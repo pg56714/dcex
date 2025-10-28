@@ -1,11 +1,12 @@
 # dcex - dex & cex trading library
 
-> Forked from [kairosresearchio/krex](https://github.com/kairosresearchio/krex), this project streamlines the [CCXT](https://github.com/ccxt/ccxt) Python library.
-> As one of the original maintainers, this fork continues active development, building upon the original foundation with enhanced design, unified DEX + CEX support, and fixes for previously unresolved issues.
+**Important**: No default broker tags are set. You may manually specify a broker tag within function arguments if needed.
+
+> Forked from [krex](https://github.com/kairosresearchio/krex), a simplified version of the [ccxt](https://github.com/ccxt/ccxt) Python library.
+
+> Originally created and maintained by the same contributor, this fork continues active development, building upon the original foundation with enhanced design, unified DEX + CEX support, and fixes for previously unresolved issues.
 
 A high-performance and lightweight Python library for interacting with cryptocurrency exchanges. dcex offers full synchronous and asynchronous support across major exchanges, designed for speed, modularity, and ease of use.
-
-**Important**: No default broker tags are set.
 
 [![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -37,12 +38,8 @@ client = dcex.binance(
     api_secret="your_api_secret"
 )
 
-# Get account balance
-balance = client.get_account_balance()
-print(balance)
-
 # Get market data
-klines = client.get_klines(symbol="BTCUSDT", interval="1h")
+klines = client.get_klines(product_symbol="BTCUSDT", interval="1h")
 print(klines)
 ```
 
@@ -61,12 +58,8 @@ async def main():
     )
 
     try:
-        # Get account balance
-        balance = await client.get_account_balance()
-        print(balance)
-
         # Get market data
-        klines = await client.get_klines(symbol="BTCUSDT", interval="1h")
+        klines = await client.get_klines(product_symbol="BTCUSDT", interval="1h")
         print(klines)
 
     finally:
@@ -80,13 +73,13 @@ if __name__ == "__main__":
 
 | Exchange        | Sync Support | Async Support |
 | --------------- | ------------ | ------------- |
-| **Binance**     | ✅           | ✅            |
-| **Bybit**       | ✅           | ✅            |
+| **Binance**     | Testing      | Testing       |
+| **Bybit**       | Testing      | Testing       |
 | **OKX**         | ✅           | ✅            |
-| **BitMart**     | ✅           | ✅            |
-| **Gate.io**     | ✅           | ✅            |
-| **Hyperliquid** | ✅           | ✅            |
-| **BitMEX**      | ✅           | ✅            |
+| **BitMart**     | Testing      | Testing       |
+| **Gate.io**     | Testing      | Testing       |
+| **Hyperliquid** | Testing      | Testing       |
+| **BitMEX**      | Testing      | Testing       |
 | **BingX**       | Developing   | Developing    |
 | **AscendEX**    | Developing   | Developing    |
 | **KuCoin**      | Developing   | Developing    |
@@ -124,18 +117,17 @@ It is a table that contains the following columns:
 In most cases, we have handled the case, but if you have any specific use cases, you can use the `ptm` to get the information you want.
 
 ```python
-
 import dcex
 
-binance = dcex.binance()
+bn = dcex.binance()
 
-btcusdt_product_symbol = binance.ptm.get_product_symbol(
+product_symbol = bn.ptm.get_product_symbol(
     exchange="binance",
     exchange_symbol="BTCUSDT",
     product_type="swap",
 )
 
-print(btcusdt_product_symbol)
+print(product_symbol)
 ```
 
 ## 🤝 Contributing
