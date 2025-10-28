@@ -1,16 +1,35 @@
-name: Publish to PyPI
+name: Release and Publish
+
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+
+permissions:
+  contents: write
+
 jobs:
-  publish:
+  release_and_publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Create bump and changelog
+        id: cz
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          changelog_increment_filename: body.md
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: "body.md"
+          tag_name: ${{ steps.cz.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,11 +42,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - name: Build and publish
+      - name: Publish to PyPI
         env:
           UV_PUBLISH_USERNAME: "__token__"
           UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          echo "Publishing version ${{ github.ref_name }} to PyPI..."
+          echo "Publishing version ${{ steps.cz.outputs.version }} to PyPI..."
           uv build
           uv publish
