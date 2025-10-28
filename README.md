@@ -39,7 +39,7 @@ client = dcex.binance(
 )
 
 # Get market data
-klines = client.get_klines(product_symbol="BTCUSDT", interval="1h")
+klines = client.get_klines(product_symbol="BTC-USDT-SWAP", interval="1h")
 print(klines)
 ```
 
@@ -59,7 +59,7 @@ async def main():
 
     try:
         # Get market data
-        klines = await client.get_klines(product_symbol="BTCUSDT", interval="1h")
+        klines = await client.get_klines(product_symbol="BTC-USDT-SWAP", interval="1h")
         print(klines)
 
     finally:
