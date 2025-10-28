@@ -1,0 +1,31 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-check:
+    name: Lint, Format, Type Check, Test
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint (ruff)
+        run: uv run ruff check . --fix
+
+      - name: Format (ruff format)
+        run: uv run ruff format .
+
+      - name: Type check (pyright)
+        run: uv run pyright
+
+      - name: Run unit tests
+        run: uv run pytest -m "not private"

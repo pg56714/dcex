@@ -1,0 +1,11 @@
+name: Auto Assign Pull Request
+on: pull_request
+
+jobs:
+  add-reviews:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: kentaro-m/auto-assign-action@v2.0.0

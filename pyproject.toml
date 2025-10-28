@@ -1,0 +1,162 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=75.8.2"]
+
+[project]
+authors = [
+  {name = "Sam Hong"},
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "httpx>=0.28.1",
+  "polars>=1.27.1",
+  "requests>=2.32.3",
+  "msgspec>=0.18.0",
+]
+description = "A Lightweight Python Package for Low-Latency and Cross-Exchange Trading."
+license = {text = "MIT"}
+name = "dcex"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "0.1.0"
+
+[tool.uv]
+default-groups = ["dev"]
+
+[project.urls]
+Repository = "https://github.com/pg56714/dcex"
+
+[dependency-groups]
+dev = [
+  "pre-commit>=4.1.0",
+  "python-dotenv>=1.2.1",
+  "pytest-asyncio>=0.26.0",
+  "commitizen>=4.8.3",
+  "pyright[nodejs]>=1.1.407",
+  "ruff>=0.14.2",
+  "pytest>=8.4.2",
+  "pytest-cov>=7.0.0",
+  "ipython>=9.6.0",
+  "nest-asyncio>=1.6.0",
+]
+
+[tool.commitizen]
+major_version_zero = true
+name = "cz_conventional_commits"
+tag_format = "v$version"
+update_changelog_on_bump = true
+version_provider = "uv"
+version_scheme = "pep440"
+
+[tool.ruff] # https://docs.astral.sh/ruff/settings/#top-level
+exclude = [".venv", "tests", "examples"]
+line-length = 100
+
+[tool.ruff.lint] # https://docs.astral.sh/ruff/settings/#lint
+extend-select = [
+  # "ERA001", # commented-out-code
+  "FAST001", # fast-api-redundant-response-model
+  "FAST002", # fast-api-non-annotated-dependency
+  "D100", # missing-module-docstring
+  "D101", # undocumented-public-class
+  "D102", # missing-class-docstring
+  "D103", # undocumented-public-function
+  "D213", # multi-line-summary-second-line
+  "D400", # missing-trailing-period
+]
+select = [
+  "B", # flake8-bugbear
+  "E", # pycodestyle
+  "F", # pyflakes
+  "I", # isort
+  "S", # bandit
+  "W", # pycodestyle
+  "UP", # pyupgrade
+  "C4", # flake8-comprehensions
+  "ANN", # flake8-annotations
+  "TRY", # tryceratops
+  "PERF", # perflint
+  "ASYNC", # flake8-async
+]
+
+# Globally ignore noisy rules
+ignore = [
+  "E402", # module level import not at top of file
+  "TRY003", # Avoid specifying long messages outside the exception class
+  "TRY301", # Abstract `raise` to an inner function
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+  "S101", # Allow use of assert statements in tests
+  "S105", # hardcoded-password-string
+  "S106", # hardcoded-password-func-arg
+]
+
+[tool.ruff.format] # https://docs.astral.sh/ruff/settings/#format
+quote-style = "double" # Quote style, double quotes are default
+
+[tool.coverage.run]
+branch = true
+omit = [
+  "tests/*",
+  ".venv/*",
+  "examples/*",
+]
+source = ["dcex"]
+
+[tool.coverage.report]
+exclude_also = [
+  "def __repr__",
+  "if self\\.debug",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "class .*\\bProtocol\\):",
+  "@(abc\\.)?abstractmethod",
+]
+ignore_errors = true
+show_missing = true
+# skip_covered = true
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.html] #  pytest --cov=dcex --cov-report=html
+directory = "coverage_html_report"
+show_contexts = true
+title = "Coverage Report"
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers"
+filterwarnings = [
+  "error",
+  "ignore::pytest.PytestUnraisableExceptionWarning",
+  "ignore::ResourceWarning",
+  "ignore::pytest.PytestCollectionWarning",
+  "ignore:Module.*was never imported",
+  "ignore:No data was collected",
+  "ignore:Failed to generate report",
+]
+markers = [
+  "asyncio: marks tests as asyncio tests",
+  "private: marks tests that require private API keys",
+]
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+
+[tool.pyright]
+exclude = [
+  ".venv",
+  "tests",
+  "examples",
+]
+typeCheckingMode = "basic"
+venv = ".venv"
+venvPath = "."
