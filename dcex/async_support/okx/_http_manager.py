@@ -3,8 +3,6 @@
 import base64
 import hmac
 import logging
-import socket
-import ssl
 from dataclasses import dataclass, field
 from typing import Any, Self
 
@@ -128,8 +126,6 @@ class HTTPManager:
     session: httpx.AsyncClient | None = field(init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    context = ssl.create_default_context()
-    context.set_ciphers("ECDHE-ECDSA-CHACHA20-POLY1305")
 
     async def async_init(self) -> Self:
         """
@@ -138,21 +134,7 @@ class HTTPManager:
         Returns:
             Self instance
         """
-        # Build socket options for TCP optimization (only basic options for compatibility)
-        socket_options = [
-            (socket.IPPROTO_TCP, socket.TCP_NODELAY, 1),  # Disable Nagle's algorithm
-        ]
-
-        # Create custom transport with socket configuration
-        transport = httpx.AsyncHTTPTransport(
-            socket_options=socket_options,
-            # Additional transport settings for performance
-            retries=0,  # Handle retries at application level
-        )
-
-        self.session = httpx.AsyncClient(
-            timeout=self.timeout, verify=self.context, transport=transport
-        )
+        self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self.logger or logging.getLogger(__name__)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.OKX)
