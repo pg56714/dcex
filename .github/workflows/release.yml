@@ -47,6 +47,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ needs.bump_version.outputs.cz_version }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -64,6 +65,8 @@ jobs:
           UV_PUBLISH_USERNAME: "__token__"
           UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          echo "Publishing version ${{ needs.bump_version.outputs.cz_version }} to PyPI..."
+          VERSION=${{ needs.bump_version.outputs.cz_version }}
+          echo "Publishing version $VERSION to PyPI..."
+          rm -rf dist/
           uv build
           uv publish
