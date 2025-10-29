@@ -25,17 +25,22 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           changelog_increment_filename: body.md
 
+      - name: Debug cz output
+        run: echo "Bumped version is ${{ steps.cz.outputs.version }}"
+
       - name: Release
+        if: ${{ steps.cz.outputs.version != '' }}
         uses: softprops/action-gh-release@v1
         with:
           body_path: "body.md"
           tag_name: ${{ steps.cz.outputs.version }}
+          name: v${{ steps.cz.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish_if_bumped:
     needs: bump_version
-    if: needs.bump_version.outputs.cz_version != ''
+    if: ${{ success() && needs.bump_version.outputs.cz_version != '' }}
     runs-on: ubuntu-latest
 
     steps:
