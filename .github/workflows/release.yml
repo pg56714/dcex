@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  release_and_publish:
+  bump_version:
     runs-on: ubuntu-latest
     outputs:
       cz_version: ${{ steps.cz.outputs.version }}
@@ -25,9 +25,17 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           changelog_increment_filename: body.md
 
-  release_and_publish_if_bumped:
-    needs: release_and_publish
-    if: needs.release_and_publish.outputs.cz_version != ''
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: "body.md"
+          tag_name: ${{ steps.cz.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish_if_bumped:
+    needs: bump_version
+    if: needs.bump_version.outputs.cz_version != ''
     runs-on: ubuntu-latest
 
     steps:
@@ -46,19 +54,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: "body.md"
-          tag_name: ${{ needs.release_and_publish.outputs.cz_version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish to PyPI
         env:
           UV_PUBLISH_USERNAME: "__token__"
           UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          echo "Publishing version ${{ needs.release_and_publish.outputs.cz_version }} to PyPI..."
+          echo "Publishing version ${{ needs.bump_version.outputs.cz_version }} to PyPI..."
           uv build
           uv publish
