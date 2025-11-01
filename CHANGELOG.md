@@ -1,3 +1,9 @@
+## 0.4.1 (2025-11-01)
+
+### Fix
+
+- **ci**: update release workflow
+
 ## 0.4.0 (2025-11-01)
 
 ### Feat
