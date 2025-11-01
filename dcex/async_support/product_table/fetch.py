@@ -696,50 +696,6 @@ async def kucoin() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
-async def ascendex() -> pl.DataFrame:
-    """
-    Fetch market information from AscendEX exchange.
-
-    Retrieves trading pairs from AscendEX including spot markets.
-    Standardizes the data into MarketInfo format.
-
-    Returns:
-        Polars DataFrame containing standardized market information from AscendEX.
-    """
-    from ..ascendex._market_http import MarketHTTP
-
-    market_http = MarketHTTP()
-    await market_http.async_init()
-    markets = []
-    res = await market_http.get_spot_instrument_info()
-    data = res.get("data", [])
-    for market in data:
-        symbol = market.get("symbol", "")
-
-        if "/" in symbol:
-            base, quote = symbol.split("/")
-        else:
-            continue
-        product_symbol = f"{base}-{quote}-SPOT"
-        markets.append(
-            MarketInfo(
-                exchange=Common.ASCENDEX,
-                exchange_symbol=symbol,
-                product_symbol=product_symbol,
-                product_type="spot",
-                exchange_type="spot",
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=str(market.get("tickSize", "0")),
-                size_precision=str(market.get("lotSize", "0")),
-                min_size=str(market.get("minQty", "0")),
-                min_notional=str(market.get("minNotional", "0")),
-            )
-        )
-    markets = [market.to_dict() for market in markets]
-    return pl.DataFrame(markets)
-
-
 async def bitmex() -> pl.DataFrame:
     """
     Fetch market information from BitMEX exchange.

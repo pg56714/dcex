@@ -8,7 +8,6 @@ which return an initialized async client (after awaiting `async_init`).
 # Import exchange client classes and create callable functions
 from typing import Any, cast
 
-from .ascendex.client import Client as AscendexClient
 from .binance.client import Client as BinanceClient
 from .bingx.client import Client as BingXClient
 from .bitmart.client import Client as BitmartClient
@@ -19,13 +18,6 @@ from .hyperliquid.client import Client as HyperliquidClient
 from .kucoin.client import Client as KuCoinClient
 from .okx.client import Client as OKXClient
 from .zoomex.client import Client as ZoomexClient
-
-
-async def ascendex(
-    **kwargs: Any,  # noqa: ANN401
-) -> AscendexClient:
-    """Create and initialize an AscendEX client instance."""
-    return cast(AscendexClient, await AscendexClient(**kwargs).async_init())
 
 
 async def binance(
@@ -99,7 +91,6 @@ async def zoomex(
 
 
 __all__ = [
-    "ascendex",
     "binance",
     "bingx",
     "bitmart",

@@ -13,7 +13,6 @@ from typing import Any
 import polars as pl
 
 from .fetch import (
-    ascendex,
     binance,
     bingx,
     bitmart,
@@ -27,7 +26,6 @@ from .fetch import (
 )
 
 VALID_EXCHANGES = [
-    ascendex,
     binance,
     bingx,
     bitmart,

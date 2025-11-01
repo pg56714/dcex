@@ -14,7 +14,6 @@ class Common(str, Enum):
     HYPERLIQUID = "hyperliquid"
     BINGX = "bingx"
     KUCOIN = "kucoin"
-    ASCENDEX = "ascendex"
     BITMEX = "bitmex"
     ZOOMEX = "zoomex"
 
