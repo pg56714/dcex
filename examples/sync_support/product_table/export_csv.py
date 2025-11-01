@@ -10,7 +10,10 @@ def test_fetch_product_tables():
         print(manager.product_table.head())
 
         csv_filename = "product_table.csv"
-        manager.product_table.write_csv(csv_filename)
+        # Get CSV string from Polars and write with UTF-8-BOM encoding to prevent Chinese character corruption
+        csv_string = manager.product_table.write_csv()
+        with open(csv_filename, "w", encoding="utf-8-sig", newline="") as f:
+            f.write(csv_string)
         print(f"📁 Data successfully exported to {csv_filename}")
     else:
         print(

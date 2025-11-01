@@ -8,9 +8,9 @@
 
 A high-performance and lightweight Python library for interacting with cryptocurrency exchanges. dcex offers full synchronous and asynchronous support across major exchanges, designed for speed, modularity, and ease of use.
 
-[![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PyPI version](https://badge.fury.io/py/dcex.svg)](https://badge.fury.io/py/dcex)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI](https://img.shields.io/pypi/v/dcex)](https://badge.fury.io/py/dcex)
 
 ## 📦 Installation
 
@@ -133,12 +133,6 @@ print(product_symbol)
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](.github/CONTRIBUTING.md) for details.
-
-### Contributors
-
-<a href="https://github.com/pg56714/dcex/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=pg56714/dcex" />
-</a>
 
 ## 📄 License
 
