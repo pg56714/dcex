@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cz_version: ${{ steps.cz.outputs.version }}
+      has_bump: ${{ steps.check_bump.outputs.has_bump }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,11 +26,24 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           changelog_increment_filename: body.md
 
-      - name: Debug cz output
-        run: echo "Bumped version is ${{ steps.cz.outputs.version }}"
+      - name: Check if bump occurred
+        id: check_bump
+        run: |
+          if grep -q "\[NO_COMMITS_TO_BUMP\]" body.md; then
+            echo "No version bump detected."
+            echo "has_bump=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version bump detected."
+            echo "has_bump=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Debug output
+        run: |
+          echo "Bumped version: ${{ steps.cz.outputs.version }}"
+          echo "Has bump: ${{ steps.check_bump.outputs.has_bump }}"
 
       - name: Release
-        if: ${{ steps.cz.outputs.version != '' }}
+        if: ${{ steps.check_bump.outputs.has_bump == 'true' }}
         uses: softprops/action-gh-release@v1
         with:
           body_path: "body.md"
@@ -40,7 +54,7 @@ jobs:
 
   publish_if_bumped:
     needs: bump_version
-    if: ${{ success() && needs.bump_version.outputs.cz_version != '' }}
+    if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -67,8 +81,6 @@ jobs:
         run: |
           VERSION=${{ needs.bump_version.outputs.cz_version }}
           echo "Publishing version $VERSION to PyPI..."
-          if [ -d "dist" ]; then
-            rm -rf dist
-          fi
+          rm -rf dist
           uv build
           uv publish
