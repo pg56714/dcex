@@ -1,3 +1,10 @@
+## 0.4.0 (2025-11-01)
+
+### Feat
+
+- **ascendex**: initial implementation
+- add binance exchange support (api, fapi)
+
 ## 0.3.4 (2025-10-29)
 
 ### Fix
