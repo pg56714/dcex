@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
 | Exchange        | Sync Support | Async Support |
 | --------------- | ------------ | ------------- |
-| **Binance**     | Testing      | Testing       |
+| **Binance**     | ✅           | ✅            |
 | **Bybit**       | Testing      | Testing       |
 | **OKX**         | ✅           | ✅            |
 | **BitMart**     | Testing      | Testing       |
@@ -82,6 +82,7 @@ if __name__ == "__main__":
 | **BitMEX**      | Testing      | Testing       |
 | **BingX**       | Developing   | Developing    |
 | **KuCoin**      | Developing   | Developing    |
+| **Zoomex**      | Developing   | Developing    |
 
 ## 🔍 Key Features
 
