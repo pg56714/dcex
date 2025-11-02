@@ -117,12 +117,13 @@ It is a table that contains the following columns:
 In most cases, we have handled the case, but if you have any specific use cases, you can use the `ptm` to get the information you want.
 
 ```python
-import dcex
+from dcex.product_table.manager import ProductTableManager
+from dcex.utils.common import Common
 
-bn = dcex.binance()
+ptm = ProductTableManager.get_instance(Common.BINANCE)
 
-product_symbol = bn.ptm.get_product_symbol(
-    exchange="binance",
+product_symbol = ptm.get_product_symbol(
+    exchange=Common.BINANCE,
     exchange_symbol="BTCUSDT",
     product_type="swap",
 )
