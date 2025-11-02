@@ -1,3 +1,13 @@
+## 0.5.0 (2025-11-02)
+
+### Feat
+
+- add bybit exchange support
+
+### Fix
+
+- **ci**: update release workflow
+
 ## 0.4.1 (2025-11-01)
 
 ### Fix
