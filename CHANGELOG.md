@@ -1,3 +1,9 @@
+## 0.6.0 (2025-11-02)
+
+### Feat
+
+- add bitmart exchange support
+
 ## 0.5.0 (2025-11-02)
 
 ### Feat
