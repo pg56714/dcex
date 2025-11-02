@@ -1,3 +1,9 @@
+## 0.6.1 (2025-11-02)
+
+### Fix
+
+- **ci**: update release workflow
+
 ## 0.6.0 (2025-11-02)
 
 ### Feat
