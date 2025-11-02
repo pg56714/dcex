@@ -29,11 +29,19 @@ jobs:
       - name: Check if bump occurred
         id: check_bump
         run: |
-          if grep -q "\[NO_COMMITS_TO_BUMP\]" body.md; then
-            echo "No version bump detected."
-            echo "has_bump=false" >> $GITHUB_OUTPUT
+          echo "Checking body.md for version bump status..."
+          if [ -f body.md ]; then
+            echo "body.md exists, checking content:"
+            cat body.md
+            if grep -q "NO_COMMITS_TO_BUMP" body.md; then
+              echo "No version bump detected (found NO_COMMITS_TO_BUMP)."
+              echo "has_bump=false" >> $GITHUB_OUTPUT
+            else
+              echo "Version bump detected (no NO_COMMITS_TO_BUMP found)."
+              echo "has_bump=true" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "Version bump detected."
+            echo "body.md not found, assuming version bump."
             echo "has_bump=true" >> $GITHUB_OUTPUT
           fi
 
