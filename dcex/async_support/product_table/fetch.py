@@ -65,6 +65,295 @@ class MarketInfo:
         return asdict(self)
 
 
+async def binance() -> pl.DataFrame:
+    """
+    Fetch market information from Binance exchange.
+
+    Retrieves trading pairs from Binance including spot and futures markets.
+    Standardizes the data into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from Binance.
+    """
+    from ..binance._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    await market_http.async_init()
+
+    markets = []
+    res_spot = await market_http.get_spot_exchange_info()
+    df_spot = to_dataframe(res_spot.get("symbols", []))
+    for market in df_spot.iter_rows(named=True):
+        base = market["baseAsset"]
+        quote = market["quoteAsset"]
+        product_symbol = f"{base}-{quote}-SPOT"
+
+        price_filter = next((f for f in market["filters"] if f["filterType"] == "PRICE_FILTER"), {})
+        lot_size_filter = next((f for f in market["filters"] if f["filterType"] == "LOT_SIZE"), {})
+        min_notional_filter = next(
+            (f for f in market["filters"] if f["filterType"] == "NOTIONAL"), {}
+        )
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BINANCE,
+                exchange_symbol=market["symbol"],
+                product_symbol=product_symbol,
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=market["baseAsset"],
+                quote_currency=market["quoteAsset"],
+                price_precision=price_filter.get("tickSize", "0"),
+                size_precision=lot_size_filter.get("stepSize", "0"),
+                min_size=lot_size_filter.get("minQty", "0"),
+                min_notional=str(float(min_notional_filter.get("minNotional", "0"))),
+            )
+        )
+
+    res_futures = await market_http.get_futures_exchange_info()
+    df_futures = to_dataframe(res_futures.get("symbols", []))
+    for market in df_futures.iter_rows(named=True):
+        base = market["baseAsset"]
+        quote = market["quoteAsset"]
+
+        parts = market["symbol"].split("_")
+        if len(parts) >= 2:
+            expiry_str = parts[1]
+            product_symbol = f"{base}-{quote}-{expiry_str}-SWAP"
+        else:
+            product_symbol = f"{base}-{quote}-SWAP"
+
+        price_filter = next((f for f in market["filters"] if f["filterType"] == "PRICE_FILTER"), {})
+        lot_size_filter = next((f for f in market["filters"] if f["filterType"] == "LOT_SIZE"), {})
+        min_notional_filter = next(
+            (f for f in market["filters"] if f["filterType"] == "MIN_NOTIONAL"), {}
+        )
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BINANCE,
+                exchange_symbol=market["symbol"],
+                product_symbol=product_symbol,
+                product_type="swap",
+                exchange_type=market["contractType"],
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=price_filter.get("tickSize", "0"),
+                size_precision=lot_size_filter.get("stepSize", "0"),
+                min_size=lot_size_filter.get("minQty", "0"),
+                min_notional=min_notional_filter.get("notional", "0"),
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
+async def bingx() -> pl.DataFrame:
+    """
+    Fetch market information from BingX exchange.
+
+    Retrieves trading pairs from BingX including swap markets.
+    Standardizes the data into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from BingX.
+    """
+    from ..bingx._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    await market_http.async_init()
+
+    markets = []
+    res = await market_http.get_swap_instrument_info()
+    df = to_dataframe(res.get("data", []))
+
+    for market in df.iter_rows(named=True):
+        symbol = market["symbol"]
+
+        if "-" in symbol:
+            base, quote = symbol.rsplit("-", 1)
+
+        product_symbol = f"{base}-{quote}-SWAP"
+
+        price_precision_val = int(market.get("pricePrecision", 0))
+        quantity_precision_val = int(market.get("quantityPrecision", 0))
+
+        price_precision = (
+            str(reverse_decimal_places(price_precision_val)) if price_precision_val > 0 else "0"
+        )
+        size_precision = (
+            str(reverse_decimal_places(quantity_precision_val))
+            if quantity_precision_val > 0
+            else "0"
+        )
+        min_size = size_precision
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BINGX,
+                exchange_symbol=symbol,
+                product_symbol=product_symbol,
+                product_type="swap",
+                exchange_type="perpetual",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=price_precision,
+                size_precision=size_precision,
+                min_size=min_size,
+                min_notional=str(market.get("tradeMinUSDT", "0")),
+                size_per_contract=str(market.get("size", "1")),
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
+async def bitmart() -> pl.DataFrame:
+    """
+    Fetch market information from BitMart exchange.
+
+    Retrieves trading pairs from BitMart including swap and spot markets.
+    Standardizes the data into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from BitMart.
+    """
+    from ..bitmart._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    await market_http.async_init()
+
+    markets = []
+    res_swap = await market_http.get_contracts_details()
+    df_swap = to_dataframe(res_swap.get("data", {}).get("symbols", []))
+    for market in df_swap.iter_rows(named=True):
+        base = market["base_currency"]
+        quote = market["quote_currency"]
+        product_symbol = f"{base}-{quote}-SWAP"
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BITMART,
+                exchange_symbol=market["symbol"],
+                product_symbol=product_symbol,
+                product_type="swap",
+                exchange_type="swap",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=market["price_precision"],
+                size_precision=market["vol_precision"],
+                min_size=market["min_volume"],
+                size_per_contract=market["contract_size"],
+            )
+        )
+
+    res_spot = await market_http.get_trading_pairs_details()
+    df_spot = to_dataframe(res_spot.get("data", {}).get("symbols", []))
+    for market in df_spot.iter_rows(named=True):
+        base = market["base_currency"]
+        quote = market["quote_currency"]
+        product_symbol = f"{base}-{quote}-SPOT"
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BITMART,
+                exchange_symbol=market["symbol"],
+                product_symbol=product_symbol,
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(reverse_decimal_places(market["price_max_precision"])),
+                size_precision=market["quote_increment"],
+                min_size=market["base_min_size"],
+                min_notional=market["min_buy_amount"],
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
+async def bitmex() -> pl.DataFrame:
+    """
+    Fetch market information from BitMEX exchange.
+
+    Retrieves trading pairs from BitMEX including swap, futures, and spot markets.
+    Standardizes the data into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from BitMEX.
+    """
+    from ..bitmex._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    await market_http.async_init()
+
+    res = await market_http.get_instrument_info(filter={"state": ["FFWCSX", "FFCCSX", "IFXXXP"]})
+
+    if not isinstance(res, list):
+        res = []
+
+    typ_map = {
+        "FFWCSX": "swap",
+        "FFCCSX": "futures",
+        "IFXXXP": "spot",
+    }
+
+    markets = []
+    for market in res:
+        if not isinstance(market, dict):
+            continue
+
+        typ = market.get("typ", "")
+        product_type = typ_map.get(typ)
+        if not product_type:
+            continue
+
+        symbol = market["symbol"]
+        base = market.get("underlying", "")
+        quote = market["quoteCurrency"]
+        price_precision = str(market["tickSize"])
+        size_precision = str(market["lotSize"])
+        min_size = str(market["lotSize"])
+        size_per_contract = str(market["multiplier"])
+        min_notional = "0"
+
+        if typ == "IFXXXP":
+            product_symbol = f"{base}-{quote}-SPOT"
+        elif typ == "FFWCSX":
+            product_symbol = f"{base}-{quote}-SWAP"
+        elif typ == "FFCCSX":
+            if (base + quote) in symbol:
+                expiry_str = symbol.replace(base + quote, "", 1)
+            else:
+                expiry_str = symbol.replace(base, "", 1)
+            product_symbol = f"{base}-{quote}-{expiry_str}-SWAP"
+        else:
+            product_symbol = symbol
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BITMEX,
+                exchange_symbol=symbol,
+                product_symbol=product_symbol,
+                product_type=product_type,
+                exchange_type=typ,
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=price_precision,
+                size_precision=size_precision,
+                min_size=min_size,
+                min_notional=min_notional,
+                size_per_contract=size_per_contract,
+            ).to_dict()
+        )
+
+    return pl.DataFrame(markets)
+
+
 async def bybit() -> pl.DataFrame:
     """
     Fetch market information from Bybit exchange.
@@ -204,158 +493,6 @@ async def bybit() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
-async def okx() -> pl.DataFrame:
-    """
-    Fetch market information from OKX exchange.
-
-    Retrieves trading pairs from OKX including swap, spot, and futures markets.
-    Standardizes the data into MarketInfo format.
-
-    Returns:
-        Polars DataFrame containing standardized market information from OKX.
-    """
-    from ..okx._public_http import PublicHTTP
-
-    public_http = PublicHTTP(preload_product_table=False)
-    await public_http.async_init()
-
-    markets = []
-    res_swap = await public_http.get_public_instruments(instType="SWAP")
-    df_swap = to_dataframe(res_swap["data"]) if "data" in res_swap else pl.DataFrame()
-    for market in df_swap.iter_rows(named=True):
-        parts = market["instId"].split("-")
-        if len(parts) >= 2:
-            base, quote = parts[0], parts[1]
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.OKX,
-                exchange_symbol=market["instId"],
-                product_symbol=market["instId"],
-                product_type="swap",
-                exchange_type=market["instType"],
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=market["tickSz"],
-                size_precision=market["lotSz"],
-                min_size=market["minSz"],
-                size_per_contract=market["ctVal"],
-            )
-        )
-
-    res_spot = await public_http.get_public_instruments(instType="SPOT")
-    df_spot = to_dataframe(res_spot["data"]) if "data" in res_spot else pl.DataFrame()
-    for market in df_spot.iter_rows(named=True):
-        base = market["baseCcy"]
-        quote = market["quoteCcy"]
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.OKX,
-                exchange_symbol=market["instId"],
-                product_symbol=market["instId"] + "-SPOT",
-                product_type="spot",
-                exchange_type=market["instType"],
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=market["tickSz"],
-                size_precision=market["lotSz"],
-                min_size=market["minSz"],
-            )
-        )
-
-    res_futures = await public_http.get_public_instruments(instType="FUTURES")
-    df_futures = to_dataframe(res_futures["data"]) if "data" in res_futures else pl.DataFrame()
-    for market in df_futures.iter_rows(named=True):
-        parts = market["instId"].split("-")
-        if len(parts) >= 2:
-            base, quote = parts[0], parts[1]
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.OKX,
-                exchange_symbol=market["instId"],
-                product_symbol=market["instId"],
-                product_type="futures",
-                exchange_type=market["instType"],
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=market["tickSz"],
-                size_precision=market["lotSz"],
-                min_size=market["minSz"],
-            )
-        )
-
-    markets = [market.to_dict() for market in markets]
-    return pl.DataFrame(markets)
-
-
-async def bitmart() -> pl.DataFrame:
-    """
-    Fetch market information from BitMart exchange.
-
-    Retrieves trading pairs from BitMart including swap and spot markets.
-    Standardizes the data into MarketInfo format.
-
-    Returns:
-        Polars DataFrame containing standardized market information from BitMart.
-    """
-    from ..bitmart._market_http import MarketHTTP
-
-    market_http = MarketHTTP(preload_product_table=False)
-    await market_http.async_init()
-
-    markets = []
-    res_swap = await market_http.get_contracts_details()
-    df_swap = to_dataframe(res_swap.get("data", {}).get("symbols", []))
-    for market in df_swap.iter_rows(named=True):
-        base = market["base_currency"]
-        quote = market["quote_currency"]
-        product_symbol = f"{base}-{quote}-SWAP"
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.BITMART,
-                exchange_symbol=market["symbol"],
-                product_symbol=product_symbol,
-                product_type="swap",
-                exchange_type="swap",
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=market["price_precision"],
-                size_precision=market["vol_precision"],
-                min_size=market["min_volume"],
-                size_per_contract=market["contract_size"],
-            )
-        )
-
-    res_spot = await market_http.get_trading_pairs_details()
-    df_spot = to_dataframe(res_spot.get("data", {}).get("symbols", []))
-    for market in df_spot.iter_rows(named=True):
-        base = market["base_currency"]
-        quote = market["quote_currency"]
-        product_symbol = f"{base}-{quote}-SPOT"
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.BITMART,
-                exchange_symbol=market["symbol"],
-                product_symbol=product_symbol,
-                product_type="spot",
-                exchange_type="spot",
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=str(reverse_decimal_places(market["price_max_precision"])),
-                size_precision=market["quote_increment"],
-                min_size=market["base_min_size"],
-                min_notional=market["min_buy_amount"],
-            )
-        )
-
-    markets = [market.to_dict() for market in markets]
-    return pl.DataFrame(markets)
-
-
 async def gateio() -> pl.DataFrame:
     """
     Fetch market information from Gate.io exchange.
@@ -453,90 +590,6 @@ async def gateio() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
-async def binance() -> pl.DataFrame:
-    """
-    Fetch market information from Binance exchange.
-
-    Retrieves trading pairs from Binance including spot and futures markets.
-    Standardizes the data into MarketInfo format.
-
-    Returns:
-        Polars DataFrame containing standardized market information from Binance.
-    """
-    from ..binance._market_http import MarketHTTP
-
-    market_http = MarketHTTP(preload_product_table=False)
-    await market_http.async_init()
-
-    markets = []
-    res_spot = await market_http.get_spot_exchange_info()
-    df_spot = to_dataframe(res_spot.get("symbols", []))
-    for market in df_spot.iter_rows(named=True):
-        base = market["baseAsset"]
-        quote = market["quoteAsset"]
-        product_symbol = f"{base}-{quote}-SPOT"
-
-        price_filter = next((f for f in market["filters"] if f["filterType"] == "PRICE_FILTER"), {})
-        lot_size_filter = next((f for f in market["filters"] if f["filterType"] == "LOT_SIZE"), {})
-        min_notional_filter = next(
-            (f for f in market["filters"] if f["filterType"] == "NOTIONAL"), {}
-        )
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.BINANCE,
-                exchange_symbol=market["symbol"],
-                product_symbol=product_symbol,
-                product_type="spot",
-                exchange_type="spot",
-                base_currency=market["baseAsset"],
-                quote_currency=market["quoteAsset"],
-                price_precision=price_filter.get("tickSize", "0"),
-                size_precision=lot_size_filter.get("stepSize", "0"),
-                min_size=lot_size_filter.get("minQty", "0"),
-                min_notional=str(float(min_notional_filter.get("minNotional", "0"))),
-            )
-        )
-
-    res_futures = await market_http.get_futures_exchange_info()
-    df_futures = to_dataframe(res_futures.get("symbols", []))
-    for market in df_futures.iter_rows(named=True):
-        base = market["baseAsset"]
-        quote = market["quoteAsset"]
-
-        parts = market["symbol"].split("_")
-        if len(parts) >= 2:
-            expiry_str = parts[1]
-            product_symbol = f"{base}-{quote}-{expiry_str}-SWAP"
-        else:
-            product_symbol = f"{base}-{quote}-SWAP"
-
-        price_filter = next((f for f in market["filters"] if f["filterType"] == "PRICE_FILTER"), {})
-        lot_size_filter = next((f for f in market["filters"] if f["filterType"] == "LOT_SIZE"), {})
-        min_notional_filter = next(
-            (f for f in market["filters"] if f["filterType"] == "MIN_NOTIONAL"), {}
-        )
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.BINANCE,
-                exchange_symbol=market["symbol"],
-                product_symbol=product_symbol,
-                product_type="swap",
-                exchange_type=market["contractType"],
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=price_filter.get("tickSize", "0"),
-                size_precision=lot_size_filter.get("stepSize", "0"),
-                min_size=lot_size_filter.get("minQty", "0"),
-                min_notional=min_notional_filter.get("notional", "0"),
-            )
-        )
-
-    markets = [market.to_dict() for market in markets]
-    return pl.DataFrame(markets)
-
-
 async def hyperliquid() -> pl.DataFrame:
     """
     Fetch market information from Hyperliquid exchange.
@@ -604,67 +657,6 @@ async def hyperliquid() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
-async def bingx() -> pl.DataFrame:
-    """
-    Fetch market information from BingX exchange.
-
-    Retrieves trading pairs from BingX including swap markets.
-    Standardizes the data into MarketInfo format.
-
-    Returns:
-        Polars DataFrame containing standardized market information from BingX.
-    """
-    from ..bingx._market_http import MarketHTTP
-
-    market_http = MarketHTTP(preload_product_table=False)
-    await market_http.async_init()
-
-    markets = []
-    res = await market_http.get_swap_instrument_info()
-    df = to_dataframe(res.get("data", []))
-
-    for market in df.iter_rows(named=True):
-        symbol = market["symbol"]
-
-        if "-" in symbol:
-            base, quote = symbol.rsplit("-", 1)
-
-        product_symbol = f"{base}-{quote}-SWAP"
-
-        price_precision_val = int(market.get("pricePrecision", 0))
-        quantity_precision_val = int(market.get("quantityPrecision", 0))
-
-        price_precision = (
-            str(reverse_decimal_places(price_precision_val)) if price_precision_val > 0 else "0"
-        )
-        size_precision = (
-            str(reverse_decimal_places(quantity_precision_val))
-            if quantity_precision_val > 0
-            else "0"
-        )
-        min_size = size_precision
-
-        markets.append(
-            MarketInfo(
-                exchange=Common.BINGX,
-                exchange_symbol=symbol,
-                product_symbol=product_symbol,
-                product_type="swap",
-                exchange_type="perpetual",
-                base_currency=base,
-                quote_currency=quote,
-                price_precision=price_precision,
-                size_precision=size_precision,
-                min_size=min_size,
-                min_notional=str(market.get("tradeMinUSDT", "0")),
-                size_per_contract=str(market.get("size", "1")),
-            )
-        )
-
-    markets = [market.to_dict() for market in markets]
-    return pl.DataFrame(markets)
-
-
 async def kucoin() -> pl.DataFrame:
     """
     Fetch market information from KuCoin exchange.
@@ -709,81 +701,89 @@ async def kucoin() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
-async def bitmex() -> pl.DataFrame:
+async def okx() -> pl.DataFrame:
     """
-    Fetch market information from BitMEX exchange.
+    Fetch market information from OKX exchange.
 
-    Retrieves trading pairs from BitMEX including swap, futures, and spot markets.
+    Retrieves trading pairs from OKX including swap, spot, and futures markets.
     Standardizes the data into MarketInfo format.
 
     Returns:
-        Polars DataFrame containing standardized market information from BitMEX.
+        Polars DataFrame containing standardized market information from OKX.
     """
-    from ..bitmex._market_http import MarketHTTP
+    from ..okx._public_http import PublicHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
-    await market_http.async_init()
-
-    res = await market_http.get_instrument_info(filter={"state": ["FFWCSX", "FFCCSX", "IFXXXP"]})
-
-    if not isinstance(res, list):
-        res = []
-
-    typ_map = {
-        "FFWCSX": "swap",
-        "FFCCSX": "futures",
-        "IFXXXP": "spot",
-    }
+    public_http = PublicHTTP(preload_product_table=False)
+    await public_http.async_init()
 
     markets = []
-    for market in res:
-        if not isinstance(market, dict):
-            continue
-
-        typ = market.get("typ", "")
-        product_type = typ_map.get(typ)
-        if not product_type:
-            continue
-
-        symbol = market["symbol"]
-        base = market.get("underlying", "")
-        quote = market["quoteCurrency"]
-        price_precision = str(market["tickSize"])
-        size_precision = str(market["lotSize"])
-        min_size = str(market["lotSize"])
-        size_per_contract = str(market["multiplier"])
-        min_notional = "0"
-
-        if typ == "IFXXXP":
-            product_symbol = f"{base}-{quote}-SPOT"
-        elif typ == "FFWCSX":
-            product_symbol = f"{base}-{quote}-SWAP"
-        elif typ == "FFCCSX":
-            if (base + quote) in symbol:
-                expiry_str = symbol.replace(base + quote, "", 1)
-            else:
-                expiry_str = symbol.replace(base, "", 1)
-            product_symbol = f"{base}-{quote}-{expiry_str}-SWAP"
-        else:
-            product_symbol = symbol
+    res_swap = await public_http.get_public_instruments(instType="SWAP")
+    df_swap = to_dataframe(res_swap["data"]) if "data" in res_swap else pl.DataFrame()
+    for market in df_swap.iter_rows(named=True):
+        parts = market["instId"].split("-")
+        if len(parts) >= 2:
+            base, quote = parts[0], parts[1]
 
         markets.append(
             MarketInfo(
-                exchange=Common.BITMEX,
-                exchange_symbol=symbol,
-                product_symbol=product_symbol,
-                product_type=product_type,
-                exchange_type=typ,
+                exchange=Common.OKX,
+                exchange_symbol=market["instId"],
+                product_symbol=market["instId"],
+                product_type="swap",
+                exchange_type=market["instType"],
                 base_currency=base,
                 quote_currency=quote,
-                price_precision=price_precision,
-                size_precision=size_precision,
-                min_size=min_size,
-                min_notional=min_notional,
-                size_per_contract=size_per_contract,
-            ).to_dict()
+                price_precision=market["tickSz"],
+                size_precision=market["lotSz"],
+                min_size=market["minSz"],
+                size_per_contract=market["ctVal"],
+            )
         )
 
+    res_spot = await public_http.get_public_instruments(instType="SPOT")
+    df_spot = to_dataframe(res_spot["data"]) if "data" in res_spot else pl.DataFrame()
+    for market in df_spot.iter_rows(named=True):
+        base = market["baseCcy"]
+        quote = market["quoteCcy"]
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.OKX,
+                exchange_symbol=market["instId"],
+                product_symbol=market["instId"] + "-SPOT",
+                product_type="spot",
+                exchange_type=market["instType"],
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=market["tickSz"],
+                size_precision=market["lotSz"],
+                min_size=market["minSz"],
+            )
+        )
+
+    res_futures = await public_http.get_public_instruments(instType="FUTURES")
+    df_futures = to_dataframe(res_futures["data"]) if "data" in res_futures else pl.DataFrame()
+    for market in df_futures.iter_rows(named=True):
+        parts = market["instId"].split("-")
+        if len(parts) >= 2:
+            base, quote = parts[0], parts[1]
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.OKX,
+                exchange_symbol=market["instId"],
+                product_symbol=market["instId"],
+                product_type="futures",
+                exchange_type=market["instType"],
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=market["tickSz"],
+                size_precision=market["lotSz"],
+                min_size=market["minSz"],
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
     return pl.DataFrame(markets)
 
 
