@@ -74,7 +74,7 @@ if __name__ == "__main__":
 | Exchange        | Sync Support | Async Support |
 | --------------- | ------------ | ------------- |
 | **Binance**     | ✅           | ✅            |
-| **Bybit**       | Testing      | Testing       |
+| **Bybit**       | ✅           | ✅            |
 | **OKX**         | ✅           | ✅            |
 | **BitMart**     | Testing      | Testing       |
 | **Gate.io**     | Testing      | Testing       |
