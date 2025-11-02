@@ -51,22 +51,31 @@ class MarketInfo:
 
 def bybit() -> pl.DataFrame:
     """
-    Fetch product information from Bybit exchange.
+    Fetch market information from Bybit exchange.
+
+    Retrieves trading pairs from Bybit including linear futures, inverse futures,
+    and spot markets. Standardizes the data into MarketInfo format.
 
     Returns:
-        pl.DataFrame: DataFrame containing Bybit product information
+        Polars DataFrame containing standardized market information from Bybit.
     """
     from ..bybit._market_http import MarketHTTP
 
     market_http = MarketHTTP(preload_product_table=False)
 
     markets = []
-    res_linear = market_http.get_instruments_info(category="linear")
-    df_linear = (
-        to_dataframe(res_linear["result"]["list"])
-        if "list" in res_linear.get("result", {})
-        else pl.DataFrame()
-    )
+    linear_data = []
+    cursor = None
+    while True:
+        res_linear = market_http.get_instruments_info(category="linear", cursor=cursor)
+        if "list" in res_linear.get("result", {}):
+            linear_data.extend(res_linear["result"]["list"])
+        result = res_linear.get("result", {})
+        if result.get("nextPageCursor", "") == "":
+            break
+        cursor = result["nextPageCursor"]
+
+    df_linear = to_dataframe(linear_data)
     for market in df_linear.iter_rows(named=True):
         base = market["baseCoin"]
         quote = market["quoteCoin"]
@@ -99,12 +108,18 @@ def bybit() -> pl.DataFrame:
             )
         )
 
-    res_inverse = market_http.get_instruments_info(category="inverse")
-    df_inverse = (
-        to_dataframe(res_inverse["result"]["list"])
-        if "list" in res_inverse.get("result", {})
-        else pl.DataFrame()
-    )
+    inverse_data = []
+    cursor = None
+    while True:
+        res_inverse = market_http.get_instruments_info(category="inverse", cursor=cursor)
+        if "list" in res_inverse.get("result", {}):
+            inverse_data.extend(res_inverse["result"]["list"])
+        result = res_inverse.get("result", {})
+        if result.get("nextPageCursor", "") == "":
+            break
+        cursor = result["nextPageCursor"]
+
+    df_inverse = to_dataframe(inverse_data)
     for market in df_inverse.iter_rows(named=True):
         base = market["baseCoin"]
         quote = market["quoteCoin"]
@@ -136,12 +151,18 @@ def bybit() -> pl.DataFrame:
             )
         )
 
-    res_spot = market_http.get_instruments_info(category="spot")
-    df_spot = (
-        to_dataframe(res_spot["result"]["list"])
-        if "list" in res_spot.get("result", {})
-        else pl.DataFrame()
-    )
+    spot_data = []
+    cursor = None
+    while True:
+        res_spot = market_http.get_instruments_info(category="spot", cursor=cursor)
+        if "list" in res_spot.get("result", {}):
+            spot_data.extend(res_spot["result"]["list"])
+        result = res_spot.get("result", {})
+        if result.get("nextPageCursor", "") == "":
+            break
+        cursor = result["nextPageCursor"]
+
+    df_spot = to_dataframe(spot_data)
     for market in df_spot.iter_rows(named=True):
         base = market["baseCoin"]
         quote = market["quoteCoin"]
