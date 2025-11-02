@@ -30,37 +30,35 @@ uv add dcex
 
 ```python
 import dcex
-import os
 
-# Initialize client for any supported exchange
-client = dcex.binance(
-    api_key="your_api_key",
-    api_secret="your_api_secret"
-)
+client = dcex.binance()
 
-# Get market data
-klines = client.get_klines(product_symbol="BTC-USDT-SWAP", interval="1h")
+klines = client.get_klines(product_symbol="BTC-USDT-SWAP", interval="1m")
 print(klines)
 ```
 
 ### Asynchronous Usage
 
 ```python
+import os
 import asyncio
 import dcex.async_support as dcex
-import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
+BINANCE_API_SECRET = os.getenv("BINANCE_API_SECRET")
 
 async def main():
-    # Initialize async client
     client = await dcex.binance(
-        api_key="your_api_key",
-        api_secret="your_api_secret"
+        api_key=BINANCE_API_KEY,
+        api_secret=BINANCE_API_SECRET
     )
 
     try:
-        # Get market data
-        klines = await client.get_klines(product_symbol="BTC-USDT-SWAP", interval="1h")
-        print(klines)
+        result = await client.get_income_history()
+        print(result)
 
     finally:
         await client.close()
@@ -117,8 +115,8 @@ It is a table that contains the following columns:
 In most cases, we have handled the case, but if you have any specific use cases, you can use the `ptm` to get the information you want.
 
 ```python
-from dcex.product_table.manager import ProductTableManager
 from dcex.utils.common import Common
+from dcex.product_table.manager import ProductTableManager
 
 ptm = ProductTableManager.get_instance(Common.BINANCE)
 
