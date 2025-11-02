@@ -76,10 +76,10 @@ if __name__ == "__main__":
 | **Binance**     | ✅           | ✅            |
 | **Bybit**       | ✅           | ✅            |
 | **OKX**         | ✅           | ✅            |
-| **BitMart**     | Testing      | Testing       |
+| **BitMart**     | ✅           | ✅            |
+| **BitMEX**      | Testing      | Testing       |
 | **Gate.io**     | Testing      | Testing       |
 | **Hyperliquid** | Testing      | Testing       |
-| **BitMEX**      | Testing      | Testing       |
 | **BingX**       | Developing   | Developing    |
 | **KuCoin**      | Developing   | Developing    |
 | **Zoomex**      | Developing   | Developing    |
