@@ -75,7 +75,7 @@ if __name__ == "__main__":
 | **Bybit**       | ✅           | ✅            |
 | **OKX**         | ✅           | ✅            |
 | **BitMart**     | ✅           | ✅            |
-| **BitMEX**      | Testing      | Testing       |
+| **BitMEX**      | ✅           | ✅            |
 | **Gate.io**     | Testing      | Testing       |
 | **Hyperliquid** | Testing      | Testing       |
 | **BingX**       | Developing   | Developing    |
