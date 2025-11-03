@@ -1,3 +1,15 @@
+## 0.7.0 (2025-11-03)
+
+### Feat
+
+- add bingx exchange async swap support
+- add gate exchange support
+- add bitmex exchange support
+
+### Fix
+
+- remove trailing whitespace
+
 ## 0.6.1 (2025-11-02)
 
 ### Fix
