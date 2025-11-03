@@ -1,3 +1,9 @@
+## 0.8.0 (2025-11-03)
+
+### Feat
+
+- add kucoin exchange async spot support
+
 ## 0.7.0 (2025-11-03)
 
 ### Feat
