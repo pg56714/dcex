@@ -28,7 +28,7 @@ async def test_get_public_trades(client):
 async def test_get_kline(client):
     res = await client.get_kline("BTC-USDT-SWAP", "1h", limit=5)
     assert res is not None
-    
+
 @pytest.mark.asyncio
 async def test_get_ticker(client):
     res = await client.get_ticker("BTC-USDT-SWAP")
