@@ -80,7 +80,6 @@ if __name__ == "__main__":
 | **Hyperliquid** | Testing      | Testing       |
 | **BingX**       | Developing   | Developing    |
 | **KuCoin**      | Developing   | Developing    |
-| **Zoomex**      | Developing   | Developing    |
 
 ## 🔍 Key Features
 
