@@ -17,7 +17,6 @@ from .gateio.client import Client as GateioClient
 from .hyperliquid.client import Client as HyperliquidClient
 from .kucoin.client import Client as KuCoinClient
 from .okx.client import Client as OKXClient
-from .zoomex.client import Client as ZoomexClient
 
 
 async def binance(
@@ -83,13 +82,6 @@ async def okx(
     return cast(OKXClient, await OKXClient(**kwargs).async_init())
 
 
-async def zoomex(
-    **kwargs: Any,  # noqa: ANN401
-) -> ZoomexClient:
-    """Create and initialize a Zoomex client instance."""
-    return cast(ZoomexClient, await ZoomexClient(**kwargs).async_init())
-
-
 __all__ = [
     "binance",
     "bingx",
@@ -100,5 +92,4 @@ __all__ = [
     "hyperliquid",
     "kucoin",
     "okx",
-    "zoomex",
 ]

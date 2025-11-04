@@ -22,7 +22,6 @@ from .fetch import (
     hyperliquid,
     kucoin,
     okx,
-    zoomex,
 )
 
 VALID_EXCHANGES = [
@@ -35,7 +34,6 @@ VALID_EXCHANGES = [
     hyperliquid,
     kucoin,
     okx,
-    zoomex,
 ]
 
 
