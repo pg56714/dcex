@@ -35,7 +35,6 @@ class MarketInfo:
         base_currency: Base currency of the trading pair.
         quote_currency: Quote currency of the trading pair.
         min_notional: Minimum notional value for orders.
-        multiplier: Contract multiplier for derivatives.
         size_per_contract: Size per contract for derivatives.
     """
 
@@ -50,7 +49,6 @@ class MarketInfo:
     base_currency: str = ""
     quote_currency: str = ""
     min_notional: str = "0"
-    multiplier: str = "1"
 
     # contract
     size_per_contract: str = "1"

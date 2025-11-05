@@ -34,7 +34,6 @@ class MarketInfo:
     base_currency: str = ""
     quote_currency: str = ""
     min_notional: str = "0"
-    multiplier: str = "1"
 
     # contract
     size_per_contract: str = "1"
@@ -51,10 +50,13 @@ class MarketInfo:
 
 def binance() -> pl.DataFrame:
     """
-    Fetch product information from Binance exchange.
+    Fetch market information from Binance exchange.
+
+    Retrieves trading pairs from Binance including spot and futures markets.
+    Standardizes the data into MarketInfo format.
 
     Returns:
-        pl.DataFrame: DataFrame containing Binance product information
+        Polars DataFrame containing standardized market information from Binance.
     """
     from ..binance._market_http import MarketHTTP
 
@@ -131,10 +133,13 @@ def binance() -> pl.DataFrame:
 
 def bitmart() -> pl.DataFrame:
     """
-    Fetch product information from BitMart exchange.
+    Fetch market information from BitMart exchange.
+
+    Retrieves trading pairs from BitMart including swap and spot markets.
+    Standardizes the data into MarketInfo format.
 
     Returns:
-        pl.DataFrame: DataFrame containing BitMart product information
+        Polars DataFrame containing standardized market information from BitMart.
     """
     from ..bitmart._market_http import MarketHTTP
 
@@ -193,10 +198,13 @@ def bitmart() -> pl.DataFrame:
 
 def bitmex() -> pl.DataFrame:
     """
-    Fetch product information from BitMEX exchange.
+    Fetch market information from BitMEX exchange.
+
+    Retrieves trading pairs from BitMEX including swap, futures, and spot markets.
+    Standardizes the data into MarketInfo format.
 
     Returns:
-        pl.DataFrame: DataFrame containing BitMEX product information
+        Polars DataFrame containing standardized market information from BitMEX.
     """
     from ..bitmex._market_http import MarketHTTP
 
@@ -207,7 +215,7 @@ def bitmex() -> pl.DataFrame:
     if not isinstance(res, list):
         res = []
 
-    typ_map: dict[str, str] = {
+    typ_map = {
         "FFWCSX": "swap",
         "FFCCSX": "futures",
         "IFXXXP": "spot",
@@ -217,20 +225,19 @@ def bitmex() -> pl.DataFrame:
     for market in res:
         if not isinstance(market, dict):
             continue
-        typ = market.get("typ")
-        if not typ:
-            continue
+
+        typ = market.get("typ", "")
         product_type = typ_map.get(typ)
         if not product_type:
             continue
 
-        symbol = market.get("symbol", "")
+        symbol = market["symbol"]
         base = market.get("underlying", "")
-        quote = market.get("quoteCurrency", "")
-        price_precision = str(market.get("tickSize", 0))
-        size_precision = str(market.get("lotSize", 0))
-        min_size = str(market.get("lotSize", 0))
-        size_per_contract = str(market.get("multiplier", 1))
+        quote = market["quoteCurrency"]
+        price_precision = str(market["tickSize"])
+        size_precision = str(market["lotSize"])
+        min_size = str(market["lotSize"])
+        size_per_contract = str(market["multiplier"])
         min_notional = "0"
 
         if typ == "IFXXXP":
@@ -238,23 +245,21 @@ def bitmex() -> pl.DataFrame:
         elif typ == "FFWCSX":
             product_symbol = f"{base}-{quote}-SWAP"
         elif typ == "FFCCSX":
-            if symbol and (base + quote) in symbol:
+            if (base + quote) in symbol:
                 expiry_str = symbol.replace(base + quote, "", 1)
-            elif symbol:
-                expiry_str = symbol.replace(base, "", 1)
             else:
-                expiry_str = ""
+                expiry_str = symbol.replace(base, "", 1)
             product_symbol = f"{base}-{quote}-{expiry_str}-SWAP"
         else:
-            product_symbol = symbol or ""
+            product_symbol = symbol
 
         markets.append(
             MarketInfo(
                 exchange=Common.BITMEX,
-                exchange_symbol=symbol or "",
+                exchange_symbol=symbol,
                 product_symbol=product_symbol,
                 product_type=product_type,
-                exchange_type=typ or "",
+                exchange_type=typ,
                 base_currency=base,
                 quote_currency=quote,
                 price_precision=price_precision,
@@ -408,10 +413,13 @@ def bybit() -> pl.DataFrame:
 
 def gateio() -> pl.DataFrame:
     """
-    Fetch product information from Gate.io exchange.
+    Fetch market information from Gate.io exchange.
+
+    Retrieves trading pairs from Gate.io including futures, delivery contracts,
+    and spot markets. Standardizes the data into MarketInfo format.
 
     Returns:
-        pl.DataFrame: DataFrame containing Gate.io product information
+        Polars DataFrame containing standardized market information from Gate.io.
     """
     from ..gateio._market_http import MarketHTTP
 
@@ -567,10 +575,13 @@ def hyperliquid() -> pl.DataFrame:
 
 def okx() -> pl.DataFrame:
     """
-    Fetch product information from OKX exchange.
+    Fetch market information from OKX exchange.
+
+    Retrieves trading pairs from OKX including swap, spot, and futures markets.
+    Standardizes the data into MarketInfo format.
 
     Returns:
-        pl.DataFrame: DataFrame containing OKX product information
+        Polars DataFrame containing standardized market information from OKX.
     """
     from ..okx._public_http import PublicHTTP
 

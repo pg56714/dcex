@@ -106,7 +106,6 @@ It is a table that contains the following columns:
 | size_precision    | The size precision, e.g. `0.000001`                                                                                                                                                                                        |
 | min_size          | The minimum size, e.g. `0.000001`                                                                                                                                                                                          |
 | min_notional      | The minimum notional, e.g. `0.000001`                                                                                                                                                                                      |
-| multiplier        | The multiplier of the product, such symbol like `1000BONKUSDT` in Bybit will need to be multiplied by 1000 to get the actual size, if you are trading across spot and swap, you will need this                             |
 | size_per_contract | The size per contract. Sometimes 1 contract is not the same as 1 unit in exchanges like OKX.                                                                                                                               |
 
 ## How to use Product Table Manager?
