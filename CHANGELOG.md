@@ -1,3 +1,9 @@
+## 0.9.2 (2025-11-05)
+
+### Fix
+
+- **ptm**: remove unnecessary fields and sync async code to sync version
+
 ## 0.9.1 (2025-11-05)
 
 ### Fix
