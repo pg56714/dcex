@@ -10,7 +10,7 @@ HYPERLIQUID_WALLET_ADDRESS = os.getenv("HYPERLIQUID_WALLET_ADDRESS")
 async def main():
     if HYPERLIQUID_WALLET_ADDRESS is None:
         raise ValueError("HYPERLIQUID_WALLET_ADDRESS is not set in the environment variables")
-    
+
     # HYPERLIQUID_WALLET_ADDRESS = ""
 
     client = await dcex.hyperliquid()
