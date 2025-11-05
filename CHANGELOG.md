@@ -1,3 +1,10 @@
+## 0.9.0 (2025-11-05)
+
+### Feat
+
+- add hyperliquid exchange support
+- **zoomex**: initial implementation
+
 ## 0.8.0 (2025-11-03)
 
 ### Feat
