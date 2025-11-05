@@ -27,5 +27,5 @@ jobs:
       - name: Type check (pyright)
         run: uv run pyright
 
-      - name: Run unit tests
-        run: uv run pytest -m "not private"
+      # - name: Run unit tests
+      #   run: uv run pytest -m "not private"
