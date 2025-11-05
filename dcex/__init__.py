@@ -12,6 +12,7 @@ from .bitmart.client import Client as BitmartClient
 from .bitmex.client import Client as BitmexClient
 from .bybit.client import Client as BybitClient
 from .gateio.client import Client as GateioClient
+from .hyperliquid.client import Client as HyperliquidClient
 from .okx.client import Client as OKXClient
 from .utils.jupyter_helper import auto_apply_nest_asyncio
 
@@ -44,6 +45,11 @@ def gateio(**kwargs: Any) -> GateioClient:  # noqa: ANN401
     return GateioClient(**kwargs)
 
 
+def hyperliquid(**kwargs: Any) -> HyperliquidClient:  # noqa: ANN401
+    """Create a Hyperliquid client instance."""
+    return HyperliquidClient(**kwargs)
+
+
 def okx(**kwargs: Any) -> OKXClient:  # noqa: ANN401
     """Create an OKX client instance."""
     return OKXClient(**kwargs)
@@ -55,5 +61,6 @@ __all__ = [
     "bitmex",
     "bybit",
     "gateio",
+    "hyperliquid",
     "okx",
 ]

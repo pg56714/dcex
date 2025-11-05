@@ -606,7 +606,7 @@ async def hyperliquid() -> pl.DataFrame:
     await market_http.async_init()
 
     markets = []
-    res_prep = await market_http.meta()
+    res_prep = await market_http.get_meta()
     df_prep = to_dataframe(res_prep.get("universe", []))
 
     for idx, market in enumerate(df_prep.iter_rows(named=True)):
@@ -627,7 +627,7 @@ async def hyperliquid() -> pl.DataFrame:
             )
         )
 
-    res_spot = await market_http.spot_meta()
+    res_spot = await market_http.get_spot_meta()
     df_tokens = to_dataframe(res_spot.get("tokens", []))
     df_spot = to_dataframe(res_spot.get("universe", []))
 

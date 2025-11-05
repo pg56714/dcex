@@ -77,7 +77,7 @@ if __name__ == "__main__":
 | **BitMart**     | ✅           | ✅            |
 | **BitMEX**      | ✅           | ✅            |
 | **Gate.io**     | ✅           | ✅            |
-| **Hyperliquid** | Testing      | Testing       |
+| **Hyperliquid** | ✅           | ✅            |
 | **BingX**       | Developing   | Developing    |
 | **KuCoin**      | Developing   | Developing    |
 

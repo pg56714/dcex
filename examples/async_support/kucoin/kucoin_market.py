@@ -8,8 +8,13 @@ import dcex.async_support as dcex
 load_dotenv()
 
 async def main():
+    client = await dcex.kucoin()
+
     try:
-        client = await dcex.kucoin()
+        # # need apk key
+        # orderbook = await client.get_spot_orderbook(product_symbol="BTC-USDT-SPOT")
+        # print(orderbook)
+
         instrument_info = await client.get_spot_instrument_info()
         print(instrument_info)
 
@@ -18,9 +23,6 @@ async def main():
 
         all_tickers = await client.get_spot_all_tickers()
         print(all_tickers)
-
-        orderbook = await client.get_spot_orderbook(product_symbol="BTC-USDT-SPOT")
-        print(orderbook)
 
         public_trades = await client.get_spot_public_trades(product_symbol="BTC-USDT-SPOT")
         print(public_trades)

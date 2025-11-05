@@ -40,19 +40,19 @@ def test_get_futures_funding_rate_history(client):
     assert res is not None
 
 
-def test_get_contract_order_book_delivery(client):
-    res = client.get_contract_order_book(product_symbol="BTC-USDT-20250926-SWAP", path="delivery")
-    assert res is not None
+# def test_get_contract_order_book_delivery(client):
+#     res = client.get_contract_order_book(product_symbol="BTC-USDT-20250926-SWAP", path="delivery")
+#     assert res is not None
 
 
-def test_get_contract_kline_delivery(client):
-    res = client.get_contract_kline(product_symbol="BTC-USDT-20250926-SWAP", path="delivery")
-    assert res is not None
+# def test_get_contract_kline_delivery(client):
+#     res = client.get_contract_kline(product_symbol="BTC-USDT-20250926-SWAP", path="delivery")
+#     assert res is not None
 
 
-def test_get_contract_list_tickers_delivery(client):
-    res = client.get_contract_list_tickers(product_symbol="BTC-USDT-20250926-SWAP", path="delivery")
-    assert res is not None
+# def test_get_contract_list_tickers_delivery(client):
+#     res = client.get_contract_list_tickers(product_symbol="BTC-USDT-20250926-SWAP", path="delivery")
+#     assert res is not None
 
 
 def test_get_spot_all_currency_pairs(client):

@@ -28,6 +28,7 @@ async def test_get_spot_all_tickers(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.private
 async def test_get_spot_orderbook(client):
     res = await client.get_spot_orderbook(product_symbol="BTC-USDT-SPOT")
     assert res is not None

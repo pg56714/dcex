@@ -10,7 +10,7 @@ from typing import Any
 
 import polars as pl
 
-from .fetch import binance, bitmart, bitmex, bybit, gateio, okx
+from .fetch import binance, bitmart, bitmex, bybit, gateio, hyperliquid, okx
 
 VALID_EXCHANGES = [
     binance,
@@ -18,6 +18,7 @@ VALID_EXCHANGES = [
     bitmex,
     bybit,
     gateio,
+    hyperliquid,
     okx,
 ]
 
