@@ -36,4 +36,5 @@ repos:
         stages: [commit-msg]
       - id: commitizen-branch
         stages: [pre-push]
-      # pre-commit install --hook-type commit-msg --hook-type pre-push
+      # Install all three hook types so ruff/pyright run on commit too:
+      # pre-commit install --hook-type pre-commit --hook-type commit-msg --hook-type pre-push
