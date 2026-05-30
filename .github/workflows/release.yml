@@ -67,6 +67,9 @@ jobs:
     needs: bump_version
     if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # checkout (job-level permissions replace the top-level block)
+      id-token: write # required for PyPI Trusted Publishing (OIDC)
 
     steps:
       - uses: actions/checkout@v4
@@ -86,9 +89,6 @@ jobs:
         run: uv sync --locked
 
       - name: Publish to PyPI
-        env:
-          UV_PUBLISH_USERNAME: "__token__"
-          UV_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           VERSION=${{ needs.bump_version.outputs.cz_version }}
           echo "Publishing version $VERSION to PyPI..."
