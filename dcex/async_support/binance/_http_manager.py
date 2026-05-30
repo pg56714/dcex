@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 
 import httpx
 
+from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
@@ -18,7 +19,9 @@ from .endpoints.trade import FuturesTrade, SpotTrade
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
+    EXCHANGE = Common.BINANCE
+
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
     timeout: int = field(default=10)
@@ -42,7 +45,7 @@ class HTTPManager:
 
     async def async_init(self) -> Self:
         self.session = httpx.AsyncClient(timeout=self.timeout)
-        self._logger = self.logger or logging.getLogger(__name__)
+        self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINANCE)
         return self

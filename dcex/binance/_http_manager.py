@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 
 import requests
 
+from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
@@ -18,13 +19,15 @@ from .endpoints.trade import FuturesTrade, SpotTrade
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     HTTP manager for Binance API requests.
 
     Handles authentication, request signing, and API endpoint routing for both
     spot and futures trading APIs.
     """
+
+    EXCHANGE = Common.BINANCE
 
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
@@ -49,10 +52,7 @@ class HTTPManager:
 
     def __post_init__(self) -> None:
         """Initialize the HTTP manager after dataclass creation."""
-        if self.logger is None:
-            self._logger = logging.getLogger(__name__)
-        else:
-            self._logger = self.logger
+        self._logger = self._setup_logger(self.logger)
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BINANCE)
