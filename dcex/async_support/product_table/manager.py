@@ -12,29 +12,12 @@ from typing import Any
 
 import polars as pl
 
-from .fetch import (
-    binance,
-    bingx,
-    bitmart,
-    bitmex,
-    bybit,
-    gateio,
-    hyperliquid,
-    kucoin,
-    okx,
-)
+from ...registry import ASYNC_EXCHANGES
+from . import fetch
 
-VALID_EXCHANGES = [
-    binance,
-    bingx,
-    bitmart,
-    bitmex,
-    bybit,
-    gateio,
-    hyperliquid,
-    kucoin,
-    okx,
-]
+# Derived from the canonical registry so the async fetch list cannot drift from
+# the sync one or from the registry. Order follows ASYNC_EXCHANGES.
+VALID_EXCHANGES = [getattr(fetch, name) for name in ASYNC_EXCHANGES]
 
 
 class ProductTableError(Exception):
