@@ -129,6 +129,7 @@ class HTTPManager(BaseHTTPManager):
         try:
             base_url = self._get_base_url(path)
             url = f"{base_url}{path}"
+            self._log_request(method, url)
             if method.upper() == "GET":
                 url += f"?{urlencode(query)}" if query else ""
                 response = self.session.get(url, headers=self._headers(), timeout=self.timeout)
@@ -151,6 +152,7 @@ class HTTPManager(BaseHTTPManager):
             if isinstance(data, dict) and "code" in data and str(data["code"]) != "200":
                 code = data.get("code", "Unknown")
                 error_message = data.get("msg", "Unknown error")
+                self._log_failed_request(f"BINANCE API Error: [{code}] {error_message}", code)
                 raise FailedRequestError(
                     request=f"{method} {url} | Body: {query}",
                     message=f"BINANCE API Error: [{code}] {error_message}",
@@ -161,6 +163,9 @@ class HTTPManager(BaseHTTPManager):
 
             # If http status is not 2xx (like 403, 404)
             if not response.status_code // 100 == 2:
+                self._log_failed_request(
+                    f"HTTP Error {response.status_code}: {response.text}", response.status_code
+                )
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"HTTP Error {response.status_code}: {response.text}",

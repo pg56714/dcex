@@ -59,10 +59,32 @@ class BaseHTTPManager:
         old ``logging.getLogger(__name__)`` call that lived in each manager's
         ``__post_init__`` (``__class__.__module__`` equals that ``__name__``).
 
+        A :class:`logging.NullHandler` is attached to the default logger so the
+        library stays silent unless the application configures logging, while
+        still emitting records that the application can opt into. A
+        caller-supplied logger is returned untouched.
+
         Args:
             logger: A caller-supplied logger, or ``None`` to use the default.
 
         Returns:
             The logger instance to store on the manager.
         """
-        return logger if logger is not None else logging.getLogger(self.__class__.__module__)
+        if logger is not None:
+            return logger
+        resolved = logging.getLogger(self.__class__.__module__)
+        if not any(isinstance(handler, logging.NullHandler) for handler in resolved.handlers):
+            resolved.addHandler(logging.NullHandler())
+        return resolved
+
+    def _log_request(self, method: str, url: str) -> None:
+        """Emit a debug record for an outgoing request."""
+        logger = getattr(self, "_logger", None)
+        if logger is not None:
+            logger.debug("%s request: %s %s", self.EXCHANGE, method.upper(), url)
+
+    def _log_failed_request(self, message: str, status_code: object) -> None:
+        """Emit an error record just before a failed request is raised."""
+        logger = getattr(self, "_logger", None)
+        if logger is not None:
+            logger.error("%s request failed [%s]: %s", self.EXCHANGE, status_code, message)
