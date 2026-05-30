@@ -1,5 +1,7 @@
-# Set to true to add reviewers to pull requests
-addReviewers: true
+# GitHub does not allow a PR author to be their own reviewer, so for a
+# single-maintainer repo reviewer assignment is a no-op. Disable it and
+# only auto-assign the author as assignee.
+addReviewers: false
 
 # Set to true to add assignees to pull requests
 addAssignees: author
@@ -7,6 +9,3 @@ addAssignees: author
 # A number of reviewers added to the pull request
 # Set 0 to add all the reviewers (default: 0)
 numberOfReviewers: 0
-
-reviewers:
-  - pg56714

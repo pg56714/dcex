@@ -21,7 +21,7 @@ jobs:
 
       - name: Create bump and changelog
         id: cz
-        uses: commitizen-tools/commitizen-action@master
+        uses: commitizen-tools/commitizen-action@0.27.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           changelog_increment_filename: body.md
@@ -55,7 +55,7 @@ jobs:
 
       - name: Release
         if: ${{ steps.check_bump.outputs.has_bump == 'true' }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body_path: "body.md"
           tag_name: ${{ steps.cz.outputs.version }}
