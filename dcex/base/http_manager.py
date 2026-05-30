@@ -8,35 +8,16 @@ is pulled together here:
 
 - logger setup (previously copy-pasted into every ``__post_init__``)
 - an ``EXCHANGE`` marker so call sites stop hard-coding ``Common.BINANCE`` etc.
-- ``drop_none`` for building request payloads without ``None`` values
+- request/error logging helpers used on each manager's request path
 
 Mixing :class:`BaseHTTPManager` in does not change any request behaviour; it
 only removes duplicated boilerplate.
 """
 
 import logging
-from typing import Any, ClassVar
+from typing import ClassVar
 
 from ..utils.common import Common
-
-
-def drop_none(payload: dict[str, Any]) -> dict[str, Any]:
-    """
-    Return a copy of ``payload`` with keys whose value is ``None`` removed.
-
-    Optional API parameters must be omitted entirely rather than sent as
-    ``None``: exchanges that fold parameters into the request signature (e.g.
-    Binance urlencodes them) would otherwise sign and send the literal string
-    ``"None"`` and the request would be rejected. Keys whose value is ``0``,
-    ``""`` or ``False`` are kept, because those are valid API values.
-
-    Args:
-        payload: The raw payload, possibly containing ``None`` values.
-
-    Returns:
-        A new dict containing only the entries whose value is not ``None``.
-    """
-    return {key: value for key, value in payload.items() if value is not None}
 
 
 class BaseHTTPManager:
