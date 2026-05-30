@@ -189,6 +189,8 @@ class HTTPManager(BaseHTTPManager):
                 }
             )
 
+        self._log_request(method, url)
+
         try:
             method_upper = method.upper()
             body_string = None
@@ -228,6 +230,7 @@ class HTTPManager(BaseHTTPManager):
             if response.status_code // 100 == 2:
                 return response.json()
 
+            self._log_failed_request(f"GATEIO API Error: {response.text}", response.status_code)
             raise FailedRequestError(
                 request=f"{method_upper} {url}",
                 message=f"GATEIO API Error: {response.status_code}, {response.text}",

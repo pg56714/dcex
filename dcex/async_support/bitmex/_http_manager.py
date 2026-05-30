@@ -163,6 +163,7 @@ class HTTPManager(BaseHTTPManager):
             url = f"{self.base_url}{path}"
             body = ""
             full_path = path
+            self._log_request(method, url)
 
             if method.upper() == "GET":
                 if query:
@@ -220,6 +221,7 @@ class HTTPManager(BaseHTTPManager):
                     if isinstance(data, dict)
                     else response.text
                 )
+                self._log_failed_request(f"BITMEX API Error: {error_message}", response.status_code)
                 raise FailedRequestError(
                     request=f"{method} {url} | Body: {query}",
                     message=f"BITMEX API Error: {error_message}",

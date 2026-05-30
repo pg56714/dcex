@@ -189,6 +189,7 @@ class HTTPManager(BaseHTTPManager):
             headers = get_header_no_sign(self.flag)
 
         url = self.base_api + path
+        self._log_request(method, url)
 
         try:
             if self.session is None:
@@ -218,6 +219,9 @@ class HTTPManager(BaseHTTPManager):
             if data.get("code", "0") != "0":
                 status_code = data.get("data", [{}])[0].get("sCode", "Unknown")
                 error_message = data.get("data", [{}])[0].get("sMsg", "Unknown error")
+                self._log_failed_request(
+                    f"OKX API Error: [{status_code}] {error_message}", status_code
+                )
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"OKX API Error: [{status_code}] {error_message}",

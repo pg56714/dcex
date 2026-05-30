@@ -358,6 +358,7 @@ class HTTPManager(BaseHTTPManager):
         headers = get_header()
 
         url = self.endpoint + path
+        self._log_request(method, url)
 
         session = self._ensure_session()
 
@@ -393,6 +394,9 @@ class HTTPManager(BaseHTTPManager):
                 data = {}
 
             if not response.status_code // 100 == 2:
+                self._log_failed_request(
+                    f"HTTP Error {response.status_code}: {response.text}", response.status_code
+                )
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"HTTP Error {response.status_code}: {response.text}",

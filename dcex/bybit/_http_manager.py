@@ -183,6 +183,7 @@ class HTTPManager(BaseHTTPManager):
             headers = get_header_no_sign()
 
         url = self.endpoint + path
+        self._log_request(method, url)
 
         try:
             if method.upper() == "GET":
@@ -202,6 +203,7 @@ class HTTPManager(BaseHTTPManager):
             if data.get("retCode", 0) != 0:
                 code = data.get("retCode", "Unknown")
                 error_message = data.get("retMsg", "Unknown error")
+                self._log_failed_request(f"Bybit API Error: [{code}] {error_message}", code)
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"Bybit API Error: [{code}] {error_message}",

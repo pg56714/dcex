@@ -173,6 +173,8 @@ class HTTPManager(BaseHTTPManager):
         else:
             headers = get_header_no_sign()
 
+        self._log_request(method, url)
+
         try:
             if method.upper() == "GET":
                 response = self.session.get(url, headers=headers, timeout=self.timeout)
@@ -194,6 +196,7 @@ class HTTPManager(BaseHTTPManager):
             if data.get("code", 0) != 1000:
                 code = data.get("code", "Unknown")
                 error_msg = data.get("msg") or data.get("message") or "Unknown error"
+                self._log_failed_request(f"BitMart API Error: [{code}] {error_msg}", code)
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"BitMart API Error: [{code}] {error_msg}",
