@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 import httpx
 import msgspec
 
+from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
@@ -16,7 +17,7 @@ from ..product_table.manager import ProductTableManager
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     Base HTTP manager for BitMEX API interactions.
 
@@ -36,6 +37,8 @@ class HTTPManager:
         preload_product_table: Whether to preload product table
         last_rate_limit_info: Last received rate limit information
     """
+
+    EXCHANGE = Common.BITMEX
 
     base_url: str = "https://www.bitmex.com"
     api_key: str | None = field(default=None)
@@ -61,7 +64,7 @@ class HTTPManager:
             RuntimeError: If session initialization fails
         """
         self.session = httpx.AsyncClient(timeout=self.timeout)
-        self._logger = self.logger or logging.getLogger(__name__)
+        self._logger = self._setup_logger(self.logger)
         self.last_rate_limit_info = None
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMEX)

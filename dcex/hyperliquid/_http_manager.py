@@ -10,6 +10,7 @@ import requests
 from coincurve import PrivateKey
 from Crypto.Hash import keccak
 
+from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.address_utils import address_to_bytes
 from ..utils.common import Common
@@ -34,13 +35,15 @@ def get_header() -> dict[str, str]:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     HTTP manager for Hyperliquid exchange API with optimized authentication and request handling.
 
     This class provides high-performance HTTP client functionality with optimized cryptographic
     operations using coincurve, pycryptodome, and msgspec for better performance.
     """
+
+    EXCHANGE = Common.HYPERLIQUID
 
     testnet: bool = field(default=False)
     subdomain: str = field(default=SUBDOMAIN_MAIN)
@@ -58,7 +61,7 @@ class HTTPManager:
 
     def __post_init__(self) -> None:
         """Initialize the HTTP manager with synchronous client and configuration."""
-        self._logger = self.logger or logging.getLogger(__name__)
+        self._logger = self._setup_logger(self.logger)
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)
         self.session = requests.Session()

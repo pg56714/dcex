@@ -18,6 +18,7 @@ import httpx
 import msgspec
 import requests
 
+from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
@@ -25,7 +26,7 @@ from ..utils.helpers import generate_timestamp
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     BitMEX HTTP Manager for API communication.
 
@@ -45,6 +46,8 @@ class HTTPManager:
         last_rate_limit_info: Last received rate limit information
     """
 
+    EXCHANGE = Common.BITMEX
+
     base_url: str = "https://www.bitmex.com"
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
@@ -62,10 +65,7 @@ class HTTPManager:
         Sets up logging, initializes rate limit tracking, and optionally
         preloads the product table for symbol conversion.
         """
-        if self.logger is None:
-            self._logger = logging.getLogger(__name__)
-        else:
-            self._logger = self.logger
+        self._logger = self._setup_logger(self.logger)
 
         self.last_rate_limit_info = None
         if self.preload_product_table:
