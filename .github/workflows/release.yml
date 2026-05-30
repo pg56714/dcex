@@ -28,16 +28,19 @@ jobs:
 
       - name: Check if bump occurred
         id: check_bump
+        env:
+          PREV_VERSION: ${{ steps.cz.outputs.previous_version }}
+          CURR_VERSION: ${{ steps.cz.outputs.version }}
         run: |
-          echo "Previous version: ${PREVIOUS_REVISION:-unknown}"
-          echo "Current version: ${REVISION:-unknown}"
+          echo "Previous version: ${PREV_VERSION:-unknown}"
+          echo "Current version: ${CURR_VERSION:-unknown}"
 
-          if [ -n "${PREVIOUS_REVISION}" ] && [ -n "${REVISION}" ] && [ "${PREVIOUS_REVISION}" = "${REVISION}" ]; then
-            echo "No version bump detected (versions match)."
-            echo "has_bump=false" >> $GITHUB_OUTPUT
-          else
+          if [ -n "${CURR_VERSION}" ] && [ "${PREV_VERSION}" != "${CURR_VERSION}" ]; then
             echo "Version bump detected (versions differ)."
-            echo "has_bump=true" >> $GITHUB_OUTPUT
+            echo "has_bump=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No version bump detected."
+            echo "has_bump=false" >> "$GITHUB_OUTPUT"
           fi
 
           if [ -f body.md ]; then
