@@ -9,6 +9,7 @@ from typing import Any, Self
 import httpx
 import msgspec
 
+from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
@@ -111,8 +112,10 @@ def parse_params_to_str(query: dict[str, Any]) -> str:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """HTTP manager for OKX API requests."""
+
+    EXCHANGE = Common.OKX
 
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
@@ -135,7 +138,7 @@ class HTTPManager:
             Self instance
         """
         self.session = httpx.AsyncClient(timeout=self.timeout)
-        self._logger = self.logger or logging.getLogger(__name__)
+        self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.OKX)
         return self

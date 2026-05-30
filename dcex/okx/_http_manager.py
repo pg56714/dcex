@@ -7,6 +7,7 @@ from typing import Any
 import msgspec
 import requests
 
+from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
@@ -112,7 +113,7 @@ def get_header_no_sign(flag: str) -> dict[str, str]:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     HTTP manager for OKX API requests with authentication and error handling.
 
@@ -133,6 +134,8 @@ class HTTPManager:
         preload_product_table: Whether to preload product table
     """
 
+    EXCHANGE = Common.OKX
+
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
     passphrase: str | None = field(default=None)
@@ -151,10 +154,7 @@ class HTTPManager:
 
         Sets up logger and optionally preloads the product table.
         """
-        if self.logger is None:
-            self._logger = logging.getLogger(__name__)
-        else:
-            self._logger = self.logger
+        self._logger = self._setup_logger(self.logger)
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.OKX)

@@ -16,13 +16,14 @@ from typing import Any
 import msgspec
 import requests
 
+from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     Base HTTP manager for Gate.io API operations.
 
@@ -41,6 +42,8 @@ class HTTPManager:
         preload_product_table: Whether to preload product table on initialization
     """
 
+    EXCHANGE = Common.GATEIO
+
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
     base_url: str = field(default="https://api.gateio.ws")
@@ -54,10 +57,7 @@ class HTTPManager:
 
         Sets up logging and preloads the product table if configured.
         """
-        if self.logger is None:
-            self._logger = logging.getLogger(__name__)
-        else:
-            self._logger = self.logger
+        self._logger = self._setup_logger(self.logger)
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.GATEIO)

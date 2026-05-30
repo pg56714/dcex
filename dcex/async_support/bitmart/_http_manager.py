@@ -7,6 +7,7 @@ from typing import Any, Literal, Self
 import httpx
 import msgspec
 
+from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
@@ -36,8 +37,10 @@ def get_header_no_sign() -> dict[str, str]:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """HTTP manager for BitMart API requests with authentication and error handling."""
+
+    EXCHANGE = Common.BITMART
 
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
@@ -71,7 +74,7 @@ class HTTPManager:
             HTTPManager: Initialized HTTP manager instance
         """
         self.session = httpx.AsyncClient(timeout=self.timeout)
-        self._logger = self.logger or logging.getLogger(__name__)
+        self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMART)
         return self

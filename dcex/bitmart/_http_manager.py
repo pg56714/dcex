@@ -9,6 +9,7 @@ from typing import Any
 import msgspec
 import requests
 
+from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
@@ -68,13 +69,15 @@ def get_header_no_sign() -> dict[str, str]:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     HTTP manager for Bitmart API requests.
 
     This class handles authentication, request signing, and API communication
     for both spot and futures trading endpoints.
     """
+
+    EXCHANGE = Common.BITMART
 
     api_key: str | None = field(default=None)
     api_secret: str | None = field(default=None)
@@ -102,10 +105,7 @@ class HTTPManager:
 
     def __post_init__(self) -> None:
         """Initialize logger and product table manager."""
-        if self.logger is None:
-            self._logger = logging.getLogger(__name__)
-        else:
-            self._logger = self.logger
+        self._logger = self._setup_logger(self.logger)
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BITMART)

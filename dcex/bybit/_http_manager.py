@@ -14,6 +14,7 @@ from typing import Any
 import msgspec
 import requests
 
+from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
@@ -60,7 +61,7 @@ def get_header_no_sign() -> dict[str, str]:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     Base HTTP manager for Bybit API operations.
 
@@ -84,6 +85,8 @@ class HTTPManager:
         preload_product_table: Whether to preload product table
     """
 
+    EXCHANGE = Common.BYBIT
+
     testnet: bool = field(default=False)
     domain: str = field(default=DOMAIN_MAIN)
     tld: str = field(default=TLD_MAIN)
@@ -104,10 +107,7 @@ class HTTPManager:
 
         Sets up logging, endpoint URL, and product table manager.
         """
-        if self.logger is None:
-            self._logger = logging.getLogger(__name__)
-        else:
-            self._logger = self.logger
+        self._logger = self._setup_logger(self.logger)
 
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=subdomain, DOMAIN=self.domain, TLD=self.tld)

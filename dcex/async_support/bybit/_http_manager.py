@@ -15,6 +15,7 @@ from typing import Any, Literal, Self
 import httpx
 import msgspec
 
+from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
@@ -61,7 +62,7 @@ def get_header_no_sign() -> dict[str, str]:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """
     HTTP manager for Bybit API requests.
 
@@ -87,6 +88,8 @@ class HTTPManager:
         preload_product_table: Whether to preload product table
     """
 
+    EXCHANGE = Common.BYBIT
+
     testnet: bool = field(default=False)
     domain: str = field(default=DOMAIN_MAIN)
     tld: str = field(default=TLD_MAIN)
@@ -109,7 +112,7 @@ class HTTPManager:
             Self instance for method chaining
         """
         self.session = httpx.AsyncClient(timeout=self.timeout)
-        self._logger = self.logger or logging.getLogger(__name__)
+        self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BYBIT)
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
