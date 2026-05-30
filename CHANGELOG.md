@@ -1,3 +1,9 @@
+## 0.9.3 (2026-05-30)
+
+### Fix
+
+- **ci**: enforce ruff gates and fix release bump detection
+
 ## 0.9.2 (2025-11-05)
 
 ### Fix
