@@ -104,3 +104,44 @@ class PublicHTTP(HTTPManager):
             signed=False,
         )
         return res
+
+    def get_position_tiers(
+        self,
+        instType: str = "SWAP",
+        tdMode: str = "isolated",
+        instFamily: str | None = None,
+        product_symbol: str | None = None,
+        ccy: str | None = None,
+        tier: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Get position tiers information.
+
+        Args:
+            instType: Instrument type.
+            tdMode: Trading mode.
+            instFamily: Instrument family.
+            product_symbol: Trading pair symbol.
+            ccy: Currency.
+            tier: Tier level.
+
+        Returns:
+            Dictionary containing position tiers information.
+        """
+        payload: dict[str, Any] = {"instType": instType, "tdMode": tdMode}
+        if instFamily is not None:
+            payload["instFamily"] = instFamily
+        if product_symbol is not None:
+            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
+        if ccy is not None:
+            payload["ccy"] = ccy
+        if tier is not None:
+            payload["tier"] = tier
+
+        res = self._request(
+            method="GET",
+            path=Public.GET_POSITION_TIERS,
+            query=payload,
+            signed=False,
+        )
+        return res

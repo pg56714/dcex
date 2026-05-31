@@ -68,6 +68,23 @@ def test_binance_request_logs_debug_and_error(caplog: pytest.LogCaptureFixture) 
     assert any("request failed" in m for m in messages)
 
 
+def test_sync_bitmex_wraps_requests_errors() -> None:
+    """Sync BitMEX uses requests, so requests transport errors must be wrapped."""
+    import requests
+
+    from dcex.bitmex._http_manager import HTTPManager
+
+    class RaisingSession:
+        def get(self, *args: object, **kwargs: object) -> object:
+            raise requests.exceptions.ConnectionError("offline")
+
+    manager = HTTPManager(preload_product_table=False)
+    manager.session = RaisingSession()  # type: ignore[assignment]
+
+    with pytest.raises(FailedRequestError, match="offline"):
+        manager._request("GET", "/api/v1/instrument", signed=False)
+
+
 class _FakeSession:
     """Minimal stand-in for requests.Session returning a Binance API error."""
 

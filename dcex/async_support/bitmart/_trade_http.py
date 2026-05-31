@@ -227,7 +227,7 @@ class TradeHTTP(HTTPManager):
             client_order_id=client_order_id,
         )
 
-    async def place_post_only_limit_sell_order(
+    async def place_spot_post_only_limit_sell_order(
         self,
         product_symbol: str,
         size: str,
@@ -237,6 +237,20 @@ class TradeHTTP(HTTPManager):
         return await self.place_spot_post_only_limit_order(
             product_symbol=product_symbol,
             side="sell",
+            size=size,
+            price=price,
+            client_order_id=client_order_id,
+        )
+
+    async def place_post_only_limit_sell_order(
+        self,
+        product_symbol: str,
+        size: str,
+        price: str,
+        client_order_id: str | None = None,
+    ) -> dict[str, Any]:
+        return await self.place_spot_post_only_limit_sell_order(
+            product_symbol=product_symbol,
             size=size,
             price=price,
             client_order_id=client_order_id,

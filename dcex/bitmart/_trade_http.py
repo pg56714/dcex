@@ -337,6 +337,32 @@ class TradeHTTP(HTTPManager):
             client_order_id=client_order_id,
         )
 
+    def place_post_only_limit_sell_order(
+        self,
+        product_symbol: str,
+        size: str,
+        price: str,
+        client_order_id: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Backward-compatible alias for spot post-only limit sell orders.
+
+        Args:
+            product_symbol: Trading pair symbol
+            size: Order size
+            price: Order price
+            client_order_id: Client order ID (optional)
+
+        Returns:
+            Dict containing order placement result
+        """
+        return self.place_spot_post_only_limit_sell_order(
+            product_symbol=product_symbol,
+            size=size,
+            price=price,
+            client_order_id=client_order_id,
+        )
+
     def cancel_spot_order(
         self,
         product_symbol: str,

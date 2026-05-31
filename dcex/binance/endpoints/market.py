@@ -10,6 +10,7 @@ class SpotMarket(str, Enum):
     ORDERBOOK = "/api/v3/depth"
     TRADES = "/api/v3/trades"
     KLINES = "/api/v3/klines"
+    PRICE = "/api/v3/ticker/price"
 
     def __str__(self) -> str:
         return self.value

@@ -356,6 +356,7 @@ class TradeHTTP(HTTPManager):
         reduceOnly: bool | None = None,
         isLeverage: int | None = None,
         timeInForce: str | None = None,
+        positionIdx: int | None = None,
     ) -> dict[str, Any]:
         """
         Place a post-only limit order.
@@ -368,6 +369,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly: Whether this is a reduce-only order
             isLeverage: Whether to use leverage (0 or 1)
             timeInForce: Time in force (defaults to "PostOnly")
+            positionIdx: Position index
 
         Returns:
             dict[str, Any]: API response containing order information
@@ -380,7 +382,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
             timeInForce="PostOnly",
             isLeverage=isLeverage,
-            positionIdx=None,
+            positionIdx=positionIdx,
         )
 
     def place_post_only_limit_buy_order(
@@ -413,6 +415,7 @@ class TradeHTTP(HTTPManager):
             price=price,
             reduceOnly=reduceOnly,
             isLeverage=isLeverage,
+            positionIdx=positionIdx,
         )
 
     def place_post_only_limit_sell_order(
@@ -445,6 +448,7 @@ class TradeHTTP(HTTPManager):
             price=price,
             reduceOnly=reduceOnly,
             isLeverage=isLeverage,
+            positionIdx=positionIdx,
         )
 
     def amend_order(

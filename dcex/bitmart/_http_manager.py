@@ -157,31 +157,36 @@ class HTTPManager(BaseHTTPManager):
         base_url = self._get_base_url(path)
         url = base_url + str(path)
 
-        if method.upper() == "GET" and query:
+        method_upper = method.upper()
+        if method_upper == "GET" and query:
             params_str = "&".join(f"{k}={v}" for k, v in sorted(query.items()) if v)
             url = f"{url}?{params_str}"
 
         timestamp = generate_timestamp()
+        body = (
+            msgspec.json.encode(query if query else {}).decode("utf-8")
+            if method_upper == "POST"
+            else ""
+        )
 
         if signed:
             if not (self.api_key and self.api_secret and self.memo):
                 raise ValueError("Signed request requires API Key and Secret and Memo.")
-            sign = sign_message(
-                timestamp, self.memo, msgspec.json.encode(query).decode("utf-8"), self.api_secret
-            )
+            sign = sign_message(timestamp, self.memo, body, self.api_secret)
             headers = get_header(self.api_key, sign, timestamp, self.memo)
         else:
             headers = get_header_no_sign()
 
         self._log_request(method, url)
 
+        response = None
         try:
-            if method.upper() == "GET":
+            if method_upper == "GET":
                 response = self.session.get(url, headers=headers, timeout=self.timeout)
-            elif method.upper() == "POST":
+            elif method_upper == "POST":
                 response = self.session.post(
                     url,
-                    json=query if query else {},
+                    data=body,
                     headers=headers,
                     timeout=self.timeout,
                 )

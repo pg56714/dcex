@@ -13,7 +13,10 @@ to fail loudly if a refactor ever changes signing behaviour.
 import base64
 import hashlib
 import hmac
+from importlib import import_module
 from urllib.parse import urlencode
+
+import pytest
 
 # Fixed, fake credentials shared across the tests. Not real secrets.
 API_KEY = "test_api_key_0000"
@@ -22,6 +25,30 @@ MEMO = "test_memo"
 TS_MS = 1700000000000
 TS_S = "1700000000"
 RECV_WINDOW = 5000
+
+
+class _FakeResponse:
+    def __init__(self, payload: dict, status_code: int = 200, text: str = "") -> None:
+        self._payload = payload
+        self.status_code = status_code
+        self.headers: dict[str, str] = {}
+        self.text = text
+
+    def json(self) -> dict:
+        return self._payload
+
+
+class _CaptureBitmartSession:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str, dict]] = []
+
+    def get(self, url: str, **kwargs: object) -> _FakeResponse:
+        self.calls.append(("GET", url, kwargs))
+        return _FakeResponse({"code": 1000})
+
+    def post(self, url: str, **kwargs: object) -> _FakeResponse:
+        self.calls.append(("POST", url, kwargs))
+        return _FakeResponse({"code": 1000})
 
 
 def test_binance_sign_matches_hmac_sha256() -> None:
@@ -33,9 +60,7 @@ def test_binance_sign_matches_hmac_sha256() -> None:
 
     signature = manager._sign(params)
 
-    expected = hmac.new(
-        API_SECRET.encode(), urlencode(params).encode(), hashlib.sha256
-    ).hexdigest()
+    expected = hmac.new(API_SECRET.encode(), urlencode(params).encode(), hashlib.sha256).hexdigest()
     assert signature == expected
     assert signature == "b64fbb3537cfe45d61d16ef4426dcb9c1f86e5a438660d4d25fb0cf541817c48"
 
@@ -103,6 +128,72 @@ def test_bitmart_sign_matches_hmac_sha256() -> None:
     ).hexdigest()
     assert signature == expected
     assert signature == "a5a38bab707890a577d96959ca82a1b7a4c0db7ffd9b40ba17b20ad57932a542"
+
+
+def test_bitmart_signed_get_uses_empty_body_for_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """BitMart signed GET signs an empty body and sends params in the URL."""
+    from dcex.bitmart._http_manager import HTTPManager, sign_message
+    from dcex.bitmart.endpoints.account import FundingAccount
+
+    bitmart_http = import_module("dcex.bitmart._http_manager")
+    monkeypatch.setattr(bitmart_http, "generate_timestamp", lambda: TS_MS)
+    session = _CaptureBitmartSession()
+    manager = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        memo=MEMO,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+
+    manager._request(
+        "GET",
+        FundingAccount.GET_ACCOUNT_BALANCE,
+        query={"currency": "USDT"},
+        signed=True,
+    )
+
+    method, url, kwargs = session.calls[0]
+    expected_sign = sign_message(TS_MS, MEMO, "", API_SECRET)
+    assert method == "GET"
+    assert url.endswith("/account/v1/wallet?currency=USDT")
+    assert kwargs["headers"]["X-BM-SIGN"] == expected_sign
+
+
+def test_bitmart_signed_post_sends_the_exact_body_used_for_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """BitMart signed POST uses the same compact JSON string for signing and body."""
+    from dcex.bitmart._http_manager import HTTPManager, sign_message
+    from dcex.bitmart.endpoints.account import FundingAccount
+
+    bitmart_http = import_module("dcex.bitmart._http_manager")
+    monkeypatch.setattr(bitmart_http, "generate_timestamp", lambda: TS_MS)
+    session = _CaptureBitmartSession()
+    manager = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        memo=MEMO,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+
+    manager._request(
+        "POST",
+        FundingAccount.WITHDRAW,
+        query={"currency": "USDT", "amount": "1", "address": "test-address"},
+        signed=True,
+    )
+
+    method, _url, kwargs = session.calls[0]
+    body = '{"currency":"USDT","amount":"1","address":"test-address"}'
+    expected_sign = sign_message(TS_MS, MEMO, body, API_SECRET)
+    assert method == "POST"
+    assert kwargs["data"] == body
+    assert "json" not in kwargs
+    assert kwargs["headers"]["X-BM-SIGN"] == expected_sign
 
 
 def test_bitmex_sign_matches_hmac_sha256() -> None:

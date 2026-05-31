@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlencode
 
-import httpx
 import msgspec
 import requests
 
@@ -222,7 +221,7 @@ class HTTPManager(BaseHTTPManager):
                 self._update_rate_limit_info(response)
                 return data
 
-        except httpx.RequestError as e:
+        except requests.exceptions.RequestException as e:
             timestamp = str(generate_timestamp(iso_format=True))
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Params: {query}",

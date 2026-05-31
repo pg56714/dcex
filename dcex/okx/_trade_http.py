@@ -469,6 +469,25 @@ class TradeHTTP(HTTPManager):
             query=payload,
         )
 
+    def cancel_batch_orders(
+        self,
+        orders: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """
+        Cancel multiple orders in batch.
+
+        Args:
+            orders: List of order dictionaries to cancel.
+
+        Returns:
+            Dictionary containing batch cancellation result.
+        """
+        return self._request(
+            method="POST",
+            path=Trade.CANCEL_BATCH_ORDERS,
+            query=orders,
+        )
+
     def cancel_all_orders(
         self,
         product_symbol: str | None = None,

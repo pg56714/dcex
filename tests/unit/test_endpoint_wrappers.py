@@ -324,6 +324,8 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
     kwargs = _required_kwargs(case, method)
     if case.exchange == "bitmex" and case.method_name == "amend_order":
         kwargs["orderID"] = "test-order-id"
+    if case.exchange == "bitmart" and case.method_name == "post_withdraw_apply":
+        kwargs["address"] = "test-address"
     return kwargs
 
 
@@ -439,6 +441,52 @@ def test_sync_hyperliquid_builder_fee_requires_address_and_fee() -> None:
         )
 
 
+def test_sync_bitmart_withdraw_apply_payload_matches_docs() -> None:
+    client = _client_class("sync", "bitmart")(**_client_kwargs("bitmart"))
+    calls = _wire_sync(client)
+
+    result = client.post_withdraw_apply(
+        currency="USDT",
+        amount="1",
+        address="test-address",
+        address_memo="memo",
+        destination="wallet",
+    )
+
+    assert result == {"ok": True}
+    assert calls[0]["query"] == {
+        "currency": "USDT",
+        "amount": "1",
+        "address": "test-address",
+        "address_memo": "memo",
+        "destination": "wallet",
+    }
+
+
+def test_sync_bitmart_withdraw_apply_requires_destination() -> None:
+    client = _client_class("sync", "bitmart")(**_client_kwargs("bitmart"))
+    _wire_sync(client)
+
+    with pytest.raises(ValueError, match="Withdraw requires address"):
+        client.post_withdraw_apply(currency="USDT", amount="1")
+
+
+def test_sync_bybit_post_only_forwards_position_idx() -> None:
+    client = _client_class("sync", "bybit")(**_client_kwargs("bybit"))
+    calls = _wire_sync(client)
+
+    result = client.place_post_only_limit_buy_order(
+        product_symbol="BTC-USDT-SWAP",
+        qty="1",
+        price="100",
+        positionIdx=1,
+    )
+
+    assert result == {"ok": True}
+    assert calls[0]["query"]["timeInForce"] == "PostOnly"
+    assert calls[0]["query"]["positionIdx"] == "1"
+
+
 @pytest.mark.parametrize("case", ASYNC_CASES, ids=[case.id for case in ASYNC_CASES])
 @pytest.mark.asyncio
 async def test_async_endpoint_wrapper_is_reachable(
@@ -493,3 +541,35 @@ async def test_async_hyperliquid_builder_fee_requires_address_and_fee() -> None:
             reduceOnly=False,
             builder_address="0x0000000000000000000000000000000000000002",
         )
+
+
+@pytest.mark.asyncio
+async def test_async_bitmart_withdraw_apply_payload_matches_docs() -> None:
+    client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))
+    calls = _wire_async(client)
+
+    result = await client.post_withdraw_apply(
+        currency="USDT",
+        amount="1",
+        address="test-address",
+        address_memo="memo",
+        destination="wallet",
+    )
+
+    assert result == {"ok": True}
+    assert calls[0]["query"] == {
+        "currency": "USDT",
+        "amount": "1",
+        "address": "test-address",
+        "address_memo": "memo",
+        "destination": "wallet",
+    }
+
+
+@pytest.mark.asyncio
+async def test_async_bitmart_withdraw_apply_requires_destination() -> None:
+    client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))
+    _wire_async(client)
+
+    with pytest.raises(ValueError, match="Withdraw requires address"):
+        await client.post_withdraw_apply(currency="USDT", amount="1")

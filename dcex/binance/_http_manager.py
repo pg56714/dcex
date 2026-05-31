@@ -126,6 +126,7 @@ class HTTPManager(BaseHTTPManager):
             query["recvWindow"] = 5000
             query["signature"] = self._sign(query)
 
+        response = None
         try:
             base_url = self._get_base_url(path)
             url = f"{base_url}{path}"

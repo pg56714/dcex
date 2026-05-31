@@ -141,6 +141,12 @@ class AccountHTTP(HTTPManager):
         self,
         currency: str,
         amount: str,
+        address: str | None = None,
+        address_memo: str | None = None,
+        destination: str | None = None,
+        type: int | None = None,
+        value: str | None = None,
+        areaCode: str | None = None,
     ) -> dict[str, Any]:
         """
         Apply for withdrawal of a specific currency and amount.
@@ -148,6 +154,12 @@ class AccountHTTP(HTTPManager):
         Args:
             currency: Currency symbol to withdraw
             amount: Amount to withdraw (as string)
+            address: Blockchain withdrawal address
+            address_memo: Address memo or tag
+            destination: Destination description
+            type: Internal transfer target type
+            value: Internal transfer target value
+            areaCode: Phone area code for phone-number internal transfers
 
         Returns:
             Dict containing withdrawal application result
@@ -155,10 +167,31 @@ class AccountHTTP(HTTPManager):
         Raises:
             FailedRequestError: If the API request fails
         """
+        has_blockchain_destination = address is not None
+        has_internal_destination = type is not None or value is not None or areaCode is not None
+        if has_blockchain_destination and has_internal_destination:
+            raise ValueError("Specify either address or internal transfer destination, not both.")
+        if not has_blockchain_destination and not (type is not None and value is not None):
+            raise ValueError("Withdraw requires address, or type and value for internal transfer.")
+        if type == 3 and areaCode is None:
+            raise ValueError("areaCode is required when internal transfer type is phone.")
+
         payload: dict[str, Any] = {
             "currency": currency,
             "amount": amount,
         }
+        if address is not None:
+            payload["address"] = address
+        if address_memo is not None:
+            payload["address_memo"] = address_memo
+        if destination is not None:
+            payload["destination"] = destination
+        if type is not None:
+            payload["type"] = type
+        if value is not None:
+            payload["value"] = value
+        if areaCode is not None:
+            payload["areaCode"] = areaCode
 
         res = self._request(
             method="POST",

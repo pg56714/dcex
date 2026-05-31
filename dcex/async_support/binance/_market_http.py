@@ -104,6 +104,7 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         product_symbols: list | None = None,
+        symbolStatus: str | None = None,
     ) -> dict:
         """
         Get spot price information.
@@ -111,6 +112,7 @@ class MarketHTTP(HTTPManager):
         Args:
             product_symbol: Single trading pair symbol (e.g., 'BTCUSDT')
             product_symbols: List of trading pair symbols
+            symbolStatus: Symbol status filter
 
         Returns:
             dict: Price information
@@ -123,6 +125,8 @@ class MarketHTTP(HTTPManager):
                 self.ptm.get_exchange_symbol(Common.BINANCE, symbol) for symbol in product_symbols
             ]
             payload["symbols"] = str(formatted_symbols).replace("'", '"')
+        if symbolStatus is not None:
+            payload["symbolStatus"] = symbolStatus
 
         res = await self._request(
             method="GET",
