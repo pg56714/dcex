@@ -1,3 +1,27 @@
+## 0.10.0 (2026-05-31)
+
+### Feat
+
+- **trade**: accept OrderSide in order placement across all exchanges
+- **enums**: add unified OrderSide enum
+- **base**: emit request/error logs across remaining exchanges
+- **base**: emit request/error logs, adopt in binance
+
+### Fix
+
+- harden exchange http managers
+- align exchange wrappers with api docs
+- align live test gating and hyperliquid builder payload
+
+### Refactor
+
+- **product_table**: share query logic between sync and async
+- **base**: drop the unused drop_none helper
+- **base**: adopt BaseHTTPManager in bitmex and hyperliquid
+- **base**: adopt BaseHTTPManager in bybit, okx, bitmart, gateio
+- **base**: add shared HTTP manager base, adopt in binance
+- **product_table**: derive fetch lists from a central registry
+
 ## 0.9.3 (2026-05-30)
 
 ### Fix
