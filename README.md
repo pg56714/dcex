@@ -133,23 +133,40 @@ We welcome contributions! Please see our [Contributing Guide](.github/CONTRIBUTI
 
 ## Testing
 
-The default test suite is offline and does not require exchange API keys:
+The default test suite is offline and does not require exchange API keys or network access:
 
 ```bash
 uv run pytest
 ```
 
-Live exchange tests are opt-in:
+Public live exchange tests are opt-in. They use network access but do not require API keys:
 
 ```bash
 uv run pytest -m "live and not private"
 ```
 
-Private live tests require the relevant exchange API key environment variables:
+Private live tests require the relevant exchange API key environment variables. Use `not stateful`
+for the normal per-exchange key rotation workflow:
 
 ```bash
-uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private"
+uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful"
 ```
+
+Stateful tests can change exchange or account settings, such as leverage or position mode. Run them
+only when that is intentional:
+
+```bash
+uv run pytest tests/sync_support/okx tests/async_support/okx -m "live and private and stateful"
+```
+
+## Examples
+
+Examples are under `examples/sync` and `examples/async`. They are concise read-only usage examples:
+
+- `*_public.py` examples do not require API keys.
+- `*_private_readonly.py` examples require credentials but avoid order placement, cancellations,
+  withdrawals, transfers, leverage changes, and account-mode changes.
+- Endpoint validation belongs in `tests`, not in `examples`.
 
 ## 📄 License
 
