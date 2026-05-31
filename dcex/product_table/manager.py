@@ -58,8 +58,9 @@ class ProductTableManager(ProductTableQueryMixin):
             ProductTableManager: The singleton instance
         """
         if exchange_name not in cls._instance:
-            cls._instance[exchange_name] = cls()
-            cls._instance[exchange_name]._initialize(exchange_name=exchange_name)
+            instance = cls()
+            instance._initialize(exchange_name=exchange_name)
+            cls._instance[exchange_name] = instance
         return cls._instance[exchange_name]
 
     def _initialize(self, exchange_name: str | None = None) -> None:

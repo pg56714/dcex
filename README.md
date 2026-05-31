@@ -131,6 +131,26 @@ print(product_symbol)
 
 We welcome contributions! Please see our [Contributing Guide](.github/CONTRIBUTING.md) for details.
 
+## Testing
+
+The default test suite is offline and does not require exchange API keys:
+
+```bash
+uv run pytest
+```
+
+Live exchange tests are opt-in:
+
+```bash
+uv run pytest -m "live and not private"
+```
+
+Private live tests require the relevant exchange API key environment variables:
+
+```bash
+uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private"
+```
+
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).

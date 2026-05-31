@@ -3,7 +3,7 @@ import polars as pl
 from dcex.product_table.manager import ProductTableManager
 
 
-def test_fetch_product_tables():
+def main():
     manager = ProductTableManager.get_instance()
 
     if isinstance(manager.product_table, pl.DataFrame) and manager.product_table.height > 0:
@@ -22,4 +22,4 @@ def test_fetch_product_tables():
 
 
 if __name__ == "__main__":
-    test_fetch_product_tables()
+    main()

@@ -70,8 +70,9 @@ class ProductTableManager(ProductTableQueryMixin):
                 )
 
         if exchange_name not in cls._instance:
-            cls._instance[exchange_name] = cls()
-            await cls._instance[exchange_name]._initialize(exchange_name=exchange_name)
+            instance = cls()
+            await instance._initialize(exchange_name=exchange_name)
+            cls._instance[exchange_name] = instance
         return cls._instance[exchange_name]
 
     async def _initialize(self, exchange_name: str | None = None) -> None:

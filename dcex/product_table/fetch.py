@@ -147,8 +147,10 @@ def bitmart() -> pl.DataFrame:
 
     markets = []
     res_swap = market_http.get_contracts_details()
-    df_swap = to_dataframe(res_swap.get("data", {}).get("symbols", []))
-    for market in df_swap.iter_rows(named=True):
+    for market in res_swap.get("data", {}).get("symbols", []):
+        if not isinstance(market, dict):
+            continue
+
         base = market["base_currency"]
         quote = market["quote_currency"]
         product_symbol = f"{base}-{quote}-SWAP"
@@ -170,8 +172,10 @@ def bitmart() -> pl.DataFrame:
         )
 
     res_spot = market_http.get_trading_pairs_details()
-    df_spot = to_dataframe(res_spot.get("data", {}).get("symbols", []))
-    for market in df_spot.iter_rows(named=True):
+    for market in res_spot.get("data", {}).get("symbols", []):
+        if not isinstance(market, dict):
+            continue
+
         base = market["base_currency"]
         quote = market["quote_currency"]
         product_symbol = f"{base}-{quote}-SPOT"
@@ -544,21 +548,28 @@ def hyperliquid() -> pl.DataFrame:
         )
 
     res_spot = market_http.get_spot_meta()
-    df_tokens = to_dataframe(res_spot.get("tokens", []))
-    df_spot = to_dataframe(res_spot.get("universe", []))
+    token_by_index = {
+        token["index"]: token for token in res_spot.get("tokens", []) if isinstance(token, dict)
+    }
 
-    for idx, market in enumerate(df_spot.iter_rows(named=True)):
-        # exchange_symbol = market["name"]
+    for idx, market in enumerate(res_spot.get("universe", [])):
+        if not isinstance(market, dict):
+            continue
         base_i, quote_i = market["tokens"]
+        base_token = token_by_index.get(base_i)
+        quote_token = token_by_index.get(quote_i)
+        if base_token is None or quote_token is None:
+            continue
 
-        base = df_tokens["name"][base_i]  # e.g. "PURR"
-        quote = df_tokens["name"][quote_i]  # e.g. "USDC"
-        tick = str(reverse_decimal_places(df_tokens["szDecimals"][base_i]))
+        base = base_token["name"]  # e.g. "PURR"
+        quote = quote_token["name"]  # e.g. "USDC"
+        tick = str(reverse_decimal_places(base_token["szDecimals"]))
+        asset_index = market.get("index", idx)
 
         markets.append(
             MarketInfo(
                 exchange=Common.HYPERLIQUID,
-                exchange_symbol='["{}", {}]'.format(market["name"], 10000 + idx),
+                exchange_symbol='["{}", {}]'.format(market["name"], 10000 + asset_index),
                 product_symbol=f"{base}-{quote}-SPOT",
                 product_type="spot",
                 exchange_type="spot",

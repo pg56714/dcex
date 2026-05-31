@@ -5,7 +5,7 @@ import polars as pl
 from dcex.async_support.product_table.manager import ProductTableManager
 
 
-async def test_fetch_product_tables():
+async def main():
     manager = await ProductTableManager.get_instance()
 
     if isinstance(manager.product_table, pl.DataFrame) and manager.product_table.height > 0:
@@ -24,4 +24,4 @@ async def test_fetch_product_tables():
 
 
 if __name__ == "__main__":
-    asyncio.run(test_fetch_product_tables())
+    asyncio.run(main())

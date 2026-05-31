@@ -141,7 +141,7 @@ show_contexts = true
 title = "Coverage Report"
 
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib -ra --strict-config --strict-markers"
+addopts = "--import-mode=importlib -ra --strict-config --strict-markers -m 'not live and not private'"
 filterwarnings = [
   "error",
   "ignore::pytest.PytestUnraisableExceptionWarning",
@@ -153,6 +153,7 @@ filterwarnings = [
 ]
 markers = [
   "asyncio: marks tests as asyncio tests",
+  "live: marks tests that call live exchange APIs",
   "private: marks tests that require private API keys",
 ]
 python_files = ["test_*.py"]

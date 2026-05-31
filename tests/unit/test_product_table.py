@@ -9,6 +9,9 @@ import polars as pl
 import pytest
 
 from dcex.product_table.manager import ProductTableManager, ProductTableError
+from dcex.async_support.product_table.manager import (
+    ProductTableManager as AsyncProductTableManager,
+)
 
 # A tiny fixture table covering two exchanges and spot/swap rows.
 _ROWS = [
@@ -131,3 +134,43 @@ def test_missing_lookup_raises() -> None:
     manager = _make_manager()
     with pytest.raises(ProductTableError):
         manager.get_exchange_symbol("binance", "DOGE-USDT-SPOT")
+
+
+def test_failed_sync_initialization_is_not_cached(monkeypatch: pytest.MonkeyPatch) -> None:
+    key = "broken-sync"
+    ProductTableManager._instance.pop(key, None)
+
+    def fail_initialize(self: ProductTableManager, exchange_name: str | None = None) -> None:
+        raise ProductTableError("boom")
+
+    monkeypatch.setattr(ProductTableManager, "_initialize", fail_initialize)
+
+    with pytest.raises(ProductTableError, match="boom"):
+        ProductTableManager.get_instance(key)
+
+    assert key not in ProductTableManager._instance
+
+
+@pytest.mark.asyncio
+async def test_failed_async_initialization_is_not_cached(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    key = "binance"
+    original = AsyncProductTableManager._instance.pop(key, None)
+
+    async def fail_initialize(
+        self: AsyncProductTableManager,
+        exchange_name: str | None = None,
+    ) -> None:
+        raise ProductTableError("boom")
+
+    monkeypatch.setattr(AsyncProductTableManager, "_initialize", fail_initialize)
+
+    try:
+        with pytest.raises(ProductTableError, match="boom"):
+            await AsyncProductTableManager.get_instance(key)
+
+        assert key not in AsyncProductTableManager._instance
+    finally:
+        if original is not None:
+            AsyncProductTableManager._instance[key] = original
