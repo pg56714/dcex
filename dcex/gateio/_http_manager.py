@@ -22,6 +22,12 @@ from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 
 
+def _format_query_string(query: dict[str, Any] | None) -> str:
+    if not query:
+        return ""
+    return "&".join(f"{key}={value}" for key, value in query.items())
+
+
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """
@@ -38,6 +44,7 @@ class HTTPManager(BaseHTTPManager):
         api_secret: Gate.io API secret for request signing
         base_url: Base URL for the Gate.io API
         logger: Logger instance for debugging
+        timeout: Request timeout in seconds
         session: HTTP session for connection pooling
         preload_product_table: Whether to preload product table on initialization
     """
@@ -48,6 +55,7 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None)
     base_url: str = field(default="https://api.gateio.ws")
     logger: logging.Logger | None = field(default=None)
+    timeout: int = field(default=10)
     session: requests.Session = field(default_factory=requests.Session, init=False)
     preload_product_table: bool = field(default=True)
 
@@ -116,9 +124,7 @@ class HTTPManager(BaseHTTPManager):
         payload_string = msgspec.json.encode(body or {}).decode("utf-8") if body else ""
         hashed_payload = hashlib.sha512(payload_string.encode("utf-8")).hexdigest()
 
-        query_string = ""
-        if query:
-            query_string = "&".join(f"{k}={v}" for k, v in sorted(query.items()))
+        query_string = _format_query_string(query)
 
         s = f"{method.upper()}\n{url_path}\n{query_string}\n{hashed_payload}\n{timestamp}"
         return hmac.new(
@@ -182,24 +188,56 @@ class HTTPManager(BaseHTTPManager):
         try:
             method_upper = method.upper()
             body_string = None
+            query_params: Any = _format_query_string(query) or None
             if method_upper in ("POST", "PUT", "PATCH"):
                 body_string = msgspec.json.encode(body).decode("utf-8")
 
             if method_upper == "GET":
-                response = self.session.get(url, headers=headers, params=query)
+                response = self.session.get(
+                    url,
+                    headers=headers,
+                    params=query_params,
+                    timeout=self.timeout,
+                )
             elif method_upper == "POST":
                 if body:
                     response = self.session.post(
-                        url, headers=headers, params=query, data=body_string
+                        url,
+                        headers=headers,
+                        params=query_params,
+                        data=body_string,
+                        timeout=self.timeout,
                     )
                 else:
-                    response = self.session.post(url, headers=headers, params=query)
+                    response = self.session.post(
+                        url,
+                        headers=headers,
+                        params=query_params,
+                        timeout=self.timeout,
+                    )
             elif method_upper == "PUT":
-                response = self.session.put(url, headers=headers, params=query, data=body_string)
+                response = self.session.put(
+                    url,
+                    headers=headers,
+                    params=query_params,
+                    data=body_string,
+                    timeout=self.timeout,
+                )
             elif method_upper == "DELETE":
-                response = self.session.delete(url, headers=headers, params=query)
+                response = self.session.delete(
+                    url,
+                    headers=headers,
+                    params=query_params,
+                    timeout=self.timeout,
+                )
             elif method_upper == "PATCH":
-                response = self.session.patch(url, headers=headers, params=query, data=body_string)
+                response = self.session.patch(
+                    url,
+                    headers=headers,
+                    params=query_params,
+                    data=body_string,
+                    timeout=self.timeout,
+                )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 

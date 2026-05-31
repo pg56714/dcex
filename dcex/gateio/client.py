@@ -60,6 +60,7 @@ class Client(
                    - api_key: Gate.io API key
                    - api_secret: Gate.io API secret
                    - base_url: Base URL for the API (default: https://api.gateio.ws)
+                   - timeout: Request timeout in seconds
                    - logger: Logger instance for debugging
                    - preload_product_table: Whether to preload product table (default: True)
         """

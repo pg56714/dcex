@@ -23,6 +23,12 @@ from ...utils.errors import FailedRequestError
 from ..product_table.manager import ProductTableManager
 
 
+def _format_query_string(query: dict[str, Any] | None) -> str:
+    if not query:
+        return ""
+    return "&".join(f"{key}={value}" for key, value in query.items())
+
+
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """
@@ -119,9 +125,7 @@ class HTTPManager(BaseHTTPManager):
         payload_string = msgspec.json.encode(body or {}).decode("utf-8") if body else ""
         hashed_payload = hashlib.sha512(payload_string.encode("utf-8")).hexdigest()
 
-        query_string = ""
-        if query:
-            query_string = "&".join(f"{k}={v}" for k, v in sorted(query.items()))
+        query_string = _format_query_string(query)
 
         s = f"{method.upper()}\n{url_path}\n{query_string}\n{hashed_payload}\n{timestamp}"
         if self.api_secret is None:
@@ -194,24 +198,25 @@ class HTTPManager(BaseHTTPManager):
         try:
             method_upper = method.upper()
             body_string = None
+            query_params: Any = _format_query_string(query) or None
             if method_upper in ("POST", "PUT", "PATCH"):
                 body_string = msgspec.json.encode(body).decode("utf-8")
 
             if method_upper == "GET":
-                response = await self.session.get(url, headers=headers, params=query)
+                response = await self.session.get(url, headers=headers, params=query_params)
             elif method_upper == "POST":
                 response = await self.session.post(
-                    url, headers=headers, params=query, content=body_string
+                    url, headers=headers, params=query_params, content=body_string
                 )
             elif method_upper == "PUT":
                 response = await self.session.put(
-                    url, headers=headers, params=query, content=body_string
+                    url, headers=headers, params=query_params, content=body_string
                 )
             elif method_upper == "DELETE":
-                response = await self.session.delete(url, headers=headers, params=query)
+                response = await self.session.delete(url, headers=headers, params=query_params)
             elif method_upper == "PATCH":
                 response = await self.session.patch(
-                    url, headers=headers, params=query, content=body_string
+                    url, headers=headers, params=query_params, content=body_string
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")

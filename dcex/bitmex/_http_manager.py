@@ -169,7 +169,9 @@ class HTTPManager(BaseHTTPManager):
                     url += f"?{query_string}"
                     full_path += f"?{query_string}"
                 response = self.session.get(
-                    url, headers=self._headers(method, full_path, signed=signed)
+                    url,
+                    headers=self._headers(method, full_path, signed=signed),
+                    timeout=self.timeout,
                 )
             elif method.upper() == "POST":
                 body = msgspec.json.encode(query).decode("utf-8") if query else ""
@@ -177,6 +179,7 @@ class HTTPManager(BaseHTTPManager):
                     url,
                     headers=self._headers(method, full_path, body, signed=signed),
                     data=body,
+                    timeout=self.timeout,
                 )
             elif method.upper() == "PUT":
                 body = msgspec.json.encode(query).decode("utf-8") if query else ""
@@ -184,6 +187,7 @@ class HTTPManager(BaseHTTPManager):
                     url,
                     headers=self._headers(method, full_path, body, signed=signed),
                     data=body,
+                    timeout=self.timeout,
                 )
             elif method.upper() == "DELETE":
                 body = msgspec.json.encode(query).decode("utf-8") if query else ""
@@ -192,6 +196,7 @@ class HTTPManager(BaseHTTPManager):
                     url=url,
                     headers=self._headers(method, full_path, body, signed=signed),
                     data=body,
+                    timeout=self.timeout,
                 )
             else:
                 raise ValueError(f"Unsupported method: {method}")

@@ -46,7 +46,8 @@ class Client(
                - api_secret: OKX API secret
                - passphrase: OKX API passphrase
                - flag: Trading flag ("0" for live, "1" for demo)
-               - base_api: Base API URL (default: "https://www.okx.com")
+               - base_api: Base API URL (default: "https://openapi.okx.com")
+               - timeout: Request timeout in seconds
                - max_retries: Maximum number of retries for failed requests
                - retry_delay: Delay between retries in seconds
                - logger: Custom logger instance

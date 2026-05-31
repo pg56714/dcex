@@ -112,6 +112,16 @@ def get_header_no_sign(flag: str) -> dict[str, str]:
     return header
 
 
+def _okx_error_details(data: dict[str, Any]) -> tuple[str, str]:
+    api_code = str(data.get("code", "Unknown"))
+    error_message = str(data.get("msg") or "Unknown error")
+    rows = data.get("data")
+    if isinstance(rows, list) and rows and isinstance(rows[0], dict):
+        api_code = str(rows[0].get("sCode") or api_code)
+        error_message = str(rows[0].get("sMsg") or error_message)
+    return api_code, error_message
+
+
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """
@@ -126,6 +136,7 @@ class HTTPManager(BaseHTTPManager):
         passphrase: OKX API passphrase
         flag: Simulated trading flag ("0" for live, "1" for simulated)
         base_api: Base URL for OKX API
+        timeout: Request timeout in seconds
         max_retries: Maximum number of retry attempts
         retry_delay: Delay between retry attempts in seconds
         logger: Logger instance for debugging
@@ -140,7 +151,8 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None)
     passphrase: str | None = field(default=None)
     flag: str = field(default="0")
-    base_api: str = field(default="https://www.okx.com")
+    base_api: str = field(default="https://openapi.okx.com")
+    timeout: int = field(default=10)
     max_retries: int = field(default=3)
     retry_delay: int = field(default=3)
     logger: logging.Logger | None = field(default=None)
@@ -211,9 +223,14 @@ class HTTPManager(BaseHTTPManager):
 
         try:
             if method.upper() == "GET":
-                response = self.session.get(url, headers=headers)
+                response = self.session.get(url, headers=headers, timeout=self.timeout)
             elif method.upper() == "POST":
-                response = self.session.post(url, data=body_str, headers=headers)
+                response = self.session.post(
+                    url,
+                    data=body_str,
+                    headers=headers,
+                    timeout=self.timeout,
+                )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
         except requests.exceptions.RequestException as e:
@@ -229,16 +246,15 @@ class HTTPManager(BaseHTTPManager):
                 data = response.json()
             except Exception:
                 data = {}
+            if not isinstance(data, dict):
+                data = {}
 
             if data.get("code", "0") != "0":
-                status_code = data.get("data", [{}])[0].get("sCode", "Unknown")
-                error_message = data.get("data", [{}])[0].get("sMsg", "Unknown error")
-                self._log_failed_request(
-                    f"OKX API Error: [{status_code}] {error_message}", status_code
-                )
+                api_code, error_message = _okx_error_details(data)
+                self._log_failed_request(f"OKX API Error: [{api_code}] {error_message}", api_code)
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"OKX API Error: [{status_code}] {error_message}",
+                    message=f"OKX API Error: [{api_code}] {error_message}",
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),
