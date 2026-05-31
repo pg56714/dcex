@@ -8,6 +8,7 @@ and spot margin trading functionality.
 
 from typing import Any
 
+from ..enums import OrderSide
 from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.trade import SpotMarginTrade, Trade
@@ -28,7 +29,7 @@ class TradeHTTP(HTTPManager):
     def place_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         orderType: str,
         qty: str,
         price: str | None = None,
@@ -89,7 +90,7 @@ class TradeHTTP(HTTPManager):
         payload = {
             "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
             "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "side": side,
+            "side": OrderSide.from_any(side).to_exchange(Common.BYBIT),
             "orderType": orderType,
             "qty": qty,
         }
@@ -145,7 +146,7 @@ class TradeHTTP(HTTPManager):
     def place_market_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         qty: str,
         reduceOnly: bool | None = None,
         isLeverage: int | None = None,
@@ -238,7 +239,7 @@ class TradeHTTP(HTTPManager):
     def place_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         qty: str,
         price: str,
         reduceOnly: bool | None = None,
@@ -349,7 +350,7 @@ class TradeHTTP(HTTPManager):
     def place_post_only_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         qty: str,
         price: str,
         reduceOnly: bool | None = None,
@@ -773,7 +774,7 @@ class TradeHTTP(HTTPManager):
     def get_borrow_quota(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
     ) -> dict[str, Any]:
         """
         Get borrow quota for spot trading.
@@ -788,7 +789,7 @@ class TradeHTTP(HTTPManager):
         payload = {
             "category": "spot",
             "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "side": side,
+            "side": OrderSide.from_any(side).to_exchange(Common.BYBIT),
         }
 
         res = self._request(

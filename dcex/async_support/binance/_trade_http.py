@@ -1,3 +1,4 @@
+from ...enums import OrderSide
 from ...utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.trade import FuturesTrade, SpotTrade
@@ -37,7 +38,7 @@ class TradeHTTP(HTTPManager):
     async def place_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         type_: str,
         quantity: str | None = None,
         price: str | None = None,
@@ -85,7 +86,7 @@ class TradeHTTP(HTTPManager):
         """
         payload = {
             "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "side": side,
+            "side": OrderSide.from_any(side).to_exchange(Common.BINANCE),
             "type": type_,
         }
 
@@ -135,7 +136,7 @@ class TradeHTTP(HTTPManager):
     async def place_market_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         quantity: str,
         positionSide: str | None = None,
         reduceOnly: str | None = None,
@@ -219,7 +220,7 @@ class TradeHTTP(HTTPManager):
     async def place_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         quantity: str,
         price: str,
         timeInForce: str = "GTC",
@@ -293,7 +294,7 @@ class TradeHTTP(HTTPManager):
     async def place_post_only_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         quantity: str,
         price: str,
         positionSide: str | None = None,

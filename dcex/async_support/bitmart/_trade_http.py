@@ -1,6 +1,7 @@
 import asyncio
 from typing import Any, cast
 
+from ...enums import OrderSide
 from ...utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.trade import FuturesTrade, SpotTrade
@@ -12,7 +13,7 @@ class TradeHTTP(HTTPManager):
     async def place_spot_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         type: str,
         size: str | None = None,
         price: str | None = None,
@@ -38,7 +39,7 @@ class TradeHTTP(HTTPManager):
             raise RuntimeError("ProductTableManager not initialized")
         payload = {
             "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "side": side,
+            "side": OrderSide.from_any(side).to_exchange(Common.BITMART),
             "type": type,
         }
         if size is not None:
@@ -59,7 +60,7 @@ class TradeHTTP(HTTPManager):
     async def place_spot_market_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         size: str | None = None,
         notional: str | None = None,
         client_order_id: str | None = None,
@@ -137,7 +138,7 @@ class TradeHTTP(HTTPManager):
     async def place_spot_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         size: str,
         price: str,
         client_order_id: str | None = None,
@@ -197,7 +198,7 @@ class TradeHTTP(HTTPManager):
     async def place_spot_post_only_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         size: str,
         price: str,
         client_order_id: str | None = None,
@@ -277,7 +278,7 @@ class TradeHTTP(HTTPManager):
     async def cancel_spot_all_order(
         self,
         product_symbol: str | None = None,
-        side: str | None = None,
+        side: OrderSide | str | None = None,
     ) -> dict[str, Any]:
         """
         Cancel all spot orders.
@@ -295,7 +296,7 @@ class TradeHTTP(HTTPManager):
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMART, product_symbol)
         if side is not None:
-            payload["side"] = side
+            payload["side"] = OrderSide.from_any(side).to_exchange(Common.BITMART)
 
         return await self._request(
             method="POST",
@@ -306,7 +307,7 @@ class TradeHTTP(HTTPManager):
     async def place_margin_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         type: str,
         size: str | None = None,
         price: str | None = None,
@@ -325,7 +326,7 @@ class TradeHTTP(HTTPManager):
             raise RuntimeError("ProductTableManager not initialized")
         payload = {
             "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "side": side,
+            "side": OrderSide.from_any(side).to_exchange(Common.BITMART),
             "type": type,
         }
         if clientOrderId is not None:

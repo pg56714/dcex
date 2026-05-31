@@ -9,6 +9,7 @@ from typing import Any
 
 import msgspec
 
+from ..enums import OrderSide
 from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.order import Order
@@ -25,7 +26,7 @@ class TradeHTTP(HTTPManager):
     def place_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         orderQty: int | None = None,
         ordType: str = "Limit",
         price: float | None = None,
@@ -80,7 +81,7 @@ class TradeHTTP(HTTPManager):
         payload: dict[str, str | int | list[str] | float | bool] = {}
 
         payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
-        payload["side"] = side
+        payload["side"] = OrderSide.from_any(side).to_exchange(Common.BITMEX)
         payload["ordType"] = ordType
 
         if orderQty is not None:
@@ -120,7 +121,7 @@ class TradeHTTP(HTTPManager):
     def place_market_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         orderQty: int,
         clOrdID: str | None = None,
     ) -> dict[str, Any]:
@@ -210,7 +211,7 @@ class TradeHTTP(HTTPManager):
     def place_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         orderQty: int,
         price: float,
         clOrdID: str | None = None,
@@ -312,7 +313,7 @@ class TradeHTTP(HTTPManager):
     def place_post_only_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         orderQty: int,
         price: float,
         clOrdID: str | None = None,

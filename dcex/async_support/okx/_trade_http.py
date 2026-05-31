@@ -1,5 +1,6 @@
 from typing import Any
 
+from ...enums import OrderSide
 from ...utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.trade import Trade
@@ -10,7 +11,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         tdMode: str,
-        side: str,
+        side: OrderSide | str,
         ordType: str,
         sz: str,
         ccy: str | None = None,
@@ -56,7 +57,7 @@ class TradeHTTP(HTTPManager):
         payload = {
             "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
             "tdMode": tdMode,
-            "side": side,
+            "side": OrderSide.from_any(side).to_exchange(Common.OKX),
             "ordType": ordType,
             "sz": sz,
         }
@@ -117,7 +118,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         tdMode: str,
-        side: str,
+        side: OrderSide | str,
         sz: str,
         posSide: str | None = None,
         reduceOnly: str | None = None,
@@ -219,7 +220,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         tdMode: str,
-        side: str,
+        side: OrderSide | str,
         sz: str,
         px: str,
         posSide: str | None = None,
@@ -330,7 +331,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         tdMode: str,
-        side: str,
+        side: OrderSide | str,
         sz: str,
         px: str,
         posSide: str | None = None,

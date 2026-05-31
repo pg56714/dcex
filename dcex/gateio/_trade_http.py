@@ -1,5 +1,6 @@
 from typing import Any
 
+from ..enums import OrderSide
 from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.trade import DeliveryTrade, FutureTrade, SpotTrade
@@ -602,7 +603,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         ccy: str = "usdt",  # or "btc"
         path: str = "futures",
-        side: str | None = None,
+        side: OrderSide | str | None = None,
     ) -> dict[str, Any]:
         """
         Cancel all matched orders for a contract.
@@ -624,7 +625,7 @@ class TradeHTTP(HTTPManager):
             "contract": self.ptm.get_exchange_symbol(Common.GATEIO, product_symbol),
         }
         if side is not None:
-            payload["side"] = side
+            payload["side"] = OrderSide.from_any(side).to_exchange(Common.GATEIO)
 
         if path == "futures":
             path_ = FutureTrade.FUTURES_ORDER
@@ -833,7 +834,7 @@ class TradeHTTP(HTTPManager):
         offset: int | None = None,
         from_timestamp: int | None = None,
         to_timestamp: int | None = None,
-        side: str | None = None,
+        side: OrderSide | str | None = None,
         pnl: str | None = None,
     ) -> dict[str, Any]:
         """
@@ -869,7 +870,7 @@ class TradeHTTP(HTTPManager):
         if to_timestamp is not None:
             payload["to"] = to_timestamp
         if side is not None:
-            payload["side"] = side
+            payload["side"] = OrderSide.from_any(side).to_exchange(Common.GATEIO)
         if pnl is not None:
             payload["pnl"] = pnl
 
@@ -1018,7 +1019,7 @@ class TradeHTTP(HTTPManager):
     def place_spot_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         amount: str,
         text: str | None = None,
         order_type: str | None = None,  # limit or market
@@ -1055,7 +1056,7 @@ class TradeHTTP(HTTPManager):
 
         body: dict[str, Any] = {
             "currency_pair": self.ptm.get_exchange_symbol(Common.GATEIO, product_symbol),
-            "side": side,
+            "side": OrderSide.from_any(side).to_exchange(Common.GATEIO),
             "amount": amount,
         }
 
@@ -1090,7 +1091,7 @@ class TradeHTTP(HTTPManager):
     def place_spot_market_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         amount: str,
     ) -> dict[str, Any]:
         """
@@ -1157,7 +1158,7 @@ class TradeHTTP(HTTPManager):
     def place_spot_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         amount: str,
         price: str,
     ) -> dict[str, Any]:
@@ -1232,7 +1233,7 @@ class TradeHTTP(HTTPManager):
     def place_spot_post_only_limit_order(
         self,
         product_symbol: str,
-        side: str,
+        side: OrderSide | str,
         amount: str,
         price: str,
     ) -> dict[str, Any]:
@@ -1348,7 +1349,7 @@ class TradeHTTP(HTTPManager):
         account: str | None = None,
         from_timestamp: str | None = None,
         to_timestamp: str | None = None,
-        side: str | None = None,
+        side: OrderSide | str | None = None,
     ) -> dict[str, Any]:
         """
         Get spot order list.
@@ -1383,7 +1384,7 @@ class TradeHTTP(HTTPManager):
         if to_timestamp is not None:
             payload["to"] = to_timestamp
         if side is not None:
-            payload["side"] = side
+            payload["side"] = OrderSide.from_any(side).to_exchange(Common.GATEIO)
 
         res = self._request(
             method="GET",
@@ -1395,7 +1396,7 @@ class TradeHTTP(HTTPManager):
     def cancel_spot_order(
         self,
         product_symbol: str | None = None,
-        side: str | None = None,
+        side: OrderSide | str | None = None,
         account: str | None = None,
         action_mode: str | None = None,
     ) -> dict[str, Any]:
@@ -1415,7 +1416,7 @@ class TradeHTTP(HTTPManager):
         if product_symbol is not None:
             payload["currency_pair"] = self.ptm.get_exchange_symbol(Common.GATEIO, product_symbol)
         if side is not None:
-            payload["side"] = side
+            payload["side"] = OrderSide.from_any(side).to_exchange(Common.GATEIO)
         if account is not None:
             payload["account"] = account
         if action_mode is not None:
