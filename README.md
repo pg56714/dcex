@@ -146,10 +146,10 @@ uv run pytest -m "live and not private"
 ```
 
 Private live tests require the relevant exchange API key environment variables. Use `not stateful`
-for the normal per-exchange key rotation workflow:
+and `not generated` for the normal per-exchange key rotation workflow:
 
 ```bash
-uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful"
+uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful and not generated"
 ```
 
 Stateful tests can change exchange or account settings, such as leverage or position mode. Run them
@@ -157,6 +157,13 @@ only when that is intentional:
 
 ```bash
 uv run pytest tests/sync_support/okx tests/async_support/okx -m "live and private and stateful"
+```
+
+Generated-report tests request server-side report generation or downloadable files, such as OKX
+monthly statements. Run them separately because they can consume low-frequency report quotas:
+
+```bash
+uv run pytest tests/sync_support/okx tests/async_support/okx -m "live and private and generated"
 ```
 
 ## Examples

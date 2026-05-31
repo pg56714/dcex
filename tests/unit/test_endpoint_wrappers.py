@@ -12,6 +12,7 @@ from typing import Any
 
 import pytest
 
+from dcex.registry import ASYNC_EXCHANGES, SYNC_EXCHANGES
 from dcex.utils.common import Common
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,19 +24,6 @@ ENDPOINT_FILE_SUFFIXES = (
     "_public_http.py",
     "_trade_http.py",
     "_trading_http.py",
-)
-
-SYNC_EXCHANGES = ("binance", "bitmart", "bitmex", "bybit", "gateio", "hyperliquid", "okx")
-ASYNC_EXCHANGES = (
-    "binance",
-    "bingx",
-    "bitmart",
-    "bitmex",
-    "bybit",
-    "gateio",
-    "hyperliquid",
-    "kucoin",
-    "okx",
 )
 
 
@@ -415,6 +403,42 @@ def test_sync_endpoint_wrapper_is_reachable(
         assert calls
 
 
+def test_sync_hyperliquid_builder_fee_payload_matches_docs() -> None:
+    client = _client_class("sync", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    calls = _wire_sync(client)
+    builder_address = "0x0000000000000000000000000000000000000002"
+
+    result = client.place_order(
+        product_symbol="BTC-USD-SWAP",
+        isBuy=True,
+        price="100",
+        size="1",
+        reduceOnly=False,
+        builder_address=builder_address,
+        fee_ten_bp=10,
+    )
+
+    action = calls[0]["query"]["action"]
+    assert result == {"ok": True}
+    assert action["builder"] == {"b": builder_address, "f": 10}
+    assert "feeTenBp" not in action
+
+
+def test_sync_hyperliquid_builder_fee_requires_address_and_fee() -> None:
+    client = _client_class("sync", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    _wire_sync(client)
+
+    with pytest.raises(ValueError, match="builder_address and fee_ten_bp"):
+        client.place_order(
+            product_symbol="BTC-USD-SWAP",
+            isBuy=True,
+            price="100",
+            size="1",
+            reduceOnly=False,
+            builder_address="0x0000000000000000000000000000000000000002",
+        )
+
+
 @pytest.mark.parametrize("case", ASYNC_CASES, ids=[case.id for case in ASYNC_CASES])
 @pytest.mark.asyncio
 async def test_async_endpoint_wrapper_is_reachable(
@@ -431,3 +455,41 @@ async def test_async_endpoint_wrapper_is_reachable(
     assert result is not None
     if case.method_name not in {"get_listen_key"}:
         assert calls
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_builder_fee_payload_matches_docs() -> None:
+    client = _client_class("async", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    calls = _wire_async(client)
+    builder_address = "0x0000000000000000000000000000000000000002"
+
+    result = await client.place_order(
+        product_symbol="BTC-USD-SWAP",
+        isBuy=True,
+        price="100",
+        size="1",
+        reduceOnly=False,
+        builder_address=builder_address,
+        fee_ten_bp=10,
+    )
+
+    action = calls[0]["query"]["action"]
+    assert result == {"ok": True}
+    assert action["builder"] == {"b": builder_address, "f": 10}
+    assert "feeTenBp" not in action
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_builder_fee_requires_address_and_fee() -> None:
+    client = _client_class("async", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    _wire_async(client)
+
+    with pytest.raises(ValueError, match="builder_address and fee_ten_bp"):
+        await client.place_order(
+            product_symbol="BTC-USD-SWAP",
+            isBuy=True,
+            price="100",
+            size="1",
+            reduceOnly=False,
+            builder_address="0x0000000000000000000000000000000000000002",
+        )

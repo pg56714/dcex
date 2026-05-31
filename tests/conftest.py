@@ -2,12 +2,27 @@
 
 import ast
 import inspect
+import os
 import textwrap
 from pathlib import Path
 
 import pytest
 
 _LIVE_TEST_DIRS = {"sync_support", "async_support"}
+_PRIVATE_ENV_VARS = {
+    "binance": ("BINANCE_API_KEY", "BINANCE_API_SECRET"),
+    "bingx": ("BINGX_API_KEY", "BINGX_API_SECRET"),
+    "bitmart": ("BITMART_API_KEY", "BITMART_API_SECRET", "BITMART_MEMO"),
+    "bitmex": ("BITMEX_API_KEY", "BITMEX_API_SECRET"),
+    "bybit": ("BYBIT_API_KEY", "BYBIT_API_SECRET"),
+    "gateio": ("GATEIO_API_KEY", "GATEIO_API_SECRET"),
+    "kucoin": ("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
+    "okx": ("OKX_API_KEY", "OKX_API_SECRET", "OKX_PASSPHRASE"),
+}
+_GENERATED_METHOD_NAMES = {
+    "post_account_bills_history_archive",
+    "post_monthly_statement",
+}
 _STATEFUL_METHOD_PREFIXES = (
     "amend",
     "cancel",
@@ -30,7 +45,20 @@ _STATEFUL_METHOD_PREFIXES = (
 )
 
 
-def _calls_stateful_client_method(item: pytest.Item) -> bool:
+def _relative_test_path(config: pytest.Config, item: pytest.Item) -> Path | None:
+    tests_root = Path(config.rootpath) / "tests"
+    item_path = Path(str(item.fspath))
+    try:
+        return item_path.relative_to(tests_root)
+    except ValueError:
+        return None
+
+
+def _is_live_path(relative_path: Path | None) -> bool:
+    return bool(relative_path and relative_path.parts and relative_path.parts[0] in _LIVE_TEST_DIRS)
+
+
+def _calls_client_method(item: pytest.Item, names: set[str] | None = None) -> bool:
     test_function = getattr(item, "obj", None)
     if test_function is None:
         return False
@@ -45,25 +73,47 @@ def _calls_stateful_client_method(item: pytest.Item) -> bool:
         if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
             continue
         method_name = node.func.attr
-        if method_name.startswith(_STATEFUL_METHOD_PREFIXES):
+        if names is not None and method_name in names:
+            return True
+        if names is None and method_name.startswith(_STATEFUL_METHOD_PREFIXES):
             return True
     return False
 
 
+def _calls_stateful_client_method(item: pytest.Item) -> bool:
+    return _calls_client_method(item)
+
+
+def _calls_generated_client_method(item: pytest.Item) -> bool:
+    return _calls_client_method(item, _GENERATED_METHOD_NAMES)
+
+
+def _private_env_vars(item: pytest.Item, relative_path: Path | None) -> tuple[str, ...]:
+    if item.get_closest_marker("private") is None or not _is_live_path(relative_path):
+        return ()
+    if relative_path is None or len(relative_path.parts) < 2:
+        return ()
+    return _PRIVATE_ENV_VARS.get(relative_path.parts[1], ())
+
+
+def pytest_runtest_setup(item: pytest.Item) -> None:
+    """Skip private live tests early when the exchange credentials are not configured."""
+    relative_path = _relative_test_path(item.config, item)
+    missing = [name for name in _private_env_vars(item, relative_path) if not os.getenv(name)]
+    if missing:
+        pytest.skip(f"Set {', '.join(missing)} before running this private live test.")
+
+
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """Mark exchange API tests as live so the default suite stays offline."""
-    tests_root = Path(config.rootpath) / "tests"
-
     for item in items:
-        item_path = Path(str(item.fspath))
-        try:
-            relative_path = item_path.relative_to(tests_root)
-        except ValueError:
-            continue
-
-        is_live_test = bool(relative_path.parts and relative_path.parts[0] in _LIVE_TEST_DIRS)
+        relative_path = _relative_test_path(config, item)
+        is_live_test = _is_live_path(relative_path)
         if is_live_test:
             item.add_marker(pytest.mark.live)
+
+        if is_live_test and _calls_generated_client_method(item):
+            item.add_marker(pytest.mark.generated)
 
         if is_live_test and _calls_stateful_client_method(item):
             item.add_marker(pytest.mark.stateful)
