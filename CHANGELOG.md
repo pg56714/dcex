@@ -1,3 +1,13 @@
+## 0.12.0 (2026-06-01)
+
+### Feat
+
+- add public market sentiment endpoints
+
+### Refactor
+
+- remove high-risk asset operations
+
 ## 0.11.0 (2026-06-01)
 
 ### Feat
