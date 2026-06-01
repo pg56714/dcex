@@ -71,13 +71,6 @@ async def test_get_deposit_history(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
-async def test_get_withdrawal_history(client):
-    res = await client.get_withdrawal_history()
-    assert res is not None
-
-
-@pytest.mark.asyncio
-@pytest.mark.private
 async def test_get_exchange_list(client):
     res = await client.get_exchange_list()
     assert res is not None

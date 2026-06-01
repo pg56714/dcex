@@ -6,7 +6,6 @@ on the Bybit exchange, including deposits, withdrawals, transfers,
 and coin information queries.
 """
 
-import time
 import uuid
 from typing import Any
 
@@ -277,47 +276,6 @@ class AssetHTTP(HTTPManager):
         )
         return res
 
-    def create_universal_transfer(
-        self,
-        coin: str,
-        amount: str,
-        fromMemberId: str,
-        toMemberId: str,
-        fromAccountType: str,
-        toAccountType: str,
-    ) -> dict[str, Any]:
-        """
-        Create universal transfer between members.
-
-        Args:
-            coin: Currency symbol to transfer
-            amount: Amount to transfer
-            fromMemberId: Source member ID
-            toMemberId: Target member ID
-            fromAccountType: Source account type
-            toAccountType: Target account type
-
-        Returns:
-            dict[str, Any]: API response confirming the transfer
-        """
-        transfer_id = str(uuid.uuid4())
-        payload = {
-            "transferId": transfer_id,
-            "coin": coin,
-            "amount": amount,
-            "fromMemberId": fromMemberId,
-            "toMemberId": toMemberId,
-            "fromAccountType": fromAccountType,
-            "toAccountType": toAccountType,
-        }
-
-        res = self._request(
-            method="POST",
-            path=Asset.CREATE_UNIVERSAL_TRANSFER,
-            query=payload,
-        )
-        return res
-
     def get_universal_transfer_records(
         self,
         coin: str | None = None,
@@ -497,108 +455,6 @@ class AssetHTTP(HTTPManager):
         res = self._request(
             method="GET",
             path=Asset.GET_MASTER_DEPOSIT_ADDRESS,
-            query=payload,
-        )
-        return res
-
-    def get_withdrawal_records(
-        self,
-        coin: str | None = None,
-        withdrawType: int | None = None,
-        startTime: int | None = None,
-        limit: int = 20,
-    ) -> dict[str, Any]:
-        """
-        Get withdrawal records.
-
-        Args:
-            coin: Currency symbol to filter by
-            withdrawType: Withdrawal type to filter by
-            startTime: Start timestamp in milliseconds
-            limit: Maximum number of records to return (default: 20)
-
-        Returns:
-            dict[str, Any]: API response containing withdrawal records
-        """
-        payload: dict[str, Any] = {
-            "limit": limit,
-        }
-        if coin is not None:
-            payload["coin"] = coin
-        if withdrawType is not None:
-            payload["withdrawType"] = withdrawType
-        if startTime is not None:
-            payload["startTime"] = startTime
-
-        res = self._request(
-            method="GET",
-            path=Asset.GET_WITHDRAWAL_RECORDS,
-            query=payload,
-        )
-        return res
-
-    def withdraw(
-        self,
-        coin: str,
-        chain: str,
-        address: str,
-        amount: str,
-        tag: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Create withdrawal request.
-
-        Args:
-            coin: Currency symbol to withdraw
-            chain: Blockchain network
-            address: Withdrawal address
-            amount: Amount to withdraw
-            tag: Memo/tag for withdrawal (if required)
-
-        Returns:
-            dict[str, Any]: API response confirming the withdrawal
-        """
-        payload = {
-            "coin": coin,
-            "chain": chain,
-            "address": address,
-            "amount": amount,
-            "timestamp": int(time.time() * 1000),
-            "accountType": "FUND",
-            "feeType": 1,
-        }
-        if chain is not None:
-            payload["chain"] = chain
-        if tag is not None:
-            payload["tag"] = tag
-
-        res = self._request(
-            method="POST",
-            path=Asset.WITHDRAW,
-            query=payload,
-        )
-        return res
-
-    def cancel_withdrawal(
-        self,
-        id: str,
-    ) -> dict[str, Any]:
-        """
-        Cancel withdrawal request.
-
-        Args:
-            id: Withdrawal ID to cancel
-
-        Returns:
-            dict[str, Any]: API response confirming the cancellation
-        """
-        payload = {
-            "id": id,
-        }
-
-        res = self._request(
-            method="POST",
-            path=Asset.CANCEL_WITHDRAWAL,
             query=payload,
         )
         return res

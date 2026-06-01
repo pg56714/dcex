@@ -43,7 +43,6 @@ class Account(str, Enum):
     SET_GREEKS = "/api/v5/account/set-greeks"
     MAX_WITHDRAWAL = "/api/v5/account/max-withdrawal"
     INTEREST_LIMITS = "/api/v5/account/interest-limits"
-    SET_AUTO_LOAN = "/api/v5/account/set-auto-loan"
 
     def __str__(self) -> str:
         return self.value

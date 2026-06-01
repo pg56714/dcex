@@ -318,46 +318,6 @@ class TradeHTTP(HTTPManager):
             query=payload,
         )
 
-    async def place_margin_order(
-        self,
-        product_symbol: str,
-        side: OrderSide | str,
-        type: str,
-        size: str | None = None,
-        price: str | None = None,
-        notional: str | None = None,
-        clientOrderId: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        :param product_symbol: str
-        :param side: str (buy, sell)
-        :param type: str (limit, market, limit_maker, ioc)
-        :param size: str
-        :param price: str
-        :param clientOrderId: str
-        """
-        if self.ptm is None:
-            raise RuntimeError("ProductTableManager not initialized")
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "side": OrderSide.from_any(side).to_exchange(Common.BITMART),
-            "type": type,
-        }
-        if clientOrderId is not None:
-            payload["clientOrderId"] = clientOrderId
-        if size is not None:
-            payload["size"] = str(size)
-        if price is not None:
-            payload["price"] = str(price)
-        if notional is not None:
-            payload["notional"] = notional
-
-        return await self._request(
-            method="POST",
-            path=SpotTrade.NEW_MARGIN_ORDER,
-            query=payload,
-        )
-
     async def get_spot_order_by_order_id(
         self,
         orderId: str,

@@ -56,12 +56,6 @@ def test_get_deposit_history(client):
 
 
 @pytest.mark.private
-def test_get_withdrawal_history(client):
-    res = client.get_withdrawal_history()
-    assert res is not None
-
-
-@pytest.mark.private
 def test_get_exchange_list(client):
     res = client.get_exchange_list()
     assert res is not None

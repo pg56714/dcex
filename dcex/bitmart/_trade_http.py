@@ -427,54 +427,6 @@ class TradeHTTP(HTTPManager):
             query=payload,
         )
 
-    def place_margin_order(
-        self,
-        product_symbol: str,
-        side: OrderSide | str,
-        type: str,
-        size: str | None = None,
-        price: str | None = None,
-        notional: str | None = None,
-        clientOrderId: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Place a margin trading order.
-
-        Args:
-            product_symbol: Trading pair symbol
-            side: Order side ("buy" or "sell")
-            type: Order type ("limit", "market", "limit_maker", "ioc")
-            size: Order size (optional)
-            price: Order price (optional)
-            notional: Order notional amount (optional)
-            clientOrderId: Client order ID (optional)
-
-        Returns:
-            Dict containing order placement result
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "side": OrderSide.from_any(side).to_exchange(Common.BITMART),
-            "type": type,
-        }
-        if clientOrderId is not None:
-            payload["clientOrderId"] = clientOrderId
-        if size is not None:
-            payload["size"] = size
-        if price is not None:
-            payload["price"] = price
-        if notional is not None:
-            payload["notional"] = notional
-
-        return self._request(
-            method="POST",
-            path=SpotTrade.NEW_MARGIN_ORDER,
-            query=payload,
-        )
-
     def get_spot_order_by_order_id(
         self,
         orderId: str,

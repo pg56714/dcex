@@ -328,8 +328,6 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
     kwargs = _required_kwargs(case, method)
     if case.exchange == "bitmex" and case.method_name == "amend_order":
         kwargs["orderID"] = "test-order-id"
-    if case.exchange == "bitmart" and case.method_name == "post_withdraw_apply":
-        kwargs["address"] = "test-address"
     if case.exchange == "binance" and case.method_name in {
         "cancel_futures_algo_order",
         "get_futures_algo_order",
@@ -465,36 +463,6 @@ def test_sync_hyperliquid_builder_fee_requires_fee_when_address_given() -> None:
         )
 
 
-def test_sync_bitmart_withdraw_apply_payload_matches_docs() -> None:
-    client = _client_class("sync", "bitmart")(**_client_kwargs("bitmart"))
-    calls = _wire_sync(client)
-
-    result = client.post_withdraw_apply(
-        currency="USDT",
-        amount="1",
-        address="test-address",
-        address_memo="memo",
-        destination="wallet",
-    )
-
-    assert result == {"ok": True}
-    assert calls[0]["query"] == {
-        "currency": "USDT",
-        "amount": "1",
-        "address": "test-address",
-        "address_memo": "memo",
-        "destination": "wallet",
-    }
-
-
-def test_sync_bitmart_withdraw_apply_requires_destination() -> None:
-    client = _client_class("sync", "bitmart")(**_client_kwargs("bitmart"))
-    _wire_sync(client)
-
-    with pytest.raises(ValueError, match="Withdraw requires address"):
-        client.post_withdraw_apply(currency="USDT", amount="1")
-
-
 def test_sync_bybit_post_only_forwards_position_idx() -> None:
     client = _client_class("sync", "bybit")(**_client_kwargs("bybit"))
     calls = _wire_sync(client)
@@ -581,35 +549,3 @@ async def test_async_hyperliquid_builder_fee_requires_fee_when_address_given() -
             reduceOnly=False,
             fee_ten_bp=10,
         )
-
-
-@pytest.mark.asyncio
-async def test_async_bitmart_withdraw_apply_payload_matches_docs() -> None:
-    client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))
-    calls = _wire_async(client)
-
-    result = await client.post_withdraw_apply(
-        currency="USDT",
-        amount="1",
-        address="test-address",
-        address_memo="memo",
-        destination="wallet",
-    )
-
-    assert result == {"ok": True}
-    assert calls[0]["query"] == {
-        "currency": "USDT",
-        "amount": "1",
-        "address": "test-address",
-        "address_memo": "memo",
-        "destination": "wallet",
-    }
-
-
-@pytest.mark.asyncio
-async def test_async_bitmart_withdraw_apply_requires_destination() -> None:
-    client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))
-    _wire_async(client)
-
-    with pytest.raises(ValueError, match="Withdraw requires address"):
-        await client.post_withdraw_apply(currency="USDT", amount="1")

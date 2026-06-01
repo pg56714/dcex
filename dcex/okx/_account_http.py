@@ -799,27 +799,3 @@ class AccountHTTP(HTTPManager):
             query=payload,
         )
         return res
-
-    def set_auto_loan(
-        self,
-        autoLoan: str,
-    ) -> dict[str, Any]:
-        """
-        Set auto loan setting.
-
-        Args:
-            autoLoan: Auto loan flag
-
-        Returns:
-            Dictionary containing auto loan setting result.
-        """
-        kwargs = {
-            "autoLoan": autoLoan,
-        }
-
-        res = self._request(
-            method="POST",
-            path=Account.SET_AUTO_LOAN,
-            query=kwargs,
-        )
-        return res

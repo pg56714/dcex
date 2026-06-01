@@ -892,49 +892,6 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    def spot_margin_trade_toggle_margin_trade(
-        self,
-        spotMarginMode: str,
-    ) -> dict[str, Any]:
-        """
-        Toggle spot margin trading mode.
-
-        Args:
-            spotMarginMode: Margin mode ("1" to open, "0" to close)
-
-        Returns:
-            dict[str, Any]: API response confirming the mode toggle
-        """
-        payload = {
-            "spotMarginMode": spotMarginMode,
-        }
-
-        return self._request(
-            method="POST",
-            path=SpotMarginTrade.TOGGLE_MARGIN_TRADE,
-            query=payload,
-        )
-
-    def spot_margin_trade_set_leverage(self, leverage: str) -> dict[str, Any]:
-        """
-        Set spot margin trading leverage.
-
-        Args:
-            leverage: Leverage value (2-10)
-
-        Returns:
-            dict[str, Any]: API response confirming the leverage setting
-        """
-        payload = {
-            "leverage": leverage,
-        }
-
-        return self._request(
-            method="POST",
-            path=SpotMarginTrade.SET_LEVERAGE,
-            query=payload,
-        )
-
     def get_status_and_leverage(self) -> dict[str, Any]:
         """
         Get spot margin trading status and leverage.

@@ -15,7 +15,6 @@ class SpotTrade(str, Enum):
     SUBMIT_ORDER = "/spot/v2/submit_order"
     CANCEL_ORDER = "/spot/v3/cancel_order"
     CANCEL_ALL_ORDERS = "/spot/v4/cancel_all"
-    NEW_MARGIN_ORDER = "/spot/v1/margin/submit_order"
     QUERY_ORDER_BY_ID = "/spot/v4/query/order"
     QUERY_ORDER_BY_CLIENT_ORDER_ID = "/spot/v4/query/client-order"
     CURRENT_OPEN_ORDERS = "/spot/v4/query/open-orders"

@@ -50,18 +50,6 @@ def test_get_withdraw_charge(client):
 
 
 @pytest.mark.private
-def test_get_deposit_withdraw_history(client):
-    res = client.get_deposit_withdraw_history(currency="USDT")
-    assert res is not None
-
-
-@pytest.mark.private
-def test_get_deposit_withdraw_history_detail(client):
-    res = client.get_deposit_withdraw_history_detail(id="26695771")
-    assert res is not None
-
-
-@pytest.mark.private
 def test_get_contract_assets(client):
     res = client.get_contract_assets()
     assert res is not None

@@ -94,10 +94,3 @@ async def test_get_internal_deposit_records(client):
 # async def test_get_master_deposit_address(client):
 #     res = await client.get_master_deposit_address(coin="USDT")
 #     assert res is not None
-
-
-@pytest.mark.asyncio
-@pytest.mark.private
-async def test_get_withdrawal_records(client):
-    res = await client.get_withdrawal_records()
-    assert res is not None

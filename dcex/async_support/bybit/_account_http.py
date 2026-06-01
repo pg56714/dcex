@@ -124,32 +124,6 @@ class AccountHTTP(HTTPManager):
         )
         return res
 
-    async def repay_liability(
-        self,
-        coin: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Repay liability for a specific coin.
-
-        Args:
-            coin: Optional coin symbol to repay liability for
-
-        Returns:
-            Dict containing repayment result
-        """
-        payload = {}
-        if coin is not None:
-            payload = {
-                "coin": coin,
-            }
-
-        res = await self._request(
-            method="POST",
-            path=Account.REPAY_LIABILITY,
-            query=payload,
-        )
-        return res
-
     async def get_collateral_info(
         self,
         coin: str | None = None,
@@ -172,33 +146,6 @@ class AccountHTTP(HTTPManager):
         res = await self._request(
             method="GET",
             path=Account.GET_COLLATERAL_INFO,
-            query=payload,
-        )
-        return res
-
-    async def set_collateral_coin(
-        self,
-        coin: str,
-        switch: str,
-    ) -> dict[str, Any]:
-        """
-        Set collateral coin switch.
-
-        Args:
-            coin: Coin symbol
-            switch: Switch status ("ON" or "OFF")
-
-        Returns:
-            Dict containing collateral setting result
-        """
-        payload = {
-            "coin": coin,
-            "collateralSwitch": switch,
-        }
-
-        res = await self._request(
-            method="POST",
-            path=Account.SET_COLLATERAL_COIN,
             query=payload,
         )
         return res

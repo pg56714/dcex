@@ -801,27 +801,3 @@ class AccountHTTP(HTTPManager):
             query=payload,
         )
         return res
-
-    async def set_auto_loan(
-        self,
-        autoLoan: str,
-    ) -> dict[str, Any]:
-        """
-        Set auto loan feature.
-
-        Args:
-            autoLoan: Whether to enable auto loan
-
-        Returns:
-            Dict containing operation result
-        """
-        kwargs = {
-            "autoLoan": autoLoan,
-        }
-
-        res = await self._request(
-            method="POST",
-            path=Account.SET_AUTO_LOAN,
-            query=kwargs,
-        )
-        return res

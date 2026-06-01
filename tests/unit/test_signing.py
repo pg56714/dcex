@@ -1,4 +1,5 @@
-"""Offline signing unit tests.
+"""
+Offline signing unit tests.
 
 These tests pin each exchange's signature algorithm against known-good outputs
 computed from fixed fake credentials and a fixed timestamp. They require no API
@@ -167,7 +168,7 @@ def test_bitmart_signed_post_sends_the_exact_body_used_for_signature(
 ) -> None:
     """BitMart signed POST uses the same compact JSON string for signing and body."""
     from dcex.bitmart._http_manager import HTTPManager, sign_message
-    from dcex.bitmart.endpoints.account import FundingAccount
+    from dcex.bitmart.endpoints.trade import SpotTrade
 
     bitmart_http = import_module("dcex.bitmart._http_manager")
     monkeypatch.setattr(bitmart_http, "generate_timestamp", lambda: TS_MS)
@@ -182,13 +183,13 @@ def test_bitmart_signed_post_sends_the_exact_body_used_for_signature(
 
     manager._request(
         "POST",
-        FundingAccount.WITHDRAW,
-        query={"currency": "USDT", "amount": "1", "address": "test-address"},
+        SpotTrade.SUBMIT_ORDER,
+        query={"symbol": "BTC_USDT", "side": "buy", "type": "market", "size": "1"},
         signed=True,
     )
 
     method, _url, kwargs = session.calls[0]
-    body = '{"currency":"USDT","amount":"1","address":"test-address"}'
+    body = '{"symbol":"BTC_USDT","side":"buy","type":"market","size":"1"}'
     expected_sign = sign_message(TS_MS, MEMO, body, API_SECRET)
     assert method == "POST"
     assert kwargs["data"] == body
