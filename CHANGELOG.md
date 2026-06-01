@@ -1,3 +1,9 @@
+## 0.11.0 (2026-06-01)
+
+### Feat
+
+- expand binance trading coverage
+
 ## 0.10.1 (2026-06-01)
 
 ### Fix
