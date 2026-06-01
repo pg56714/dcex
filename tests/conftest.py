@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 _LIVE_TEST_DIRS = {"sync_support", "async_support"}
+_relative_path_key = pytest.StashKey[Path | None]()
 _PRIVATE_ENV_VARS = {
     "binance": ("BINANCE_API_KEY", "BINANCE_API_SECRET"),
     "bingx": ("BINGX_API_KEY", "BINGX_API_SECRET"),
@@ -17,6 +18,7 @@ _PRIVATE_ENV_VARS = {
     "bybit": ("BYBIT_API_KEY", "BYBIT_API_SECRET"),
     "gateio": ("GATEIO_API_KEY", "GATEIO_API_SECRET"),
     "kucoin": ("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
+    "hyperliquid": ("HYPERLIQUID_WALLET_ADDRESS", "HYPERLIQUID_PRIVATE_KEY"),
     "okx": ("OKX_API_KEY", "OKX_API_SECRET", "OKX_PASSPHRASE"),
 }
 _GENERATED_METHOD_NAMES = {
@@ -59,6 +61,12 @@ def _is_live_path(relative_path: Path | None) -> bool:
 
 
 def _calls_client_method(item: pytest.Item, names: set[str] | None = None) -> bool:
+    """Check whether a test's AST calls certain client methods.
+
+    When *names* is provided the check is an exact-match lookup against that
+    set.  When *names* is ``None`` the check falls back to prefix-matching
+    against ``_STATEFUL_METHOD_PREFIXES``.
+    """
     test_function = getattr(item, "obj", None)
     if test_function is None:
         return False
@@ -98,7 +106,7 @@ def _private_env_vars(item: pytest.Item, relative_path: Path | None) -> tuple[st
 
 def pytest_runtest_setup(item: pytest.Item) -> None:
     """Skip private live tests early when the exchange credentials are not configured."""
-    relative_path = _relative_test_path(item.config, item)
+    relative_path = item.stash.get(_relative_path_key, None) or _relative_test_path(item.config, item)
     missing = [name for name in _private_env_vars(item, relative_path) if not os.getenv(name)]
     if missing:
         pytest.skip(f"Set {', '.join(missing)} before running this private live test.")
@@ -108,6 +116,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     """Mark exchange API tests as live so the default suite stays offline."""
     for item in items:
         relative_path = _relative_test_path(config, item)
+        item.stash[_relative_path_key] = relative_path
         is_live_test = _is_live_path(relative_path)
         if is_live_test:
             item.add_marker(pytest.mark.live)

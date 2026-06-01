@@ -441,6 +441,21 @@ def test_sync_hyperliquid_builder_fee_requires_address_and_fee() -> None:
         )
 
 
+def test_sync_hyperliquid_builder_fee_requires_fee_when_address_given() -> None:
+    client = _client_class("sync", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    _wire_sync(client)
+
+    with pytest.raises(ValueError, match="builder_address and fee_ten_bp"):
+        client.place_order(
+            product_symbol="BTC-USD-SWAP",
+            isBuy=True,
+            price="100",
+            size="1",
+            reduceOnly=False,
+            fee_ten_bp=10,
+        )
+
+
 def test_sync_bitmart_withdraw_apply_payload_matches_docs() -> None:
     client = _client_class("sync", "bitmart")(**_client_kwargs("bitmart"))
     calls = _wire_sync(client)
@@ -540,6 +555,22 @@ async def test_async_hyperliquid_builder_fee_requires_address_and_fee() -> None:
             size="1",
             reduceOnly=False,
             builder_address="0x0000000000000000000000000000000000000002",
+        )
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_builder_fee_requires_fee_when_address_given() -> None:
+    client = _client_class("async", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    _wire_async(client)
+
+    with pytest.raises(ValueError, match="builder_address and fee_ten_bp"):
+        await client.place_order(
+            product_symbol="BTC-USD-SWAP",
+            isBuy=True,
+            price="100",
+            size="1",
+            reduceOnly=False,
+            fee_ten_bp=10,
         )
 
 

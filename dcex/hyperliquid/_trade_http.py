@@ -48,7 +48,7 @@ class TradeHTTP(HTTPManager):
             cloid: Client order ID
             grouping: Order grouping
             builder_address: Builder address
-            fee_ten_bp: Fee in tenths of a basis point
+            fee_ten_bp: Fee rate in units of 1/10 basis point (e.g. 10 = 1 bp)
             vaultAddress: Vault address
             expireAfter: Expiration timestamp
 
@@ -87,7 +87,7 @@ class TradeHTTP(HTTPManager):
             action["orders"][0]["c"] = cloid
         if (builder_address is None) != (fee_ten_bp is None):
             raise ValueError("builder_address and fee_ten_bp must be provided together")
-        if builder_address is not None and fee_ten_bp is not None:
+        if builder_address is not None:
             action["builder"] = {"b": builder_address, "f": fee_ten_bp}
 
         payload = {
