@@ -233,8 +233,19 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
+            try:
+                data = response.json()
+            except Exception as exc:
+                raise FailedRequestError(
+                    request=f"{method_upper} {url}",
+                    message=f"Failed to decode JSON response: {exc}",
+                    status_code=response.status_code,
+                    time=timestamp,
+                    resp_headers=dict(response.headers),
+                ) from exc
+
             if response.ok:
-                return response.json()
+                return data
 
             self._log_failed_request(f"GATEIO API Error: {response.text}", response.status_code)
             raise FailedRequestError(

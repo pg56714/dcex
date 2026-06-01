@@ -31,6 +31,15 @@ class _FakeResponse:
         return self._payload
 
 
+class _BadJsonResponse(_FakeResponse):
+    def __init__(self, status_code: int = 200) -> None:
+        super().__init__({}, status_code)
+        self.text = "<html>"
+
+    def json(self) -> dict[str, Any]:
+        raise ValueError("bad json")
+
+
 class _CaptureSession:
     def __init__(self, payload: dict[str, Any] | None = None, status_code: int = 200) -> None:
         self.payload = payload
@@ -59,6 +68,11 @@ class _CaptureSession:
     def request(self, method: str, url: str, **kwargs: Any) -> _FakeResponse:
         self.calls.append((method.upper(), url, kwargs))
         return self._response()
+
+
+class _BadJsonSession(_CaptureSession):
+    def _response(self) -> _FakeResponse:
+        return _BadJsonResponse(self.status_code)
 
 
 class _AsyncCaptureSession:
@@ -93,6 +107,11 @@ class _AsyncCaptureSession:
         return self._response()
 
 
+class _AsyncBadJsonSession(_AsyncCaptureSession):
+    def _response(self) -> _FakeResponse:
+        return _BadJsonResponse(self.status_code)
+
+
 def _gateio_expected_signature(query_string: str) -> str:
     hashed_payload = hashlib.sha512(b"").hexdigest()
     canonical = f"GET\n/api/v4/futures/orders\n{query_string}\n{hashed_payload}\n{TS_S}"
@@ -124,6 +143,19 @@ def test_gateio_signed_query_order_matches_sent_params(monkeypatch: pytest.Monke
     assert kwargs["headers"]["SIGN"] == _gateio_expected_signature(query_string)
 
 
+def test_sync_gateio_json_decode_failure_is_failed_request() -> None:
+    from dcex.gateio._http_manager import HTTPManager
+
+    manager = HTTPManager(preload_product_table=False)
+    manager.session = _BadJsonSession()  # type: ignore[assignment]
+
+    with pytest.raises(FailedRequestError, match="Failed to decode JSON response") as exc_info:
+        manager._request("GET", "/spot/currencies", signed=False)
+
+    assert exc_info.value.status_code == 200
+    assert exc_info.value.resp_headers == {}
+
+
 @pytest.mark.asyncio
 async def test_async_gateio_signed_query_order_matches_sent_params(
     monkeypatch: pytest.MonkeyPatch,
@@ -148,6 +180,20 @@ async def test_async_gateio_signed_query_order_matches_sent_params(
     assert method == "GET"
     assert kwargs["params"] == query_string
     assert kwargs["headers"]["SIGN"] == _gateio_expected_signature(query_string)
+
+
+@pytest.mark.asyncio
+async def test_async_gateio_json_decode_failure_is_failed_request() -> None:
+    from dcex.async_support.gateio._http_manager import HTTPManager
+
+    manager = HTTPManager(preload_product_table=False)
+    manager.session = _AsyncBadJsonSession()  # type: ignore[assignment]
+
+    with pytest.raises(FailedRequestError, match="Failed to decode JSON response") as exc_info:
+        await manager._request("GET", "/spot/currencies", signed=False)
+
+    assert exc_info.value.status_code == 200
+    assert exc_info.value.resp_headers == {}
 
 
 def test_sync_bitmex_passes_configured_timeout() -> None:
