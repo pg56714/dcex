@@ -26,6 +26,13 @@ class FuturesMarket(str, Enum):
     KLINES = "/fapi/v1/klines"
     PREMIUM_INDEX = "/fapi/v1/premiumIndex"
     FUNDING_RATE_HISTORY = "/fapi/v1/fundingRate"
+    OPEN_INTEREST = "/fapi/v1/openInterest"
+    OPEN_INTEREST_HISTORY = "/futures/data/openInterestHist"
+    GLOBAL_LONG_SHORT_ACCOUNT_RATIO = "/futures/data/globalLongShortAccountRatio"
+    TOP_LONG_SHORT_ACCOUNT_RATIO = "/futures/data/topLongShortAccountRatio"
+    TOP_LONG_SHORT_POSITION_RATIO = "/futures/data/topLongShortPositionRatio"
+    TAKER_LONG_SHORT_RATIO = "/futures/data/takerlongshortRatio"
+    BASIS = "/futures/data/basis"
 
     def __str__(self) -> str:
         return self.value

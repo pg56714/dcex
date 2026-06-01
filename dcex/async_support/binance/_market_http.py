@@ -1,3 +1,5 @@
+from typing import Any
+
 from ...utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.market import FuturesMarket, SpotMarket
@@ -75,7 +77,7 @@ class MarketHTTP(HTTPManager):
         Returns:
             dict: Order book data including bids and asks
         """
-        payload = {
+        payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
         }
         if limit is not None:
@@ -295,3 +297,260 @@ class MarketHTTP(HTTPManager):
             signed=False,
         )
         return res
+
+    async def get_futures_open_interest(self, product_symbol: str) -> dict:
+        """
+        Get current futures open interest.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
+
+        Returns:
+            dict: Open interest data
+        """
+        payload = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
+        }
+        return await self._request(
+            method="GET",
+            path=FuturesMarket.OPEN_INTEREST,
+            query=payload,
+            signed=False,
+        )
+
+    async def get_futures_open_interest_history(
+        self,
+        product_symbol: str,
+        period: str = "5m",
+        limit: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+    ) -> dict:
+        """
+        Get futures open interest statistics history.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
+            period: Data period (e.g., '5m', '1h', '1d')
+            limit: Number of records to return
+            startTime: Start time in milliseconds
+            endTime: End time in milliseconds
+
+        Returns:
+            dict: Open interest statistics history
+        """
+        payload: dict[str, Any] = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
+            "period": period,
+        }
+        if limit is not None:
+            payload["limit"] = limit
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+
+        return await self._request(
+            method="GET",
+            path=FuturesMarket.OPEN_INTEREST_HISTORY,
+            query=payload,
+            signed=False,
+        )
+
+    async def get_futures_global_long_short_account_ratio(
+        self,
+        product_symbol: str,
+        period: str = "5m",
+        limit: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+    ) -> dict:
+        """
+        Get global futures long/short account ratio history.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
+            period: Data period (e.g., '5m', '1h', '1d')
+            limit: Number of records to return
+            startTime: Start time in milliseconds
+            endTime: End time in milliseconds
+
+        Returns:
+            dict: Long/short account ratio history
+        """
+        payload: dict[str, Any] = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
+            "period": period,
+        }
+        if limit is not None:
+            payload["limit"] = limit
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+
+        return await self._request(
+            method="GET",
+            path=FuturesMarket.GLOBAL_LONG_SHORT_ACCOUNT_RATIO,
+            query=payload,
+            signed=False,
+        )
+
+    async def get_futures_top_long_short_account_ratio(
+        self,
+        product_symbol: str,
+        period: str = "5m",
+        limit: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+    ) -> dict:
+        """
+        Get top trader futures long/short account ratio history.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
+            period: Data period (e.g., '5m', '1h', '1d')
+            limit: Number of records to return
+            startTime: Start time in milliseconds
+            endTime: End time in milliseconds
+
+        Returns:
+            dict: Top trader account ratio history
+        """
+        payload: dict[str, Any] = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
+            "period": period,
+        }
+        if limit is not None:
+            payload["limit"] = limit
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+
+        return await self._request(
+            method="GET",
+            path=FuturesMarket.TOP_LONG_SHORT_ACCOUNT_RATIO,
+            query=payload,
+            signed=False,
+        )
+
+    async def get_futures_top_long_short_position_ratio(
+        self,
+        product_symbol: str,
+        period: str = "5m",
+        limit: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+    ) -> dict:
+        """
+        Get top trader futures long/short position ratio history.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
+            period: Data period (e.g., '5m', '1h', '1d')
+            limit: Number of records to return
+            startTime: Start time in milliseconds
+            endTime: End time in milliseconds
+
+        Returns:
+            dict: Top trader position ratio history
+        """
+        payload: dict[str, Any] = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
+            "period": period,
+        }
+        if limit is not None:
+            payload["limit"] = limit
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+
+        return await self._request(
+            method="GET",
+            path=FuturesMarket.TOP_LONG_SHORT_POSITION_RATIO,
+            query=payload,
+            signed=False,
+        )
+
+    async def get_futures_taker_buy_sell_volume(
+        self,
+        product_symbol: str,
+        period: str = "5m",
+        limit: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+    ) -> dict:
+        """
+        Get futures taker buy/sell volume history.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTCUSDT')
+            period: Data period (e.g., '5m', '1h', '1d')
+            limit: Number of records to return
+            startTime: Start time in milliseconds
+            endTime: End time in milliseconds
+
+        Returns:
+            dict: Taker buy/sell volume history
+        """
+        payload: dict[str, Any] = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
+            "period": period,
+        }
+        if limit is not None:
+            payload["limit"] = limit
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+
+        return await self._request(
+            method="GET",
+            path=FuturesMarket.TAKER_LONG_SHORT_RATIO,
+            query=payload,
+            signed=False,
+        )
+
+    async def get_futures_basis(
+        self,
+        product_symbol: str,
+        contractType: str = "PERPETUAL",
+        period: str = "5m",
+        limit: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+    ) -> dict:
+        """
+        Get futures basis history.
+
+        Args:
+            product_symbol: Trading pair symbol used as Binance pair (e.g., 'BTCUSDT')
+            contractType: Contract type (CURRENT_QUARTER, NEXT_QUARTER, PERPETUAL)
+            period: Data period (e.g., '5m', '1h', '1d')
+            limit: Number of records to return
+            startTime: Start time in milliseconds
+            endTime: End time in milliseconds
+
+        Returns:
+            dict: Futures basis history
+        """
+        payload: dict[str, Any] = {
+            "pair": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
+            "contractType": contractType,
+            "period": period,
+        }
+        if limit is not None:
+            payload["limit"] = limit
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+
+        return await self._request(
+            method="GET",
+            path=FuturesMarket.BASIS,
+            query=payload,
+            signed=False,
+        )

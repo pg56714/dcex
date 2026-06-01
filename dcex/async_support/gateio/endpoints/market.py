@@ -22,6 +22,7 @@ class FutureMarket(str, Enum):
     GET_KLINE = "/futures/{settle}/candlesticks"
     LIST_TICKERS = "/futures/{settle}/tickers"
     FUNDING_RATE_HISTORY = "/futures/{settle}/funding_rate"
+    CONTRACT_STATS = "/futures/{settle}/contract_stats"
 
     def __str__(self) -> str:
         return self.value

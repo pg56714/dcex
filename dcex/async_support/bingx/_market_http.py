@@ -131,6 +131,68 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
+    async def get_open_interest(self, product_symbol: str) -> dict:
+        """
+        Get swap open interest.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
+
+        Returns:
+            dict: Open interest data
+        """
+        payload = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
+        }
+
+        res = await self._request(
+            method="GET",
+            path=SwapMarket.OPEN_INTEREST,
+            query=payload,
+            signed=False,
+        )
+        return res
+
+    async def get_mark_price_kline(
+        self,
+        product_symbol: str,
+        interval: str,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict:
+        """
+        Get swap mark price kline data.
+
+        Args:
+            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
+            interval: Kline interval
+            start_time: Start time in milliseconds
+            end_time: End time in milliseconds
+            limit: Number of klines to return
+
+        Returns:
+            dict: Mark price kline data
+        """
+        payload = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
+            "interval": interval,
+        }
+        if start_time is not None:
+            payload["startTime"] = str(start_time)
+        if end_time is not None:
+            payload["endTime"] = str(end_time)
+        if limit is not None:
+            payload["limit"] = str(limit)
+
+        res = await self._request(
+            method="GET",
+            path=SwapMarket.MARK_PRICE_KLINE,
+            query=payload,
+            signed=False,
+        )
+        return res
+
     async def get_ticker(
         self,
         product_symbol: str | None = None,

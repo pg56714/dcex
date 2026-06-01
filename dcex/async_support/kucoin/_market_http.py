@@ -5,7 +5,7 @@ from typing import Any
 from ...utils.common import Common
 from ...utils.timeframe_utils import kucoin_convert_timeframe
 from ._http_manager import HTTPManager
-from .endpoints.market import SpotMarket
+from .endpoints.market import FuturesMarket, SpotMarket
 
 
 class MarketHTTP(HTTPManager):
@@ -159,6 +159,34 @@ class MarketHTTP(HTTPManager):
         res = await self._request(
             method="GET",
             path=SpotMarket.KLINE,
+            query=payload,
+            signed=False,
+        )
+        return res
+
+    async def get_futures_open_interest(
+        self,
+        product_symbol: str,
+        interval: str = "5min",
+        startAt: int | None = None,
+        endAt: int | None = None,
+        pageSize: int | None = None,
+    ) -> dict[str, Any]:
+        """Get futures open interest history."""
+        payload: dict[str, Any] = {
+            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
+            "interval": interval,
+        }
+        if startAt is not None:
+            payload["startAt"] = startAt
+        if endAt is not None:
+            payload["endAt"] = endAt
+        if pageSize is not None:
+            payload["pageSize"] = pageSize
+
+        res = await self._request(
+            method="GET",
+            path=FuturesMarket.OPEN_INTEREST,
             query=payload,
             signed=False,
         )

@@ -27,6 +27,9 @@ class FuturesMarket(str, Enum):
     GET_CONTRACTS_KLINE = "/contract/public/kline"
     GET_CURRENT_FUNDING_RATE = "/contract/public/funding-rate"
     GET_FUNDING_RATE_HISTORY = "/contract/public/funding-rate-history"
+    GET_OPEN_INTEREST = "/contract/public/open-interest"
+    GET_MARK_PRICE_KLINE = "/contract/public/markprice-kline"
+    GET_LEVERAGE_BRACKET = "/contract/public/leverage-bracket"
 
     def __str__(self) -> str:
         return self.value

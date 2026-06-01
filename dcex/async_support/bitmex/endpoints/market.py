@@ -23,6 +23,7 @@ class Market(str, Enum):
     TICKER = "/api/v1/quote/bucketed"
     KLINE = "/api/v1/trade/bucketed"
     FUNDING = "/api/v1/funding"
+    LIQUIDATION = "/api/v1/liquidation"
 
     def __str__(self) -> str:
         return self.value

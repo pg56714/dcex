@@ -21,3 +21,12 @@ class SpotMarket(str, Enum):
 
     def __str__(self) -> str:
         return self.value
+
+
+class FuturesMarket(str, Enum):
+    """Enumeration of KuCoin Futures Market API endpoints."""
+
+    OPEN_INTEREST = "/api/ua/v1/market/open-interest"
+
+    def __str__(self) -> str:
+        return self.value

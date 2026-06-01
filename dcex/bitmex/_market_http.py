@@ -322,3 +322,41 @@ class MarketHTTP(HTTPManager):
             signed=False,
         )
         return res
+
+    def get_liquidations(
+        self,
+        product_symbol: str | None = None,
+        filter: dict[str, Any] | None = None,
+        columns: str | None = None,
+        count: int | None = None,
+        start: int | None = None,
+        reverse: bool | None = None,
+        startTime: str | None = None,
+        endTime: str | None = None,
+    ) -> dict[str, Any]:
+        """Get liquidation orders."""
+        payload: dict[str, str | int | list[str] | float | bool] = {}
+        if product_symbol is not None:
+            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
+        if filter is not None:
+            payload["filter"] = msgspec.json.encode(filter).decode("utf-8")
+        if columns is not None:
+            payload["columns"] = columns
+        if count is not None:
+            payload["count"] = count
+        if start is not None:
+            payload["start"] = start
+        if reverse is not None:
+            payload["reverse"] = reverse
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+
+        res = self._request(
+            method="GET",
+            path=Market.LIQUIDATION,
+            query=payload,
+            signed=False,
+        )
+        return res

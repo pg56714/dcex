@@ -273,6 +273,37 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
+    def get_futures_contract_stats(
+        self,
+        product_symbol: str,
+        ccy: str = "usdt",
+        interval: str | None = None,
+        from_timestamp: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Get futures contract statistics."""
+        path_params: dict[str, Any] = {
+            "settle": ccy,
+        }
+        payload: dict[str, Any] = {
+            "contract": self.ptm.get_exchange_symbol(Common.GATEIO, product_symbol),
+        }
+        if interval is not None:
+            payload["interval"] = interval
+        if from_timestamp is not None:
+            payload["from"] = from_timestamp
+        if limit is not None:
+            payload["limit"] = limit
+
+        res = self._request(
+            method="GET",
+            path=FutureMarket.CONTRACT_STATS,
+            path_params=path_params,
+            query=payload,
+            signed=False,
+        )
+        return res
+
     def get_all_delivery_contracts(self) -> dict[str, Any]:
         """
         Get all delivery contracts.

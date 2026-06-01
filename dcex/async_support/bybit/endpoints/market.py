@@ -23,7 +23,14 @@ class Market(str, Enum):
     GET_TICKERS = "/v5/market/tickers"
     GET_FUNDING_RATE_HISTORY = "/v5/market/funding/history"
     GET_PUBLIC_TRADE_HISTORY = "/v5/market/recent-trade"
+    GET_OPEN_INTEREST = "/v5/market/open-interest"
+    GET_HISTORICAL_VOLATILITY = "/v5/market/historical-volatility"
+    GET_INSURANCE_POOL = "/v5/market/insurance"
     GET_RISK_MARKET = "/v5/market/risk-limit"
+    GET_DELIVERY_PRICE = "/v5/market/delivery-price"
+    GET_LONG_SHORT_RATIO = "/v5/market/account-ratio"
+    GET_ORDER_PRICE_LIMIT = "/v5/market/order-price-limit"
+    GET_ADL_ALERT = "/v5/market/adl-alert"
 
     def __str__(self) -> str:
         return self.value

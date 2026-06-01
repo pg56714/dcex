@@ -253,6 +253,57 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
+    def get_open_interest(self, product_symbol: str) -> dict[str, Any]:
+        """Get futures contract open interest."""
+        payload = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
+        }
+
+        res = self._request(
+            method="GET",
+            path=FuturesMarket.GET_OPEN_INTEREST,
+            query=payload,
+            signed=False,
+        )
+        return res
+
+    def get_mark_price_kline(
+        self,
+        product_symbol: str,
+        interval: str,
+        start_time: int,
+        end_time: int,
+    ) -> dict[str, Any]:
+        """Get futures mark price kline data."""
+        payload = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
+            "step": bitmart_convert_timeframe(interval),
+            "start_time": start_time,
+            "end_time": end_time,
+        }
+
+        res = self._request(
+            method="GET",
+            path=FuturesMarket.GET_MARK_PRICE_KLINE,
+            query=payload,
+            signed=False,
+        )
+        return res
+
+    def get_leverage_bracket(self, product_symbol: str) -> dict[str, Any]:
+        """Get futures contract leverage bracket."""
+        payload = {
+            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
+        }
+
+        res = self._request(
+            method="GET",
+            path=FuturesMarket.GET_LEVERAGE_BRACKET,
+            query=payload,
+            signed=False,
+        )
+        return res
+
     def get_current_funding_rate(
         self,
         product_symbol: str,
