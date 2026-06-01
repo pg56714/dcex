@@ -200,21 +200,13 @@ class HTTPManager(BaseHTTPManager):
                     timeout=self.timeout,
                 )
             elif method_upper == "POST":
-                if body:
-                    response = self.session.post(
-                        url,
-                        headers=headers,
-                        params=query_params,
-                        data=body_string,
-                        timeout=self.timeout,
-                    )
-                else:
-                    response = self.session.post(
-                        url,
-                        headers=headers,
-                        params=query_params,
-                        timeout=self.timeout,
-                    )
+                response = self.session.post(
+                    url,
+                    headers=headers,
+                    params=query_params,
+                    data=body_string if body else None,
+                    timeout=self.timeout,
+                )
             elif method_upper == "PUT":
                 response = self.session.put(
                     url,

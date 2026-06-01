@@ -102,13 +102,12 @@ def parse_params_to_str(query: dict[str, Any]) -> str:
         query: Query parameters dictionary
 
     Returns:
-        URL query string
+        URL query string, or empty string when *query* is empty.
     """
-    url = "?"
-    for key, value in query.items():
-        if value != "":
-            url += f"{key}={value}&"
-    return url.rstrip("&")
+    parts = [f"{key}={value}" for key, value in query.items() if value != ""]
+    if not parts:
+        return ""
+    return "?" + "&".join(parts)
 
 
 def _okx_error_details(data: dict[str, Any]) -> tuple[str, str]:
@@ -223,10 +222,22 @@ class HTTPManager(BaseHTTPManager):
         else:
             try:
                 data = response.json()
-            except Exception:
-                data = {}
+            except Exception as exc:
+                raise FailedRequestError(
+                    request=f"{method.upper()} {url} | Body: {query}",
+                    message=f"Failed to decode JSON response: {exc}",
+                    status_code=response.status_code,
+                    time=str(timestamp),
+                    resp_headers=dict(response.headers),
+                ) from exc
             if not isinstance(data, dict):
-                data = {}
+                raise FailedRequestError(
+                    request=f"{method.upper()} {url} | Body: {query}",
+                    message=f"Unexpected response type: {type(data).__name__}",
+                    status_code=response.status_code,
+                    time=str(timestamp),
+                    resp_headers=dict(response.headers),
+                )
 
             if data.get("code", "0") != "0":
                 api_code, error_message = _okx_error_details(data)
