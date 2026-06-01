@@ -1,3 +1,12 @@
+## 0.10.1 (2026-06-01)
+
+### Fix
+
+- wrap gateio json decode errors
+- raise on JSON decode failure in all remaining HTTP managers
+- harden JSON decode and query-string handling in HTTP managers
+- address code review findings across builder fee and test infra
+
 ## 0.10.0 (2026-05-31)
 
 ### Feat
