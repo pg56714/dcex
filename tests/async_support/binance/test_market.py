@@ -16,6 +16,18 @@ async def test_get_spot_exchange_info(client):
 
 
 @pytest.mark.asyncio
+async def test_get_spot_server_time(client):
+    res = await client.get_server_time(market_type="spot")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_server_time(client):
+    res = await client.get_server_time(market_type="swap")
+    assert res is not None
+
+
+@pytest.mark.asyncio
 async def test_get_futures_exchange_info(client):
     res = await client.get_futures_exchange_info()
     assert res is not None

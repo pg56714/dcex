@@ -29,6 +29,36 @@ async def test_get_account_balance(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+async def test_get_futures_account_balance(client):
+    res = await client.get_account_balance(market_type="swap")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_get_futures_account_info(client):
+    res = await client.get_futures_account_info()
+    assert res is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
 async def test_get_income_history(client):
     res = await client.get_income_history()
     assert res is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_spot_rest_listen_key_is_unavailable(client):
+    with pytest.raises(NotImplementedError):
+        await client.get_listen_key(market_type="spot")
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_futures_listen_key_lifecycle(client):
+    listen_key = await client.get_listen_key(market_type="swap")
+    assert listen_key
+    assert await client.keep_alive_listen_key(listen_key, market_type="swap") is not None
+    assert await client.close_listen_key(listen_key, market_type="swap") is not None

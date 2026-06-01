@@ -12,6 +12,16 @@ def test_get_spot_exchange_info(client):
     assert res is not None
 
 
+def test_get_spot_server_time(client):
+    res = client.get_server_time(market_type="spot")
+    assert res is not None
+
+
+def test_get_futures_server_time(client):
+    res = client.get_server_time(market_type="swap")
+    assert res is not None
+
+
 def test_get_futures_exchange_info(client):
     res = client.get_futures_exchange_info()
     assert res is not None

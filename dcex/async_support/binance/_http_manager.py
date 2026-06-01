@@ -22,8 +22,8 @@ from .endpoints.trade import FuturesTrade, SpotTrade
 class HTTPManager(BaseHTTPManager):
     EXCHANGE = Common.BINANCE
 
-    api_key: str | None = field(default=None)
-    api_secret: str | None = field(default=None)
+    api_key: str | None = field(default=None, repr=False)
+    api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     session: httpx.AsyncClient | None = field(default=None, init=False)
@@ -100,6 +100,8 @@ class HTTPManager(BaseHTTPManager):
                 response = await self.session.get(url, headers=self._headers())
             elif method.upper() == "POST":
                 response = await self.session.post(url, headers=self._headers(), data=query)
+            elif method.upper() == "PUT":
+                response = await self.session.put(url, headers=self._headers(), data=query)
             elif method.upper() == "DELETE":
                 url += f"?{urlencode(query)}" if query else ""
                 response = await self.session.delete(url, headers=self._headers())

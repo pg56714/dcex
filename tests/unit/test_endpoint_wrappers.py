@@ -160,6 +160,8 @@ def _wire_sync(client: Any) -> list[dict[str, Any]]:
         calls.append(
             {"method": method, "path": path, "query": query, "body": body, "kwargs": kwargs}
         )
+        if getattr(path, "name", "") == "USER_DATA_STREAM" or "listenKey" in str(path):
+            return {"listenKey": "test-listen-key"}
         return {"ok": True}
 
     client._request = fake_request
@@ -181,6 +183,8 @@ def _wire_async(client: Any) -> list[dict[str, Any]]:
         calls.append(
             {"method": method, "path": path, "query": query, "body": body, "kwargs": kwargs}
         )
+        if getattr(path, "name", "") == "USER_DATA_STREAM" or "listenKey" in str(path):
+            return {"listenKey": "test-listen-key"}
         return {"ok": True}
 
     client._request = fake_request
@@ -326,6 +330,11 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         kwargs["orderID"] = "test-order-id"
     if case.exchange == "bitmart" and case.method_name == "post_withdraw_apply":
         kwargs["address"] = "test-address"
+    if case.exchange == "binance" and case.method_name in {
+        "cancel_futures_algo_order",
+        "get_futures_algo_order",
+    }:
+        kwargs["algoId"] = 1
     return kwargs
 
 

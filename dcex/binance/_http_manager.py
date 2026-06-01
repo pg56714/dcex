@@ -29,8 +29,8 @@ class HTTPManager(BaseHTTPManager):
 
     EXCHANGE = Common.BINANCE
 
-    api_key: str | None = field(default=None)
-    api_secret: str | None = field(default=None)
+    api_key: str | None = field(default=None, repr=False)
+    api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     session: requests.Session = field(default_factory=requests.Session, init=False)
@@ -136,6 +136,10 @@ class HTTPManager(BaseHTTPManager):
                 response = self.session.get(url, headers=self._headers(), timeout=self.timeout)
             elif method.upper() == "POST":
                 response = self.session.post(
+                    url, headers=self._headers(), timeout=self.timeout, data=query
+                )
+            elif method.upper() == "PUT":
+                response = self.session.put(
                     url, headers=self._headers(), timeout=self.timeout, data=query
                 )
             elif method.upper() == "DELETE":

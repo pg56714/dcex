@@ -6,6 +6,7 @@ from enum import Enum
 class SpotMarket(str, Enum):
     """Spot trading market data endpoints."""
 
+    SERVER_TIME = "/api/v3/time"
     EXCHANGE_INFO = "/api/v3/exchangeInfo"
     ORDERBOOK = "/api/v3/depth"
     TRADES = "/api/v3/trades"
@@ -19,6 +20,7 @@ class SpotMarket(str, Enum):
 class FuturesMarket(str, Enum):
     """Futures trading market data endpoints."""
 
+    SERVER_TIME = "/fapi/v1/time"
     EXCHANGE_INFO = "/fapi/v1/exchangeInfo"
     BOOK_TICKER = "/fapi/v1/ticker/bookTicker"
     KLINES = "/fapi/v1/klines"

@@ -7,6 +7,23 @@ from .enums import BinanceProductType
 class MarketHTTP(HTTPManager):
     """HTTP client for Binance market data API endpoints."""
 
+    async def get_server_time(self, market_type: str = BinanceProductType.SPOT) -> dict:
+        """
+        Get Binance server time for spot or futures.
+
+        Args:
+            market_type: Market type ("spot" or "swap").
+
+        Returns:
+            dict: Server time response.
+        """
+        path = (
+            SpotMarket.SERVER_TIME
+            if str(market_type) == BinanceProductType.SPOT.value
+            else FuturesMarket.SERVER_TIME
+        )
+        return await self._request(method="GET", path=path, query={}, signed=False)
+
     async def get_spot_exchange_info(
         self,
         product_symbol: str | None = None,

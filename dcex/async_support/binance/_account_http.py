@@ -7,6 +7,13 @@ from .enums import BinanceProductType
 class AccountHTTP(HTTPManager):
     """HTTP client for Binance account-related API endpoints."""
 
+    def _listen_key_path(self, market_type: str) -> FuturesAccount:
+        if str(market_type) == BinanceProductType.SPOT.value:
+            raise NotImplementedError(
+                "Binance Spot user data streams are subscribed through the WebSocket API."
+            )
+        return FuturesAccount.USER_DATA_STREAM
+
     async def get_account_balance(
         self,
         market_type: str,
@@ -72,3 +79,77 @@ class AccountHTTP(HTTPManager):
             query=payload,
         )
         return res
+
+    async def get_futures_account_info(self) -> dict:
+        """
+        Get futures account information, including balances and positions.
+
+        Returns:
+            dict: Futures account information.
+        """
+        res = await self._request(
+            method="GET",
+            path=FuturesAccount.ACCOUNT_INFO,
+            query={},
+        )
+        return res
+
+    async def get_listen_key(self, market_type: str = BinanceProductType.SWAP) -> str:
+        """
+        Start a futures user data stream and return its listen key.
+
+        Args:
+            market_type: Market type. Only "swap" is supported by this REST endpoint.
+
+        Returns:
+            str: User data stream listen key.
+        """
+        path = self._listen_key_path(market_type)
+        res = await self._request(method="POST", path=path, query={}, signed=False)
+        return res["listenKey"]
+
+    async def keep_alive_listen_key(
+        self,
+        listen_key: str,
+        market_type: str = BinanceProductType.SWAP,
+    ) -> dict:
+        """
+        Keep a futures user data stream alive.
+
+        Args:
+            listen_key: User data stream listen key.
+            market_type: Market type. Only "swap" is supported by this REST endpoint.
+
+        Returns:
+            dict: Binance response.
+        """
+        path = self._listen_key_path(market_type)
+        return await self._request(
+            method="PUT",
+            path=path,
+            query={"listenKey": listen_key},
+            signed=False,
+        )
+
+    async def close_listen_key(
+        self,
+        listen_key: str,
+        market_type: str = BinanceProductType.SWAP,
+    ) -> dict:
+        """
+        Close a futures user data stream.
+
+        Args:
+            listen_key: User data stream listen key.
+            market_type: Market type. Only "swap" is supported by this REST endpoint.
+
+        Returns:
+            dict: Binance response.
+        """
+        path = self._listen_key_path(market_type)
+        return await self._request(
+            method="DELETE",
+            path=path,
+            query={"listenKey": listen_key},
+            signed=False,
+        )
