@@ -146,8 +146,14 @@ class HTTPManager(BaseHTTPManager):
 
             try:
                 data = response.json()
-            except Exception:
-                data = {}
+            except Exception as exc:
+                raise FailedRequestError(
+                    request=f"{method.upper()} {url} | Body: {query}",
+                    message=f"Failed to decode JSON response: {exc}",
+                    status_code=response.status_code,
+                    time=str(generate_timestamp(iso_format=True)),
+                    resp_headers=dict(response.headers),
+                ) from exc
 
             timestamp = generate_timestamp(iso_format=True)
             if isinstance(data, dict) and "code" in data and str(data["code"]) != "200":

@@ -159,8 +159,14 @@ class HTTPManager:
         else:
             try:
                 data = response.json()
-            except Exception:
-                data = {}
+            except Exception as exc:
+                raise FailedRequestError(
+                    request=f"{method.upper()} {url} | Body: {query}",
+                    message=f"Failed to decode JSON response: {exc}",
+                    status_code=response.status_code,
+                    time=str(int(time.time() * 1000)),
+                    resp_headers=dict(response.headers),
+                ) from exc
 
             if data.get("code", 0) != 0:
                 code = data.get("code", "Unknown")

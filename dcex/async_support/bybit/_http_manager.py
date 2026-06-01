@@ -216,8 +216,14 @@ class HTTPManager(BaseHTTPManager):
         else:
             try:
                 data = response.json()
-            except Exception:
-                data = {}
+            except Exception as exc:
+                raise FailedRequestError(
+                    request=f"{method.upper()} {url} | Body: {query}",
+                    message=f"Failed to decode JSON response: {exc}",
+                    status_code=response.status_code,
+                    time=str(timestamp),
+                    resp_headers=dict(response.headers),
+                ) from exc
 
             if data.get("retCode", 0) != 0:
                 code = data.get("retCode", "Unknown")

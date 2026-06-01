@@ -390,8 +390,14 @@ class HTTPManager(BaseHTTPManager):
         else:
             try:
                 data = response.json()
-            except Exception:
-                data = {}
+            except Exception as exc:
+                raise FailedRequestError(
+                    request=f"{method.upper()} {url} | Body: {query}",
+                    message=f"Failed to decode JSON response: {exc}",
+                    status_code=response.status_code,
+                    time=str(timestamp),
+                    resp_headers=dict(response.headers),
+                ) from exc
 
             if not response.status_code // 100 == 2:
                 self._log_failed_request(
