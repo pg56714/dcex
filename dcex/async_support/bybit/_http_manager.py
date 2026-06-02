@@ -26,6 +26,25 @@ SUBDOMAIN_TESTNET = "api-testnet"
 SUBDOMAIN_MAINNET = "api"
 DOMAIN_MAIN = "bybit"
 TLD_MAIN = "com"
+TIME_ENDPOINT = "/v5/market/time"
+
+
+def _extract_server_time_ms(data: dict[str, Any]) -> int | None:
+    value = data.get("time")
+    if value is not None:
+        return int(value)
+
+    result = data.get("result")
+    if isinstance(result, dict):
+        time_nano = result.get("timeNano")
+        if time_nano is not None:
+            return int(time_nano) // 1_000_000
+
+        time_second = result.get("timeSecond")
+        if time_second is not None:
+            return int(time_second) * 1_000
+
+    return None
 
 
 def get_header(api_key: str, signature: str, timestamp: int, recv_window: int) -> dict[str, str]:
@@ -93,8 +112,8 @@ class HTTPManager(BaseHTTPManager):
     testnet: bool = field(default=False)
     domain: str = field(default=DOMAIN_MAIN)
     tld: str = field(default=TLD_MAIN)
-    api_key: str | None = field(default=None)
-    api_secret: str | None = field(default=None)
+    api_key: str | None = field(default=None, repr=False)
+    api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     recv_window: int = field(default=5000)
     max_retries: int = field(default=3)
@@ -103,6 +122,9 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    sync_server_time: bool = field(default=True)
+    timestamp_offset_ms: int = field(default=0, repr=False)
+    _time_offset_synced: bool = field(default=False, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """
@@ -118,6 +140,36 @@ class HTTPManager(BaseHTTPManager):
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=subdomain, DOMAIN=self.domain, TLD=self.tld)
         return self
+
+    async def _sync_time_offset(self) -> None:
+        if self._time_offset_synced or not self.sync_server_time:
+            self._time_offset_synced = True
+            return
+
+        self._time_offset_synced = True
+        if self.session is None:
+            return
+
+        try:
+            local_start = int(generate_timestamp())
+            response = await self.session.get(
+                self.endpoint + TIME_ENDPOINT,
+                headers=get_header_no_sign(),
+                timeout=self.timeout,
+            )
+            local_end = int(generate_timestamp())
+            data = response.json()
+            server_time_ms = _extract_server_time_ms(data)
+            if response.status_code // 100 == 2 and server_time_ms is not None:
+                self.timestamp_offset_ms = server_time_ms - ((local_start + local_end) // 2)
+        except Exception:
+            return
+
+    async def _timestamp(self, signed: bool) -> int:
+        # Bybit rejects signed requests more than 1000ms ahead of server time.
+        if signed:
+            await self._sync_time_offset()
+        return int(generate_timestamp()) + self.timestamp_offset_ms
 
     def _auth(self, payload: str, timestamp: int) -> str:
         """
@@ -171,7 +223,7 @@ class HTTPManager(BaseHTTPManager):
         if query is None:
             query = {}
 
-        timestamp = int(generate_timestamp())
+        timestamp = await self._timestamp(signed)
 
         if method.upper() == "GET":
             if query:

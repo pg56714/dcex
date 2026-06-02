@@ -29,8 +29,8 @@ class Market(str, Enum):
     GET_RISK_MARKET = "/v5/market/risk-limit"
     GET_DELIVERY_PRICE = "/v5/market/delivery-price"
     GET_LONG_SHORT_RATIO = "/v5/market/account-ratio"
-    GET_ORDER_PRICE_LIMIT = "/v5/market/order-price-limit"
-    GET_ADL_ALERT = "/v5/market/adl-alert"
+    GET_ORDER_PRICE_LIMIT = "/v5/market/price-limit"
+    GET_ADL_ALERT = "/v5/market/adlAlert"
 
     def __str__(self) -> str:
         return self.value

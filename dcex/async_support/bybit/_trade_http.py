@@ -562,25 +562,39 @@ class TradeHTTP(HTTPManager):
 
     async def get_open_orders(
         self,
+        category: str = "linear",
         product_symbol: str | None = None,
+        settleCoin: str | None = None,
+        baseCoin: str | None = None,
         limit: int = 20,
     ) -> dict[str, Any]:
         """
         Get open orders.
 
         Args:
+            category: Product category (linear, option, spot, inverse)
             product_symbol: Optional product symbol to filter results
+            settleCoin: Optional settlement coin to filter results
+            baseCoin: Optional base coin to filter results
             limit: Maximum number of orders to return (default: 20)
 
         Returns:
             Dict containing open orders
         """
         payload = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
+            "category": category,
             "limit": limit,
         }
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
+            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
+        else:
+            if baseCoin is not None:
+                payload["baseCoin"] = baseCoin
+            if settleCoin is not None:
+                payload["settleCoin"] = settleCoin
+            elif category == "linear":
+                payload["settleCoin"] = "USDT"
 
         res = await self._request(
             method="GET",

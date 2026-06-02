@@ -561,25 +561,39 @@ class TradeHTTP(HTTPManager):
 
     def get_open_orders(
         self,
+        category: str = "linear",
         product_symbol: str | None = None,
+        settleCoin: str | None = None,
+        baseCoin: str | None = None,
         limit: int = 20,
     ) -> dict[str, Any]:
         """
         Get open orders.
 
         Args:
+            category: Product category (linear, option, spot, inverse)
             product_symbol: Product symbol to filter by
+            settleCoin: Settlement coin to filter by
+            baseCoin: Base coin to filter by
             limit: Maximum number of records to return (default: 20)
 
         Returns:
             dict[str, Any]: API response containing open orders
         """
         payload: dict[str, Any] = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
+            "category": category,
             "limit": limit,
         }
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
+            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
+        else:
+            if baseCoin is not None:
+                payload["baseCoin"] = baseCoin
+            if settleCoin is not None:
+                payload["settleCoin"] = settleCoin
+            elif category == "linear":
+                payload["settleCoin"] = "USDT"
 
         res = self._request(
             method="GET",
