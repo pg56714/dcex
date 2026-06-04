@@ -1,27 +1,20 @@
-<!-- 1. Verify and Update PR Title -->
-<!-- Example PR Title: `build | chore | ci | docs | feat | fix | perf | refactor | revert | style | test: Fix page layout` -->
-
-<!-- 2. Provide a detailed description of the changes -->
+<!-- Use a Conventional Commit title, for example: docs: clarify endpoint scope -->
 
 ## Description
 
-<!--
-- Provide a comprehensive description of the changes made.
-- Highlight the importance of the changes and how they improve the project.
-- If there are pending TODOs, list them with clear objectives.
-- Guide the reviewers through your changes for easier understanding.
-- Attach visuals (screenshots, screen recordings) if they help validate the changes.
--->
+<!-- Summarize what changed and why. Mention any behavior, API, documentation, or test impact. -->
 
-<!-- 3. Link the Github Issue related to these changes -->
+## Related Issues
 
-## Related tickets
+<!-- Use "Closes #123", "Fixes #123", or "N/A". -->
 
-https://github.com/pg56714/dcex/issues/XX
+## Verification
 
-<!-- 4. Confirm the following before submitting your PR -->
+<!-- List the checks you ran, for example: uv run pytest tests/unit -->
 
 ## PR Checklist
 
-- [ ] I have read the [Contributing Guide](../.github/CONTRIBUTING.md).
-- [ ] I have written documentation and tests where necessary.
+- [ ] I have read the [Contributing Guide](.github/CONTRIBUTING.md).
+- [ ] I have updated documentation where public behavior or supported scope changed.
+- [ ] I have added or updated tests where behavior changed.
+- [ ] I have run the relevant local checks, or explained why they were not run.

@@ -7,7 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to submit this feature request! Your feedback is valuable in helping us improve the dcex trading package.
+        Thank you for taking the time to submit this feature request.
+
+        Scope note: dcex focuses on market data, account queries, and trading/order APIs. External withdrawal creation endpoints are not currently wrapped, and options support is not normalized by the Product Table Manager.
   - type: textarea
     id: feature_description
     attributes:
@@ -29,9 +31,9 @@ body:
       label: "Benefits"
       description: "Explain the benefits this feature would provide."
       value: |
-        1. Accelerate the development and integration of trading acceleration modules.
-        2. Improve efficiency in supporting multiple exchanges.
-        3. Enhance flexibility for automation and strategy development.
+        1. Improve exchange integration coverage.
+        2. Make cross-exchange behavior easier to use or validate.
+        3. Reduce user-side workaround code.
     validations:
       required: true
   - type: dropdown
@@ -43,11 +45,11 @@ body:
         - "N/A"
         - "Binance"
         - "Bybit"
-        - "Bitmart"
+        - "BitMart"
         - "BingX"
         - "Hyperliquid"
         - "OKX"
-        - "Gate"
+        - "Gate.io"
         - "KuCoin"
         - "BitMEX"
         - "Other (please specify in description)"
