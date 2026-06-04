@@ -100,30 +100,6 @@ class AccountHTTP(HTTPManager):
         )
         return res
 
-    async def get_withdraw_charge(
-        self,
-        currency: str,
-    ) -> dict[str, Any]:
-        """
-        Get withdraw charge.
-
-        Args:
-            currency: Currency symbol (e.g., 'USDT')
-
-        Returns:
-            dict: Withdraw charge data
-        """
-        payload = {
-            "currency": currency,
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FundingAccount.WITHDRAW_QUOTA,
-            query=payload,
-        )
-        return res
-
     async def get_contract_assets(self) -> dict[str, Any]:
         """
         Get contract assets.

@@ -1,6 +1,8 @@
+from datetime import datetime, timedelta
+
 import pytest
 import pytest_asyncio
-from datetime import datetime, timedelta
+
 from dcex.async_support.bitmart.client import Client
 
 
@@ -57,4 +59,42 @@ async def test_get_contract_kline(client):
     start = int((datetime.now() - timedelta(days=1)).timestamp())
     end = int(datetime.now().timestamp())
     res = await client.get_contract_kline("BTC-USDT-SWAP", "5m", start, end)
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_contracts_details(client):
+    res = await client.get_contracts_details(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_open_interest(client):
+    res = await client.get_open_interest(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_mark_price_kline(client):
+    start = int((datetime.now() - timedelta(days=1)).timestamp())
+    end = int(datetime.now().timestamp())
+    res = await client.get_mark_price_kline("BTC-USDT-SWAP", "5m", start, end)
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_leverage_bracket(client):
+    res = await client.get_leverage_bracket(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_current_funding_rate(client):
+    res = await client.get_current_funding_rate(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_funding_rate_history(client):
+    res = await client.get_funding_rate_history(product_symbol="BTC-USDT-SWAP", limit=10)
     assert res is not None

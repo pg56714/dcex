@@ -110,33 +110,6 @@ class AccountHTTP(HTTPManager):
         )
         return res
 
-    def get_withdraw_charge(
-        self,
-        currency: str,
-    ) -> dict[str, Any]:
-        """
-        Get withdrawal fee information for a specific currency.
-
-        Args:
-            currency: Currency symbol for which to get withdrawal fee
-
-        Returns:
-            Dict containing withdrawal fee information
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload: dict[str, Any] = {
-            "currency": currency,
-        }
-
-        res = self._request(
-            method="GET",
-            path=FundingAccount.WITHDRAW_QUOTA,
-            query=payload,
-        )
-        return res
-
     def get_contract_assets(self) -> dict[str, Any]:
         """
         Get contract assets information for futures trading.

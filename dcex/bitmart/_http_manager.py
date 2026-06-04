@@ -79,9 +79,9 @@ class HTTPManager(BaseHTTPManager):
 
     EXCHANGE = Common.BITMART
 
-    api_key: str | None = field(default=None)
-    api_secret: str | None = field(default=None)
-    memo: str | None = field(default=None)
+    api_key: str | None = field(default=None, repr=False)
+    api_secret: str | None = field(default=None, repr=False)
+    memo: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     max_retries: int = field(default=3)
     retry_delay: int = field(default=3)

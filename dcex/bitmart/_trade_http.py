@@ -383,11 +383,11 @@ class TradeHTTP(HTTPManager):
         Raises:
             FailedRequestError: If the API request fails
         """
-        payload = {
+        payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
         }
         if order_id is not None:
-            payload["order_id"] = order_id
+            payload["order_id"] = int(order_id) if str(order_id).isdigit() else order_id
         if client_order_id is not None:
             payload["client_order_id"] = client_order_id
 
@@ -1082,7 +1082,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         order_id: str | None = None,
         client_order_id: str | None = None,
-        price: int | None = None,
+        price: str | int | None = None,
         size: int | None = None,
     ) -> dict[str, Any]:
         """
@@ -1101,17 +1101,17 @@ class TradeHTTP(HTTPManager):
         Raises:
             FailedRequestError: If the API request fails
         """
-        payload = {
+        payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
         }
         if order_id is not None:
-            payload["order_id"] = order_id
+            payload["order_id"] = int(order_id) if str(order_id).isdigit() else order_id
         if client_order_id is not None:
             payload["client_order_id"] = client_order_id
         if price is not None:
             payload["price"] = str(price)
         if size is not None:
-            payload["size"] = str(size)
+            payload["size"] = int(size)
 
         return self._request(
             method="POST",

@@ -1,8 +1,10 @@
+import os
+
 import pytest
 import pytest_asyncio
-from dcex.async_support.bitmart.client import Client
-import os
 from dotenv import load_dotenv
+
+from dcex.async_support.bitmart.client import Client
 
 load_dotenv()
 
@@ -46,13 +48,6 @@ async def test_get_spot_wallet(client):
 @pytest.mark.private
 async def test_get_deposit_address(client):
     res = await client.get_deposit_address(currency="BTC")
-    assert res is not None
-
-
-@pytest.mark.asyncio
-@pytest.mark.private
-async def test_get_withdraw_charge(client):
-    res = await client.get_withdraw_charge(currency="BTC")
     assert res is not None
 
 

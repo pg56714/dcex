@@ -1,7 +1,9 @@
-from dcex.bitmart.client import Client
 import os
-from dotenv import load_dotenv
+
 import pytest
+from dotenv import load_dotenv
+
+from dcex.bitmart.client import Client
 
 load_dotenv()
 
@@ -40,12 +42,6 @@ def test_get_spot_wallet(client):
 @pytest.mark.private
 def test_get_deposit_address(client):
     res = client.get_deposit_address(currency="BTC")
-    assert res is not None
-
-
-@pytest.mark.private
-def test_get_withdraw_charge(client):
-    res = client.get_withdraw_charge(currency="BTC")
     assert res is not None
 
 

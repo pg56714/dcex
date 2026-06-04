@@ -479,6 +479,24 @@ def test_sync_bybit_post_only_forwards_position_idx() -> None:
     assert calls[0]["query"]["positionIdx"] == "1"
 
 
+def test_sync_bitmart_modify_limit_order_uses_documented_payload_types() -> None:
+    client = _client_class("sync", "bitmart")(**_client_kwargs("bitmart"))
+    calls = _wire_sync(client)
+
+    result = client.modify_limit_order(
+        product_symbol="BTC-USDT-SWAP",
+        order_id="123456",
+        price="100.1",
+        size=1,
+    )
+
+    query = calls[0]["query"]
+    assert result == {"ok": True}
+    assert query["order_id"] == 123456
+    assert query["price"] == "100.1"
+    assert query["size"] == 1
+
+
 @pytest.mark.parametrize("case", ASYNC_CASES, ids=[case.id for case in ASYNC_CASES])
 @pytest.mark.asyncio
 async def test_async_endpoint_wrapper_is_reachable(
@@ -549,3 +567,42 @@ async def test_async_hyperliquid_builder_fee_requires_fee_when_address_given() -
             reduceOnly=False,
             fee_ten_bp=10,
         )
+
+
+@pytest.mark.asyncio
+async def test_async_bitmart_modify_limit_order_uses_documented_payload_types() -> None:
+    client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))
+    calls = _wire_async(client)
+
+    result = await client.modify_limit_order(
+        product_symbol="BTC-USDT-SWAP",
+        order_id="123456",
+        price="100.1",
+        size=1,
+    )
+
+    query = calls[0]["query"]
+    assert result == {"ok": True}
+    assert query["order_id"] == 123456
+    assert query["price"] == "100.1"
+    assert query["size"] == 1
+
+
+@pytest.mark.asyncio
+async def test_async_bitmart_post_only_buy_reads_position_response_data() -> None:
+    client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))
+    calls = _wire_async(client)
+
+    async def fake_get_contract_position(*args: object, **kwargs: object) -> dict[str, Any]:
+        return {"data": [{"position_type": 2, "current_amount": "1"}]}
+
+    client.get_contract_position = fake_get_contract_position
+
+    result = await client.place_contract_post_only_buy_order(
+        product_symbol="BTC-USDT-SWAP",
+        price="100.1",
+        size=1,
+    )
+
+    assert result == {"ok": True}
+    assert calls[0]["query"]["side"] == 2

@@ -11,7 +11,6 @@ class FundingAccount(str, Enum):
     GET_ACCOUNT_CURRENCIES = "/account/v1/currencies"
     GET_SPOT_WALLET_BALANCE = "/spot/v1/wallet"
     DEPOSIT_ADDRESS = "/account/v1/deposit/address"
-    WITHDRAW_QUOTA = "/account/v1/withdraw/charge"
 
     def __str__(self) -> str:
         return self.value

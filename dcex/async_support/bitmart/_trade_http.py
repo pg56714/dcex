@@ -275,11 +275,11 @@ class TradeHTTP(HTTPManager):
         """
         if self.ptm is None:
             raise RuntimeError("ProductTableManager not initialized")
-        payload = {
+        payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
         }
         if order_id is not None:
-            payload["order_id"] = str(order_id)
+            payload["order_id"] = int(order_id) if str(order_id).isdigit() else str(order_id)
         if client_order_id is not None:
             payload["client_order_id"] = str(client_order_id)
 
@@ -708,8 +708,9 @@ class TradeHTTP(HTTPManager):
         size: int,
         client_order_id: str | None = None,
     ) -> dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]:
-        positions: list[dict[str, Any]] = cast(
-            list[dict[str, Any]], await self.get_contract_position(product_symbol)
+        res = await self.get_contract_position(product_symbol)
+        positions: list[dict[str, Any]] = (
+            res.get("data", []) if isinstance(res, dict) else cast(list[dict[str, Any]], res)
         )
         short_size = sum(int(p["current_amount"]) for p in positions if p["position_type"] == 2)
 
@@ -756,8 +757,9 @@ class TradeHTTP(HTTPManager):
         size: int,
         client_order_id: str | None = None,
     ) -> dict[str, Any] | tuple[dict[str, Any], dict[str, Any]]:
-        positions: list[dict[str, Any]] = cast(
-            list[dict[str, Any]], await self.get_contract_position(product_symbol)
+        res = await self.get_contract_position(product_symbol)
+        positions: list[dict[str, Any]] = (
+            res.get("data", []) if isinstance(res, dict) else cast(list[dict[str, Any]], res)
         )
         long_size = sum(int(p["current_amount"]) for p in positions if p["position_type"] == 1)
 
@@ -802,7 +804,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         order_id: str | None = None,
         client_order_id: str | None = None,
-        price: int | None = None,
+        price: str | int | None = None,
         size: int | None = None,
     ) -> dict[str, Any]:
         """
@@ -812,17 +814,17 @@ class TradeHTTP(HTTPManager):
         :param price: int
         :param size: int
         """
-        payload = {
+        payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
         }
         if order_id is not None:
-            payload["order_id"] = str(order_id)
+            payload["order_id"] = int(order_id) if str(order_id).isdigit() else str(order_id)
         if client_order_id is not None:
             payload["client_order_id"] = str(client_order_id)
         if price is not None:
             payload["price"] = str(price)
         if size is not None:
-            payload["size"] = str(size)
+            payload["size"] = int(size)
 
         return await self._request(
             method="POST",
