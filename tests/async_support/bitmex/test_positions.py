@@ -1,8 +1,10 @@
+import os
+
 import pytest
 import pytest_asyncio
-from dcex.async_support.bitmex.client import Client
-import os
 from dotenv import load_dotenv
+
+from dcex.async_support.bitmex.client import Client
 
 load_dotenv()
 
@@ -36,7 +38,7 @@ async def test_switch_mode(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_set_leverage(client):
-    res = await client.set_leverage(product_symbol="XBT-USDT-SWAP", leverage=10.0, cross_margin=False)
+    res = await client.set_leverage(product_symbol="XBT-USDT-SWAP", leverage=10.0)
     assert res is not None
 
 

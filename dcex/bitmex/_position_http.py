@@ -95,7 +95,6 @@ class PositionHTTP(HTTPManager):
         self,
         product_symbol: str,
         leverage: float,
-        cross_margin: bool = True,
         target_account_id: int | None = None,
     ) -> dict[str, Any]:
         """
@@ -104,7 +103,6 @@ class PositionHTTP(HTTPManager):
         Args:
             product_symbol: Trading symbol to set leverage for
             leverage: Leverage multiplier (e.g., 10.0 for 10x)
-            cross_margin: True for cross margin, False for isolated margin
             target_account_id: Specific account ID to set leverage for
 
         Returns:
@@ -116,7 +114,6 @@ class PositionHTTP(HTTPManager):
         payload: dict[str, str | int | list[str] | float] = {
             "symbol": self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol),
             "leverage": leverage,
-            "crossMargin": cross_margin,
         }
 
         if target_account_id is not None:

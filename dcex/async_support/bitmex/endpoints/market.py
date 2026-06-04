@@ -17,7 +17,8 @@ class Market(str, Enum):
     orderbook, trades, tickers, klines, and funding rates.
     """
 
-    INSTRUMENT_INFO = "/api/v1/instrument/active"
+    INSTRUMENT_INFO = "/api/v1/instrument"
+    ACTIVE_INSTRUMENTS = "/api/v1/instrument/active"
     ORDERBOOK = "/api/v1/orderBook/L2"
     TRADE = "/api/v1/trade"
     TICKER = "/api/v1/quote/bucketed"

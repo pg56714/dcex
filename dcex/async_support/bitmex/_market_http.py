@@ -43,9 +43,15 @@ class MarketHTTP(HTTPManager):
         if count is not None:
             payload["count"] = count
 
+        path = (
+            Market.INSTRUMENT_INFO
+            if product_symbol is not None or filter is not None or count is not None
+            else Market.ACTIVE_INSTRUMENTS
+        )
+
         res = await self._request(
             method="GET",
-            path=Market.INSTRUMENT_INFO,
+            path=path,
             query=payload,
             signed=False,
         )

@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+
 from dcex.async_support.bitmex.client import Client
 
 
@@ -19,6 +20,7 @@ async def test_get_instrument_info(client):
 async def test_get_instrument_info_with_symbol(client):
     res = await client.get_instrument_info(product_symbol="XBT-USDT-SWAP")
     assert res is not None
+    assert res[0]["symbol"] == "XBTUSDT"
 
 
 @pytest.mark.asyncio
@@ -48,4 +50,10 @@ async def test_get_kline(client):
 @pytest.mark.asyncio
 async def test_get_funding(client):
     res = await client.get_funding(product_symbol="XBT-USDT-SWAP", count=10)
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_liquidations(client):
+    res = await client.get_liquidations(product_symbol="XBT-USDT-SWAP", count=10)
     assert res is not None

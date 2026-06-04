@@ -1,4 +1,5 @@
 import pytest
+
 from dcex.bitmex.client import Client
 
 
@@ -15,6 +16,7 @@ def test_get_instrument_info(client):
 def test_get_instrument_info_with_symbol(client):
     res = client.get_instrument_info(product_symbol="XBT-USDT-SWAP")
     assert res is not None
+    assert res[0]["symbol"] == "XBTUSDT"
 
 
 def test_get_orderbook(client):
@@ -39,4 +41,9 @@ def test_get_kline(client):
 
 def test_get_funding(client):
     res = client.get_funding(product_symbol="XBT-USDT-SWAP", count=10)
+    assert res is not None
+
+
+def test_get_liquidations(client):
+    res = client.get_liquidations(product_symbol="XBT-USDT-SWAP", count=10)
     assert res is not None

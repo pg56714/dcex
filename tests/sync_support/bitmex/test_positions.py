@@ -1,7 +1,9 @@
-import pytest
-from dcex.bitmex.client import Client
 import os
+
+import pytest
 from dotenv import load_dotenv
+
+from dcex.bitmex.client import Client
 
 load_dotenv()
 
@@ -31,7 +33,7 @@ def test_switch_mode(client):
 
 @pytest.mark.private
 def test_set_leverage(client):
-    res = client.set_leverage(product_symbol="XBT-USDT-SWAP", leverage=10.0, cross_margin=False)
+    res = client.set_leverage(product_symbol="XBT-USDT-SWAP", leverage=10.0)
     assert res is not None
 
 

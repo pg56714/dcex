@@ -293,7 +293,10 @@ async def bitmex() -> pl.DataFrame:
     market_http = MarketHTTP(preload_product_table=False)
     await market_http.async_init()
 
-    res = await market_http.get_instrument_info(filter={"state": ["FFWCSX", "FFCCSX", "IFXXXP"]})
+    res = await market_http.get_instrument_info(
+        filter={"typ": ["FFWCSX", "FFCCSX", "IFXXXP"]},
+        count=500,
+    )
 
     if not isinstance(res, list):
         res = []
