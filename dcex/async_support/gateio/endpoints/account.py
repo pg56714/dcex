@@ -23,6 +23,24 @@ class FutureAccount(str, Enum):
         return self.value
 
 
+class WalletAccount(str, Enum):
+    """Gate.io wallet account API endpoints."""
+
+    TOTAL_BALANCE = "/wallet/total_balance"
+
+    def __str__(self) -> str:
+        return self.value
+
+
+class UnifiedAccount(str, Enum):
+    """Gate.io unified account API endpoints."""
+
+    ACCOUNTS = "/unified/accounts"
+
+    def __str__(self) -> str:
+        return self.value
+
+
 class DeliveryAccount(str, Enum):
     """
     Gate.io delivery account management API endpoints.
@@ -48,6 +66,8 @@ class SpotAccount(str, Enum):
 
     QUERY_SPOT_ACCOUNT = "/spot/accounts"
     QUERY_ACCOUNT_BOOK = "/spot/account_book"
+    FEE = "/spot/fee"
+    BATCH_FEE = "/spot/batch_fee"
 
     def __str__(self) -> str:
         return self.value

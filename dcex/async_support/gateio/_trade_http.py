@@ -404,7 +404,7 @@ class TradeHTTP(HTTPManager):
             method="POST",
             path=FutureTrade.BATCH_FUTURES_ORDERS,
             path_params=path_params,
-            body={"orders": orders},
+            body=orders,
         )
         return res
 

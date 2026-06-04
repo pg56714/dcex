@@ -51,8 +51,8 @@ class HTTPManager(BaseHTTPManager):
 
     EXCHANGE = Common.GATEIO
 
-    api_key: str | None = field(default=None)
-    api_secret: str | None = field(default=None)
+    api_key: str | None = field(default=None, repr=False)
+    api_secret: str | None = field(default=None, repr=False)
     base_url: str = field(default="https://api.gateio.ws")
     logger: logging.Logger | None = field(default=None)
     timeout: int = field(default=10)

@@ -53,8 +53,8 @@ class HTTPManager(BaseHTTPManager):
 
     EXCHANGE = Common.GATEIO
 
-    api_key: str | None = field(default=None)
-    api_secret: str | None = field(default=None)
+    api_key: str | None = field(default=None, repr=False)
+    api_secret: str | None = field(default=None, repr=False)
     base_url: str = field(default="https://api.gateio.ws")
     logger: logging.Logger | None = field(default=None)
     timeout: int = field(default=10)
@@ -103,7 +103,7 @@ class HTTPManager(BaseHTTPManager):
         method: str,
         url_path: str,
         query: dict[str, Any] | None,
-        body: dict[str, Any] | None,
+        body: dict[str, Any] | list | None,
         timestamp: str,
     ) -> str:
         """
@@ -140,7 +140,7 @@ class HTTPManager(BaseHTTPManager):
         path: str,
         path_params: dict[str, Any] | None = None,
         query: dict[str, Any] | None = None,
-        body: dict[str, Any] | None = None,
+        body: dict[str, Any] | list | None = None,
         signed: bool = True,
     ) -> dict[str, Any]:
         """
@@ -199,7 +199,7 @@ class HTTPManager(BaseHTTPManager):
             method_upper = method.upper()
             body_string = None
             query_params: Any = _format_query_string(query) or None
-            if method_upper in ("POST", "PUT", "PATCH"):
+            if method_upper in ("POST", "PUT", "PATCH") and body:
                 body_string = msgspec.json.encode(body).decode("utf-8")
 
             if method_upper == "GET":

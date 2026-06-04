@@ -118,6 +118,17 @@ def _gateio_expected_signature(query_string: str) -> str:
     return hmac.new(API_SECRET.encode(), canonical.encode(), hashlib.sha512).hexdigest()
 
 
+def _gateio_expected_signature_for(
+    method: str,
+    path: str,
+    query_string: str,
+    payload: bytes = b"",
+) -> str:
+    hashed_payload = hashlib.sha512(payload).hexdigest()
+    canonical = f"{method}\n{path}\n{query_string}\n{hashed_payload}\n{TS_S}"
+    return hmac.new(API_SECRET.encode(), canonical.encode(), hashlib.sha512).hexdigest()
+
+
 def test_gateio_signed_query_order_matches_sent_params(monkeypatch: pytest.MonkeyPatch) -> None:
     from dcex.gateio._http_manager import HTTPManager
 
@@ -180,6 +191,43 @@ async def test_async_gateio_signed_query_order_matches_sent_params(
     assert method == "GET"
     assert kwargs["params"] == query_string
     assert kwargs["headers"]["SIGN"] == _gateio_expected_signature(query_string)
+
+
+@pytest.mark.asyncio
+async def test_async_gateio_empty_post_body_matches_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.gateio._http_manager import HTTPManager
+
+    gateio_http = import_module("dcex.async_support.gateio._http_manager")
+    monkeypatch.setattr(gateio_http.time, "time", lambda: int(TS_S))
+    session = _AsyncCaptureSession({})
+    manager = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+    query = {"leverage": "10"}
+
+    await manager._request(
+        "POST",
+        "/futures/{settle}/positions/{contract}/leverage",
+        path_params={"settle": "usdt", "contract": "BTC_USDT"},
+        query=query,
+        signed=True,
+    )
+
+    method, _url, kwargs = session.calls[0]
+    query_string = "leverage=10"
+    assert method == "POST"
+    assert kwargs["params"] == query_string
+    assert kwargs["content"] is None
+    assert kwargs["headers"]["SIGN"] == _gateio_expected_signature_for(
+        "POST",
+        "/api/v4/futures/usdt/positions/BTC_USDT/leverage",
+        query_string,
+    )
 
 
 @pytest.mark.asyncio

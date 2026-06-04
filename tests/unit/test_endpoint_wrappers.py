@@ -516,6 +516,21 @@ async def test_async_endpoint_wrapper_is_reachable(
 
 
 @pytest.mark.asyncio
+async def test_async_gateio_batch_order_uses_list_body() -> None:
+    client = _client_class("async", "gateio")(**_client_kwargs("gateio"))
+    calls = _wire_async(client)
+
+    result = await client.place_futures_batch_order(
+        [{"product_symbol": "BTC-USDT-SWAP", "size": 1, "price": "100"}]
+    )
+
+    assert result == {"ok": True}
+    assert isinstance(calls[0]["body"], list)
+    assert calls[0]["body"][0]["contract"] == "BTC_USDT"
+    assert "orders" not in calls[0]["body"]
+
+
+@pytest.mark.asyncio
 async def test_async_hyperliquid_builder_fee_payload_matches_docs() -> None:
     client = _client_class("async", "hyperliquid")(**_client_kwargs("hyperliquid"))
     calls = _wire_async(client)
