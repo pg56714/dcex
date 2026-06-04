@@ -126,9 +126,9 @@ class HTTPManager(BaseHTTPManager):
 
     EXCHANGE = Common.OKX
 
-    api_key: str | None = field(default=None)
-    api_secret: str | None = field(default=None)
-    passphrase: str | None = field(default=None)
+    api_key: str | None = field(default=None, repr=False)
+    api_secret: str | None = field(default=None, repr=False)
+    passphrase: str | None = field(default=None, repr=False)
     flag: str = field(default="0")
     base_api: str = field(default="https://openapi.okx.com")
     timeout: int = field(default=10)

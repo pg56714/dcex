@@ -593,57 +593,21 @@ class TradeHTTP(HTTPManager):
 
     def amend_multiple_orders(
         self,
-        product_symbol: str,
-        ordId: str | None = None,
-        clOrdId: str | None = None,
-        newSz: str | None = None,
-        newPx: str | None = None,
-        newPxUsd: str | None = None,
-        newPxVol: str | None = None,
-        cxlOnFail: str | None = None,
-        reqId: str | None = None,
+        orders: list[dict[str, Any]],
     ) -> dict[str, Any]:
         """
         Amend multiple orders.
 
         Args:
-            product_symbol: Trading pair symbol
-            ordId: Order ID
-            clOrdId: Client order ID
-            newSz: New order size
-            newPx: New order price
-            newPxUsd: New price in USD
-            newPxVol: New price in volume
-            cxlOnFail: Cancel on fail flag
-            reqId: Request ID
+            orders: List of order amendment dictionaries.
 
         Returns:
             Dictionary containing multiple orders amendment result.
         """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if ordId is not None:
-            payload["ordId"] = ordId
-        if clOrdId is not None:
-            payload["clOrdId"] = clOrdId
-        if newSz is not None:
-            payload["newSz"] = newSz
-        if newPx is not None:
-            payload["newPx"] = newPx
-        if newPxUsd is not None:
-            payload["newPxUsd"] = newPxUsd
-        if newPxVol is not None:
-            payload["newPxVol"] = newPxVol
-        if cxlOnFail is not None:
-            payload["cxlOnFail"] = cxlOnFail
-        if reqId is not None:
-            payload["reqId"] = reqId
-
         return self._request(
             method="POST",
             path=Trade.AMEND_BATCH_ORDER,
-            query=payload,
+            query=orders,
         )
 
     def close_positions(

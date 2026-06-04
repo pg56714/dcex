@@ -134,6 +134,7 @@ class PublicHTTP(HTTPManager):
         instType: str = "SWAP",
         tdMode: str = "isolated",
         instFamily: str | None = None,
+        uly: str | None = None,
         product_symbol: str | None = None,
         ccy: str | None = None,
         tier: str | None = None,
@@ -145,6 +146,7 @@ class PublicHTTP(HTTPManager):
             instType: Instrument type.
             tdMode: Trading mode.
             instFamily: Instrument family.
+            uly: Underlying.
             product_symbol: Trading pair symbol.
             ccy: Currency.
             tier: Tier level.
@@ -153,10 +155,21 @@ class PublicHTTP(HTTPManager):
             Dictionary containing position tiers information.
         """
         payload: dict[str, Any] = {"instType": instType, "tdMode": tdMode}
+        exchange_symbol = (
+            self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
+            if product_symbol is not None
+            else None
+        )
+        if exchange_symbol is not None and instFamily is None and uly is None:
+            symbol_parts = exchange_symbol.split("-")
+            if len(symbol_parts) >= 2:
+                instFamily = "-".join(symbol_parts[:2])
         if instFamily is not None:
             payload["instFamily"] = instFamily
+        if uly is not None:
+            payload["uly"] = uly
         if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
+            payload["instId"] = exchange_symbol
         if ccy is not None:
             payload["ccy"] = ccy
         if tier is not None:

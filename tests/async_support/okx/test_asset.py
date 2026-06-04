@@ -1,8 +1,10 @@
+import os
+
 import pytest
 import pytest_asyncio
-from dcex.async_support.okx.client import Client
-import os
 from dotenv import load_dotenv
+
+from dcex.async_support.okx.client import Client
 
 load_dotenv()
 
@@ -94,4 +96,11 @@ async def test_get_monthly_statement(client):
 @pytest.mark.private
 async def test_get_convert_currencies(client):
     res = await client.get_convert_currencies()
+    assert res is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_get_convert_history(client):
+    res = await client.get_convert_history()
     assert res is not None

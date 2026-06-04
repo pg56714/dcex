@@ -1,7 +1,9 @@
-from dcex.okx.client import Client
 import os
-from dotenv import load_dotenv
+
 import pytest
+from dotenv import load_dotenv
+
+from dcex.okx.client import Client
 
 load_dotenv()
 
@@ -76,4 +78,10 @@ def test_get_monthly_statement(client):
 @pytest.mark.private
 def test_get_convert_currencies(client):
     res = client.get_convert_currencies()
+    assert res is not None
+
+
+@pytest.mark.private
+def test_get_convert_history(client):
+    res = client.get_convert_history()
     assert res is not None

@@ -404,3 +404,43 @@ class AssetHTTP(HTTPManager):
             query={},
         )
         return res
+
+    async def get_convert_history(
+        self,
+        clTReqId: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        limit: str | None = None,
+        tag: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Get convert trade history.
+
+        Args:
+            clTReqId: Client order ID assigned by the client.
+            after: Return records earlier than this timestamp.
+            before: Return records newer than this timestamp.
+            limit: Number of results to return.
+            tag: Order tag.
+
+        Returns:
+            Dict containing convert trade history from OKX API.
+        """
+        payload = {}
+        if clTReqId is not None:
+            payload["clTReqId"] = clTReqId
+        if after is not None:
+            payload["after"] = after
+        if before is not None:
+            payload["before"] = before
+        if limit is not None:
+            payload["limit"] = limit
+        if tag is not None:
+            payload["tag"] = tag
+
+        res = await self._request(
+            method="GET",
+            path=Asset.CONVERT_HISTORY,
+            query=payload,
+        )
+        return res
