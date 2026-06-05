@@ -18,11 +18,14 @@ load_dotenv()
 BITMART_API_KEY = os.getenv("BITMART_API_KEY")
 BITMART_API_SECRET = os.getenv("BITMART_API_SECRET")
 BITMART_MEMO = os.getenv("BITMART_MEMO")
-SPOT_SYMBOL = "BTC-USDT-SPOT"
-CONTRACT_SYMBOL = "BTC-USDT-SWAP"
+SPOT_SYMBOL = "DOGE-USDT-SPOT"
+SPOT_EXCHANGE_SYMBOL = "DOGE_USDT"
+SPOT_BASE_CURRENCY = "DOGE"
+CONTRACT_SYMBOL = "DOGE-USDT-SWAP"
 CONTRACT_SIZE = 1
 CONTRACT_LEVERAGE = "50"
 CONTRACT_TRANSFER_USDT = Decimal("2")
+SPOT_TEST_NOTIONAL = Decimal("5.4")
 
 pytestmark = [
     pytest.mark.private,
@@ -152,10 +155,19 @@ async def _skip_if_existing_state(client: Client) -> None:
 
 async def _spot_pair_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
     for item in _items(await client.get_trading_pairs_details()):
-        if item.get("symbol") == "BTC_USDT":
+        if item.get("symbol") == SPOT_EXCHANGE_SYMBOL:
             base_step = _dec(item.get("base_min_size"), "0.00001")
-            min_notional = max(_dec(item.get("min_buy_amount"), "5"), Decimal("5"))
-            return base_step, min_notional, Decimal("0.01")
+            min_notional = max(
+                _dec(item.get("min_buy_amount"), "5"),
+                _dec(item.get("min_sell_amount"), "5"),
+                Decimal("5"),
+            )
+            precision = item.get("price_max_precision")
+            if precision is None:
+                price_step = Decimal("0.01")
+            else:
+                price_step = Decimal("1").scaleb(-int(precision))
+            return base_step, min_notional, price_step
     return Decimal("0.00001"), Decimal("5"), Decimal("0.01")
 
 
@@ -171,14 +183,14 @@ async def _spot_best_prices(client: Client) -> tuple[Decimal, Decimal]:
 async def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = await _spot_pair_details(client)
     best_bid, _ = await _spot_best_prices(client)
-    price = _round_to_step(best_bid * Decimal("0.50"), price_step, ROUND_DOWN)
+    price = _round_to_step(best_bid * Decimal("0.98"), price_step, ROUND_DOWN)
     size = _round_to_step((min_notional * Decimal("1.05")) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
 async def _spot_market_notional(client: Client) -> str:
     _, min_notional, _ = await _spot_pair_details(client)
-    return _fmt(max(min_notional * Decimal("1.05"), Decimal("5.25")))
+    return _fmt(max(min_notional * Decimal("1.2"), SPOT_TEST_NOTIONAL))
 
 
 async def _spot_sell_size(client: Client, size: Decimal) -> str:
@@ -195,15 +207,15 @@ async def _spot_post_only_sell_price(client: Client) -> str:
 async def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = await _spot_pair_details(client)
     _, best_ask = await _spot_best_prices(client)
-    price = _round_to_step(best_ask * Decimal("1.02"), price_step, ROUND_UP)
-    size = _round_to_step((min_notional * Decimal("1.05")) / price, base_step, ROUND_UP)
+    price = _round_to_step(best_ask + price_step, price_step, ROUND_UP)
+    size = _round_to_step((min_notional * Decimal("1.2")) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
 async def _spot_fillable_sell_price(client: Client) -> str:
     _, _, price_step = await _spot_pair_details(client)
     best_bid, _ = await _spot_best_prices(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), price_step, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - price_step, price_step, ROUND_DOWN))
 
 
 async def _contract_best_prices(client: Client) -> tuple[Decimal, Decimal]:
@@ -225,25 +237,25 @@ async def _contract_price_step(client: Client) -> Decimal:
 async def _contract_post_only_buy_price(client: Client) -> str:
     best_bid, _ = await _contract_best_prices(client)
     step = await _contract_price_step(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.50"), step, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid * Decimal("0.98"), step, ROUND_DOWN))
 
 
 async def _contract_post_only_sell_price(client: Client) -> str:
     _, best_ask = await _contract_best_prices(client)
     step = await _contract_price_step(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), step, ROUND_UP))
+    return _fmt(_round_to_step(best_ask * Decimal("1.02"), step, ROUND_UP))
 
 
 async def _contract_fillable_buy_price(client: Client) -> str:
     _, best_ask = await _contract_best_prices(client)
     step = await _contract_price_step(client)
-    return _fmt(_round_to_step(best_ask + step, step, ROUND_UP))
+    return _fmt(_round_to_step(best_ask * Decimal("1.02"), step, ROUND_UP))
 
 
 async def _contract_fillable_sell_price(client: Client) -> str:
     best_bid, _ = await _contract_best_prices(client)
     step = await _contract_price_step(client)
-    return _fmt(_round_to_step(best_bid - step, step, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid * Decimal("0.98"), step, ROUND_DOWN))
 
 
 async def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
@@ -266,7 +278,7 @@ async def _ensure_contract_margin(client: Client) -> None:
 
 async def _cleanup(
     client: Client,
-    initial_spot_btc: Decimal,
+    initial_spot_base: Decimal,
     initial_contract_usdt: Decimal,
 ) -> None:
     with suppress(Exception):
@@ -285,8 +297,8 @@ async def _cleanup(
             await client.place_contract_market_order(CONTRACT_SYMBOL, side=2, size=int(abs(size)))
         await asyncio.sleep(2)
     with suppress(Exception):
-        btc_delta = await _spot_available(client, "BTC") - initial_spot_btc
-        sell_size = await _spot_sell_size(client, btc_delta)
+        base_delta = await _spot_available(client, SPOT_BASE_CURRENCY) - initial_spot_base
+        sell_size = await _spot_sell_size(client, base_delta)
         if Decimal(sell_size) > 0:
             await client.place_spot_market_sell_order(SPOT_SYMBOL, size=sell_size)
             await asyncio.sleep(2)
@@ -318,9 +330,18 @@ async def _close_contract_position(client: Client) -> None:
     assert await _contract_position_size(client) == 0
 
 
+async def _wait_for_contract_flat(client: Client) -> None:
+    for _ in range(8):
+        if await _contract_position_size(client) == 0:
+            return
+        await asyncio.sleep(1)
+    positions = await _contract_positions(client)
+    raise AssertionError(f"BitMart contract position remains open: {positions}")
+
+
 async def test_spot_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
-    initial_btc = await _spot_available(client, "BTC")
+    initial_base = await _spot_available(client, SPOT_BASE_CURRENCY)
     initial_contract_usdt = await _contract_available_usdt(client)
     try:
         size, price = await _spot_post_only_buy_params(client)
@@ -377,10 +398,10 @@ async def test_spot_stateful_order_lifecycle(client):
 
         notional = await _spot_market_notional(client)
         await _ensure_spot_usdt(client, Decimal(notional))
-        before_btc = await _spot_available(client, "BTC")
+        before_base = await _spot_available(client, SPOT_BASE_CURRENCY)
         market_buy = await client.place_spot_market_buy_order(SPOT_SYMBOL, notional, _client_id())
         await asyncio.sleep(2)
-        bought = await _spot_available(client, "BTC") - before_btc
+        bought = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = await _spot_sell_size(client, bought)
         assert Decimal(sell_size) > 0
         assert await client.get_spot_order_trade_list(_order_id(market_buy)) is not None
@@ -392,13 +413,13 @@ async def test_spot_stateful_order_lifecycle(client):
 
         fill_size, fill_price = await _spot_fillable_buy_params(client)
         await _ensure_spot_usdt(client, Decimal(fill_size) * Decimal(fill_price))
-        before_btc = await _spot_available(client, "BTC")
+        before_base = await _spot_available(client, SPOT_BASE_CURRENCY)
         assert (
             await client.place_spot_limit_buy_order(SPOT_SYMBOL, fill_size, fill_price)
             is not None
         )
         await asyncio.sleep(2)
-        bought = await _spot_available(client, "BTC") - before_btc
+        bought = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = await _spot_sell_size(client, bought)
         assert Decimal(sell_size) > 0
         assert (
@@ -413,7 +434,7 @@ async def test_spot_stateful_order_lifecycle(client):
 
         notional = await _spot_market_notional(client)
         await _ensure_spot_usdt(client, Decimal(notional))
-        before_btc = await _spot_available(client, "BTC")
+        before_base = await _spot_available(client, SPOT_BASE_CURRENCY)
         assert (
             await client.place_spot_market_order(
                 SPOT_SYMBOL,
@@ -423,7 +444,7 @@ async def test_spot_stateful_order_lifecycle(client):
             is not None
         )
         await asyncio.sleep(2)
-        bought = await _spot_available(client, "BTC") - before_btc
+        bought = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = await _spot_sell_size(client, bought)
         assert Decimal(sell_size) > 0
         order_id = None
@@ -449,7 +470,7 @@ async def test_spot_stateful_order_lifecycle(client):
         finally:
             if order_id is not None:
                 await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id)
-            remaining = await _spot_available(client, "BTC") - before_btc
+            remaining = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
             sell_size = await _spot_sell_size(client, remaining)
             if Decimal(sell_size) > 0:
                 await client.place_spot_market_sell_order(SPOT_SYMBOL, sell_size)
@@ -466,12 +487,12 @@ async def test_spot_stateful_order_lifecycle(client):
     except FailedRequestError as exc:
         _skip_if_account_restriction(exc)
     finally:
-        await _cleanup(client, initial_btc, initial_contract_usdt)
+        await _cleanup(client, initial_base, initial_contract_usdt)
 
 
 async def test_contract_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
-    initial_btc = await _spot_available(client, "BTC")
+    initial_base = await _spot_available(client, SPOT_BASE_CURRENCY)
     initial_contract_usdt = await _contract_available_usdt(client)
     try:
         await _ensure_contract_margin(client)
@@ -643,8 +664,7 @@ async def test_contract_stateful_order_lifecycle(client):
             )
             is not None
         )
-        await asyncio.sleep(2)
-        assert await _contract_position_size(client) == 0
+        await _wait_for_contract_flat(client)
 
         assert (
             await client.get_contract_open_order(product_symbol=CONTRACT_SYMBOL, limit=10)
@@ -662,7 +682,7 @@ async def test_contract_stateful_order_lifecycle(client):
     except FailedRequestError as exc:
         _skip_if_account_restriction(exc)
     finally:
-        await _cleanup(client, initial_btc, initial_contract_usdt)
+        await _cleanup(client, initial_base, initial_contract_usdt)
 
     assert not await _spot_open_orders(client)
     assert not await _contract_open_orders(client)

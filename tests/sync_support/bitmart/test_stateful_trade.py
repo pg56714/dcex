@@ -17,11 +17,14 @@ load_dotenv()
 BITMART_API_KEY = os.getenv("BITMART_API_KEY")
 BITMART_API_SECRET = os.getenv("BITMART_API_SECRET")
 BITMART_MEMO = os.getenv("BITMART_MEMO")
-SPOT_SYMBOL = "BTC-USDT-SPOT"
-CONTRACT_SYMBOL = "BTC-USDT-SWAP"
+SPOT_SYMBOL = "DOGE-USDT-SPOT"
+SPOT_EXCHANGE_SYMBOL = "DOGE_USDT"
+SPOT_BASE_CURRENCY = "DOGE"
+CONTRACT_SYMBOL = "DOGE-USDT-SWAP"
 CONTRACT_SIZE = 1
 CONTRACT_LEVERAGE = "50"
 CONTRACT_TRANSFER_USDT = Decimal("2")
+SPOT_TEST_NOTIONAL = Decimal("5.4")
 
 pytestmark = [
     pytest.mark.private,
@@ -149,10 +152,19 @@ def _skip_if_existing_state(client: Client) -> None:
 
 def _spot_pair_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
     for item in _items(client.get_trading_pairs_details()):
-        if item.get("symbol") == "BTC_USDT":
+        if item.get("symbol") == SPOT_EXCHANGE_SYMBOL:
             base_step = _dec(item.get("base_min_size"), "0.00001")
-            min_notional = max(_dec(item.get("min_buy_amount"), "5"), Decimal("5"))
-            return base_step, min_notional, Decimal("0.01")
+            min_notional = max(
+                _dec(item.get("min_buy_amount"), "5"),
+                _dec(item.get("min_sell_amount"), "5"),
+                Decimal("5"),
+            )
+            precision = item.get("price_max_precision")
+            if precision is None:
+                price_step = Decimal("0.01")
+            else:
+                price_step = Decimal("1").scaleb(-int(precision))
+            return base_step, min_notional, price_step
     return Decimal("0.00001"), Decimal("5"), Decimal("0.01")
 
 
@@ -168,14 +180,14 @@ def _spot_best_prices(client: Client) -> tuple[Decimal, Decimal]:
 def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = _spot_pair_details(client)
     best_bid, _ = _spot_best_prices(client)
-    price = _round_to_step(best_bid * Decimal("0.50"), price_step, ROUND_DOWN)
+    price = _round_to_step(best_bid * Decimal("0.98"), price_step, ROUND_DOWN)
     size = _round_to_step((min_notional * Decimal("1.05")) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
 def _spot_market_notional(client: Client) -> str:
     _, min_notional, _ = _spot_pair_details(client)
-    return _fmt(max(min_notional * Decimal("1.05"), Decimal("5.25")))
+    return _fmt(max(min_notional * Decimal("1.2"), SPOT_TEST_NOTIONAL))
 
 
 def _spot_sell_size(client: Client, size: Decimal) -> str:
@@ -192,15 +204,15 @@ def _spot_post_only_sell_price(client: Client) -> str:
 def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = _spot_pair_details(client)
     _, best_ask = _spot_best_prices(client)
-    price = _round_to_step(best_ask * Decimal("1.02"), price_step, ROUND_UP)
-    size = _round_to_step((min_notional * Decimal("1.05")) / price, base_step, ROUND_UP)
+    price = _round_to_step(best_ask + price_step, price_step, ROUND_UP)
+    size = _round_to_step((min_notional * Decimal("1.2")) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
 def _spot_fillable_sell_price(client: Client) -> str:
     _, _, price_step = _spot_pair_details(client)
     best_bid, _ = _spot_best_prices(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), price_step, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - price_step, price_step, ROUND_DOWN))
 
 
 def _contract_best_prices(client: Client) -> tuple[Decimal, Decimal]:
@@ -222,25 +234,25 @@ def _contract_price_step(client: Client) -> Decimal:
 def _contract_post_only_buy_price(client: Client) -> str:
     best_bid, _ = _contract_best_prices(client)
     return _fmt(
-        _round_to_step(best_bid * Decimal("0.50"), _contract_price_step(client), ROUND_DOWN)
+        _round_to_step(best_bid * Decimal("0.98"), _contract_price_step(client), ROUND_DOWN)
     )
 
 
 def _contract_post_only_sell_price(client: Client) -> str:
     _, best_ask = _contract_best_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), _contract_price_step(client), ROUND_UP))
+    return _fmt(_round_to_step(best_ask * Decimal("1.02"), _contract_price_step(client), ROUND_UP))
 
 
 def _contract_fillable_buy_price(client: Client) -> str:
     _, best_ask = _contract_best_prices(client)
     step = _contract_price_step(client)
-    return _fmt(_round_to_step(best_ask + step, step, ROUND_UP))
+    return _fmt(_round_to_step(best_ask * Decimal("1.02"), step, ROUND_UP))
 
 
 def _contract_fillable_sell_price(client: Client) -> str:
     best_bid, _ = _contract_best_prices(client)
     step = _contract_price_step(client)
-    return _fmt(_round_to_step(best_bid - step, step, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid * Decimal("0.98"), step, ROUND_DOWN))
 
 
 def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
@@ -261,7 +273,7 @@ def _ensure_contract_margin(client: Client) -> None:
         pytest.skip("Insufficient BitMart contract USDT after transfer.")
 
 
-def _cleanup(client: Client, initial_spot_btc: Decimal, initial_contract_usdt: Decimal) -> None:
+def _cleanup(client: Client, initial_spot_base: Decimal, initial_contract_usdt: Decimal) -> None:
     with suppress(Exception):
         if _spot_open_orders(client):
             client.cancel_spot_all_order(product_symbol=SPOT_SYMBOL)
@@ -278,8 +290,8 @@ def _cleanup(client: Client, initial_spot_btc: Decimal, initial_contract_usdt: D
             client.place_contract_market_order(CONTRACT_SYMBOL, side=2, size=int(abs(size)))
         time.sleep(2)
     with suppress(Exception):
-        btc_delta = _spot_available(client, "BTC") - initial_spot_btc
-        sell_size = _spot_sell_size(client, btc_delta)
+        base_delta = _spot_available(client, SPOT_BASE_CURRENCY) - initial_spot_base
+        sell_size = _spot_sell_size(client, base_delta)
         if Decimal(sell_size) > 0:
             client.place_spot_market_sell_order(SPOT_SYMBOL, size=sell_size)
             time.sleep(2)
@@ -311,9 +323,17 @@ def _close_contract_position(client: Client) -> None:
     assert _contract_position_size(client) == 0
 
 
+def _wait_for_contract_flat(client: Client) -> None:
+    for _ in range(8):
+        if _contract_position_size(client) == 0:
+            return
+        time.sleep(1)
+    raise AssertionError(f"BitMart contract position remains open: {_contract_positions(client)}")
+
+
 def test_spot_stateful_order_lifecycle(client):
     _skip_if_existing_state(client)
-    initial_btc = _spot_available(client, "BTC")
+    initial_base = _spot_available(client, SPOT_BASE_CURRENCY)
     initial_contract_usdt = _contract_available_usdt(client)
     try:
         size, price = _spot_post_only_buy_params(client)
@@ -369,10 +389,10 @@ def test_spot_stateful_order_lifecycle(client):
 
         notional = _spot_market_notional(client)
         _ensure_spot_usdt(client, Decimal(notional))
-        before_btc = _spot_available(client, "BTC")
+        before_base = _spot_available(client, SPOT_BASE_CURRENCY)
         market_buy = client.place_spot_market_buy_order(SPOT_SYMBOL, notional, _client_id())
         time.sleep(2)
-        bought = _spot_available(client, "BTC") - before_btc
+        bought = _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = _spot_sell_size(client, bought)
         assert Decimal(sell_size) > 0
         assert client.get_spot_order_trade_list(_order_id(market_buy)) is not None
@@ -381,10 +401,10 @@ def test_spot_stateful_order_lifecycle(client):
 
         fill_size, fill_price = _spot_fillable_buy_params(client)
         _ensure_spot_usdt(client, Decimal(fill_size) * Decimal(fill_price))
-        before_btc = _spot_available(client, "BTC")
+        before_base = _spot_available(client, SPOT_BASE_CURRENCY)
         assert client.place_spot_limit_buy_order(SPOT_SYMBOL, fill_size, fill_price) is not None
         time.sleep(2)
-        bought = _spot_available(client, "BTC") - before_btc
+        bought = _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = _spot_sell_size(client, bought)
         assert Decimal(sell_size) > 0
         assert client.place_spot_limit_sell_order(
@@ -396,14 +416,14 @@ def test_spot_stateful_order_lifecycle(client):
 
         notional = _spot_market_notional(client)
         _ensure_spot_usdt(client, Decimal(notional))
-        before_btc = _spot_available(client, "BTC")
+        before_base = _spot_available(client, SPOT_BASE_CURRENCY)
         assert client.place_spot_market_order(
             SPOT_SYMBOL,
             side="buy",
             notional=notional,
         ) is not None
         time.sleep(2)
-        bought = _spot_available(client, "BTC") - before_btc
+        bought = _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = _spot_sell_size(client, bought)
         assert Decimal(sell_size) > 0
         order_id = None
@@ -429,7 +449,7 @@ def test_spot_stateful_order_lifecycle(client):
         finally:
             if order_id is not None:
                 client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id)
-            remaining = _spot_available(client, "BTC") - before_btc
+            remaining = _spot_available(client, SPOT_BASE_CURRENCY) - before_base
             sell_size = _spot_sell_size(client, remaining)
             if Decimal(sell_size) > 0:
                 client.place_spot_market_sell_order(SPOT_SYMBOL, sell_size)
@@ -440,12 +460,12 @@ def test_spot_stateful_order_lifecycle(client):
     except FailedRequestError as exc:
         _skip_if_account_restriction(exc)
     finally:
-        _cleanup(client, initial_btc, initial_contract_usdt)
+        _cleanup(client, initial_base, initial_contract_usdt)
 
 
 def test_contract_stateful_order_lifecycle(client):
     _skip_if_existing_state(client)
-    initial_btc = _spot_available(client, "BTC")
+    initial_base = _spot_available(client, SPOT_BASE_CURRENCY)
     initial_contract_usdt = _contract_available_usdt(client)
     try:
         _ensure_contract_margin(client)
@@ -587,8 +607,7 @@ def test_contract_stateful_order_lifecycle(client):
             client_order_id=_client_id(),
             mode=3,
         ) is not None
-        time.sleep(2)
-        assert _contract_position_size(client) == 0
+        _wait_for_contract_flat(client)
 
         assert client.get_contract_open_order(product_symbol=CONTRACT_SYMBOL, limit=10) is not None
         assert client.get_contract_order_history(product_symbol=CONTRACT_SYMBOL) is not None
@@ -598,7 +617,7 @@ def test_contract_stateful_order_lifecycle(client):
     except FailedRequestError as exc:
         _skip_if_account_restriction(exc)
     finally:
-        _cleanup(client, initial_btc, initial_contract_usdt)
+        _cleanup(client, initial_base, initial_contract_usdt)
 
     assert not _spot_open_orders(client)
     assert not _contract_open_orders(client)
