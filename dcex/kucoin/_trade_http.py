@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from ...utils.common import Common
+from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.trade import FuturesTrade, SpotTrade
 
@@ -17,7 +17,7 @@ class TradeHTTP(HTTPManager):
     limit, post-only, and batch orders.
     """
 
-    async def place_spot_order(
+    def place_spot_order(
         self,
         product_symbol: str,
         side: str,
@@ -101,14 +101,14 @@ class TradeHTTP(HTTPManager):
         if clientTimestamp is not None:
             payload["clientTimestamp"] = clientTimestamp
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SpotTrade.PLACE_ORDER,
             query=payload,
         )
         return res
 
-    async def place_spot_market_order(
+    def place_spot_market_order(
         self,
         product_symbol: str,
         side: str,
@@ -139,7 +139,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             Order placement result from KuCoin API.
         """
-        return await self.place_spot_order(
+        return self.place_spot_order(
             product_symbol=product_symbol,
             side=side,
             type_="market",
@@ -153,7 +153,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_market_buy_order(
+    def place_spot_market_buy_order(
         self,
         product_symbol: str,
         size: str | None = None,
@@ -176,7 +176,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_market_order(
+        return self.place_spot_market_order(
             product_symbol=product_symbol,
             side="buy",
             size=size,
@@ -189,7 +189,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_market_sell_order(
+    def place_spot_market_sell_order(
         self,
         product_symbol: str,
         size: str | None = None,
@@ -212,7 +212,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_market_order(
+        return self.place_spot_market_order(
             product_symbol=product_symbol,
             side="sell",
             size=size,
@@ -225,7 +225,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_limit_order(
+    def place_spot_limit_order(
         self,
         product_symbol: str,
         side: str,
@@ -262,7 +262,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_order(
+        return self.place_spot_order(
             product_symbol=product_symbol,
             side=side,
             type_="limit",
@@ -282,7 +282,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_limit_buy_order(
+    def place_spot_limit_buy_order(
         self,
         product_symbol: str,
         size: str,
@@ -317,7 +317,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_limit_order(
+        return self.place_spot_limit_order(
             product_symbol=product_symbol,
             side="buy",
             size=size,
@@ -336,7 +336,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_limit_sell_order(
+    def place_spot_limit_sell_order(
         self,
         product_symbol: str,
         size: str,
@@ -371,7 +371,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_limit_order(
+        return self.place_spot_limit_order(
             product_symbol=product_symbol,
             side="sell",
             size=size,
@@ -390,7 +390,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_post_only_limit_order(
+    def place_spot_post_only_limit_order(
         self,
         product_symbol: str,
         side: str,
@@ -425,7 +425,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_limit_order(
+        return self.place_spot_limit_order(
             product_symbol=product_symbol,
             side=side,
             size=size,
@@ -444,7 +444,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_post_only_limit_buy_order(
+    def place_spot_post_only_limit_buy_order(
         self,
         product_symbol: str,
         size: str,
@@ -477,7 +477,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_post_only_limit_order(
+        return self.place_spot_post_only_limit_order(
             product_symbol=product_symbol,
             side="buy",
             size=size,
@@ -495,7 +495,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_post_only_limit_sell_order(
+    def place_spot_post_only_limit_sell_order(
         self,
         product_symbol: str,
         size: str,
@@ -528,7 +528,7 @@ class TradeHTTP(HTTPManager):
         :param allowMaxTimeWindow: int - Order timeout in milliseconds
         :param clientTimestamp: int - Client timestamp
         """
-        return await self.place_spot_post_only_limit_order(
+        return self.place_spot_post_only_limit_order(
             product_symbol=product_symbol,
             side="sell",
             size=size,
@@ -546,7 +546,7 @@ class TradeHTTP(HTTPManager):
             clientTimestamp=clientTimestamp,
         )
 
-    async def place_spot_batch_orders(
+    def place_spot_batch_orders(
         self,
         orders: list[dict[str, Any]],
     ) -> dict[str, Any]:
@@ -614,14 +614,14 @@ class TradeHTTP(HTTPManager):
 
         payload: dict[str, Any] = {"orderList": processed_orders}
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SpotTrade.BATCH_ORDERS,
             query=payload,
         )
         return res
 
-    async def place_spot_batch_limit_orders(
+    def place_spot_batch_limit_orders(
         self,
         orders: list[dict[str, Any]],
     ) -> dict[str, Any]:
@@ -649,9 +649,9 @@ class TradeHTTP(HTTPManager):
             processed_order["type"] = "limit"
             processed_orders.append(processed_order)
 
-        return await self.place_spot_batch_orders(processed_orders)
+        return self.place_spot_batch_orders(processed_orders)
 
-    async def place_spot_batch_market_orders(
+    def place_spot_batch_market_orders(
         self,
         orders: list[dict[str, Any]],
     ) -> dict[str, Any]:
@@ -673,9 +673,9 @@ class TradeHTTP(HTTPManager):
             processed_order["type"] = "market"
             processed_orders.append(processed_order)
 
-        return await self.place_spot_batch_orders(processed_orders)
+        return self.place_spot_batch_orders(processed_orders)
 
-    async def cancel_spot_order(
+    def cancel_spot_order(
         self,
         orderId: str,
         product_symbol: str,
@@ -697,14 +697,14 @@ class TradeHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=path,
             query=payload,
         )
         return res
 
-    async def cancel_spot_all_orders_by_symbol(
+    def cancel_spot_all_orders_by_symbol(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
@@ -720,14 +720,14 @@ class TradeHTTP(HTTPManager):
         payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=SpotTrade.CANCEL_ALL_ORDERS_BY_SYMBOL,
             query=payload,
         )
         return res
 
-    async def cancel_spot_all_orders(
+    def cancel_spot_all_orders(
         self,
     ) -> dict[str, Any]:
         """
@@ -736,13 +736,13 @@ class TradeHTTP(HTTPManager):
         Returns:
             Order cancellation result from KuCoin API.
         """
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=SpotTrade.CANCEL_ALL_ORDERS,
         )
         return res
 
-    async def get_spot_open_orders(
+    def get_spot_open_orders(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
@@ -759,14 +759,14 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotTrade.GET_OPEN_ORDERS,
             query=payload,
         )
         return res
 
-    async def get_spot_trade_history(
+    def get_spot_trade_history(
         self,
         product_symbol: str | None = None,
         orderId: str | None = None,
@@ -799,14 +799,14 @@ class TradeHTTP(HTTPManager):
         if limit:
             payload["limit"] = limit
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotTrade.GET_TRADE_HISTORY,
             query=payload,
         )
         return res
 
-    async def place_futures_order(
+    def place_futures_order(
         self,
         product_symbol: str,
         side: str,
@@ -860,7 +860,7 @@ class TradeHTTP(HTTPManager):
         }
         payload.update({key: value for key, value in optional.items() if value is not None})
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=FuturesTrade.PLACE_ORDER,
             query=payload,
@@ -868,7 +868,7 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    async def place_futures_market_order(
+    def place_futures_market_order(
         self,
         product_symbol: str,
         side: str,
@@ -881,7 +881,7 @@ class TradeHTTP(HTTPManager):
         closeOrder: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures market order."""
-        return await self.place_futures_order(
+        return self.place_futures_order(
             product_symbol=product_symbol,
             side=side,
             type_="market",
@@ -894,7 +894,7 @@ class TradeHTTP(HTTPManager):
             closeOrder=closeOrder,
         )
 
-    async def place_futures_market_buy_order(
+    def place_futures_market_buy_order(
         self,
         product_symbol: str,
         size: int | str,
@@ -906,7 +906,7 @@ class TradeHTTP(HTTPManager):
         closeOrder: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures market buy order."""
-        return await self.place_futures_market_order(
+        return self.place_futures_market_order(
             product_symbol=product_symbol,
             side="buy",
             size=size,
@@ -918,7 +918,7 @@ class TradeHTTP(HTTPManager):
             closeOrder=closeOrder,
         )
 
-    async def place_futures_market_sell_order(
+    def place_futures_market_sell_order(
         self,
         product_symbol: str,
         size: int | str,
@@ -930,7 +930,7 @@ class TradeHTTP(HTTPManager):
         closeOrder: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures market sell order."""
-        return await self.place_futures_market_order(
+        return self.place_futures_market_order(
             product_symbol=product_symbol,
             side="sell",
             size=size,
@@ -942,7 +942,7 @@ class TradeHTTP(HTTPManager):
             closeOrder=closeOrder,
         )
 
-    async def place_futures_limit_order(
+    def place_futures_limit_order(
         self,
         product_symbol: str,
         side: str,
@@ -957,7 +957,7 @@ class TradeHTTP(HTTPManager):
         reduceOnly: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures limit order."""
-        return await self.place_futures_order(
+        return self.place_futures_order(
             product_symbol=product_symbol,
             side=side,
             type_="limit",
@@ -972,7 +972,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_futures_limit_buy_order(
+    def place_futures_limit_buy_order(
         self,
         product_symbol: str,
         size: int | str,
@@ -986,7 +986,7 @@ class TradeHTTP(HTTPManager):
         reduceOnly: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures limit buy order."""
-        return await self.place_futures_limit_order(
+        return self.place_futures_limit_order(
             product_symbol=product_symbol,
             side="buy",
             size=size,
@@ -1000,7 +1000,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_futures_limit_sell_order(
+    def place_futures_limit_sell_order(
         self,
         product_symbol: str,
         size: int | str,
@@ -1014,7 +1014,7 @@ class TradeHTTP(HTTPManager):
         reduceOnly: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures limit sell order."""
-        return await self.place_futures_limit_order(
+        return self.place_futures_limit_order(
             product_symbol=product_symbol,
             side="sell",
             size=size,
@@ -1028,7 +1028,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_futures_post_only_limit_order(
+    def place_futures_post_only_limit_order(
         self,
         product_symbol: str,
         side: str,
@@ -1040,7 +1040,7 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures post-only limit order."""
-        return await self.place_futures_limit_order(
+        return self.place_futures_limit_order(
             product_symbol=product_symbol,
             side=side,
             size=size,
@@ -1052,7 +1052,7 @@ class TradeHTTP(HTTPManager):
             postOnly=True,
         )
 
-    async def place_futures_post_only_limit_buy_order(
+    def place_futures_post_only_limit_buy_order(
         self,
         product_symbol: str,
         size: int | str,
@@ -1063,7 +1063,7 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures post-only limit buy order."""
-        return await self.place_futures_post_only_limit_order(
+        return self.place_futures_post_only_limit_order(
             product_symbol=product_symbol,
             side="buy",
             size=size,
@@ -1074,7 +1074,7 @@ class TradeHTTP(HTTPManager):
             positionSide=positionSide,
         )
 
-    async def place_futures_post_only_limit_sell_order(
+    def place_futures_post_only_limit_sell_order(
         self,
         product_symbol: str,
         size: int | str,
@@ -1085,7 +1085,7 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures post-only limit sell order."""
-        return await self.place_futures_post_only_limit_order(
+        return self.place_futures_post_only_limit_order(
             product_symbol=product_symbol,
             side="sell",
             size=size,
@@ -1096,7 +1096,7 @@ class TradeHTTP(HTTPManager):
             positionSide=positionSide,
         )
 
-    async def get_futures_order_list(
+    def get_futures_order_list(
         self,
         product_symbol: str | None = None,
         status: str | None = None,
@@ -1122,7 +1122,7 @@ class TradeHTTP(HTTPManager):
         }
         payload.update({key: value for key, value in optional.items() if value is not None})
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesTrade.GET_ORDER_LIST,
             query=payload,
@@ -1130,16 +1130,16 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_order(self, orderId: str) -> dict[str, Any]:
+    def get_futures_order(self, orderId: str) -> dict[str, Any]:
         """Retrieve a KuCoin futures order by order ID."""
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesTrade.GET_ORDER.format(orderId=orderId),
             base_url=self.futures_base_url,
         )
         return res
 
-    async def get_futures_order_by_client_oid(
+    def get_futures_order_by_client_oid(
         self,
         clientOid: str,
         product_symbol: str | None = None,
@@ -1149,7 +1149,7 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesTrade.GET_ORDER_BY_CLIENT_OID,
             query=payload,
@@ -1157,16 +1157,16 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    async def cancel_futures_order(self, orderId: str) -> dict[str, Any]:
+    def cancel_futures_order(self, orderId: str) -> dict[str, Any]:
         """Cancel a KuCoin futures order by order ID."""
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=FuturesTrade.CANCEL_ORDER.format(orderId=orderId),
             base_url=self.futures_base_url,
         )
         return res
 
-    async def cancel_futures_order_by_client_oid(
+    def cancel_futures_order_by_client_oid(
         self,
         clientOid: str,
         product_symbol: str | None = None,
@@ -1176,7 +1176,7 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=FuturesTrade.CANCEL_ORDER_BY_CLIENT_OID.format(clientOid=clientOid),
             query=payload,
@@ -1184,7 +1184,7 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    async def cancel_futures_all_orders(
+    def cancel_futures_all_orders(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
@@ -1193,7 +1193,7 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=FuturesTrade.CANCEL_ALL_ORDERS,
             query=payload,
@@ -1201,7 +1201,7 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_open_order_value(
+    def get_futures_open_order_value(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
@@ -1210,7 +1210,7 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesTrade.GET_OPEN_ORDER_VALUE,
             query=payload,
@@ -1218,7 +1218,7 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_trade_history(
+    def get_futures_trade_history(
         self,
         product_symbol: str | None = None,
         orderId: str | None = None,
@@ -1246,7 +1246,7 @@ class TradeHTTP(HTTPManager):
         }
         payload.update({key: value for key, value in optional.items() if value is not None})
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesTrade.GET_TRADE_HISTORY,
             query=payload,
@@ -1254,7 +1254,7 @@ class TradeHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_recent_trade_history(
+    def get_futures_recent_trade_history(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
@@ -1263,7 +1263,7 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesTrade.GET_RECENT_TRADE_HISTORY,
             query=payload,

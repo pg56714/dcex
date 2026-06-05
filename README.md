@@ -81,7 +81,7 @@ if __name__ == "__main__":
 | **Gate.io**     | Yes          | Yes           |
 | **Hyperliquid** | Yes          | Yes           |
 | **BingX**       | No           | Developing    |
-| **KuCoin**      | No           | Developing    |
+| **KuCoin**      | Yes          | Yes           |
 
 ## Key Features
 

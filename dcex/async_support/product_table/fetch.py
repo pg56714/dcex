@@ -673,7 +673,7 @@ async def kucoin() -> pl.DataFrame:
     """
     Fetch market information from KuCoin exchange.
 
-    Retrieves trading pairs from KuCoin including spot markets.
+    Retrieves trading pairs from KuCoin including spot and futures markets.
     Standardizes the data into MarketInfo format.
 
     Returns:
@@ -706,6 +706,31 @@ async def kucoin() -> pl.DataFrame:
                 size_precision=market["baseIncrement"],
                 min_size=market["baseMinSize"],
                 min_notional=market["minFunds"] if market["minFunds"] else "0",
+            )
+        )
+
+    res_futures = await market_http.get_futures_contracts()
+    for market in res_futures.get("data", []):
+        if not isinstance(market, dict):
+            continue
+
+        base = "BTC" if market["baseCurrency"] == "XBT" else str(market["baseCurrency"])
+        quote = str(market["quoteCurrency"])
+        product_symbol = f"{base}-{quote}-SWAP"
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.KUCOIN,
+                exchange_symbol=market["symbol"],
+                product_symbol=product_symbol,
+                product_type="swap",
+                exchange_type=market["type"],
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(market["tickSize"]),
+                size_precision=str(market["lotSize"]),
+                min_size=str(market["lotSize"]),
+                size_per_contract=str(market["multiplier"]),
             )
         )
 

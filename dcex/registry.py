@@ -20,7 +20,7 @@ EXCHANGES: dict[str, dict[str, bool]] = {
     "bybit": {"sync": True, "async": True},
     "gateio": {"sync": True, "async": True},
     "hyperliquid": {"sync": True, "async": True},
-    "kucoin": {"sync": False, "async": True},
+    "kucoin": {"sync": True, "async": True},
     "okx": {"sync": True, "async": True},
 }
 

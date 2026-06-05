@@ -587,6 +587,78 @@ def hyperliquid() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+def _normalize_kucoin_currency(currency: str) -> str:
+    return "BTC" if currency == "XBT" else currency
+
+
+def kucoin() -> pl.DataFrame:
+    """
+    Fetch market information from KuCoin exchange.
+
+    Retrieves trading pairs from KuCoin including spot and futures markets.
+    Standardizes the data into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from KuCoin.
+    """
+    from ..kucoin._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+
+    markets = []
+    res_spot = market_http.get_spot_instrument_info()
+    df_spot = to_dataframe(res_spot.get("data", []))
+
+    for market in df_spot.iter_rows(named=True):
+        base = market["baseCurrency"]
+        quote = market["quoteCurrency"]
+        product_symbol = f"{base}-{quote}-SPOT"
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.KUCOIN,
+                exchange_symbol=market["symbol"],
+                product_symbol=product_symbol,
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=market["priceIncrement"],
+                size_precision=market["baseIncrement"],
+                min_size=market["baseMinSize"],
+                min_notional=market["minFunds"] if market["minFunds"] else "0",
+            )
+        )
+
+    res_futures = market_http.get_futures_contracts()
+    for market in res_futures.get("data", []):
+        if not isinstance(market, dict):
+            continue
+
+        base = _normalize_kucoin_currency(str(market["baseCurrency"]))
+        quote = str(market["quoteCurrency"])
+        product_symbol = f"{base}-{quote}-SWAP"
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.KUCOIN,
+                exchange_symbol=market["symbol"],
+                product_symbol=product_symbol,
+                product_type="swap",
+                exchange_type=market["type"],
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(market["tickSize"]),
+                size_precision=str(market["lotSize"]),
+                min_size=str(market["lotSize"]),
+                size_per_contract=str(market["multiplier"]),
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
 def okx() -> pl.DataFrame:
     """
     Fetch market information from OKX exchange.

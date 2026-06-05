@@ -60,3 +60,51 @@ async def test_get_spot_public_trades(client):
 async def test_get_spot_kline(client):
     res = await client.get_spot_kline(product_symbol="BTC-USDT-SPOT", timeframe="1m")
     assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_contracts(client):
+    res = await client.get_futures_contracts()
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_contract(client):
+    res = await client.get_futures_contract(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_ticker(client):
+    res = await client.get_futures_ticker(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_orderbook(client):
+    res = await client.get_futures_orderbook(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_part_orderbook(client):
+    res = await client.get_futures_orderbook(product_symbol="BTC-USDT-SWAP", depth=20)
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_public_trades(client):
+    res = await client.get_futures_public_trades(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_kline(client):
+    res = await client.get_futures_kline(product_symbol="BTC-USDT-SWAP", timeframe="1m")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_futures_open_interest(client):
+    res = await client.get_futures_open_interest(product_symbol="BTC-USDT-SWAP")
+    assert res is not None

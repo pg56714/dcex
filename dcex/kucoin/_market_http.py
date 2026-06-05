@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ...utils.common import Common
-from ...utils.timeframe_utils import kucoin_convert_timeframe
+from ..utils.common import Common
+from ..utils.timeframe_utils import kucoin_convert_timeframe
 from ._http_manager import HTTPManager
 from .endpoints.market import FuturesMarket, SpotMarket
 
@@ -38,7 +38,7 @@ class MarketHTTP(HTTPManager):
     and candlestick/K-line data.
     """
 
-    async def get_spot_instrument_info(
+    def get_spot_instrument_info(
         self,
     ) -> dict[str, Any]:
         """
@@ -48,7 +48,7 @@ class MarketHTTP(HTTPManager):
             List of available trading instruments from KuCoin API.
         """
         payload: dict[str, Any] = {}
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.INSTRUMENT_INFO,
             query=payload,
@@ -56,7 +56,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_ticker(
+    def get_spot_ticker(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
@@ -73,7 +73,7 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.TICKER,
             query=payload,
@@ -81,7 +81,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_all_tickers(
+    def get_spot_all_tickers(
         self,
     ) -> dict[str, Any]:
         """
@@ -91,7 +91,7 @@ class MarketHTTP(HTTPManager):
             Ticker information for all available trading pairs.
         """
         payload: dict[str, Any] = {}
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.ALL_TICKERS,
             query=payload,
@@ -99,7 +99,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_orderbook(
+    def get_spot_orderbook(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
@@ -116,14 +116,14 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.ORDERBOOK,
             query=payload,
         )
         return res
 
-    async def get_spot_public_trades(
+    def get_spot_public_trades(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
@@ -140,7 +140,7 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.PUBLIC_TRADES,
             query=payload,
@@ -148,7 +148,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_kline(
+    def get_spot_kline(
         self,
         product_symbol: str,
         timeframe: str,
@@ -177,7 +177,7 @@ class MarketHTTP(HTTPManager):
         if endAt is not None:
             payload["endAt"] = endAt
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.KLINE,
             query=payload,
@@ -185,9 +185,9 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_contracts(self) -> dict[str, Any]:
+    def get_futures_contracts(self) -> dict[str, Any]:
         """Retrieve active KuCoin futures contracts."""
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesMarket.CONTRACTS,
             signed=False,
@@ -195,13 +195,13 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_contract(
+    def get_futures_contract(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
         """Retrieve one KuCoin futures contract."""
         exchange_symbol = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesMarket.CONTRACT.format(symbol=exchange_symbol),
             signed=False,
@@ -209,7 +209,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_ticker(
+    def get_futures_ticker(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
@@ -217,7 +217,7 @@ class MarketHTTP(HTTPManager):
         payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesMarket.TICKER,
             query=payload,
@@ -226,7 +226,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_orderbook(
+    def get_futures_orderbook(
         self,
         product_symbol: str,
         depth: int | None = None,
@@ -240,7 +240,7 @@ class MarketHTTP(HTTPManager):
             if depth is not None
             else FuturesMarket.ORDERBOOK
         )
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=path,
             query=payload,
@@ -249,7 +249,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_public_trades(
+    def get_futures_public_trades(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
@@ -257,7 +257,7 @@ class MarketHTTP(HTTPManager):
         payload: dict[str, Any] = {
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesMarket.PUBLIC_TRADES,
             query=payload,
@@ -266,7 +266,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_kline(
+    def get_futures_kline(
         self,
         product_symbol: str,
         timeframe: str,
@@ -283,7 +283,7 @@ class MarketHTTP(HTTPManager):
         if to is not None:
             payload["to"] = to
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesMarket.KLINE,
             query=payload,
@@ -292,7 +292,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_open_interest(
+    def get_futures_open_interest(
         self,
         product_symbol: str,
         interval: str = "5min",
@@ -312,7 +312,7 @@ class MarketHTTP(HTTPManager):
         if pageSize is not None:
             payload["pageSize"] = pageSize
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesMarket.OPEN_INTEREST,
             query=payload,

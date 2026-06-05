@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from ...utils.common import Common
+from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.account import FuturesAccount, SpotAccount
 
@@ -15,7 +15,7 @@ class AccountHTTP(HTTPManager):
     including balance details and account management operations.
     """
 
-    async def get_account_balance(
+    def get_account_balance(
         self,
         currency: str | None = None,
         type: str | None = None,
@@ -36,14 +36,14 @@ class AccountHTTP(HTTPManager):
         if type:
             payload["type"] = type
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotAccount.ACCOUNT_BALANCE,
             query=payload,
         )
         return res
 
-    async def get_futures_account(
+    def get_futures_account(
         self,
         currency: str | None = None,
     ) -> dict[str, Any]:
@@ -52,7 +52,7 @@ class AccountHTTP(HTTPManager):
         if currency:
             payload["currency"] = currency
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesAccount.ACCOUNT_OVERVIEW,
             query=payload,
@@ -60,7 +60,7 @@ class AccountHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_positions(
+    def get_futures_positions(
         self,
         currency: str | None = None,
     ) -> dict[str, Any]:
@@ -69,7 +69,7 @@ class AccountHTTP(HTTPManager):
         if currency:
             payload["currency"] = currency
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesAccount.POSITIONS,
             query=payload,
@@ -77,7 +77,7 @@ class AccountHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_position(
+    def get_futures_position(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
@@ -86,7 +86,7 @@ class AccountHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesAccount.POSITION,
             query=payload,
@@ -94,9 +94,9 @@ class AccountHTTP(HTTPManager):
         )
         return res
 
-    async def get_futures_position_mode(self) -> dict[str, Any]:
+    def get_futures_position_mode(self) -> dict[str, Any]:
         """Retrieve KuCoin futures position mode."""
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FuturesAccount.POSITION_MODE,
             base_url=self.futures_base_url,
