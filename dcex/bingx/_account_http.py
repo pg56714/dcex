@@ -1,6 +1,6 @@
 """BingX account HTTP client."""
 
-from ...utils.common import Common
+from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.account import FundAccount, SpotAccount, SwapAccount, TransferAccount
 
@@ -8,7 +8,7 @@ from .endpoints.account import FundAccount, SpotAccount, SwapAccount, TransferAc
 class AccountHTTP(HTTPManager):
     """HTTP client for BingX account-related API endpoints."""
 
-    async def get_account_balance(self) -> dict:
+    def get_account_balance(self) -> dict:
         """
         Get account balance information.
 
@@ -16,18 +16,18 @@ class AccountHTTP(HTTPManager):
             dict: Account balance data
         """
         payload = {}
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapAccount.ACCOUNT_BALANCE,
             query=payload,
         )
         return res
 
-    async def get_swap_account_balance(self) -> dict:
+    def get_swap_account_balance(self) -> dict:
         """Get swap account balance information."""
-        return await self.get_account_balance()
+        return self.get_account_balance()
 
-    async def get_spot_account_balance(
+    def get_spot_account_balance(
         self,
         recvWindow: int | None = None,
     ) -> dict:
@@ -36,14 +36,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = recvWindow
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotAccount.ACCOUNT_BALANCE,
             query=payload,
         )
         return res
 
-    async def get_fund_account_balance(
+    def get_fund_account_balance(
         self,
         asset: str | None = None,
         recvWindow: int | None = None,
@@ -55,14 +55,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = recvWindow
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FundAccount.ACCOUNT_BALANCE,
             query=payload,
         )
         return res
 
-    async def get_all_account_balance(
+    def get_all_account_balance(
         self,
         accountType: str | None = None,
         recvWindow: int | None = None,
@@ -74,14 +74,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = recvWindow
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FundAccount.ALL_ACCOUNT_BALANCE,
             query=payload,
         )
         return res
 
-    async def get_account_uid(
+    def get_account_uid(
         self,
         recvWindow: int | None = None,
     ) -> dict:
@@ -90,14 +90,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = recvWindow
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FundAccount.ACCOUNT_UID,
             query=payload,
         )
         return res
 
-    async def get_api_key_info(
+    def get_api_key_info(
         self,
         uid: int | str,
         apiKey: str | None = None,
@@ -110,14 +110,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=FundAccount.API_KEY_INFO,
             query=payload,
         )
         return res
 
-    async def get_transferable_coins(
+    def get_transferable_coins(
         self,
         fromAccount: str,
         toAccount: str,
@@ -131,14 +131,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=TransferAccount.TRANSFERABLE_COINS,
             query=payload,
         )
         return res
 
-    async def asset_transfer(
+    def asset_transfer(
         self,
         fromAccount: str,
         toAccount: str,
@@ -156,14 +156,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=TransferAccount.ASSET_TRANSFER,
             query=payload,
         )
         return res
 
-    async def get_asset_transfer_records(
+    def get_asset_transfer_records(
         self,
         fromAccount: str | None = None,
         toAccount: str | None = None,
@@ -193,14 +193,14 @@ class AccountHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=TransferAccount.TRANSFER_RECORDS,
             query=payload,
         )
         return res
 
-    async def get_open_positions(
+    def get_open_positions(
         self,
         product_symbol: str | None = None,
     ) -> dict:
@@ -217,14 +217,14 @@ class AccountHTTP(HTTPManager):
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINGX, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapAccount.OPEN_POSITIONS,
             query=payload,
         )
         return res
 
-    async def get_fund_flow(
+    def get_fund_flow(
         self,
         product_symbol: str | None = None,
         income_type: str | None = None,
@@ -257,14 +257,14 @@ class AccountHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = limit
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapAccount.FUND_FLOW,
             query=payload,
         )
         return res
 
-    async def get_listen_key(self) -> str:
+    def get_listen_key(self) -> str:
         """
         Get WebSocket listen key.
 
@@ -272,21 +272,17 @@ class AccountHTTP(HTTPManager):
             str: WebSocket listen key
         """
 
-        if self.session is None or getattr(self.session, "is_closed", False):
-            await self.async_init()
-        if self.session is None:
-            raise ValueError("Session is not initialized")
         if not self.api_key:
             raise ValueError("API key is required")
 
         url = self.base_url + SwapAccount.LISTEN_KEY
         headers = {"X-BX-APIKEY": self.api_key}
 
-        res = await self.session.post(url, headers=headers)
+        res = self.session.post(url, headers=headers)
         data = res.json()
         return data.get("listenKey")
 
-    async def keep_alive_listen_key(self, listen_key: str) -> dict:
+    def keep_alive_listen_key(self, listen_key: str) -> dict:
         """
         Keep alive WebSocket listen key.
 
@@ -300,7 +296,7 @@ class AccountHTTP(HTTPManager):
             "listenKey": listen_key,
         }
 
-        res = await self._request(
+        res = self._request(
             method="PUT",
             path=SwapAccount.LISTEN_KEY,
             query=payload,

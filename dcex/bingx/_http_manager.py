@@ -1,4 +1,4 @@
-"""BingX HTTP manager for API requests."""
+"""BingX sync HTTP manager for API requests."""
 
 import hashlib
 import hmac
@@ -6,14 +6,14 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Self
+from typing import Any
 from urllib.parse import urlencode
 
-import httpx
+import requests
 
-from ...utils.common import Common
-from ...utils.errors import FailedRequestError
 from ..product_table.manager import ProductTableManager
+from ..utils.common import Common
+from ..utils.errors import FailedRequestError
 
 
 def get_header(api_key: str) -> dict[str, str]:
@@ -80,51 +80,25 @@ class HTTPManager:
     max_retries: int = field(default=3)
     retry_delay: int = field(default=3)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(init=False, default=None)
+    session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     base_url: str = field(default="https://open-api.bingx.com")
 
-    async def async_init(self) -> Self:
-        """
-        Initialize the HTTP manager.
-
-        Returns:
-            HTTPManager: Initialized HTTP manager instance
-        """
-        self.session = httpx.AsyncClient(timeout=self.timeout)
+    def __post_init__(self) -> None:
+        """Initialize the HTTP manager."""
         self._logger = self.logger or logging.getLogger(__name__)
         if self.preload_product_table:
-            self.ptm = await ProductTableManager.get_instance(Common.BINGX)
-        return self
+            self.ptm = ProductTableManager.get_instance(Common.BINGX)
 
-    async def _request(
+    def _request(
         self,
         method: str,
         path: str,
-        query: dict | None = None,
+        query: dict[str, Any] | None = None,
         signed: bool = True,
-    ) -> dict:
-        """
-        Make an HTTP request to BingX API.
-
-        Args:
-            method: HTTP method (GET, POST, PUT, DELETE)
-            path: API endpoint path
-            query: Query parameters
-            signed: Whether to sign the request
-
-        Returns:
-            dict: API response data
-
-        Raises:
-            ValueError: When API credentials are missing for signed requests
-            FailedRequestError: When API request fails
-        """
-
-        if self.session is None or self.session.is_closed:
-            await self.async_init()
-
+    ) -> dict[str, Any]:
+        """Make an HTTP request to BingX API."""
         if signed:
             if not (self.api_key and self.api_secret):
                 raise ValueError("Signed request requires API Key and Secret.")
@@ -141,50 +115,27 @@ class HTTPManager:
                 sorted_query = urlencode(_prepare_query(query))
                 url += "?" + sorted_query if sorted_query else ""
 
+        response = None
         try:
-            if self.session is None:
-                raise ValueError("Session is not initialized. Call async_init() first.")
-
-            if method.upper() == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method.upper() == "POST":
-                if signed:
-                    response = await self.session.post(url, headers=headers)
-                else:
-                    response = await self.session.post(
-                        url, headers=headers, json=query if query else {}
-                    )
-            elif method.upper() == "PUT":
-                if signed:
-                    response = await self.session.put(url, headers=headers)
-                else:
-                    response = await self.session.put(
-                        url, headers=headers, json=query if query else {}
-                    )
-            elif method.upper() == "DELETE":
-                response = await self.session.delete(url, headers=headers)
+            method_upper = method.upper()
+            if method_upper == "GET":
+                response = self.session.get(url, headers=headers, timeout=self.timeout)
+            elif method_upper == "POST":
+                response = self.session.post(url, headers=headers, timeout=self.timeout)
+            elif method_upper == "PUT":
+                response = self.session.put(url, headers=headers, timeout=self.timeout)
+            elif method_upper == "DELETE":
+                response = self.session.delete(url, headers=headers, timeout=self.timeout)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except httpx.HTTPError as e:
-            status_code = "Unknown"
-            resp_headers = None
-            # httpx.HTTPError doesn't always have a response attribute
-            # We need to handle this more carefully
-            try:
-                response_obj = getattr(e, "response", None)
-                if response_obj is not None:
-                    status_code = getattr(response_obj, "status_code", "Unknown")
-                    resp_headers = getattr(response_obj, "headers", None)
-            except AttributeError:
-                pass
-
+        except requests.RequestException as e:
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Request failed: {str(e)}",
-                status_code=status_code,
+                message=f"Request failed: {e}",
+                status_code=response.status_code if response else "Unknown",
                 time=str(int(time.time() * 1000)),
-                resp_headers=resp_headers,
+                resp_headers=dict(response.headers) if response else None,
             ) from e
         else:
             try:
@@ -219,3 +170,7 @@ class HTTPManager:
                 )
 
             return data
+
+    def close(self) -> None:
+        """Close the HTTP session."""
+        self.session.close()

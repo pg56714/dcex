@@ -1,6 +1,6 @@
 """BingX market HTTP client."""
 
-from ...utils.common import Common
+from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.market import SpotMarket, SwapMarket
 
@@ -8,7 +8,7 @@ from .endpoints.market import SpotMarket, SwapMarket
 class MarketHTTP(HTTPManager):
     """HTTP client for BingX market-related API endpoints."""
 
-    async def get_swap_instrument_info(
+    def get_swap_instrument_info(
         self,
         product_symbol: str | None = None,
     ) -> dict:
@@ -25,7 +25,7 @@ class MarketHTTP(HTTPManager):
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINGX, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapMarket.INSTRUMENT_INFO,
             query=payload,
@@ -33,7 +33,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_instrument_info(
+    def get_spot_instrument_info(
         self,
         product_symbol: str | None = None,
     ) -> dict:
@@ -42,7 +42,7 @@ class MarketHTTP(HTTPManager):
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINGX, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.SYMBOLS,
             query=payload,
@@ -50,7 +50,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_orderbook(
+    def get_orderbook(
         self,
         product_symbol: str,
         limit: int | None = None,
@@ -71,7 +71,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapMarket.ORDERBOOK,
             query=payload,
@@ -79,7 +79,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_orderbook(
+    def get_spot_orderbook(
         self,
         product_symbol: str,
         limit: int | None = None,
@@ -91,7 +91,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.ORDERBOOK,
             query=payload,
@@ -99,7 +99,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_orderbook_v2(
+    def get_spot_orderbook_v2(
         self,
         product_symbol: str,
         limit: int | None = None,
@@ -113,7 +113,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["depth"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.ORDERBOOK_V2,
             query=payload,
@@ -121,7 +121,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_public_trades(
+    def get_public_trades(
         self,
         product_symbol: str,
         limit: int | None = None,
@@ -142,7 +142,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapMarket.PUBLIC_TRADE,
             query=payload,
@@ -150,7 +150,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_public_trades(
+    def get_spot_public_trades(
         self,
         product_symbol: str,
     ) -> dict:
@@ -159,7 +159,7 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.PUBLIC_TRADE,
             query=payload,
@@ -167,7 +167,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_kline(
+    def get_kline(
         self,
         product_symbol: str,
         interval: str,
@@ -199,7 +199,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapMarket.KLINE,
             query=payload,
@@ -207,7 +207,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_kline(
+    def get_spot_kline(
         self,
         product_symbol: str,
         interval: str,
@@ -227,7 +227,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.KLINE,
             query=payload,
@@ -235,7 +235,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_kline_v2(
+    def get_spot_kline_v2(
         self,
         product_symbol: str,
         interval: str,
@@ -255,7 +255,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.KLINE_V2,
             query=payload,
@@ -263,7 +263,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_open_interest(self, product_symbol: str) -> dict:
+    def get_open_interest(self, product_symbol: str) -> dict:
         """
         Get swap open interest.
 
@@ -277,7 +277,7 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapMarket.OPEN_INTEREST,
             query=payload,
@@ -285,7 +285,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_mark_price_kline(
+    def get_mark_price_kline(
         self,
         product_symbol: str,
         interval: str,
@@ -317,7 +317,7 @@ class MarketHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapMarket.MARK_PRICE_KLINE,
             query=payload,
@@ -325,7 +325,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_ticker(
+    def get_ticker(
         self,
         product_symbol: str | None = None,
     ) -> dict:
@@ -342,7 +342,7 @@ class MarketHTTP(HTTPManager):
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINGX, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapMarket.TICKER,
             query=payload,
@@ -350,7 +350,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_ticker(
+    def get_spot_ticker(
         self,
         product_symbol: str,
     ) -> dict:
@@ -359,7 +359,7 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.TICKER,
             query=payload,
@@ -367,7 +367,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_book_ticker(
+    def get_spot_book_ticker(
         self,
         product_symbol: str,
     ) -> dict:
@@ -376,7 +376,7 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.BOOK_TICKER,
             query=payload,
@@ -384,7 +384,7 @@ class MarketHTTP(HTTPManager):
         )
         return res
 
-    async def get_spot_price_ticker(
+    def get_spot_price_ticker(
         self,
         product_symbol: str,
     ) -> dict:
@@ -393,7 +393,7 @@ class MarketHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotMarket.PRICE_TICKER,
             query=payload,

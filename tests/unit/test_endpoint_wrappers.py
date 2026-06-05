@@ -72,6 +72,22 @@ class FakeAsyncResponse:
         return {"listenKey": "test-listen-key"}
 
 
+class FakeSyncResponse:
+    status_code = 200
+    headers: dict[str, str] = {}
+
+    def json(self) -> dict[str, str]:
+        return {"listenKey": "test-listen-key"}
+
+
+class FakeSyncSession:
+    def post(self, *args: object, **kwargs: object) -> FakeSyncResponse:
+        return FakeSyncResponse()
+
+    def close(self) -> None:
+        return None
+
+
 class FakeAsyncSession:
     is_closed = False
 
@@ -149,6 +165,7 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
 def _wire_sync(client: Any) -> list[dict[str, Any]]:
     calls: list[dict[str, Any]] = []
     client.ptm = FakePTM()
+    client.session = FakeSyncSession()
 
     def fake_request(
         method: str,

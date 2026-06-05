@@ -1,6 +1,6 @@
 """BingX trade HTTP client."""
 
-from ...utils.common import Common
+from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.trade import SpotTrade, SwapTrade
 
@@ -35,7 +35,7 @@ def _normalize_batch_orders(orders: object) -> object:
 class TradeHTTP(HTTPManager):
     """HTTP client for BingX trade-related API endpoints."""
 
-    async def place_spot_order(
+    def place_spot_order(
         self,
         product_symbol: str,
         side: str,
@@ -66,21 +66,21 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SpotTrade.PLACE_ORDER,
             query=payload,
         )
         return res
 
-    async def place_spot_market_buy_order(
+    def place_spot_market_buy_order(
         self,
         product_symbol: str,
         quoteOrderQty: float | str,
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot market buy order."""
-        return await self.place_spot_order(
+        return self.place_spot_order(
             product_symbol=product_symbol,
             side="BUY",
             type_="MARKET",
@@ -88,14 +88,14 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_market_sell_order(
+    def place_spot_market_sell_order(
         self,
         product_symbol: str,
         quantity: float | str,
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot market sell order."""
-        return await self.place_spot_order(
+        return self.place_spot_order(
             product_symbol=product_symbol,
             side="SELL",
             type_="MARKET",
@@ -103,7 +103,7 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_limit_order(
+    def place_spot_limit_order(
         self,
         product_symbol: str,
         side: str,
@@ -113,7 +113,7 @@ class TradeHTTP(HTTPManager):
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot limit order."""
-        return await self.place_spot_order(
+        return self.place_spot_order(
             product_symbol=product_symbol,
             side=side,
             type_="LIMIT",
@@ -123,7 +123,7 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_limit_buy_order(
+    def place_spot_limit_buy_order(
         self,
         product_symbol: str,
         quantity: float | str,
@@ -132,7 +132,7 @@ class TradeHTTP(HTTPManager):
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot limit buy order."""
-        return await self.place_spot_limit_order(
+        return self.place_spot_limit_order(
             product_symbol=product_symbol,
             side="BUY",
             quantity=quantity,
@@ -141,7 +141,7 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_limit_sell_order(
+    def place_spot_limit_sell_order(
         self,
         product_symbol: str,
         quantity: float | str,
@@ -150,7 +150,7 @@ class TradeHTTP(HTTPManager):
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot limit sell order."""
-        return await self.place_spot_limit_order(
+        return self.place_spot_limit_order(
             product_symbol=product_symbol,
             side="SELL",
             quantity=quantity,
@@ -159,7 +159,7 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_post_only_order(
+    def place_spot_post_only_order(
         self,
         product_symbol: str,
         side: str,
@@ -168,7 +168,7 @@ class TradeHTTP(HTTPManager):
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot post-only limit order."""
-        return await self.place_spot_limit_order(
+        return self.place_spot_limit_order(
             product_symbol=product_symbol,
             side=side,
             quantity=quantity,
@@ -177,7 +177,7 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_post_only_buy_order(
+    def place_spot_post_only_buy_order(
         self,
         product_symbol: str,
         quantity: float | str,
@@ -185,7 +185,7 @@ class TradeHTTP(HTTPManager):
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot post-only limit buy order."""
-        return await self.place_spot_post_only_order(
+        return self.place_spot_post_only_order(
             product_symbol=product_symbol,
             side="BUY",
             quantity=quantity,
@@ -193,7 +193,7 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_post_only_sell_order(
+    def place_spot_post_only_sell_order(
         self,
         product_symbol: str,
         quantity: float | str,
@@ -201,7 +201,7 @@ class TradeHTTP(HTTPManager):
         clientOrderId: str | None = None,
     ) -> dict:
         """Place a spot post-only limit sell order."""
-        return await self.place_spot_post_only_order(
+        return self.place_spot_post_only_order(
             product_symbol=product_symbol,
             side="SELL",
             quantity=quantity,
@@ -209,19 +209,19 @@ class TradeHTTP(HTTPManager):
             clientOrderId=clientOrderId,
         )
 
-    async def place_spot_batch_order(
+    def place_spot_batch_order(
         self,
         data: list[dict],
     ) -> dict:
         """Place spot orders in batch."""
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SpotTrade.PLACE_BATCH_ORDER,
             query={"data": _normalize_batch_orders(data)},
         )
         return res
 
-    async def cancel_spot_order(
+    def cancel_spot_order(
         self,
         product_symbol: str,
         orderId: int | str | None = None,
@@ -239,14 +239,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SpotTrade.CANCEL_ORDER,
             query=payload,
         )
         return res
 
-    async def cancel_spot_batch_orders(
+    def cancel_spot_batch_orders(
         self,
         product_symbol: str,
         orderIds: list[int | str] | str,
@@ -265,14 +265,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SpotTrade.CANCEL_BATCH_ORDERS,
             query=payload,
         )
         return res
 
-    async def cancel_spot_open_orders(
+    def cancel_spot_open_orders(
         self,
         product_symbol: str | None = None,
         recvWindow: int | None = None,
@@ -284,14 +284,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SpotTrade.CANCEL_OPEN_ORDERS,
             query=payload,
         )
         return res
 
-    async def get_spot_order(
+    def get_spot_order(
         self,
         product_symbol: str,
         orderId: int | str | None = None,
@@ -309,14 +309,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotTrade.QUERY_ORDER,
             query=payload,
         )
         return res
 
-    async def get_spot_open_orders(
+    def get_spot_open_orders(
         self,
         product_symbol: str,
         recvWindow: int | None = None,
@@ -328,14 +328,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotTrade.QUERY_OPEN_ORDERS,
             query=payload,
         )
         return res
 
-    async def get_spot_order_history(
+    def get_spot_order_history(
         self,
         product_symbol: str,
         orderId: int | str | None = None,
@@ -360,14 +360,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotTrade.QUERY_ORDER_HISTORY,
             query=payload,
         )
         return res
 
-    async def get_spot_my_trades(
+    def get_spot_my_trades(
         self,
         product_symbol: str,
         orderId: int | str | None = None,
@@ -391,14 +391,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotTrade.QUERY_MY_TRADES,
             query=payload,
         )
         return res
 
-    async def get_spot_commission_rate(
+    def get_spot_commission_rate(
         self,
         product_symbol: str,
         recvWindow: int | None = None,
@@ -410,14 +410,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SpotTrade.COMMISSION_RATE,
             query=payload,
         )
         return res
 
-    async def place_swap_order(
+    def place_swap_order(
         self,
         product_symbol: str,
         type_: str,
@@ -504,14 +504,14 @@ class TradeHTTP(HTTPManager):
         if positionId is not None:
             payload["positionId"] = str(positionId)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.PLACE_ORDER,
             query=payload,
         )
         return res
 
-    async def test_swap_order(
+    def test_swap_order(
         self,
         product_symbol: str,
         type_: str,
@@ -572,14 +572,14 @@ class TradeHTTP(HTTPManager):
         if positionId is not None:
             payload["positionId"] = str(positionId)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.TEST_ORDER,
             query=payload,
         )
         return res
 
-    async def place_swap_market_order(
+    def place_swap_market_order(
         self,
         product_symbol: str,
         side: str,
@@ -603,7 +603,7 @@ class TradeHTTP(HTTPManager):
             dict: Order data
         """
 
-        return await self.place_swap_order(
+        return self.place_swap_order(
             product_symbol=product_symbol,
             type_="MARKET",
             side=side,
@@ -613,7 +613,7 @@ class TradeHTTP(HTTPManager):
             positionSide=positionSide,
         )
 
-    async def place_swap_market_buy_order(
+    def place_swap_market_buy_order(
         self,
         product_symbol: str,
         quantity: float,
@@ -635,7 +635,7 @@ class TradeHTTP(HTTPManager):
             dict: Order data
         """
 
-        return await self.place_swap_market_order(
+        return self.place_swap_market_order(
             product_symbol=product_symbol,
             side="BUY",
             quantity=quantity,
@@ -644,7 +644,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_swap_market_sell_order(
+    def place_swap_market_sell_order(
         self,
         product_symbol: str,
         quantity: float,
@@ -665,7 +665,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order data
         """
-        return await self.place_swap_market_order(
+        return self.place_swap_market_order(
             product_symbol=product_symbol,
             side="SELL",
             quantity=quantity,
@@ -674,7 +674,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_swap_limit_order(
+    def place_swap_limit_order(
         self,
         product_symbol: str,
         side: str,
@@ -701,7 +701,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order data
         """
-        return await self.place_swap_order(
+        return self.place_swap_order(
             product_symbol=product_symbol,
             type_="LIMIT",
             side=side,
@@ -713,7 +713,7 @@ class TradeHTTP(HTTPManager):
             positionSide=positionSide,
         )
 
-    async def place_swap_limit_buy_order(
+    def place_swap_limit_buy_order(
         self,
         product_symbol: str,
         quantity: float,
@@ -738,7 +738,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order data
         """
-        return await self.place_swap_limit_order(
+        return self.place_swap_limit_order(
             product_symbol=product_symbol,
             side="BUY",
             quantity=quantity,
@@ -749,7 +749,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_swap_limit_sell_order(
+    def place_swap_limit_sell_order(
         self,
         product_symbol: str,
         quantity: float,
@@ -774,7 +774,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order data
         """
-        return await self.place_swap_limit_order(
+        return self.place_swap_limit_order(
             product_symbol=product_symbol,
             side="SELL",
             quantity=quantity,
@@ -785,7 +785,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_swap_post_only_order(
+    def place_swap_post_only_order(
         self,
         product_symbol: str,
         side: str,
@@ -812,7 +812,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order data
         """
-        return await self.place_swap_order(
+        return self.place_swap_order(
             product_symbol=product_symbol,
             type_="LIMIT",
             side=side,
@@ -824,7 +824,7 @@ class TradeHTTP(HTTPManager):
             positionSide=positionSide,
         )
 
-    async def place_swap_post_only_buy_order(
+    def place_swap_post_only_buy_order(
         self,
         product_symbol: str,
         quantity: float,
@@ -847,7 +847,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order data
         """
-        return await self.place_swap_post_only_order(
+        return self.place_swap_post_only_order(
             product_symbol=product_symbol,
             side="BUY",
             quantity=quantity,
@@ -857,7 +857,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_swap_post_only_sell_order(
+    def place_swap_post_only_sell_order(
         self,
         product_symbol: str,
         quantity: float,
@@ -880,7 +880,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order data
         """
-        return await self.place_swap_post_only_order(
+        return self.place_swap_post_only_order(
             product_symbol=product_symbol,
             side="SELL",
             quantity=quantity,
@@ -890,7 +890,7 @@ class TradeHTTP(HTTPManager):
             reduceOnly=reduceOnly,
         )
 
-    async def place_swap_batch_order(
+    def place_swap_batch_order(
         self,
         batchOrders: list,
     ) -> dict:
@@ -904,14 +904,14 @@ class TradeHTTP(HTTPManager):
             dict: Batch order response
         """
         payload = {"batchOrders": _normalize_batch_orders(batchOrders)}
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.PLACE_BATCH_ORDER,
             query=payload,
         )
         return res
 
-    async def cancel_swap_order(
+    def cancel_swap_order(
         self,
         product_symbol: str,
         orderId: int | None = None,
@@ -940,14 +940,14 @@ class TradeHTTP(HTTPManager):
         if recvWindow is not None:
             payload["recvWindow"] = str(recvWindow)
 
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=SwapTrade.CANCEL_ORDER,
             query=payload,
         )
         return res
 
-    async def cancel_swap_batch_order(
+    def cancel_swap_batch_order(
         self,
         product_symbol: str,
         orderIdList: list | None = None,
@@ -972,14 +972,14 @@ class TradeHTTP(HTTPManager):
         if clientOrderIdList is not None:
             payload["clientOrderIdList"] = str(clientOrderIdList).replace("'", "").replace(" ", "")
 
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=SwapTrade.CANCEL_BATCH_ORDER,
             query=payload,
         )
         return res
 
-    async def cancel_swap_all_orders(
+    def cancel_swap_all_orders(
         self,
         product_symbol: str,
         type_: str | None = None,
@@ -1000,14 +1000,14 @@ class TradeHTTP(HTTPManager):
         if type_ is not None:
             payload["type"] = type_
 
-        res = await self._request(
+        res = self._request(
             method="DELETE",
             path=SwapTrade.CANCEL_ALL_OPEN_ORDERS,
             query=payload,
         )
         return res
 
-    async def replace_swap_order(
+    def replace_swap_order(
         self,
         product_symbol: str,
         orderId: str,
@@ -1108,14 +1108,14 @@ class TradeHTTP(HTTPManager):
         if positionId is not None:
             payload["positionId"] = str(positionId)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.REPLACE_ORDER,
             query=payload,
         )
         return res
 
-    async def close_swap_position(
+    def close_swap_position(
         self,
         positionId: str,
     ) -> dict:
@@ -1132,14 +1132,14 @@ class TradeHTTP(HTTPManager):
             "positionId": positionId,
         }
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.CLOSE_POSITION,
             query=payload,
         )
         return res
 
-    async def close_swap_all_positions(
+    def close_swap_all_positions(
         self,
         product_symbol: str,
     ) -> dict:
@@ -1156,14 +1156,14 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINGX, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.CLOSE_ALL_POSITIONS,
             query=payload,
         )
         return res
 
-    async def get_order_detail(
+    def get_order_detail(
         self,
         product_symbol: str,
         orderId: int | None = None,
@@ -1188,14 +1188,14 @@ class TradeHTTP(HTTPManager):
         if clientOrderId is not None:
             payload["clientOrderId"] = clientOrderId
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapTrade.QUERY_ORDER_DETAIL,
             query=payload,
         )
         return res
 
-    async def get_open_orders(
+    def get_open_orders(
         self,
         product_symbol: str | None = None,
         type_: str | None = None,
@@ -1216,14 +1216,14 @@ class TradeHTTP(HTTPManager):
         if type_ is not None:
             payload["type"] = type_
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapTrade.QUERY_ALL_OPEN_ORDERS,
             query=payload,
         )
         return res
 
-    async def get_order_history(
+    def get_order_history(
         self,
         product_symbol: str | None = None,
         currency: str | None = None,
@@ -1260,14 +1260,14 @@ class TradeHTTP(HTTPManager):
         if limit is not None:
             payload["limit"] = str(limit)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapTrade.QUERY_ORDER_HISTORY,
             query=payload,
         )
         return res
 
-    async def change_margin_type(
+    def change_margin_type(
         self,
         product_symbol: str,
         marginType: str,
@@ -1287,14 +1287,14 @@ class TradeHTTP(HTTPManager):
             "marginType": marginType,
         }
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.CHANGE_MARGIN_TYPE,
             query=payload,
         )
         return res
 
-    async def get_margin_type(
+    def get_margin_type(
         self,
         product_symbol: str | None = None,
     ) -> dict:
@@ -1311,14 +1311,14 @@ class TradeHTTP(HTTPManager):
         if product_symbol:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINGX, product_symbol)
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapTrade.QUERY_MARGIN_TYPE,
             query=payload,
         )
         return res
 
-    async def set_leverage(
+    def set_leverage(
         self,
         product_symbol: str,
         side: str,
@@ -1341,14 +1341,14 @@ class TradeHTTP(HTTPManager):
             "leverage": leverage,
         }
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.SET_LEVERAGE,
             query=payload,
         )
         return res
 
-    async def get_leverage(
+    def get_leverage(
         self,
         product_symbol: str,
     ) -> dict:
@@ -1365,14 +1365,14 @@ class TradeHTTP(HTTPManager):
             "symbol": self.ptm.get_exchange_symbol(Common.BINGX, product_symbol),
         }
 
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapTrade.QUERY_LEVERAGE,
             query=payload,
         )
         return res
 
-    async def set_position_mode(
+    def set_position_mode(
         self,
         dualSidePosition: str,
     ) -> dict:
@@ -1389,14 +1389,14 @@ class TradeHTTP(HTTPManager):
             "dualSidePosition": dualSidePosition,
         }
 
-        res = await self._request(
+        res = self._request(
             method="POST",
             path=SwapTrade.SET_POSITION_MODE,
             query=payload,
         )
         return res
 
-    async def get_position_mode(
+    def get_position_mode(
         self,
     ) -> dict:
         """
@@ -1406,7 +1406,7 @@ class TradeHTTP(HTTPManager):
             dict: Position mode data
         """
         payload = {}
-        res = await self._request(
+        res = self._request(
             method="GET",
             path=SwapTrade.QUERY_POSITION_MODE,
             query=payload,

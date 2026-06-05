@@ -131,6 +131,88 @@ def binance() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+def bingx() -> pl.DataFrame:
+    """
+    Fetch market information from BingX exchange.
+
+    Retrieves trading pairs from BingX including spot and swap markets.
+    Standardizes the data into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from BingX.
+    """
+    from ..bingx._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+
+    markets = []
+    res_swap = market_http.get_swap_instrument_info()
+    for market in res_swap.get("data", []):
+        if not isinstance(market, dict):
+            continue
+        symbol = market["symbol"]
+        base, quote = symbol.rsplit("-", 1)
+        price_precision_val = int(market.get("pricePrecision", 0))
+        quantity_precision_val = int(market.get("quantityPrecision", 0))
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BINGX,
+                exchange_symbol=symbol,
+                product_symbol=f"{base}-{quote}-SWAP",
+                product_type="swap",
+                exchange_type="perpetual",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=(
+                    str(reverse_decimal_places(price_precision_val))
+                    if price_precision_val > 0
+                    else "0"
+                ),
+                size_precision=(
+                    str(reverse_decimal_places(quantity_precision_val))
+                    if quantity_precision_val > 0
+                    else "0"
+                ),
+                min_size=(
+                    str(reverse_decimal_places(quantity_precision_val))
+                    if quantity_precision_val > 0
+                    else "0"
+                ),
+                min_notional=str(market.get("tradeMinUSDT", "0")),
+                size_per_contract=str(market.get("size", "1")),
+            )
+        )
+
+    res_spot = market_http.get_spot_instrument_info()
+    spot_data = res_spot.get("data", {})
+    spot_symbols = spot_data.get("symbols", spot_data) if isinstance(spot_data, dict) else spot_data
+    for market in spot_symbols:
+        if not isinstance(market, dict):
+            continue
+        symbol = market["symbol"]
+        base, quote = symbol.rsplit("-", 1)
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BINGX,
+                exchange_symbol=symbol,
+                product_symbol=f"{base}-{quote}-SPOT",
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(market.get("tickSize", "0")),
+                size_precision=str(market.get("stepSize", "0")),
+                min_size=str(market.get("minQty", "0")),
+                min_notional=str(market.get("minNotional", "0")),
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
 def bitmart() -> pl.DataFrame:
     """
     Fetch market information from BitMart exchange.

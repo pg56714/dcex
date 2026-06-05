@@ -80,7 +80,7 @@ if __name__ == "__main__":
 | **BitMEX**      | Yes          | Yes           |
 | **Gate.io**     | Yes          | Yes           |
 | **Hyperliquid** | Yes          | Yes           |
-| **BingX**       | No           | Developing    |
+| **BingX**       | Yes          | Yes           |
 | **KuCoin**      | Yes          | Yes           |
 
 ## Key Features
