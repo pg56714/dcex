@@ -322,3 +322,10 @@ def test_stateful_order_lifecycle(client):
 
     assert not _open_orders(client)
     assert _position_qty(client) == 0
+
+
+@pytest.mark.private
+def test_trading_read_endpoints(client):
+    assert client.get_executions(product_symbol=SYMBOL, count=5) is not None
+    assert client.get_trade_history(product_symbol=SYMBOL, count=5) is not None
+    assert client.get_trading_volume() is not None

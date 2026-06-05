@@ -752,3 +752,29 @@ def test_spot_cancel_all_orders(client):
     finally:
         if order_id is not None:
             client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+
+
+@pytest.mark.private
+def test_trade_read_and_test_order_endpoints(client):
+    _skip_if_swap_state(client)
+    _skip_if_spot_state(client)
+    quantity, price = _swap_order_params(client)
+    _ensure_swap_usdt(client, quantity, price)
+
+    assert (
+        client.test_swap_order(
+            product_symbol=SWAP_SYMBOL,
+            type_="LIMIT",
+            side="BUY",
+            positionSide="LONG",
+            quantity=float(quantity),
+            price=float(price),
+            timeInForce="PostOnly",
+            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+        )
+        is not None
+    )
+    assert client.get_order_history(product_symbol=SWAP_SYMBOL, limit=5) is not None
+    assert client.get_spot_order_history(product_symbol=SPOT_SYMBOL, pageSize=5) is not None
+    assert client.get_spot_my_trades(product_symbol=SPOT_SYMBOL, limit=5) is not None
+    assert client.get_spot_commission_rate(product_symbol=SPOT_SYMBOL) is not None

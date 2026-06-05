@@ -341,3 +341,10 @@ async def test_async_stateful_order_lifecycle(client):
 
     assert not await _open_orders(client)
     assert await _position_qty(client) == 0
+
+
+@pytest.mark.private
+async def test_async_trading_read_endpoints(client):
+    assert await client.get_executions(product_symbol=SYMBOL, count=5) is not None
+    assert await client.get_trade_history(product_symbol=SYMBOL, count=5) is not None
+    assert await client.get_trading_volume() is not None

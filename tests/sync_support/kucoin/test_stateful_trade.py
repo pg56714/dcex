@@ -457,3 +457,18 @@ def test_futures_market_round_trip(client):
                 reduceOnly=True,
             )
         raise
+
+
+@pytest.mark.private
+def test_trade_history_endpoints(client):
+    assert client.get_spot_trade_history(product_symbol=SPOT_SYMBOL, limit=10) is not None
+    assert (
+        client.get_futures_order_list(
+            product_symbol=FUTURES_SYMBOL,
+            status="active",
+            pageSize=10,
+        )
+        is not None
+    )
+    assert client.get_futures_trade_history(product_symbol=FUTURES_SYMBOL, pageSize=10) is not None
+    assert client.get_futures_recent_trade_history(product_symbol=FUTURES_SYMBOL) is not None

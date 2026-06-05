@@ -3,6 +3,7 @@
 import asyncio
 import os
 import uuid
+from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -173,19 +174,17 @@ async def _snapshot_balances(client: Client) -> dict[str, Decimal]:
 
 
 async def _cleanup(client: Client, initial: dict[str, Decimal]) -> None:
-    try:
+    with suppress(Exception):
         if await _spot_open_orders(client):
             await client.cancel_spot_all_orders_by_symbol(product_symbol=SPOT_SYMBOL)
             await asyncio.sleep(1)
-    except Exception:
-        pass
-    try:
+
+    with suppress(Exception):
         if await _futures_open_orders(client):
             await client.cancel_futures_all_orders(product_symbol=FUTURES_SYMBOL)
             await asyncio.sleep(1)
-    except Exception:
-        pass
-    try:
+
+    with suppress(Exception):
         position_size = await _futures_position_size(client)
         if position_size > 0:
             await client.place_futures_market_sell_order(
@@ -209,9 +208,8 @@ async def _cleanup(client: Client, initial: dict[str, Decimal]) -> None:
                 reduceOnly=True,
             )
             await asyncio.sleep(2)
-    except Exception:
-        pass
-    try:
+
+    with suppress(Exception):
         trade_btc = await _available(client, "BTC", "trade")
         excess_btc = trade_btc - initial["trade_btc"]
         if excess_btc > 0:
@@ -223,29 +221,24 @@ async def _cleanup(client: Client, initial: dict[str, Decimal]) -> None:
                     clientOid=_client_oid(),
                 )
                 await asyncio.sleep(2)
-    except Exception:
-        pass
-    try:
+
+    with suppress(Exception):
         trade_usdt = await _available(client, "USDT", "trade")
         excess_usdt = trade_usdt - initial["trade_usdt"]
         if excess_usdt > Decimal("0.00000001"):
             await _flex_transfer(client, "USDT", excess_usdt, "TRADE", "MAIN")
-    except Exception:
-        pass
-    try:
+
+    with suppress(Exception):
         trade_btc = await _available(client, "BTC", "trade")
         excess_btc = trade_btc - initial["trade_btc"]
         if excess_btc > Decimal("0.00000001"):
             await _flex_transfer(client, "BTC", excess_btc, "TRADE", "MAIN")
-    except Exception:
-        pass
-    try:
+
+    with suppress(Exception):
         contract_usdt = await _futures_available_usdt(client)
         excess_contract_usdt = contract_usdt - initial["contract_usdt"]
         if excess_contract_usdt > Decimal("0.00000001"):
             await _flex_transfer(client, "USDT", excess_contract_usdt, "CONTRACT", "MAIN")
-    except Exception:
-        pass
 
 
 def _spot_step_and_min(client: Client) -> tuple[Decimal, Decimal, Decimal]:
@@ -262,7 +255,9 @@ async def _spot_order_params(client: Client) -> tuple[str, str]:
     step = _dec(details["size_precision"], "0.00000001")
     min_size = _dec(details["min_size"], "0.00001")
     min_notional = max(_dec(details["min_notional"], "1"), Decimal("1"))
-    current_price = _dec((await client.get_spot_ticker(product_symbol=SPOT_SYMBOL))["data"]["price"])
+    current_price = _dec(
+        (await client.get_spot_ticker(product_symbol=SPOT_SYMBOL))["data"]["price"]
+    )
     price = _round_to_step(current_price * Decimal("0.50"), tick, ROUND_DOWN)
     size = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
@@ -350,7 +345,9 @@ async def _futures_order_params(client: Client) -> tuple[int, str, Decimal, Deci
     tick = _dec(contract["tickSize"], "0.1")
     lot = _dec(contract["lotSize"], "1")
     multiplier = _dec(contract["multiplier"], "0.001")
-    current_price = _dec((await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]["price"])
+    current_price = _dec(
+        (await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]["price"]
+    )
     price = _round_to_step(current_price * Decimal("0.50"), tick, ROUND_DOWN)
     return int(max(lot, Decimal("1"))), _fmt(price), current_price, multiplier
 
@@ -483,7 +480,10 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["orderId"]
         assert await _spot_open_orders(client)
-        assert await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
+        assert (
+            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            is not None
+        )
         order_id = None
     finally:
         if order_id is not None:
@@ -517,7 +517,10 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             clientOid=_client_oid(),
         )
         order_id = order["data"]["orderId"]
-        assert await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
+        assert (
+            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            is not None
+        )
         order_id = None
     finally:
         if order_id is not None:
@@ -532,7 +535,10 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             clientOid=_client_oid(),
         )
         order_id = order["data"]["orderId"]
-        assert await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
+        assert (
+            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            is not None
+        )
         order_id = None
     finally:
         if order_id is not None:
@@ -960,7 +966,10 @@ async def _exercise_futures_stateful_methods(client: Client) -> None:
         )
         is not None
     )
-    assert await client.get_futures_trade_history(product_symbol=FUTURES_SYMBOL, pageSize=10) is not None
+    assert (
+        await client.get_futures_trade_history(product_symbol=FUTURES_SYMBOL, pageSize=10)
+        is not None
+    )
     assert await client.get_futures_recent_trade_history(product_symbol=FUTURES_SYMBOL) is not None
 
 
@@ -976,3 +985,8 @@ async def test_async_stateful_order_transfer_and_position_lifecycle(client):
     assert not await _spot_open_orders(client)
     assert not await _futures_open_orders(client)
     assert await _futures_position_size(client) == 0
+
+
+@pytest.mark.private
+async def test_async_spot_trade_history_endpoint(client):
+    assert await client.get_spot_trade_history(product_symbol=SPOT_SYMBOL, limit=10) is not None
