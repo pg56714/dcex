@@ -178,6 +178,14 @@ def _skip_if_spot_open_orders(client: Client) -> None:
         pytest.skip("BTC-USDT spot already has open orders; not touching unrelated orders.")
 
 
+def _wait_until_no_spot_open_orders(client: Client) -> None:
+    for _ in range(5):
+        if not _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL)):
+            return
+        time.sleep(1)
+    assert not _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+
+
 def _skip_if_spot_usdt_insufficient(client: Client, size: str, price: str) -> None:
     required = Decimal(size) * Decimal(price)
     available = _available(client, "USDT", "trade")
@@ -265,7 +273,25 @@ def test_spot_batch_order_and_cancel_by_symbol(client):
 
 @pytest.mark.private
 def test_spot_cancel_all_orders(client):
-    pytest.skip("KuCoin HF open-order query requires a symbol; not canceling across all symbols.")
+    _skip_if_spot_open_orders(client)
+    size, price = _spot_order_params(client)
+    _skip_if_spot_usdt_insufficient(client, size, price)
+    order_id = None
+    try:
+        order = client.place_spot_post_only_limit_buy_order(
+            product_symbol=SPOT_SYMBOL,
+            size=size,
+            price=price,
+            clientOid=f"dcex-{uuid.uuid4().hex}",
+        )
+        order_id = order["data"]["orderId"]
+        assert _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+        assert client.cancel_spot_all_orders().get("data") is not None
+        order_id = None
+        _wait_until_no_spot_open_orders(client)
+    finally:
+        if order_id is not None:
+            client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
 
 
 @pytest.mark.private
