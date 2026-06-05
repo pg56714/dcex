@@ -20,6 +20,15 @@ FUTURES_SYMBOL = "BTC-USDT-SWAP"
 FUTURES_LEVERAGE = Decimal("20")
 TRANSFER_BUFFER_USDT = Decimal("0.1")
 
+pytestmark = [
+    pytest.mark.private,
+    pytest.mark.stateful,
+    pytest.mark.skipif(
+        os.getenv("RUN_LIVE_TRADING_TESTS") != "1",
+        reason="Set RUN_LIVE_TRADING_TESTS=1 to run real KuCoin order tests.",
+    ),
+]
+
 
 @pytest.fixture
 def client():
