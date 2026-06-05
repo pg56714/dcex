@@ -1,3 +1,18 @@
+## 0.13.0 (2026-06-05)
+
+### Feat
+
+- add kucoin transfer and leverage support
+- complete kucoin support
+- complete okx endpoint coverage
+
+### Fix
+
+- complete gateio live endpoint coverage
+- complete bitmex live endpoint coverage
+- complete bitmart live endpoint coverage
+- harden bybit v5 live workflows
+
 ## 0.12.0 (2026-06-01)
 
 ### Feat
