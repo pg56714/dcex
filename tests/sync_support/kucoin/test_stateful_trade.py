@@ -17,6 +17,8 @@ KUCOIN_API_SECRET = os.getenv("KUCOIN_API_SECRET")
 KUCOIN_API_PASSPHRASE = os.getenv("KUCOIN_API_PASSPHRASE")
 SPOT_SYMBOL = "BTC-USDT-SPOT"
 FUTURES_SYMBOL = "BTC-USDT-SWAP"
+FUTURES_LEVERAGE = Decimal("20")
+TRANSFER_BUFFER_USDT = Decimal("0.1")
 
 
 @pytest.fixture
@@ -44,6 +46,11 @@ def _fmt(value: Decimal) -> str:
     return format(value.normalize(), "f")
 
 
+def _fmt_usdt_transfer(value: Decimal) -> str:
+    rounded = value.quantize(Decimal("0.00000001"), rounding=ROUND_DOWN)
+    return format(rounded.normalize(), "f")
+
+
 def _items(res: dict) -> list[dict]:
     data = res.get("data")
     if isinstance(data, list):
@@ -56,6 +63,36 @@ def _items(res: dict) -> list[dict]:
 def _available(client: Client, currency: str, type_: str) -> Decimal:
     res = client.get_account_balance(currency=currency, type=type_)
     return sum((_dec(item.get("available")) for item in _items(res)), Decimal("0"))
+
+
+def _futures_available_usdt(client: Client) -> Decimal:
+    data = client.get_futures_account(currency="USDT").get("data")
+    if not isinstance(data, dict):
+        return Decimal("0")
+    return _dec(data.get("availableBalance"))
+
+
+def _transfer_from_main(client: Client, amount: Decimal, to_account_type: str, reason: str) -> None:
+    main_available = _available(client, "USDT", "main")
+    if main_available < amount:
+        pytest.skip(reason)
+
+    client.flex_transfer(
+        currency="USDT",
+        amount=_fmt_usdt_transfer(amount),
+        fromAccountType="MAIN",
+        toAccountType=to_account_type,
+        clientOid=f"dcex-{uuid.uuid4().hex}",
+    )
+    time.sleep(2)
+
+
+def _transfer_amount(required: Decimal, available: Decimal, main_available: Decimal) -> Decimal:
+    needed = required - available
+    buffered = needed + TRANSFER_BUFFER_USDT
+    if main_available >= buffered:
+        return buffered
+    return needed
 
 
 def _spot_order_params(client: Client) -> tuple[str, str]:
@@ -98,15 +135,40 @@ def _futures_order_params(client: Client) -> tuple[int, str, Decimal, Decimal]:
     return int(max(lot, Decimal("1"))), _fmt(price), current_price, multiplier
 
 
+def _ensure_futures_cross_leverage(client: Client) -> None:
+    target_leverage = str(int(FUTURES_LEVERAGE))
+    data = client.get_futures_cross_margin_leverage(product_symbol=FUTURES_SYMBOL).get("data")
+    if isinstance(data, dict) and str(data.get("leverage")) == target_leverage:
+        return
+    client.modify_futures_cross_margin_leverage(
+        product_symbol=FUTURES_SYMBOL,
+        leverage=target_leverage,
+    )
+    time.sleep(1)
+
+
 def _skip_if_futures_margin_insufficient(
     client: Client,
     size: int,
     price: str,
     multiplier: Decimal,
-    leverage: Decimal = Decimal("3"),
+    leverage: Decimal = FUTURES_LEVERAGE,
 ) -> None:
-    available = _dec(client.get_futures_account(currency="USDT")["data"].get("availableBalance"))
+    _ensure_futures_cross_leverage(client)
     required_margin = Decimal(price) * multiplier * Decimal(size) / leverage * Decimal("1.25")
+    available = _futures_available_usdt(client)
+    if available >= required_margin:
+        return
+
+    main_available = _available(client, "USDT", "main")
+    transfer_amount = _transfer_amount(required_margin, available, main_available)
+    _transfer_from_main(
+        client,
+        transfer_amount,
+        "CONTRACT",
+        "Insufficient main USDT to fund KuCoin futures stateful order test.",
+    )
+    available = _futures_available_usdt(client)
     if available < required_margin:
         pytest.skip("Insufficient futures USDT for KuCoin futures post-only order.")
 
@@ -118,8 +180,37 @@ def _skip_if_spot_open_orders(client: Client) -> None:
 
 def _skip_if_spot_usdt_insufficient(client: Client, size: str, price: str) -> None:
     required = Decimal(size) * Decimal(price)
+    available = _available(client, "USDT", "trade")
+    if available >= required:
+        return
+
+    main_available = _available(client, "USDT", "main")
+    transfer_amount = _transfer_amount(required, available, main_available)
+    _transfer_from_main(
+        client,
+        transfer_amount,
+        "TRADE",
+        "Insufficient main USDT to fund KuCoin spot stateful order test.",
+    )
     if _available(client, "USDT", "trade") < required:
         pytest.skip("Insufficient spot trade USDT for KuCoin spot post-only order.")
+
+
+def _skip_if_spot_funds_insufficient(client: Client, funds: Decimal) -> None:
+    available = _available(client, "USDT", "trade")
+    if available >= funds:
+        return
+
+    main_available = _available(client, "USDT", "main")
+    transfer_amount = _transfer_amount(funds, available, main_available)
+    _transfer_from_main(
+        client,
+        transfer_amount,
+        "TRADE",
+        "Insufficient main USDT to fund KuCoin spot market round-trip.",
+    )
+    if _available(client, "USDT", "trade") < funds:
+        pytest.skip("Insufficient spot trade USDT for KuCoin spot market round-trip.")
 
 
 def _skip_if_futures_state(client: Client) -> None:
@@ -181,8 +272,7 @@ def test_spot_cancel_all_orders(client):
 def test_spot_market_round_trip(client):
     step, min_size, min_notional = _spot_step_and_min(client)
     funds = max(min_notional * Decimal("1.25"), Decimal("1"))
-    if _available(client, "USDT", "trade") < funds:
-        pytest.skip("Insufficient spot trade USDT for KuCoin spot market round-trip.")
+    _skip_if_spot_funds_insufficient(client, funds)
 
     btc_before = _available(client, "BTC", "trade")
     client.place_spot_market_buy_order(
@@ -213,7 +303,7 @@ def test_futures_post_only_order_lifecycle(client):
             size=size,
             price=price,
             clientOid=client_oid,
-            leverage=3,
+            leverage=int(FUTURES_LEVERAGE),
             marginMode="CROSS",
             positionSide="BOTH",
         )
@@ -246,7 +336,7 @@ def test_futures_cancel_by_client_oid(client):
             size=size,
             price=price,
             clientOid=client_oid,
-            leverage=3,
+            leverage=int(FUTURES_LEVERAGE),
             marginMode="CROSS",
             positionSide="BOTH",
         )
@@ -276,7 +366,7 @@ def test_futures_cancel_all_orders(client):
             size=size,
             price=price,
             clientOid=f"dcex-{uuid.uuid4().hex}",
-            leverage=3,
+            leverage=int(FUTURES_LEVERAGE),
             marginMode="CROSS",
             positionSide="BOTH",
         )
@@ -292,16 +382,18 @@ def test_futures_cancel_all_orders(client):
 def test_futures_market_round_trip(client):
     _skip_if_futures_state(client)
     size, _, current_price, multiplier = _futures_order_params(client)
-    available = _dec(client.get_futures_account(currency="USDT")["data"].get("availableBalance"))
-    required_margin = current_price * multiplier * Decimal(size) / Decimal("3") * Decimal("1.25")
-    if available < required_margin:
-        pytest.skip("Insufficient futures USDT for KuCoin futures market round-trip.")
+    _skip_if_futures_margin_insufficient(
+        client,
+        size,
+        _fmt(current_price),
+        multiplier,
+    )
 
     client.place_futures_market_buy_order(
         product_symbol=FUTURES_SYMBOL,
         size=size,
         clientOid=f"dcex-{uuid.uuid4().hex}",
-        leverage=3,
+        leverage=int(FUTURES_LEVERAGE),
         marginMode="CROSS",
         positionSide="BOTH",
     )
@@ -311,7 +403,7 @@ def test_futures_market_round_trip(client):
             product_symbol=FUTURES_SYMBOL,
             size=size,
             clientOid=f"dcex-{uuid.uuid4().hex}",
-            leverage=3,
+            leverage=int(FUTURES_LEVERAGE),
             marginMode="CROSS",
             positionSide="BOTH",
             reduceOnly=True,
@@ -324,7 +416,7 @@ def test_futures_market_round_trip(client):
                 product_symbol=FUTURES_SYMBOL,
                 size=size,
                 clientOid=f"dcex-{uuid.uuid4().hex}",
-                leverage=3,
+                leverage=int(FUTURES_LEVERAGE),
                 marginMode="CROSS",
                 positionSide="BOTH",
                 reduceOnly=True,

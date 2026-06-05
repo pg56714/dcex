@@ -12,6 +12,8 @@ class SpotAccount(str, Enum):
     """
 
     ACCOUNT_BALANCE = "/api/v1/accounts"
+    TRANSFER_QUOTAS = "/api/v1/accounts/transferable"
+    FLEX_TRANSFER = "/api/v3/accounts/universal-transfer"
 
     def __str__(self) -> str:
         return self.value
@@ -24,6 +26,8 @@ class FuturesAccount(str, Enum):
     POSITIONS = "/api/v1/positions"
     POSITION = "/api/v1/position"
     POSITION_MODE = "/api/v2/position/getPositionMode"
+    CROSS_MARGIN_LEVERAGE = "/api/v2/getCrossUserLeverage"
+    MODIFY_CROSS_MARGIN_LEVERAGE = "/api/v2/changeCrossUserLeverage"
 
     def __str__(self) -> str:
         return self.value

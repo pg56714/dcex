@@ -30,6 +30,12 @@ def test_get_account_balance(client):
 
 
 @pytest.mark.private
+def test_get_transfer_quotas(client):
+    res = client.get_transfer_quotas(currency="USDT", account_type="MAIN")
+    assert res is not None
+
+
+@pytest.mark.private
 def test_get_futures_account(client):
     res = client.get_futures_account(currency="USDT")
     assert res is not None
@@ -50,4 +56,10 @@ def test_get_futures_position(client):
 @pytest.mark.private
 def test_get_futures_position_mode(client):
     res = client.get_futures_position_mode()
+    assert res is not None
+
+
+@pytest.mark.private
+def test_get_futures_cross_margin_leverage(client):
+    res = client.get_futures_cross_margin_leverage(product_symbol="BTC-USDT-SWAP")
     assert res is not None
