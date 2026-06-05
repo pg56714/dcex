@@ -20,6 +20,15 @@ FUND_ACCOUNT = "fund"
 SPOT_ACCOUNT = "spot"
 SWAP_ACCOUNT = "USDTMPerp"
 
+pytestmark = [
+    pytest.mark.private,
+    pytest.mark.stateful,
+    pytest.mark.skipif(
+        os.getenv("RUN_LIVE_TRADING_TESTS") != "1",
+        reason="Set RUN_LIVE_TRADING_TESTS=1 to run real BingX order tests.",
+    ),
+]
+
 
 @pytest.fixture
 def client():
@@ -65,7 +74,7 @@ def _spot_available(client: Client, asset: str) -> Decimal:
 
 
 def _fund_available(client: Client, asset: str) -> Decimal:
-    balances = client.get_fund_account_balance(asset=asset).get("data", {}).get("balances", [])
+    balances = client.get_fund_account_balance(asset=asset).get("data", {}).get("assets", [])
     for item in balances:
         if item.get("asset") == asset:
             return _dec(item.get("free"))
