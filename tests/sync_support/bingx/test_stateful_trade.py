@@ -138,6 +138,117 @@ def _spot_order_params(client: Client) -> tuple[str, str]:
     return _fmt(max(quantity, min_size)), _fmt(price)
 
 
+def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
+    details = client.ptm.get_trading_details("bingx", SPOT_SYMBOL)
+    return (
+        _dec(details["price_precision"], "0.01"),
+        _dec(details["size_precision"], "0.000001"),
+        max(_dec(details["min_notional"], "0.5"), Decimal("0.5")),
+    )
+
+
+def _spot_market_quote_amount(client: Client) -> Decimal:
+    _, _, min_notional = _spot_details(client)
+    return max(min_notional * Decimal("2"), Decimal("2"))
+
+
+def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
+    tick, step, min_notional = _spot_details(client)
+    best_ask = _dec(
+        client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]["asks"][0][0]
+    )
+    price = _round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP)
+    quantity = _round_to_step(_spot_market_quote_amount(client) / price, step, ROUND_UP)
+    return _fmt(quantity), _fmt(price)
+
+
+def _spot_fillable_limit_sell_price(client: Client) -> str:
+    tick, _, _ = _spot_details(client)
+    best_bid = _dec(
+        client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]["bids"][0][0]
+    )
+    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+
+
+def _spot_post_only_sell_price(client: Client) -> str:
+    tick, _, _ = _spot_details(client)
+    best_ask = _dec(
+        client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]["asks"][0][0]
+    )
+    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+
+
+def _spot_trade_delta(client: Client, before: Decimal, asset: str) -> Decimal:
+    return max(_spot_available(client, asset) - before, Decimal("0"))
+
+
+def _spot_market_buy_delta(client: Client, quote_amount: Decimal) -> Decimal:
+    before_btc = _spot_available(client, "BTC")
+    assert (
+        client.place_spot_market_buy_order(
+            product_symbol=SPOT_SYMBOL,
+            quoteOrderQty=_fmt(quote_amount),
+            clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+        )
+        is not None
+    )
+    time.sleep(2)
+    return _spot_trade_delta(client, before_btc, "BTC")
+
+
+def _spot_sell_quantity(client: Client, quantity: Decimal) -> str:
+    _, step, _ = _spot_details(client)
+    return _fmt(_round_to_step(quantity, step, ROUND_DOWN))
+
+
+def _swap_current_price(client: Client) -> Decimal:
+    return _dec(client.get_ticker(product_symbol=SWAP_SYMBOL)["data"]["lastPrice"])
+
+
+def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
+    current_price = _swap_current_price(client)
+    required = Decimal(quantity) * current_price / Decimal("10") * Decimal("1.50")
+    _ensure_usdt_for_account(
+        client=client,
+        to_account=SWAP_ACCOUNT,
+        required=required,
+        current_available=_swap_available_usdt(client),
+    )
+    if _swap_available_usdt(client) < required:
+        pytest.skip("BingX swap USDT remains insufficient after fund transfer.")
+
+
+def _swap_fillable_limit_buy_price(client: Client) -> float:
+    tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
+    price = _round_to_step(_swap_current_price(client) * Decimal("1.02"), tick, ROUND_UP)
+    return float(_fmt(price))
+
+
+def _swap_fillable_limit_sell_price(client: Client) -> float:
+    tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
+    price = _round_to_step(_swap_current_price(client) * Decimal("0.98"), tick, ROUND_DOWN)
+    return float(_fmt(price))
+
+
+def _position_id(client: Client, side: str) -> str | None:
+    for position in _positions(client):
+        if position.get("positionSide") == side and _dec(
+            position.get("positionAmt", position.get("positionAmount", "0"))
+        ) != Decimal("0"):
+            position_id = position.get("positionId")
+            return str(position_id) if position_id is not None else None
+    return None
+
+
+def _wait_for_position(client: Client, side: str) -> str | None:
+    for _ in range(5):
+        position_id = _position_id(client, side)
+        if position_id is not None:
+            return position_id
+        time.sleep(1)
+    return None
+
+
 def _ensure_usdt_for_account(
     client: Client,
     to_account: str,
@@ -341,6 +452,125 @@ def test_swap_replace_order(client):
 
 
 @pytest.mark.private
+def test_swap_market_buy_and_close_position(client):
+    _skip_if_swap_state(client)
+    quantity, _ = _swap_order_params(client)
+    _ensure_swap_usdt_for_quantity(client, quantity)
+
+    try:
+        assert (
+            client.place_swap_market_buy_order(
+                product_symbol=SWAP_SYMBOL,
+                quantity=float(quantity),
+                positionSide="LONG",
+                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            )
+            is not None
+        )
+        position_id = _wait_for_position(client, "LONG")
+        assert position_id is not None
+        assert client.close_swap_position(positionId=position_id) is not None
+        time.sleep(2)
+        assert not _positions(client)
+    finally:
+        if _positions(client):
+            client.close_swap_all_positions(product_symbol=SWAP_SYMBOL)
+
+
+@pytest.mark.private
+def test_swap_market_sell_and_close_all_positions(client):
+    _skip_if_swap_state(client)
+    quantity, _ = _swap_order_params(client)
+    _ensure_swap_usdt_for_quantity(client, quantity)
+
+    try:
+        assert (
+            client.place_swap_market_sell_order(
+                product_symbol=SWAP_SYMBOL,
+                quantity=float(quantity),
+                positionSide="SHORT",
+                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            )
+            is not None
+        )
+        assert _wait_for_position(client, "SHORT") is not None
+        assert client.close_swap_all_positions(product_symbol=SWAP_SYMBOL) is not None
+        time.sleep(2)
+        assert not _positions(client)
+    finally:
+        if _positions(client):
+            client.close_swap_all_positions(product_symbol=SWAP_SYMBOL)
+
+
+@pytest.mark.private
+def test_swap_fillable_limit_buy_and_sell(client):
+    _skip_if_swap_state(client)
+    quantity, _ = _swap_order_params(client)
+    _ensure_swap_usdt_for_quantity(client, quantity)
+
+    try:
+        assert (
+            client.place_swap_limit_buy_order(
+                product_symbol=SWAP_SYMBOL,
+                quantity=float(quantity),
+                price=_swap_fillable_limit_buy_price(client),
+                positionSide="LONG",
+                timeInForce="GTC",
+                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            )
+            is not None
+        )
+        assert _wait_for_position(client, "LONG") is not None
+        assert client.close_swap_all_positions(product_symbol=SWAP_SYMBOL) is not None
+        time.sleep(2)
+        assert not _positions(client)
+
+        assert (
+            client.place_swap_limit_sell_order(
+                product_symbol=SWAP_SYMBOL,
+                quantity=float(quantity),
+                price=_swap_fillable_limit_sell_price(client),
+                positionSide="SHORT",
+                timeInForce="GTC",
+                clientOrderId=f"dcex-{uuid.uuid4().hex}",
+            )
+            is not None
+        )
+        assert _wait_for_position(client, "SHORT") is not None
+        assert client.close_swap_all_positions(product_symbol=SWAP_SYMBOL) is not None
+        time.sleep(2)
+        assert not _positions(client)
+    finally:
+        if _swap_open_orders(client):
+            client.cancel_swap_all_orders(product_symbol=SWAP_SYMBOL)
+        if _positions(client):
+            client.close_swap_all_positions(product_symbol=SWAP_SYMBOL)
+
+
+@pytest.mark.private
+def test_swap_post_only_sell_order_lifecycle(client):
+    _skip_if_swap_state(client)
+    quantity, _ = _swap_order_params(client)
+    _ensure_swap_usdt_for_quantity(client, quantity)
+    tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
+    price = _fmt(_round_to_step(_swap_current_price(client) * Decimal("1.50"), tick, ROUND_UP))
+    order_id = None
+    try:
+        order = client.place_swap_post_only_sell_order(
+            product_symbol=SWAP_SYMBOL,
+            quantity=float(quantity),
+            price=float(price),
+            positionSide="SHORT",
+            clientOrderId=f"dcex-{uuid.uuid4().hex}",
+        )
+        order_id = order["data"]["order"]["orderId"]
+        assert client.get_order_detail(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
+    finally:
+        if order_id is not None:
+            client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
+
+
+@pytest.mark.private
 def test_spot_post_only_order_lifecycle(client):
     _skip_if_spot_state(client)
     quantity, price = _spot_order_params(client)
@@ -358,6 +588,102 @@ def test_spot_post_only_order_lifecycle(client):
     finally:
         if order_id is not None:
             client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+
+
+@pytest.mark.private
+def test_spot_market_buy_and_sell(client):
+    _skip_if_spot_state(client)
+    quote_amount = _spot_market_quote_amount(client)
+    _ensure_spot_usdt(client, "1", _fmt(quote_amount))
+    before_btc = _spot_available(client, "BTC")
+
+    try:
+        bought = _spot_market_buy_delta(client, quote_amount)
+        sell_quantity = _spot_sell_quantity(client, bought)
+        assert Decimal(sell_quantity) > 0
+        assert (
+            client.place_spot_market_sell_order(
+                product_symbol=SPOT_SYMBOL,
+                quantity=sell_quantity,
+                clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+            )
+            is not None
+        )
+        time.sleep(2)
+    finally:
+        remaining = _spot_sell_quantity(client, _spot_trade_delta(client, before_btc, "BTC"))
+        if Decimal(remaining) > 0:
+            client.place_spot_market_sell_order(product_symbol=SPOT_SYMBOL, quantity=remaining)
+
+
+@pytest.mark.private
+def test_spot_fillable_limit_buy_and_sell(client):
+    _skip_if_spot_state(client)
+    quantity, price = _spot_fillable_limit_buy_params(client)
+    _ensure_spot_usdt(client, quantity, price)
+    before_btc = _spot_available(client, "BTC")
+
+    try:
+        assert (
+            client.place_spot_limit_buy_order(
+                product_symbol=SPOT_SYMBOL,
+                quantity=quantity,
+                price=price,
+                timeInForce="GTC",
+                clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+            )
+            is not None
+        )
+        time.sleep(2)
+        bought = _spot_trade_delta(client, before_btc, "BTC")
+        sell_quantity = _spot_sell_quantity(client, bought)
+        assert Decimal(sell_quantity) > 0
+        assert (
+            client.place_spot_limit_sell_order(
+                product_symbol=SPOT_SYMBOL,
+                quantity=sell_quantity,
+                price=_spot_fillable_limit_sell_price(client),
+                timeInForce="GTC",
+                clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+            )
+            is not None
+        )
+    finally:
+        if _spot_open_orders(client):
+            client.cancel_spot_open_orders(product_symbol=SPOT_SYMBOL)
+        remaining = _spot_trade_delta(client, before_btc, "BTC")
+        sell_quantity = _spot_sell_quantity(client, remaining)
+        if Decimal(sell_quantity) > 0:
+            client.place_spot_market_sell_order(product_symbol=SPOT_SYMBOL, quantity=sell_quantity)
+
+
+@pytest.mark.private
+def test_spot_post_only_sell_order_lifecycle(client):
+    _skip_if_spot_state(client)
+    quote_amount = _spot_market_quote_amount(client)
+    _ensure_spot_usdt(client, "1", _fmt(quote_amount))
+    before_btc = _spot_available(client, "BTC")
+    order_id = None
+
+    try:
+        bought = _spot_market_buy_delta(client, quote_amount)
+        sell_quantity = _spot_sell_quantity(client, bought)
+        assert Decimal(sell_quantity) > 0
+        order = client.place_spot_post_only_sell_order(
+            product_symbol=SPOT_SYMBOL,
+            quantity=sell_quantity,
+            price=_spot_post_only_sell_price(client),
+            clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+        )
+        order_id = order["data"]["orderId"]
+        assert client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
+    finally:
+        if order_id is not None:
+            client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+        remaining = _spot_trade_delta(client, before_btc, "BTC")
+        sell_quantity = _spot_sell_quantity(client, remaining)
+        if Decimal(sell_quantity) > 0:
+            client.place_spot_market_sell_order(product_symbol=SPOT_SYMBOL, quantity=sell_quantity)
 
 
 @pytest.mark.private
