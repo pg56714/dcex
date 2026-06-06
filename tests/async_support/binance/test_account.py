@@ -1,8 +1,12 @@
+# ruff: noqa: ANN001, ANN201, D100, D103
+
+import os
+
 import pytest
 import pytest_asyncio
-from dcex.async_support.binance.client import Client
-import os
 from dotenv import load_dotenv
+
+from dcex.async_support.binance.client import Client
 
 load_dotenv()
 
@@ -38,6 +42,27 @@ async def test_get_futures_account_balance(client):
 @pytest.mark.private
 async def test_get_futures_account_info(client):
     res = await client.get_futures_account_info()
+    assert res is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_get_wallet_balance(client):
+    res = await client.get_wallet_balance(quoteAsset="USDT")
+    assert isinstance(res, list)
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_get_funding_wallet(client):
+    res = await client.get_funding_wallet(asset="USDT", needBtcValuation=True)
+    assert isinstance(res, list)
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_get_universal_transfer_history(client):
+    res = await client.get_universal_transfer_history(type_="FUNDING_MAIN", size=1)
     assert res is not None
 
 

@@ -1,7 +1,11 @@
-from dcex.binance.client import Client
+# ruff: noqa: ANN001, ANN201, D100, D103
+
 import os
-from dotenv import load_dotenv
+
 import pytest
+from dotenv import load_dotenv
+
+from dcex.binance.client import Client
 
 load_dotenv()
 
@@ -33,6 +37,24 @@ def test_get_futures_account_balance(client):
 @pytest.mark.private
 def test_get_futures_account_info(client):
     res = client.get_futures_account_info()
+    assert res is not None
+
+
+@pytest.mark.private
+def test_get_wallet_balance(client):
+    res = client.get_wallet_balance(quoteAsset="USDT")
+    assert isinstance(res, list)
+
+
+@pytest.mark.private
+def test_get_funding_wallet(client):
+    res = client.get_funding_wallet(asset="USDT", needBtcValuation=True)
+    assert isinstance(res, list)
+
+
+@pytest.mark.private
+def test_get_universal_transfer_history(client):
+    res = client.get_universal_transfer_history(type_="FUNDING_MAIN", size=1)
     assert res is not None
 
 

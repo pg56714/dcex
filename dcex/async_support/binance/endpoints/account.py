@@ -12,6 +12,17 @@ class SpotAccount(str, Enum):
         return self.value
 
 
+class WalletAsset(str, Enum):
+    """Binance wallet asset endpoints."""
+
+    WALLET_BALANCE = "/sapi/v1/asset/wallet/balance"
+    FUNDING_WALLET = "/sapi/v1/asset/get-funding-asset"
+    UNIVERSAL_TRANSFER = "/sapi/v1/asset/transfer"
+
+    def __str__(self) -> str:
+        return self.value
+
+
 class FuturesAccount(str, Enum):
     """Futures trading account endpoints."""
 

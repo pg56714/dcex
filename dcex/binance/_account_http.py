@@ -1,6 +1,8 @@
+from typing import Any, cast
+
 from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.account import FuturesAccount, SpotAccount
+from .endpoints.account import FuturesAccount, SpotAccount, WalletAsset
 from .enums import BinanceProductType
 
 
@@ -93,6 +95,101 @@ class AccountHTTP(HTTPManager):
             query={},
         )
         return res
+
+    def get_wallet_balance(
+        self,
+        quoteAsset: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get the estimated balance of every activated Binance wallet."""
+        payload = {}
+        if quoteAsset is not None:
+            payload["quoteAsset"] = quoteAsset
+        return cast(
+            list[dict[str, Any]],
+            self._request(
+                method="GET",
+                path=WalletAsset.WALLET_BALANCE,
+                query=payload,
+            ),
+        )
+
+    def get_funding_wallet(
+        self,
+        asset: str | None = None,
+        needBtcValuation: bool | str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get assets held in the Binance Funding Wallet."""
+        payload = {}
+        if asset is not None:
+            payload["asset"] = asset
+        if needBtcValuation is not None:
+            payload["needBtcValuation"] = (
+                str(needBtcValuation).lower()
+                if isinstance(needBtcValuation, bool)
+                else needBtcValuation
+            )
+        return cast(
+            list[dict[str, Any]],
+            self._request(
+                method="POST",
+                path=WalletAsset.FUNDING_WALLET,
+                query=payload,
+            ),
+        )
+
+    def create_universal_transfer(
+        self,
+        type_: str,
+        asset: str,
+        amount: str,
+        fromSymbol: str | None = None,
+        toSymbol: str | None = None,
+    ) -> dict:
+        """Transfer an asset between Binance account wallets."""
+        payload = {
+            "type": type_,
+            "asset": asset,
+            "amount": amount,
+        }
+        if fromSymbol is not None:
+            payload["fromSymbol"] = fromSymbol
+        if toSymbol is not None:
+            payload["toSymbol"] = toSymbol
+        return self._request(
+            method="POST",
+            path=WalletAsset.UNIVERSAL_TRANSFER,
+            query=payload,
+        )
+
+    def get_universal_transfer_history(
+        self,
+        type_: str,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        fromSymbol: str | None = None,
+        toSymbol: str | None = None,
+    ) -> dict:
+        """Get Binance universal transfer records."""
+        payload: dict[str, Any] = {"type": type_}
+        if startTime is not None:
+            payload["startTime"] = startTime
+        if endTime is not None:
+            payload["endTime"] = endTime
+        if current is not None:
+            payload["current"] = current
+        if size is not None:
+            payload["size"] = size
+        if fromSymbol is not None:
+            payload["fromSymbol"] = fromSymbol
+        if toSymbol is not None:
+            payload["toSymbol"] = toSymbol
+        return self._request(
+            method="GET",
+            path=WalletAsset.UNIVERSAL_TRANSFER,
+            query=payload,
+        )
 
     def get_listen_key(self, market_type: str = BinanceProductType.SWAP) -> str:
         """

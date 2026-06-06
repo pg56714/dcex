@@ -13,7 +13,7 @@ from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
-from .endpoints.account import FuturesAccount, SpotAccount
+from .endpoints.account import FuturesAccount, SpotAccount, WalletAsset
 from .endpoints.market import FuturesMarket, SpotMarket
 from .endpoints.trade import FuturesTrade, SpotTrade
 
@@ -40,6 +40,7 @@ class HTTPManager(BaseHTTPManager):
             SpotMarket,
             SpotTrade,
             SpotAccount,
+            WalletAsset,
         },
     }
 
@@ -52,7 +53,15 @@ class HTTPManager(BaseHTTPManager):
 
     def _get_base_url(
         self,
-        path: SpotAccount | FuturesAccount | SpotMarket | FuturesMarket | SpotTrade | FuturesTrade,
+        path: (
+            SpotAccount
+            | FuturesAccount
+            | WalletAsset
+            | SpotMarket
+            | FuturesMarket
+            | SpotTrade
+            | FuturesTrade
+        ),
     ) -> str:
         for base_url, enums in self.api_map.items():
             if type(path) in enums:
@@ -71,7 +80,15 @@ class HTTPManager(BaseHTTPManager):
     async def _request(
         self,
         method: str,
-        path: SpotAccount | FuturesAccount | SpotMarket | FuturesMarket | SpotTrade | FuturesTrade,
+        path: (
+            SpotAccount
+            | FuturesAccount
+            | WalletAsset
+            | SpotMarket
+            | FuturesMarket
+            | SpotTrade
+            | FuturesTrade
+        ),
         query: dict | None = None,
         signed: bool = True,
     ) -> dict:
