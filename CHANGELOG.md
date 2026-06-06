@@ -1,3 +1,13 @@
+## 0.15.0 (2026-06-06)
+
+### Feat
+
+- add binance wallet transfer support
+
+### Fix
+
+- validate okx deposit status queries
+
 ## 0.14.0 (2026-06-05)
 
 ### Feat
