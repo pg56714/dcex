@@ -1,4 +1,5 @@
 """Offline request-path regression tests for HTTP managers."""
+# ruff: noqa: ANN401, D103
 
 from __future__ import annotations
 
@@ -17,11 +18,17 @@ TS_S = "1700000000"
 
 
 class _FakeResponse:
-    def __init__(self, payload: dict[str, Any] | None = None, status_code: int = 200) -> None:
+    def __init__(
+        self,
+        payload: Any | None = None,  # noqa: ANN401
+        status_code: int = 200,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         self._payload = payload or {}
         self.status_code = status_code
-        self.headers: dict[str, str] = {}
+        self.headers: dict[str, str] = headers or {}
         self.text = str(self._payload)
+        self.content = b"" if payload is None else b"{}"
 
     @property
     def ok(self) -> bool:
@@ -41,13 +48,19 @@ class _BadJsonResponse(_FakeResponse):
 
 
 class _CaptureSession:
-    def __init__(self, payload: dict[str, Any] | None = None, status_code: int = 200) -> None:
+    def __init__(
+        self,
+        payload: Any | None = None,  # noqa: ANN401
+        status_code: int = 200,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         self.payload = payload
         self.status_code = status_code
+        self.headers = headers
         self.calls: list[tuple[str, str, dict[str, Any]]] = []
 
     def _response(self) -> _FakeResponse:
-        return _FakeResponse(self.payload, self.status_code)
+        return _FakeResponse(self.payload, self.status_code, self.headers)
 
     def get(self, url: str, **kwargs: Any) -> _FakeResponse:
         self.calls.append(("GET", url, kwargs))
@@ -78,13 +91,19 @@ class _BadJsonSession(_CaptureSession):
 class _AsyncCaptureSession:
     is_closed = False
 
-    def __init__(self, payload: dict[str, Any] | None = None, status_code: int = 200) -> None:
+    def __init__(
+        self,
+        payload: Any | None = None,  # noqa: ANN401
+        status_code: int = 200,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         self.payload = payload
         self.status_code = status_code
+        self.headers = headers
         self.calls: list[tuple[str, str, dict[str, Any]]] = []
 
     def _response(self) -> _FakeResponse:
-        return _FakeResponse(self.payload, self.status_code)
+        return _FakeResponse(self.payload, self.status_code, self.headers)
 
     async def get(self, url: str, **kwargs: Any) -> _FakeResponse:
         self.calls.append(("GET", url, kwargs))
@@ -110,6 +129,173 @@ class _AsyncCaptureSession:
 class _AsyncBadJsonSession(_AsyncCaptureSession):
     def _response(self) -> _FakeResponse:
         return _BadJsonResponse(self.status_code)
+
+
+def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
+    from dcex.binance.endpoints.market import SpotMarket
+    from dcex.bitmart.endpoints.market import SpotMarket as BitmartSpotMarket
+
+    return [
+        (
+            "dcex.binance._http_manager",
+            SpotMarket.SERVER_TIME,
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.bingx._http_manager",
+            "/openApi/swap/v2/quote/ticker",
+            {"payload": {"code": 0}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.bitmart._http_manager",
+            BitmartSpotMarket.GET_TRADING_PAIRS_DETAILS,
+            {"payload": {"code": 1000}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.bitmex._http_manager",
+            "/api/v1/instrument",
+            {"payload": {"ok": True}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.bybit._http_manager",
+            "/v5/market/time",
+            {"payload": {"retCode": 0}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.gateio._http_manager",
+            "/spot/currencies",
+            {"payload": {"ok": True}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.hyperliquid._http_manager",
+            "/info",
+            {"method": "POST", "payload": {"ok": True}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.kucoin._http_manager",
+            "/api/v1/timestamp",
+            {"payload": {"code": "200000", "data": 1}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.okx._http_manager",
+            "/api/v5/public/time",
+            {"payload": {"code": "0", "data": []}, "kwargs": {"signed": False}},
+        ),
+    ]
+
+
+def _async_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
+    from dcex.async_support.binance.endpoints.market import SpotMarket
+    from dcex.async_support.bitmart.endpoints.market import (
+        SpotMarket as AsyncBitmartSpotMarket,
+    )
+
+    return [
+        (
+            "dcex.async_support.binance._http_manager",
+            SpotMarket.SERVER_TIME,
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.bingx._http_manager",
+            "/openApi/swap/v2/quote/ticker",
+            {"payload": {"code": 0}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.bitmart._http_manager",
+            AsyncBitmartSpotMarket.GET_TRADING_PAIRS_DETAILS,
+            {"payload": {"code": 1000}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.bitmex._http_manager",
+            "/api/v1/instrument",
+            {"payload": {"ok": True}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.bybit._http_manager",
+            "/v5/market/time",
+            {
+                "attrs": {"endpoint": "https://api.bybit.com"},
+                "payload": {"retCode": 0},
+                "kwargs": {"signed": False},
+            },
+        ),
+        (
+            "dcex.async_support.gateio._http_manager",
+            "/spot/currencies",
+            {"payload": {"ok": True}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.hyperliquid._http_manager",
+            "/info",
+            {
+                "attrs": {"endpoint": "https://api.hyperliquid.xyz"},
+                "method": "POST",
+                "payload": {"ok": True},
+                "kwargs": {"signed": False},
+            },
+        ),
+        (
+            "dcex.async_support.kucoin._http_manager",
+            "/api/v1/timestamp",
+            {"payload": {"code": "200000", "data": 1}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.okx._http_manager",
+            "/api/v5/public/time",
+            {"payload": {"code": "0", "data": []}, "kwargs": {"signed": False}},
+        ),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("module_name", "path", "case"),
+    _sync_header_cases(),
+    ids=[
+        case[0].removeprefix("dcex.").replace("._http_manager", "") for case in _sync_header_cases()
+    ],
+)
+def test_sync_http_managers_store_last_response_headers(
+    module_name: str,
+    path: object,
+    case: dict[str, Any],
+) -> None:
+    headers = {"x-test-rate-limit": "42"}
+    module = import_module(module_name)
+    manager = module.HTTPManager(preload_product_table=False)
+    for name, value in case.get("attrs", {}).items():
+        setattr(manager, name, value)
+    manager.session = _CaptureSession(case["payload"], headers=headers)
+
+    manager._request(case.get("method", "GET"), path, **case.get("kwargs", {}))
+
+    assert manager.last_response_headers == headers
+
+
+@pytest.mark.parametrize(
+    ("module_name", "path", "case"),
+    _async_header_cases(),
+    ids=[
+        case[0].removeprefix("dcex.async_support.").replace("._http_manager", "")
+        for case in _async_header_cases()
+    ],
+)
+@pytest.mark.asyncio
+async def test_async_http_managers_store_last_response_headers(
+    module_name: str,
+    path: object,
+    case: dict[str, Any],
+) -> None:
+    headers = {"x-test-rate-limit": "42"}
+    module = import_module(module_name)
+    manager = module.HTTPManager(preload_product_table=False)
+    for name, value in case.get("attrs", {}).items():
+        setattr(manager, name, value)
+    manager.session = _AsyncCaptureSession(case["payload"], headers=headers)
+
+    await manager._request(case.get("method", "GET"), path, **case.get("kwargs", {}))
+
+    assert manager.last_response_headers == headers
 
 
 def _gateio_expected_signature(query_string: str) -> str:

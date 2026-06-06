@@ -10,6 +10,7 @@ from urllib.parse import urlencode
 import httpx
 import msgspec
 
+from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
@@ -23,7 +24,9 @@ def _sign(plain: bytes, key: bytes) -> str:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
+    EXCHANGE = Common.KUCOIN
+
     base_url: str = field(default="https://api.kucoin.com")
     futures_base_url: str = field(default="https://api-futures.kucoin.com")
     api_key: str | None = field(default=None, repr=False)
@@ -154,6 +157,7 @@ class HTTPManager:
                 resp_headers=dict(response.headers) if response else None,
             ) from e
         else:
+            self._store_response_headers(response)
             try:
                 data = response.json()
             except Exception as exc:

@@ -31,6 +31,7 @@ class BaseHTTPManager:
 
     #: The exchange this manager talks to. Overridden by each subclass.
     EXCHANGE: ClassVar[Common | None] = None
+    last_response_headers: dict[str, str] | None = None
 
     def _setup_logger(self, logger: logging.Logger | None) -> logging.Logger:
         """
@@ -69,3 +70,9 @@ class BaseHTTPManager:
         logger = getattr(self, "_logger", None)
         if logger is not None:
             logger.error("%s request failed [%s]: %s", self.EXCHANGE, status_code, message)
+
+    def _store_response_headers(self, response: object) -> dict[str, str]:
+        """Store raw HTTP response headers from the latest completed response."""
+        headers = dict(getattr(response, "headers", {}) or {})
+        self.last_response_headers = headers
+        return headers

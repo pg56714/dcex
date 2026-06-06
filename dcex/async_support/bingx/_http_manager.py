@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 
 import httpx
 
+from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ..product_table.manager import ProductTableManager
@@ -71,8 +72,10 @@ def parse_param(params_map: dict[str, Any]) -> str:
 
 
 @dataclass
-class HTTPManager:
+class HTTPManager(BaseHTTPManager):
     """HTTP manager for BingX API requests with authentication and error handling."""
+
+    EXCHANGE = Common.BINGX
 
     api_key: str | None = field(default=None, repr=False)
     api_secret: str | None = field(default=None, repr=False)
@@ -187,6 +190,7 @@ class HTTPManager:
                 resp_headers=resp_headers,
             ) from e
         else:
+            self._store_response_headers(response)
             try:
                 data = {"code": 0} if not response.content else response.json()
             except Exception as exc:

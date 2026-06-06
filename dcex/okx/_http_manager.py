@@ -241,6 +241,7 @@ class HTTPManager(BaseHTTPManager):
                 resp_headers=None,
             ) from e
         else:
+            self._store_response_headers(response)
             try:
                 data = response.json()
             except Exception as exc:

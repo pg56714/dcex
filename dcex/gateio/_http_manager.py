@@ -233,6 +233,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
+            self._store_response_headers(response)
             try:
                 data = response.json()
             except Exception as exc:
