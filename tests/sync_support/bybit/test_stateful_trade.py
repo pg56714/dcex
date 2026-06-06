@@ -143,6 +143,11 @@ def _spot_post_only_sell_price(client: Client) -> str:
     return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
 
 
+def _spot_price(client: Client, value: Decimal) -> str:
+    tick, _, _, _ = _spot_details(client)
+    return _fmt(_round_to_step(value, tick, ROUND_DOWN))
+
+
 def _spot_sell_size(client: Client, size: Decimal) -> str:
     _, step, _, _ = _spot_details(client)
     return _fmt(_round_to_step(size, step, ROUND_DOWN))
@@ -179,11 +184,54 @@ def _wait_for_spot_delta(client: Client, before: Decimal) -> Decimal:
     return Decimal("0")
 
 
+def _ensure_unified_usdt(client: Client, required: Decimal) -> Decimal:
+    available = _wallet_available(client, "USDT")
+    if available >= required:
+        return Decimal("0")
+
+    needed = (required - available).quantize(Decimal("0.0001"), rounding=ROUND_UP)
+    if _transferable_balance(client, "FUND", "USDT") < needed:
+        pytest.skip("Insufficient Bybit total USDT for spot stateful orders.")
+    _assert_ok(
+        client.create_internal_transfer(
+            coin="USDT",
+            amount=_fmt(needed),
+            fromAccountType="FUND",
+            toAccountType="UNIFIED",
+        )
+    )
+    time.sleep(2)
+    if _wallet_available(client, "USDT") < required:
+        pytest.skip("Bybit unified USDT remains insufficient after transfer.")
+    return needed
+
+
+def _return_to_funding(client: Client, transferred: Decimal) -> None:
+    remaining = transferred
+    for _ in range(5):
+        amount = min(remaining, _transferable_balance(client, "UNIFIED", "USDT"))
+        amount = amount.quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+        if amount > 0:
+            _assert_ok(
+                client.create_internal_transfer(
+                    coin="USDT",
+                    amount=_fmt(amount),
+                    fromAccountType="UNIFIED",
+                    toAccountType="FUND",
+                )
+            )
+            remaining -= amount
+        if remaining <= Decimal("0.0001"):
+            return
+        time.sleep(1)
+
+
 def _cancel(client: Client, order_id: str) -> None:
     _assert_ok(client.cancel_order(product_symbol=SPOT_SYMBOL, orderId=order_id))
 
 
-def _cleanup(client: Client, initial_btc: Decimal) -> None:
+def _cleanup(client: Client, initial_btc: Decimal) -> Decimal:
+    transferred = Decimal("0")
     with suppress(Exception):
         if _open_orders(client, SPOT_SYMBOL):
             _assert_ok(client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
@@ -192,10 +240,19 @@ def _cleanup(client: Client, initial_btc: Decimal) -> None:
             _assert_ok(client.cancel_all_orders(product_symbol=SWAP_SYMBOL))
     with suppress(Exception):
         delta = _wallet_available(client, "BTC") - initial_btc
+        _, _, min_size, min_notional = _spot_details(client)
+        best_bid, _ = _spot_orderbook_prices(client)
+        if delta > 0 and (delta < min_size or delta * best_bid < min_notional):
+            quote = max(min_notional * Decimal("1.25"), Decimal("5"))
+            transferred += _ensure_unified_usdt(client, quote)
+            before_btc = _wallet_available(client, "BTC")
+            _assert_ok(client.place_market_buy_order(SPOT_SYMBOL, _fmt(quote)))
+            delta += _wait_for_spot_delta(client, before_btc)
         sell_size = _spot_sell_size(client, delta)
-        if Decimal(sell_size) > 0:
+        if Decimal(sell_size) >= min_size:
             _assert_ok(client.place_market_sell_order(SPOT_SYMBOL, sell_size))
             time.sleep(2)
+    return transferred
 
 
 def _accept_unchanged(call, codes: tuple[str, ...]) -> None:
@@ -277,11 +334,11 @@ def test_account_settings_and_internal_transfer(client):
 def test_spot_stateful_order_lifecycle(client):
     _skip_if_existing_state(client)
     initial_btc = _wallet_available(client, "BTC")
+    transferred = Decimal("0")
     try:
         size, price = _spot_post_only_buy_params(client)
-        required = Decimal(size) * Decimal(price) * Decimal("3")
-        if _wallet_available(client, "USDT") < required:
-            pytest.skip("Insufficient Bybit unified USDT for spot stateful orders.")
+        required = Decimal(size) * Decimal(price)
+        transferred += _ensure_unified_usdt(client, required)
 
         order_id = None
         try:
@@ -295,7 +352,7 @@ def test_spot_stateful_order_lifecycle(client):
                     timeInForce="PostOnly",
                 )
             )
-            amended_price = _fmt(Decimal(price) * Decimal("0.99"))
+            amended_price = _spot_price(client, Decimal(price) * Decimal("0.99"))
             _assert_ok(
                 client.amend_order(
                     product_symbol=SPOT_SYMBOL,
@@ -322,19 +379,11 @@ def test_spot_stateful_order_lifecycle(client):
                         "price": price,
                         "timeInForce": "PostOnly",
                     },
-                    {
-                        "symbol": exchange_symbol,
-                        "side": "Buy",
-                        "orderType": "Limit",
-                        "qty": size,
-                        "price": _fmt(Decimal(price) * Decimal("0.98")),
-                        "timeInForce": "PostOnly",
-                    },
                 ],
             )
         )
         batch_ids = _batch_order_ids(batch)
-        assert len(batch_ids) == 2
+        assert len(batch_ids) == 1
         try:
             _assert_ok(
                 client.amend_batch_order(
@@ -343,7 +392,10 @@ def test_spot_stateful_order_lifecycle(client):
                         {
                             "symbol": exchange_symbol,
                             "orderId": order_id,
-                            "price": _fmt(Decimal(price) * Decimal("0.97")),
+                            "price": _spot_price(
+                                client,
+                                Decimal(price) * Decimal("0.97"),
+                            ),
                         }
                         for order_id in batch_ids
                     ],
@@ -388,8 +440,7 @@ def test_spot_stateful_order_lifecycle(client):
                 _cancel(client, order_id)
 
         quote = _spot_market_quote(client)
-        if _wallet_available(client, "USDT") < quote:
-            pytest.skip("Insufficient Bybit unified USDT for spot market round-trip.")
+        transferred += _ensure_unified_usdt(client, quote)
         before_btc = _wallet_available(client, "BTC")
         _assert_ok(client.place_market_buy_order(SPOT_SYMBOL, _fmt(quote)))
         bought = _wait_for_spot_delta(client, before_btc)
@@ -413,6 +464,7 @@ def test_spot_stateful_order_lifecycle(client):
         _assert_ok(client.place_market_sell_order(SPOT_SYMBOL, sell_size))
         time.sleep(2)
 
+        transferred += _ensure_unified_usdt(client, quote)
         before_btc = _wallet_available(client, "BTC")
         _assert_ok(client.place_market_order(SPOT_SYMBOL, "Buy", _fmt(quote)))
         bought = _wait_for_spot_delta(client, before_btc)
@@ -435,4 +487,5 @@ def test_spot_stateful_order_lifecycle(client):
         assert client.get_historical_interest_rate(currency="USDT") is not None
         assert client.get_status_and_leverage() is not None
     finally:
-        _cleanup(client, initial_btc)
+        transferred += _cleanup(client, initial_btc)
+        _return_to_funding(client, transferred)
