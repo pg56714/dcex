@@ -273,6 +273,46 @@ def _ensure_contract_margin(client: Client) -> None:
         pytest.skip("Insufficient BitMart contract USDT after transfer.")
 
 
+def _cleanup_spot_base(client: Client, initial_spot_base: Decimal) -> None:
+    base_delta = _spot_available(client, SPOT_BASE_CURRENCY) - initial_spot_base
+    sell_size = _spot_sell_size(client, base_delta)
+    best_bid, _ = _spot_best_prices(client)
+    _, min_notional, _ = _spot_pair_details(client)
+    if Decimal(sell_size) > 0 and Decimal(sell_size) * best_bid >= min_notional:
+        client.place_spot_market_sell_order(SPOT_SYMBOL, size=sell_size)
+        time.sleep(2)
+
+    remaining = _spot_available(client, SPOT_BASE_CURRENCY) - initial_spot_base
+    if remaining <= 0:
+        return
+
+    top_up_notional = max(min_notional * Decimal("1.05"), SPOT_TEST_NOTIONAL)
+    if _spot_available(client, "USDT") < top_up_notional:
+        return
+
+    client.place_spot_market_buy_order(SPOT_SYMBOL, notional=_fmt(top_up_notional))
+    time.sleep(2)
+    sell_size = _spot_sell_size(
+        client,
+        _spot_available(client, SPOT_BASE_CURRENCY) - initial_spot_base,
+    )
+    best_bid, _ = _spot_best_prices(client)
+    if Decimal(sell_size) > 0 and Decimal(sell_size) * best_bid >= min_notional:
+        client.place_spot_market_sell_order(SPOT_SYMBOL, size=sell_size)
+        time.sleep(2)
+
+
+def _cleanup_contract_excess(client: Client, initial_contract_usdt: Decimal) -> None:
+    for _ in range(4):
+        time.sleep(2)
+        excess_contract = _contract_available_usdt(client) - initial_contract_usdt
+        transfer_amount = _round_to_step(excess_contract, Decimal("0.1"), ROUND_DOWN)
+        if transfer_amount <= 0:
+            return
+        client.transfer_contract(amount=_fmt(transfer_amount), type="contract_to_spot")
+        time.sleep(2)
+
+
 def _cleanup(client: Client, initial_spot_base: Decimal, initial_contract_usdt: Decimal) -> None:
     with suppress(Exception):
         if _spot_open_orders(client):
@@ -290,16 +330,9 @@ def _cleanup(client: Client, initial_spot_base: Decimal, initial_contract_usdt: 
             client.place_contract_market_order(CONTRACT_SYMBOL, side=2, size=int(abs(size)))
         time.sleep(2)
     with suppress(Exception):
-        base_delta = _spot_available(client, SPOT_BASE_CURRENCY) - initial_spot_base
-        sell_size = _spot_sell_size(client, base_delta)
-        if Decimal(sell_size) > 0:
-            client.place_spot_market_sell_order(SPOT_SYMBOL, size=sell_size)
-            time.sleep(2)
+        _cleanup_spot_base(client, initial_spot_base)
     with suppress(Exception):
-        excess_contract = _contract_available_usdt(client) - initial_contract_usdt
-        if excess_contract > Decimal("0.01"):
-            client.transfer_contract(amount=_fmt(excess_contract), type="contract_to_spot")
-            time.sleep(2)
+        _cleanup_contract_excess(client, initial_contract_usdt)
 
 
 def _wait_for_contract_position(client: Client, sign: int) -> Decimal:
