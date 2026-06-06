@@ -1,3 +1,14 @@
+## 0.16.0 (2026-06-06)
+
+### Feat
+
+- add hyperliquid live coverage
+- expose raw response headers
+
+### Refactor
+
+- remove bitmex parsed rate limit state
+
 ## 0.15.0 (2026-06-06)
 
 ### Feat
