@@ -1,8 +1,12 @@
+# ruff: noqa: ANN001, ANN201, D100, D103
+
+import os
+
 import pytest
 import pytest_asyncio
-from dcex.async_support.bybit.client import Client
-import os
 from dotenv import load_dotenv
+
+from dcex.async_support.bybit.client import Client
 
 load_dotenv()
 
@@ -26,11 +30,11 @@ async def test_get_coin_info(client):
     assert res is not None
 
 
-# @pytest.mark.asyncio
-# @pytest.mark.private
-# async def test_get_sub_uid(client):
-#     res = await client.get_sub_uid()
-#     assert res is not None
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_get_sub_uid(client):
+    res = await client.get_sub_uid()
+    assert res is not None
 
 
 @pytest.mark.asyncio
@@ -70,6 +74,16 @@ async def test_get_internal_transfer_records(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+async def test_get_transferable_coin(client):
+    res = await client.get_transferable_coin(
+        fromAccountType="FUND",
+        toAccountType="UNIFIED",
+    )
+    assert res is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
 async def test_get_universal_transfer_records(client):
     res = await client.get_universal_transfer_records()
     assert res is not None
@@ -84,13 +98,27 @@ async def test_get_deposit_records(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+async def test_get_sub_deposit_records(client):
+    response = await client.get_sub_uid()
+    members = response.get("result", {}).get("subMembers", [])
+    sub_member_id = os.getenv("BYBIT_SUB_MEMBER_ID")
+    if not sub_member_id and members:
+        sub_member_id = str(members[0]["uid"])
+    if not sub_member_id:
+        pytest.skip("Set BYBIT_SUB_MEMBER_ID or create a Bybit sub-account.")
+    res = await client.get_sub_deposit_records(subMemberId=sub_member_id)
+    assert res is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
 async def test_get_internal_deposit_records(client):
     res = await client.get_internal_deposit_records()
     assert res is not None
 
 
-# @pytest.mark.asyncio
-# @pytest.mark.private
-# async def test_get_master_deposit_address(client):
-#     res = await client.get_master_deposit_address(coin="USDT")
-#     assert res is not None
+@pytest.mark.asyncio
+@pytest.mark.private
+async def test_get_master_deposit_address(client):
+    res = await client.get_master_deposit_address(coin="USDT")
+    assert res is not None

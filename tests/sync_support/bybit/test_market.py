@@ -1,5 +1,8 @@
-from dcex.bybit.client import Client
+# ruff: noqa: ANN001, ANN201, D100, D103
+
 import pytest
+
+from dcex.bybit.client import Client
 
 
 @pytest.fixture
@@ -32,4 +35,49 @@ def test_get_tickers(client):
 
 def test_get_funding_rate_history(client):
     res = client.get_funding_rate_history(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+def test_get_public_trade_history(client):
+    res = client.get_public_trade_history(product_symbol="BTC-USDT-SPOT", limit=10)
+    assert res is not None
+
+
+def test_get_open_interest(client):
+    res = client.get_open_interest(product_symbol="BTC-USDT-SWAP", limit=10)
+    assert res is not None
+
+
+def test_get_long_short_ratio(client):
+    res = client.get_long_short_ratio(product_symbol="BTC-USDT-SWAP", limit=10)
+    assert res is not None
+
+
+def test_get_historical_volatility(client):
+    res = client.get_historical_volatility(baseCoin="BTC", period=7)
+    assert res is not None
+
+
+def test_get_insurance_pool(client):
+    res = client.get_insurance_pool(coin="USDT")
+    assert res is not None
+
+
+def test_get_delivery_price(client):
+    res = client.get_delivery_price(category="linear", baseCoin="BTC", limit=10)
+    assert res is not None
+
+
+def test_get_order_price_limit(client):
+    res = client.get_order_price_limit(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+def test_get_adl_alert(client):
+    res = client.get_adl_alert(product_symbol="BTC-USDT-SWAP")
+    assert res is not None
+
+
+def test_get_risk_limit(client):
+    res = client.get_risk_limit(product_symbol="BTC-USDT-SWAP")
     assert res is not None
