@@ -23,8 +23,8 @@ class HTTPManager(BaseHTTPManager):
 
     This class provides the foundation for all BitMEX API HTTP clients,
     handling authentication, request signing, session management, and
-    error handling. It includes optimized TCP settings and rate limiting
-    information tracking.
+    error handling. It includes optimized TCP settings and response
+    header tracking.
 
     Attributes:
         base_url: Base URL for BitMEX API
@@ -35,7 +35,6 @@ class HTTPManager(BaseHTTPManager):
         session: HTTP client session
         ptm: Product table manager instance
         preload_product_table: Whether to preload product table
-        last_rate_limit_info: Last received rate limit information
     """
 
     EXCHANGE = Common.BITMEX
@@ -48,7 +47,6 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    last_rate_limit_info: dict[str, Any] | None = field(default=None, init=False)
 
     async def async_init(self) -> Self:
         """
@@ -65,7 +63,6 @@ class HTTPManager(BaseHTTPManager):
         """
         self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
-        self.last_rate_limit_info = None
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMEX)
         return self
@@ -136,7 +133,7 @@ class HTTPManager(BaseHTTPManager):
         Make an HTTP request to the BitMEX API.
 
         Handles request preparation, execution, response parsing, and error handling.
-        Automatically initializes session if needed and updates rate limit information.
+        Automatically initializes session if needed and stores response headers.
 
         Args:
             method: HTTP method to use
@@ -237,34 +234,4 @@ class HTTPManager(BaseHTTPManager):
                     resp_headers=dict(response.headers),
                 )
 
-            self._update_rate_limit_info(response.headers)
-
             return data
-
-    def _update_rate_limit_info(self, headers: httpx.Headers) -> None:
-        """
-        Update rate limit information from response headers.
-
-        Extracts rate limiting information from BitMEX API response headers
-        and stores it for monitoring and debugging purposes.
-
-        Args:
-            headers: HTTP response headers
-        """
-        if "x-ratelimit-remaining" in headers:
-            self.last_rate_limit_info = {
-                "limit": headers.get("x-ratelimit-limit"),
-                "remaining": headers.get("x-ratelimit-remaining"),
-                "reset": headers.get("x-ratelimit-reset"),
-                "remaining-1s": headers.get("x-ratelimit-remaining-1s"),
-            }
-
-    def get_rate_limit_info(self) -> dict[str, Any] | None:
-        """
-        Get the last received rate limit information.
-
-        Returns:
-            dict[str, Any] | None: Rate limit information including limit,
-                remaining requests, reset time, and per-second limits
-        """
-        return self.last_rate_limit_info

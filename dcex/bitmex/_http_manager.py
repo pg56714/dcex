@@ -42,7 +42,6 @@ class HTTPManager(BaseHTTPManager):
         session: HTTP session for connection pooling
         ptm: Product table manager for symbol conversion
         preload_product_table: Whether to preload product table on initialization
-        last_rate_limit_info: Last received rate limit information
     """
 
     EXCHANGE = Common.BITMEX
@@ -55,18 +54,16 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    last_rate_limit_info: dict[str, Any] | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         """
         Initialize the HTTP manager after dataclass creation.
 
-        Sets up logging, initializes rate limit tracking, and optionally
+        Sets up logging and optionally
         preloads the product table for symbol conversion.
         """
         self._logger = self._setup_logger(self.logger)
 
-        self.last_rate_limit_info = None
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BITMEX)
 
@@ -138,7 +135,7 @@ class HTTPManager(BaseHTTPManager):
         Make an HTTP request to the BitMEX API.
 
         Handles all HTTP methods (GET, POST, PUT, DELETE) with proper
-        authentication, error handling, and rate limit tracking.
+        authentication, error handling, and response header tracking.
 
         Args:
             method: HTTP method (GET, POST, PUT, DELETE)
@@ -230,7 +227,6 @@ class HTTPManager(BaseHTTPManager):
                     resp_headers=dict(response.headers),
                 )
             else:
-                self._update_rate_limit_info(response)
                 return data
 
         except requests.exceptions.RequestException as e:
@@ -242,31 +238,3 @@ class HTTPManager(BaseHTTPManager):
                 time=timestamp,
                 resp_headers=dict(response.headers) if response else None,
             ) from e
-
-    def _update_rate_limit_info(self, response: requests.Response) -> None:
-        """
-        Update rate limit information from API response headers.
-
-        Extracts rate limiting information from the response headers
-        and stores it for monitoring API usage.
-
-        Args:
-            response: HTTP response object containing rate limit headers
-        """
-        headers = response.headers
-        if "x-ratelimit-remaining" in headers:
-            self.last_rate_limit_info = {
-                "limit": headers.get("x-ratelimit-limit"),
-                "remaining": headers.get("x-ratelimit-remaining"),
-                "reset": headers.get("x-ratelimit-reset"),
-                "remaining-1s": headers.get("x-ratelimit-remaining-1s"),
-            }
-
-    def get_rate_limit_info(self) -> dict[str, Any] | None:
-        """
-        Get the last received rate limit information.
-
-        Returns:
-            Dictionary containing rate limit information or None if not available
-        """
-        return self.last_rate_limit_info
