@@ -692,6 +692,54 @@ async def hyperliquid() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+def _normalize_kraken_currency(currency: str) -> str:
+    aliases = {
+        "XXBT": "BTC",
+        "XBT": "BTC",
+        "XDG": "DOGE",
+        "ZUSD": "USD",
+        "ZEUR": "EUR",
+        "ZGBP": "GBP",
+        "ZJPY": "JPY",
+        "ZCAD": "CAD",
+        "ZAUD": "AUD",
+    }
+    if currency in aliases:
+        return aliases[currency]
+    if currency.startswith(("X", "Z")) and len(currency) > 3:
+        stripped = currency[1:]
+        return aliases.get(stripped, stripped)
+    return currency
+
+
+def _kraken_size_precision(market: dict[str, object]) -> str:
+    precision = int(str(market.get("contractValueTradePrecision", 0) or 0))
+    return str(reverse_decimal_places(precision)) if precision > 0 else "1"
+
+
+def _kraken_futures_product_symbol(
+    symbol: str,
+    base: str,
+    quote: str,
+    instrument_type: str,
+    last_trading_time: object | None,
+) -> tuple[str, str]:
+    parts = symbol.split("_")
+    prefix = parts[0] if parts else ""
+    inverse_suffix = "-INVERSE" if instrument_type == "futures_inverse" else ""
+
+    if last_trading_time:
+        expiry = parts[2] if len(parts) > 2 else ""
+        if expiry:
+            return f"{base}-{quote}-{expiry}{inverse_suffix}-SWAP", "futures"
+        return f"{base}-{quote}{inverse_suffix}-SWAP", "futures"
+
+    if prefix in {"PI", "PF"}:
+        return f"{base}-{quote}{inverse_suffix}-SWAP", "swap"
+
+    return f"{base}-{quote}{inverse_suffix}-SWAP", "swap"
+
+
 async def kucoin() -> pl.DataFrame:
     """
     Fetch market information from KuCoin exchange.
@@ -754,6 +802,100 @@ async def kucoin() -> pl.DataFrame:
                 size_precision=str(market["lotSize"]),
                 min_size=str(market["lotSize"]),
                 size_per_contract=str(market["multiplier"]),
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
+async def kraken() -> pl.DataFrame:
+    """
+    Fetch market information from Kraken exchange.
+
+    Retrieves Kraken spot pairs and futures instruments, then standardizes them
+    into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from Kraken.
+    """
+    from ..kraken._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    await market_http.async_init()
+
+    markets = []
+    res_spot = await market_http.get_spot_asset_pairs()
+    for symbol, market in res_spot.get("result", {}).items():
+        if not isinstance(market, dict):
+            continue
+        if market.get("status") and market.get("status") != "online":
+            continue
+
+        wsname = str(market.get("wsname", ""))
+        if "/" in wsname:
+            base, quote = [_normalize_kraken_currency(part) for part in wsname.split("/", 1)]
+        else:
+            base = _normalize_kraken_currency(str(market.get("base", "")))
+            quote = _normalize_kraken_currency(str(market.get("quote", "")))
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.KRAKEN,
+                exchange_symbol=str(symbol),
+                product_symbol=f"{base}-{quote}-SPOT",
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(
+                    market.get(
+                        "tick_size",
+                        reverse_decimal_places(int(market.get("pair_decimals", 0) or 0)),
+                    )
+                ),
+                size_precision=str(reverse_decimal_places(int(market.get("lot_decimals", 0) or 0))),
+                min_size=str(market.get("ordermin", "0")),
+                min_notional=str(market.get("costmin", "0")),
+            )
+        )
+
+    res_futures = await market_http.get_futures_instruments(
+        contractType=["futures_inverse", "futures_vanilla", "flexible_futures"],
+    )
+    for market in res_futures.get("instruments", []):
+        if not isinstance(market, dict):
+            continue
+        instrument_type = str(market.get("type", ""))
+        if instrument_type == "options":
+            continue
+        if not market.get("tradeable", False) or market.get("isExpired", False):
+            continue
+
+        symbol = str(market["symbol"])
+        base = _normalize_kraken_currency(str(market.get("base", "")))
+        quote = _normalize_kraken_currency(str(market.get("quote", "")))
+        product_symbol, product_type = _kraken_futures_product_symbol(
+            symbol=symbol,
+            base=base,
+            quote=quote,
+            instrument_type=instrument_type,
+            last_trading_time=market.get("lastTradingTime"),
+        )
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.KRAKEN,
+                exchange_symbol=symbol,
+                product_symbol=product_symbol,
+                product_type=product_type,
+                exchange_type=instrument_type,
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(market.get("tickSize", "0")),
+                size_precision=_kraken_size_precision(market),
+                min_size=_kraken_size_precision(market),
+                size_per_contract=str(market.get("contractSize", "1")),
             )
         )
 

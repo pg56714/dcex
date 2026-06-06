@@ -61,6 +61,10 @@ Private live tests require exchange credentials. Use marker filters to avoid uni
 uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful and not generated"
 ```
 
+Kraken private live tests require separate Spot and Futures key pairs:
+`KRAKEN_SPOT_API_KEY` / `KRAKEN_SPOT_API_SECRET` and
+`KRAKEN_FUTURES_API_KEY` / `KRAKEN_FUTURES_API_SECRET`.
+
 Stateful tests can mutate exchange or account settings, such as leverage or position mode. Run them only when that is intentional:
 
 ```sh

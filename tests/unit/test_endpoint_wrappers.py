@@ -50,6 +50,8 @@ class FakePTM:
             return product_symbol or "BTC-USDT-SWAP"
         if exchange == Common.BITMEX or str(exchange) == Common.BITMEX.value:
             return "XBTUSDT"
+        if exchange == Common.KRAKEN or str(exchange) == Common.KRAKEN.value:
+            return "XBTUSDT" if product_symbol and "SPOT" in product_symbol else "PF_XBTUSD"
         return "BTCUSDT"
 
     def get_product_type(self, exchange: Common | str, product_symbol: str | None = None) -> str:
@@ -166,6 +168,13 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
         kwargs.update(api_key="api-key", api_secret="api-secret", memo="memo")
     elif exchange in {"okx", "kucoin"}:
         kwargs.update(api_key="api-key", api_secret="api-secret", passphrase="passphrase")
+    elif exchange == "kraken":
+        kwargs.update(
+            spot_api_key="api-key",
+            spot_api_secret="api-secret",
+            futures_api_key="api-key",
+            futures_api_secret="api-secret",
+        )
     elif exchange == "hyperliquid":
         kwargs.update(
             wallet_address="0x0000000000000000000000000000000000000001",
@@ -225,6 +234,8 @@ def _product_symbol(exchange: str, method_name: str) -> str:
         return "XBT-USDT-SWAP"
     if exchange == "hyperliquid":
         return "BTC-USD-SWAP"
+    if exchange == "kraken":
+        return "BTC-USDT-SPOT" if "spot" in method_name else "BTC-USD-SWAP"
     if "spot" in method_name:
         return "BTC-USDT-SPOT"
     return "BTC-USDT-SWAP"
@@ -277,11 +288,15 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "cross"
     if name in {"ordType"}:
         return "limit"
+    if name in {"ordertype"}:
+        return "limit"
+    if name in {"orderType"}:
+        return "lmt"
     if name in {"category"}:
         return "linear"
     if name in {"instType"}:
         return "SPOT"
-    if name in {"ccy", "currency", "coin", "quoteCoin", "baseCoin"}:
+    if name in {"ccy", "currency", "coin", "quoteCoin", "baseCoin", "asset", "unit"}:
         return "USDT"
     if name in {"settleCoin"}:
         return "USDT"
@@ -315,14 +330,27 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return [_sample_order(case.exchange)]
     if name in {"modifies"}:
         return [{"oid": 1, "order": {"a": 0, "b": True, "p": "100", "s": "1", "r": False}}]
-    if name in {"orderId", "order_id", "ordId", "orderID", "clientOrderId", "clOrdID", "cloid"}:
+    if name in {
+        "orderId",
+        "order_id",
+        "ordId",
+        "orderID",
+        "clientOrderId",
+        "clOrdID",
+        "cloid",
+        "txid",
+    }:
         return "test-order-id"
     if name in {"oid", "twap_id", "positionId", "id", "page", "limit", "size", "qty", "quantity"}:
         return 1
     if name in {"orderQty", "leverage", "lever", "ntli", "minutes"}:
         return 1
-    if name in {"amount", "notional", "price", "px", "sz", "funds"}:
+    if name in {"amount", "notional", "price", "px", "sz", "funds", "volume"}:
         return "1"
+    if name in {"fromAccount", "toAccount"}:
+        return "cash"
+    if name in {"orderIds", "cliOrdIds"}:
+        return ["test-order-id"]
     if name in {"from_", "to", "transId", "wdId"}:
         return "test-id"
     if name in {"chain", "addr", "dest", "fee", "toAddr"}:
@@ -333,6 +361,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return 1
     if name in {"interval", "bar", "binSize"}:
         return "1m"
+    if name in {"contractType"}:
+        return "flexible_futures"
     if name in {"filter"}:
         return {}
     if name in {"columns"}:
@@ -369,6 +399,10 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
             to="test-address",
             chain="USDT-ERC20",
         )
+    if case.exchange == "kraken" and case.method_name == "cancel_spot_order":
+        kwargs["txid"] = "test-order-id"
+    if case.exchange == "kraken" and case.method_name == "cancel_futures_order":
+        kwargs["order_id"] = "test-order-id"
     return kwargs
 
 

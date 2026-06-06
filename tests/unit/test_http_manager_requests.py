@@ -177,6 +177,11 @@ def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
             {"payload": {"code": "200000", "data": 1}, "kwargs": {"signed": False}},
         ),
         (
+            "dcex.kraken._http_manager",
+            "/0/public/Time",
+            {"payload": {"error": [], "result": {"unixtime": 1}}, "kwargs": {"signed": False}},
+        ),
+        (
             "dcex.okx._http_manager",
             "/api/v5/public/time",
             {"payload": {"code": "0", "data": []}, "kwargs": {"signed": False}},
@@ -239,6 +244,11 @@ def _async_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
             "dcex.async_support.kucoin._http_manager",
             "/api/v1/timestamp",
             {"payload": {"code": "200000", "data": 1}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.kraken._http_manager",
+            "/0/public/Time",
+            {"payload": {"error": [], "result": {"unixtime": 1}}, "kwargs": {"signed": False}},
         ),
         (
             "dcex.async_support.okx._http_manager",
