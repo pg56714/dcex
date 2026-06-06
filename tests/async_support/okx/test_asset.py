@@ -76,7 +76,27 @@ async def test_get_deposit_history(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_get_deposit_withdraw_status(client):
-    res = await client.get_deposit_withdraw_status(ccy="USDT")
+    history = await client.get_deposit_history(ccy="USDT")
+    deposit = next(
+        (
+            item
+            for item in history.get("data", [])
+            if isinstance(item, dict)
+            and item.get("txId")
+            and item.get("ccy")
+            and item.get("to")
+            and item.get("chain")
+        ),
+        None,
+    )
+    if deposit is None:
+        pytest.skip("OKX account has no complete USDT deposit record to query.")
+    res = await client.get_deposit_withdraw_status(
+        txId=deposit["txId"],
+        ccy=deposit["ccy"],
+        to=deposit["to"],
+        chain=deposit["chain"],
+    )
     assert res is not None
 
 

@@ -310,6 +310,19 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing deposit and withdrawal status information from OKX API.
         """
+        if (wdId is None) == (txId is None):
+            raise ValueError("Exactly one of wdId or txId is required.")
+        if txId is not None:
+            missing = [
+                name
+                for name, value in (("ccy", ccy), ("to", to), ("chain", chain))
+                if value is None
+            ]
+            if missing:
+                raise ValueError(
+                    f"{', '.join(missing)} required when querying deposit status by txId."
+                )
+
         payload = {}
         if wdId is not None:
             payload["wdId"] = wdId

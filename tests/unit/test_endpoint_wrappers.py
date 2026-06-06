@@ -350,6 +350,13 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         "get_futures_algo_order",
     }:
         kwargs["algoId"] = 1
+    if case.exchange == "okx" and case.method_name == "get_deposit_withdraw_status":
+        kwargs.update(
+            txId="test-transaction-id",
+            ccy="USDT",
+            to="test-address",
+            chain="USDT-ERC20",
+        )
     return kwargs
 
 
@@ -514,6 +521,24 @@ def test_sync_bitmart_modify_limit_order_uses_documented_payload_types() -> None
     assert query["size"] == 1
 
 
+@pytest.mark.parametrize(
+    "kwargs, message",
+    [
+        ({}, "Exactly one of wdId or txId"),
+        ({"wdId": "withdrawal-id", "txId": "transaction-id"}, "Exactly one of wdId or txId"),
+        ({"txId": "transaction-id"}, "ccy, to, chain required"),
+    ],
+)
+def test_sync_okx_deposit_withdraw_status_validates_query(
+    kwargs: dict[str, str], message: str
+) -> None:
+    client = _client_class("sync", "okx")(**_client_kwargs("okx"))
+    _wire_sync(client)
+
+    with pytest.raises(ValueError, match=message):
+        client.get_deposit_withdraw_status(**kwargs)
+
+
 @pytest.mark.parametrize("case", ASYNC_CASES, ids=[case.id for case in ASYNC_CASES])
 @pytest.mark.asyncio
 async def test_async_endpoint_wrapper_is_reachable(
@@ -618,6 +643,25 @@ async def test_async_bitmart_modify_limit_order_uses_documented_payload_types() 
     assert query["order_id"] == 123456
     assert query["price"] == "100.1"
     assert query["size"] == 1
+
+
+@pytest.mark.parametrize(
+    "kwargs, message",
+    [
+        ({}, "Exactly one of wdId or txId"),
+        ({"wdId": "withdrawal-id", "txId": "transaction-id"}, "Exactly one of wdId or txId"),
+        ({"txId": "transaction-id"}, "ccy, to, chain required"),
+    ],
+)
+@pytest.mark.asyncio
+async def test_async_okx_deposit_withdraw_status_validates_query(
+    kwargs: dict[str, str], message: str
+) -> None:
+    client = _client_class("async", "okx")(**_client_kwargs("okx"))
+    _wire_async(client)
+
+    with pytest.raises(ValueError, match=message):
+        await client.get_deposit_withdraw_status(**kwargs)
 
 
 @pytest.mark.asyncio

@@ -216,6 +216,7 @@ def _wait_for_swap_position(client: Client) -> Decimal:
 
 def _cancel_order(client: Client, order_id: str) -> None:
     _assert_ok(client.cancel_order(product_symbol=SPOT_SYMBOL, ordId=order_id))
+    time.sleep(0.5)
 
 
 def _cleanup(client: Client, initial_btc: Decimal) -> None:
@@ -356,6 +357,7 @@ def test_spot_stateful_order_lifecycle(client):
                     [{"instId": exchange_symbol, "ordId": order_id} for order_id in batch_ids]
                 )
             )
+            time.sleep(0.5)
             batch_ids = []
         finally:
             for order_id in batch_ids:
@@ -381,6 +383,7 @@ def test_spot_stateful_order_lifecycle(client):
         order_id = _order_id(client.place_limit_buy_order(SPOT_SYMBOL, "cash", size, price))
         try:
             _assert_ok(client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
+            time.sleep(0.5)
             order_id = None
         finally:
             if order_id is not None:
