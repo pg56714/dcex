@@ -49,7 +49,7 @@ class HTTPManager(BaseHTTPManager):
     subdomain: str = field(default=SUBDOMAIN_MAIN)
     tld: str = field(default=TLD_MAIN)
     wallet_address: str | None = field(default=None)
-    private_key: str | None = field(default=None)
+    private_key: str | None = field(default=None, repr=False)
     timeout: float = field(default=10)
     recv_window: int = field(default=5000)
     max_retries: int = field(default=3)

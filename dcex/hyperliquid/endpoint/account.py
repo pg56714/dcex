@@ -12,6 +12,7 @@ class Account(str, Enum):
     """
 
     CLEARINGHOUSESTATE = "clearinghouseState"
+    SPOTCLEARINGHOUSESTATE = "spotClearinghouseState"
     OPENORDERS = "openOrders"
     USERFILLS = "userFills"
     USERRATELIMIT = "userRateLimit"

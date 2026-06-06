@@ -96,16 +96,28 @@ class FakeAsyncSession:
 
 
 class FakeSyncHyperliquidMarket:
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        return None
+
     def get_meta_and_asset_ctxs(self) -> list[Any]:
         return [{}, [{"midPx": "100.0"}]]
 
+    def close(self) -> None:
+        return None
+
 
 class FakeAsyncHyperliquidMarket:
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        return None
+
     async def async_init(self) -> FakeAsyncHyperliquidMarket:
         return self
 
     async def get_meta_and_asset_ctxs(self) -> list[Any]:
         return [{}, [{"midPx": "100.0"}]]
+
+    async def close(self) -> None:
+        return None
 
 
 def _endpoint_method_names(mode: str, exchange: str) -> list[str]:
@@ -487,6 +499,20 @@ def test_sync_hyperliquid_builder_fee_requires_fee_when_address_given() -> None:
         )
 
 
+def test_sync_hyperliquid_market_order_uses_ioc_limit_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_hyperliquid_market(monkeypatch)
+    client = _client_class("sync", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    calls = _wire_sync(client)
+
+    client.place_future_market_buy_order(product_symbol="BTC-USD-SWAP", size="1")
+
+    order = calls[0]["query"]["action"]["orders"][0]
+    assert order["p"] == "103"
+    assert order["t"] == {"limit": {"tif": "Ioc"}}
+
+
 def test_sync_bybit_post_only_forwards_position_idx() -> None:
     client = _client_class("sync", "bybit")(**_client_kwargs("bybit"))
     calls = _wire_sync(client)
@@ -624,6 +650,21 @@ async def test_async_hyperliquid_builder_fee_requires_fee_when_address_given() -
             reduceOnly=False,
             fee_ten_bp=10,
         )
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_market_order_uses_ioc_limit_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_hyperliquid_market(monkeypatch)
+    client = _client_class("async", "hyperliquid")(**_client_kwargs("hyperliquid"))
+    calls = _wire_async(client)
+
+    await client.place_future_market_buy_order(product_symbol="BTC-USD-SWAP", size="1")
+
+    order = calls[0]["query"]["action"]["orders"][0]
+    assert order["p"] == "103"
+    assert order["t"] == {"limit": {"tif": "Ioc"}}
 
 
 @pytest.mark.asyncio

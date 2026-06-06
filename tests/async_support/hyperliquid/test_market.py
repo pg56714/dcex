@@ -14,6 +14,7 @@ async def test_get_meta(client):
     res = await client.get_meta()
     assert res is not None
 
+
 @pytest.mark.asyncio
 async def test_get_spot_meta(client):
     res = await client.get_spot_meta()
@@ -34,14 +35,24 @@ async def test_get_spot_meta_and_asset_ctxs(client):
 
 @pytest.mark.asyncio
 async def test_get_l2book(client):
-    res = await client.get_l2book(product_symbol="FLASK-USDC-SPOT")
+    res = await client.get_l2book(product_symbol="BTC-USD-SWAP")
     assert res is not None
+
 
 @pytest.mark.asyncio
 async def test_get_candle_snapshot(client):
     res = await client.get_candle_snapshot(
-            product_symbol="BTC-USD-SWAP",
-            interval="1m",
-            startTime=1696128000000,
-        )
+        product_symbol="BTC-USD-SWAP",
+        interval="1m",
+        startTime=1696128000000,
+    )
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_funding_rate_history(client):
+    res = await client.get_funding_rate_history(
+        product_symbol="BTC-USD-SWAP",
+        startTime=1696128000000,
+    )
     assert res is not None

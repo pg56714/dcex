@@ -1,5 +1,6 @@
 """Trading-related HTTP API client for Hyperliquid exchange."""
 
+from decimal import ROUND_DOWN, ROUND_UP, Decimal
 from typing import Any
 
 import msgspec
@@ -13,6 +14,17 @@ from .endpoint.trade import Trade
 
 class TradeHTTP(HTTPManager):
     """HTTP client for trading operations on Hyperliquid exchange."""
+
+    def _format_market_order_price(self, price: str, isBuy: bool) -> str:
+        """Format an aggressive IOC price within Hyperliquid precision rules."""
+        value = Decimal(str(price))
+        if value <= 0:
+            return "0"
+
+        rounding = ROUND_UP if isBuy else ROUND_DOWN
+        precision_step = Decimal(1).scaleb(value.adjusted() - 4)
+        rounded = value.quantize(precision_step, rounding=rounding)
+        return format(rounded.normalize(), "f")
 
     async def place_order(
         self,
@@ -132,24 +144,47 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        market_http = MarketHTTP()
+        market_http = MarketHTTP(
+            testnet=self.testnet,
+            subdomain=self.subdomain,
+            tld=self.tld,
+            timeout=self.timeout,
+            preload_product_table=False,
+        )
         await market_http.async_init()
-        result: Any = await market_http.get_meta_and_asset_ctxs()
+        try:
+            result: Any = await market_http.get_meta_and_asset_ctxs()
+        finally:
+            await market_http.close()
         exchange_symbol = msgspec.json.decode(
             self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
         )[1]
         asset_contexts = result[1]
-        price = asset_contexts[exchange_symbol]["midPx"]
+        mid_price = Decimal(str(asset_contexts[exchange_symbol]["midPx"]))
+        slippage_multiplier = Decimal("1.03") if isBuy else Decimal("0.97")
+        price = self._format_market_order_price(str(mid_price * slippage_multiplier), isBuy)
+
+        if triggerPx is not None or tpsl is not None:
+            return await self.place_order(
+                product_symbol=product_symbol,
+                isBuy=isBuy,
+                price=price,
+                size=size,
+                reduceOnly=False,
+                isMarket=True,
+                triggerPx=triggerPx,
+                tpsl=tpsl,
+                vaultAddress=vaultAddress,
+                expireAfter=expireAfter,
+            )
 
         return await self.place_order(
             product_symbol=product_symbol,
             isBuy=isBuy,
-            price=price.split(".", 1)[0],
+            price=price,
             size=size,
             reduceOnly=False,
-            isMarket=True,
-            triggerPx=triggerPx,
-            tpsl=tpsl,
+            tif="Ioc",
             vaultAddress=vaultAddress,
             expireAfter=expireAfter,
         )

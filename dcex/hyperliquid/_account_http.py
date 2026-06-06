@@ -41,6 +41,32 @@ class AccountHTTP(HTTPManager):
         )
         return res
 
+    def spot_clearinghouse_state(
+        self,
+        user: str,
+    ) -> dict[str, Any]:
+        """
+        Get spot clearinghouse state for a user.
+
+        Args:
+            user: Wallet address
+
+        Returns:
+            Dict containing spot balances and held amounts
+        """
+        payload = {
+            "type": Account.SPOTCLEARINGHOUSESTATE,
+            "user": user,
+        }
+
+        res = self._request(
+            method="POST",
+            path=Path.INFO,
+            query=payload,
+            signed=False,
+        )
+        return res
+
     def open_orders(
         self,
         user: str,
