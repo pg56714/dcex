@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, D100, D103
+
 import os
 
 import pytest
@@ -54,6 +56,12 @@ def test_get_deposit_address(client):
 @pytest.mark.private
 def test_get_deposit_history(client):
     res = client.get_deposit_history()
+    assert res is not None
+
+
+@pytest.mark.private
+def test_get_deposit_withdraw_status(client):
+    res = client.get_deposit_withdraw_status(ccy="USDT")
     assert res is not None
 
 
