@@ -17,6 +17,7 @@ from .gateio.client import Client as GateioClient
 from .hyperliquid.client import Client as HyperliquidClient
 from .kraken.client import Client as KrakenClient
 from .kucoin.client import Client as KuCoinClient
+from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
 from .utils.jupyter_helper import auto_apply_nest_asyncio
 
@@ -74,6 +75,11 @@ def kraken(**kwargs: Any) -> KrakenClient:  # noqa: ANN401
     return KrakenClient(**kwargs)
 
 
+def mexc(**kwargs: Any) -> MEXCClient:  # noqa: ANN401
+    """Create a MEXC client instance."""
+    return MEXCClient(**kwargs)
+
+
 def okx(**kwargs: Any) -> OKXClient:  # noqa: ANN401
     """Create an OKX client instance."""
     return OKXClient(**kwargs)
@@ -90,5 +96,6 @@ __all__ = [
     "hyperliquid",
     "kucoin",
     "kraken",
+    "mexc",
     "okx",
 ]

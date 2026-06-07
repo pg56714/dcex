@@ -23,6 +23,7 @@ EXCHANGES: dict[str, dict[str, bool]] = {
     "hyperliquid": {"sync": True, "async": True},
     "kucoin": {"sync": True, "async": True},
     "kraken": {"sync": True, "async": True},
+    "mexc": {"sync": True, "async": True},
     "okx": {"sync": True, "async": True},
 }
 

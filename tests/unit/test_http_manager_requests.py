@@ -187,6 +187,11 @@ def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
             {"payload": {"error": [], "result": {"unixtime": 1}}, "kwargs": {"signed": False}},
         ),
         (
+            "dcex.mexc._http_manager",
+            "/api/v3/time",
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
+        ),
+        (
             "dcex.okx._http_manager",
             "/api/v5/public/time",
             {"payload": {"code": "0", "data": []}, "kwargs": {"signed": False}},
@@ -259,6 +264,11 @@ def _async_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
             "dcex.async_support.kraken._http_manager",
             "/0/public/Time",
             {"payload": {"error": [], "result": {"unixtime": 1}}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.mexc._http_manager",
+            "/api/v3/time",
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
         ),
         (
             "dcex.async_support.okx._http_manager",
@@ -335,6 +345,11 @@ def _gateio_expected_signature_for(
     return hmac.new(API_SECRET.encode(), canonical.encode(), hashlib.sha512).hexdigest()
 
 
+def _mexc_contract_expected_signature(request_time: str, payload: str) -> str:
+    canonical = f"{API_KEY}{request_time}{payload}"
+    return hmac.new(API_SECRET.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+
+
 def test_gateio_signed_query_order_matches_sent_params(monkeypatch: pytest.MonkeyPatch) -> None:
     from dcex.gateio._http_manager import HTTPManager
 
@@ -371,6 +386,41 @@ def test_sync_gateio_json_decode_failure_is_failed_request() -> None:
 
     assert exc_info.value.status_code == 200
     assert exc_info.value.resp_headers == {}
+
+
+def test_sync_mexc_contract_list_body_matches_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.mexc._http_manager import HTTPManager
+
+    mexc_http = import_module("dcex.mexc._http_manager")
+    monkeypatch.setattr(mexc_http.time, "time", lambda: int(TS_S))
+    session = _CaptureSession({"success": True, "code": 0})
+    manager = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+
+    manager._request(
+        "POST",
+        "/api/v1/private/order/cancel",
+        [{"orderId": "test-order-id"}],
+        api="contract",
+    )
+
+    method, url, kwargs = session.calls[0]
+    request_time = str(int(int(TS_S) * 1000))
+    body = '[{"orderId":"test-order-id"}]'
+    assert method == "POST"
+    assert url == "https://api.mexc.com/api/v1/private/order/cancel"
+    assert kwargs["data"] == body
+    assert kwargs["headers"]["Request-Time"] == request_time
+    assert kwargs["headers"]["Signature"] == _mexc_contract_expected_signature(
+        request_time,
+        body,
+    )
 
 
 @pytest.mark.asyncio
@@ -448,6 +498,42 @@ async def test_async_gateio_json_decode_failure_is_failed_request() -> None:
 
     assert exc_info.value.status_code == 200
     assert exc_info.value.resp_headers == {}
+
+
+@pytest.mark.asyncio
+async def test_async_mexc_contract_list_body_matches_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.mexc._http_manager import HTTPManager
+
+    mexc_http = import_module("dcex.async_support.mexc._http_manager")
+    monkeypatch.setattr(mexc_http.time, "time", lambda: int(TS_S))
+    session = _AsyncCaptureSession({"success": True, "code": 0})
+    manager = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+
+    await manager._request(
+        "POST",
+        "/api/v1/private/order/cancel",
+        [{"orderId": "test-order-id"}],
+        api="contract",
+    )
+
+    method, url, kwargs = session.calls[0]
+    request_time = str(int(int(TS_S) * 1000))
+    body = '[{"orderId":"test-order-id"}]'
+    assert method == "POST"
+    assert url == "https://api.mexc.com/api/v1/private/order/cancel"
+    assert kwargs["content"] == body
+    assert kwargs["headers"]["Request-Time"] == request_time
+    assert kwargs["headers"]["Signature"] == _mexc_contract_expected_signature(
+        request_time,
+        body,
+    )
 
 
 def test_sync_bitmex_passes_configured_timeout() -> None:

@@ -52,6 +52,8 @@ class FakePTM:
             return "XBTUSDT"
         if exchange == Common.KRAKEN or str(exchange) == Common.KRAKEN.value:
             return "XBTUSDT" if product_symbol and "SPOT" in product_symbol else "PF_XBTUSD"
+        if exchange == Common.MEXC or str(exchange) == Common.MEXC.value:
+            return "BTCUSDT" if product_symbol and "SPOT" in product_symbol else "BTC_USDT"
         return "BTCUSDT"
 
     def get_product_type(self, exchange: Common | str, product_symbol: str | None = None) -> str:
@@ -162,7 +164,7 @@ def _client_class(mode: str, exchange: str) -> type:
 
 def _client_kwargs(exchange: str) -> dict[str, Any]:
     kwargs: dict[str, Any] = {"preload_product_table": False}
-    if exchange in {"binance", "bingx", "bitmex", "bybit", "gateio"}:
+    if exchange in {"binance", "bingx", "bitmex", "bybit", "gateio", "mexc"}:
         kwargs.update(api_key="api-key", api_secret="api-secret")
     elif exchange == "bitmart":
         kwargs.update(api_key="api-key", api_secret="api-secret", memo="memo")
@@ -270,6 +272,14 @@ def _sample_order(exchange: str) -> dict[str, Any]:
             "size": "1",
             "price": "1",
         }
+    if exchange == "mexc":
+        return {
+            "product_symbol": "BTC-USDT-SPOT",
+            "side": "BUY",
+            "type": "LIMIT",
+            "quantity": "1",
+            "price": "1",
+        }
     return {"symbol": "BTCUSDT", "side": "Buy", "orderType": "Limit", "qty": "1", "price": "1"}
 
 
@@ -284,12 +294,18 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     if name in {"side"}:
         if case.exchange == "bitmart" and "contract" in method_name:
             return 1
+        if case.exchange == "mexc" and "contract" in method_name:
+            return 1
         if case.exchange in {"bybit", "bitmex"}:
             return "Buy"
         return "buy"
     if name in {"isBuy", "reduceOnly", "isCross", "randomize", "dual_mode"}:
         return True
+    if name in {"mxDeductEnable"}:
+        return True
     if name in {"type", "type_"}:
+        if case.exchange == "mexc" and "contract" in method_name:
+            return 1
         return "limit"
     if name in {"orderType"}:
         if case.exchange == "bitget":
@@ -331,6 +347,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "GTC"
     if name in {"posMode"}:
         return "net_mode"
+    if name in {"positionMode"}:
+        return 1
     if name in {"greeksType"}:
         return "PA"
     if name in {"spotMarginMode", "marginType"}:
@@ -339,6 +357,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "STOP_ON_FAILURE"
     if name in {"positionSide"}:
         return "LONG"
+    if name in {"positionType", "openType"}:
+        return 1
     if name in {"dualSidePosition"}:
         return "true"
     if name in {"status", "state"}:
@@ -363,7 +383,18 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         "txid",
     }:
         return "test-order-id"
-    if name in {"oid", "twap_id", "positionId", "id", "page", "limit", "size", "qty", "quantity"}:
+    if name in {
+        "oid",
+        "twap_id",
+        "positionId",
+        "id",
+        "page",
+        "limit",
+        "size",
+        "qty",
+        "quantity",
+        "vol",
+    }:
         return 1
     if name in {"orderQty", "leverage", "lever", "ntli", "minutes"}:
         return 1
@@ -377,10 +408,16 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "usdt_futures"
     if name in {"orderIds", "cliOrdIds"}:
         return ["test-order-id"]
+    if name in {"order_ids"}:
+        return ["test-order-id"]
     if name in {"orderList", "orderIdList"}:
         return [{"orderId": "test-order-id"}]
     if name in {"from_", "to", "transId", "wdId"}:
         return "test-id"
+    if name in {"fromAccountType", "toAccountType"}:
+        return "SPOT"
+    if name in {"external_oid", "externalOid"}:
+        return "test-external-id"
     if name in {"chain", "addr", "dest", "fee", "toAddr"}:
         return "test"
     if name in {"amt"}:

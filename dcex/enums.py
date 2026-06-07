@@ -38,6 +38,7 @@ _ORDER_SIDE_MAP: dict[str, dict[str, str]] = {
         "bingx": "BUY",
         "kucoin": "buy",
         "kraken": "buy",
+        "mexc": "BUY",
     },
     "SELL": {
         "binance": "SELL",
@@ -50,6 +51,7 @@ _ORDER_SIDE_MAP: dict[str, dict[str, str]] = {
         "bingx": "SELL",
         "kucoin": "sell",
         "kraken": "sell",
+        "mexc": "SELL",
     },
 }
 

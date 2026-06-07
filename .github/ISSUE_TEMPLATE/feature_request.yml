@@ -53,6 +53,7 @@ body:
         - "Gate.io"
         - "KuCoin"
         - "Kraken"
+        - "MEXC"
         - "BitMEX"
         - "Other (please specify in description)"
     validations:

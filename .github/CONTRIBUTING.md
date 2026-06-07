@@ -55,12 +55,8 @@ Public live exchange tests are opt-in and require network access:
 uv run pytest -m "live and not private"
 ```
 
-Private live tests require exchange credentials. Use marker filters to avoid unintended account changes:
-
-Kraken private Spot and Futures APIs use separate API key pairs. Configure
-`KRAKEN_SPOT_API_KEY` / `KRAKEN_SPOT_API_SECRET` for Spot REST private endpoints,
-and `KRAKEN_FUTURES_API_KEY` / `KRAKEN_FUTURES_API_SECRET` for Futures REST
-private endpoints.
+Private live tests require the relevant exchange credentials from `.env.sample`.
+Use marker filters to avoid unintended account changes:
 
 ```sh
 uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful and not generated"

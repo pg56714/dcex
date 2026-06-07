@@ -960,6 +960,93 @@ def kraken() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+def mexc() -> pl.DataFrame:
+    """
+    Fetch market information from MEXC exchange.
+
+    Retrieves MEXC spot pairs and USDT-M perpetual contracts, then standardizes
+    them into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from MEXC.
+    """
+    from ..mexc._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+
+    markets = []
+    res_spot = market_http.get_spot_exchange_info()
+    if isinstance(res_spot, dict):
+        spot_symbols = res_spot.get("symbols", [])
+    else:
+        spot_symbols = []
+    for market in spot_symbols:
+        if not isinstance(market, dict):
+            continue
+        status = str(market.get("status", ""))
+        if status and status not in {"1", "TRADING"}:
+            continue
+        if market.get("isSpotTradingAllowed") is False:
+            continue
+
+        base = str(market["baseAsset"])
+        quote = str(market["quoteAsset"])
+        quote_precision = int(str(market.get("quotePrecision", "0") or "0"))
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.MEXC,
+                exchange_symbol=str(market["symbol"]),
+                product_symbol=f"{base}-{quote}-SPOT",
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(reverse_decimal_places(quote_precision)),
+                size_precision=str(market.get("baseSizePrecision", "0")),
+                min_size=str(market.get("baseSizePrecision", "0")),
+                min_notional=str(market.get("quoteAmountPrecision", "0")),
+            )
+        )
+
+    res_contract = market_http.get_contract_details()
+    if isinstance(res_contract, dict):
+        contract_data = res_contract.get("data", [])
+    else:
+        contract_data = []
+    if isinstance(contract_data, dict):
+        contract_data = [contract_data]
+    for market in contract_data:
+        if not isinstance(market, dict):
+            continue
+        if market.get("state") not in {0, "0", None}:
+            continue
+        if market.get("apiAllowed") is False:
+            continue
+
+        base = str(market["baseCoin"])
+        quote = str(market["quoteCoin"])
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.MEXC,
+                exchange_symbol=str(market["symbol"]),
+                product_symbol=f"{base}-{quote}-SWAP",
+                product_type="swap",
+                exchange_type="perpetual",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(market.get("priceUnit", "0")),
+                size_precision=str(market.get("volUnit", "0")),
+                min_size=str(market.get("minVol", "0")),
+                size_per_contract=str(market.get("contractSize", "1")),
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
 def okx() -> pl.DataFrame:
     """
     Fetch market information from OKX exchange.
