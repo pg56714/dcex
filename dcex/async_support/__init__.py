@@ -10,6 +10,7 @@ from typing import Any, cast
 
 from .binance.client import Client as BinanceClient
 from .bingx.client import Client as BingXClient
+from .bitget.client import Client as BitgetClient
 from .bitmart.client import Client as BitmartClient
 from .bitmex.client import Client as BitmexClient
 from .bybit.client import Client as BybitClient
@@ -32,6 +33,13 @@ async def bingx(
 ) -> BingXClient:
     """Create and initialize a BingX client instance."""
     return cast(BingXClient, await BingXClient(**kwargs).async_init())
+
+
+async def bitget(
+    **kwargs: Any,  # noqa: ANN401
+) -> BitgetClient:
+    """Create and initialize a Bitget client instance."""
+    return cast(BitgetClient, await BitgetClient(**kwargs).async_init())
 
 
 async def bitmart(
@@ -93,6 +101,7 @@ async def okx(
 __all__ = [
     "binance",
     "bingx",
+    "bitget",
     "bitmart",
     "bitmex",
     "bybit",

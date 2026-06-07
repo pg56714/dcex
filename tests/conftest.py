@@ -13,6 +13,7 @@ _relative_path_key = pytest.StashKey[Path | None]()
 _PRIVATE_ENV_VARS = {
     "binance": ("BINANCE_API_KEY", "BINANCE_API_SECRET"),
     "bingx": ("BINGX_API_KEY", "BINGX_API_SECRET"),
+    "bitget": ("BITGET_API_KEY", "BITGET_API_SECRET", "BITGET_PASSPHRASE"),
     "bitmart": ("BITMART_API_KEY", "BITMART_API_SECRET", "BITMART_MEMO"),
     "bitmex": ("BITMEX_API_KEY", "BITMEX_API_SECRET"),
     "bybit": ("BYBIT_API_KEY", "BYBIT_API_SECRET"),

@@ -1,0 +1,1 @@
+"""Bitget sync client package."""

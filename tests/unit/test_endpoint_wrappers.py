@@ -166,7 +166,7 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
         kwargs.update(api_key="api-key", api_secret="api-secret")
     elif exchange == "bitmart":
         kwargs.update(api_key="api-key", api_secret="api-secret", memo="memo")
-    elif exchange in {"okx", "kucoin"}:
+    elif exchange in {"bitget", "okx", "kucoin"}:
         kwargs.update(api_key="api-key", api_secret="api-secret", passphrase="passphrase")
     elif exchange == "kraken":
         kwargs.update(
@@ -261,6 +261,15 @@ def _sample_order(exchange: str) -> dict[str, Any]:
             "sz": "1",
             "px": "100",
         }
+    if exchange == "bitget":
+        return {
+            "symbol": "BTCUSDT",
+            "side": "buy",
+            "orderType": "limit",
+            "force": "gtc",
+            "size": "1",
+            "price": "1",
+        }
     return {"symbol": "BTCUSDT", "side": "Buy", "orderType": "Limit", "qty": "1", "price": "1"}
 
 
@@ -283,6 +292,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     if name in {"type", "type_"}:
         return "limit"
     if name in {"orderType"}:
+        if case.exchange == "bitget":
+            return "limit"
         return "Limit"
     if name in {"tdMode", "mgnMode"}:
         return "cross"
@@ -290,8 +301,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "limit"
     if name in {"ordertype"}:
         return "limit"
-    if name in {"orderType"}:
-        return "lmt"
+    if name in {"productType"}:
+        return "USDT-FUTURES"
     if name in {"category"}:
         return "linear"
     if name in {"instType"}:
@@ -300,6 +311,16 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "USDT"
     if name in {"settleCoin"}:
         return "USDT"
+    if name in {"marginCoin"}:
+        return "USDT"
+    if name in {"marginMode"}:
+        return "crossed"
+    if name in {"holdSide"}:
+        return "long"
+    if name in {"force"}:
+        return "gtc"
+    if name in {"assetType"}:
+        return "all"
     if name in {"symbol"}:
         return "XBT-USDT-SWAP" if case.exchange == "bitmex" else "BTCUSDT"
     if name in {"contract"}:
@@ -336,6 +357,7 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         "ordId",
         "orderID",
         "clientOrderId",
+        "clientOid",
         "clOrdID",
         "cloid",
         "txid",
@@ -349,8 +371,14 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "1"
     if name in {"fromAccount", "toAccount"}:
         return "cash"
+    if name in {"fromType"}:
+        return "spot"
+    if name in {"toType"}:
+        return "usdt_futures"
     if name in {"orderIds", "cliOrdIds"}:
         return ["test-order-id"]
+    if name in {"orderList", "orderIdList"}:
+        return [{"orderId": "test-order-id"}]
     if name in {"from_", "to", "transId", "wdId"}:
         return "test-id"
     if name in {"chain", "addr", "dest", "fee", "toAddr"}:
@@ -403,6 +431,13 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         kwargs["txid"] = "test-order-id"
     if case.exchange == "kraken" and case.method_name == "cancel_futures_order":
         kwargs["order_id"] = "test-order-id"
+    if case.exchange == "bitget" and case.method_name in {
+        "cancel_spot_order",
+        "get_spot_order",
+        "cancel_futures_order",
+        "get_futures_order",
+    }:
+        kwargs["orderId"] = "test-order-id"
     return kwargs
 
 

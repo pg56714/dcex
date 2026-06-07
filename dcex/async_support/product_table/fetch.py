@@ -231,6 +231,86 @@ async def bingx() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+async def bitget() -> pl.DataFrame:
+    """
+    Fetch market information from Bitget exchange.
+
+    Retrieves trading pairs from Bitget including spot and USDT-M futures markets.
+    Standardizes the data into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from Bitget.
+    """
+    from ..bitget._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    await market_http.async_init()
+
+    markets = []
+    res_spot = await market_http.get_spot_symbols()
+    for market in res_spot.get("data", []):
+        if not isinstance(market, dict):
+            continue
+        status = str(market.get("status", "")).lower()
+        if status and status != "online":
+            continue
+
+        base = str(market["baseCoin"])
+        quote = str(market["quoteCoin"])
+        price_precision = int(str(market.get("pricePrecision", "0") or "0"))
+        quantity_precision = int(str(market.get("quantityPrecision", "0") or "0"))
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BITGET,
+                exchange_symbol=str(market["symbol"]),
+                product_symbol=f"{base}-{quote}-SPOT",
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(reverse_decimal_places(price_precision)),
+                size_precision=str(reverse_decimal_places(quantity_precision)),
+                min_size=str(market.get("minTradeAmount", "0")),
+                min_notional=str(market.get("minTradeUSDT", "0")),
+            )
+        )
+
+    res_futures = await market_http.get_futures_contracts(productType="USDT-FUTURES")
+    for market in res_futures.get("data", []):
+        if not isinstance(market, dict):
+            continue
+        status = str(market.get("symbolStatus") or market.get("status") or "").lower()
+        if status and status not in {"normal", "online"}:
+            continue
+
+        base = str(market["baseCoin"])
+        quote = str(market["quoteCoin"])
+        price_precision = int(str(market.get("pricePlace", "0") or "0"))
+        volume_precision = int(str(market.get("volumePlace", "0") or "0"))
+
+        markets.append(
+            MarketInfo(
+                exchange=Common.BITGET,
+                exchange_symbol=str(market["symbol"]),
+                product_symbol=f"{base}-{quote}-SWAP",
+                product_type="swap",
+                exchange_type=str(market.get("symbolType", "USDT-FUTURES")),
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(reverse_decimal_places(price_precision)),
+                size_precision=str(reverse_decimal_places(volume_precision)),
+                min_size=str(market.get("minTradeNum", "0")),
+                min_notional=str(market.get("minTradeUSDT", "0")),
+                size_per_contract=str(market.get("sizeMultiplier", "1")),
+            )
+        )
+
+    markets = [market.to_dict() for market in markets]
+    await market_http.close()
+    return pl.DataFrame(markets)
+
+
 async def bitmart() -> pl.DataFrame:
     """
     Fetch market information from BitMart exchange.

@@ -147,6 +147,11 @@ def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
             {"payload": {"code": 0}, "kwargs": {"signed": False}},
         ),
         (
+            "dcex.bitget._http_manager",
+            "/api/v2/spot/public/symbols",
+            {"payload": {"code": "00000", "data": []}, "kwargs": {"signed": False}},
+        ),
+        (
             "dcex.bitmart._http_manager",
             BitmartSpotMarket.GET_TRADING_PAIRS_DETAILS,
             {"payload": {"code": 1000}, "kwargs": {"signed": False}},
@@ -205,6 +210,11 @@ def _async_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
             "dcex.async_support.bingx._http_manager",
             "/openApi/swap/v2/quote/ticker",
             {"payload": {"code": 0}, "kwargs": {"signed": False}},
+        ),
+        (
+            "dcex.async_support.bitget._http_manager",
+            "/api/v2/spot/public/symbols",
+            {"payload": {"code": "00000", "data": []}, "kwargs": {"signed": False}},
         ),
         (
             "dcex.async_support.bitmart._http_manager",

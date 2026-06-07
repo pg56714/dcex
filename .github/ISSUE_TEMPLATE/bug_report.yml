@@ -57,6 +57,7 @@ body:
       options:
         - "N/A"
         - "Binance"
+        - "Bitget"
         - "Bybit"
         - "BitMart"
         - "BingX"

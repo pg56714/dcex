@@ -65,6 +65,9 @@ Kraken private live tests require separate Spot and Futures key pairs:
 `KRAKEN_SPOT_API_KEY` / `KRAKEN_SPOT_API_SECRET` and
 `KRAKEN_FUTURES_API_KEY` / `KRAKEN_FUTURES_API_SECRET`.
 
+Bitget private live tests require `BITGET_API_KEY`, `BITGET_API_SECRET`, and
+`BITGET_PASSPHRASE`.
+
 Stateful tests can mutate exchange or account settings, such as leverage or position mode. Run them only when that is intentional:
 
 ```sh

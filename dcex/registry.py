@@ -15,6 +15,7 @@ package). ``sync``/``async`` reflect whether a corresponding fetcher exists in
 EXCHANGES: dict[str, dict[str, bool]] = {
     "binance": {"sync": True, "async": True},
     "bingx": {"sync": True, "async": True},
+    "bitget": {"sync": True, "async": True},
     "bitmart": {"sync": True, "async": True},
     "bitmex": {"sync": True, "async": True},
     "bybit": {"sync": True, "async": True},
