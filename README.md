@@ -85,11 +85,6 @@ if __name__ == "__main__":
 | **KuCoin**      | Yes          | Yes           |
 | **Kraken**      | Yes          | Yes           |
 
-Kraken private Spot and Futures APIs use separate API key pairs. Configure
-`KRAKEN_SPOT_API_KEY` / `KRAKEN_SPOT_API_SECRET` for Spot REST private endpoints,
-and `KRAKEN_FUTURES_API_KEY` / `KRAKEN_FUTURES_API_SECRET` for Futures REST
-private endpoints.
-
 ## Key Features
 
 - Product Table Manager for unifying trading instruments across exchanges
