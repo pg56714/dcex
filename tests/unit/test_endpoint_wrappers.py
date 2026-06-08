@@ -25,6 +25,7 @@ ENDPOINT_FILE_SUFFIXES = (
     "_trade_http.py",
     "_trading_http.py",
 )
+NO_REQUEST_METHODS = {"check_client", "create_auth_token", "get_listen_key"}
 
 
 @dataclass(frozen=True)
@@ -52,6 +53,8 @@ class FakePTM:
             return "XBTUSDT"
         if exchange == Common.KRAKEN or str(exchange) == Common.KRAKEN.value:
             return "XBTUSDT" if product_symbol and "SPOT" in product_symbol else "PF_XBTUSD"
+        if exchange == Common.LIGHTER or str(exchange) == Common.LIGHTER.value:
+            return "0"
         if exchange == Common.MEXC or str(exchange) == Common.MEXC.value:
             return "BTCUSDT" if product_symbol and "SPOT" in product_symbol else "BTC_USDT"
         return "BTCUSDT"
@@ -124,6 +127,34 @@ class FakeAsyncHyperliquidMarket:
         return None
 
 
+class FakeLighterSigner:
+    """Signer stand-in for Lighter endpoint wrapper tests."""
+
+    def create_auth_token_with_expiry(self, **kwargs: object) -> tuple[str, None]:
+        return "test-auth-token", None
+
+    def check_client(self) -> None:
+        return None
+
+    def sign_create_order(self, **kwargs: object) -> tuple[int, str, str, None]:
+        return 1, "{}", "test-tx-hash", None
+
+    def sign_cancel_order(self, **kwargs: object) -> tuple[int, str, str, None]:
+        return 2, "{}", "test-tx-hash", None
+
+    def sign_modify_order(self, **kwargs: object) -> tuple[int, str, str, None]:
+        return 3, "{}", "test-tx-hash", None
+
+    def sign_cancel_all_orders(self, **kwargs: object) -> tuple[int, str, str, None]:
+        return 4, "{}", "test-tx-hash", None
+
+    def sign_update_leverage(self, **kwargs: object) -> tuple[int, str, str, None]:
+        return 5, "{}", "test-tx-hash", None
+
+    def sign_update_margin(self, **kwargs: object) -> tuple[int, str, str, None]:
+        return 6, "{}", "test-tx-hash", None
+
+
 def _endpoint_method_names(mode: str, exchange: str) -> list[str]:
     base = ROOT / "dcex"
     if mode == "async":
@@ -182,6 +213,8 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
             wallet_address="0x0000000000000000000000000000000000000001",
             private_key="0x" + "1" * 64,
         )
+    elif exchange == "lighter":
+        kwargs.update(account_index=1, api_key_index=2, api_private_key="1" * 64)
     return kwargs
 
 
@@ -202,6 +235,8 @@ def _wire_sync(client: Any) -> list[dict[str, Any]]:
         )
         if getattr(path, "name", "") == "USER_DATA_STREAM" or "listenKey" in str(path):
             return {"listenKey": "test-listen-key"}
+        if "nextNonce" in str(path):
+            return {"nonce": 1}
         return {"ok": True}
 
     client._request = fake_request
@@ -225,6 +260,8 @@ def _wire_async(client: Any) -> list[dict[str, Any]]:
         )
         if getattr(path, "name", "") == "USER_DATA_STREAM" or "listenKey" in str(path):
             return {"listenKey": "test-listen-key"}
+        if "nextNonce" in str(path):
+            return {"nonce": 1}
         return {"ok": True}
 
     client._request = fake_request
@@ -301,6 +338,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "buy"
     if name in {"isBuy", "reduceOnly", "isCross", "randomize", "dual_mode"}:
         return True
+    if name in {"is_ask", "reduce_only"}:
+        return False
     if name in {"mxDeductEnable"}:
         return True
     if name in {"type", "type_"}:
@@ -394,12 +433,26 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         "qty",
         "quantity",
         "vol",
+        "market_index",
+        "client_order_index",
+        "base_amount",
+        "price",
+        "order_index",
+        "order_type",
+        "time_in_force",
+        "timestamp_ms",
+        "fraction",
+        "margin_mode",
+        "direction",
+        "tx_type",
     }:
         return 1
     if name in {"orderQty", "leverage", "lever", "ntli", "minutes"}:
         return 1
     if name in {"amount", "notional", "price", "px", "sz", "funds", "volume"}:
         return "1"
+    if name in {"tx_info", "tx_infos", "tx_types"}:
+        return "{}"
     if name in {"fromAccount", "toAccount"}:
         return "cash"
     if name in {"fromType"}:
@@ -537,20 +590,27 @@ def _patch_hyperliquid_market(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(async_trade, "MarketHTTP", FakeAsyncHyperliquidMarket)
 
 
+def _patch_lighter_signer(client: Any) -> None:
+    if client.__class__.__module__.endswith(".lighter.client"):
+        client._signer = FakeLighterSigner()
+
+
 @pytest.mark.parametrize("case", SYNC_CASES, ids=[case.id for case in SYNC_CASES])
 def test_sync_endpoint_wrapper_is_reachable(
     case: EndpointCase, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     _patch_hyperliquid_market(monkeypatch)
     client = _client_class(case.mode, case.exchange)(**_client_kwargs(case.exchange))
+    _patch_lighter_signer(client)
     calls = _wire_sync(client)
     _patch_sync_case(client, case)
 
     method = getattr(client, case.method_name)
     result = method(**_case_kwargs(case, method))
 
-    assert result is not None
-    if case.method_name != "get_listen_key":
+    if case.method_name != "check_client":
+        assert result is not None
+    if case.method_name not in NO_REQUEST_METHODS:
         assert calls
 
 
@@ -678,14 +738,16 @@ async def test_async_endpoint_wrapper_is_reachable(
 ) -> None:
     _patch_hyperliquid_market(monkeypatch)
     client = _client_class(case.mode, case.exchange)(**_client_kwargs(case.exchange))
+    _patch_lighter_signer(client)
     calls = _wire_async(client)
     _patch_async_case(client, case)
 
     method = getattr(client, case.method_name)
     result = await method(**_case_kwargs(case, method))
 
-    assert result is not None
-    if case.method_name not in {"get_listen_key"}:
+    if case.method_name != "check_client":
+        assert result is not None
+    if case.method_name not in NO_REQUEST_METHODS:
         assert calls
 
 

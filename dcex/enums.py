@@ -22,8 +22,8 @@ from enum import Enum
 
 from .registry import EXCHANGES
 
-# Exchanges that take a boolean buy flag instead of a side string.
-_BOOL_SIDE_EXCHANGES = frozenset({"hyperliquid"})
+# Exchanges that take a boolean side flag or signed order payload instead of a side string.
+_BOOL_SIDE_EXCHANGES = frozenset({"hyperliquid", "lighter"})
 
 # value -> {exchange: native side string}. Module-level constant.
 _ORDER_SIDE_MAP: dict[str, dict[str, str]] = {

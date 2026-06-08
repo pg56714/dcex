@@ -983,6 +983,88 @@ async def kraken() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+def _lighter_precision(market: dict[str, object], key: str, fallback_key: str) -> str:
+    decimals = int(str(market.get(key, market.get(fallback_key, 0)) or 0))
+    return str(reverse_decimal_places(decimals))
+
+
+def _lighter_market_info(market: dict[str, object], product_type: str) -> MarketInfo:
+    symbol = str(market["symbol"])
+    market_type = str(market.get("market_type") or product_type)
+
+    if product_type == "spot":
+        if "/" in symbol:
+            base, quote = symbol.split("/", 1)
+        else:
+            base, quote = symbol, "USDC"
+        product_symbol = f"{base}-{quote}-SPOT"
+    else:
+        base, quote = symbol, "USDC"
+        product_symbol = f"{base}-{quote}-SWAP"
+
+    return MarketInfo(
+        exchange=Common.LIGHTER,
+        exchange_symbol=str(market["market_id"]),
+        product_symbol=product_symbol,
+        product_type=product_type,
+        exchange_type=market_type,
+        base_currency=base,
+        quote_currency=quote,
+        price_precision=_lighter_precision(
+            market,
+            key="price_decimals",
+            fallback_key="supported_price_decimals",
+        ),
+        size_precision=_lighter_precision(
+            market,
+            key="size_decimals",
+            fallback_key="supported_size_decimals",
+        ),
+        min_size=str(market.get("min_base_amount", "0")),
+        min_notional=str(market.get("min_quote_amount", "0")),
+    )
+
+
+async def lighter() -> pl.DataFrame:
+    """
+    Fetch market information from Lighter exchange.
+
+    Retrieves Lighter perpetual and spot order books, then standardizes them
+    into MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from Lighter.
+    """
+    from ..lighter._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    await market_http.async_init()
+
+    try:
+        markets = []
+        res = await market_http.get_order_book_details()
+        if not isinstance(res, dict):
+            return pl.DataFrame(markets)
+        for market in res.get("order_book_details", []):
+            if not isinstance(market, dict):
+                continue
+            if str(market.get("status", "")).lower() != "active":
+                continue
+            markets.append(_lighter_market_info(market, product_type="swap"))
+
+        for market in res.get("spot_order_book_details", []):
+            if not isinstance(market, dict):
+                continue
+            if str(market.get("status", "")).lower() != "active":
+                continue
+            markets.append(_lighter_market_info(market, product_type="spot"))
+    finally:
+        await market_http.close()
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
 async def mexc() -> pl.DataFrame:
     """
     Fetch market information from MEXC exchange.

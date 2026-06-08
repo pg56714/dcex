@@ -2,7 +2,7 @@
 
 Thank you for contributing to dcex. Before opening a large change, please discuss the scope in an issue or discussion so maintainers can confirm that it fits the project direction.
 
-Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) in all project interactions.
+Please follow the [Code of Conduct](https://github.com/pg56714/dcex/blob/main/.github/CODE_OF_CONDUCT.md) in all project interactions.
 
 ## Project Scope
 
@@ -62,6 +62,10 @@ Use marker filters to avoid unintended account changes:
 uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful and not generated"
 ```
 
+Lighter private tests require the optional official `lighter-sdk` signer package
+and `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_INDEX`, and `LIGHTER_API_PRIVATE_KEY`.
+The private key is the Lighter API private key, not an Ethereum wallet private key.
+
 Stateful tests can mutate exchange or account settings, such as leverage or position mode. Run them only when that is intentional:
 
 ```sh
@@ -97,19 +101,19 @@ Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) in En
 
 Common commit types:
 
-| Type       | Use for                                           |
-| ---------- | ------------------------------------------------- |
-| `feat`     | New user-facing functionality                     |
-| `fix`      | Bug fixes                                         |
-| `docs`     | Documentation-only changes                        |
-| `deps`     | Dependency updates                                |
-| `perf`     | Performance improvements                          |
-| `refactor` | Code restructuring without behavior changes       |
-| `test`     | Test additions or updates                         |
-| `ci`       | CI workflow changes                               |
-| `build`    | Build system or packaging changes                 |
-| `chore`    | Maintenance that does not fit another category    |
-| `revert`   | Reverting a previous change                       |
+| Type       | Use for                                        |
+| ---------- | ---------------------------------------------- |
+| `feat`     | New user-facing functionality                  |
+| `fix`      | Bug fixes                                      |
+| `docs`     | Documentation-only changes                     |
+| `deps`     | Dependency updates                             |
+| `perf`     | Performance improvements                       |
+| `refactor` | Code restructuring without behavior changes    |
+| `test`     | Test additions or updates                      |
+| `ci`       | CI workflow changes                            |
+| `build`    | Build system or packaging changes              |
+| `chore`    | Maintenance that does not fit another category |
+| `revert`   | Reverting a previous change                    |
 
 Examples:
 

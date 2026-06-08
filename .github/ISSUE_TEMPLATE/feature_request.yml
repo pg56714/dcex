@@ -53,6 +53,7 @@ body:
         - "Gate.io"
         - "KuCoin"
         - "Kraken"
+        - "Lighter"
         - "MEXC"
         - "BitMEX"
         - "Other (please specify in description)"

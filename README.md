@@ -84,6 +84,7 @@ if __name__ == "__main__":
 | **BingX**       | Yes          | Yes           |
 | **KuCoin**      | Yes          | Yes           |
 | **Kraken**      | Yes          | Yes           |
+| **Lighter**     | Yes          | Yes           |
 | **MEXC**        | Yes          | Yes           |
 
 ## Key Features

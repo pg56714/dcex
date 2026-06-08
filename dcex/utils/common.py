@@ -17,6 +17,7 @@ class Common(str, Enum):
     KUCOIN = "kucoin"
     BITMEX = "bitmex"
     KRAKEN = "kraken"
+    LIGHTER = "lighter"
     MEXC = "mexc"
 
     def __str__(self) -> str:

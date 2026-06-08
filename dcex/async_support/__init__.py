@@ -18,6 +18,7 @@ from .gateio.client import Client as GateioClient
 from .hyperliquid.client import Client as HyperliquidClient
 from .kraken.client import Client as KrakenClient
 from .kucoin.client import Client as KuCoinClient
+from .lighter.client import Client as LighterClient
 from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
 
@@ -92,6 +93,13 @@ async def kraken(
     return cast(KrakenClient, await KrakenClient(**kwargs).async_init())
 
 
+async def lighter(
+    **kwargs: Any,  # noqa: ANN401
+) -> LighterClient:
+    """Create and initialize a Lighter client instance."""
+    return cast(LighterClient, await LighterClient(**kwargs).async_init())
+
+
 async def mexc(
     **kwargs: Any,  # noqa: ANN401
 ) -> MEXCClient:
@@ -117,6 +125,7 @@ __all__ = [
     "hyperliquid",
     "kucoin",
     "kraken",
+    "lighter",
     "mexc",
     "okx",
 ]
