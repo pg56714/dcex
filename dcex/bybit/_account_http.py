@@ -47,7 +47,7 @@ class AccountHTTP(HTTPManager):
 
     def get_transferable_amount(
         self,
-        coins: list[str] | None = None,
+        coins: list[str],
     ) -> dict[str, Any]:
         """
         Get transferable amount for specified coins.
@@ -58,12 +58,12 @@ class AccountHTTP(HTTPManager):
         Returns:
             dict[str, Any]: API response containing transferable amounts
         """
-        payload = {}
-        if coins is not None:
-            coinName = ",".join(coins)
-            payload = {
-                "coinName": coinName,
-            }
+        if not coins:
+            raise ValueError("coins must contain at least one coin.")
+        if len(coins) > 20:
+            raise ValueError("coins must contain no more than 20 coins.")
+
+        payload = {"coinName": ",".join(coins)}
 
         res = self._request(
             method="GET",

@@ -510,6 +510,8 @@ class MarketHTTP(HTTPManager):
 
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
+        if cursor is not None:
+            payload["cursor"] = cursor
 
         res = await self._request(
             method="GET",

@@ -118,11 +118,22 @@ def _private_env_vars(item: pytest.Item, relative_path: Path | None) -> tuple[st
     return _PRIVATE_ENV_VARS.get(relative_path.parts[1], ())
 
 
+def _stateful_tests_enabled() -> bool:
+    return os.getenv("RUN_LIVE_TRADING_TESTS") == "1"
+
+
 def pytest_runtest_setup(item: pytest.Item) -> None:
-    """Skip private live tests early when the exchange credentials are not configured."""
+    """Enforce opt-in and credential requirements for live tests."""
     relative_path = item.stash.get(_relative_path_key, None) or _relative_test_path(
         item.config, item
     )
+    if (
+        _is_live_path(relative_path)
+        and item.get_closest_marker("stateful") is not None
+        and not _stateful_tests_enabled()
+    ):
+        pytest.skip("Set RUN_LIVE_TRADING_TESTS=1 before running a stateful live test.")
+
     missing = [name for name in _private_env_vars(item, relative_path) if not os.getenv(name)]
     if missing:
         pytest.skip(f"Set {', '.join(missing)} before running this private live test.")

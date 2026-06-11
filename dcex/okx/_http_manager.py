@@ -136,8 +136,6 @@ class HTTPManager(BaseHTTPManager):
         flag: Simulated trading flag ("0" for live, "1" for simulated)
         base_api: Base URL for OKX API
         timeout: Request timeout in seconds
-        max_retries: Maximum number of retry attempts
-        retry_delay: Delay between retry attempts in seconds
         logger: Logger instance for debugging
         session: HTTP session for connection pooling
         ptm: Product table manager instance
@@ -152,8 +150,6 @@ class HTTPManager(BaseHTTPManager):
     flag: str = field(default="0")
     base_api: str = field(default="https://openapi.okx.com")
     timeout: int = field(default=10)
-    max_retries: int = field(default=3)
-    retry_delay: int = field(default=3)
     logger: logging.Logger | None = field(default=None)
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)

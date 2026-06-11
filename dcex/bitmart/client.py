@@ -37,8 +37,6 @@ class Client(
                 api_secret: API secret for authentication
                 memo: API memo for authentication
                 timeout: Request timeout in seconds
-                max_retries: Maximum number of retries
-                retry_delay: Delay between retries
                 logger: Logger instance
                 preload_product_table: Whether to preload product table
         """

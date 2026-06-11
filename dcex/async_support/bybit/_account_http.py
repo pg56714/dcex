@@ -64,12 +64,12 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing transferable amount information
         """
-        payload = {}
-        if coins is not None:
-            coinName = ",".join(coins)
-            payload = {
-                "coinName": coinName,
-            }
+        if not coins:
+            raise ValueError("coins must contain at least one coin.")
+        if len(coins) > 20:
+            raise ValueError("coins must contain no more than 20 coins.")
+
+        payload = {"coinName": ",".join(coins)}
 
         res = await self._request(
             method="GET",

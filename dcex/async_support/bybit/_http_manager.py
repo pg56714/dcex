@@ -99,8 +99,6 @@ class HTTPManager(BaseHTTPManager):
         api_secret: API secret for signing
         timeout: Request timeout in seconds
         recv_window: Receive window for requests
-        max_retries: Maximum number of retries
-        retry_delay: Delay between retries in seconds
         logger: Logger instance
         session: HTTP client session
         ptm: Product table manager
@@ -116,8 +114,6 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     recv_window: int = field(default=5000)
-    max_retries: int = field(default=3)
-    retry_delay: int = field(default=3)
     logger: logging.Logger | None = field(default=None)
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)

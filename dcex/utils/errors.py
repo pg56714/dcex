@@ -1,6 +1,9 @@
 """Custom exception classes for API and request handling."""
 
 from typing import Protocol
+from urllib.parse import urlsplit, urlunsplit
+
+_HTTP_METHODS = frozenset({"DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"})
 
 
 class ResponseProtocol(Protocol):
@@ -8,6 +11,27 @@ class ResponseProtocol(Protocol):
 
     status_code: int
     text: str
+
+
+def _sanitize_request(request: str) -> str:
+    """Return a request summary without query parameters or payload data."""
+    request_line = request.partition(" | ")[0].strip()
+    method, separator, url = request_line.partition(" ")
+    method = method.upper()
+    if not separator or method not in _HTTP_METHODS:
+        return "<redacted>"
+
+    url = url.strip()
+    if not url:
+        return "<redacted>"
+    url = url.split(maxsplit=1)[0]
+    parsed = urlsplit(url)
+    if parsed.scheme and parsed.netloc:
+        safe_url = urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", ""))
+    else:
+        safe_url = url.split("?", 1)[0].split("#", 1)[0]
+
+    return f"{method} {safe_url}"
 
 
 class APIRequestError(Exception):
@@ -21,13 +45,14 @@ class APIRequestError(Exception):
         time: str | None = None,
         resp_headers: dict | None = None,
     ) -> None:
-        self.request = request
+        self.request = _sanitize_request(request)
         self.message = message
         self.status_code = status_code if status_code is not None else "Unknown"
         self.time = time if time is not None else "Unknown"
         self.resp_headers = resp_headers
         super().__init__(
-            f"{message} (ErrCode: {self.status_code}) (ErrTime: {self.time}).\nRequest → {request}."
+            f"{message} (ErrCode: {self.status_code}) (ErrTime: {self.time}).\n"
+            f"Request: {self.request}."
         )
 
 
