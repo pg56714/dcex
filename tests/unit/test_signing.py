@@ -18,6 +18,8 @@ from importlib import import_module
 from urllib.parse import urlencode
 
 import pytest
+from coincurve import PrivateKey
+from Crypto.Hash import keccak
 
 # Fixed, fake credentials shared across the tests. Not real secrets.
 API_KEY = "test_api_key_0000"
@@ -50,6 +52,30 @@ class _CaptureBitmartSession:
     def post(self, url: str, **kwargs: object) -> _FakeResponse:
         self.calls.append(("POST", url, kwargs))
         return _FakeResponse({"code": 1000})
+
+
+def test_aster_eip712_signature_recovers_signer() -> None:
+    """Aster EIP-712 signatures recover the wallet that signed the message."""
+    from dcex.aster._http_manager import _eip712_digest, sign_message
+
+    private_key = "0x" + "11" * 32
+    message = (
+        "symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.001"
+        "&nonce=1700000000000000"
+        "&signer=0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"
+    )
+    signature = bytes.fromhex(sign_message(message, private_key).removeprefix("0x"))
+    recoverable = signature[:64] + bytes([signature[64] - 27])
+    public_key = PrivateKey(bytes.fromhex(private_key.removeprefix("0x"))).public_key
+    recovered = public_key.from_signature_and_message(
+        recoverable,
+        _eip712_digest(message),
+        hasher=None,
+    )
+    digest = keccak.new(digest_bits=256)
+    digest.update(recovered.format(compressed=False)[1:])
+
+    assert f"0x{digest.digest()[-20:].hex()}" == ("0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a")
 
 
 def test_binance_sign_matches_hmac_sha256() -> None:

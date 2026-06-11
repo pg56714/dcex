@@ -198,7 +198,13 @@ def _client_class(mode: str, exchange: str) -> type:
 
 def _client_kwargs(exchange: str) -> dict[str, Any]:
     kwargs: dict[str, Any] = {"preload_product_table": False}
-    if exchange == "backpack":
+    if exchange == "aster":
+        kwargs.update(
+            user_address="0x0000000000000000000000000000000000000002",
+            signer_address="0x0000000000000000000000000000000000000001",
+            private_key="0x" + "1" * 64,
+        )
+    elif exchange == "backpack":
         kwargs.update(
             api_key=base64.b64encode(b"2" * 32).decode(),
             api_secret=base64.b64encode(b"1" * 32).decode(),
@@ -291,6 +297,14 @@ def _product_symbol(exchange: str, method_name: str) -> str:
 
 
 def _sample_order(exchange: str) -> dict[str, Any]:
+    if exchange == "aster":
+        return {
+            "product_symbol": "BTC-USDT-SWAP",
+            "side": "BUY",
+            "type": "LIMIT",
+            "quantity": "1",
+            "price": "1",
+        }
     if exchange == "gateio":
         return {"product_symbol": "BTC-USDT-SWAP", "size": 1, "price": "100"}
     if exchange == "kucoin":
@@ -347,6 +361,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     if name in {"product_symbols"}:
         return [_product_symbol(case.exchange, method_name)]
     if name in {"side"}:
+        if case.exchange == "aster":
+            return "BUY"
         if case.exchange == "backpack":
             return "Bid"
         if case.exchange == "bitmart" and "contract" in method_name:
@@ -444,6 +460,31 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "0x0000000000000000000000000000000000000001"
     if name in {"request", "orders", "batchOrders"}:
         return [_sample_order(case.exchange)]
+    if name in {"subOrderList"}:
+        if case.exchange == "aster":
+            return [
+                {
+                    "strategySubId": "1",
+                    "securityType": "USDT_FUTURES",
+                    "symbol": "BTCUSDT",
+                    "side": "BUY",
+                    "type": "LIMIT",
+                    "quantity": "1",
+                    "price": "1",
+                    "timeInForce": "GTC",
+                },
+                {
+                    "strategySubId": "2",
+                    "securityType": "USDT_FUTURES",
+                    "symbol": "BTCUSDT",
+                    "side": "SELL",
+                    "type": "LIMIT",
+                    "quantity": "1",
+                    "price": "2",
+                    "timeInForce": "GTC",
+                },
+            ]
+        return [_sample_order(case.exchange)]
     if name in {"modifies"}:
         return [{"oid": 1, "order": {"a": 0, "b": True, "p": "100", "s": "1", "r": False}}]
     if name in {
@@ -471,6 +512,9 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         "vol",
         "market_index",
         "client_order_index",
+        "countdownTime",
+        "frozenTimeInMilliseconds",
+        "windowTimeInMilliseconds",
         "base_amount",
         "price",
         "order_index",
@@ -505,6 +549,26 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return "test-id"
     if name in {"fromAccountType", "toAccountType"}:
         return "SPOT"
+    if name in {"kindType"}:
+        return "FUTURE_SPOT"
+    if name in {"stpMode"}:
+        return "EXPIRE_TAKER"
+    if name in {"multiAssetsMargin"}:
+        return True
+    if name in {"quantityUnit"}:
+        return "BASE"
+    if name in {"chaseOffset", "maxChaseOffset"}:
+        return "1"
+    if name in {"chaseOffsetType", "maxChaseOffsetType"}:
+        return "ABSOLUTE"
+    if name in {"strategyType"}:
+        return "OTO"
+    if name in {"strategyId", "clientStrategyId"}:
+        return "test-strategy-id"
+    if name in {"listenKey"}:
+        return "test-listen-key"
+    if name in {"pair"}:
+        return "BTCUSDT"
     if name in {"external_oid", "externalOid"}:
         return "test-external-id"
     if name in {"chain", "addr", "dest", "fee", "toAddr"}:
@@ -539,6 +603,16 @@ def _required_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
 
 def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
     kwargs = _required_kwargs(case, method)
+    if case.exchange == "aster" and case.method_name in {
+        "cancel_futures_order",
+        "cancel_spot_order",
+        "get_futures_open_order",
+        "get_futures_order",
+        "get_spot_open_order",
+        "get_spot_order",
+        "modify_futures_order",
+    }:
+        kwargs["orderId"] = 1
     if case.exchange == "bitmex" and case.method_name == "amend_order":
         kwargs["orderID"] = "test-order-id"
     if case.exchange == "binance" and case.method_name in {

@@ -62,10 +62,6 @@ Use marker filters to avoid unintended account changes:
 uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful and not generated"
 ```
 
-Lighter private tests require the optional official `lighter-sdk` signer package
-and `LIGHTER_ACCOUNT_INDEX`, `LIGHTER_API_KEY_INDEX`, and `LIGHTER_API_PRIVATE_KEY`.
-The private key is the Lighter API private key, not an Ethereum wallet private key.
-
 Stateful tests can mutate exchange or account settings, such as leverage or position mode. Run them only when that is intentional:
 
 ```sh

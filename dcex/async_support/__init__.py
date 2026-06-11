@@ -8,6 +8,7 @@ which return an initialized async client (after awaiting `async_init`).
 # Import exchange client classes and create callable functions
 from typing import Any, cast
 
+from .aster.client import Client as AsterClient
 from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
 from .bingx.client import Client as BingXClient
@@ -22,6 +23,13 @@ from .kucoin.client import Client as KuCoinClient
 from .lighter.client import Client as LighterClient
 from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
+
+
+async def aster(
+    **kwargs: Any,  # noqa: ANN401
+) -> AsterClient:
+    """Create and initialize an Aster client instance."""
+    return cast(AsterClient, await AsterClient(**kwargs).async_init())
 
 
 async def backpack(
@@ -123,6 +131,7 @@ async def okx(
 
 
 __all__ = [
+    "aster",
     "backpack",
     "binance",
     "bingx",

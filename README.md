@@ -87,6 +87,7 @@ if __name__ == "__main__":
 | **Hyperliquid** | Yes          | Yes           |
 | **Lighter**     | Yes          | Yes           |
 | **Backpack**    | Yes          | Yes           |
+| **Aster**       | Yes          | Yes           |
 
 ## Key Features
 

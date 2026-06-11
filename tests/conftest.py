@@ -11,6 +11,7 @@ import pytest
 _LIVE_TEST_DIRS = {"sync_support", "async_support"}
 _relative_path_key = pytest.StashKey[Path | None]()
 _PRIVATE_ENV_VARS = {
+    "aster": ("ASTER_USER_ADDRESS", "ASTER_SIGNER_ADDRESS", "ASTER_PRIVATE_KEY"),
     "backpack": ("BACKPACK_API_KEY", "BACKPACK_API_SECRET"),
     "binance": ("BINANCE_API_KEY", "BINANCE_API_SECRET"),
     "bingx": ("BINGX_API_KEY", "BINGX_API_SECRET"),

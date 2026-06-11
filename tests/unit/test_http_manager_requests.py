@@ -128,6 +128,10 @@ class _AsyncCaptureSession:
         self.calls.append(("PATCH", url, kwargs))
         return self._response()
 
+    async def request(self, method: str, url: str, **kwargs: Any) -> _FakeResponse:
+        self.calls.append((method.upper(), url, kwargs))
+        return self._response()
+
 
 class _AsyncBadJsonSession(_AsyncCaptureSession):
     def _response(self) -> _FakeResponse:
@@ -135,10 +139,16 @@ class _AsyncBadJsonSession(_AsyncCaptureSession):
 
 
 def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
+    from dcex.aster.endpoints.market import SpotMarket as AsterSpotMarket
     from dcex.binance.endpoints.market import SpotMarket
     from dcex.bitmart.endpoints.market import SpotMarket as BitmartSpotMarket
 
     return [
+        (
+            "dcex.aster._http_manager",
+            AsterSpotMarket.SERVER_TIME,
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
+        ),
         (
             "dcex.backpack._http_manager",
             "/api/v1/time",
@@ -208,12 +218,20 @@ def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
 
 
 def _async_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
+    from dcex.async_support.aster.endpoints.market import (
+        SpotMarket as AsyncAsterSpotMarket,
+    )
     from dcex.async_support.binance.endpoints.market import SpotMarket
     from dcex.async_support.bitmart.endpoints.market import (
         SpotMarket as AsyncBitmartSpotMarket,
     )
 
     return [
+        (
+            "dcex.async_support.aster._http_manager",
+            AsyncAsterSpotMarket.SERVER_TIME,
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
+        ),
         (
             "dcex.async_support.backpack._http_manager",
             "/api/v1/time",
@@ -375,6 +393,132 @@ def _backpack_expected_signature(message: str) -> str:
     key = ECC.construct(curve="Ed25519", seed=b"1" * 32)
     signature = eddsa.new(key, "rfc8032").sign(message.encode())
     return base64.b64encode(signature).decode()
+
+
+def test_sync_aster_signed_body_matches_docs(monkeypatch: pytest.MonkeyPatch) -> None:
+    from dcex.aster._http_manager import HTTPManager, sign_message
+    from dcex.aster.endpoints.account import SpotAccount
+
+    nonce = 1700000000000000
+    signer = "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"
+    private_key = "0x" + "11" * 32
+    session = _CaptureSession({})
+    manager = HTTPManager(
+        signer_address=signer,
+        private_key=private_key,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+    monkeypatch.setattr(manager, "_next_nonce", lambda: nonce)
+
+    manager._request(
+        "POST",
+        SpotAccount.TRANSFER,
+        {"amount": "1", "asset": "USDT", "kindType": "FUTURE_SPOT"},
+    )
+
+    method, url, kwargs = session.calls[0]
+    message = f"amount=1&asset=USDT&kindType=FUTURE_SPOT&nonce={nonce}&signer={signer}"
+    assert method == "POST"
+    assert url == "https://sapi.asterdex.com/api/v3/asset/wallet/transfer"
+    assert kwargs["data"]["signature"] == sign_message(message, private_key)
+
+
+@pytest.mark.asyncio
+async def test_async_aster_signed_body_matches_docs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.aster._http_manager import sign_message
+    from dcex.async_support.aster._http_manager import HTTPManager
+    from dcex.async_support.aster.endpoints.account import SpotAccount
+
+    nonce = 1700000000000000
+    signer = "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"
+    private_key = "0x" + "11" * 32
+    session = _AsyncCaptureSession({})
+    manager = HTTPManager(
+        signer_address=signer,
+        private_key=private_key,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+    monkeypatch.setattr(manager, "_next_nonce", lambda: nonce)
+
+    await manager._request(
+        "POST",
+        SpotAccount.TRANSFER,
+        {"amount": "1", "asset": "USDT", "kindType": "FUTURE_SPOT"},
+    )
+
+    method, url, kwargs = session.calls[0]
+    message = f"amount=1&asset=USDT&kindType=FUTURE_SPOT&nonce={nonce}&signer={signer}"
+    assert method == "POST"
+    assert url == "https://sapi.asterdex.com/api/v3/asset/wallet/transfer"
+    assert kwargs["data"]["signature"] == sign_message(message, private_key)
+
+
+def test_sync_aster_futures_signature_includes_user(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.aster._http_manager import HTTPManager, sign_message
+    from dcex.aster.endpoints.account import FuturesAccount
+
+    nonce = 1700000000000000
+    user = "0x" + "22" * 20
+    signer = "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"
+    private_key = "0x" + "11" * 32
+    session = _CaptureSession([])
+    manager = HTTPManager(
+        user_address=user,
+        signer_address=signer,
+        private_key=private_key,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+    monkeypatch.setattr(manager, "_next_nonce", lambda: nonce)
+
+    manager._request("GET", FuturesAccount.BALANCE, {"asset": "USDC"})
+
+    method, url, kwargs = session.calls[0]
+    message = f"asset=USDC&nonce={nonce}&user={user}&signer={signer}"
+    assert method == "GET"
+    assert url == "https://fapi.asterdex.com/fapi/v3/balance"
+    assert kwargs["params"]["user"] == user
+    assert kwargs["params"]["signer"] == signer
+    assert kwargs["params"]["signature"] == sign_message(message, private_key)
+
+
+@pytest.mark.asyncio
+async def test_async_aster_futures_signature_includes_user(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.aster._http_manager import sign_message
+    from dcex.async_support.aster._http_manager import HTTPManager
+    from dcex.async_support.aster.endpoints.account import FuturesAccount
+
+    nonce = 1700000000000000
+    user = "0x" + "22" * 20
+    signer = "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"
+    private_key = "0x" + "11" * 32
+    session = _AsyncCaptureSession([])
+    manager = HTTPManager(
+        user_address=user,
+        signer_address=signer,
+        private_key=private_key,
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+    monkeypatch.setattr(manager, "_next_nonce", lambda: nonce)
+
+    await manager._request("GET", FuturesAccount.BALANCE, {"asset": "USDC"})
+
+    method, url, kwargs = session.calls[0]
+    message = f"asset=USDC&nonce={nonce}&user={user}&signer={signer}"
+    assert method == "GET"
+    assert url == "https://fapi.asterdex.com/fapi/v3/balance"
+    assert kwargs["params"]["user"] == user
+    assert kwargs["params"]["signer"] == signer
+    assert kwargs["params"]["signature"] == sign_message(message, private_key)
 
 
 def test_sync_backpack_signed_query_matches_docs(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -48,6 +48,86 @@ class MarketInfo:
         return asdict(self)
 
 
+def _aster_market_info(market: dict[str, object], product_type: str) -> MarketInfo:
+    symbol = str(market["symbol"])
+    base = str(market["baseAsset"])
+    quote = str(market["quoteAsset"])
+    exchange_type = (
+        "spot" if product_type == "spot" else str(market.get("contractType", "PERPETUAL"))
+    )
+    product_symbol = f"{base}-{quote}-SPOT" if product_type == "spot" else f"{base}-{quote}-SWAP"
+
+    filters = market.get("filters", [])
+    if not isinstance(filters, list):
+        filters = []
+    price_filter = next(
+        (
+            item
+            for item in filters
+            if isinstance(item, dict) and item.get("filterType") == "PRICE_FILTER"
+        ),
+        {},
+    )
+    lot_filter = next(
+        (
+            item
+            for item in filters
+            if isinstance(item, dict) and item.get("filterType") == "LOT_SIZE"
+        ),
+        {},
+    )
+    notional_filter = next(
+        (
+            item
+            for item in filters
+            if isinstance(item, dict) and item.get("filterType") in {"MIN_NOTIONAL", "NOTIONAL"}
+        ),
+        {},
+    )
+
+    return MarketInfo(
+        exchange=Common.ASTER,
+        exchange_symbol=symbol,
+        product_symbol=product_symbol,
+        product_type=product_type,
+        exchange_type=exchange_type,
+        base_currency=base,
+        quote_currency=quote,
+        price_precision=str(price_filter.get("tickSize", "0")),
+        size_precision=str(lot_filter.get("stepSize", "0")),
+        min_size=str(lot_filter.get("minQty", "0")),
+        min_notional=str(notional_filter.get("minNotional", notional_filter.get("notional", "0"))),
+    )
+
+
+def aster() -> pl.DataFrame:
+    """Fetch and standardize Aster V3 spot and futures markets."""
+    from ..aster._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+    try:
+        markets = []
+        spot = market_http.get_spot_exchange_info()
+        if isinstance(spot, dict):
+            markets.extend(
+                _aster_market_info(market, "spot")
+                for market in spot.get("symbols", [])
+                if isinstance(market, dict) and market.get("status") == "TRADING"
+            )
+
+        futures = market_http.get_futures_exchange_info()
+        if isinstance(futures, dict):
+            for market in futures.get("symbols", []):
+                if not isinstance(market, dict) or market.get("status") != "TRADING":
+                    continue
+                product_type = "swap" if market.get("contractType") == "PERPETUAL" else "futures"
+                markets.append(_aster_market_info(market, product_type))
+    finally:
+        market_http.close()
+
+    return pl.DataFrame([market.to_dict() for market in markets])
+
+
 def _backpack_market_info(market: dict[str, object]) -> MarketInfo:
     symbol = str(market["symbol"])
     base = str(market.get("baseSymbol") or symbol.split("_", 1)[0])

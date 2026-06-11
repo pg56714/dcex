@@ -43,6 +43,7 @@ body:
       description: "Which exchange module would this feature primarily affect?"
       options:
         - "N/A"
+        - "Aster"
         - "Backpack"
         - "Binance"
         - "Bitget"

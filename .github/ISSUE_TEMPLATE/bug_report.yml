@@ -56,6 +56,7 @@ body:
       description: "Which exchange module is this issue related to?"
       options:
         - "N/A"
+        - "Aster"
         - "Backpack"
         - "Binance"
         - "Bitget"
