@@ -7,6 +7,7 @@ Automatically handles Jupyter Notebook compatibility with nest_asyncio.
 
 from typing import Any
 
+from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
 from .bingx.client import Client as BingXClient
 from .bitget.client import Client as BitgetClient
@@ -26,6 +27,11 @@ auto_apply_nest_asyncio(verbose=False)
 
 
 # Create callable functions for each exchange (synchronous clients)
+def backpack(**kwargs: Any) -> BackpackClient:  # noqa: ANN401
+    """Create a Backpack client instance."""
+    return BackpackClient(**kwargs)
+
+
 def binance(**kwargs: Any) -> BinanceClient:  # noqa: ANN401
     """Create a Binance client instance."""
     return BinanceClient(**kwargs)
@@ -92,6 +98,7 @@ def okx(**kwargs: Any) -> OKXClient:  # noqa: ANN401
 
 
 __all__ = [
+    "backpack",
     "binance",
     "bingx",
     "bitget",

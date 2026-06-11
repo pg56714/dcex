@@ -6,6 +6,7 @@ from enum import Enum
 class Common(str, Enum):
     """Common exchange identifiers."""
 
+    BACKPACK = "backpack"
     BYBIT = "bybit"
     OKX = "okx"
     BITMART = "bitmart"

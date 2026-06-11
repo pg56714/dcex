@@ -13,6 +13,7 @@ package). ``sync``/``async`` reflect whether a corresponding fetcher exists in
 
 # Insertion order is preserved and used as the fetch order; keep it alphabetical.
 EXCHANGES: dict[str, dict[str, bool]] = {
+    "backpack": {"sync": True, "async": True},
     "binance": {"sync": True, "async": True},
     "bingx": {"sync": True, "async": True},
     "bitget": {"sync": True, "async": True},

@@ -28,6 +28,7 @@ _BOOL_SIDE_EXCHANGES = frozenset({"hyperliquid", "lighter"})
 # value -> {exchange: native side string}. Module-level constant.
 _ORDER_SIDE_MAP: dict[str, dict[str, str]] = {
     "BUY": {
+        "backpack": "Bid",
         "binance": "BUY",
         "bybit": "Buy",
         "okx": "buy",
@@ -41,6 +42,7 @@ _ORDER_SIDE_MAP: dict[str, dict[str, str]] = {
         "mexc": "BUY",
     },
     "SELL": {
+        "backpack": "Ask",
         "binance": "SELL",
         "bybit": "Sell",
         "okx": "sell",

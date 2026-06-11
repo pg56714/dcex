@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ast
+import base64
 import inspect
 from dataclasses import dataclass
 from importlib import import_module
@@ -43,6 +44,8 @@ class FakePTM:
     """Product table stand-in with enough behavior for endpoint wrapper tests."""
 
     def get_exchange_symbol(self, exchange: Common | str, product_symbol: str | None = None) -> str:
+        if exchange == Common.BACKPACK or str(exchange) == Common.BACKPACK.value:
+            return "BTC_USDC" if product_symbol and "SPOT" in product_symbol else "BTC_USDC_PERP"
         if exchange == Common.HYPERLIQUID or str(exchange) == Common.HYPERLIQUID.value:
             return '["BTC",0]'
         if exchange == Common.GATEIO or str(exchange) == Common.GATEIO.value:
@@ -195,7 +198,12 @@ def _client_class(mode: str, exchange: str) -> type:
 
 def _client_kwargs(exchange: str) -> dict[str, Any]:
     kwargs: dict[str, Any] = {"preload_product_table": False}
-    if exchange in {"binance", "bingx", "bitmex", "bybit", "gateio", "mexc"}:
+    if exchange == "backpack":
+        kwargs.update(
+            api_key=base64.b64encode(b"2" * 32).decode(),
+            api_secret=base64.b64encode(b"1" * 32).decode(),
+        )
+    elif exchange in {"binance", "bingx", "bitmex", "bybit", "gateio", "mexc"}:
         kwargs.update(api_key="api-key", api_secret="api-secret")
     elif exchange == "bitmart":
         kwargs.update(api_key="api-key", api_secret="api-secret", memo="memo")
@@ -275,6 +283,8 @@ def _product_symbol(exchange: str, method_name: str) -> str:
         return "BTC-USD-SWAP"
     if exchange == "kraken":
         return "BTC-USDT-SPOT" if "spot" in method_name else "BTC-USD-SWAP"
+    if exchange == "backpack":
+        return "BTC-USDC-SPOT" if "spot" in method_name else "BTC-USDC-SWAP"
     if "spot" in method_name:
         return "BTC-USDT-SPOT"
     return "BTC-USDT-SWAP"
@@ -317,6 +327,14 @@ def _sample_order(exchange: str) -> dict[str, Any]:
             "quantity": "1",
             "price": "1",
         }
+    if exchange == "backpack":
+        return {
+            "product_symbol": "BTC-USDC-SPOT",
+            "side": "Bid",
+            "orderType": "Limit",
+            "quantity": "1",
+            "price": "1",
+        }
     return {"symbol": "BTCUSDT", "side": "Buy", "orderType": "Limit", "qty": "1", "price": "1"}
 
 
@@ -329,6 +347,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     if name in {"product_symbols"}:
         return [_product_symbol(case.exchange, method_name)]
     if name in {"side"}:
+        if case.exchange == "backpack":
+            return "Bid"
         if case.exchange == "bitmart" and "contract" in method_name:
             return 1
         if case.exchange == "mexc" and "contract" in method_name:
@@ -377,7 +397,23 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     if name in {"assetType"}:
         return "all"
     if name in {"symbol"}:
+        if case.exchange == "backpack":
+            return "USDC" if "borrow" in method_name or "withdrawal" in method_name else "BTC_USDC"
         return "XBT-USDT-SWAP" if case.exchange == "bitmex" else "BTCUSDT"
+    if name in {"blockchain"}:
+        return "Solana"
+    if name in {"country"}:
+        return "US"
+    if name in {"marketType"}:
+        return "SPOT"
+    if name in {"sortDirection"}:
+        return "Desc"
+    if name in {"source"}:
+        return "TradingFees"
+    if name in {"borrow"}:
+        return "eyJzeW1ib2wiOiJVU0RDIiwicXVhbnRpdHkiOiIxIiwic2lkZSI6IkJvcnJvdyJ9"
+    if name in {"orders"} and case.exchange == "backpack":
+        return [_sample_order(case.exchange)]
     if name in {"contract"}:
         return "BTC_USDT"
     if name in {"path"}:
@@ -527,6 +563,8 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         "cancel_futures_order",
         "get_futures_order",
     }:
+        kwargs["orderId"] = "test-order-id"
+    if case.exchange == "backpack" and case.method_name in {"cancel_order", "get_open_order"}:
         kwargs["orderId"] = "test-order-id"
     return kwargs
 

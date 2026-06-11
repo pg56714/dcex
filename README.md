@@ -74,18 +74,19 @@ if __name__ == "__main__":
 | Exchange        | Sync Support | Async Support |
 | --------------- | ------------ | ------------- |
 | **Binance**     | Yes          | Yes           |
-| **Bitget**      | Yes          | Yes           |
 | **Bybit**       | Yes          | Yes           |
 | **OKX**         | Yes          | Yes           |
+| **Bitget**      | Yes          | Yes           |
+| **Kraken**      | Yes          | Yes           |
+| **MEXC**        | Yes          | Yes           |
 | **BitMart**     | Yes          | Yes           |
 | **BitMEX**      | Yes          | Yes           |
 | **Gate.io**     | Yes          | Yes           |
-| **Hyperliquid** | Yes          | Yes           |
 | **BingX**       | Yes          | Yes           |
 | **KuCoin**      | Yes          | Yes           |
-| **Kraken**      | Yes          | Yes           |
+| **Hyperliquid** | Yes          | Yes           |
 | **Lighter**     | Yes          | Yes           |
-| **MEXC**        | Yes          | Yes           |
+| **Backpack**    | Yes          | Yes           |
 
 ## Key Features
 
@@ -106,7 +107,7 @@ It is a table that contains the following columns:
 | product_symbol    | The symbol we use to identify the product, it will be the same in different exchanges. For example, `BTC-USDT-SWAP` is the same product in Binance and Bybit, which named `BTCUSDT` in Binance and `BTC-USDT-SWAP` in OKX. |
 | exchange_symbol   | The symbol that the exchange actually uses                                                                                                                                                                                 |
 | product_type      | The normalized product type used by dcex, e.g. `spot`, `swap`, `futures`                                                                                                                                                   |
-| exchange_type     | The exchange-specific product type, e.g. `spot`, `linear`, `inverse`, `perpetual`, `delivery`                                                                                                                             |
+| exchange_type     | The exchange-specific product type, e.g. `spot`, `linear`, `inverse`, `perpetual`, `delivery`                                                                                                                              |
 | base_currency     | The base currency, e.g. `BTC`                                                                                                                                                                                              |
 | quote_currency    | The quote currency, e.g. `USDT`                                                                                                                                                                                            |
 | price_precision   | The price precision, e.g. `0.000001`                                                                                                                                                                                       |

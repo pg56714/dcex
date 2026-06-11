@@ -8,6 +8,7 @@ which return an initialized async client (after awaiting `async_init`).
 # Import exchange client classes and create callable functions
 from typing import Any, cast
 
+from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
 from .bingx.client import Client as BingXClient
 from .bitget.client import Client as BitgetClient
@@ -21,6 +22,13 @@ from .kucoin.client import Client as KuCoinClient
 from .lighter.client import Client as LighterClient
 from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
+
+
+async def backpack(
+    **kwargs: Any,  # noqa: ANN401
+) -> BackpackClient:
+    """Create and initialize a Backpack client instance."""
+    return cast(BackpackClient, await BackpackClient(**kwargs).async_init())
 
 
 async def binance(
@@ -115,6 +123,7 @@ async def okx(
 
 
 __all__ = [
+    "backpack",
     "binance",
     "bingx",
     "bitget",

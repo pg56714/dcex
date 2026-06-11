@@ -3,12 +3,15 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 from importlib import import_module
 from typing import Any
 
 import pytest
+from Crypto.PublicKey import ECC
+from Crypto.Signature import eddsa
 
 from dcex.utils.errors import FailedRequestError
 
@@ -137,6 +140,11 @@ def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
 
     return [
         (
+            "dcex.backpack._http_manager",
+            "/api/v1/time",
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
+        ),
+        (
             "dcex.binance._http_manager",
             SpotMarket.SERVER_TIME,
             {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
@@ -206,6 +214,11 @@ def _async_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
     )
 
     return [
+        (
+            "dcex.async_support.backpack._http_manager",
+            "/api/v1/time",
+            {"payload": {"serverTime": 1}, "kwargs": {"signed": False}},
+        ),
         (
             "dcex.async_support.binance._http_manager",
             SpotMarket.SERVER_TIME,
@@ -348,6 +361,91 @@ def _gateio_expected_signature_for(
 def _mexc_contract_expected_signature(request_time: str, payload: str) -> str:
     canonical = f"{API_KEY}{request_time}{payload}"
     return hmac.new(API_SECRET.encode(), canonical.encode(), hashlib.sha256).hexdigest()
+
+
+def _backpack_secret() -> str:
+    return base64.b64encode(b"1" * 32).decode()
+
+
+def _backpack_key() -> str:
+    return base64.b64encode(b"2" * 32).decode()
+
+
+def _backpack_expected_signature(message: str) -> str:
+    key = ECC.construct(curve="Ed25519", seed=b"1" * 32)
+    signature = eddsa.new(key, "rfc8032").sign(message.encode())
+    return base64.b64encode(signature).decode()
+
+
+def test_sync_backpack_signed_query_matches_docs(monkeypatch: pytest.MonkeyPatch) -> None:
+    from dcex.backpack._http_manager import HTTPManager
+
+    backpack_http = import_module("dcex.backpack._http_manager")
+    monkeypatch.setattr(backpack_http.time, "time", lambda: int(TS_S))
+    session = _CaptureSession({})
+    manager = HTTPManager(
+        api_key=_backpack_key(),
+        api_secret=_backpack_secret(),
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+
+    manager._request(
+        "GET",
+        "/api/v1/order",
+        {"symbol": "BTC_USDC", "orderId": "test-order-id"},
+        signed=True,
+        instruction="orderQuery",
+    )
+
+    method, url, kwargs = session.calls[0]
+    message = (
+        "instruction=orderQuery&orderId=test-order-id&symbol=BTC_USDC"
+        f"&timestamp={int(TS_S) * 1000}&window=5000"
+    )
+    assert method == "GET"
+    assert url == "https://api.backpack.exchange/api/v1/order?symbol=BTC_USDC&orderId=test-order-id"
+    assert kwargs["headers"]["X-API-Key"] == _backpack_key()
+    assert kwargs["headers"]["X-Timestamp"] == str(int(TS_S) * 1000)
+    assert kwargs["headers"]["X-Window"] == "5000"
+    assert kwargs["headers"]["X-Signature"] == _backpack_expected_signature(message)
+
+
+@pytest.mark.asyncio
+async def test_async_backpack_signed_query_matches_docs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.backpack._http_manager import HTTPManager
+
+    backpack_http = import_module("dcex.async_support.backpack._http_manager")
+    monkeypatch.setattr(backpack_http.time, "time", lambda: int(TS_S))
+    session = _AsyncCaptureSession({})
+    manager = HTTPManager(
+        api_key=_backpack_key(),
+        api_secret=_backpack_secret(),
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+
+    await manager._request(
+        "GET",
+        "/api/v1/order",
+        {"symbol": "BTC_USDC", "orderId": "test-order-id"},
+        signed=True,
+        instruction="orderQuery",
+    )
+
+    method, url, kwargs = session.calls[0]
+    message = (
+        "instruction=orderQuery&orderId=test-order-id&symbol=BTC_USDC"
+        f"&timestamp={int(TS_S) * 1000}&window=5000"
+    )
+    assert method == "GET"
+    assert url == "https://api.backpack.exchange/api/v1/order?symbol=BTC_USDC&orderId=test-order-id"
+    assert kwargs["headers"]["X-API-Key"] == _backpack_key()
+    assert kwargs["headers"]["X-Timestamp"] == str(int(TS_S) * 1000)
+    assert kwargs["headers"]["X-Window"] == "5000"
+    assert kwargs["headers"]["X-Signature"] == _backpack_expected_signature(message)
 
 
 def test_gateio_signed_query_order_matches_sent_params(monkeypatch: pytest.MonkeyPatch) -> None:

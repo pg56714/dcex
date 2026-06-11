@@ -48,6 +48,81 @@ class MarketInfo:
         return asdict(self)
 
 
+def _backpack_market_info(market: dict[str, object]) -> MarketInfo:
+    symbol = str(market["symbol"])
+    base = str(market.get("baseSymbol") or symbol.split("_", 1)[0])
+    quote = str(market.get("quoteSymbol") or "USDC")
+    market_type = str(market.get("marketType") or "").upper()
+    product_type = {
+        "SPOT": "spot",
+        "PERP": "swap",
+        "IPERP": "swap",
+        "DATED": "futures",
+    }.get(market_type, market_type.lower())
+    product_symbol = f"{base}-{quote}-{product_type.upper()}"
+    if product_type == "swap":
+        product_symbol = f"{base}-{quote}-SWAP"
+
+    filters = market.get("filters", {})
+    if not isinstance(filters, dict):
+        filters = {}
+    price_filter = filters.get("price", {})
+    if not isinstance(price_filter, dict):
+        price_filter = {}
+    quantity_filter = filters.get("quantity", {})
+    if not isinstance(quantity_filter, dict):
+        quantity_filter = {}
+
+    return MarketInfo(
+        exchange=Common.BACKPACK,
+        exchange_symbol=symbol,
+        product_symbol=product_symbol,
+        product_type=product_type,
+        exchange_type=market_type,
+        base_currency=base,
+        quote_currency=quote,
+        price_precision=str(price_filter.get("tickSize", "0")),
+        size_precision=str(quantity_filter.get("stepSize", "0")),
+        min_size=str(quantity_filter.get("minQuantity", "0")),
+        min_notional="0",
+        size_per_contract="1",
+    )
+
+
+def backpack() -> pl.DataFrame:
+    """
+    Fetch market information from Backpack exchange.
+
+    Retrieves Backpack spot and futures markets, then standardizes them into
+    MarketInfo format.
+
+    Returns:
+        Polars DataFrame containing standardized market information from Backpack.
+    """
+    from ..backpack._market_http import MarketHTTP
+
+    market_http = MarketHTTP(preload_product_table=False)
+
+    markets = []
+    res = market_http.get_markets()
+    if not isinstance(res, list):
+        return pl.DataFrame(markets)
+    for market in res:
+        if not isinstance(market, dict):
+            continue
+        if market.get("visible") is False:
+            continue
+        if str(market.get("orderBookState", "")).lower() != "open":
+            continue
+        market_type = str(market.get("marketType") or "").upper()
+        if market_type not in {"SPOT", "PERP", "IPERP", "DATED"}:
+            continue
+        markets.append(_backpack_market_info(market))
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
+
+
 def binance() -> pl.DataFrame:
     """
     Fetch market information from Binance exchange.
