@@ -1,3 +1,10 @@
+## 0.20.0 (2026-06-11)
+
+### Feat
+
+- add Aster exchange support
+- add Backpack exchange support
+
 ## 0.19.0 (2026-06-08)
 
 ### Feat
