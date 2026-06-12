@@ -7,6 +7,21 @@ from urllib.parse import urlsplit, urlunsplit
 _HTTP_METHODS = frozenset({"DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"})
 _URL_PATTERN = re.compile(r"https?://[^\s<>'\"]+")
 _BEARER_TOKEN_PATTERN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
+_AUTHORIZATION_PATTERN = re.compile(
+    r"""(?ix)
+    ["']?\bauthorization\b["']?
+    \s*[:=]\s*
+    (?:
+        '[^']*'
+        |
+        "[^"]*"
+        |
+        (?:basic|bearer|digest)\s+[^,\s;}\]]+
+        |
+        [^,\s;}\]]+
+    )
+    """
+)
 _SENSITIVE_ASSIGNMENT_PATTERN = re.compile(
     r"""(?ix)
     ["']?
@@ -57,7 +72,8 @@ def sanitize_url(url: str) -> str:
     url = url.split(maxsplit=1)[0]
     parsed = urlsplit(url)
     if parsed.scheme and parsed.netloc:
-        return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", ""))
+        safe_netloc = parsed.netloc.rsplit("@", 1)[-1]
+        return urlunsplit((parsed.scheme, safe_netloc, parsed.path, "", ""))
     return url.split("?", 1)[0].split("#", 1)[0]
 
 
@@ -71,6 +87,7 @@ def sanitize_message(message: str) -> str:
         return f"{sanitize_url(raw_url)}{trailing}"
 
     sanitized = _URL_PATTERN.sub(replace_url, message)
+    sanitized = _AUTHORIZATION_PATTERN.sub("<redacted>", sanitized)
     sanitized = _BEARER_TOKEN_PATTERN.sub("<redacted>", sanitized)
     return _SENSITIVE_ASSIGNMENT_PATTERN.sub("<redacted>", sanitized)
 

@@ -16,6 +16,7 @@ from dcex.async_support.product_table.manager import (
     ProductTableManager as AsyncProductTableManager,
 )
 from dcex.product_table import fetch as sync_fetch
+from dcex.product_table import manager as sync_manager
 from dcex.product_table.manager import ProductTableError, ProductTableManager
 
 # A tiny fixture table covering two exchanges and spot/swap rows.
@@ -161,6 +162,13 @@ def test_product_symbol_lookup_honors_product_and_exchange_types() -> None:
         )
 
 
+def test_all_product_fetches_manage_market_clients() -> None:
+    for fetch_function in sync_manager.VALID_EXCHANGES:
+        assert hasattr(fetch_function, "__wrapped__"), fetch_function.__name__
+    for fetch_function in async_manager.VALID_EXCHANGES:
+        assert hasattr(fetch_function, "__wrapped__"), fetch_function.__name__
+
+
 def test_failed_sync_initialization_is_not_cached(monkeypatch: pytest.MonkeyPatch) -> None:
     key = "broken-sync"
     ProductTableManager._instance.pop(key, None)
@@ -253,6 +261,57 @@ async def test_async_product_fetch_closes_market_client_on_failure() -> None:
         await failing_fetch()
 
     assert len(created) == 1
+    assert created[0].session.is_closed
+
+
+def test_sync_product_fetch_closes_session_without_client_close() -> None:
+    created: list[Any] = []
+
+    class Session:
+        is_closed = False
+
+        def close(self) -> None:
+            self.is_closed = True
+
+    class MarketHTTP:
+        def __init__(self, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.session = Session()
+            created.append(self)
+
+    @sync_fetch._manage_market_http
+    def successful_fetch() -> pl.DataFrame:
+        sync_fetch._market_http(MarketHTTP)
+        return pl.DataFrame()
+
+    successful_fetch()
+
+    assert created[0].session.is_closed
+
+
+@pytest.mark.asyncio
+async def test_async_product_fetch_closes_session_without_client_close() -> None:
+    created: list[Any] = []
+
+    class Session:
+        is_closed = False
+
+        async def aclose(self) -> None:
+            self.is_closed = True
+
+    class MarketHTTP:
+        def __init__(self, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.session = Session()
+            created.append(self)
+
+    @async_fetch._manage_market_http
+    async def successful_fetch() -> pl.DataFrame:
+        async_fetch._market_http(MarketHTTP)
+        return pl.DataFrame()
+
+    await successful_fetch()
+
     assert created[0].session.is_closed
 
 

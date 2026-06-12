@@ -36,7 +36,11 @@ def _manage_market_http(func: _FetchFunction) -> _FetchFunction:
                 for client in reversed(clients):
                     session = getattr(client, "session", None)
                     if session is not None and not getattr(session, "is_closed", False):
-                        client.close()
+                        close = getattr(client, "close", None)
+                        if close is not None:
+                            close()
+                        else:
+                            session.close()
             finally:
                 _active_market_http_clients.reset(token)
 
@@ -1334,6 +1338,7 @@ def mexc() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 def okx() -> pl.DataFrame:
     """
     Fetch market information from OKX exchange.
@@ -1346,7 +1351,7 @@ def okx() -> pl.DataFrame:
     """
     from ..okx._public_http import PublicHTTP
 
-    public_http = PublicHTTP(preload_product_table=False)
+    public_http = _market_http(PublicHTTP)
 
     markets = []
     res_swap = public_http.get_public_instruments(instType="SWAP")

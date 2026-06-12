@@ -358,6 +358,7 @@ class TradeHTTP(HTTPManager):
         price: str,
         reduceOnly: bool | None = None,
         isLeverage: int | None = None,
+        timeInForce: str | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
         """
@@ -370,6 +371,7 @@ class TradeHTTP(HTTPManager):
             price: Order price
             reduceOnly: Optional reduce only flag
             isLeverage: Optional leverage flag
+            timeInForce: Accepted for sync compatibility; post-only is always enforced
             positionIdx: Optional position index
 
         Returns:

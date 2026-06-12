@@ -132,6 +132,8 @@ class HTTPManager(BaseHTTPManager):
     flag: str = field(default="0")
     base_api: str = field(default="https://openapi.okx.com")
     timeout: int = field(default=10)
+    max_retries: int = field(default=3)
+    retry_delay: int = field(default=3)
     logger: logging.Logger | None = field(default=None)
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)

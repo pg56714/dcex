@@ -48,6 +48,8 @@ class Client(
                - flag: Trading flag ("0" for live, "1" for demo)
                - base_api: Base API URL (default: "https://openapi.okx.com")
                - timeout: Request timeout in seconds
+               - max_retries: Retained retry configuration
+               - retry_delay: Retained retry delay configuration
                - logger: Custom logger instance
                - preload_product_table: Whether to preload product table
     """

@@ -72,3 +72,24 @@ def test_api_request_error_sanitizes_urls_and_credentials_in_message() -> None:
         "api_key",
     ):
         assert sensitive_value not in rendered
+
+
+def test_api_request_error_redacts_basic_auth_and_url_credentials() -> None:
+    error = FailedRequestError(
+        request="GET https://request-user:request-password@api.example.com/private?token=secret",
+        message=(
+            "failed for https://message-user:message-password@api.example.com/private?token=secret "
+            "with Authorization: Basic dXNlcjpwYXNzd29yZA=="
+        ),
+    )
+
+    rendered = str(error)
+    assert "https://api.example.com/private" in rendered
+    for sensitive_value in (
+        "request-user",
+        "request-password",
+        "message-user",
+        "message-password",
+        "dXNlcjpwYXNzd29yZA==",
+    ):
+        assert sensitive_value not in rendered
