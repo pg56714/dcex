@@ -61,3 +61,46 @@ def test_contract_account(client):
         obj = test_contract_account
 
     assert module._calls_stateful_client_method(TestItem())
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        Path("sync_support/backpack/test_stateful_trade.py"),
+        Path("async_support/aster/test_stateful_account.py"),
+    ],
+)
+def test_stateful_test_files_are_classified_by_path(path: Path) -> None:
+    module = _load_test_conftest()
+
+    assert module._is_stateful_path(path)
+
+
+def test_regular_live_test_files_are_not_classified_by_path() -> None:
+    module = _load_test_conftest()
+
+    assert not module._is_stateful_path(Path("sync_support/bybit/test_account.py"))
+
+
+def test_collection_marks_stateful_file_without_matching_method_prefix(tmp_path: Path) -> None:
+    module = _load_test_conftest()
+
+    def read_only_test_body() -> None:
+        pass
+
+    class Config:
+        rootpath = tmp_path
+
+    class Item:
+        fspath = tmp_path / "tests/sync_support/backpack/test_stateful_trade.py"
+        stash: dict[object, object] = {}
+        obj = read_only_test_body
+        markers: list[object] = []
+
+        def add_marker(self, marker: object) -> None:
+            self.markers.append(marker)
+
+    item = Item()
+    module.pytest_collection_modifyitems(Config(), [item])
+
+    assert any(getattr(marker, "name", None) == "stateful" for marker in item.markers)

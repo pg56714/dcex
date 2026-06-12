@@ -73,6 +73,10 @@ def _is_live_path(relative_path: Path | None) -> bool:
     return bool(relative_path and relative_path.parts and relative_path.parts[0] in _LIVE_TEST_DIRS)
 
 
+def _is_stateful_path(relative_path: Path | None) -> bool:
+    return bool(relative_path and relative_path.name.startswith("test_stateful"))
+
+
 def _calls_client_method(item: pytest.Item, names: set[str] | None = None) -> bool:
     """
     Check whether a test's AST calls certain client methods.
@@ -151,5 +155,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         if is_live_test and _calls_generated_client_method(item):
             item.add_marker(pytest.mark.generated)
 
-        if is_live_test and _calls_stateful_client_method(item):
+        if is_live_test and (
+            _is_stateful_path(relative_path) or _calls_stateful_client_method(item)
+        ):
             item.add_marker(pytest.mark.stateful)
