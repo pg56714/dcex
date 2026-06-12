@@ -212,6 +212,43 @@ async def test_async_bitmart_unsigned_post_sends_json_body() -> None:
     assert kwargs["content"] == '{"symbol":"BTC_USDT","side":"buy"}'
 
 
+def test_sync_bitmart_get_preserves_falsy_query_values() -> None:
+    from dcex.bitmart._http_manager import HTTPManager
+    from dcex.bitmart.endpoints.market import SpotMarket
+
+    client = HTTPManager(preload_product_table=False)
+    session = _CaptureSession(payload={"code": 1000})
+    client.session = session
+
+    client._request(
+        "GET",
+        SpotMarket.GET_TICKER_OF_A_PAIR,
+        {"needUsdValuation": False, "missing": None, "zero": 0},
+        signed=False,
+    )
+
+    assert session.calls[0][1].endswith("?needUsdValuation=false&zero=0")
+
+
+@pytest.mark.asyncio
+async def test_async_bitmart_get_preserves_falsy_query_values() -> None:
+    from dcex.async_support.bitmart._http_manager import HTTPManager
+    from dcex.async_support.bitmart.endpoints.market import SpotMarket
+
+    client = HTTPManager(preload_product_table=False)
+    session = _AsyncCaptureSession(payload={"code": 1000})
+    client.session = session
+
+    await client._request(
+        "GET",
+        SpotMarket.GET_TICKER_OF_A_PAIR,
+        {"needUsdValuation": False, "missing": None, "zero": 0},
+        signed=False,
+    )
+
+    assert session.calls[0][1].endswith("?needUsdValuation=false&zero=0")
+
+
 def test_bitmex_sync_and_async_defaults_use_same_timeout() -> None:
     from dcex.async_support.bitmex._http_manager import HTTPManager as AsyncHTTPManager
     from dcex.bitmex._http_manager import HTTPManager
@@ -247,6 +284,133 @@ async def test_async_bybit_post_sends_exact_signed_payload(
     payload = '{"symbol":"BTCUSDT","note":"測試"}'
     assert kwargs["content"] == payload
     assert kwargs["headers"]["X-BAPI-SIGN"] == client._auth(payload, int(TS_S))
+
+
+def test_sync_bybit_get_preserves_falsy_query_values() -> None:
+    from dcex.bybit._http_manager import HTTPManager
+
+    client = HTTPManager(preload_product_table=False, sync_server_time=False)
+    client.endpoint = "https://api.bybit.com"
+    session = _CaptureSession(payload={"retCode": 0})
+    client.session = session
+
+    client._request(
+        "GET",
+        "/v5/test",
+        {"missing": None, "zero": 0},
+        signed=False,
+    )
+
+    assert session.calls[0][1].endswith("?zero=0")
+
+
+@pytest.mark.asyncio
+async def test_async_bybit_get_preserves_falsy_query_values() -> None:
+    from dcex.async_support.bybit._http_manager import HTTPManager
+
+    client = HTTPManager(preload_product_table=False, sync_server_time=False)
+    client.endpoint = "https://api.bybit.com"
+    session = _AsyncCaptureSession(payload={"retCode": 0})
+    client.session = session
+
+    await client._request(
+        "GET",
+        "/v5/test",
+        {"missing": None, "zero": 0},
+        signed=False,
+    )
+
+    assert session.calls[0][1].endswith("?zero=0")
+
+
+def test_sync_hyperliquid_signed_request_does_not_mutate_query(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.hyperliquid._http_manager import HTTPManager
+
+    hyperliquid_http = import_module("dcex.hyperliquid._http_manager")
+    monkeypatch.setattr(hyperliquid_http, "generate_timestamp", lambda: int(TS_S))
+    client = HTTPManager(
+        wallet_address="0x0000000000000000000000000000000000000001",
+        private_key="01" * 32,
+        preload_product_table=False,
+    )
+    session = _CaptureSession(payload={"status": "ok"})
+    client.session = session
+    query = {"action": {"type": "cancel", "cancels": []}}
+
+    client._request("POST", "/exchange", query)
+
+    assert query == {"action": {"type": "cancel", "cancels": []}}
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_signed_request_does_not_mutate_query(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.hyperliquid._http_manager import HTTPManager
+
+    hyperliquid_http = import_module("dcex.async_support.hyperliquid._http_manager")
+    monkeypatch.setattr(hyperliquid_http, "generate_timestamp", lambda: int(TS_S))
+    client = HTTPManager(
+        wallet_address="0x0000000000000000000000000000000000000001",
+        private_key="01" * 32,
+        preload_product_table=False,
+    )
+    client.endpoint = "https://api.hyperliquid.xyz"
+    session = _AsyncCaptureSession(payload={"status": "ok"})
+    client.session = session
+    query = {"action": {"type": "cancel", "cancels": []}}
+
+    await client._request("POST", "/exchange", query)
+
+    assert query == {"action": {"type": "cancel", "cancels": []}}
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_lazily_loads_product_table(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.hyperliquid._market_http import MarketHTTP
+    from dcex.utils.common import Common
+
+    hyperliquid_http = import_module("dcex.async_support.hyperliquid._http_manager")
+    get_instance_calls: list[str] = []
+
+    class _ProductTable:
+        def get_exchange_symbol(self, exchange: str, product_symbol: str) -> str:
+            assert exchange == Common.HYPERLIQUID
+            assert product_symbol == "BTC-USDC-SWAP"
+            return '["BTC", 0]'
+
+    async def get_instance(cls: type[Any], exchange_name: str) -> _ProductTable:
+        get_instance_calls.append(exchange_name)
+        return _ProductTable()
+
+    monkeypatch.setattr(
+        hyperliquid_http.ProductTableManager,
+        "get_instance",
+        classmethod(get_instance),
+    )
+    client = MarketHTTP(preload_product_table=False)
+    client.endpoint = "https://api.hyperliquid.xyz"
+    session = _AsyncCaptureSession(payload={"levels": []})
+    client.session = session
+
+    result = await client.get_l2book("BTC-USDC-SWAP")
+
+    assert result == {"levels": []}
+    assert get_instance_calls == [Common.HYPERLIQUID]
+    assert session.calls == [
+        (
+            "POST",
+            "https://api.hyperliquid.xyz/info",
+            {
+                "headers": {"Content-Type": "application/json"},
+                "json": {"type": "l2Book", "coin": "BTC"},
+            },
+        )
+    ]
 
 
 def test_bingx_listen_key_uses_managed_request_path() -> None:

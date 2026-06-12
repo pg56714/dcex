@@ -52,7 +52,7 @@ class HTTPManager(BaseHTTPManager):
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     session: httpx.AsyncClient | None = field(init=False, default=None)
-    ptm: ProductTableManager = field(init=False)
+    ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
 
     async def async_init(self) -> Self:
@@ -70,6 +70,14 @@ class HTTPManager(BaseHTTPManager):
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    async def _get_ptm(self) -> ProductTableManager:
+        """Lazily obtain the product table manager instance."""
+        ptm = self.ptm
+        if ptm is None:
+            ptm = await ProductTableManager.get_instance(Common.HYPERLIQUID)
+            self.ptm = ptm
+        return ptm
 
     def _auth(self, query: dict[str, Any], timestamp: int) -> dict[str, str | int]:
         """
@@ -324,8 +332,7 @@ class HTTPManager(BaseHTTPManager):
         if not self.session:
             await self.async_init()
 
-        if query is None:
-            query = {}
+        query = dict(query or {})
 
         timestamp = int(generate_timestamp())
 

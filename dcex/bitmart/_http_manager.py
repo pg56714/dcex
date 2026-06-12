@@ -157,7 +157,11 @@ class HTTPManager(BaseHTTPManager):
 
         method_upper = method.upper()
         if method_upper == "GET" and query:
-            params_str = "&".join(f"{k}={v}" for k, v in sorted(query.items()) if v)
+            params_str = "&".join(
+                f"{k}={str(v).lower() if isinstance(v, bool) else v}"
+                for k, v in sorted(query.items())
+                if v is not None
+            )
             url = f"{url}?{params_str}"
 
         timestamp = generate_timestamp()

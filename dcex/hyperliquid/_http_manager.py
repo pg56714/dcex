@@ -340,8 +340,7 @@ class HTTPManager(BaseHTTPManager):
             ValueError: If session not initialized or unsupported method
             FailedRequestError: If request fails
         """
-        if query is None:
-            query = {}
+        query = dict(query or {})
 
         timestamp = int(generate_timestamp())
 

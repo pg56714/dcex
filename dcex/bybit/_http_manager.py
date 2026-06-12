@@ -209,7 +209,9 @@ class HTTPManager(BaseHTTPManager):
 
         if method.upper() == "GET":
             if query:
-                sorted_query = "&".join(f"{k}={v}" for k, v in sorted(query.items()) if v)
+                sorted_query = "&".join(
+                    f"{k}={v}" for k, v in sorted(query.items()) if v is not None
+                )
                 path += "?" + sorted_query if sorted_query else ""
                 payload = sorted_query
             else:

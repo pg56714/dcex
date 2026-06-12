@@ -72,7 +72,10 @@ class TradeHTTP(HTTPManager):
             "orders": [
                 {
                     "a": msgspec.json.decode(
-                        self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                        (await self._get_ptm()).get_exchange_symbol(
+                            Common.HYPERLIQUID,
+                            product_symbol,
+                        )
                     )[1],
                     "b": isBuy,
                     "p": price,
@@ -157,7 +160,10 @@ class TradeHTTP(HTTPManager):
         finally:
             await market_http.close()
         exchange_symbol = msgspec.json.decode(
-            self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+            (await self._get_ptm()).get_exchange_symbol(
+                Common.HYPERLIQUID,
+                product_symbol,
+            )
         )[1]
         asset_contexts = result[1]
         mid_price = Decimal(str(asset_contexts[exchange_symbol]["midPx"]))
@@ -361,7 +367,10 @@ class TradeHTTP(HTTPManager):
             "cancels": [
                 {
                     "a": msgspec.json.decode(
-                        self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                        (await self._get_ptm()).get_exchange_symbol(
+                            Common.HYPERLIQUID,
+                            product_symbol,
+                        )
                     )[1],
                     "o": oid,
                 }
@@ -410,7 +419,10 @@ class TradeHTTP(HTTPManager):
             "cancels": [
                 {
                     "asset": msgspec.json.decode(
-                        self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                        (await self._get_ptm()).get_exchange_symbol(
+                            Common.HYPERLIQUID,
+                            product_symbol,
+                        )
                     )[1],
                     "cloid": cloid,
                 }
@@ -517,7 +529,10 @@ class TradeHTTP(HTTPManager):
             "oid": oid,
             "order": {
                 "a": msgspec.json.decode(
-                    self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                    (await self._get_ptm()).get_exchange_symbol(
+                        Common.HYPERLIQUID,
+                        product_symbol,
+                    )
                 )[1],
                 "b": isBuy,
                 "p": price,
@@ -618,7 +633,10 @@ class TradeHTTP(HTTPManager):
         action = {
             "type": Trade.UPDATELEVERAGE,
             "asset": msgspec.json.decode(
-                self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                (await self._get_ptm()).get_exchange_symbol(
+                    Common.HYPERLIQUID,
+                    product_symbol,
+                )
             )[1],
             "isCross": isCross,
             "leverage": leverage,
@@ -666,7 +684,10 @@ class TradeHTTP(HTTPManager):
         action = {
             "type": Trade.UPDATEISOLATEMARGIN,
             "asset": msgspec.json.decode(
-                self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                (await self._get_ptm()).get_exchange_symbol(
+                    Common.HYPERLIQUID,
+                    product_symbol,
+                )
             )[1],
             "isBuy": isBuy,
             "ntli": ntli,
@@ -721,7 +742,10 @@ class TradeHTTP(HTTPManager):
             "type": Trade.TWAPORDER,
             "twap": {
                 "a": msgspec.json.decode(
-                    self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                    (await self._get_ptm()).get_exchange_symbol(
+                        Common.HYPERLIQUID,
+                        product_symbol,
+                    )
                 )[1],
                 "b": isBuy,
                 "s": size,
@@ -772,7 +796,10 @@ class TradeHTTP(HTTPManager):
         action = {
             "type": Trade.TWAPCANCEL,
             "a": msgspec.json.decode(
-                self.ptm.get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
+                (await self._get_ptm()).get_exchange_symbol(
+                    Common.HYPERLIQUID,
+                    product_symbol,
+                )
             )[1],
             "t": twap_id,
         }
