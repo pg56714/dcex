@@ -35,12 +35,11 @@ def _manage_market_http(func: _FetchFunction) -> _FetchFunction:
             try:
                 for client in reversed(clients):
                     session = getattr(client, "session", None)
-                    if session is not None and not getattr(session, "is_closed", False):
-                        close = getattr(client, "close", None)
-                        if close is not None:
-                            close()
-                        else:
-                            session.close()
+                    close = getattr(client, "close", None)
+                    if close is not None:
+                        close()
+                    elif session is not None and not getattr(session, "is_closed", False):
+                        session.close()
             finally:
                 _active_market_http_clients.reset(token)
 
@@ -150,25 +149,22 @@ def aster() -> pl.DataFrame:
     from ..aster._market_http import MarketHTTP
 
     market_http = _market_http(MarketHTTP)
-    try:
-        markets = []
-        spot = market_http.get_spot_exchange_info()
-        if isinstance(spot, dict):
-            markets.extend(
-                _aster_market_info(market, "spot")
-                for market in spot.get("symbols", [])
-                if isinstance(market, dict) and market.get("status") == "TRADING"
-            )
+    markets = []
+    spot = market_http.get_spot_exchange_info()
+    if isinstance(spot, dict):
+        markets.extend(
+            _aster_market_info(market, "spot")
+            for market in spot.get("symbols", [])
+            if isinstance(market, dict) and market.get("status") == "TRADING"
+        )
 
-        futures = market_http.get_futures_exchange_info()
-        if isinstance(futures, dict):
-            for market in futures.get("symbols", []):
-                if not isinstance(market, dict) or market.get("status") != "TRADING":
-                    continue
-                product_type = "swap" if market.get("contractType") == "PERPETUAL" else "futures"
-                markets.append(_aster_market_info(market, product_type))
-    finally:
-        market_http.close()
+    futures = market_http.get_futures_exchange_info()
+    if isinstance(futures, dict):
+        for market in futures.get("symbols", []):
+            if not isinstance(market, dict) or market.get("status") != "TRADING":
+                continue
+            product_type = "swap" if market.get("contractType") == "PERPETUAL" else "futures"
+            markets.append(_aster_market_info(market, product_type))
 
     return pl.DataFrame([market.to_dict() for market in markets])
 

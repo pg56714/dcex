@@ -1,4 +1,5 @@
-"""Offline tests that HTTP managers emit log records on request paths.
+"""
+Offline tests that HTTP managers emit log records on request paths.
 
 These use a fake session so no network call is made. They assert that a debug
 record is emitted when a request is sent and an error record is emitted just

@@ -6,9 +6,6 @@ product information across multiple cryptocurrency exchanges.
 """
 
 import asyncio
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
-from typing import Any
 
 import polars as pl
 
@@ -129,28 +126,3 @@ class ProductTableManager(ProductTableQueryMixin):
                     f"Invalid exchange_name: {exchange_name}. Valid: {sorted(valid_names)}"
                 )
         await self._initialize(exchange_name=exchange_name)
-
-    @asynccontextmanager
-    async def _create_exchange_clients(self) -> AsyncIterator[list[Any]]:
-        """
-        Create exchange clients as an async context manager to ensure proper cleanup.
-
-        Yields:
-            List of exchange client instances.
-        """
-        clients = [exchange() for exchange in VALID_EXCHANGES]
-        try:
-            yield clients
-        finally:
-            # Collect all close coroutines that are awaitable
-            close_tasks = []
-            for client in clients:
-                if hasattr(client, "close"):
-                    close_method = client.close()
-                    # Check if the close method returns a coroutine
-                    if asyncio.iscoroutine(close_method):
-                        close_tasks.append(close_method)
-
-            # Only await if there are any close tasks
-            if close_tasks:
-                await asyncio.gather(*close_tasks)

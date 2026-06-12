@@ -1,10 +1,13 @@
-"""Offline unit tests for ProductTableManager query logic.
+"""
+Offline unit tests for ProductTableManager query logic.
 
 These build a manager from a hand-made DataFrame (no network, no fetch) and
 exercise the pure query/index methods. They pin the lookup behaviour so the
 query logic can be refactored (e.g. shared between sync and async) safely.
 """
+# ruff: noqa: D103
 
+import asyncio
 from typing import Any
 
 import polars as pl
@@ -331,6 +334,59 @@ async def test_async_product_fetch_closes_session_without_client_close() -> None
     assert created[0].session.is_closed
 
 
+def test_sync_product_fetch_closes_auxiliary_resources_after_session_closed() -> None:
+    created: list[Any] = []
+
+    class Session:
+        is_closed = True
+
+    class MarketHTTP:
+        def __init__(self, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.session = Session()
+            self.auxiliary_closed = False
+            created.append(self)
+
+        def close(self) -> None:
+            self.auxiliary_closed = True
+
+    @sync_fetch._manage_market_http
+    def successful_fetch() -> pl.DataFrame:
+        sync_fetch._market_http(MarketHTTP)
+        return pl.DataFrame()
+
+    successful_fetch()
+
+    assert created[0].auxiliary_closed
+
+
+@pytest.mark.asyncio
+async def test_async_product_fetch_closes_auxiliary_resources_after_session_closed() -> None:
+    created: list[Any] = []
+
+    class Session:
+        is_closed = True
+
+    class MarketHTTP:
+        def __init__(self, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.session = Session()
+            self.auxiliary_closed = False
+            created.append(self)
+
+        async def close(self) -> None:
+            self.auxiliary_closed = True
+
+    @async_fetch._manage_market_http
+    async def successful_fetch() -> pl.DataFrame:
+        async_fetch._market_http(MarketHTTP)
+        return pl.DataFrame()
+
+    await successful_fetch()
+
+    assert created[0].auxiliary_closed
+
+
 @pytest.mark.asyncio
 async def test_async_product_table_skips_failed_exchanges(
     monkeypatch: pytest.MonkeyPatch,
@@ -358,4 +414,17 @@ async def test_async_product_table_raises_when_all_exchanges_fail(
     monkeypatch.setattr(async_manager, "VALID_EXCHANGES", [broken])
 
     with pytest.raises(ProductTableError, match="Failed to fetch"):
+        await AsyncProductTableManager()._fetch_product_tables()
+
+
+@pytest.mark.asyncio
+async def test_async_product_table_propagates_exchange_cancellation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def cancelled() -> pl.DataFrame:
+        raise asyncio.CancelledError
+
+    monkeypatch.setattr(async_manager, "VALID_EXCHANGES", [cancelled])
+
+    with pytest.raises(asyncio.CancelledError):
         await AsyncProductTableManager()._fetch_product_tables()

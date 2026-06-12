@@ -93,3 +93,36 @@ def test_api_request_error_redacts_basic_auth_and_url_credentials() -> None:
         "dXNlcjpwYXNzd29yZA==",
     ):
         assert sensitive_value not in rendered
+
+
+def test_api_request_error_redacts_uppercase_url_credentials() -> None:
+    error = FailedRequestError(
+        request="GET HTTPS://request-user:request-password@api.example.com/private?token=secret",
+        message=(
+            "failed for HTTPS://message-user:message-password@api.example.com/private?token=secret"
+        ),
+    )
+
+    rendered = str(error)
+    assert "https://api.example.com/private" in rendered
+    for sensitive_value in (
+        "request-user",
+        "request-password",
+        "message-user",
+        "message-password",
+        "secret",
+    ):
+        assert sensitive_value not in rendered
+
+
+def test_api_request_error_handles_malformed_url_without_raising() -> None:
+    error = FailedRequestError(
+        request="GET https://[invalid?token=request-secret",
+        message="failed for https://[invalid?token=message-secret",
+    )
+
+    assert error.request == "GET <redacted-url>"
+    rendered = str(error)
+    assert "<redacted-url>" in rendered
+    assert "request-secret" not in rendered
+    assert "message-secret" not in rendered

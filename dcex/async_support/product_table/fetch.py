@@ -35,12 +35,11 @@ def _manage_market_http(func: _AsyncFetchFunction) -> _AsyncFetchFunction:
             try:
                 for client in reversed(clients):
                     session = getattr(client, "session", None)
-                    if session is not None and not getattr(session, "is_closed", False):
-                        close = getattr(client, "close", None)
-                        if close is not None:
-                            await close()
-                        else:
-                            await session.aclose()
+                    close = getattr(client, "close", None)
+                    if close is not None:
+                        await close()
+                    elif session is not None and not getattr(session, "is_closed", False):
+                        await session.aclose()
             finally:
                 _active_market_http_clients.reset(token)
 
@@ -166,25 +165,22 @@ async def aster() -> pl.DataFrame:
 
     market_http = _market_http(MarketHTTP)
     await market_http.async_init()
-    try:
-        markets = []
-        spot = await market_http.get_spot_exchange_info()
-        if isinstance(spot, dict):
-            markets.extend(
-                _aster_market_info(market, "spot")
-                for market in spot.get("symbols", [])
-                if isinstance(market, dict) and market.get("status") == "TRADING"
-            )
+    markets = []
+    spot = await market_http.get_spot_exchange_info()
+    if isinstance(spot, dict):
+        markets.extend(
+            _aster_market_info(market, "spot")
+            for market in spot.get("symbols", [])
+            if isinstance(market, dict) and market.get("status") == "TRADING"
+        )
 
-        futures = await market_http.get_futures_exchange_info()
-        if isinstance(futures, dict):
-            for market in futures.get("symbols", []):
-                if not isinstance(market, dict) or market.get("status") != "TRADING":
-                    continue
-                product_type = "swap" if market.get("contractType") == "PERPETUAL" else "futures"
-                markets.append(_aster_market_info(market, product_type))
-    finally:
-        await market_http.close()
+    futures = await market_http.get_futures_exchange_info()
+    if isinstance(futures, dict):
+        for market in futures.get("symbols", []):
+            if not isinstance(market, dict) or market.get("status") != "TRADING":
+                continue
+            product_type = "swap" if market.get("contractType") == "PERPETUAL" else "futures"
+            markets.append(_aster_market_info(market, product_type))
 
     return pl.DataFrame([market.to_dict() for market in markets])
 
@@ -246,27 +242,24 @@ async def backpack() -> pl.DataFrame:
     market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
-    try:
-        markets = []
-        res = await market_http.get_markets()
-        if not isinstance(res, list):
-            return pl.DataFrame(markets)
-        for market in res:
-            if not isinstance(market, dict):
-                continue
-            if market.get("visible") is False:
-                continue
-            if str(market.get("orderBookState", "")).lower() != "open":
-                continue
-            market_type = str(market.get("marketType") or "").upper()
-            if market_type not in {"SPOT", "PERP", "IPERP", "DATED"}:
-                continue
-            markets.append(_backpack_market_info(market))
-
-        markets = [market.to_dict() for market in markets]
+    markets = []
+    res = await market_http.get_markets()
+    if not isinstance(res, list):
         return pl.DataFrame(markets)
-    finally:
-        await market_http.close()
+    for market in res:
+        if not isinstance(market, dict):
+            continue
+        if market.get("visible") is False:
+            continue
+        if str(market.get("orderBookState", "")).lower() != "open":
+            continue
+        market_type = str(market.get("marketType") or "").upper()
+        if market_type not in {"SPOT", "PERP", "IPERP", "DATED"}:
+            continue
+        markets.append(_backpack_market_info(market))
+
+    markets = [market.to_dict() for market in markets]
+    return pl.DataFrame(markets)
 
 
 @_manage_market_http
@@ -515,9 +508,7 @@ async def bitget() -> pl.DataFrame:
             )
         )
 
-    markets = [market.to_dict() for market in markets]
-    await market_http.close()
-    return pl.DataFrame(markets)
+    return pl.DataFrame([market.to_dict() for market in markets])
 
 
 @_manage_market_http
@@ -1257,26 +1248,23 @@ async def lighter() -> pl.DataFrame:
     market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
-    try:
-        markets = []
-        res = await market_http.get_order_book_details()
-        if not isinstance(res, dict):
-            return pl.DataFrame(markets)
-        for market in res.get("order_book_details", []):
-            if not isinstance(market, dict):
-                continue
-            if str(market.get("status", "")).lower() != "active":
-                continue
-            markets.append(_lighter_market_info(market, product_type="swap"))
+    markets = []
+    res = await market_http.get_order_book_details()
+    if not isinstance(res, dict):
+        return pl.DataFrame(markets)
+    for market in res.get("order_book_details", []):
+        if not isinstance(market, dict):
+            continue
+        if str(market.get("status", "")).lower() != "active":
+            continue
+        markets.append(_lighter_market_info(market, product_type="swap"))
 
-        for market in res.get("spot_order_book_details", []):
-            if not isinstance(market, dict):
-                continue
-            if str(market.get("status", "")).lower() != "active":
-                continue
-            markets.append(_lighter_market_info(market, product_type="spot"))
-    finally:
-        await market_http.close()
+    for market in res.get("spot_order_book_details", []):
+        if not isinstance(market, dict):
+            continue
+        if str(market.get("status", "")).lower() != "active":
+            continue
+        markets.append(_lighter_market_info(market, product_type="spot"))
 
     markets = [market.to_dict() for market in markets]
     return pl.DataFrame(markets)
@@ -1298,77 +1286,74 @@ async def mexc() -> pl.DataFrame:
     market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
-    try:
-        markets = []
-        res_spot = await market_http.get_spot_exchange_info()
-        if isinstance(res_spot, dict):
-            spot_symbols = res_spot.get("symbols", [])
-        else:
-            spot_symbols = []
-        for market in spot_symbols:
-            if not isinstance(market, dict):
-                continue
-            status = str(market.get("status", ""))
-            if status and status not in {"1", "TRADING"}:
-                continue
-            if market.get("isSpotTradingAllowed") is False:
-                continue
+    markets = []
+    res_spot = await market_http.get_spot_exchange_info()
+    if isinstance(res_spot, dict):
+        spot_symbols = res_spot.get("symbols", [])
+    else:
+        spot_symbols = []
+    for market in spot_symbols:
+        if not isinstance(market, dict):
+            continue
+        status = str(market.get("status", ""))
+        if status and status not in {"1", "TRADING"}:
+            continue
+        if market.get("isSpotTradingAllowed") is False:
+            continue
 
-            base = str(market["baseAsset"])
-            quote = str(market["quoteAsset"])
-            quote_precision = int(str(market.get("quotePrecision", "0") or "0"))
+        base = str(market["baseAsset"])
+        quote = str(market["quoteAsset"])
+        quote_precision = int(str(market.get("quotePrecision", "0") or "0"))
 
-            markets.append(
-                MarketInfo(
-                    exchange=Common.MEXC,
-                    exchange_symbol=str(market["symbol"]),
-                    product_symbol=f"{base}-{quote}-SPOT",
-                    product_type="spot",
-                    exchange_type="spot",
-                    base_currency=base,
-                    quote_currency=quote,
-                    price_precision=str(reverse_decimal_places(quote_precision)),
-                    size_precision=str(market.get("baseSizePrecision", "0")),
-                    min_size=str(market.get("baseSizePrecision", "0")),
-                    min_notional=str(market.get("quoteAmountPrecision", "0")),
-                )
+        markets.append(
+            MarketInfo(
+                exchange=Common.MEXC,
+                exchange_symbol=str(market["symbol"]),
+                product_symbol=f"{base}-{quote}-SPOT",
+                product_type="spot",
+                exchange_type="spot",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(reverse_decimal_places(quote_precision)),
+                size_precision=str(market.get("baseSizePrecision", "0")),
+                min_size=str(market.get("baseSizePrecision", "0")),
+                min_notional=str(market.get("quoteAmountPrecision", "0")),
             )
+        )
 
-        res_contract = await market_http.get_contract_details()
-        if isinstance(res_contract, dict):
-            contract_data = res_contract.get("data", [])
-        else:
-            contract_data = []
-        if isinstance(contract_data, dict):
-            contract_data = [contract_data]
-        for market in contract_data:
-            if not isinstance(market, dict):
-                continue
-            if market.get("state") not in {0, "0", None}:
-                continue
-            if market.get("apiAllowed") is False:
-                continue
+    res_contract = await market_http.get_contract_details()
+    if isinstance(res_contract, dict):
+        contract_data = res_contract.get("data", [])
+    else:
+        contract_data = []
+    if isinstance(contract_data, dict):
+        contract_data = [contract_data]
+    for market in contract_data:
+        if not isinstance(market, dict):
+            continue
+        if market.get("state") not in {0, "0", None}:
+            continue
+        if market.get("apiAllowed") is False:
+            continue
 
-            base = str(market["baseCoin"])
-            quote = str(market["quoteCoin"])
+        base = str(market["baseCoin"])
+        quote = str(market["quoteCoin"])
 
-            markets.append(
-                MarketInfo(
-                    exchange=Common.MEXC,
-                    exchange_symbol=str(market["symbol"]),
-                    product_symbol=f"{base}-{quote}-SWAP",
-                    product_type="swap",
-                    exchange_type="perpetual",
-                    base_currency=base,
-                    quote_currency=quote,
-                    price_precision=str(market.get("priceUnit", "0")),
-                    size_precision=str(market.get("volUnit", "0")),
-                    min_size=str(market.get("minVol", "0")),
-                    size_per_contract=str(market.get("contractSize", "1")),
-                )
+        markets.append(
+            MarketInfo(
+                exchange=Common.MEXC,
+                exchange_symbol=str(market["symbol"]),
+                product_symbol=f"{base}-{quote}-SWAP",
+                product_type="swap",
+                exchange_type="perpetual",
+                base_currency=base,
+                quote_currency=quote,
+                price_precision=str(market.get("priceUnit", "0")),
+                size_precision=str(market.get("volUnit", "0")),
+                min_size=str(market.get("minVol", "0")),
+                size_per_contract=str(market.get("contractSize", "1")),
             )
-    finally:
-        await market_http.close()
+        )
 
     markets = [market.to_dict() for market in markets]
     return pl.DataFrame(markets)
