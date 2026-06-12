@@ -49,7 +49,7 @@ class HTTPManager(BaseHTTPManager):
     base_url: str = "https://www.bitmex.com"
     api_key: str | None = field(default=None, repr=False)
     api_secret: str | None = field(default=None, repr=False)
-    timeout: int = field(default=30)
+    timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)

@@ -96,8 +96,7 @@ class HTTPManager(BaseHTTPManager):
         if self.session is None or self.session.is_closed:
             await self.async_init()
 
-        if query is None:
-            query = {}
+        query = dict(query or {})
 
         if signed:
             if not (self.api_key and self.api_secret):

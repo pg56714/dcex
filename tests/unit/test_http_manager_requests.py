@@ -138,6 +138,117 @@ class _AsyncBadJsonSession(_AsyncCaptureSession):
         return _BadJsonResponse(self.status_code)
 
 
+def test_sync_binance_signed_request_does_not_mutate_reused_query(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.binance._http_manager import HTTPManager
+    from dcex.binance.endpoints.account import FuturesAccount
+
+    binance_http = import_module("dcex.binance._http_manager")
+    monkeypatch.setattr(binance_http.time, "time", lambda: int(TS_S))
+    client = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    session = _CaptureSession(payload={"assets": []})
+    client.session = session
+    query = {"limit": 10}
+
+    client._request("GET", FuturesAccount.ACCOUNT_INFO, query)
+    client._request("GET", FuturesAccount.ACCOUNT_INFO, query)
+
+    assert query == {"limit": 10}
+    first_url = session.calls[0][1]
+    second_url = session.calls[1][1]
+    assert first_url == second_url
+
+
+@pytest.mark.asyncio
+async def test_async_binance_signed_request_does_not_mutate_reused_query(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.binance._http_manager import HTTPManager
+    from dcex.async_support.binance.endpoints.account import FuturesAccount
+
+    binance_http = import_module("dcex.async_support.binance._http_manager")
+    monkeypatch.setattr(binance_http.time, "time", lambda: int(TS_S))
+    client = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    session = _AsyncCaptureSession(payload={"assets": []})
+    client.session = session
+    query = {"limit": 10}
+
+    await client._request("GET", FuturesAccount.ACCOUNT_INFO, query)
+    await client._request("GET", FuturesAccount.ACCOUNT_INFO, query)
+
+    assert query == {"limit": 10}
+    first_url = session.calls[0][1]
+    second_url = session.calls[1][1]
+    assert first_url == second_url
+
+
+@pytest.mark.asyncio
+async def test_async_bitmart_unsigned_post_sends_json_body() -> None:
+    from dcex.async_support.bitmart._http_manager import HTTPManager
+    from dcex.async_support.bitmart.endpoints.trade import SpotTrade
+
+    client = HTTPManager(preload_product_table=False)
+    session = _AsyncCaptureSession(payload={"code": 1000})
+    client.session = session
+
+    await client._request(
+        "POST",
+        SpotTrade.SUBMIT_ORDER,
+        {"symbol": "BTC_USDT", "side": "buy"},
+        signed=False,
+    )
+
+    method, _, kwargs = session.calls[0]
+    assert method == "POST"
+    assert kwargs["content"] == '{"symbol":"BTC_USDT","side":"buy"}'
+
+
+def test_bitmex_sync_and_async_defaults_use_same_timeout() -> None:
+    from dcex.async_support.bitmex._http_manager import HTTPManager as AsyncHTTPManager
+    from dcex.bitmex._http_manager import HTTPManager
+
+    sync_client = HTTPManager(preload_product_table=False)
+    async_client = AsyncHTTPManager(preload_product_table=False)
+
+    assert sync_client.timeout == async_client.timeout == 10
+
+
+@pytest.mark.asyncio
+async def test_async_bybit_post_sends_exact_signed_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.bybit._http_manager import HTTPManager
+
+    client = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+        sync_server_time=False,
+    )
+    client.endpoint = "https://api.bybit.com"
+    session = _AsyncCaptureSession(payload={"retCode": 0})
+    client.session = session
+    bybit_http = import_module("dcex.async_support.bybit._http_manager")
+    monkeypatch.setattr(bybit_http, "generate_timestamp", lambda: int(TS_S))
+    query = {"symbol": "BTCUSDT", "note": "測試"}
+
+    await client._request("POST", "/v5/order/create", query)
+
+    _, _, kwargs = session.calls[0]
+    payload = '{"symbol":"BTCUSDT","note":"測試"}'
+    assert kwargs["content"] == payload
+    assert kwargs["headers"]["X-BAPI-SIGN"] == client._auth(payload, int(TS_S))
+
+
 def test_bingx_listen_key_uses_managed_request_path() -> None:
     from dcex.bingx._account_http import AccountHTTP
 

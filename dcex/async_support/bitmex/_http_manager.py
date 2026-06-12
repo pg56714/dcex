@@ -42,7 +42,7 @@ class HTTPManager(BaseHTTPManager):
     base_url: str = "https://www.bitmex.com"
     api_key: str | None = field(default=None, repr=False)
     api_secret: str | None = field(default=None, repr=False)
-    timeout: int = field(default=5)
+    timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)

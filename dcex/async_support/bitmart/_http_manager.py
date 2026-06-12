@@ -149,16 +149,16 @@ class HTTPManager(BaseHTTPManager):
             url = f"{url}?{params_str}"
 
         timestamp = generate_timestamp()
+        body = (
+            msgspec.json.encode(query if query else {}).decode("utf-8")
+            if method.upper() == "POST"
+            else ""
+        )
 
         if signed:
             if not (self.api_key and self.api_secret and self.memo):
                 raise ValueError("Signed request requires API Key and Secret and Memo.")
 
-            body = (
-                ""
-                if method.upper() == "GET"
-                else msgspec.json.encode(query if query else {}).decode("utf-8")
-            )
             sign = sign_message(int(timestamp), self.memo, body, self.api_secret)
             headers = get_header(self.api_key, sign, int(timestamp), self.memo)
         else:

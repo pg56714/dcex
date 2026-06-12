@@ -133,8 +133,7 @@ class HTTPManager(BaseHTTPManager):
             ValueError: If API credentials are required but not provided.
             FailedRequestError: If the API request fails or returns an error.
         """
-        if query is None:
-            query = {}
+        query = dict(query or {})
 
         if signed:
             if not (self.api_key and self.api_secret):

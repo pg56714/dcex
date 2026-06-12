@@ -248,9 +248,7 @@ class HTTPManager(BaseHTTPManager):
             if method.upper() == "GET":
                 response = await self.session.get(url, headers=headers)
             elif method.upper() == "POST":
-                response = await self.session.post(
-                    url, headers=headers, json=query if query else {}
-                )
+                response = await self.session.post(url, headers=headers, content=payload)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
