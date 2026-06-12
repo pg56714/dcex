@@ -1,3 +1,23 @@
+## 0.20.1 (2026-06-12)
+
+### Fix
+
+- preserve request state and query values
+- align exchange request handling
+- preserve product fetch failures during cleanup
+- preserve lookup and test safety semantics
+- harden sanitization and product cleanup
+- validate managed fetch context first
+- require opt-in for stateful test files
+- close remaining request lifecycle gaps
+- harden exchange request lifecycle
+- address cross-exchange review findings
+- harden exchange request handling
+
+### Refactor
+
+- remove unused compatibility parameters
+
 ## 0.20.0 (2026-06-11)
 
 ### Feat
