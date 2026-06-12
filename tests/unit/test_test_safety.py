@@ -63,6 +63,28 @@ def test_contract_account(client):
     assert module._calls_stateful_client_method(TestItem())
 
 
+@pytest.mark.parametrize("method_name", ["get_listen_key", "keep_alive_listen_key"])
+def test_listen_key_methods_are_classified_as_stateful(
+    method_name: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_conftest()
+
+    def test_account(client: object) -> None:
+        pass
+
+    source = f"""
+def test_account(client):
+    client.{method_name}()
+"""
+    monkeypatch.setattr(module.inspect, "getsource", lambda _: source)
+
+    class TestItem:
+        obj = test_account
+
+    assert module._calls_stateful_client_method(TestItem())
+
+
 @pytest.mark.parametrize(
     "path",
     [

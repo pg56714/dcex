@@ -54,15 +54,15 @@ class ProductTableQueryMixin:
 
     def _build_indexes(self) -> None:
         """Build in-memory indexes to accelerate common lookups."""
-        self._by_exchange_product: dict[tuple[str, str], dict[str, Any]] = {}
+        self._by_exchange_product: dict[tuple[str, str], dict[str, Any] | None] = {}
         self._by_exchange_exchange_symbol: dict[tuple[str, str], list[dict[str, Any]]] = {}
         self._by_exchange_exchange_symbol_product_type: dict[
-            tuple[str, str, str], dict[str, Any]
+            tuple[str, str, str], dict[str, Any] | None
         ] = {}
         self._by_exchange_exchange_symbol_exchange_type: dict[
-            tuple[str, str, str], dict[str, Any]
+            tuple[str, str, str], dict[str, Any] | None
         ] = {}
-        self._list_cache: dict[tuple[str, str, str | None, str | None], list[str]] = {}
+        self._list_cache: dict[tuple[str, str, str | None, str | None], tuple[str, ...]] = {}
 
         for row in self.product_table.to_dicts():
             exchange = row.get("exchange")
@@ -74,7 +74,10 @@ class ProductTableQueryMixin:
             if exchange is None or product_symbol is None:
                 continue
 
-            self._by_exchange_product[(exchange, product_symbol)] = row
+            product_key = (exchange, product_symbol)
+            self._by_exchange_product[product_key] = (
+                None if product_key in self._by_exchange_product else row
+            )
 
             if exchange_symbol is not None:
                 key_ex = (exchange, exchange_symbol)
@@ -82,11 +85,15 @@ class ProductTableQueryMixin:
 
                 if product_type is not None:
                     key_pt = (exchange, exchange_symbol, product_type)
-                    self._by_exchange_exchange_symbol_product_type[key_pt] = row
+                    self._by_exchange_exchange_symbol_product_type[key_pt] = (
+                        None if key_pt in self._by_exchange_exchange_symbol_product_type else row
+                    )
 
                 if exchange_type is not None:
                     key_et = (exchange, exchange_symbol, exchange_type)
-                    self._by_exchange_exchange_symbol_exchange_type[key_et] = row
+                    self._by_exchange_exchange_symbol_exchange_type[key_et] = (
+                        None if key_et in self._by_exchange_exchange_symbol_exchange_type else row
+                    )
 
     def get(
         self,
@@ -382,7 +389,7 @@ class ProductTableQueryMixin:
             else None
         )
         if cached is not None:
-            return cached
+            return list(cached)
 
         data = self.product_table.filter(pl.col("exchange") == exchange)
         if product_type is not None:
@@ -390,7 +397,7 @@ class ProductTableQueryMixin:
         if exchange_type is not None:
             data = data.filter(pl.col("exchange_type") == exchange_type)
         result = data.select("exchange_symbol").to_series().to_list()
-        self._list_cache[cache_key] = result
+        self._list_cache[cache_key] = tuple(result)
         return result
 
     def get_product_symbols(
@@ -414,7 +421,7 @@ class ProductTableQueryMixin:
             else None
         )
         if cached is not None:
-            return cached
+            return list(cached)
 
         data = self.product_table.filter(pl.col("exchange") == exchange)
         if product_type is not None:
@@ -422,5 +429,5 @@ class ProductTableQueryMixin:
         if exchange_type is not None:
             data = data.filter(pl.col("exchange_type") == exchange_type)
         result = data.select("product_symbol").to_series().to_list()
-        self._list_cache[cache_key] = result
+        self._list_cache[cache_key] = tuple(result)
         return result

@@ -38,6 +38,10 @@ _GENERATED_METHOD_NAMES = {
     "post_account_bills_history_archive",
     "post_monthly_statement",
 }
+_STATEFUL_METHOD_NAMES = {
+    "get_listen_key",
+    "keep_alive_listen_key",
+}
 _STATEFUL_METHOD_PREFIXES = (
     "amend",
     "cancel",
@@ -107,7 +111,7 @@ def _calls_client_method(item: pytest.Item, names: set[str] | None = None) -> bo
 
 
 def _calls_stateful_client_method(item: pytest.Item) -> bool:
-    return _calls_client_method(item)
+    return _calls_client_method(item, _STATEFUL_METHOD_NAMES) or _calls_client_method(item)
 
 
 def _calls_generated_client_method(item: pytest.Item) -> bool:

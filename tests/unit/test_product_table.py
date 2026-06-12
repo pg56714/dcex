@@ -135,6 +135,21 @@ def test_get_exchange_symbols_and_product_symbols() -> None:
     assert set(manager.get_product_symbols("binance", product_type="spot")) == {"BTC-USDT-SPOT"}
 
 
+def test_symbol_list_cache_cannot_be_modified_by_callers() -> None:
+    manager = _make_manager()
+
+    exchange_symbols = manager.get_exchange_symbols("binance")
+    exchange_symbols.clear()
+    assert set(manager.get_exchange_symbols("binance")) == {"BTCUSDT"}
+
+    product_symbols = manager.get_product_symbols("binance")
+    product_symbols.clear()
+    assert set(manager.get_product_symbols("binance")) == {
+        "BTC-USDT-SPOT",
+        "BTC-USDT-SWAP",
+    }
+
+
 def test_missing_lookup_raises() -> None:
     manager = _make_manager()
     with pytest.raises(ProductTableError):
@@ -163,6 +178,46 @@ def test_product_symbol_lookup_honors_product_and_exchange_types() -> None:
             product_type="spot",
             exchange_type="PERPETUAL",
         )
+
+
+def test_indexed_lookup_preserves_ambiguous_results() -> None:
+    manager = ProductTableManager()
+    manager.product_table = pl.DataFrame(
+        [
+            {
+                "exchange": "example",
+                "product_symbol": "BTC-USD-2026-FUTURES",
+                "exchange_symbol": "BTCUSD",
+                "product_type": "futures",
+                "exchange_type": "dated-2026",
+            },
+            {
+                "exchange": "example",
+                "product_symbol": "BTC-USD-2027-FUTURES",
+                "exchange_symbol": "BTCUSD",
+                "product_type": "futures",
+                "exchange_type": "dated-2027",
+            },
+        ]
+    )
+    manager._build_indexes()
+
+    with pytest.raises(ProductTableError, match="multiple"):
+        manager.get_product_symbol(
+            "example",
+            "BTCUSD",
+            product_type="futures",
+        )
+
+    assert (
+        manager.get_product_symbol(
+            "example",
+            "BTCUSD",
+            product_type="futures",
+            exchange_type="dated-2026",
+        )
+        == "BTC-USD-2026-FUTURES"
+    )
 
 
 def test_all_product_fetches_manage_market_clients() -> None:

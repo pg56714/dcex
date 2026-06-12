@@ -115,6 +115,24 @@ def test_api_request_error_redacts_uppercase_url_credentials() -> None:
         assert sensitive_value not in rendered
 
 
+@pytest.mark.parametrize(
+    "url",
+    [
+        "//user:password@api.example.com/private?token=secret",
+        "https:/user:password@api.example.com/private?token=secret",
+    ],
+)
+def test_api_request_error_redacts_credentials_from_nonstandard_urls(url: str) -> None:
+    error = FailedRequestError(
+        request=f"GET {url}",
+        message=f"failed for {url}",
+    )
+
+    rendered = str(error)
+    for sensitive_value in ("user", "password", "secret"):
+        assert sensitive_value not in rendered
+
+
 def test_api_request_error_handles_malformed_url_without_raising() -> None:
     error = FailedRequestError(
         request="GET https://[invalid?token=request-secret",
