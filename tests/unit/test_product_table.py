@@ -442,6 +442,65 @@ async def test_async_product_fetch_closes_auxiliary_resources_after_session_clos
     assert created[0].auxiliary_closed
 
 
+def test_sync_product_fetch_preserves_primary_error_when_cleanup_fails() -> None:
+    closed: list[str] = []
+
+    class MarketHTTP:
+        def __init__(self, name: str, *, fail_close: bool, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.name = name
+            self.fail_close = fail_close
+
+        def close(self) -> None:
+            closed.append(self.name)
+            if self.fail_close:
+                raise RuntimeError(f"{self.name} cleanup failed")
+
+    @sync_fetch._manage_market_http
+    def failing_fetch() -> pl.DataFrame:
+        sync_fetch._market_http(lambda **kwargs: MarketHTTP("first", fail_close=False, **kwargs))
+        sync_fetch._market_http(lambda **kwargs: MarketHTTP("second", fail_close=True, **kwargs))
+        raise ValueError("fetch failed")
+
+    with pytest.raises(ValueError, match="fetch failed") as exc_info:
+        failing_fetch()
+
+    assert closed == ["second", "first"]
+    assert exc_info.value.__notes__ == [
+        "Market HTTP cleanup failed: RuntimeError('second cleanup failed')"
+    ]
+
+
+@pytest.mark.asyncio
+async def test_async_product_fetch_preserves_primary_error_when_cleanup_fails() -> None:
+    closed: list[str] = []
+
+    class MarketHTTP:
+        def __init__(self, name: str, *, fail_close: bool, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.name = name
+            self.fail_close = fail_close
+
+        async def close(self) -> None:
+            closed.append(self.name)
+            if self.fail_close:
+                raise RuntimeError(f"{self.name} cleanup failed")
+
+    @async_fetch._manage_market_http
+    async def failing_fetch() -> pl.DataFrame:
+        async_fetch._market_http(lambda **kwargs: MarketHTTP("first", fail_close=False, **kwargs))
+        async_fetch._market_http(lambda **kwargs: MarketHTTP("second", fail_close=True, **kwargs))
+        raise ValueError("fetch failed")
+
+    with pytest.raises(ValueError, match="fetch failed") as exc_info:
+        await failing_fetch()
+
+    assert closed == ["second", "first"]
+    assert exc_info.value.__notes__ == [
+        "Market HTTP cleanup failed: RuntimeError('second cleanup failed')"
+    ]
+
+
 @pytest.mark.asyncio
 async def test_async_product_table_skips_failed_exchanges(
     monkeypatch: pytest.MonkeyPatch,

@@ -29,19 +29,39 @@ def _manage_market_http(func: _FetchFunction) -> _FetchFunction:
     def wrapper() -> pl.DataFrame:
         clients: list[Any] = []
         token = _active_market_http_clients.set(clients)
+        primary_error: BaseException | None = None
         try:
             return func()
+        except BaseException as exc:
+            primary_error = exc
+            raise
         finally:
+            cleanup_errors: list[BaseException] = []
             try:
                 for client in reversed(clients):
-                    session = getattr(client, "session", None)
-                    close = getattr(client, "close", None)
-                    if close is not None:
-                        close()
-                    elif session is not None and not getattr(session, "is_closed", False):
-                        session.close()
+                    try:
+                        session = getattr(client, "session", None)
+                        close = getattr(client, "close", None)
+                        if close is not None:
+                            close()
+                        elif session is not None and not getattr(session, "is_closed", False):
+                            session.close()
+                    except BaseException as exc:
+                        cleanup_errors.append(exc)
             finally:
                 _active_market_http_clients.reset(token)
+
+            if cleanup_errors:
+                if primary_error is not None:
+                    for cleanup_error in cleanup_errors:
+                        primary_error.add_note(f"Market HTTP cleanup failed: {cleanup_error!r}")
+                elif len(cleanup_errors) == 1:
+                    raise cleanup_errors[0]
+                else:
+                    raise BaseExceptionGroup(
+                        "Failed to close market HTTP clients",
+                        cleanup_errors,
+                    )
 
     return wrapper
 
