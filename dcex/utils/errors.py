@@ -1,9 +1,45 @@
 """Custom exception classes for API and request handling."""
 
+import re
 from typing import Protocol
 from urllib.parse import urlsplit, urlunsplit
 
 _HTTP_METHODS = frozenset({"DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"})
+_URL_PATTERN = re.compile(r"https?://[^\s<>'\"]+")
+_BEARER_TOKEN_PATTERN = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]+")
+_SENSITIVE_ASSIGNMENT_PATTERN = re.compile(
+    r"""(?ix)
+    ["']?
+    \b(?:
+        api[_-]?(?:key|secret)
+        |
+        access[_-]?key
+        |
+        secret[_-]?key
+        |
+        signature
+        |
+        secret
+        |
+        passphrase
+        |
+        password
+        |
+        authorization
+        |
+        token
+    )\b
+    ["']?
+    \s*[:=]\s*
+    (?:
+        '[^']*'
+        |
+        "[^"]*"
+        |
+        [^,\s&}\]]+
+    )
+    """
+)
 
 
 class ResponseProtocol(Protocol):
@@ -11,6 +47,32 @@ class ResponseProtocol(Protocol):
 
     status_code: int
     text: str
+
+
+def sanitize_url(url: str) -> str:
+    """Return a URL without query parameters or fragments."""
+    url = url.strip()
+    if not url:
+        return ""
+    url = url.split(maxsplit=1)[0]
+    parsed = urlsplit(url)
+    if parsed.scheme and parsed.netloc:
+        return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", ""))
+    return url.split("?", 1)[0].split("#", 1)[0]
+
+
+def sanitize_message(message: str) -> str:
+    """Redact URLs and credential-like assignments from an error message."""
+
+    def replace_url(match: re.Match[str]) -> str:
+        matched_url = match.group(0)
+        trailing = matched_url[len(matched_url.rstrip(".,;:!?)]}")) :]
+        raw_url = matched_url[: len(matched_url) - len(trailing)] if trailing else matched_url
+        return f"{sanitize_url(raw_url)}{trailing}"
+
+    sanitized = _URL_PATTERN.sub(replace_url, message)
+    sanitized = _BEARER_TOKEN_PATTERN.sub("<redacted>", sanitized)
+    return _SENSITIVE_ASSIGNMENT_PATTERN.sub("<redacted>", sanitized)
 
 
 def _sanitize_request(request: str) -> str:
@@ -21,15 +83,9 @@ def _sanitize_request(request: str) -> str:
     if not separator or method not in _HTTP_METHODS:
         return "<redacted>"
 
-    url = url.strip()
-    if not url:
+    safe_url = sanitize_url(url)
+    if not safe_url:
         return "<redacted>"
-    url = url.split(maxsplit=1)[0]
-    parsed = urlsplit(url)
-    if parsed.scheme and parsed.netloc:
-        safe_url = urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", ""))
-    else:
-        safe_url = url.split("?", 1)[0].split("#", 1)[0]
 
     return f"{method} {safe_url}"
 
@@ -46,12 +102,12 @@ class APIRequestError(Exception):
         resp_headers: dict | None = None,
     ) -> None:
         self.request = _sanitize_request(request)
-        self.message = message
+        self.message = sanitize_message(message)
         self.status_code = status_code if status_code is not None else "Unknown"
         self.time = time if time is not None else "Unknown"
         self.resp_headers = resp_headers
         super().__init__(
-            f"{message} (ErrCode: {self.status_code}) (ErrTime: {self.time}).\n"
+            f"{self.message} (ErrCode: {self.status_code}) (ErrTime: {self.time}).\n"
             f"Request: {self.request}."
         )
 

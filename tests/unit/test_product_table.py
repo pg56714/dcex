@@ -77,12 +77,8 @@ def test_get_exchange_symbol() -> None:
 def test_get_product_symbol_by_product_type() -> None:
     manager = _make_manager()
     # BTCUSDT exists as both spot and swap on binance; product_type disambiguates.
-    assert (
-        manager.get_product_symbol("binance", "BTCUSDT", product_type="spot") == "BTC-USDT-SPOT"
-    )
-    assert (
-        manager.get_product_symbol("binance", "BTCUSDT", product_type="swap") == "BTC-USDT-SWAP"
-    )
+    assert manager.get_product_symbol("binance", "BTCUSDT", product_type="spot") == "BTC-USDT-SPOT"
+    assert manager.get_product_symbol("binance", "BTCUSDT", product_type="swap") == "BTC-USDT-SWAP"
 
 
 def test_get_product_symbol_by_exchange_type() -> None:
@@ -134,6 +130,30 @@ def test_missing_lookup_raises() -> None:
     manager = _make_manager()
     with pytest.raises(ProductTableError):
         manager.get_exchange_symbol("binance", "DOGE-USDT-SPOT")
+
+
+def test_indexed_lookup_honors_all_filters() -> None:
+    manager = _make_manager()
+
+    with pytest.raises(ProductTableError):
+        manager.get(
+            "exchange_symbol",
+            exchange="binance",
+            product_symbol="BTC-USDT-SPOT",
+            product_type="swap",
+        )
+
+
+def test_product_symbol_lookup_honors_product_and_exchange_types() -> None:
+    manager = _make_manager()
+
+    with pytest.raises(ProductTableError):
+        manager.get_product_symbol(
+            "binance",
+            "BTCUSDT",
+            product_type="spot",
+            exchange_type="PERPETUAL",
+        )
 
 
 def test_failed_sync_initialization_is_not_cached(monkeypatch: pytest.MonkeyPatch) -> None:

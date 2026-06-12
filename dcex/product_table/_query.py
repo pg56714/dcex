@@ -32,6 +32,26 @@ class ProductTableQueryMixin:
 
     product_table: pl.DataFrame
 
+    @staticmethod
+    def _row_matches(
+        row: dict[str, Any],
+        *,
+        product_symbol: str | None = None,
+        exchange: str | None = None,
+        product_type: str | None = None,
+        exchange_type: str | None = None,
+        exchange_symbol: str | None = None,
+    ) -> bool:
+        """Return whether a row satisfies every supplied filter."""
+        filters = {
+            "product_symbol": product_symbol,
+            "exchange": exchange,
+            "product_type": product_type,
+            "exchange_type": exchange_type,
+            "exchange_symbol": exchange_symbol,
+        }
+        return all(value is None or row.get(column) == value for column, value in filters.items())
+
     def _build_indexes(self) -> None:
         """Build in-memory indexes to accelerate common lookups."""
         self._by_exchange_product: dict[tuple[str, str], dict[str, Any]] = {}
@@ -84,7 +104,14 @@ class ProductTableQueryMixin:
         # Fast paths via indexes
         if exchange is not None and product_symbol is not None:
             row = self._by_exchange_product.get((exchange, product_symbol))
-            if row is not None:
+            if row is not None and self._row_matches(
+                row,
+                product_symbol=product_symbol,
+                exchange=exchange,
+                product_type=product_type,
+                exchange_type=exchange_type,
+                exchange_symbol=exchange_symbol,
+            ):
                 if key not in row:
                     raise ProductTableError(f"Key not found: {key}")
                 return row[key]
@@ -94,7 +121,14 @@ class ProductTableQueryMixin:
                 row = self._by_exchange_exchange_symbol_product_type.get(
                     (exchange, exchange_symbol, product_type)
                 )
-                if row is not None:
+                if row is not None and self._row_matches(
+                    row,
+                    product_symbol=product_symbol,
+                    exchange=exchange,
+                    product_type=product_type,
+                    exchange_type=exchange_type,
+                    exchange_symbol=exchange_symbol,
+                ):
                     if key not in row:
                         raise ProductTableError(f"Key not found: {key}")
                     return row[key]
@@ -102,7 +136,14 @@ class ProductTableQueryMixin:
                 row = self._by_exchange_exchange_symbol_exchange_type.get(
                     (exchange, exchange_symbol, exchange_type)
                 )
-                if row is not None:
+                if row is not None and self._row_matches(
+                    row,
+                    product_symbol=product_symbol,
+                    exchange=exchange,
+                    product_type=product_type,
+                    exchange_type=exchange_type,
+                    exchange_symbol=exchange_symbol,
+                ):
                     if key not in row:
                         raise ProductTableError(f"Key not found: {key}")
                     return row[key]
@@ -200,15 +241,16 @@ class ProductTableQueryMixin:
                 exchange_type=exchange_type,
             )
         elif product_type is not None and exchange_type is not None:
-            # Prefer product_type if both provided
             row = self._by_exchange_exchange_symbol_product_type.get(
                 (exchange, exchange_symbol, product_type)
             )
-            if row is None:
-                row = self._by_exchange_exchange_symbol_exchange_type.get(
-                    (exchange, exchange_symbol, exchange_type)
-                )
-            if row is not None:
+            if row is not None and self._row_matches(
+                row,
+                exchange=exchange,
+                product_type=product_type,
+                exchange_type=exchange_type,
+                exchange_symbol=exchange_symbol,
+            ):
                 return row["product_symbol"]
             return self.get(
                 "product_symbol",

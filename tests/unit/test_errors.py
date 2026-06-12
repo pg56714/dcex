@@ -48,3 +48,27 @@ def test_api_request_error_ignores_unseparated_trailing_payload() -> None:
 
     assert error.request == "POST https://api.example.com/v1/order"
     assert "private-key" not in str(error)
+
+
+def test_api_request_error_sanitizes_urls_and_credentials_in_message() -> None:
+    error = FailedRequestError(
+        request="POST https://api.example.com/v1/order?signature=request-secret",
+        message=(
+            "Request failed: 401 Client Error for url: "
+            "https://api.example.com/v1/order?timestamp=1&signature=url-secret; "
+            '"api_key": "private-key"; Authorization: Bearer bearer-token'
+        ),
+    )
+
+    rendered = str(error)
+    assert "https://api.example.com/v1/order" in rendered
+    for sensitive_value in (
+        "request-secret",
+        "url-secret",
+        "private-key",
+        "bearer-token",
+        "timestamp",
+        "signature",
+        "api_key",
+    ):
+        assert sensitive_value not in rendered

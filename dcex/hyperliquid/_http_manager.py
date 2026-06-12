@@ -51,7 +51,6 @@ class HTTPManager(BaseHTTPManager):
     wallet_address: str | None = field(default=None)
     private_key: str | None = field(default=None, repr=False)
     timeout: float = field(default=10)
-    recv_window: int = field(default=5000)
     logger: logging.Logger | None = field(default=None)
     session: requests.Session | None = field(init=False, default=None)
     ptm: ProductTableManager | None = field(init=False, default=None)

@@ -18,6 +18,7 @@ import logging
 from typing import ClassVar
 
 from ..utils.common import Common
+from ..utils.errors import sanitize_message, sanitize_url
 
 
 class BaseHTTPManager:
@@ -63,13 +64,18 @@ class BaseHTTPManager:
         """Emit a debug record for an outgoing request."""
         logger = getattr(self, "_logger", None)
         if logger is not None:
-            logger.debug("%s request: %s %s", self.EXCHANGE, method.upper(), url)
+            logger.debug("%s request: %s %s", self.EXCHANGE, method.upper(), sanitize_url(url))
 
     def _log_failed_request(self, message: str, status_code: object) -> None:
         """Emit an error record just before a failed request is raised."""
         logger = getattr(self, "_logger", None)
         if logger is not None:
-            logger.error("%s request failed [%s]: %s", self.EXCHANGE, status_code, message)
+            logger.error(
+                "%s request failed [%s]: %s",
+                self.EXCHANGE,
+                status_code,
+                sanitize_message(message),
+            )
 
     def _store_response_headers(self, response: object) -> dict[str, str]:
         """Store raw HTTP response headers from the latest completed response."""

@@ -50,7 +50,6 @@ class HTTPManager(BaseHTTPManager):
     wallet_address: str | None = field(default=None)
     private_key: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
-    recv_window: int = field(default=5000)
     logger: logging.Logger | None = field(default=None)
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
@@ -63,7 +62,8 @@ class HTTPManager(BaseHTTPManager):
         Returns:
             Self for method chaining
         """
-        self.session = httpx.AsyncClient(timeout=self.timeout)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.HYPERLIQUID)

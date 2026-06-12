@@ -93,7 +93,8 @@ class HTTPManager(BaseHTTPManager):
         Returns:
             HTTPManager: Initialized HTTP manager instance
         """
-        self.session = httpx.AsyncClient(timeout=self.timeout)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self.logger or logging.getLogger(__name__)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINGX)

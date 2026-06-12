@@ -96,7 +96,8 @@ class HTTPManager(BaseHTTPManager):
 
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
-        self.session = httpx.AsyncClient(timeout=self.timeout)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
 
         if self.preload_product_table:

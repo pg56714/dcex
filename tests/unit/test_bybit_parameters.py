@@ -1,6 +1,7 @@
 """Offline tests for Bybit endpoint parameter handling."""
 # ruff: noqa: D103
 
+import inspect
 from typing import Any, Protocol
 
 import pytest
@@ -94,3 +95,30 @@ async def test_async_bybit_transferable_amount_validates_and_sends_coins() -> No
         await manager.get_transferable_amount([])
     with pytest.raises(ValueError, match="no more than 20"):
         await manager.get_transferable_amount(["BTC"] * 21)
+
+
+def test_bybit_post_only_order_has_consistent_sync_and_async_parameters() -> None:
+    from dcex.async_support.bybit._trade_http import TradeHTTP as AsyncTradeHTTP
+    from dcex.bybit._trade_http import TradeHTTP
+
+    sync_parameters = inspect.signature(TradeHTTP.place_post_only_limit_order).parameters
+    async_parameters = inspect.signature(AsyncTradeHTTP.place_post_only_limit_order).parameters
+
+    assert tuple(sync_parameters) == tuple(async_parameters)
+    assert "timeInForce" not in sync_parameters
+
+
+def test_sync_bybit_post_only_order_forces_post_only() -> None:
+    from dcex.bybit._trade_http import TradeHTTP
+
+    manager = TradeHTTP(preload_product_table=False)
+    captured: dict[str, Any] = {}
+
+    def fake_place_limit_order(**kwargs: object) -> dict[str, Any]:
+        captured.update(kwargs)
+        return {}
+
+    manager.place_limit_order = fake_place_limit_order  # type: ignore[method-assign]
+    manager.place_post_only_limit_order("BTC-USDT-SPOT", "Buy", "0.001", "100")
+
+    assert captured["timeInForce"] == "PostOnly"

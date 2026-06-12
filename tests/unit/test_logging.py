@@ -50,6 +50,43 @@ def test_log_failed_request_emits_error(caplog: pytest.LogCaptureFixture) -> Non
     assert any("request failed" in r.message and "okx" in r.message for r in caplog.records)
 
 
+def test_request_logs_redact_query_parameters_and_credentials(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Request and failure logs must not expose signed query values."""
+
+    class Dummy(BaseHTTPManager):
+        EXCHANGE = Common.MEXC
+
+        def __init__(self) -> None:
+            self._logger = logging.getLogger("dcex.test.redaction")
+
+    with caplog.at_level(logging.DEBUG, logger="dcex.test.redaction"):
+        manager = Dummy()
+        manager._log_request(
+            "POST",
+            "https://api.example.com/order?timestamp=1&signature=url-secret",
+        )
+        manager._log_failed_request(
+            "failed for https://api.example.com/order?signature=message-secret "
+            "with 'api_key': 'private-key' and Authorization: Bearer bearer-token",
+            401,
+        )
+
+    rendered = "\n".join(record.message for record in caplog.records)
+    assert "https://api.example.com/order" in rendered
+    for sensitive_value in (
+        "timestamp",
+        "signature",
+        "url-secret",
+        "message-secret",
+        "api_key",
+        "private-key",
+        "bearer-token",
+    ):
+        assert sensitive_value not in rendered
+
+
 def test_binance_request_logs_debug_and_error(caplog: pytest.LogCaptureFixture) -> None:
     """Binance emits a debug send record and an error record on API failure."""
     from dcex.binance._http_manager import HTTPManager

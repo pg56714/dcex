@@ -133,7 +133,7 @@ class HTTPManager(BaseHTTPManager):
     base_api: str = field(default="https://openapi.okx.com")
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(init=False)
+    session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
 
@@ -144,7 +144,8 @@ class HTTPManager(BaseHTTPManager):
         Returns:
             Self instance
         """
-        self.session = httpx.AsyncClient(timeout=self.timeout)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.OKX)
