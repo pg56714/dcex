@@ -93,11 +93,11 @@ class HTTPManager(BaseHTTPManager):
         Returns:
             HTTPManager: Initialized HTTP manager instance
         """
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self.logger or logging.getLogger(__name__)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINGX)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     async def _request(
@@ -106,6 +106,7 @@ class HTTPManager(BaseHTTPManager):
         path: str,
         query: dict | None = None,
         signed: bool = True,
+        request_headers: dict[str, str] | None = None,
     ) -> dict:
         """
         Make an HTTP request to BingX API.
@@ -137,7 +138,7 @@ class HTTPManager(BaseHTTPManager):
             )
             headers = get_header(self.api_key)
         else:
-            headers = get_header_no_sign()
+            headers = request_headers or get_header_no_sign()
             url = self.base_url + path
             if query:
                 sorted_query = urlencode(_prepare_query(query))

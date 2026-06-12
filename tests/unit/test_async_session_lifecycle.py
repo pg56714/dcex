@@ -20,6 +20,8 @@ from dcex.async_support.kucoin.client import Client as KuCoinClient
 from dcex.async_support.lighter.client import Client as LighterClient
 from dcex.async_support.mexc.client import Client as MEXCClient
 from dcex.async_support.okx.client import Client as OKXClient
+from dcex.async_support.product_table.manager import ProductTableManager
+from dcex.product_table.manager import ProductTableError
 
 _CLIENT_TYPES = [
     AsterClient,
@@ -58,3 +60,24 @@ async def test_async_client_reuses_open_session(client_type: type[Any]) -> None:
         assert not original_session.is_closed
     finally:
         await client.close()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("client_type", _CLIENT_TYPES)
+async def test_product_table_failure_does_not_create_session(
+    client_type: type[Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def fail_get_instance(
+        cls: type[ProductTableManager],
+        exchange_name: str | None = None,
+    ) -> ProductTableManager:
+        raise ProductTableError(f"failed to load {exchange_name}")
+
+    monkeypatch.setattr(ProductTableManager, "get_instance", classmethod(fail_get_instance))
+    client = client_type()
+
+    with pytest.raises(ProductTableError):
+        await client.async_init()
+
+    assert client.session is None

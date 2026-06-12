@@ -41,3 +41,23 @@ def test_stateful_live_test_runs_after_explicit_opt_in(monkeypatch: pytest.Monke
     monkeypatch.setenv("RUN_LIVE_TRADING_TESTS", "1")
 
     module.pytest_runtest_setup(_stateful_item(module))
+
+
+def test_change_contract_methods_are_classified_as_stateful(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_conftest()
+
+    def test_contract_account(client: object) -> None:
+        client.change_contract_leverage()
+
+    source = """
+def test_contract_account(client):
+    client.change_contract_leverage()
+"""
+    monkeypatch.setattr(module.inspect, "getsource", lambda _: source)
+
+    class TestItem:
+        obj = test_contract_account
+
+    assert module._calls_stateful_client_method(TestItem())

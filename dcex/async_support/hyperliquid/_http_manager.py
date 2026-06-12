@@ -62,13 +62,13 @@ class HTTPManager(BaseHTTPManager):
         Returns:
             Self for method chaining
         """
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.HYPERLIQUID)
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _auth(self, query: dict[str, Any], timestamp: int) -> dict[str, str | int]:

@@ -98,6 +98,7 @@ class HTTPManager(BaseHTTPManager):
         path: str,
         query: dict[str, Any] | None = None,
         signed: bool = True,
+        request_headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         """Make an HTTP request to BingX API."""
         if signed:
@@ -110,7 +111,7 @@ class HTTPManager(BaseHTTPManager):
             )
             headers = get_header(self.api_key)
         else:
-            headers = get_header_no_sign()
+            headers = request_headers or get_header_no_sign()
             url = self.base_url + path
             if query:
                 sorted_query = urlencode(_prepare_query(query))

@@ -61,11 +61,11 @@ class HTTPManager(BaseHTTPManager):
         Raises:
             RuntimeError: If session initialization fails
         """
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMEX)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _sign(self, method: str, path: str, expires: int, body: str = "") -> str:

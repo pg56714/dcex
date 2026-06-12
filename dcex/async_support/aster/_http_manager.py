@@ -42,11 +42,11 @@ class HTTPManager(BaseHTTPManager):
 
     async def async_init(self) -> Self:
         """Initialize the asynchronous Aster HTTP manager."""
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.ASTER)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _get_base_url(self, path: AsterPath) -> str:

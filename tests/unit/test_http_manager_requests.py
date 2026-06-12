@@ -138,6 +138,71 @@ class _AsyncBadJsonSession(_AsyncCaptureSession):
         return _BadJsonResponse(self.status_code)
 
 
+def test_bingx_listen_key_uses_managed_request_path() -> None:
+    from dcex.bingx._account_http import AccountHTTP
+
+    client = AccountHTTP(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    session = _CaptureSession(payload={"code": 0, "listenKey": "listen-key"})
+    client.session = session
+
+    assert client.get_listen_key() == "listen-key"
+    method, _, kwargs = session.calls[0]
+    assert method == "POST"
+    assert kwargs["headers"] == {"X-BX-APIKEY": API_KEY}
+    assert kwargs["timeout"] == client.timeout
+
+
+def test_bingx_listen_key_raises_for_api_error() -> None:
+    from dcex.bingx._account_http import AccountHTTP
+
+    client = AccountHTTP(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    client.session = _CaptureSession(payload={"code": 100001, "msg": "invalid api key"})
+
+    with pytest.raises(FailedRequestError, match="100001"):
+        client.get_listen_key()
+
+
+@pytest.mark.asyncio
+async def test_async_bingx_listen_key_uses_managed_request_path() -> None:
+    from dcex.async_support.bingx._account_http import AccountHTTP
+
+    client = AccountHTTP(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    session = _AsyncCaptureSession(payload={"code": 0, "listenKey": "listen-key"})
+    client.session = session
+
+    assert await client.get_listen_key() == "listen-key"
+    method, _, kwargs = session.calls[0]
+    assert method == "POST"
+    assert kwargs["headers"] == {"X-BX-APIKEY": API_KEY}
+
+
+@pytest.mark.asyncio
+async def test_async_bingx_listen_key_raises_for_api_error() -> None:
+    from dcex.async_support.bingx._account_http import AccountHTTP
+
+    client = AccountHTTP(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        preload_product_table=False,
+    )
+    client.session = _AsyncCaptureSession(payload={"code": 100001, "msg": "invalid api key"})
+
+    with pytest.raises(FailedRequestError, match="100001"):
+        await client.get_listen_key()
+
+
 def _sync_header_cases() -> list[tuple[str, object, dict[str, Any]]]:
     from dcex.aster.endpoints.market import SpotMarket as AsterSpotMarket
     from dcex.binance.endpoints.market import SpotMarket

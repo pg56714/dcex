@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ast
+import asyncio
 import base64
 import inspect
 from dataclasses import dataclass
@@ -247,7 +248,9 @@ def _wire_sync(client: Any) -> list[dict[str, Any]]:
         calls.append(
             {"method": method, "path": path, "query": query, "body": body, "kwargs": kwargs}
         )
-        if getattr(path, "name", "") == "USER_DATA_STREAM" or "listenKey" in str(path):
+        if getattr(path, "name", "") in {"LISTEN_KEY", "USER_DATA_STREAM"} or "listenKey" in str(
+            path
+        ):
             return {"listenKey": "test-listen-key"}
         if "nextNonce" in str(path):
             return {"nonce": 1}
@@ -272,7 +275,9 @@ def _wire_async(client: Any) -> list[dict[str, Any]]:
         calls.append(
             {"method": method, "path": path, "query": query, "body": body, "kwargs": kwargs}
         )
-        if getattr(path, "name", "") == "USER_DATA_STREAM" or "listenKey" in str(path):
+        if getattr(path, "name", "") in {"LISTEN_KEY", "USER_DATA_STREAM"} or "listenKey" in str(
+            path
+        ):
             return {"listenKey": "test-listen-key"}
         if "nextNonce" in str(path):
             return {"nonce": 1}
@@ -1003,3 +1008,50 @@ async def test_async_bitmart_post_only_buy_reads_position_response_data() -> Non
 
     assert result == {"ok": True}
     assert calls[0]["query"]["side"] == 2
+
+
+@pytest.mark.parametrize(
+    ("helper_name", "order_method_name", "position_type", "close_side", "open_side"),
+    [
+        ("place_contract_market_buy_order", "place_contract_market_order", 2, 2, 1),
+        ("place_contract_market_sell_order", "place_contract_market_order", 1, 3, 4),
+        ("place_contract_post_only_buy_order", "place_contract_post_only_order", 2, 2, 1),
+        ("place_contract_post_only_sell_order", "place_contract_post_only_order", 1, 3, 4),
+    ],
+)
+@pytest.mark.asyncio
+async def test_async_bitmart_reverse_helpers_close_before_opening(
+    helper_name: str,
+    order_method_name: str,
+    position_type: int,
+    close_side: int,
+    open_side: int,
+) -> None:
+    client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))
+    close_completed = False
+    sides: list[int] = []
+
+    async def fake_get_contract_position(*args: object, **kwargs: object) -> dict[str, Any]:
+        return {"data": [{"position_type": position_type, "current_amount": "1"}]}
+
+    async def fake_place_order(*args: object, **kwargs: Any) -> dict[str, Any]:
+        nonlocal close_completed
+        side = kwargs["side"]
+        sides.append(side)
+        if side == close_side:
+            await asyncio.sleep(0)
+            close_completed = True
+        else:
+            assert close_completed
+        return {"side": side}
+
+    client.get_contract_position = fake_get_contract_position
+    setattr(client, order_method_name, fake_place_order)
+    kwargs: dict[str, Any] = {"product_symbol": "BTC-USDT-SWAP", "size": 2}
+    if "post_only" in helper_name:
+        kwargs["price"] = "100.1"
+
+    result = await getattr(client, helper_name)(**kwargs)
+
+    assert result == ({"side": close_side}, {"side": open_side})
+    assert sides == [close_side, open_side]

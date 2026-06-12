@@ -275,12 +275,13 @@ class AccountHTTP(HTTPManager):
         if not self.api_key:
             raise ValueError("API key is required")
 
-        url = self.base_url + SwapAccount.LISTEN_KEY
-        headers = {"X-BX-APIKEY": self.api_key}
-
-        res = self.session.post(url, headers=headers)
-        data = res.json()
-        return data.get("listenKey")
+        res = self._request(
+            method="POST",
+            path=SwapAccount.LISTEN_KEY,
+            signed=False,
+            request_headers={"X-BX-APIKEY": self.api_key},
+        )
+        return res["listenKey"]
 
     def keep_alive_listen_key(self, listen_key: str) -> dict:
         """

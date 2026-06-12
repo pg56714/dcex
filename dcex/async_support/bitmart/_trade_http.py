@@ -1,4 +1,3 @@
-import asyncio
 from typing import Any, cast
 
 from ...enums import OrderSide
@@ -601,20 +600,19 @@ class TradeHTTP(HTTPManager):
                     client_order_id=client_order_id,
                 )
             else:
-                return await asyncio.gather(
-                    self.place_contract_market_order(
-                        product_symbol=product_symbol,
-                        side=2,
-                        size=short_size,
-                        client_order_id=client_order_id,
-                    ),
-                    self.place_contract_market_order(
-                        product_symbol=product_symbol,
-                        side=1,
-                        size=excess_size,
-                        client_order_id=client_order_id,
-                    ),
+                close_result = await self.place_contract_market_order(
+                    product_symbol=product_symbol,
+                    side=2,
+                    size=short_size,
+                    client_order_id=client_order_id,
                 )
+                open_result = await self.place_contract_market_order(
+                    product_symbol=product_symbol,
+                    side=1,
+                    size=excess_size,
+                    client_order_id=client_order_id,
+                )
+                return close_result, open_result
         else:
             return await self.place_contract_market_order(
                 product_symbol=product_symbol,
@@ -643,20 +641,19 @@ class TradeHTTP(HTTPManager):
                     client_order_id=client_order_id,
                 )
             else:
-                return await asyncio.gather(
-                    self.place_contract_market_order(
-                        product_symbol=product_symbol,
-                        side=3,
-                        size=long_size,
-                        client_order_id=client_order_id,
-                    ),
-                    self.place_contract_market_order(
-                        product_symbol=product_symbol,
-                        side=4,
-                        size=excess_size,
-                        client_order_id=client_order_id,
-                    ),
+                close_result = await self.place_contract_market_order(
+                    product_symbol=product_symbol,
+                    side=3,
+                    size=long_size,
+                    client_order_id=client_order_id,
                 )
+                open_result = await self.place_contract_market_order(
+                    product_symbol=product_symbol,
+                    side=4,
+                    size=excess_size,
+                    client_order_id=client_order_id,
+                )
+                return close_result, open_result
         else:
             return await self.place_contract_market_order(
                 product_symbol=product_symbol,
@@ -725,22 +722,21 @@ class TradeHTTP(HTTPManager):
                     client_order_id=client_order_id,
                 )
             else:
-                return await asyncio.gather(
-                    self.place_contract_post_only_order(
-                        product_symbol=product_symbol,
-                        side=2,
-                        price=price,
-                        size=short_size,
-                        client_order_id=client_order_id,
-                    ),
-                    self.place_contract_post_only_order(
-                        product_symbol=product_symbol,
-                        side=1,
-                        price=price,
-                        size=excess_size,
-                        client_order_id=client_order_id,
-                    ),
+                close_result = await self.place_contract_post_only_order(
+                    product_symbol=product_symbol,
+                    side=2,
+                    price=price,
+                    size=short_size,
+                    client_order_id=client_order_id,
                 )
+                open_result = await self.place_contract_post_only_order(
+                    product_symbol=product_symbol,
+                    side=1,
+                    price=price,
+                    size=excess_size,
+                    client_order_id=client_order_id,
+                )
+                return close_result, open_result
         else:
             return await self.place_contract_post_only_order(
                 product_symbol=product_symbol,
@@ -774,22 +770,21 @@ class TradeHTTP(HTTPManager):
                     client_order_id=client_order_id,
                 )
             else:
-                return await asyncio.gather(
-                    self.place_contract_post_only_order(
-                        product_symbol=product_symbol,
-                        side=3,
-                        price=price,
-                        size=long_size,
-                        client_order_id=client_order_id,
-                    ),
-                    self.place_contract_post_only_order(
-                        product_symbol=product_symbol,
-                        side=4,
-                        price=price,
-                        size=excess_size,
-                        client_order_id=client_order_id,
-                    ),
+                close_result = await self.place_contract_post_only_order(
+                    product_symbol=product_symbol,
+                    side=3,
+                    price=price,
+                    size=long_size,
+                    client_order_id=client_order_id,
                 )
+                open_result = await self.place_contract_post_only_order(
+                    product_symbol=product_symbol,
+                    side=4,
+                    price=price,
+                    size=excess_size,
+                    client_order_id=client_order_id,
+                )
+                return close_result, open_result
         else:
             return await self.place_contract_post_only_order(
                 product_symbol=product_symbol,

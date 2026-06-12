@@ -272,19 +272,16 @@ class AccountHTTP(HTTPManager):
             str: WebSocket listen key
         """
 
-        if self.session is None or getattr(self.session, "is_closed", False):
-            await self.async_init()
-        if self.session is None:
-            raise ValueError("Session is not initialized")
         if not self.api_key:
             raise ValueError("API key is required")
 
-        url = self.base_url + SwapAccount.LISTEN_KEY
-        headers = {"X-BX-APIKEY": self.api_key}
-
-        res = await self.session.post(url, headers=headers)
-        data = res.json()
-        return data.get("listenKey")
+        res = await self._request(
+            method="POST",
+            path=SwapAccount.LISTEN_KEY,
+            signed=False,
+            request_headers={"X-BX-APIKEY": self.api_key},
+        )
+        return res["listenKey"]
 
     async def keep_alive_listen_key(self, listen_key: str) -> dict:
         """

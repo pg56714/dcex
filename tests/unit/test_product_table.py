@@ -5,13 +5,18 @@ exercise the pure query/index methods. They pin the lookup behaviour so the
 query logic can be refactored (e.g. shared between sync and async) safely.
 """
 
+from typing import Any
+
 import polars as pl
 import pytest
 
-from dcex.product_table.manager import ProductTableManager, ProductTableError
+from dcex.async_support.product_table import fetch as async_fetch
+from dcex.async_support.product_table import manager as async_manager
 from dcex.async_support.product_table.manager import (
     ProductTableManager as AsyncProductTableManager,
 )
+from dcex.product_table import fetch as sync_fetch
+from dcex.product_table.manager import ProductTableError, ProductTableManager
 
 # A tiny fixture table covering two exchanges and spot/swap rows.
 _ROWS = [
@@ -194,3 +199,88 @@ async def test_failed_async_initialization_is_not_cached(
     finally:
         if original is not None:
             AsyncProductTableManager._instance[key] = original
+
+
+def test_sync_product_fetch_closes_market_client_on_failure() -> None:
+    created: list[Any] = []
+
+    class Session:
+        is_closed = False
+
+    class MarketHTTP:
+        def __init__(self, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.session = Session()
+            created.append(self)
+
+        def close(self) -> None:
+            self.session.is_closed = True
+
+    @sync_fetch._manage_market_http
+    def failing_fetch() -> pl.DataFrame:
+        sync_fetch._market_http(MarketHTTP)
+        raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError, match="boom"):
+        failing_fetch()
+
+    assert len(created) == 1
+    assert created[0].session.is_closed
+
+
+@pytest.mark.asyncio
+async def test_async_product_fetch_closes_market_client_on_failure() -> None:
+    created: list[Any] = []
+
+    class Session:
+        is_closed = False
+
+    class MarketHTTP:
+        def __init__(self, preload_product_table: bool) -> None:
+            assert not preload_product_table
+            self.session = Session()
+            created.append(self)
+
+        async def close(self) -> None:
+            self.session.is_closed = True
+
+    @async_fetch._manage_market_http
+    async def failing_fetch() -> pl.DataFrame:
+        async_fetch._market_http(MarketHTTP)
+        raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError, match="boom"):
+        await failing_fetch()
+
+    assert len(created) == 1
+    assert created[0].session.is_closed
+
+
+@pytest.mark.asyncio
+async def test_async_product_table_skips_failed_exchanges(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def working() -> pl.DataFrame:
+        return pl.DataFrame({"exchange": ["working"]})
+
+    async def broken() -> pl.DataFrame:
+        raise RuntimeError("exchange unavailable")
+
+    monkeypatch.setattr(async_manager, "VALID_EXCHANGES", [working, broken])
+
+    result = await AsyncProductTableManager()._fetch_product_tables()
+
+    assert result.to_dicts() == [{"exchange": "working"}]
+
+
+@pytest.mark.asyncio
+async def test_async_product_table_raises_when_all_exchanges_fail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def broken() -> pl.DataFrame:
+        raise RuntimeError("exchange unavailable")
+
+    monkeypatch.setattr(async_manager, "VALID_EXCHANGES", [broken])
+
+    with pytest.raises(ProductTableError, match="Failed to fetch"):
+        await AsyncProductTableManager()._fetch_product_tables()

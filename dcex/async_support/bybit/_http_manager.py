@@ -129,13 +129,13 @@ class HTTPManager(BaseHTTPManager):
         Returns:
             Self instance for method chaining
         """
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BYBIT)
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=subdomain, DOMAIN=self.domain, TLD=self.tld)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     async def _sync_time_offset(self) -> None:

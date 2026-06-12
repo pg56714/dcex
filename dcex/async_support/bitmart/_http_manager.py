@@ -71,11 +71,11 @@ class HTTPManager(BaseHTTPManager):
         Returns:
             HTTPManager: Initialized HTTP manager instance
         """
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMART)
+        if self.session is None or self.session.is_closed:
+            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _get_base_url(

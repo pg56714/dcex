@@ -41,7 +41,7 @@ _GENERATED_METHOD_NAMES = {
 _STATEFUL_METHOD_PREFIXES = (
     "amend",
     "cancel",
-    "change_margin",
+    "change",
     "close",
     "create",
     "funds_transfer",

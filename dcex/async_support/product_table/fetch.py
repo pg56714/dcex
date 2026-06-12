@@ -5,13 +5,53 @@ This module provides functions to fetch market data from different cryptocurrenc
 and standardize the information into a common format using the MarketInfo dataclass.
 """
 
+from collections.abc import Awaitable, Callable
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass
+from functools import wraps
+from typing import Any
 
 import polars as pl
 
 from ...utils.common import Common
 from ...utils.common_dataframe import to_dataframe
 from ...utils.decimal_utils import reverse_decimal_places
+
+_AsyncFetchFunction = Callable[[], Awaitable[pl.DataFrame]]
+_active_market_http_clients: ContextVar[list[Any] | None] = ContextVar(
+    "active_async_market_http_clients",
+    default=None,
+)
+
+
+def _manage_market_http(func: _AsyncFetchFunction) -> _AsyncFetchFunction:
+    @wraps(func)
+    async def wrapper() -> pl.DataFrame:
+        clients: list[Any] = []
+        token = _active_market_http_clients.set(clients)
+        try:
+            return await func()
+        finally:
+            try:
+                for client in reversed(clients):
+                    session = getattr(client, "session", None)
+                    if session is not None and not getattr(session, "is_closed", False):
+                        await client.close()
+            finally:
+                _active_market_http_clients.reset(token)
+
+    return wrapper
+
+
+def _market_http[MarketHTTPType](
+    manager_type: Callable[..., MarketHTTPType],
+) -> MarketHTTPType:
+    client = manager_type(preload_product_table=False)
+    clients = _active_market_http_clients.get()
+    if clients is None:
+        raise RuntimeError("Market HTTP clients must be created inside a managed fetch")
+    clients.append(client)
+    return client
 
 
 @dataclass
@@ -115,11 +155,12 @@ def _aster_market_info(market: dict[str, object], product_type: str) -> MarketIn
     )
 
 
+@_manage_market_http
 async def aster() -> pl.DataFrame:
     """Fetch and standardize Aster V3 spot and futures markets."""
     from ..aster._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
     try:
         markets = []
@@ -185,6 +226,7 @@ def _backpack_market_info(market: dict[str, object]) -> MarketInfo:
     )
 
 
+@_manage_market_http
 async def backpack() -> pl.DataFrame:
     """
     Fetch market information from Backpack exchange.
@@ -197,7 +239,7 @@ async def backpack() -> pl.DataFrame:
     """
     from ..backpack._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     try:
@@ -223,6 +265,7 @@ async def backpack() -> pl.DataFrame:
         await market_http.close()
 
 
+@_manage_market_http
 async def binance() -> pl.DataFrame:
     """
     Fetch market information from Binance exchange.
@@ -235,7 +278,7 @@ async def binance() -> pl.DataFrame:
     """
     from ..binance._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -307,6 +350,7 @@ async def binance() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def bingx() -> pl.DataFrame:
     """
     Fetch market information from BingX exchange.
@@ -319,7 +363,7 @@ async def bingx() -> pl.DataFrame:
     """
     from ..bingx._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -391,6 +435,7 @@ async def bingx() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def bitget() -> pl.DataFrame:
     """
     Fetch market information from Bitget exchange.
@@ -403,7 +448,7 @@ async def bitget() -> pl.DataFrame:
     """
     from ..bitget._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -471,6 +516,7 @@ async def bitget() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def bitmart() -> pl.DataFrame:
     """
     Fetch market information from BitMart exchange.
@@ -483,7 +529,7 @@ async def bitmart() -> pl.DataFrame:
     """
     from ..bitmart._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -541,6 +587,7 @@ async def bitmart() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def bitmex() -> pl.DataFrame:
     """
     Fetch market information from BitMEX exchange.
@@ -553,7 +600,7 @@ async def bitmex() -> pl.DataFrame:
     """
     from ..bitmex._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     res = await market_http.get_instrument_info(
@@ -622,6 +669,7 @@ async def bitmex() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def bybit() -> pl.DataFrame:
     """
     Fetch market information from Bybit exchange.
@@ -634,7 +682,7 @@ async def bybit() -> pl.DataFrame:
     """
     from ..bybit._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -761,6 +809,7 @@ async def bybit() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def gateio() -> pl.DataFrame:
     """
     Fetch market information from Gate.io exchange.
@@ -773,7 +822,7 @@ async def gateio() -> pl.DataFrame:
     """
     from ..gateio._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -858,6 +907,7 @@ async def gateio() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def hyperliquid() -> pl.DataFrame:
     """
     Fetch market information from Hyperliquid exchange.
@@ -870,7 +920,7 @@ async def hyperliquid() -> pl.DataFrame:
     """
     from ..hyperliquid._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -980,6 +1030,7 @@ def _kraken_futures_product_symbol(
     return f"{base}-{quote}{inverse_suffix}-SWAP", "swap"
 
 
+@_manage_market_http
 async def kucoin() -> pl.DataFrame:
     """
     Fetch market information from KuCoin exchange.
@@ -992,7 +1043,7 @@ async def kucoin() -> pl.DataFrame:
     """
     from ..kucoin._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -1049,6 +1100,7 @@ async def kucoin() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def kraken() -> pl.DataFrame:
     """
     Fetch market information from Kraken exchange.
@@ -1061,7 +1113,7 @@ async def kraken() -> pl.DataFrame:
     """
     from ..kraken._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     markets = []
@@ -1185,6 +1237,7 @@ def _lighter_market_info(market: dict[str, object], product_type: str) -> Market
     )
 
 
+@_manage_market_http
 async def lighter() -> pl.DataFrame:
     """
     Fetch market information from Lighter exchange.
@@ -1197,7 +1250,7 @@ async def lighter() -> pl.DataFrame:
     """
     from ..lighter._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     try:
@@ -1225,6 +1278,7 @@ async def lighter() -> pl.DataFrame:
     return pl.DataFrame(markets)
 
 
+@_manage_market_http
 async def mexc() -> pl.DataFrame:
     """
     Fetch market information from MEXC exchange.
@@ -1237,7 +1291,7 @@ async def mexc() -> pl.DataFrame:
     """
     from ..mexc._market_http import MarketHTTP
 
-    market_http = MarketHTTP(preload_product_table=False)
+    market_http = _market_http(MarketHTTP)
     await market_http.async_init()
 
     try:

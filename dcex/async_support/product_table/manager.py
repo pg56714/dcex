@@ -95,12 +95,26 @@ class ProductTableManager(ProductTableQueryMixin):
         Returns:
             Combined Polars DataFrame containing all product information.
         """
-        if exchange_name is None:
-            product_tables = await asyncio.gather(*[func() for func in VALID_EXCHANGES])
-        else:
-            product_tables = await asyncio.gather(
-                *[func() for func in VALID_EXCHANGES if func.__name__ == exchange_name]
-            )
+        functions = (
+            list(VALID_EXCHANGES)
+            if exchange_name is None
+            else [func for func in VALID_EXCHANGES if func.__name__ == exchange_name]
+        )
+        results = await asyncio.gather(
+            *[func() for func in functions],
+            return_exceptions=True,
+        )
+
+        product_tables: list[pl.DataFrame] = []
+        for result in results:
+            if isinstance(result, asyncio.CancelledError):
+                raise result
+            if isinstance(result, pl.DataFrame):
+                product_tables.append(result)
+
+        if not product_tables:
+            raise ProductTableError("Failed to fetch product tables from any exchange")
+
         return pl.concat(product_tables, how="vertical")
 
     async def refresh(self, exchange_name: str | None = None) -> None:
