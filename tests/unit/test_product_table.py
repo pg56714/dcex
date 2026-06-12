@@ -169,6 +169,22 @@ def test_all_product_fetches_manage_market_clients() -> None:
         assert hasattr(fetch_function, "__wrapped__"), fetch_function.__name__
 
 
+def test_market_http_rejects_unmanaged_creation_before_constructing_client() -> None:
+    constructed = 0
+
+    class MarketHTTP:
+        def __init__(self, preload_product_table: bool) -> None:
+            nonlocal constructed
+            constructed += 1
+
+    with pytest.raises(RuntimeError, match="managed fetch"):
+        sync_fetch._market_http(MarketHTTP)
+    with pytest.raises(RuntimeError, match="managed fetch"):
+        async_fetch._market_http(MarketHTTP)
+
+    assert constructed == 0
+
+
 def test_failed_sync_initialization_is_not_cached(monkeypatch: pytest.MonkeyPatch) -> None:
     key = "broken-sync"
     ProductTableManager._instance.pop(key, None)

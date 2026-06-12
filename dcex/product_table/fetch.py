@@ -50,10 +50,10 @@ def _manage_market_http(func: _FetchFunction) -> _FetchFunction:
 def _market_http[MarketHTTPType](
     manager_type: Callable[..., MarketHTTPType],
 ) -> MarketHTTPType:
-    client = manager_type(preload_product_table=False)
     clients = _active_market_http_clients.get()
     if clients is None:
         raise RuntimeError("Market HTTP clients must be created inside a managed fetch")
+    client = manager_type(preload_product_table=False)
     clients.append(client)
     return client
 
