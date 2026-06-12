@@ -83,8 +83,6 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     memo: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
-    max_retries: int = field(default=3)
-    retry_delay: int = field(default=3)
     logger: logging.Logger | None = field(default=None)
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)

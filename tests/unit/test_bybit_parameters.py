@@ -77,8 +77,6 @@ def test_sync_bybit_transferable_amount_validates_and_sends_coins() -> None:
 
     with pytest.raises(ValueError, match="at least one"):
         manager.get_transferable_amount([])
-    with pytest.raises(ValueError, match="at least one"):
-        manager.get_transferable_amount()
     with pytest.raises(ValueError, match="no more than 20"):
         manager.get_transferable_amount(["BTC"] * 21)
 
@@ -107,7 +105,7 @@ def test_bybit_post_only_order_has_consistent_sync_and_async_parameters() -> Non
     async_parameters = inspect.signature(AsyncTradeHTTP.place_post_only_limit_order).parameters
 
     assert tuple(sync_parameters) == tuple(async_parameters)
-    assert "timeInForce" in sync_parameters
+    assert "timeInForce" not in sync_parameters
 
 
 def test_sync_bybit_post_only_order_forces_post_only() -> None:

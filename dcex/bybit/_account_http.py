@@ -47,7 +47,7 @@ class AccountHTTP(HTTPManager):
 
     def get_transferable_amount(
         self,
-        coins: list[str] | None = None,
+        coins: list[str],
     ) -> dict[str, Any]:
         """
         Get transferable amount for specified coins.

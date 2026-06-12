@@ -645,8 +645,6 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         kwargs["orderId"] = "test-order-id"
     if case.exchange == "backpack" and case.method_name in {"cancel_order", "get_open_order"}:
         kwargs["orderId"] = "test-order-id"
-    if case.exchange == "bybit" and case.method_name == "get_transferable_amount":
-        kwargs["coins"] = ["BTC"]
     return kwargs
 
 

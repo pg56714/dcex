@@ -46,8 +46,6 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     memo: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
-    max_retries: int = field(default=3)
-    retry_delay: int = field(default=3)
     logger: logging.Logger | None = field(default=None)
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
