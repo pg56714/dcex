@@ -1,3 +1,13 @@
+## 0.20.2 (2026-06-13)
+
+### Fix
+
+- preserve async client transport state
+- preserve sync client transport state
+- calculate decimal places accurately
+- validate product table exchange names
+- align sync and async endpoint signatures
+
 ## 0.20.1 (2026-06-12)
 
 ### Fix
