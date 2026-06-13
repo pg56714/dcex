@@ -8,6 +8,9 @@ needed by the HTTP signer.
 Reference implementations:
 - https://github.com/elliottech/lighter-go (Apache-2.0)
 - https://github.com/elliottech/poseidon_crypto (Apache-2.0)
+
+This file is a modified Python port of portions of those implementations.
+See LICENSES/Apache-2.0.txt and THIRD_PARTY_NOTICES.md.
 """
 
 from __future__ import annotations
