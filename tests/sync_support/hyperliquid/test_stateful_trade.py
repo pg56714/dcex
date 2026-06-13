@@ -287,10 +287,19 @@ def _close_btc_position(client: Client) -> None:
         return
     size = format(abs(position_size).normalize(), "f")
     if position_size > 0:
-        client.place_future_market_sell_order(product_symbol=SYMBOL, size=size)
+        _assert_exchange_response(
+            client.place_future_market_sell_order(product_symbol=SYMBOL, size=size)
+        )
     else:
-        client.place_future_market_buy_order(product_symbol=SYMBOL, size=size)
-    time.sleep(2)
+        _assert_exchange_response(
+            client.place_future_market_buy_order(product_symbol=SYMBOL, size=size)
+        )
+
+    for _ in range(10):
+        time.sleep(1)
+        if _btc_position_size(client) == 0:
+            return
+    pytest.fail("Hyperliquid BTC position did not close after market reduce.", pytrace=False)
 
 
 @pytest.mark.private

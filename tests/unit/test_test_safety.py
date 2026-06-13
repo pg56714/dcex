@@ -253,6 +253,55 @@ def test_hyperliquid_unfilled_order_fails() -> None:
         module._filled_size(response)
 
 
+def test_hyperliquid_close_btc_position_waits_until_flat(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "sync_support/hyperliquid/test_stateful_trade.py",
+        "dcex_sync_hyperliquid_close_position_test",
+    )
+    positions = iter((Decimal("-0.0002"), Decimal("-0.0002"), Decimal("0")))
+    sleep = Mock()
+    client = SimpleNamespace(place_future_market_buy_order=Mock(return_value={}))
+    monkeypatch.setattr(module, "_btc_position_size", lambda *_: next(positions))
+    monkeypatch.setattr(module.time, "sleep", sleep)
+
+    module._close_btc_position(client)
+
+    client.place_future_market_buy_order.assert_called_once_with(
+        product_symbol=module.SYMBOL,
+        size="0.0002",
+    )
+    assert sleep.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_close_btc_position_waits_until_flat(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "async_support/hyperliquid/test_stateful_trade.py",
+        "dcex_async_hyperliquid_close_position_test",
+    )
+    positions = iter((Decimal("-0.0002"), Decimal("-0.0002"), Decimal("0")))
+    sleep = AsyncMock()
+    client = SimpleNamespace(place_future_market_buy_order=AsyncMock(return_value={}))
+
+    async def position_size(*_args: object) -> Decimal:
+        return next(positions)
+
+    monkeypatch.setattr(module, "_btc_position_size", position_size)
+    monkeypatch.setattr(module.asyncio, "sleep", sleep)
+
+    await module._close_btc_position(client)
+
+    client.place_future_market_buy_order.assert_awaited_once_with(
+        product_symbol=module.SYMBOL,
+        size="0.0002",
+    )
+    assert sleep.await_count == 2
+
+
 def test_hyperliquid_spot_round_trip_restores_test_delta_after_sell_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
