@@ -170,18 +170,7 @@ class HTTPManager(BaseHTTPManager):
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
         except httpx.HTTPError as e:
-            status_code = "Unknown"
-            resp_headers = None
-            # httpx.HTTPError doesn't always have a response attribute
-            # We need to handle this more carefully
-            try:
-                response_obj = getattr(e, "response", None)
-                if response_obj is not None:
-                    status_code = getattr(response_obj, "status_code", "Unknown")
-                    resp_headers = getattr(response_obj, "headers", None)
-            except AttributeError:
-                pass
-
+            status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
                 message=f"Request failed: {str(e)}",

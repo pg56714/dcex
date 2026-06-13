@@ -203,12 +203,13 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
         except httpx.RequestError as exc:
+            status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
                 message=f"Request failed: {exc}",
-                status_code=response.status_code if response else "Unknown",
+                status_code=status_code,
                 time=str(generate_timestamp(iso_format=True)),
-                resp_headers=dict(response.headers) if response else None,
+                resp_headers=resp_headers,
             ) from exc
 
         self._store_response_headers(response)

@@ -225,12 +225,13 @@ class HTTPManager(BaseHTTPManager):
         except FailedRequestError:
             raise
         except Exception as e:
+            status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method_upper} {url}",
                 message=f"Request failed: {e}",
-                status_code="unknown",
+                status_code=status_code,
                 time=timestamp,
-                resp_headers={},
+                resp_headers=resp_headers,
             ) from e
         else:
             self._store_response_headers(response)
