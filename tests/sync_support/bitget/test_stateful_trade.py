@@ -570,12 +570,18 @@ def test_spot_stateful_order_lifecycle(client):
 
     try:
         size, price = _spot_buy_params(client)
-        creators = (
-            lambda: _place_spot_limit(client, "buy", size, price),
-            lambda: _place_spot_limit(client, "buy", size, price),
-            lambda: _place_spot_limit(client, "buy", size, price, "post_only"),
-            lambda: _place_spot_limit(client, "buy", size, price, "post_only"),
-        )
+        if _is_uta(client):
+            creators = (
+                lambda: _place_spot_limit(client, "buy", size, price),
+                lambda: _place_spot_limit(client, "buy", size, price, "post_only"),
+            )
+        else:
+            creators = (
+                lambda: client.place_spot_limit_order(SPOT_SYMBOL, "buy", size, price),
+                lambda: client.place_spot_limit_buy_order(SPOT_SYMBOL, size, price),
+                lambda: client.place_spot_post_only_limit_order(SPOT_SYMBOL, "buy", size, price),
+                lambda: client.place_spot_post_only_limit_buy_order(SPOT_SYMBOL, size, price),
+            )
         for create_order in creators:
             order_id = None
             try:
@@ -596,10 +602,21 @@ def test_spot_stateful_order_lifecycle(client):
         assert acquired > 0
 
         sell_price = _spot_sell_price(client)
-        for create_sell in (
-            lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price),
-            lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price, "post_only"),
-        ):
+        if _is_uta(client):
+            sell_creators = (
+                lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price),
+                lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price, "post_only"),
+            )
+        else:
+            sell_creators = (
+                lambda: client.place_spot_limit_sell_order(SPOT_SYMBOL, _fmt(acquired), sell_price),
+                lambda: client.place_spot_post_only_limit_sell_order(
+                    SPOT_SYMBOL,
+                    _fmt(acquired),
+                    sell_price,
+                ),
+            )
+        for create_sell in sell_creators:
             order_id = None
             try:
                 order_id = _order_id(create_sell())
@@ -639,12 +656,19 @@ def test_futures_stateful_order_lifecycle(client):
             _assert_ok(client.set_futures_leverage(SWAP_SYMBOL, "50"))
 
         size, price = _futures_buy_params(client)
-        for create_order in (
-            lambda: _place_futures_limit(client, "buy", size, price),
-            lambda: _place_futures_limit(client, "buy", size, price),
-            lambda: _place_futures_limit(client, "buy", size, price, "post_only"),
-            lambda: _place_futures_limit(client, "buy", size, price, "post_only"),
-        ):
+        if _is_uta(client):
+            creators = (
+                lambda: _place_futures_limit(client, "buy", size, price),
+                lambda: _place_futures_limit(client, "buy", size, price, "post_only"),
+            )
+        else:
+            creators = (
+                lambda: client.place_futures_limit_order(SWAP_SYMBOL, "buy", size, price),
+                lambda: client.place_futures_limit_buy_order(SWAP_SYMBOL, size, price),
+                lambda: client.place_futures_post_only_limit_order(SWAP_SYMBOL, "buy", size, price),
+                lambda: client.place_futures_post_only_limit_buy_order(SWAP_SYMBOL, size, price),
+            )
+        for create_order in creators:
             order_id = None
             try:
                 order_id = _order_id(create_order())
@@ -654,10 +678,19 @@ def test_futures_stateful_order_lifecycle(client):
                     _cancel_futures(client, order_id)
 
         sell_price = _futures_sell_price(client)
-        for create_sell in (
-            lambda: _place_futures_limit(client, "sell", size, sell_price),
-            lambda: _place_futures_limit(client, "sell", size, sell_price, "post_only"),
-        ):
+        if _is_uta(client):
+            sell_creators = (
+                lambda: _place_futures_limit(client, "sell", size, sell_price),
+                lambda: _place_futures_limit(client, "sell", size, sell_price, "post_only"),
+            )
+        else:
+            sell_creators = (
+                lambda: client.place_futures_limit_sell_order(SWAP_SYMBOL, size, sell_price),
+                lambda: client.place_futures_post_only_limit_sell_order(
+                    SWAP_SYMBOL, size, sell_price
+                ),
+            )
+        for create_sell in sell_creators:
             order_id = None
             try:
                 order_id = _order_id(create_sell())

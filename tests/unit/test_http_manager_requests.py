@@ -1005,6 +1005,46 @@ def test_sync_mexc_contract_list_body_matches_signature(
     )
 
 
+def test_sync_bitget_uta_batch_body_matches_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.bitget._http_manager import HTTPManager
+
+    bitget_http = import_module("dcex.bitget._http_manager")
+    monkeypatch.setattr(bitget_http.time, "time", lambda: int(TS_S))
+    session = _CaptureSession({"code": "00000", "data": {}})
+    manager = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        passphrase="test-passphrase",
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+    orders = [
+        {
+            "category": "SPOT",
+            "symbol": "BTCUSDT",
+            "qty": "0.001",
+            "price": None,
+        }
+    ]
+
+    manager._request("POST", "/api/v3/trade/place-batch", orders)
+
+    method, url, kwargs = session.calls[0]
+    timestamp = str(int(int(TS_S) * 1000))
+    body = '[{"category":"SPOT","symbol":"BTCUSDT","qty":"0.001"}]'
+    payload = f"{timestamp}POST/api/v3/trade/place-batch{body}"
+    expected_signature = base64.b64encode(
+        hmac.new(API_SECRET.encode(), payload.encode(), hashlib.sha256).digest()
+    ).decode()
+    assert orders[0]["price"] is None
+    assert method == "POST"
+    assert url == "https://api.bitget.com/api/v3/trade/place-batch"
+    assert kwargs["data"] == body
+    assert kwargs["headers"]["ACCESS-SIGN"] == expected_signature
+
+
 @pytest.mark.asyncio
 async def test_async_gateio_signed_query_order_matches_sent_params(
     monkeypatch: pytest.MonkeyPatch,
@@ -1116,6 +1156,47 @@ async def test_async_mexc_contract_list_body_matches_signature(
         request_time,
         body,
     )
+
+
+@pytest.mark.asyncio
+async def test_async_bitget_uta_batch_body_matches_signature(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.bitget._http_manager import HTTPManager
+
+    bitget_http = import_module("dcex.async_support.bitget._http_manager")
+    monkeypatch.setattr(bitget_http.time, "time", lambda: int(TS_S))
+    session = _AsyncCaptureSession({"code": "00000", "data": {}})
+    manager = HTTPManager(
+        api_key=API_KEY,
+        api_secret=API_SECRET,
+        passphrase="test-passphrase",
+        preload_product_table=False,
+    )
+    manager.session = session  # type: ignore[assignment]
+    orders = [
+        {
+            "category": "SPOT",
+            "symbol": "BTCUSDT",
+            "qty": "0.001",
+            "price": None,
+        }
+    ]
+
+    await manager._request("POST", "/api/v3/trade/place-batch", orders)
+
+    method, url, kwargs = session.calls[0]
+    timestamp = str(int(int(TS_S) * 1000))
+    body = '[{"category":"SPOT","symbol":"BTCUSDT","qty":"0.001"}]'
+    payload = f"{timestamp}POST/api/v3/trade/place-batch{body}"
+    expected_signature = base64.b64encode(
+        hmac.new(API_SECRET.encode(), payload.encode(), hashlib.sha256).digest()
+    ).decode()
+    assert orders[0]["price"] is None
+    assert method == "POST"
+    assert url == "https://api.bitget.com/api/v3/trade/place-batch"
+    assert kwargs["content"] == body
+    assert kwargs["headers"]["ACCESS-SIGN"] == expected_signature
 
 
 def test_sync_bitmex_passes_configured_timeout() -> None:
