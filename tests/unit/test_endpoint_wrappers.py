@@ -140,6 +140,9 @@ class FakeLighterSigner:
     def check_client(self) -> None:
         return None
 
+    def check_client_data(self, data: object) -> None:
+        return None
+
     def sign_create_order(self, **kwargs: object) -> tuple[int, str, str, None]:
         return 1, "{}", "test-tx-hash", None
 

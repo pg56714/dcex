@@ -19,7 +19,13 @@ class AccountHTTP(HTTPManager):
 
     async def check_client(self) -> str | None:
         """Verify the configured API key against the Lighter signer client."""
-        return self._private_signer().check_client()
+        signer = self._private_signer()
+        response = await self._request(
+            "GET",
+            Public.API_KEYS,
+            {"account_index": self._private_account_index()},
+        )
+        return signer.check_client_data(response)
 
     async def get_account_limits(
         self,

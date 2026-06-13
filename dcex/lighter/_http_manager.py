@@ -2,7 +2,7 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol
+from typing import Any, Literal
 from urllib.parse import urlencode
 
 import requests
@@ -12,93 +12,7 @@ from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
-
-
-class _SignerClient(Protocol):
-    def create_auth_token_with_expiry(
-        self,
-        deadline: int = -1,
-        *,
-        timestamp: int = 0,
-        api_key_index: int = 255,
-    ) -> tuple[str | None, str | None]: ...
-
-    def check_client(self) -> str | None: ...
-
-    def sign_create_order(
-        self,
-        market_index: int,
-        client_order_index: int,
-        base_amount: int,
-        price: int,
-        is_ask: bool,
-        order_type: int,
-        time_in_force: int,
-        reduce_only: bool = False,
-        trigger_price: int = 0,
-        order_expiry: int = -1,
-        *,
-        integrator_account_index: int = 0,
-        integrator_taker_fee: int = 0,
-        integrator_maker_fee: int = 0,
-        skip_nonce: int = 0,
-        nonce: int = -1,
-        api_key_index: int = 255,
-    ) -> tuple[Any, Any, Any, Any]: ...
-
-    def sign_cancel_order(
-        self,
-        market_index: int,
-        order_index: int,
-        skip_nonce: int = 0,
-        nonce: int = -1,
-        api_key_index: int = 255,
-    ) -> tuple[Any, Any, Any, Any]: ...
-
-    def sign_modify_order(
-        self,
-        market_index: int,
-        order_index: int,
-        base_amount: int,
-        price: int,
-        trigger_price: int = 0,
-        *,
-        integrator_account_index: int = 0,
-        integrator_taker_fee: int = 0,
-        integrator_maker_fee: int = 0,
-        skip_nonce: int = 0,
-        nonce: int = -1,
-        api_key_index: int = 255,
-    ) -> tuple[Any, Any, Any, Any]: ...
-
-    def sign_cancel_all_orders(
-        self,
-        time_in_force: int,
-        timestamp_ms: int,
-        skip_nonce: int = 0,
-        nonce: int = -1,
-        api_key_index: int = 255,
-    ) -> tuple[Any, Any, Any, Any]: ...
-
-    def sign_update_leverage(
-        self,
-        market_index: int,
-        fraction: int,
-        margin_mode: int,
-        skip_nonce: int = 0,
-        nonce: int = -1,
-        api_key_index: int = 255,
-    ) -> tuple[Any, Any, Any, Any]: ...
-
-    def sign_update_margin(
-        self,
-        market_index: int,
-        usdc_amount: int,
-        direction: int,
-        skip_nonce: int = 0,
-        nonce: int = -1,
-        api_key_index: int = 255,
-    ) -> tuple[Any, Any, Any, Any]: ...
+from .signer_client import SignerClient
 
 
 def _format_value(value: object) -> str:
@@ -129,7 +43,7 @@ class HTTPManager(BaseHTTPManager):
     logger: logging.Logger | None = field(default=None)
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False, repr=False)
-    _signer: _SignerClient | None = field(default=None, init=False, repr=False)
+    _signer: SignerClient | None = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
 
     def __post_init__(self) -> None:
@@ -241,9 +155,18 @@ class HTTPManager(BaseHTTPManager):
             raise ValueError("Lighter private requests require api_key_index.")
         return int(resolved)
 
-    def _private_signer(self) -> _SignerClient:
+    def _private_signer(self) -> SignerClient:
+        account_index = self._private_account_index()
+        api_key_index = self._private_api_key_index()
+        api_private_key = self.api_private_key
+        if not api_private_key:
+            raise ValueError("Lighter private requests require api_private_key.")
         if self._signer is None:
-            raise ValueError("Lighter local signer is not configured.")
+            self._signer = SignerClient(
+                url=self.base_url,
+                account_index=account_index,
+                api_private_keys={api_key_index: api_private_key},
+            )
         return self._signer
 
     def _auth_token(
@@ -289,8 +212,11 @@ class HTTPManager(BaseHTTPManager):
         )
 
     def close_signer(self) -> None:
-        """Clear any injected Lighter signer."""
+        """Close the Lighter signer client if it was initialized."""
+        signer = self._signer
         self._signer = None
+        if signer is not None:
+            signer.close()
 
     def close(self) -> None:
         """Close the HTTP session."""
