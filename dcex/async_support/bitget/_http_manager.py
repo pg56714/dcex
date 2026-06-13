@@ -25,7 +25,14 @@ def _format_value(value: object) -> str:
     return str(value)
 
 
-def _filtered_query(query: dict[str, Any] | None) -> dict[str, Any]:
+def _filtered_query(query: dict[str, Any] | list[dict[str, Any]] | None) -> dict[str, Any] | list:
+    if isinstance(query, list):
+        return [
+            {key: value for key, value in item.items() if value is not None}
+            if isinstance(item, dict)
+            else item
+            for item in query
+        ]
     return {key: value for key, value in (query or {}).items() if value is not None}
 
 
@@ -33,7 +40,7 @@ def _encoded_query(query: dict[str, Any]) -> str:
     return urlencode({key: _format_value(value) for key, value in query.items()}, doseq=True)
 
 
-def _json_body(query: dict[str, Any]) -> str:
+def _json_body(query: dict[str, Any] | list) -> str:
     return json.dumps(query, separators=(",", ":"), ensure_ascii=False) if query else ""
 
 
@@ -111,7 +118,7 @@ class HTTPManager(BaseHTTPManager):
         self,
         method: Literal["GET", "POST", "PUT", "DELETE"],
         path: str,
-        query: dict[str, Any] | None = None,
+        query: dict[str, Any] | list[dict[str, Any]] | None = None,
         signed: bool = True,
     ) -> dict[str, Any]:
         """Make an HTTP request to Bitget REST APIs."""
@@ -122,7 +129,11 @@ class HTTPManager(BaseHTTPManager):
 
         request_path = str(path)
         filtered_query = _filtered_query(query)
-        query_string = _encoded_query(filtered_query) if method.upper() == "GET" else ""
+        query_string = (
+            _encoded_query(filtered_query)
+            if method.upper() == "GET" and isinstance(filtered_query, dict)
+            else ""
+        )
         body = _json_body(filtered_query) if method.upper() != "GET" else ""
         url = f"{self.base_url}{request_path}"
         if query_string:

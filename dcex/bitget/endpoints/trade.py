@@ -33,3 +33,20 @@ class FuturesTrade(str, Enum):
 
     def __str__(self) -> str:
         return self.value
+
+
+class UtaTrade(str, Enum):
+    """Enumeration of Bitget UTA private trade endpoints."""
+
+    PLACE_ORDER = "/api/v3/trade/place-order"
+    BATCH_PLACE_ORDER = "/api/v3/trade/place-batch"
+    CANCEL_ORDER = "/api/v3/trade/cancel-order"
+    BATCH_CANCEL_ORDERS = "/api/v3/trade/cancel-batch"
+    ORDER_DETAIL = "/api/v3/trade/order-info"
+    PENDING_ORDERS = "/api/v3/trade/unfilled-orders"
+    HISTORY_ORDERS = "/api/v3/trade/history-orders"
+    FILLS = "/api/v3/trade/fills"
+    POSITIONS = "/api/v3/position/current-position"
+
+    def __str__(self) -> str:
+        return self.value

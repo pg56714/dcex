@@ -42,3 +42,15 @@ class FuturesAccount(str, Enum):
 
     def __str__(self) -> str:
         return self.value
+
+
+class UtaAccount(str, Enum):
+    """Enumeration of Bitget UTA private account endpoints."""
+
+    ASSETS = "/api/v3/account/assets"
+    INFO = "/api/v3/account/info"
+    SET_LEVERAGE = "/api/v3/account/set-leverage"
+    SET_HOLD_MODE = "/api/v3/account/set-hold-mode"
+
+    def __str__(self) -> str:
+        return self.value

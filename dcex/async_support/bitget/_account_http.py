@@ -4,7 +4,7 @@ from typing import Any
 
 from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.account import CommonAccount, FuturesAccount, SpotAccount
+from .endpoints.account import CommonAccount, FuturesAccount, SpotAccount, UtaAccount
 
 
 class AccountHTTP(HTTPManager):
@@ -133,6 +133,53 @@ class AccountHTTP(HTTPManager):
             "limit": limit,
         }
         return await self._request("GET", SpotAccount.DEPOSIT_RECORDS, payload, signed=True)
+
+    async def get_uta_account_assets(self) -> dict[str, Any]:
+        """Retrieve Bitget UTA account assets."""
+        return await self._request("GET", UtaAccount.ASSETS, signed=True)
+
+    async def get_uta_account_info(self) -> dict[str, Any]:
+        """Retrieve Bitget UTA API account information."""
+        return await self._request("GET", UtaAccount.INFO, signed=True)
+
+    async def set_uta_leverage(
+        self,
+        category: str,
+        leverage: str | int,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+        coin: str | None = None,
+        posSide: str | None = None,
+        marginMode: str | None = None,
+        longLeverage: str | int | None = None,
+        shortLeverage: str | int | None = None,
+    ) -> dict[str, Any]:
+        """Set Bitget UTA leverage."""
+        payload: dict[str, Any] = {
+            "category": category,
+            "symbol": symbol
+            or (
+                self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
+                if product_symbol is not None
+                else None
+            ),
+            "leverage": str(leverage),
+            "coin": coin,
+            "posSide": posSide,
+            "marginMode": marginMode,
+            "longLeverage": str(longLeverage) if longLeverage is not None else None,
+            "shortLeverage": str(shortLeverage) if shortLeverage is not None else None,
+        }
+        return await self._request("POST", UtaAccount.SET_LEVERAGE, payload, signed=True)
+
+    async def set_uta_hold_mode(self, holdMode: str) -> dict[str, Any]:
+        """Set Bitget UTA holding mode."""
+        return await self._request(
+            "POST",
+            UtaAccount.SET_HOLD_MODE,
+            {"holdMode": holdMode},
+            signed=True,
+        )
 
     async def get_futures_account(
         self,

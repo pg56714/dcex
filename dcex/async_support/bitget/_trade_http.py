@@ -4,11 +4,22 @@ from typing import Any
 
 from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.trade import FuturesTrade, SpotTrade
+from .endpoints.trade import FuturesTrade, SpotTrade, UtaTrade
 
 
 class TradeHTTP(HTTPManager):
     """Async HTTP client for Bitget private trading operations."""
+
+    def _uta_symbol(
+        self,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> str | None:
+        if symbol is not None:
+            return symbol
+        if product_symbol is not None:
+            return self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
+        return None
 
     async def place_spot_order(
         self,
@@ -297,6 +308,150 @@ class TradeHTTP(HTTPManager):
             "endTime": endTime,
         }
         return await self._request("GET", SpotTrade.FILLS, payload, signed=True)
+
+    async def place_uta_order(
+        self,
+        category: str,
+        product_symbol: str,
+        side: str,
+        orderType: str,
+        qty: str,
+        price: str | None = None,
+        timeInForce: str | None = None,
+        posSide: str | None = None,
+        clientOid: str | None = None,
+        reduceOnly: str | None = None,
+        stpMode: str | None = None,
+        marginMode: str | None = None,
+    ) -> dict[str, Any]:
+        """Place a Bitget UTA order."""
+        payload: dict[str, Any] = {
+            "category": category,
+            "symbol": self._uta_symbol(product_symbol),
+            "side": side,
+            "orderType": orderType,
+            "qty": qty,
+            "price": price,
+            "timeInForce": timeInForce,
+            "posSide": posSide,
+            "clientOid": clientOid,
+            "reduceOnly": reduceOnly,
+            "stpMode": stpMode,
+            "marginMode": marginMode,
+        }
+        return await self._request("POST", UtaTrade.PLACE_ORDER, payload, signed=True)
+
+    async def place_uta_batch_orders(self, orderList: list[dict[str, Any]]) -> dict[str, Any]:
+        """Place Bitget UTA orders in batch."""
+        return await self._request("POST", UtaTrade.BATCH_PLACE_ORDER, orderList, signed=True)
+
+    async def cancel_uta_order(
+        self,
+        orderId: str | None = None,
+        clientOid: str | None = None,
+        category: str | None = None,
+    ) -> dict[str, Any]:
+        """Cancel a Bitget UTA order."""
+        if orderId is None and clientOid is None:
+            raise ValueError("Specify orderId or clientOid.")
+        payload: dict[str, Any] = {
+            "orderId": orderId,
+            "clientOid": clientOid,
+            "category": category,
+        }
+        return await self._request("POST", UtaTrade.CANCEL_ORDER, payload, signed=True)
+
+    async def cancel_uta_batch_orders(self, orderList: list[dict[str, Any]]) -> dict[str, Any]:
+        """Cancel Bitget UTA orders in batch."""
+        return await self._request("POST", UtaTrade.BATCH_CANCEL_ORDERS, orderList, signed=True)
+
+    async def get_uta_order(
+        self,
+        orderId: str | None = None,
+        clientOid: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve one Bitget UTA order."""
+        if orderId is None and clientOid is None:
+            raise ValueError("Specify orderId or clientOid.")
+        payload: dict[str, Any] = {"orderId": orderId, "clientOid": clientOid}
+        return await self._request("GET", UtaTrade.ORDER_DETAIL, payload, signed=True)
+
+    async def get_uta_open_orders(
+        self,
+        category: str | None = None,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA open orders."""
+        payload: dict[str, Any] = {
+            "category": category,
+            "symbol": self._uta_symbol(product_symbol, symbol),
+            "startTime": startTime,
+            "endTime": endTime,
+            "limit": limit,
+            "cursor": cursor,
+        }
+        return await self._request("GET", UtaTrade.PENDING_ORDERS, payload, signed=True)
+
+    async def get_uta_history_orders(
+        self,
+        category: str,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA historical orders."""
+        payload: dict[str, Any] = {
+            "category": category,
+            "symbol": self._uta_symbol(product_symbol, symbol),
+            "startTime": startTime,
+            "endTime": endTime,
+            "limit": limit,
+            "cursor": cursor,
+        }
+        return await self._request("GET", UtaTrade.HISTORY_ORDERS, payload, signed=True)
+
+    async def get_uta_fills(
+        self,
+        category: str | None = None,
+        orderId: str | None = None,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA fills."""
+        payload: dict[str, Any] = {
+            "category": category,
+            "orderId": orderId,
+            "startTime": startTime,
+            "endTime": endTime,
+            "limit": limit,
+            "cursor": cursor,
+        }
+        return await self._request("GET", UtaTrade.FILLS, payload, signed=True)
+
+    async def get_uta_positions(
+        self,
+        category: str,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+        posSide: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA positions."""
+        payload: dict[str, Any] = {
+            "category": category,
+            "symbol": self._uta_symbol(product_symbol, symbol),
+            "posSide": posSide,
+        }
+        return await self._request("GET", UtaTrade.POSITIONS, payload, signed=True)
 
     async def place_futures_order(
         self,

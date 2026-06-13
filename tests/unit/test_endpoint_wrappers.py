@@ -701,6 +701,8 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         "get_spot_order",
         "cancel_futures_order",
         "get_futures_order",
+        "cancel_uta_order",
+        "get_uta_order",
     }:
         kwargs["orderId"] = "test-order-id"
     if case.exchange == "backpack" and case.method_name in {"cancel_order", "get_open_order"}:
