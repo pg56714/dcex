@@ -1,0 +1,12 @@
+[package]
+name = "dcex-core"
+description = "Rust core primitives for dcex."
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"

@@ -94,6 +94,82 @@ def test_public_key_for_scalar_one_is_generator_encoding() -> None:
     assert public_key_bytes(1) == (4).to_bytes(8, "little") + bytes(32)
 
 
+def test_native_lighter_crypto_matches_official_vectors_when_available() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    poseidon = bytes(
+        native.lighter_poseidon_hash_bytes(
+            [
+                3451004116618606032,
+                11263134342958518251,
+                10957204882857370932,
+                5369763041201481933,
+                7695734348563036858,
+                1393419330378128434,
+                7387917082382606332,
+            ]
+        )
+    )
+    assert _limbs(poseidon) == [
+        17992684813643984528,
+        5243896189906434327,
+        7705560276311184368,
+        2785244775876017560,
+        14449776097783372302,
+    ]
+
+    private_key = _scalar(
+        [
+            12235002942052073545,
+            1175977464658719998,
+            8536934969147463310,
+            6524687619313720391,
+            2922072024880609112,
+        ]
+    )
+    nonce = _scalar(
+        [
+            5245666847777449560,
+            15178169970799106939,
+            4403065012435293749,
+            15306540389399388999,
+            8935555081913173844,
+        ]
+    )
+    message_hash = b"".join(
+        limb.to_bytes(8, "little")
+        for limb in [
+            8398652514106806347,
+            11069112711939986896,
+            9732488227085561369,
+            18076754337204438535,
+            17155407358725346236,
+        ]
+    )
+
+    signature = bytes(
+        native.lighter_schnorr_sign(
+            message_hash,
+            private_key.to_bytes(40, "little"),
+            nonce.to_bytes(40, "little"),
+        )
+    )
+    assert _limbs(signature[:40]) == [
+        6950590877883398434,
+        17178336263794770543,
+        11012823478139181320,
+        16445091359523510936,
+        5882925226143600273,
+    ]
+    assert _limbs(signature[40:]) == [
+        4544744459434870309,
+        4180764085957612004,
+        3024669018778978615,
+        15433417688859446606,
+        6775027260348937828,
+    ]
+
+
 def test_zero_private_key_is_rejected() -> None:
     with pytest.raises(ValueError, match="must not reduce to zero"):
         SignerClient(

@@ -1,0 +1,10 @@
+[workspace]
+members = ["crates/dcex-core", "crates/dcex-python"]
+resolver = "2"
+
+[workspace.package]
+authors = ["pg56714"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/pg56714/dcex"
+version = "0.21.2"

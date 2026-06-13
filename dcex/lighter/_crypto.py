@@ -15,8 +15,15 @@ See LICENSES/Apache-2.0.txt and THIRD_PARTY_NOTICES.md.
 
 from __future__ import annotations
 
+import importlib
 import secrets
 from dataclasses import dataclass
+from types import ModuleType
+
+try:
+    _NATIVE: ModuleType | None = importlib.import_module("dcex._native")
+except ImportError:
+    _NATIVE = None
 
 _GOLDILOCKS_ORDER = 0xFFFFFFFF00000001
 _SCALAR_ORDER = int(
@@ -399,11 +406,19 @@ def private_key_from_bytes(private_key: bytes) -> int:
 
 def public_key_bytes(private_key: int) -> bytes:
     """Derive the encoded Lighter public key for a private scalar."""
+    if _NATIVE is not None:
+        return bytes(_NATIVE.lighter_public_key_bytes(private_key.to_bytes(40, "little")))
     return _fp5_encode(_point_mul(_GENERATOR, private_key).encode())
 
 
 def poseidon_hash_bytes(values: list[int]) -> bytes:
     """Hash Goldilocks field values into one encoded Fp5 element."""
+    if _NATIVE is not None:
+        return bytes(
+            _NATIVE.lighter_poseidon_hash_bytes(
+                [int(value) % _GOLDILOCKS_ORDER for value in values]
+            )
+        )
     return _fp5_encode(_poseidon_hash(values))
 
 
@@ -421,6 +436,14 @@ def schnorr_sign(message_hash: bytes, private_key: int, nonce: int | None = None
     random_scalar = nonce
     while not random_scalar:
         random_scalar = secrets.randbelow(_SCALAR_ORDER)
+    if _NATIVE is not None:
+        return bytes(
+            _NATIVE.lighter_schnorr_sign(
+                message_hash,
+                private_key.to_bytes(40, "little"),
+                random_scalar.to_bytes(40, "little"),
+            )
+        )
     encoded_r = _point_mul(_GENERATOR, random_scalar).encode()
     challenge_fp5 = _poseidon_hash([*encoded_r, *message])
     challenge = sum(limb << (64 * index) for index, limb in enumerate(challenge_fp5))

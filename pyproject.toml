@@ -1,6 +1,6 @@
 [build-system]
-build-backend = "setuptools.build_meta"
-requires = ["setuptools>=77.0.0"]
+build-backend = "maturin"
+requires = ["maturin>=1.9,<2"]
 
 [project]
 authors = [
@@ -35,8 +35,10 @@ version = "0.21.2"
 [tool.uv]
 default-groups = ["dev"]
 
-[tool.setuptools.packages.find]
-include = ["dcex*"]
+[tool.maturin]
+manifest-path = "crates/dcex-python/Cargo.toml"
+module-name = "dcex._native"
+python-source = "."
 
 [project.urls]
 Repository = "https://github.com/pg56714/dcex"
@@ -53,6 +55,7 @@ dev = [
   "pytest-cov>=7.0.0",
   "ipython>=9.6.0",
   "nest-asyncio>=1.6.0",
+  "maturin>=1.9.0",
 ]
 
 [tool.commitizen]

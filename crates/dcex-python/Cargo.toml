@@ -1,0 +1,16 @@
+[package]
+name = "dcex-python"
+description = "PyO3 bindings for dcex."
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[lib]
+name = "dcex_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+dcex-core = { path = "../dcex-core" }
+pyo3 = { version = "0.23.5", features = ["extension-module"] }

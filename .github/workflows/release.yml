@@ -63,13 +63,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish_if_bumped:
+  build_python_artifacts:
     needs: bump_version
     if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
-      contents: read # checkout (job-level permissions replace the top-level block)
-      id-token: write # required for PyPI Trusted Publishing (OIDC)
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v6
@@ -85,13 +88,50 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Install dependencies
         run: uv sync --locked
+
+      - name: Build wheel
+        run: |
+          VERSION=${{ needs.bump_version.outputs.cz_version }}
+          echo "Building wheel for version $VERSION..."
+          uv build --wheel --out-dir dist
+
+      - name: Build source distribution
+        if: ${{ runner.os == 'Linux' }}
+        run: uv build --sdist --out-dir dist
+
+      - name: Upload Python artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: python-dist-${{ runner.os }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish_if_bumped:
+    needs: [bump_version, build_python_artifacts]
+    if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # checkout (job-level permissions replace the top-level block)
+      id-token: write # required for PyPI Trusted Publishing (OIDC)
+
+    steps:
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Download Python artifacts
+        uses: actions/download-artifact@v5
+        with:
+          pattern: python-dist-*
+          path: dist
+          merge-multiple: true
 
       - name: Publish to PyPI
         run: |
           VERSION=${{ needs.bump_version.outputs.cz_version }}
           echo "Publishing version $VERSION to PyPI..."
-          rm -rf dist
-          uv build
-          uv publish
+          uv publish dist/*
