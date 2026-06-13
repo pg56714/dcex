@@ -2,10 +2,14 @@
 # ruff: noqa: D103
 
 import importlib.util
+from decimal import Decimal
 from pathlib import Path
-from types import ModuleType
+from types import ModuleType, SimpleNamespace
+from unittest.mock import AsyncMock, Mock
 
 import pytest
+
+from dcex.utils.errors import FailedRequestError
 
 
 def _load_test_conftest() -> ModuleType:
@@ -13,6 +17,16 @@ def _load_test_conftest() -> ModuleType:
     spec = importlib.util.spec_from_file_location("dcex_test_conftest", path)
     if spec is None or spec.loader is None:
         raise RuntimeError("Unable to load tests/conftest.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _load_test_module(relative_path: str, module_name: str) -> ModuleType:
+    path = Path(__file__).resolve().parents[1] / relative_path
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load {relative_path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -126,3 +140,81 @@ def test_collection_marks_stateful_file_without_matching_method_prefix(tmp_path:
     module.pytest_collection_modifyitems(Config(), [item])
 
     assert any(getattr(marker, "name", None) == "stateful" for marker in item.markers)
+
+
+def test_kraken_ambiguous_withdrawal_is_not_retried(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "sync_support/kraken/test_stateful_trade.py",
+        "dcex_sync_kraken_stateful_test",
+    )
+    withdraw = Mock(
+        side_effect=FailedRequestError(
+            request="POST https://futures.kraken.com/derivatives/api/v3/withdrawal",
+            message="Service unavailable",
+            status_code=503,
+        )
+    )
+    client = SimpleNamespace(
+        wallet_transfer_to_futures=Mock(return_value={"error": [], "result": {}}),
+        withdraw_futures_to_spot_wallet=withdraw,
+    )
+    balances = iter((Decimal("1"), *(Decimal("0") for _ in range(6))))
+    monkeypatch.setattr(module, "_spot_available", lambda *_: next(balances))
+    monkeypatch.setattr(module.time, "sleep", lambda _: None)
+
+    with pytest.raises(FailedRequestError, match="Service unavailable"):
+        module.test_wallet_transfer_round_trip(client)
+
+    assert withdraw.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_async_kraken_ambiguous_withdrawal_is_not_retried(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "async_support/kraken/test_stateful_trade.py",
+        "dcex_async_kraken_stateful_test",
+    )
+    withdraw = AsyncMock(
+        side_effect=FailedRequestError(
+            request="POST https://futures.kraken.com/derivatives/api/v3/withdrawal",
+            message="Service unavailable",
+            status_code=503,
+        )
+    )
+    client = SimpleNamespace(
+        wallet_transfer_to_futures=AsyncMock(return_value={"error": [], "result": {}}),
+        withdraw_futures_to_spot_wallet=withdraw,
+    )
+    balances = iter((Decimal("1"), *(Decimal("0") for _ in range(6))))
+
+    async def spot_available(*_args: object) -> Decimal:
+        return next(balances)
+
+    monkeypatch.setattr(module, "_spot_available", spot_available)
+    monkeypatch.setattr(module.asyncio, "sleep", AsyncMock())
+
+    with pytest.raises(FailedRequestError, match="Service unavailable"):
+        await module.test_wallet_transfer_round_trip(client)
+
+    assert withdraw.await_count == 1
+
+
+def test_hyperliquid_unfilled_order_fails() -> None:
+    module = _load_test_module(
+        "sync_support/hyperliquid/test_stateful_trade.py",
+        "dcex_sync_hyperliquid_stateful_test",
+    )
+    response = {
+        "status": "ok",
+        "response": {
+            "type": "order",
+            "data": {"statuses": [{"error": "Order must have minimum value of $10."}]},
+        },
+    }
+
+    with pytest.raises(pytest.fail.Exception, match="minimum value"):
+        module._filled_size(response)

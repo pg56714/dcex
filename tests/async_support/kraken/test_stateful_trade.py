@@ -286,7 +286,16 @@ def _is_kraken_service_unavailable(exc: FailedRequestError) -> bool:
     return str(exc.status_code) == "503" or "ErrCode: 503" in str(exc)
 
 
-async def _withdraw_futures_to_spot_with_retry(
+async def _wait_for_spot_floor(client: Client, currency: str, floor: Decimal) -> bool:
+    for delay in (0, 1, 2, 3, 4, 5):
+        if delay:
+            await asyncio.sleep(delay)
+        if await _spot_available(client, currency) >= floor:
+            return True
+    return False
+
+
+async def _withdraw_futures_to_spot_safely(
     client: Client,
     *,
     amount: str,
@@ -294,27 +303,27 @@ async def _withdraw_futures_to_spot_with_retry(
     sourceWallet: str,
     restored_spot_floor: Decimal | None = None,
 ) -> None:
-    for attempt in range(5):
-        try:
-            _assert_futures_ok(
-                await client.withdraw_futures_to_spot_wallet(
-                    amount=amount,
-                    currency=currency,
-                    sourceWallet=sourceWallet,
-                )
+    try:
+        _assert_futures_ok(
+            await client.withdraw_futures_to_spot_wallet(
+                amount=amount,
+                currency=currency,
+                sourceWallet=sourceWallet,
             )
-        except FailedRequestError as exc:
-            if not _is_kraken_service_unavailable(exc) or attempt == 4:
-                raise
-            await asyncio.sleep(2 + attempt)
-            if (
-                restored_spot_floor is not None
-                and await _spot_available(client, currency) >= restored_spot_floor
-            ):
-                return
-        else:
-            return
-    raise AssertionError("unreachable")
+        )
+    except FailedRequestError as exc:
+        if (
+            not _is_kraken_service_unavailable(exc)
+            or restored_spot_floor is None
+            or not await _wait_for_spot_floor(client, currency, restored_spot_floor)
+        ):
+            raise
+        return
+
+    if restored_spot_floor is not None:
+        assert await _wait_for_spot_floor(client, currency, restored_spot_floor), (
+            f"Kraken spot {currency} balance did not recover after Futures withdrawal."
+        )
 
 
 async def test_wallet_transfer_round_trip(client):
@@ -334,18 +343,18 @@ async def test_wallet_transfer_round_trip(client):
         )
         transferred = True
         await asyncio.sleep(2)
-        await _withdraw_futures_to_spot_with_retry(
+        transferred = False
+        await _withdraw_futures_to_spot_safely(
             client,
             amount=_fmt(SPOT_TRANSFER_AMOUNT),
             currency="USDT",
             sourceWallet="flex",
             restored_spot_floor=initial_spot,
         )
-        transferred = False
     finally:
         if transferred:
             with suppress(Exception):
-                await _withdraw_futures_to_spot_with_retry(
+                await _withdraw_futures_to_spot_safely(
                     client,
                     amount=_fmt(SPOT_TRANSFER_AMOUNT),
                     currency="USDT",

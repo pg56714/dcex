@@ -21,6 +21,8 @@ PRIVATE_KEY = os.getenv("HYPERLIQUID_PRIVATE_KEY")
 SYMBOL = "BTC-USD-SWAP"
 SPOT_SYMBOL = "PURR-USDC-SPOT"
 ORDER_SIZE = Decimal("0.0002")
+SPOT_ORDER_NOTIONAL = Decimal("12")
+SPOT_REQUIRED_USDC = Decimal("12.5")
 ACCOUNT_USER: str | None = None
 PERPS_ACCOUNT_VALUE: Decimal | None = None
 SPOT_AVAILABLE_USDC: Decimal | None = None
@@ -175,15 +177,19 @@ async def _skip_if_unfunded(client: Client) -> None:
             )
 
 
-def _extract_oid(order_response: dict) -> int | None:
+def _order_statuses(order_response: dict) -> list[dict]:
     if not isinstance(order_response, dict):
-        return None
+        return []
     response = order_response.get("response", {})
     if not isinstance(response, dict):
-        return None
+        return []
     data = response.get("data", {})
     statuses = data.get("statuses", []) if isinstance(data, dict) else []
-    for status in statuses:
+    return [status for status in statuses if isinstance(status, dict)]
+
+
+def _extract_oid(order_response: dict) -> int | None:
+    for status in _order_statuses(order_response):
         if isinstance(status, dict) and isinstance(status.get("resting"), dict):
             return int(status["resting"]["oid"])
     return None
@@ -197,17 +203,31 @@ def _order_error_message(order_response: dict) -> str | None:
         return response
     if not isinstance(response, dict):
         return None
-    data = response.get("data", {})
-    statuses = data.get("statuses", []) if isinstance(data, dict) else []
-    errors = [status.get("error") for status in statuses if isinstance(status, dict)]
+    errors = [status.get("error") for status in _order_statuses(order_response)]
     messages = [error for error in errors if isinstance(error, str)]
     return "; ".join(messages) if messages else None
 
 
-def _skip_if_api_wallet_missing(order_response: dict) -> None:
+def _filled_size(order_response: dict) -> Decimal:
+    sizes = []
+    for status in _order_statuses(order_response):
+        filled = status.get("filled")
+        if isinstance(filled, dict) and filled.get("totalSz") is not None:
+            sizes.append(Decimal(str(filled["totalSz"])))
+    if sizes:
+        return sum(sizes, Decimal("0"))
+
+    message = _order_error_message(order_response)
+    pytest.fail(
+        f"Hyperliquid order was not filled: {message or order_response}",
+        pytrace=False,
+    )
+
+
+def _fail_if_api_wallet_missing(order_response: dict) -> None:
     message = _order_error_message(order_response)
     if message and "User or API Wallet" in message and "does not exist" in message:
-        pytest.skip("Hyperliquid API wallet does not exist for this account.")
+        pytest.fail("Hyperliquid API wallet does not exist for this account.", pytrace=False)
 
 
 async def _cancel_open_orders(client: Client) -> None:
@@ -230,7 +250,7 @@ async def _spot_post_only_buy_price(client: Client) -> str:
 
 async def _spot_post_only_buy(client: Client) -> tuple[str, str]:
     price = Decimal(await _spot_post_only_buy_price(client))
-    size = int((Decimal("10.4") / price).to_integral_value(rounding=ROUND_DOWN))
+    size = int((SPOT_ORDER_NOTIONAL / price).to_integral_value(rounding=ROUND_DOWN))
     return str(max(size, 1)), format(price, "f")
 
 
@@ -239,7 +259,7 @@ async def _spot_aggressive_buy(client: Client) -> tuple[str, str]:
         str((await client.get_l2book(product_symbol=SPOT_SYMBOL))["levels"][1][0]["px"])
     )
     price = (best_ask * Decimal("1.025")).quantize(Decimal("0.000001"))
-    size = int((Decimal("10.4") / price).to_integral_value(rounding=ROUND_DOWN))
+    size = int((SPOT_ORDER_NOTIONAL / price).to_integral_value(rounding=ROUND_DOWN))
     return str(size), format(price, "f")
 
 
@@ -460,7 +480,7 @@ async def test_limit_wrappers_and_cancel_by_cloid(client):
 async def test_spot_post_only_order_lifecycle(client):
     if await _open_orders(client):
         pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
-    if await _spot_available_usdc(client) < Decimal("10.5"):
+    if await _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
         pytest.skip("Insufficient spot USDC for Hyperliquid spot post-only order.")
 
     oid = None
@@ -477,8 +497,8 @@ async def test_spot_post_only_order_lifecycle(client):
         )
         oid = _extract_oid(order)
         if oid is None:
-            _skip_if_api_wallet_missing(order)
-            pytest.skip(f"Hyperliquid did not rest spot post-only order: {order}")
+            _fail_if_api_wallet_missing(order)
+            pytest.fail(f"Hyperliquid did not rest spot post-only order: {order}", pytrace=False)
     finally:
         if oid is not None:
             await client.cancel_order(product_symbol=SPOT_SYMBOL, oid=oid)
@@ -490,37 +510,40 @@ async def test_spot_post_only_order_lifecycle(client):
 async def test_spot_market_round_trip(client):
     if await _open_orders(client):
         pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
-    if await _spot_available_usdc(client) < Decimal("10.6"):
+    if await _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
         pytest.skip("Insufficient spot USDC for Hyperliquid spot market round-trip.")
 
     before = await _spot_available(client, "PURR")
     try:
         size, price = await _spot_aggressive_buy(client)
-        _assert_exchange_response(
-            await client.place_order(
-                product_symbol=SPOT_SYMBOL,
-                isBuy=True,
-                price=price,
-                size=size,
-                reduceOnly=False,
-                tif="Ioc",
-                cloid=_cloid(),
-            )
+        buy = await client.place_order(
+            product_symbol=SPOT_SYMBOL,
+            isBuy=True,
+            price=price,
+            size=size,
+            reduceOnly=False,
+            tif="Ioc",
+            cloid=_cloid(),
         )
+        _assert_exchange_response(buy)
+        _filled_size(buy)
+        await asyncio.sleep(2)
         acquired = await _spot_available(client, "PURR") - before
         sell_size = int(acquired)
         assert sell_size > 0
-        _assert_exchange_response(
-            await client.place_order(
-                product_symbol=SPOT_SYMBOL,
-                isBuy=False,
-                price=await _spot_aggressive_sell_price(client),
-                size=str(sell_size),
-                reduceOnly=False,
-                tif="Ioc",
-                cloid=_cloid(),
-            )
+        sell = await client.place_order(
+            product_symbol=SPOT_SYMBOL,
+            isBuy=False,
+            price=await _spot_aggressive_sell_price(client),
+            size=str(sell_size),
+            reduceOnly=False,
+            tif="Ioc",
+            cloid=_cloid(),
         )
+        _assert_exchange_response(sell)
+        assert _filled_size(sell) == Decimal(sell_size)
+        await asyncio.sleep(2)
+        assert await _spot_available(client, "PURR") - before < Decimal("1")
     finally:
         await _cancel_open_orders(client)
 
