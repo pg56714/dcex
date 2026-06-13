@@ -57,6 +57,13 @@ class ProductTableManager(ProductTableQueryMixin):
         Returns:
             ProductTableManager: The singleton instance
         """
+        if exchange_name is not None:
+            valid_names = {func.__name__ for func in VALID_EXCHANGES}
+            if exchange_name not in valid_names:
+                raise ProductTableError(
+                    f"Invalid exchange_name: {exchange_name}. Valid: {sorted(valid_names)}"
+                )
+
         if exchange_name not in cls._instance:
             instance = cls()
             instance._initialize(exchange_name=exchange_name)
@@ -103,4 +110,10 @@ class ProductTableManager(ProductTableQueryMixin):
 
         If exchange_name is provided, only that exchange is fetched.
         """
+        if exchange_name is not None:
+            valid_names = {func.__name__ for func in VALID_EXCHANGES}
+            if exchange_name not in valid_names:
+                raise ProductTableError(
+                    f"Invalid exchange_name: {exchange_name}. Valid: {sorted(valid_names)}"
+                )
         self._initialize(exchange_name=exchange_name)

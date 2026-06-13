@@ -244,18 +244,22 @@ def test_market_http_rejects_unmanaged_creation_before_constructing_client() -> 
 
 
 def test_failed_sync_initialization_is_not_cached(monkeypatch: pytest.MonkeyPatch) -> None:
-    key = "broken-sync"
-    ProductTableManager._instance.pop(key, None)
+    key = "binance"
+    original = ProductTableManager._instance.pop(key, None)
 
     def fail_initialize(self: ProductTableManager, exchange_name: str | None = None) -> None:
         raise ProductTableError("boom")
 
     monkeypatch.setattr(ProductTableManager, "_initialize", fail_initialize)
 
-    with pytest.raises(ProductTableError, match="boom"):
-        ProductTableManager.get_instance(key)
+    try:
+        with pytest.raises(ProductTableError, match="boom"):
+            ProductTableManager.get_instance(key)
 
-    assert key not in ProductTableManager._instance
+        assert key not in ProductTableManager._instance
+    finally:
+        if original is not None:
+            ProductTableManager._instance[key] = original
 
 
 @pytest.mark.asyncio
@@ -281,6 +285,27 @@ async def test_failed_async_initialization_is_not_cached(
     finally:
         if original is not None:
             AsyncProductTableManager._instance[key] = original
+
+
+def test_sync_product_table_rejects_invalid_exchange_name() -> None:
+    invalid_name = "invalid-exchange"
+
+    with pytest.raises(ProductTableError, match="Invalid exchange_name"):
+        ProductTableManager.get_instance(invalid_name)
+
+    with pytest.raises(ProductTableError, match="Invalid exchange_name"):
+        ProductTableManager().refresh(invalid_name)
+
+
+@pytest.mark.asyncio
+async def test_async_product_table_rejects_invalid_exchange_name() -> None:
+    invalid_name = "invalid-exchange"
+
+    with pytest.raises(ProductTableError, match="Invalid exchange_name"):
+        await AsyncProductTableManager.get_instance(invalid_name)
+
+    with pytest.raises(ProductTableError, match="Invalid exchange_name"):
+        await AsyncProductTableManager().refresh(invalid_name)
 
 
 def test_sync_product_fetch_closes_market_client_on_failure() -> None:
