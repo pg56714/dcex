@@ -9,6 +9,7 @@ import pytest
 from dotenv import load_dotenv
 
 from dcex.kraken.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -277,8 +278,44 @@ def _cancel_futures(client: Client, order_id: str) -> None:
     time.sleep(0.5)
 
 
+def _is_kraken_service_unavailable(exc: FailedRequestError) -> bool:
+    return str(exc.status_code) == "503" or "ErrCode: 503" in str(exc)
+
+
+def _withdraw_futures_to_spot_with_retry(
+    client: Client,
+    *,
+    amount: str,
+    currency: str,
+    sourceWallet: str,
+    restored_spot_floor: Decimal | None = None,
+) -> None:
+    for attempt in range(5):
+        try:
+            _assert_futures_ok(
+                client.withdraw_futures_to_spot_wallet(
+                    amount=amount,
+                    currency=currency,
+                    sourceWallet=sourceWallet,
+                )
+            )
+        except FailedRequestError as exc:
+            if not _is_kraken_service_unavailable(exc) or attempt == 4:
+                raise
+            time.sleep(2 + attempt)
+            if (
+                restored_spot_floor is not None
+                and _spot_available(client, currency) >= restored_spot_floor
+            ):
+                return
+        else:
+            return
+    raise AssertionError("unreachable")
+
+
 def test_wallet_transfer_round_trip(client):
-    if _spot_available(client, "USDT") < SPOT_TRANSFER_AMOUNT:
+    initial_spot = _spot_available(client, "USDT")
+    if initial_spot < SPOT_TRANSFER_AMOUNT:
         pytest.skip("Insufficient Kraken spot USDT for Spot-to-Futures transfer round-trip.")
 
     transferred = False
@@ -293,21 +330,23 @@ def test_wallet_transfer_round_trip(client):
         )
         transferred = True
         time.sleep(2)
-        _assert_futures_ok(
-            client.withdraw_futures_to_spot_wallet(
-                amount=_fmt(SPOT_TRANSFER_AMOUNT),
-                currency="USDT",
-                sourceWallet="flex",
-            )
+        _withdraw_futures_to_spot_with_retry(
+            client,
+            amount=_fmt(SPOT_TRANSFER_AMOUNT),
+            currency="USDT",
+            sourceWallet="flex",
+            restored_spot_floor=initial_spot,
         )
         transferred = False
     finally:
         if transferred:
             with suppress(Exception):
-                client.withdraw_futures_to_spot_wallet(
+                _withdraw_futures_to_spot_with_retry(
+                    client,
                     amount=_fmt(SPOT_TRANSFER_AMOUNT),
                     currency="USDT",
                     sourceWallet="flex",
+                    restored_spot_floor=initial_spot,
                 )
         time.sleep(2)
 

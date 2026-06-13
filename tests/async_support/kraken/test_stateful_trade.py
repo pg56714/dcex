@@ -10,6 +10,7 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.kraken.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -281,8 +282,44 @@ async def _cancel_futures(client: Client, order_id: str) -> None:
     await asyncio.sleep(0.5)
 
 
+def _is_kraken_service_unavailable(exc: FailedRequestError) -> bool:
+    return str(exc.status_code) == "503" or "ErrCode: 503" in str(exc)
+
+
+async def _withdraw_futures_to_spot_with_retry(
+    client: Client,
+    *,
+    amount: str,
+    currency: str,
+    sourceWallet: str,
+    restored_spot_floor: Decimal | None = None,
+) -> None:
+    for attempt in range(5):
+        try:
+            _assert_futures_ok(
+                await client.withdraw_futures_to_spot_wallet(
+                    amount=amount,
+                    currency=currency,
+                    sourceWallet=sourceWallet,
+                )
+            )
+        except FailedRequestError as exc:
+            if not _is_kraken_service_unavailable(exc) or attempt == 4:
+                raise
+            await asyncio.sleep(2 + attempt)
+            if (
+                restored_spot_floor is not None
+                and await _spot_available(client, currency) >= restored_spot_floor
+            ):
+                return
+        else:
+            return
+    raise AssertionError("unreachable")
+
+
 async def test_wallet_transfer_round_trip(client):
-    if await _spot_available(client, "USDT") < SPOT_TRANSFER_AMOUNT:
+    initial_spot = await _spot_available(client, "USDT")
+    if initial_spot < SPOT_TRANSFER_AMOUNT:
         pytest.skip("Insufficient Kraken spot USDT for Spot-to-Futures transfer round-trip.")
 
     transferred = False
@@ -297,21 +334,23 @@ async def test_wallet_transfer_round_trip(client):
         )
         transferred = True
         await asyncio.sleep(2)
-        _assert_futures_ok(
-            await client.withdraw_futures_to_spot_wallet(
-                amount=_fmt(SPOT_TRANSFER_AMOUNT),
-                currency="USDT",
-                sourceWallet="flex",
-            )
+        await _withdraw_futures_to_spot_with_retry(
+            client,
+            amount=_fmt(SPOT_TRANSFER_AMOUNT),
+            currency="USDT",
+            sourceWallet="flex",
+            restored_spot_floor=initial_spot,
         )
         transferred = False
     finally:
         if transferred:
             with suppress(Exception):
-                await client.withdraw_futures_to_spot_wallet(
+                await _withdraw_futures_to_spot_with_retry(
+                    client,
                     amount=_fmt(SPOT_TRANSFER_AMOUNT),
                     currency="USDT",
                     sourceWallet="flex",
+                    restored_spot_floor=initial_spot,
                 )
         await asyncio.sleep(2)
 
