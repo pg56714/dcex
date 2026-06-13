@@ -75,6 +75,13 @@ def _assert_ok(response):
     return response
 
 
+def _skip_if_unified_account_error(exc: FailedRequestError) -> None:
+    if "40085" in str(exc) or "Unified Account mode" in str(exc):
+        pytest.skip(
+            "Bitget account is in Unified Account mode; Classic Account API is unsupported."
+        )
+
+
 def _items(response: object) -> list[dict]:
     if isinstance(response, list):
         return [item for item in response if isinstance(item, dict)]
@@ -180,7 +187,11 @@ def _batch_order_id(response) -> str:
 
 
 def _spot_open_orders(client: Client) -> list[dict]:
-    return _items(_assert_ok(client.get_spot_open_orders(SPOT_SYMBOL, limit=20)))
+    try:
+        return _items(_assert_ok(client.get_spot_open_orders(SPOT_SYMBOL, limit=20)))
+    except FailedRequestError as exc:
+        _skip_if_unified_account_error(exc)
+        raise
 
 
 def _futures_open_orders(client: Client) -> list[dict]:
