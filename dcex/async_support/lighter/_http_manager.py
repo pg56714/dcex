@@ -1,12 +1,8 @@
 """Lighter asynchronous HTTP manager."""
 
-import importlib
-import inspect
 import logging
-import warnings
-from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol, Self, cast
+from typing import Any, Literal, Protocol, Self
 from urllib.parse import urlencode
 
 import httpx
@@ -28,8 +24,6 @@ class _SignerClient(Protocol):
     ) -> tuple[str | None, str | None]: ...
 
     def check_client(self) -> str | None: ...
-
-    def close(self) -> Awaitable[None] | None: ...
 
     def sign_create_order(
         self,
@@ -119,22 +113,6 @@ def _filtered_query(query: dict[str, Any] | None) -> dict[str, Any]:
 
 def _encoded_query(query: dict[str, Any]) -> str:
     return urlencode({key: _format_value(value) for key, value in query.items()}, doseq=True)
-
-
-def _load_signer_client() -> Callable[..., _SignerClient]:
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            module = importlib.import_module("lighter.signer_client")
-    except ImportError as exc:
-        raise ValueError(
-            "Lighter private signing requires optional lighter-sdk. "
-            "Install lighter-sdk to use Lighter private APIs."
-        ) from exc
-    signer_client = getattr(module, "SignerClient", None)
-    if signer_client is None:
-        raise ValueError("lighter-sdk does not expose SignerClient.")
-    return cast(Callable[..., _SignerClient], signer_client)
 
 
 @dataclass
@@ -278,20 +256,8 @@ class HTTPManager(BaseHTTPManager):
         return int(resolved)
 
     def _private_signer(self) -> _SignerClient:
-        account_index = self._private_account_index()
-        api_key_index = self._private_api_key_index()
-        api_private_key = self.api_private_key
-        if not api_private_key:
-            raise ValueError("Lighter private requests require api_private_key.")
         if self._signer is None:
-            signer_client = _load_signer_client()
-            self._signer = signer_client(
-                url=self.base_url,
-                account_index=account_index,
-                api_private_keys={api_key_index: api_private_key},
-            )
-        if self._signer is None:
-            raise RuntimeError("Failed to initialize Lighter signer.")
+            raise ValueError("Lighter local signer is not configured.")
         return self._signer
 
     def _auth_token(
@@ -337,14 +303,8 @@ class HTTPManager(BaseHTTPManager):
         )
 
     async def close_signer(self) -> None:
-        """Close the official Lighter signer client if it was initialized."""
-        signer = self._signer
+        """Clear any injected Lighter signer."""
         self._signer = None
-        if signer is None:
-            return
-        close_result = signer.close()
-        if inspect.isawaitable(close_result):
-            await cast(Awaitable[None], close_result)
 
     async def close(self) -> None:
         """Close the HTTP session."""

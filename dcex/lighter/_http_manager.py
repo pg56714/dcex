@@ -1,12 +1,8 @@
 """Lighter synchronous HTTP manager."""
 
-import asyncio
-import importlib
 import logging
-import warnings
-from collections.abc import Awaitable, Callable, Coroutine
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol, cast
+from typing import Any, Literal, Protocol
 from urllib.parse import urlencode
 
 import requests
@@ -28,8 +24,6 @@ class _SignerClient(Protocol):
     ) -> tuple[str | None, str | None]: ...
 
     def check_client(self) -> str | None: ...
-
-    def close(self) -> Awaitable[None] | None: ...
 
     def sign_create_order(
         self,
@@ -121,22 +115,6 @@ def _encoded_query(query: dict[str, Any]) -> str:
     return urlencode({key: _format_value(value) for key, value in query.items()}, doseq=True)
 
 
-def _load_signer_client() -> Callable[..., _SignerClient]:
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            module = importlib.import_module("lighter.signer_client")
-    except ImportError as exc:
-        raise ValueError(
-            "Lighter private signing requires optional lighter-sdk. "
-            "Install lighter-sdk to use Lighter private APIs."
-        ) from exc
-    signer_client = getattr(module, "SignerClient", None)
-    if signer_client is None:
-        raise ValueError("lighter-sdk does not expose SignerClient.")
-    return cast(Callable[..., _SignerClient], signer_client)
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for Lighter REST APIs."""
@@ -152,7 +130,6 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False, repr=False)
     _signer: _SignerClient | None = field(default=None, init=False, repr=False)
-    _signer_loop: asyncio.AbstractEventLoop | None = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
 
     def __post_init__(self) -> None:
@@ -264,30 +241,9 @@ class HTTPManager(BaseHTTPManager):
             raise ValueError("Lighter private requests require api_key_index.")
         return int(resolved)
 
-    def _run_signer_coro(self, coro: Coroutine[object, object, _SignerClient]) -> _SignerClient:
-        if self._signer_loop is None or self._signer_loop.is_closed():
-            self._signer_loop = asyncio.new_event_loop()
-        return self._signer_loop.run_until_complete(coro)
-
     def _private_signer(self) -> _SignerClient:
-        account_index = self._private_account_index()
-        api_key_index = self._private_api_key_index()
-        api_private_key = self.api_private_key
-        if not api_private_key:
-            raise ValueError("Lighter private requests require api_private_key.")
         if self._signer is None:
-            signer_client = _load_signer_client()
-
-            async def create_signer() -> _SignerClient:
-                return signer_client(
-                    url=self.base_url,
-                    account_index=account_index,
-                    api_private_keys={api_key_index: api_private_key},
-                )
-
-            self._signer = self._run_signer_coro(create_signer())
-        if self._signer is None:
-            raise RuntimeError("Failed to initialize Lighter signer.")
+            raise ValueError("Lighter local signer is not configured.")
         return self._signer
 
     def _auth_token(
@@ -333,23 +289,8 @@ class HTTPManager(BaseHTTPManager):
         )
 
     def close_signer(self) -> None:
-        """Close the official Lighter signer client if it was initialized."""
-        signer = self._signer
+        """Clear any injected Lighter signer."""
         self._signer = None
-        signer_loop = self._signer_loop
-        self._signer_loop = None
-        if signer is None:
-            if signer_loop is not None and not signer_loop.is_closed():
-                signer_loop.close()
-            return
-        close_result = signer.close()
-        if asyncio.iscoroutine(close_result):
-            if signer_loop is not None and not signer_loop.is_closed():
-                signer_loop.run_until_complete(close_result)
-            else:
-                asyncio.run(close_result)
-        if signer_loop is not None and not signer_loop.is_closed():
-            signer_loop.close()
 
     def close(self) -> None:
         """Close the HTTP session."""
