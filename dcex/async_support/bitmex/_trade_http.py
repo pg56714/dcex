@@ -495,7 +495,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str | None = None,
         filter: dict[str, Any] | None = None,
         targetAccountId: int | None = None,
-        targetAccountIds: list[str] | None = None,
+        targetAccountIds: list[str | int] | None = None,
         text: str | None = None,
     ) -> dict[str, Any]:
         """
@@ -514,7 +514,7 @@ class TradeHTTP(HTTPManager):
         Raises:
             FailedRequestError: If the API request fails
         """
-        payload: dict[str, str | int | list[str] | float | bool] = {}
+        payload: dict[str, str | int | list[str | int] | float | bool] = {}
 
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
@@ -546,7 +546,7 @@ class TradeHTTP(HTTPManager):
         startTime: str | None = None,
         endTime: str | None = None,
         targetAccountIds: str | None = None,
-        targetAccountIds_array: list[str] | None = None,
+        targetAccountIds_array: list[str | int] | None = None,
     ) -> dict[str, Any]:
         """
         Get order information.
@@ -570,7 +570,7 @@ class TradeHTTP(HTTPManager):
         Raises:
             FailedRequestError: If the API request fails
         """
-        payload: dict[str, str | int | list[str] | float | bool] = {}
+        payload: dict[str, str | int | list[str | int] | float | bool] = {}
 
         if product_symbol is not None:
             payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)

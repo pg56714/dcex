@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import logging
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self
 from urllib.parse import urlencode
@@ -127,7 +128,7 @@ class HTTPManager(BaseHTTPManager):
         self,
         method: Literal["GET", "POST", "PUT", "DELETE"],
         path: str,
-        query: dict[str, str | int | list[str] | float | bool] | None = None,
+        query: Mapping[str, str | int | Sequence[str | int] | float | bool] | None = None,
         signed: bool = True,
     ) -> dict[str, Any]:
         """

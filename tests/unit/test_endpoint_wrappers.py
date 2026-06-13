@@ -178,6 +178,58 @@ def _endpoint_method_names(mode: str, exchange: str) -> list[str]:
     return sorted(set(names))
 
 
+def _endpoint_parameter_signatures(
+    mode: str,
+    exchange: str,
+) -> dict[tuple[str, str, str], tuple[object, ...]]:
+    base = ROOT / "dcex"
+    if mode == "async":
+        base /= "async_support"
+    exchange_dir = base / exchange
+
+    def source(node: ast.expr | None) -> str | None:
+        return ast.unparse(node) if node is not None else None
+
+    signatures: dict[tuple[str, str, str], tuple[object, ...]] = {}
+    for path in sorted(exchange_dir.glob("*.py")):
+        if not path.name.endswith(ENDPOINT_FILE_SUFFIXES):
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for cls in [node for node in tree.body if isinstance(node, ast.ClassDef)]:
+            for node in cls.body:
+                if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                if node.name.startswith("_") or node.name in {"async_init", "close"}:
+                    continue
+
+                positional = node.args.posonlyargs + node.args.args
+                defaults = [None] * (len(positional) - len(node.args.defaults))
+                defaults.extend(node.args.defaults)
+                positional_signature = tuple(
+                    (argument.arg, source(argument.annotation), source(default))
+                    for argument, default in zip(positional, defaults, strict=True)
+                )
+                keyword_signature = tuple(
+                    (argument.arg, source(argument.annotation), source(default))
+                    for argument, default in zip(
+                        node.args.kwonlyargs,
+                        node.args.kw_defaults,
+                        strict=True,
+                    )
+                )
+                signatures[(path.name, cls.name, node.name)] = (
+                    positional_signature,
+                    keyword_signature,
+                    None
+                    if node.args.vararg is None
+                    else (node.args.vararg.arg, source(node.args.vararg.annotation)),
+                    None
+                    if node.args.kwarg is None
+                    else (node.args.kwarg.arg, source(node.args.kwarg.annotation)),
+                )
+    return signatures
+
+
 def _cases(mode: str, exchanges: tuple[str, ...]) -> list[EndpointCase]:
     return [
         EndpointCase(mode=mode, exchange=exchange, method_name=name)
@@ -188,6 +240,14 @@ def _cases(mode: str, exchanges: tuple[str, ...]) -> list[EndpointCase]:
 
 SYNC_CASES = _cases("sync", SYNC_EXCHANGES)
 ASYNC_CASES = _cases("async", ASYNC_EXCHANGES)
+
+
+@pytest.mark.parametrize("exchange", sorted(set(SYNC_EXCHANGES) & set(ASYNC_EXCHANGES)))
+def test_sync_async_endpoint_parameter_signatures_match(exchange: str) -> None:
+    assert _endpoint_parameter_signatures(
+        "sync",
+        exchange,
+    ) == _endpoint_parameter_signatures("async", exchange)
 
 
 def _client_class(mode: str, exchange: str) -> type:

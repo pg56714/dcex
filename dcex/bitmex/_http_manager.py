@@ -10,6 +10,7 @@ import hashlib
 import hmac
 import logging
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlencode
@@ -128,7 +129,7 @@ class HTTPManager(BaseHTTPManager):
         self,
         method: str,
         path: str,
-        query: dict[str, str | int | list[str] | float | bool] | None = None,
+        query: Mapping[str, str | int | Sequence[str | int] | float | bool] | None = None,
         signed: bool = True,
     ) -> dict[str, Any]:
         """

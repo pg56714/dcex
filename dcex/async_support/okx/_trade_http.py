@@ -471,7 +471,7 @@ class TradeHTTP(HTTPManager):
 
     async def cancel_batch_orders(
         self,
-        orders: list[dict],
+        orders: list[dict[str, Any]],
     ) -> dict[str, Any]:
         """
         Cancel multiple orders in batch.

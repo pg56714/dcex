@@ -29,7 +29,7 @@ class MarketHTTP(HTTPManager):
     async def get_spot_exchange_info(
         self,
         product_symbol: str | None = None,
-        product_symbols: list | None = None,
+        product_symbols: list[str] | None = None,
         symbolStatus: str | None = None,
     ) -> dict:
         """
@@ -122,7 +122,7 @@ class MarketHTTP(HTTPManager):
     async def get_spot_price(
         self,
         product_symbol: str | None = None,
-        product_symbols: list | None = None,
+        product_symbols: list[str] | None = None,
         symbolStatus: str | None = None,
     ) -> dict:
         """
