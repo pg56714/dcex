@@ -270,6 +270,30 @@ async def _spot_aggressive_sell_price(client: Client) -> str:
     return format((best_bid * Decimal("0.975")).quantize(Decimal("0.000001")), "f")
 
 
+async def _close_spot_test_delta(
+    client: Client,
+    before: Decimal,
+    remaining: Decimal,
+) -> None:
+    sell_size = int(remaining)
+    if sell_size <= 0:
+        return
+
+    sell = await client.place_order(
+        product_symbol=SPOT_SYMBOL,
+        isBuy=False,
+        price=await _spot_aggressive_sell_price(client),
+        size=str(sell_size),
+        reduceOnly=False,
+        tif="Ioc",
+        cloid=_cloid(),
+    )
+    _assert_exchange_response(sell)
+    assert _filled_size(sell) == Decimal(sell_size)
+    await asyncio.sleep(2)
+    assert await _spot_available(client, "PURR") - before < Decimal("1")
+
+
 async def _close_btc_position(client: Client) -> None:
     position_size = await _btc_position_size(client)
     if position_size == 0:
@@ -514,6 +538,10 @@ async def test_spot_market_round_trip(client):
         pytest.skip("Insufficient spot USDC for Hyperliquid spot market round-trip.")
 
     before = await _spot_available(client, "PURR")
+    bought_size = Decimal("0")
+    sold_size = Decimal("0")
+    sell_submitted = False
+    sell_outcome_known = False
     try:
         size, price = await _spot_aggressive_buy(client)
         buy = await client.place_order(
@@ -526,11 +554,11 @@ async def test_spot_market_round_trip(client):
             cloid=_cloid(),
         )
         _assert_exchange_response(buy)
-        _filled_size(buy)
+        bought_size = _filled_size(buy)
         await asyncio.sleep(2)
-        acquired = await _spot_available(client, "PURR") - before
-        sell_size = int(acquired)
+        sell_size = int(bought_size)
         assert sell_size > 0
+        sell_submitted = True
         sell = await client.place_order(
             product_symbol=SPOT_SYMBOL,
             isBuy=False,
@@ -541,11 +569,20 @@ async def test_spot_market_round_trip(client):
             cloid=_cloid(),
         )
         _assert_exchange_response(sell)
-        assert _filled_size(sell) == Decimal(sell_size)
+        if _order_error_message(sell) is not None:
+            sell_outcome_known = True
+        sold_size = _filled_size(sell)
+        sell_outcome_known = True
+        assert sold_size == Decimal(sell_size)
         await asyncio.sleep(2)
         assert await _spot_available(client, "PURR") - before < Decimal("1")
     finally:
-        await _cancel_open_orders(client)
+        try:
+            remaining = bought_size - sold_size
+            if remaining > 0 and (not sell_submitted or sell_outcome_known):
+                await _close_spot_test_delta(client, before, remaining)
+        finally:
+            await _cancel_open_orders(client)
 
 
 @pytest.mark.asyncio

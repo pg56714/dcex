@@ -218,3 +218,155 @@ def test_hyperliquid_unfilled_order_fails() -> None:
 
     with pytest.raises(pytest.fail.Exception, match="minimum value"):
         module._filled_size(response)
+
+
+def test_hyperliquid_spot_round_trip_restores_test_delta_after_sell_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "sync_support/hyperliquid/test_stateful_trade.py",
+        "dcex_sync_hyperliquid_spot_cleanup_test",
+    )
+
+    def filled(size: int) -> dict:
+        return {
+            "status": "ok",
+            "response": {
+                "type": "order",
+                "data": {"statuses": [{"filled": {"totalSz": str(size)}}]},
+            },
+        }
+
+    rejected = {
+        "status": "ok",
+        "response": {
+            "type": "order",
+            "data": {"statuses": [{"error": "Primary sell failed."}]},
+        },
+    }
+    place_order = Mock(side_effect=[filled(120), rejected, filled(120)])
+    client = SimpleNamespace(place_order=place_order)
+    balances = iter((Decimal("10"), Decimal("10.5")))
+    monkeypatch.setattr(module, "_open_orders", lambda *_: [])
+    monkeypatch.setattr(module, "_spot_available_usdc", lambda *_: Decimal("20"))
+    monkeypatch.setattr(module, "_spot_available", lambda *_: next(balances))
+    monkeypatch.setattr(module, "_spot_aggressive_buy", lambda *_: ("120", "0.1"))
+    monkeypatch.setattr(module, "_spot_aggressive_sell_price", lambda *_: "0.1")
+    monkeypatch.setattr(module, "_cancel_open_orders", Mock())
+    monkeypatch.setattr(module.time, "sleep", lambda _: None)
+
+    with pytest.raises(pytest.fail.Exception, match="Primary sell failed"):
+        module.test_spot_market_round_trip(client)
+
+    assert place_order.call_count == 3
+    assert place_order.call_args_list[-1].kwargs["isBuy"] is False
+    assert place_order.call_args_list[-1].kwargs["size"] == "120"
+
+
+def test_hyperliquid_spot_round_trip_does_not_retry_ambiguous_sell(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "sync_support/hyperliquid/test_stateful_trade.py",
+        "dcex_sync_hyperliquid_ambiguous_sell_test",
+    )
+    filled = {
+        "status": "ok",
+        "response": {
+            "type": "order",
+            "data": {"statuses": [{"filled": {"totalSz": "120"}}]},
+        },
+    }
+    place_order = Mock(side_effect=[filled, TimeoutError("sell outcome unknown")])
+    client = SimpleNamespace(place_order=place_order)
+    monkeypatch.setattr(module, "_open_orders", lambda *_: [])
+    monkeypatch.setattr(module, "_spot_available_usdc", lambda *_: Decimal("20"))
+    monkeypatch.setattr(module, "_spot_available", lambda *_: Decimal("10"))
+    monkeypatch.setattr(module, "_spot_aggressive_buy", lambda *_: ("120", "0.1"))
+    monkeypatch.setattr(module, "_spot_aggressive_sell_price", lambda *_: "0.1")
+    monkeypatch.setattr(module, "_cancel_open_orders", Mock())
+    monkeypatch.setattr(module.time, "sleep", lambda _: None)
+
+    with pytest.raises(TimeoutError, match="outcome unknown"):
+        module.test_spot_market_round_trip(client)
+
+    assert place_order.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_spot_round_trip_restores_test_delta_after_sell_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "async_support/hyperliquid/test_stateful_trade.py",
+        "dcex_async_hyperliquid_spot_cleanup_test",
+    )
+
+    def filled(size: int) -> dict:
+        return {
+            "status": "ok",
+            "response": {
+                "type": "order",
+                "data": {"statuses": [{"filled": {"totalSz": str(size)}}]},
+            },
+        }
+
+    rejected = {
+        "status": "ok",
+        "response": {
+            "type": "order",
+            "data": {"statuses": [{"error": "Primary sell failed."}]},
+        },
+    }
+    place_order = AsyncMock(side_effect=[filled(120), rejected, filled(120)])
+    client = SimpleNamespace(place_order=place_order)
+    balances = iter((Decimal("10"), Decimal("10.5")))
+
+    async def spot_available(*_args: object) -> Decimal:
+        return next(balances)
+
+    monkeypatch.setattr(module, "_open_orders", AsyncMock(return_value=[]))
+    monkeypatch.setattr(module, "_spot_available_usdc", AsyncMock(return_value=Decimal("20")))
+    monkeypatch.setattr(module, "_spot_available", spot_available)
+    monkeypatch.setattr(module, "_spot_aggressive_buy", AsyncMock(return_value=("120", "0.1")))
+    monkeypatch.setattr(module, "_spot_aggressive_sell_price", AsyncMock(return_value="0.1"))
+    monkeypatch.setattr(module, "_cancel_open_orders", AsyncMock())
+    monkeypatch.setattr(module.asyncio, "sleep", AsyncMock())
+
+    with pytest.raises(pytest.fail.Exception, match="Primary sell failed"):
+        await module.test_spot_market_round_trip(client)
+
+    assert place_order.await_count == 3
+    assert place_order.call_args_list[-1].kwargs["isBuy"] is False
+    assert place_order.call_args_list[-1].kwargs["size"] == "120"
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_spot_round_trip_does_not_retry_ambiguous_sell(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "async_support/hyperliquid/test_stateful_trade.py",
+        "dcex_async_hyperliquid_ambiguous_sell_test",
+    )
+    filled = {
+        "status": "ok",
+        "response": {
+            "type": "order",
+            "data": {"statuses": [{"filled": {"totalSz": "120"}}]},
+        },
+    }
+    place_order = AsyncMock(side_effect=[filled, TimeoutError("sell outcome unknown")])
+    client = SimpleNamespace(place_order=place_order)
+    monkeypatch.setattr(module, "_open_orders", AsyncMock(return_value=[]))
+    monkeypatch.setattr(module, "_spot_available_usdc", AsyncMock(return_value=Decimal("20")))
+    monkeypatch.setattr(module, "_spot_available", AsyncMock(return_value=Decimal("10")))
+    monkeypatch.setattr(module, "_spot_aggressive_buy", AsyncMock(return_value=("120", "0.1")))
+    monkeypatch.setattr(module, "_spot_aggressive_sell_price", AsyncMock(return_value="0.1"))
+    monkeypatch.setattr(module, "_cancel_open_orders", AsyncMock())
+    monkeypatch.setattr(module.asyncio, "sleep", AsyncMock())
+
+    with pytest.raises(TimeoutError, match="outcome unknown"):
+        await module.test_spot_market_round_trip(client)
+
+    assert place_order.await_count == 2
