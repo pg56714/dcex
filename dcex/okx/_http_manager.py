@@ -229,12 +229,13 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
         except requests.exceptions.RequestException as e:
+            status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
                 message=f"Request failed: {str(e)}",
-                status_code="Unknown",
+                status_code=status_code,
                 time=str(timestamp),
-                resp_headers=None,
+                resp_headers=resp_headers,
             ) from e
         else:
             self._store_response_headers(response)
@@ -277,3 +278,7 @@ class HTTPManager(BaseHTTPManager):
                     resp_headers=dict(response.headers),
                 )
             return data
+
+    def close(self) -> None:
+        """Close the HTTP session."""
+        self.session.close()

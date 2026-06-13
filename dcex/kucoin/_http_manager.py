@@ -126,12 +126,13 @@ class HTTPManager(BaseHTTPManager):
                 raise ValueError(f"Unsupported method: {method}")
 
         except requests.RequestException as e:
+            status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
                 message=f"Request failed: {e}",
-                status_code=response.status_code if response else "Unknown",
+                status_code=status_code,
                 time=str(timestamp),
-                resp_headers=dict(response.headers) if response else None,
+                resp_headers=resp_headers,
             ) from e
         else:
             self._store_response_headers(response)

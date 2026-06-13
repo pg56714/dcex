@@ -276,10 +276,15 @@ class HTTPManager(BaseHTTPManager):
                 return data
 
         except requests.exceptions.RequestException as e:
+            status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {payload}",
                 message=f"Request failed: {str(e)}",
-                status_code=getattr(e.response, "status_code", "Unknown"),
+                status_code=status_code,
                 time=str(timestamp),
-                resp_headers=getattr(e.response, "headers", None),
+                resp_headers=resp_headers,
             ) from e
+
+    def close(self) -> None:
+        """Close the HTTP session."""
+        self.session.close()

@@ -82,3 +82,17 @@ class BaseHTTPManager:
         headers = dict(getattr(response, "headers", {}) or {})
         self.last_response_headers = headers
         return headers
+
+    @staticmethod
+    def _exception_response_details(
+        exception: BaseException,
+    ) -> tuple[str | int, dict[str, str] | None]:
+        """Extract response metadata carried by a transport exception."""
+        response = getattr(exception, "response", None)
+        if response is None:
+            return "Unknown", None
+
+        raw_status = getattr(response, "status_code", "Unknown")
+        status_code = raw_status if isinstance(raw_status, (str, int)) else str(raw_status)
+        headers = dict(getattr(response, "headers", {}) or {})
+        return status_code, headers
