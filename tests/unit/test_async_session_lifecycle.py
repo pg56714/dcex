@@ -66,6 +66,21 @@ class _RaisingSession:
         raise error
 
 
+class _SuccessfulSession:
+    is_closed = False
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str, dict[str, Any]]] = []
+
+    async def post(self, url: str, **kwargs: Any) -> httpx.Response:  # noqa: ANN401
+        self.calls.append(("POST", url, kwargs))
+        request = httpx.Request("POST", url)
+        return httpx.Response(200, json={"ok": True}, request=request)
+
+    async def aclose(self) -> None:
+        self.is_closed = True
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("client_type", _CLIENT_TYPES)
 async def test_async_client_reuses_open_session(client_type: type[Any]) -> None:
@@ -105,6 +120,38 @@ async def test_product_table_failure_does_not_create_session(
         await client.async_init()
 
     assert client.session is None
+
+
+@pytest.mark.asyncio
+async def test_async_hyperliquid_request_recreates_closed_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dcex.async_support.hyperliquid import _http_manager as hyperliquid_http
+
+    replacement_session = _SuccessfulSession()
+    client = HyperliquidClient(preload_product_table=False)
+    await client.async_init()
+    assert client.session is not None
+    await client.session.aclose()
+    assert client.session.is_closed
+
+    monkeypatch.setattr(
+        hyperliquid_http.httpx,
+        "AsyncClient",
+        lambda timeout: replacement_session,
+    )
+
+    result = await client._request("POST", "/info", {"type": "meta"}, signed=False)
+
+    assert result == {"ok": True}
+    assert client.session is replacement_session
+    assert replacement_session.calls == [
+        (
+            "POST",
+            "https://api.hyperliquid.xyz/info",
+            {"headers": {"Content-Type": "application/json"}, "json": {"type": "meta"}},
+        )
+    ]
 
 
 @pytest.mark.asyncio

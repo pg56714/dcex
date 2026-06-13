@@ -329,7 +329,7 @@ class HTTPManager(BaseHTTPManager):
             ValueError: If session not initialized or unsupported method
             FailedRequestError: If request fails
         """
-        if not self.session:
+        if self.session is None or self.session.is_closed:
             await self.async_init()
 
         query = dict(query or {})
