@@ -1,3 +1,9 @@
+## 0.20.3 (2026-06-13)
+
+### Fix
+
+- recreate closed hyperliquid async session
+
 ## 0.20.2 (2026-06-13)
 
 ### Fix
