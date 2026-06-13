@@ -1,3 +1,9 @@
+## 0.21.2 (2026-06-13)
+
+### Fix
+
+- harden exchange stateful tests
+
 ## 0.21.1 (2026-06-13)
 
 ### Fix
