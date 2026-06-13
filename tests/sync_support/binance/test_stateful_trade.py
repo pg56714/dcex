@@ -8,6 +8,7 @@ import pytest
 from dotenv import load_dotenv
 
 from dcex.binance.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -46,6 +47,17 @@ def _round_to_step(value: Decimal, step: Decimal, rounding: str) -> Decimal:
 
 def _format_decimal(value: Decimal) -> str:
     return format(value.normalize(), "f")
+
+
+def _get_futures_algo_order_with_retry(client: Client, client_algo_id: str) -> dict:
+    for attempt in range(8):
+        try:
+            return client.get_futures_algo_order(clientAlgoId=client_algo_id)
+        except FailedRequestError as exc:
+            if "-2013" not in str(exc) or attempt == 7:
+                raise
+            time.sleep(1)
+    raise AssertionError("unreachable")
 
 
 def _minimum_notional(filters: dict[str, dict], default: Decimal) -> Decimal:
@@ -557,7 +569,7 @@ def test_advanced_order_validation(client):
             newOrderRespType="ACK",
         )
         time.sleep(0.5)
-        queried = client.get_futures_algo_order(clientAlgoId=client_algo_id)
+        queried = _get_futures_algo_order_with_retry(client, client_algo_id)
         assert queried["clientAlgoId"] == client_algo_id
         assert isinstance(
             client.get_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL), list

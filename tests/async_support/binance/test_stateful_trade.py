@@ -10,6 +10,7 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.binance.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -49,6 +50,17 @@ def _round_to_step(value: Decimal, step: Decimal, rounding: str) -> Decimal:
 
 def _format_decimal(value: Decimal) -> str:
     return format(value.normalize(), "f")
+
+
+async def _get_futures_algo_order_with_retry(client: Client, client_algo_id: str) -> dict:
+    for attempt in range(8):
+        try:
+            return await client.get_futures_algo_order(clientAlgoId=client_algo_id)
+        except FailedRequestError as exc:
+            if "-2013" not in str(exc) or attempt == 7:
+                raise
+            await asyncio.sleep(1)
+    raise AssertionError("unreachable")
 
 
 def _minimum_notional(filters: dict[str, dict], default: Decimal) -> Decimal:
@@ -589,7 +601,7 @@ async def test_advanced_order_validation(client):
             newOrderRespType="ACK",
         )
         await asyncio.sleep(0.5)
-        queried = await client.get_futures_algo_order(clientAlgoId=client_algo_id)
+        queried = await _get_futures_algo_order_with_retry(client, client_algo_id)
         assert queried["clientAlgoId"] == client_algo_id
         assert isinstance(
             await client.get_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL), list
