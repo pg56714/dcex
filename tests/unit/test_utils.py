@@ -70,10 +70,30 @@ def test_timeframe_converters_reject_unknown_values(
         converter("2d")
 
 
-def test_decimal_place_helpers() -> None:
-    assert get_decimal_places(0.001) == 3
-    assert get_decimal_places(1) == 0
-    assert get_decimal_places(0) == 0
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (0.001, 3),
+        (0.5, 1),
+        (0.25, 2),
+        (2.5, 1),
+        (-0.125, 3),
+        (1e-7, 7),
+        (1, 0),
+        (0, 0),
+    ],
+)
+def test_get_decimal_places(value: float, expected: int) -> None:
+    assert get_decimal_places(value) == expected
+
+
+@pytest.mark.parametrize("value", [float("inf"), float("-inf"), float("nan")])
+def test_get_decimal_places_rejects_non_finite_values(value: float) -> None:
+    with pytest.raises(ValueError, match="finite"):
+        get_decimal_places(value)
+
+
+def test_reverse_decimal_places() -> None:
     assert reverse_decimal_places(3) == 0.001
 
 

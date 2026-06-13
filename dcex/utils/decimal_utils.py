@@ -1,13 +1,15 @@
 """Utility functions for decimal precision handling."""
 
-import math
+from decimal import Decimal
 
 
 def get_decimal_places(value: float) -> int:
     """Returns the number of decimal places for a given value."""
-    if value > 0:
-        return int(-math.log10(value))
-    return 0  # Avoid errors when value is 0
+    decimal_value = Decimal(str(value))
+    if not decimal_value.is_finite():
+        raise ValueError("value must be finite")
+    exponent = decimal_value.normalize().as_tuple().exponent
+    return max(0, -int(exponent))
 
 
 def reverse_decimal_places(decimal_places: int) -> float:
