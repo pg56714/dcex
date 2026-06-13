@@ -577,7 +577,12 @@ async def test_spot_stateful_order_lifecycle(client):
         size, price = await _spot_buy_params(client)
         order_id = None
         try:
-            order_id = _order_id(await _place_spot_limit(client, "buy", size, price))
+            if await _is_uta(client):
+                order_id = _order_id(await _place_spot_limit(client, "buy", size, price))
+            else:
+                order_id = _order_id(
+                    await client.place_spot_limit_order(SPOT_SYMBOL, "buy", size, price)
+                )
             _assert_ok(await _get_spot_order(client, order_id))
         finally:
             if order_id is not None:
@@ -588,16 +593,32 @@ async def test_spot_stateful_order_lifecycle(client):
         await asyncio.sleep(1)
 
         before_btc = await _spot_available(client, "BTC")
-        _assert_ok(await _place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+        if await _is_uta(client):
+            _assert_ok(await _place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+        else:
+            _assert_ok(
+                await client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(SPOT_TEST_NOTIONAL))
+            )
         await asyncio.sleep(2)
         acquired = _spot_sell_size(client, await _spot_available(client, "BTC") - before_btc)
         assert acquired > 0
 
         sell_price = await _spot_sell_price(client)
-        for create_sell in (
-            lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price),
-            lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price, "post_only"),
-        ):
+        if await _is_uta(client):
+            sell_creators = (
+                lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price),
+                lambda: _place_spot_limit(client, "sell", _fmt(acquired), sell_price, "post_only"),
+            )
+        else:
+            sell_creators = (
+                lambda: client.place_spot_limit_sell_order(SPOT_SYMBOL, _fmt(acquired), sell_price),
+                lambda: client.place_spot_post_only_limit_sell_order(
+                    SPOT_SYMBOL,
+                    _fmt(acquired),
+                    sell_price,
+                ),
+            )
+        for create_sell in sell_creators:
             order_id = None
             try:
                 order_id = _order_id(await create_sell())
@@ -606,8 +627,28 @@ async def test_spot_stateful_order_lifecycle(client):
                 if order_id is not None:
                     await _cancel_spot(client, order_id)
 
-        _assert_ok(await _place_spot_market(client, "sell", _fmt(acquired)))
+        if await _is_uta(client):
+            _assert_ok(await _place_spot_market(client, "sell", _fmt(acquired)))
+        else:
+            _assert_ok(await client.place_spot_market_sell_order(SPOT_SYMBOL, _fmt(acquired)))
         await asyncio.sleep(2)
+
+        before_btc = await _spot_available(client, "BTC")
+        if await _is_uta(client):
+            _assert_ok(await _place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+        else:
+            _assert_ok(
+                await client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(SPOT_TEST_NOTIONAL))
+            )
+        await asyncio.sleep(2)
+        acquired = _spot_sell_size(client, await _spot_available(client, "BTC") - before_btc)
+        assert acquired > 0
+        if await _is_uta(client):
+            _assert_ok(await _place_spot_market(client, "sell", _fmt(acquired)))
+        else:
+            _assert_ok(await client.place_spot_market_order(SPOT_SYMBOL, "sell", _fmt(acquired)))
+        await asyncio.sleep(2)
+
         _assert_ok(await _get_spot_history_orders(client))
         _assert_ok(await _get_spot_fills(client))
     finally:
@@ -631,7 +672,12 @@ async def test_futures_stateful_order_lifecycle(client):
         size, price = await _futures_buy_params(client)
         order_id = None
         try:
-            order_id = _order_id(await _place_futures_limit(client, "buy", size, price))
+            if await _is_uta(client):
+                order_id = _order_id(await _place_futures_limit(client, "buy", size, price))
+            else:
+                order_id = _order_id(
+                    await client.place_futures_limit_order(SWAP_SYMBOL, "buy", size, price)
+                )
             _assert_ok(await _get_futures_order(client, order_id))
         finally:
             if order_id is not None:
@@ -640,9 +686,16 @@ async def test_futures_stateful_order_lifecycle(client):
         sell_price = await _futures_sell_price(client)
         order_id = None
         try:
-            order_id = _order_id(
-                await _place_futures_limit(client, "sell", size, sell_price, "post_only")
-            )
+            if await _is_uta(client):
+                order_id = _order_id(
+                    await _place_futures_limit(client, "sell", size, sell_price, "post_only")
+                )
+            else:
+                order_id = _order_id(
+                    await client.place_futures_post_only_limit_sell_order(
+                        SWAP_SYMBOL, size, sell_price
+                    )
+                )
         finally:
             if order_id is not None:
                 await _cancel_futures(client, order_id)
@@ -651,16 +704,39 @@ async def test_futures_stateful_order_lifecycle(client):
         _assert_ok(await _cancel_futures_batch(client, order_id))
         await asyncio.sleep(1)
 
-        _assert_ok(await _place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        if await _is_uta(client):
+            _assert_ok(await _place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        else:
+            _assert_ok(
+                await client.place_futures_market_order(SWAP_SYMBOL, "buy", _fmt(FUTURES_SIZE))
+            )
         await asyncio.sleep(2)
         assert await _futures_position_size(client) > 0
-        _assert_ok(await _place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        if await _is_uta(client):
+            _assert_ok(await _place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        else:
+            _assert_ok(
+                await client.place_futures_market_sell_order(SWAP_SYMBOL, _fmt(FUTURES_SIZE), "YES")
+            )
         await asyncio.sleep(2)
 
-        _assert_ok(await _place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        if await _is_uta(client):
+            _assert_ok(await _place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        else:
+            _assert_ok(await client.place_futures_market_buy_order(SWAP_SYMBOL, _fmt(FUTURES_SIZE)))
         await asyncio.sleep(2)
         assert await _futures_position_size(client) > 0
-        _assert_ok(await _place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        if await _is_uta(client):
+            _assert_ok(await _place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        else:
+            _assert_ok(
+                await client.place_futures_market_order(
+                    SWAP_SYMBOL,
+                    "sell",
+                    _fmt(FUTURES_SIZE),
+                    reduceOnly="YES",
+                )
+            )
         await asyncio.sleep(2)
 
         assert await _futures_position_size(client) == 0

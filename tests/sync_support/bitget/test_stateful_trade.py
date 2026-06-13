@@ -596,7 +596,10 @@ def test_spot_stateful_order_lifecycle(client):
         time.sleep(1)
 
         before_btc = _spot_available(client, "BTC")
-        _assert_ok(_place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+        if _is_uta(client):
+            _assert_ok(_place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+        else:
+            _assert_ok(client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(SPOT_TEST_NOTIONAL)))
         time.sleep(2)
         acquired = _spot_sell_size(client, _spot_available(client, "BTC") - before_btc)
         assert acquired > 0
@@ -625,15 +628,24 @@ def test_spot_stateful_order_lifecycle(client):
                 if order_id is not None:
                     _cancel_spot(client, order_id)
 
-        _assert_ok(_place_spot_market(client, "sell", _fmt(acquired)))
+        if _is_uta(client):
+            _assert_ok(_place_spot_market(client, "sell", _fmt(acquired)))
+        else:
+            _assert_ok(client.place_spot_market_sell_order(SPOT_SYMBOL, _fmt(acquired)))
         time.sleep(2)
 
         before_btc = _spot_available(client, "BTC")
-        _assert_ok(_place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+        if _is_uta(client):
+            _assert_ok(_place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+        else:
+            _assert_ok(client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(SPOT_TEST_NOTIONAL)))
         time.sleep(2)
         acquired = _spot_sell_size(client, _spot_available(client, "BTC") - before_btc)
         assert acquired > 0
-        _assert_ok(_place_spot_market(client, "sell", _fmt(acquired)))
+        if _is_uta(client):
+            _assert_ok(_place_spot_market(client, "sell", _fmt(acquired)))
+        else:
+            _assert_ok(client.place_spot_market_order(SPOT_SYMBOL, "sell", _fmt(acquired)))
         time.sleep(2)
 
         _assert_ok(_get_spot_history_orders(client))
@@ -702,16 +714,37 @@ def test_futures_stateful_order_lifecycle(client):
         _assert_ok(_cancel_futures_batch(client, order_id))
         time.sleep(1)
 
-        _assert_ok(_place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        if _is_uta(client):
+            _assert_ok(_place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        else:
+            _assert_ok(client.place_futures_market_order(SWAP_SYMBOL, "buy", _fmt(FUTURES_SIZE)))
         time.sleep(2)
         assert _futures_position_size(client) > 0
-        _assert_ok(_place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        if _is_uta(client):
+            _assert_ok(_place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        else:
+            _assert_ok(
+                client.place_futures_market_sell_order(SWAP_SYMBOL, _fmt(FUTURES_SIZE), "YES")
+            )
         time.sleep(2)
 
-        _assert_ok(_place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        if _is_uta(client):
+            _assert_ok(_place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+        else:
+            _assert_ok(client.place_futures_market_buy_order(SWAP_SYMBOL, _fmt(FUTURES_SIZE)))
         time.sleep(2)
         assert _futures_position_size(client) > 0
-        _assert_ok(_place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        if _is_uta(client):
+            _assert_ok(_place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+        else:
+            _assert_ok(
+                client.place_futures_market_order(
+                    SWAP_SYMBOL,
+                    "sell",
+                    _fmt(FUTURES_SIZE),
+                    reduceOnly="YES",
+                )
+            )
         time.sleep(2)
 
         assert _futures_position_size(client) == 0

@@ -142,6 +142,39 @@ def test_collection_marks_stateful_file_without_matching_method_prefix(tmp_path:
     assert any(getattr(marker, "name", None) == "stateful" for marker in item.markers)
 
 
+def test_bitget_classic_stateful_tests_keep_convenience_wrapper_coverage() -> None:
+    tests_root = Path(__file__).resolve().parents[1]
+    sources = {
+        "sync": (tests_root / "sync_support/bitget/test_stateful_trade.py").read_text(),
+        "async": (tests_root / "async_support/bitget/test_stateful_trade.py").read_text(),
+    }
+    common_methods = (
+        "place_spot_limit_sell_order",
+        "place_spot_post_only_limit_sell_order",
+        "place_spot_market_buy_order",
+        "place_spot_market_sell_order",
+        "place_spot_market_order",
+        "place_futures_post_only_limit_sell_order",
+        "place_futures_market_order",
+        "place_futures_market_sell_order",
+        "place_futures_market_buy_order",
+    )
+    sync_only_methods = (
+        "place_spot_limit_buy_order",
+        "place_spot_post_only_limit_buy_order",
+        "place_futures_limit_buy_order",
+        "place_futures_post_only_limit_buy_order",
+        "place_futures_limit_sell_order",
+    )
+
+    for source in sources.values():
+        for method in common_methods:
+            assert method in source
+
+    for method in sync_only_methods:
+        assert method in sources["sync"]
+
+
 def test_kraken_ambiguous_withdrawal_is_not_retried(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
