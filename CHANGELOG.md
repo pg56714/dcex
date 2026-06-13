@@ -1,3 +1,9 @@
+## 0.21.1 (2026-06-13)
+
+### Fix
+
+- implement lighter signing in pure python
+
 ## 0.21.0 (2026-06-13)
 
 ### Feat
