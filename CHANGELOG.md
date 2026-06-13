@@ -1,3 +1,13 @@
+## 0.21.0 (2026-06-13)
+
+### Feat
+
+- support bitget uta live tests
+
+### Refactor
+
+- remove lighter sdk signing dependency
+
 ## 0.20.3 (2026-06-13)
 
 ### Fix
