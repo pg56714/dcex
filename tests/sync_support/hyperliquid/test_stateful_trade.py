@@ -173,15 +173,38 @@ def _skip_if_unfunded(client: Client) -> None:
 
 
 def _extract_oid(order_response: dict) -> int | None:
-    statuses = (
-        order_response.get("response", {}).get("data", {}).get("statuses", [])
-        if isinstance(order_response, dict)
-        else []
-    )
+    if not isinstance(order_response, dict):
+        return None
+    response = order_response.get("response", {})
+    if not isinstance(response, dict):
+        return None
+    data = response.get("data", {})
+    statuses = data.get("statuses", []) if isinstance(data, dict) else []
     for status in statuses:
         if isinstance(status, dict) and isinstance(status.get("resting"), dict):
             return int(status["resting"]["oid"])
     return None
+
+
+def _order_error_message(order_response: dict) -> str | None:
+    if not isinstance(order_response, dict):
+        return None
+    response = order_response.get("response")
+    if isinstance(response, str):
+        return response
+    if not isinstance(response, dict):
+        return None
+    data = response.get("data", {})
+    statuses = data.get("statuses", []) if isinstance(data, dict) else []
+    errors = [status.get("error") for status in statuses if isinstance(status, dict)]
+    messages = [error for error in errors if isinstance(error, str)]
+    return "; ".join(messages) if messages else None
+
+
+def _skip_if_api_wallet_missing(order_response: dict) -> None:
+    message = _order_error_message(order_response)
+    if message and "User or API Wallet" in message and "does not exist" in message:
+        pytest.skip("Hyperliquid API wallet does not exist for this account.")
 
 
 def _cancel_open_orders(client: Client) -> None:
@@ -434,6 +457,7 @@ def test_spot_post_only_order_lifecycle(client):
         )
         oid = _extract_oid(order)
         if oid is None:
+            _skip_if_api_wallet_missing(order)
             pytest.skip(f"Hyperliquid did not rest spot post-only order: {order}")
     finally:
         if oid is not None:
