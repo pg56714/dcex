@@ -8,7 +8,6 @@ query logic can be refactored (e.g. shared between sync and async) safely.
 # ruff: noqa: D103
 
 import asyncio
-from typing import Any
 
 import polars as pl
 import pytest
@@ -220,27 +219,60 @@ def test_indexed_lookup_preserves_ambiguous_results() -> None:
     )
 
 
-def test_all_product_fetches_manage_market_clients() -> None:
-    for fetch_function in sync_manager.VALID_EXCHANGES:
-        assert hasattr(fetch_function, "__wrapped__"), fetch_function.__name__
-    for fetch_function in async_manager.VALID_EXCHANGES:
-        assert hasattr(fetch_function, "__wrapped__"), fetch_function.__name__
+def test_all_product_fetches_match_the_registry() -> None:
+    assert [function.__name__ for function in sync_manager.VALID_EXCHANGES] == [
+        function.__name__ for function in async_manager.VALID_EXCHANGES
+    ]
+    assert {function.__name__ for function in sync_manager.VALID_EXCHANGES} == {
+        "aster",
+        "backpack",
+        "binance",
+        "bingx",
+        "bitget",
+        "bitmart",
+        "bitmex",
+        "bybit",
+        "gateio",
+        "hyperliquid",
+        "kucoin",
+        "kraken",
+        "lighter",
+        "mexc",
+        "okx",
+    }
 
 
-def test_market_http_rejects_unmanaged_creation_before_constructing_client() -> None:
-    constructed = 0
+def test_sync_fetch_delegates_to_rust(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[str | None] = []
 
-    class MarketHTTP:
-        def __init__(self, preload_product_table: bool) -> None:
-            nonlocal constructed
-            constructed += 1
+    def fetch_product_table(exchange_name: str | None = None) -> list[dict[str, str]]:
+        calls.append(exchange_name)
+        return [_ROWS[0]]
 
-    with pytest.raises(RuntimeError, match="managed fetch"):
-        sync_fetch._market_http(MarketHTTP)
-    with pytest.raises(RuntimeError, match="managed fetch"):
-        async_fetch._market_http(MarketHTTP)
+    monkeypatch.setattr(sync_fetch._native, "fetch_product_table", fetch_product_table)
 
-    assert constructed == 0
+    assert sync_fetch.binance().to_dicts() == [_ROWS[0]]
+    assert calls == ["binance"]
+
+
+@pytest.mark.asyncio
+async def test_async_fetch_delegates_to_rust(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[str | None] = []
+
+    async def fetch_product_table_async(
+        exchange_name: str | None = None,
+    ) -> list[dict[str, str]]:
+        calls.append(exchange_name)
+        return [_ROWS[0]]
+
+    monkeypatch.setattr(
+        async_fetch._native,
+        "fetch_product_table_async",
+        fetch_product_table_async,
+    )
+
+    assert (await async_fetch.binance()).to_dicts() == [_ROWS[0]]
+    assert calls == ["binance"]
 
 
 def test_failed_sync_initialization_is_not_cached(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -308,262 +340,75 @@ async def test_async_product_table_rejects_invalid_exchange_name() -> None:
         await AsyncProductTableManager().refresh(invalid_name)
 
 
-def test_sync_product_fetch_closes_market_client_on_failure() -> None:
-    created: list[Any] = []
-
-    class Session:
-        is_closed = False
-
-    class MarketHTTP:
-        def __init__(self, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.session = Session()
-            created.append(self)
-
-        def close(self) -> None:
-            self.session.is_closed = True
-
-    @sync_fetch._manage_market_http
-    def failing_fetch() -> pl.DataFrame:
-        sync_fetch._market_http(MarketHTTP)
-        raise RuntimeError("boom")
-
-    with pytest.raises(RuntimeError, match="boom"):
-        failing_fetch()
-
-    assert len(created) == 1
-    assert created[0].session.is_closed
-
-
-@pytest.mark.asyncio
-async def test_async_product_fetch_closes_market_client_on_failure() -> None:
-    created: list[Any] = []
-
-    class Session:
-        is_closed = False
-
-    class MarketHTTP:
-        def __init__(self, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.session = Session()
-            created.append(self)
-
-        async def close(self) -> None:
-            self.session.is_closed = True
-
-    @async_fetch._manage_market_http
-    async def failing_fetch() -> pl.DataFrame:
-        async_fetch._market_http(MarketHTTP)
-        raise RuntimeError("boom")
-
-    with pytest.raises(RuntimeError, match="boom"):
-        await failing_fetch()
-
-    assert len(created) == 1
-    assert created[0].session.is_closed
-
-
-def test_sync_product_fetch_closes_session_without_client_close() -> None:
-    created: list[Any] = []
-
-    class Session:
-        is_closed = False
-
-        def close(self) -> None:
-            self.is_closed = True
-
-    class MarketHTTP:
-        def __init__(self, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.session = Session()
-            created.append(self)
-
-    @sync_fetch._manage_market_http
-    def successful_fetch() -> pl.DataFrame:
-        sync_fetch._market_http(MarketHTTP)
-        return pl.DataFrame()
-
-    successful_fetch()
-
-    assert created[0].session.is_closed
-
-
-@pytest.mark.asyncio
-async def test_async_product_fetch_closes_session_without_client_close() -> None:
-    created: list[Any] = []
-
-    class Session:
-        is_closed = False
-
-        async def aclose(self) -> None:
-            self.is_closed = True
-
-    class MarketHTTP:
-        def __init__(self, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.session = Session()
-            created.append(self)
-
-    @async_fetch._manage_market_http
-    async def successful_fetch() -> pl.DataFrame:
-        async_fetch._market_http(MarketHTTP)
-        return pl.DataFrame()
-
-    await successful_fetch()
-
-    assert created[0].session.is_closed
-
-
-def test_sync_product_fetch_closes_auxiliary_resources_after_session_closed() -> None:
-    created: list[Any] = []
-
-    class Session:
-        is_closed = True
-
-    class MarketHTTP:
-        def __init__(self, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.session = Session()
-            self.auxiliary_closed = False
-            created.append(self)
-
-        def close(self) -> None:
-            self.auxiliary_closed = True
-
-    @sync_fetch._manage_market_http
-    def successful_fetch() -> pl.DataFrame:
-        sync_fetch._market_http(MarketHTTP)
-        return pl.DataFrame()
-
-    successful_fetch()
-
-    assert created[0].auxiliary_closed
-
-
-@pytest.mark.asyncio
-async def test_async_product_fetch_closes_auxiliary_resources_after_session_closed() -> None:
-    created: list[Any] = []
-
-    class Session:
-        is_closed = True
-
-    class MarketHTTP:
-        def __init__(self, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.session = Session()
-            self.auxiliary_closed = False
-            created.append(self)
-
-        async def close(self) -> None:
-            self.auxiliary_closed = True
-
-    @async_fetch._manage_market_http
-    async def successful_fetch() -> pl.DataFrame:
-        async_fetch._market_http(MarketHTTP)
-        return pl.DataFrame()
-
-    await successful_fetch()
-
-    assert created[0].auxiliary_closed
-
-
-def test_sync_product_fetch_preserves_primary_error_when_cleanup_fails() -> None:
-    closed: list[str] = []
-
-    class MarketHTTP:
-        def __init__(self, name: str, *, fail_close: bool, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.name = name
-            self.fail_close = fail_close
-
-        def close(self) -> None:
-            closed.append(self.name)
-            if self.fail_close:
-                raise RuntimeError(f"{self.name} cleanup failed")
-
-    @sync_fetch._manage_market_http
-    def failing_fetch() -> pl.DataFrame:
-        sync_fetch._market_http(lambda **kwargs: MarketHTTP("first", fail_close=False, **kwargs))
-        sync_fetch._market_http(lambda **kwargs: MarketHTTP("second", fail_close=True, **kwargs))
-        raise ValueError("fetch failed")
-
-    with pytest.raises(ValueError, match="fetch failed") as exc_info:
-        failing_fetch()
-
-    assert closed == ["second", "first"]
-    assert exc_info.value.__notes__ == [
-        "Market HTTP cleanup failed: RuntimeError('second cleanup failed')"
-    ]
-
-
-@pytest.mark.asyncio
-async def test_async_product_fetch_preserves_primary_error_when_cleanup_fails() -> None:
-    closed: list[str] = []
-
-    class MarketHTTP:
-        def __init__(self, name: str, *, fail_close: bool, preload_product_table: bool) -> None:
-            assert not preload_product_table
-            self.name = name
-            self.fail_close = fail_close
-
-        async def close(self) -> None:
-            closed.append(self.name)
-            if self.fail_close:
-                raise RuntimeError(f"{self.name} cleanup failed")
-
-    @async_fetch._manage_market_http
-    async def failing_fetch() -> pl.DataFrame:
-        async_fetch._market_http(lambda **kwargs: MarketHTTP("first", fail_close=False, **kwargs))
-        async_fetch._market_http(lambda **kwargs: MarketHTTP("second", fail_close=True, **kwargs))
-        raise ValueError("fetch failed")
-
-    with pytest.raises(ValueError, match="fetch failed") as exc_info:
-        await failing_fetch()
-
-    assert closed == ["second", "first"]
-    assert exc_info.value.__notes__ == [
-        "Market HTTP cleanup failed: RuntimeError('second cleanup failed')"
-    ]
-
-
-@pytest.mark.asyncio
-async def test_async_product_table_skips_failed_exchanges(
+def test_sync_manager_fetch_uses_rust_and_wraps_errors(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    async def working() -> pl.DataFrame:
-        return pl.DataFrame({"exchange": ["working"]})
+    calls: list[str | None] = []
 
-    async def broken() -> pl.DataFrame:
-        raise RuntimeError("exchange unavailable")
+    def fetch_product_table(exchange_name: str | None = None) -> list[dict[str, str]]:
+        calls.append(exchange_name)
+        return [_ROWS[0]]
 
-    monkeypatch.setattr(async_manager, "VALID_EXCHANGES", [working, broken])
+    monkeypatch.setattr(sync_manager._native, "fetch_product_table", fetch_product_table)
+    result = ProductTableManager()._fetch_product_tables("binance")
 
-    result = await AsyncProductTableManager()._fetch_product_tables()
+    assert result.to_dicts() == [_ROWS[0]]
+    assert calls == ["binance"]
 
-    assert result.to_dicts() == [{"exchange": "working"}]
+    def fail_fetch(exchange_name: str | None = None) -> list[dict[str, str]]:
+        raise RuntimeError(f"failed: {exchange_name}")
+
+    monkeypatch.setattr(sync_manager._native, "fetch_product_table", fail_fetch)
+    with pytest.raises(ProductTableError, match="failed: binance"):
+        ProductTableManager()._fetch_product_tables("binance")
 
 
 @pytest.mark.asyncio
-async def test_async_product_table_raises_when_all_exchanges_fail(
+async def test_async_manager_fetch_uses_rust_and_wraps_errors(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    async def broken() -> pl.DataFrame:
-        raise RuntimeError("exchange unavailable")
+    calls: list[str | None] = []
 
-    monkeypatch.setattr(async_manager, "VALID_EXCHANGES", [broken])
+    async def fetch_product_table_async(
+        exchange_name: str | None = None,
+    ) -> list[dict[str, str]]:
+        calls.append(exchange_name)
+        return [_ROWS[0]]
 
-    with pytest.raises(ProductTableError, match="Failed to fetch"):
-        await AsyncProductTableManager()._fetch_product_tables()
+    monkeypatch.setattr(
+        async_manager._native,
+        "fetch_product_table_async",
+        fetch_product_table_async,
+    )
+    result = await AsyncProductTableManager()._fetch_product_tables("binance")
+
+    assert result.to_dicts() == [_ROWS[0]]
+    assert calls == ["binance"]
+
+    async def fail_fetch(exchange_name: str | None = None) -> list[dict[str, str]]:
+        raise RuntimeError(f"failed: {exchange_name}")
+
+    monkeypatch.setattr(
+        async_manager._native,
+        "fetch_product_table_async",
+        fail_fetch,
+    )
+    with pytest.raises(ProductTableError, match="failed: binance"):
+        await AsyncProductTableManager()._fetch_product_tables("binance")
 
 
 @pytest.mark.asyncio
 async def test_async_product_table_propagates_exchange_cancellation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    async def cancelled() -> pl.DataFrame:
+    async def cancelled(exchange_name: str | None = None) -> list[dict[str, str]]:
         raise asyncio.CancelledError
 
-    monkeypatch.setattr(async_manager, "VALID_EXCHANGES", [cancelled])
+    monkeypatch.setattr(
+        async_manager._native,
+        "fetch_product_table_async",
+        cancelled,
+    )
 
     with pytest.raises(asyncio.CancelledError):
         await AsyncProductTableManager()._fetch_product_tables()

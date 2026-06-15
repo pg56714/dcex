@@ -1,11 +1,11 @@
 """Helper functions for logging configuration and timestamp generation."""
 
 import os
-import time
 from collections.abc import Callable
-from datetime import UTC, datetime
 from logging.handlers import TimedRotatingFileHandler
 from typing import Any, Protocol, overload
+
+from .. import _native
 
 
 class LoggingModuleProtocol(Protocol):
@@ -34,9 +34,7 @@ def generate_timestamp(iso_format: bool = False) -> int | str:
     Returns:
         int | str: Timestamp in milliseconds or ISO format
     """
-    if iso_format:
-        return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
-    return int(time.time() * 10**3)
+    return _native.generate_timestamp_iso() if iso_format else _native.generate_timestamp_ms()
 
 
 def config_logging(
@@ -56,6 +54,8 @@ def config_logging(
     """
 
     # Set UTC time format
+    import time
+
     logging_module.Formatter.converter = time.gmtime
 
     # Define log format

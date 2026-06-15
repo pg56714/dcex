@@ -20,43 +20,20 @@ Design notes:
 
 from enum import Enum
 
+from . import _native
 from .registry import EXCHANGES
 
 # Exchanges that take a boolean side flag or signed order payload instead of a side string.
 _BOOL_SIDE_EXCHANGES = frozenset({"hyperliquid", "lighter"})
 
-# value -> {exchange: native side string}. Module-level constant.
+# Compatibility view of the Rust mapping for callers that imported this private constant.
 _ORDER_SIDE_MAP: dict[str, dict[str, str]] = {
-    "BUY": {
-        "aster": "BUY",
-        "backpack": "Bid",
-        "binance": "BUY",
-        "bybit": "Buy",
-        "okx": "buy",
-        "bitget": "buy",
-        "bitmart": "buy",
-        "bitmex": "Buy",
-        "gateio": "buy",
-        "bingx": "BUY",
-        "kucoin": "buy",
-        "kraken": "buy",
-        "mexc": "BUY",
-    },
-    "SELL": {
-        "aster": "SELL",
-        "backpack": "Ask",
-        "binance": "SELL",
-        "bybit": "Sell",
-        "okx": "sell",
-        "bitget": "sell",
-        "bitmart": "sell",
-        "bitmex": "Sell",
-        "gateio": "sell",
-        "bingx": "SELL",
-        "kucoin": "sell",
-        "kraken": "sell",
-        "mexc": "SELL",
-    },
+    side: {
+        exchange: _native.order_side_to_exchange(side, exchange)
+        for exchange in EXCHANGES
+        if exchange not in _BOOL_SIDE_EXCHANGES
+    }
+    for side in ("BUY", "SELL")
 }
 
 
@@ -69,16 +46,11 @@ class OrderSide(str, Enum):
     @classmethod
     def from_any(cls, value: str) -> "OrderSide":
         """Parse a loose buy/sell string (case-insensitive) into an OrderSide."""
-        normalized = value.strip().lower()
-        if normalized == "buy":
-            return cls.BUY
-        if normalized == "sell":
-            return cls.SELL
-        raise ValueError(f"Unknown order side: {value!r}")
+        return cls(_native.order_side_parse(value))
 
     def is_buy(self) -> bool:
         """Return True for BUY. Useful for exchanges that take a boolean flag."""
-        return self is OrderSide.BUY
+        return _native.order_side_is_buy(self.value)
 
     def to_exchange(self, exchange: str) -> str:
         """
@@ -94,15 +66,7 @@ class OrderSide(str, Enum):
             ValueError: If the exchange uses a boolean flag (use :meth:`is_buy`)
                 or has no mapping.
         """
-        key = exchange.lower()
-        if key in _BOOL_SIDE_EXCHANGES:
-            raise ValueError(
-                f"{exchange} expresses side as a boolean; use OrderSide.is_buy() instead"
-            )
-        try:
-            return _ORDER_SIDE_MAP[self.name][key]
-        except KeyError as exc:
-            raise ValueError(f"No OrderSide mapping for exchange: {exchange!r}") from exc
+        return _native.order_side_to_exchange(self.value, exchange)
 
 
 def _exchanges_needing_string_side() -> set[str]:

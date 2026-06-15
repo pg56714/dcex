@@ -1,5 +1,7 @@
 """Utility functions for Ethereum address handling."""
 
+from .. import _native
+
 
 def address_to_bytes(address: str) -> bytes:
     """
@@ -11,4 +13,4 @@ def address_to_bytes(address: str) -> bytes:
     Returns:
         bytes: The address as bytes
     """
-    return bytes.fromhex(address[2:] if address.startswith("0x") else address)
+    return _native.address_to_bytes(address)

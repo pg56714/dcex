@@ -5,10 +5,9 @@ This module provides the ProductTableManager class for managing exchange product
 mapping tables and standardized product information across different exchanges.
 """
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
 import polars as pl
 
+from .. import _native
 from ..registry import SYNC_EXCHANGES
 from . import fetch
 from ._query import ProductTableError, ProductTableQueryMixin
@@ -40,8 +39,8 @@ class ProductTableManager(ProductTableQueryMixin):
         - min_size: The minimum order size allowed on the exchange.
         - min_notional: The minimum notional value required for an order.
 
-    The pure query/index methods live in :class:`ProductTableQueryMixin`; this
-    class only adds the synchronous fetch/initialise layer.
+    Fetching, normalization, indexing, and querying are implemented by the Rust
+    core. This class preserves the synchronous Python API and Polars output.
     """
 
     _instance = {}
@@ -77,32 +76,15 @@ class ProductTableManager(ProductTableQueryMixin):
 
     def _fetch_product_tables(self, exchange_name: str | None = None) -> pl.DataFrame:
         """
-        Fetch product tables from all valid exchanges and combine them into a single DataFrame.
+        Fetch product tables through the Rust core.
         """
-        functions = (
-            list(VALID_EXCHANGES)
-            if exchange_name is None
-            else [func for func in VALID_EXCHANGES if func.__name__ == exchange_name]
-        )
-
-        tables: list[pl.DataFrame] = []
-        # Use threads to parallelize synchronous HTTP calls
-        with ThreadPoolExecutor(max_workers=min(8, max(1, len(functions)))) as executor:
-            future_to_name = {executor.submit(func): func.__name__ for func in functions}
-            for future in as_completed(future_to_name):
-                try:
-                    table = future.result()
-                    if isinstance(table, pl.DataFrame):
-                        tables.append(table)
-                except Exception as exc:
-                    # Skip failed exchanges; align with async version behavior
-                    _ = exc  # avoid unused var warning
-                    continue
-
-        if not tables:
+        try:
+            rows = _native.fetch_product_table(exchange_name)
+        except (RuntimeError, ValueError) as exc:
+            raise ProductTableError(str(exc)) from exc
+        if not rows:
             raise ProductTableError("Failed to fetch product tables from any exchange")
-
-        return pl.concat(tables, how="vertical")
+        return pl.DataFrame(rows)
 
     def refresh(self, exchange_name: str | None = None) -> None:
         """

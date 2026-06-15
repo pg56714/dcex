@@ -21,6 +21,27 @@ async fn main() -> dcex::Result<()> {
 }
 ```
 
+## Product Table
+
+Canonical product symbols and exchange-specific symbols are resolved by the
+Rust product table:
+
+```rust
+use std::time::Duration;
+
+use dcex::exchange::Exchange;
+use dcex::product_table::ProductTable;
+
+#[tokio::main]
+async fn main() -> dcex::Result<()> {
+    let table =
+        ProductTable::fetch(Some(Exchange::Binance), Duration::from_secs(10)).await?;
+    let symbol = table.get_exchange_symbol("binance", "BTC-USDT-SWAP")?;
+    println!("{symbol}");
+    Ok(())
+}
+```
+
 ## Benchmark
 
 Run the live public HTTP benchmark from the workspace root:

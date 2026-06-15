@@ -1,9 +1,11 @@
+pub mod common;
 pub mod crypto;
 pub mod ethereum;
 pub mod exchange;
 pub mod exchanges;
 pub mod http;
 pub mod lighter;
+pub mod product_table;
 
 use std::fmt::{Display, Formatter};
 

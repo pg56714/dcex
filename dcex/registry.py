@@ -11,23 +11,11 @@ package). ``sync``/``async`` reflect whether a corresponding fetcher exists in
 ``dcex.product_table.fetch`` / ``dcex.async_support.product_table.fetch``.
 """
 
+from . import _native
+
 # Insertion order is preserved and used as the fetch order; keep it alphabetical.
 EXCHANGES: dict[str, dict[str, bool]] = {
-    "aster": {"sync": True, "async": True},
-    "backpack": {"sync": True, "async": True},
-    "binance": {"sync": True, "async": True},
-    "bingx": {"sync": True, "async": True},
-    "bitget": {"sync": True, "async": True},
-    "bitmart": {"sync": True, "async": True},
-    "bitmex": {"sync": True, "async": True},
-    "bybit": {"sync": True, "async": True},
-    "gateio": {"sync": True, "async": True},
-    "hyperliquid": {"sync": True, "async": True},
-    "kucoin": {"sync": True, "async": True},
-    "kraken": {"sync": True, "async": True},
-    "lighter": {"sync": True, "async": True},
-    "mexc": {"sync": True, "async": True},
-    "okx": {"sync": True, "async": True},
+    name: {"sync": True, "async": True} for name in _native.exchange_names()
 }
 
 #: Exchange names with a synchronous product-table fetcher.

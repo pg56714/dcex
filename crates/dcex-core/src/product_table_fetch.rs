@@ -1,0 +1,1346 @@
+use std::collections::{BTreeMap, HashMap};
+use std::time::Duration;
+
+use serde_json::Value;
+use tokio::task::JoinSet;
+
+use crate::common::reverse_decimal_places;
+use crate::exchange::{Exchange, ValidatedResponse};
+use crate::exchanges::aster::AsterClient;
+use crate::exchanges::backpack::BackpackClient;
+use crate::exchanges::binance::BinanceClient;
+use crate::exchanges::bingx::BingxClient;
+use crate::exchanges::bitget::BitgetClient;
+use crate::exchanges::bitmart::BitmartClient;
+use crate::exchanges::bitmex::BitmexClient;
+use crate::exchanges::bybit::BybitClient;
+use crate::exchanges::gateio::GateioClient;
+use crate::exchanges::hyperliquid::HyperliquidClient;
+use crate::exchanges::kraken::KrakenClient;
+use crate::exchanges::kucoin::KucoinClient;
+use crate::exchanges::lighter::LighterClient;
+use crate::exchanges::mexc::MexcClient;
+use crate::exchanges::okx::OkxClient;
+use crate::product_table::MarketInfo;
+use crate::{DcexError, Result};
+
+pub(crate) async fn fetch_product_rows(
+    exchange: Option<Exchange>,
+    timeout: Duration,
+) -> Result<Vec<MarketInfo>> {
+    if let Some(exchange) = exchange {
+        return fetch_exchange_rows(exchange, timeout).await;
+    }
+
+    let mut tasks = JoinSet::new();
+    for exchange in Exchange::ALL {
+        tasks.spawn(async move { fetch_exchange_rows(exchange, timeout).await });
+    }
+
+    let mut rows = Vec::new();
+    while let Some(result) = tasks.join_next().await {
+        if let Ok(Ok(mut exchange_rows)) = result {
+            rows.append(&mut exchange_rows);
+        }
+    }
+    if rows.is_empty() {
+        Err(DcexError::Runtime(
+            "Failed to fetch product tables from any exchange".to_string(),
+        ))
+    } else {
+        Ok(rows)
+    }
+}
+
+async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Vec<MarketInfo>> {
+    match exchange {
+        Exchange::Aster => fetch_aster(timeout).await,
+        Exchange::Backpack => fetch_backpack(timeout).await,
+        Exchange::Binance => fetch_binance(timeout).await,
+        Exchange::BingX => fetch_bingx(timeout).await,
+        Exchange::Bitget => fetch_bitget(timeout).await,
+        Exchange::BitMart => fetch_bitmart(timeout).await,
+        Exchange::BitMEX => fetch_bitmex(timeout).await,
+        Exchange::Bybit => fetch_bybit(timeout).await,
+        Exchange::GateIo => fetch_gateio(timeout).await,
+        Exchange::Hyperliquid => fetch_hyperliquid(timeout).await,
+        Exchange::KuCoin => fetch_kucoin(timeout).await,
+        Exchange::Kraken => fetch_kraken(timeout).await,
+        Exchange::Lighter => fetch_lighter(timeout).await,
+        Exchange::Mexc => fetch_mexc(timeout).await,
+        Exchange::Okx => fetch_okx(timeout).await,
+    }
+}
+
+async fn fetch_aster(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = AsterClient::new(None, None, None, timeout)?;
+    let spot = client
+        .public_request("get_spot_exchange_info", vec![])
+        .await?;
+    let futures = client
+        .public_request("get_futures_exchange_info", vec![])
+        .await?;
+    let mut rows = Vec::new();
+    for market in response_array(&spot, &["symbols"]) {
+        if value_string(market, "status", "") == "TRADING" {
+            rows.push(aster_market_info(market, "spot")?);
+        }
+    }
+    for market in response_array(&futures, &["symbols"]) {
+        if value_string(market, "status", "") != "TRADING" {
+            continue;
+        }
+        let product_type = if value_string(market, "contractType", "") == "PERPETUAL" {
+            "swap"
+        } else {
+            "futures"
+        };
+        rows.push(aster_market_info(market, product_type)?);
+    }
+    Ok(rows)
+}
+
+fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
+    let symbol = required_string(market, "symbol")?;
+    let base = required_string(market, "baseAsset")?;
+    let quote = required_string(market, "quoteAsset")?;
+    let filters = value_array(market.get("filters"));
+    let price = find_filter(filters, &["PRICE_FILTER"]);
+    let lot = find_filter(filters, &["LOT_SIZE"]);
+    let notional = find_filter(filters, &["MIN_NOTIONAL", "NOTIONAL"]);
+    Ok(MarketInfo {
+        exchange: "aster".to_string(),
+        exchange_symbol: symbol,
+        product_symbol: if product_type == "spot" {
+            format!("{base}-{quote}-SPOT")
+        } else {
+            format!("{base}-{quote}-SWAP")
+        },
+        product_type: product_type.to_string(),
+        exchange_type: if product_type == "spot" {
+            "spot".to_string()
+        } else {
+            value_string(market, "contractType", "PERPETUAL")
+        },
+        price_precision: value_string(price, "tickSize", "0"),
+        size_precision: value_string(lot, "stepSize", "0"),
+        min_size: value_string(lot, "minQty", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: first_non_empty(
+            value_string(notional, "minNotional", ""),
+            value_string(notional, "notional", "0"),
+        ),
+        size_per_contract: "1".to_string(),
+    })
+}
+
+async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = BackpackClient::new(None, None, 5_000, timeout)?;
+    let response = client.public_request("/api/v1/markets", vec![]).await?;
+    let mut rows = Vec::new();
+    for market in value_array(Some(&response.data)) {
+        if market.get("visible").and_then(Value::as_bool) == Some(false)
+            || value_string(market, "orderBookState", "").to_ascii_lowercase() != "open"
+        {
+            continue;
+        }
+        let market_type = value_string(market, "marketType", "").to_ascii_uppercase();
+        if !matches!(market_type.as_str(), "SPOT" | "PERP" | "IPERP" | "DATED") {
+            continue;
+        }
+        let symbol = required_string(market, "symbol")?;
+        let base = non_empty_string(market, "baseSymbol")
+            .unwrap_or_else(|| symbol.split('_').next().unwrap_or(&symbol).to_string());
+        let quote = non_empty_string(market, "quoteSymbol").unwrap_or_else(|| "USDC".to_string());
+        let product_type = match market_type.as_str() {
+            "SPOT" => "spot",
+            "PERP" | "IPERP" => "swap",
+            "DATED" => "futures",
+            _ => unreachable!(),
+        };
+        let filters = market.get("filters").and_then(Value::as_object);
+        let price = filters
+            .and_then(|filters| filters.get("price"))
+            .unwrap_or(&Value::Null);
+        let quantity = filters
+            .and_then(|filters| filters.get("quantity"))
+            .unwrap_or(&Value::Null);
+        rows.push(MarketInfo {
+            exchange: "backpack".to_string(),
+            exchange_symbol: symbol,
+            product_symbol: if product_type == "swap" {
+                format!("{base}-{quote}-SWAP")
+            } else {
+                format!("{base}-{quote}-{}", product_type.to_ascii_uppercase())
+            },
+            product_type: product_type.to_string(),
+            exchange_type: market_type,
+            price_precision: value_string(price, "tickSize", "0"),
+            size_precision: value_string(quantity, "stepSize", "0"),
+            min_size: value_string(quantity, "minQuantity", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = BinanceClient::new(None, None, timeout)?;
+    let spot = client
+        .public_request("get_spot_exchange_info", vec![])
+        .await?;
+    let futures = client
+        .public_request("get_futures_exchange_info", vec![])
+        .await?;
+    let mut rows = Vec::new();
+    for market in response_array(&spot, &["symbols"]) {
+        let base = required_string(market, "baseAsset")?;
+        let quote = required_string(market, "quoteAsset")?;
+        let filters = value_array(market.get("filters"));
+        let price = find_filter(filters, &["PRICE_FILTER"]);
+        let lot = find_filter(filters, &["LOT_SIZE"]);
+        let notional = find_filter(filters, &["NOTIONAL"]);
+        rows.push(MarketInfo {
+            exchange: "binance".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: value_string(price, "tickSize", "0"),
+            size_precision: value_string(lot, "stepSize", "0"),
+            min_size: value_string(lot, "minQty", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: python_float_string(&value_string(notional, "minNotional", "0")),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    for market in response_array(&futures, &["symbols"]) {
+        let base = required_string(market, "baseAsset")?;
+        let quote = required_string(market, "quoteAsset")?;
+        let symbol = required_string(market, "symbol")?;
+        let product_symbol = binance_product_symbol(&base, &quote, &symbol, false);
+        let filters = value_array(market.get("filters"));
+        let price = find_filter(filters, &["PRICE_FILTER"]);
+        let lot = find_filter(filters, &["LOT_SIZE"]);
+        let notional = find_filter(filters, &["MIN_NOTIONAL"]);
+        rows.push(MarketInfo {
+            exchange: "binance".to_string(),
+            exchange_symbol: symbol,
+            product_symbol,
+            product_type: "swap".to_string(),
+            exchange_type: value_string(market, "contractType", ""),
+            price_precision: value_string(price, "tickSize", "0"),
+            size_precision: value_string(lot, "stepSize", "0"),
+            min_size: value_string(lot, "minQty", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(notional, "notional", "0"),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = BingxClient::new(None, None, timeout)?;
+    let swap = client
+        .public_request("get_swap_instrument_info", vec![])
+        .await?;
+    let spot = client
+        .public_request("get_spot_instrument_info", vec![])
+        .await?;
+    let mut rows = Vec::new();
+    for market in response_array(&swap, &["data"]) {
+        let symbol = required_string(market, "symbol")?;
+        let (base, quote) = split_last(&symbol, '-')?;
+        let price_places = value_i32(market, "pricePrecision", 0);
+        let quantity_places = value_i32(market, "quantityPrecision", 0);
+        rows.push(MarketInfo {
+            exchange: "bingx".to_string(),
+            exchange_symbol: symbol,
+            product_symbol: format!("{base}-{quote}-SWAP"),
+            product_type: "swap".to_string(),
+            exchange_type: "perpetual".to_string(),
+            price_precision: decimal_precision_or_zero(price_places),
+            size_precision: decimal_precision_or_zero(quantity_places),
+            min_size: decimal_precision_or_zero(quantity_places),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(market, "tradeMinUSDT", "0"),
+            size_per_contract: value_string(market, "size", "1"),
+        });
+    }
+    let spot_data = spot.data.get("data").unwrap_or(&Value::Null);
+    let spot_symbols = spot_data.get("symbols").unwrap_or(spot_data);
+    for market in value_array(Some(spot_symbols)) {
+        let symbol = required_string(market, "symbol")?;
+        let (base, quote) = split_last(&symbol, '-')?;
+        rows.push(MarketInfo {
+            exchange: "bingx".to_string(),
+            exchange_symbol: symbol,
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: value_string(market, "tickSize", "0"),
+            size_precision: value_string(market, "stepSize", "0"),
+            min_size: value_string(market, "minQty", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(market, "minNotional", "0"),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = BitgetClient::new(None, None, None, timeout)?;
+    let spot = client.public_request("get_spot_symbols", vec![]).await?;
+    let futures = client
+        .public_request(
+            "get_futures_contracts",
+            vec![("productType".to_string(), "USDT-FUTURES".to_string())],
+        )
+        .await?;
+    let mut rows = Vec::new();
+    for market in response_array(&spot, &["data"]) {
+        let status = value_string(market, "status", "").to_ascii_lowercase();
+        if !status.is_empty() && status != "online" {
+            continue;
+        }
+        let base = required_string(market, "baseCoin")?;
+        let quote = required_string(market, "quoteCoin")?;
+        rows.push(MarketInfo {
+            exchange: "bitget".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: decimal_precision(value_i32(market, "pricePrecision", 0)),
+            size_precision: decimal_precision(value_i32(market, "quantityPrecision", 0)),
+            min_size: value_string(market, "minTradeAmount", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(market, "minTradeUSDT", "0"),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    for market in response_array(&futures, &["data"]) {
+        let status = first_non_empty(
+            value_string(market, "symbolStatus", ""),
+            value_string(market, "status", ""),
+        )
+        .to_ascii_lowercase();
+        if !status.is_empty() && !matches!(status.as_str(), "normal" | "online") {
+            continue;
+        }
+        let base = required_string(market, "baseCoin")?;
+        let quote = required_string(market, "quoteCoin")?;
+        rows.push(MarketInfo {
+            exchange: "bitget".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SWAP"),
+            product_type: "swap".to_string(),
+            exchange_type: value_string(market, "symbolType", "USDT-FUTURES"),
+            price_precision: decimal_precision(value_i32(market, "pricePlace", 0)),
+            size_precision: decimal_precision(value_i32(market, "volumePlace", 0)),
+            min_size: value_string(market, "minTradeNum", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(market, "minTradeUSDT", "0"),
+            size_per_contract: value_string(market, "sizeMultiplier", "1"),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_bitmart(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = BitmartClient::new(None, None, None, timeout)?;
+    let swap = client
+        .public_request("get_contracts_details", vec![])
+        .await?;
+    let spot = client
+        .public_request("get_trading_pairs_details", vec![])
+        .await?;
+    let mut rows = Vec::new();
+    for market in response_array(&swap, &["data", "symbols"]) {
+        let base = required_string(market, "base_currency")?;
+        let quote = required_string(market, "quote_currency")?;
+        rows.push(MarketInfo {
+            exchange: "bitmart".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SWAP"),
+            product_type: "swap".to_string(),
+            exchange_type: "swap".to_string(),
+            price_precision: value_string(market, "price_precision", "0"),
+            size_precision: value_string(market, "vol_precision", "0"),
+            min_size: value_string(market, "min_volume", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: value_string(market, "contract_size", "1"),
+        });
+    }
+    for market in response_array(&spot, &["data", "symbols"]) {
+        let base = required_string(market, "base_currency")?;
+        let quote = required_string(market, "quote_currency")?;
+        rows.push(MarketInfo {
+            exchange: "bitmart".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: decimal_precision(value_i32(market, "price_max_precision", 0)),
+            size_precision: value_string(market, "quote_increment", "0"),
+            min_size: value_string(market, "base_min_size", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(market, "min_buy_amount", "0"),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_bitmex(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = BitmexClient::new(None, None, timeout)?;
+    let response = client
+        .public_request(
+            "get_instrument_info",
+            vec![
+                (
+                    "filter".to_string(),
+                    r#"{"typ":["FFWCSX","FFCCSX","IFXXXP"]}"#.to_string(),
+                ),
+                ("count".to_string(), "500".to_string()),
+            ],
+        )
+        .await?;
+    let mut rows = Vec::new();
+    for market in value_array(Some(&response.data)) {
+        let typ = value_string(market, "typ", "");
+        let product_type = match typ.as_str() {
+            "FFWCSX" => "swap",
+            "FFCCSX" => "futures",
+            "IFXXXP" => "spot",
+            _ => continue,
+        };
+        let symbol = required_string(market, "symbol")?;
+        let base = value_string(market, "underlying", "");
+        let quote = required_string(market, "quoteCurrency")?;
+        let product_symbol = bitmex_product_symbol(&typ, &symbol, &base, &quote);
+        rows.push(MarketInfo {
+            exchange: "bitmex".to_string(),
+            exchange_symbol: symbol,
+            product_symbol,
+            product_type: product_type.to_string(),
+            exchange_type: typ,
+            price_precision: value_string(market, "tickSize", "0"),
+            size_precision: value_string(market, "lotSize", "0"),
+            min_size: value_string(market, "lotSize", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: value_string(market, "multiplier", "1"),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = BybitClient::new(None, None, 5_000, false, timeout)?;
+    let mut rows = Vec::new();
+    for category in ["linear", "inverse", "spot"] {
+        let markets = bybit_instruments(&client, category).await?;
+        for market in markets {
+            let mut base = required_string(&market, "baseCoin")?;
+            let quote = required_string(&market, "quoteCoin")?;
+            let symbol = required_string(&market, "symbol")?;
+            let parts = symbol.split('-').collect::<Vec<_>>();
+            let product_symbol = bybit_product_symbol(category, &mut base, &quote, &symbol, &parts);
+            let product_type = if category == "spot" {
+                "spot"
+            } else if value_string(&market, "contractType", "") == "LinearFutures" {
+                "futures"
+            } else {
+                "swap"
+            };
+            let price = market.get("priceFilter").unwrap_or(&Value::Null);
+            let lot = market.get("lotSizeFilter").unwrap_or(&Value::Null);
+            rows.push(MarketInfo {
+                exchange: "bybit".to_string(),
+                exchange_symbol: symbol,
+                product_symbol,
+                product_type: product_type.to_string(),
+                exchange_type: category.to_string(),
+                price_precision: value_string(price, "tickSize", "0"),
+                size_precision: value_string(
+                    lot,
+                    if category == "spot" {
+                        "basePrecision"
+                    } else {
+                        "qtyStep"
+                    },
+                    "0",
+                ),
+                min_size: value_string(lot, "minOrderQty", "0"),
+                base_currency: base,
+                quote_currency: quote,
+                min_notional: if category == "inverse" {
+                    "0".to_string()
+                } else {
+                    value_string(lot, "minNotionalValue", "0")
+                },
+                size_per_contract: "1".to_string(),
+            });
+        }
+    }
+    Ok(rows)
+}
+
+async fn bybit_instruments(client: &BybitClient, category: &str) -> Result<Vec<Value>> {
+    let mut rows = Vec::new();
+    let mut cursor: Option<String> = None;
+    loop {
+        let mut params = vec![("category".to_string(), category.to_string())];
+        if let Some(cursor) = cursor.as_ref() {
+            params.push(("cursor".to_string(), cursor.clone()));
+        }
+        let response = client
+            .public_request("get_instruments_info", params)
+            .await?;
+        let result = response.data.get("result").unwrap_or(&Value::Null);
+        rows.extend(value_array(result.get("list")).iter().cloned());
+        let next = value_string(result, "nextPageCursor", "");
+        if next.is_empty() {
+            break;
+        }
+        cursor = Some(next);
+    }
+    Ok(rows)
+}
+
+async fn fetch_gateio(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = GateioClient::new(None, None, timeout)?;
+    let futures = client
+        .public_request("get_all_futures_contracts", vec![])
+        .await?;
+    let delivery = client
+        .public_request("get_all_delivery_contracts", vec![])
+        .await?;
+    let spot = client
+        .public_request("get_spot_all_currency_pairs", vec![])
+        .await?;
+    let mut rows = Vec::new();
+    rows.extend(parse_gateio_contracts(&futures.data, "swap", "futures")?);
+    rows.extend(parse_gateio_contracts(
+        &delivery.data,
+        "futures",
+        "delivery",
+    )?);
+    for market in value_array(Some(&spot.data)) {
+        let base = required_string(market, "base")?;
+        let quote = required_string(market, "quote")?;
+        rows.push(MarketInfo {
+            exchange: "gateio".to_string(),
+            exchange_symbol: required_string(market, "id")?,
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: decimal_precision(value_i32(market, "precision", 0)),
+            size_precision: decimal_precision(value_i32(market, "amount_precision", 0)),
+            min_size: value_string(market, "min_base_amount", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(market, "min_quote_amount", "0"),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    Ok(rows)
+}
+
+fn parse_gateio_contracts(
+    data: &Value,
+    product_type: &str,
+    exchange_type: &str,
+) -> Result<Vec<MarketInfo>> {
+    let mut rows = Vec::new();
+    for market in value_array(Some(data)) {
+        let symbol = required_string(market, "name")?;
+        let parts = symbol.split('_').collect::<Vec<_>>();
+        if parts.len() < 2 || parts.len() > 3 {
+            continue;
+        }
+        let base = parts[0].to_string();
+        let quote = parts[1].to_string();
+        let product_symbol = if let Some(expiry) = parts.get(2) {
+            format!("{base}-{quote}-{expiry}-SWAP")
+        } else {
+            format!("{base}-{quote}-SWAP")
+        };
+        rows.push(MarketInfo {
+            exchange: "gateio".to_string(),
+            exchange_symbol: symbol,
+            product_symbol,
+            product_type: product_type.to_string(),
+            exchange_type: exchange_type.to_string(),
+            price_precision: value_string(market, "order_price_round", "0"),
+            size_precision: value_string(market, "order_size_min", "0"),
+            min_size: value_string(market, "order_size_min", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: value_string(market, "quanto_multiplier", "1"),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = HyperliquidClient::new(false, None, None, timeout)?;
+    let perpetual = client
+        .public_request(br#"{"type":"meta"}"#.to_vec())
+        .await?;
+    let spot = client
+        .public_request(br#"{"type":"spotMeta"}"#.to_vec())
+        .await?;
+    let mut rows = Vec::new();
+    for (index, market) in response_array(&perpetual, &["universe"]).iter().enumerate() {
+        let coin = required_string(market, "name")?;
+        let precision = decimal_precision(value_i32(market, "szDecimals", 0));
+        rows.push(MarketInfo {
+            exchange: "hyperliquid".to_string(),
+            exchange_symbol: format!("[\"{coin}\", {index}]"),
+            product_symbol: format!("{coin}-USD-SWAP"),
+            product_type: "swap".to_string(),
+            exchange_type: "perpetual".to_string(),
+            price_precision: precision.clone(),
+            size_precision: precision.clone(),
+            min_size: precision,
+            base_currency: coin,
+            quote_currency: "USD".to_string(),
+            min_notional: "0".to_string(),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    let mut tokens = HashMap::new();
+    for token in response_array(&spot, &["tokens"]) {
+        if let Some(index) = token.get("index").and_then(Value::as_i64) {
+            tokens.insert(index, token);
+        }
+    }
+    for (index, market) in response_array(&spot, &["universe"]).iter().enumerate() {
+        let token_indexes = value_array(market.get("tokens"));
+        if token_indexes.len() < 2 {
+            continue;
+        }
+        let Some(base_token) = token_indexes[0]
+            .as_i64()
+            .and_then(|value| tokens.get(&value))
+        else {
+            continue;
+        };
+        let Some(quote_token) = token_indexes[1]
+            .as_i64()
+            .and_then(|value| tokens.get(&value))
+        else {
+            continue;
+        };
+        let base = required_string(base_token, "name")?;
+        let quote = required_string(quote_token, "name")?;
+        let precision = decimal_precision(value_i32(base_token, "szDecimals", 0));
+        let asset_index = market
+            .get("index")
+            .and_then(Value::as_u64)
+            .unwrap_or(index as u64);
+        rows.push(MarketInfo {
+            exchange: "hyperliquid".to_string(),
+            exchange_symbol: format!(
+                "[\"{}\", {}]",
+                required_string(market, "name")?,
+                10_000 + asset_index
+            ),
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: precision.clone(),
+            size_precision: precision.clone(),
+            min_size: precision,
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_kucoin(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = KucoinClient::new(None, None, None, timeout)?;
+    let spot = client
+        .public_request("get_spot_instrument_info", vec![])
+        .await?;
+    let futures = client
+        .public_request("get_futures_contracts", vec![])
+        .await?;
+    let mut rows = Vec::new();
+    for market in response_array(&spot, &["data"]) {
+        let base = required_string(market, "baseCurrency")?;
+        let quote = required_string(market, "quoteCurrency")?;
+        rows.push(MarketInfo {
+            exchange: "kucoin".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: value_string(market, "priceIncrement", "0"),
+            size_precision: value_string(market, "baseIncrement", "0"),
+            min_size: value_string(market, "baseMinSize", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: non_empty_string(market, "minFunds").unwrap_or_else(|| "0".to_string()),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    for market in response_array(&futures, &["data"]) {
+        let base = normalize_kucoin_currency(&required_string(market, "baseCurrency")?);
+        let quote = required_string(market, "quoteCurrency")?;
+        rows.push(MarketInfo {
+            exchange: "kucoin".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SWAP"),
+            product_type: "swap".to_string(),
+            exchange_type: value_string(market, "type", ""),
+            price_precision: value_string(market, "tickSize", "0"),
+            size_precision: value_string(market, "lotSize", "0"),
+            min_size: value_string(market, "lotSize", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: value_string(market, "multiplier", "1"),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = KrakenClient::new(None, None, None, None, timeout)?;
+    let spot = client
+        .public_request("get_spot_asset_pairs", vec![])
+        .await?;
+    let futures = client
+        .public_request(
+            "get_futures_instruments",
+            vec![
+                ("contractType".to_string(), "futures_inverse".to_string()),
+                ("contractType".to_string(), "futures_vanilla".to_string()),
+                ("contractType".to_string(), "flexible_futures".to_string()),
+            ],
+        )
+        .await?;
+    let mut rows = Vec::new();
+    if let Some(result) = spot.data.get("result").and_then(Value::as_object) {
+        for (symbol, market) in result {
+            let status = value_string(market, "status", "");
+            if !status.is_empty() && status != "online" {
+                continue;
+            }
+            let wsname = value_string(market, "wsname", "");
+            let (base, quote) = if let Some((base, quote)) = wsname.split_once('/') {
+                (
+                    normalize_kraken_currency(base),
+                    normalize_kraken_currency(quote),
+                )
+            } else {
+                (
+                    normalize_kraken_currency(&value_string(market, "base", "")),
+                    normalize_kraken_currency(&value_string(market, "quote", "")),
+                )
+            };
+            rows.push(MarketInfo {
+                exchange: "kraken".to_string(),
+                exchange_symbol: symbol.clone(),
+                product_symbol: format!("{base}-{quote}-SPOT"),
+                product_type: "spot".to_string(),
+                exchange_type: "spot".to_string(),
+                price_precision: market.get("tick_size").map_or_else(
+                    || decimal_precision(value_i32(market, "pair_decimals", 0)),
+                    json_string,
+                ),
+                size_precision: decimal_precision(value_i32(market, "lot_decimals", 0)),
+                min_size: value_string(market, "ordermin", "0"),
+                base_currency: base,
+                quote_currency: quote,
+                min_notional: value_string(market, "costmin", "0"),
+                size_per_contract: "1".to_string(),
+            });
+        }
+    }
+    for market in response_array(&futures, &["instruments"]) {
+        let instrument_type = value_string(market, "type", "");
+        if instrument_type == "options"
+            || market.get("tradeable").and_then(Value::as_bool) != Some(true)
+            || market
+                .get("isExpired")
+                .and_then(Value::as_bool)
+                .unwrap_or(false)
+        {
+            continue;
+        }
+        let symbol = required_string(market, "symbol")?;
+        let base = normalize_kraken_currency(&value_string(market, "base", ""));
+        let quote = normalize_kraken_currency(&value_string(market, "quote", ""));
+        let (product_symbol, product_type) =
+            kraken_futures_product(&symbol, &base, &quote, &instrument_type, market);
+        let precision = kraken_size_precision(market);
+        rows.push(MarketInfo {
+            exchange: "kraken".to_string(),
+            exchange_symbol: symbol,
+            product_symbol,
+            product_type,
+            exchange_type: instrument_type,
+            price_precision: value_string(market, "tickSize", "0"),
+            size_precision: precision.clone(),
+            min_size: precision,
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: value_string(market, "contractSize", "1"),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_lighter(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = LighterClient::new(timeout)?;
+    let response = client
+        .public_request("/api/v1/orderBookDetails", Vec::new(), BTreeMap::new())
+        .await?;
+    let mut rows = Vec::new();
+    for (key, product_type) in [
+        ("order_book_details", "swap"),
+        ("spot_order_book_details", "spot"),
+    ] {
+        for market in response_array(&response, &[key]) {
+            if value_string(market, "status", "").to_ascii_lowercase() != "active" {
+                continue;
+            }
+            rows.push(lighter_market_info(market, product_type)?);
+        }
+    }
+    Ok(rows)
+}
+
+fn lighter_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
+    let symbol = required_string(market, "symbol")?;
+    let (base, quote) = if product_type == "spot" {
+        symbol.split_once('/').map_or_else(
+            || (symbol.clone(), "USDC".to_string()),
+            |(base, quote)| (base.to_string(), quote.to_string()),
+        )
+    } else {
+        (symbol, "USDC".to_string())
+    };
+    Ok(MarketInfo {
+        exchange: "lighter".to_string(),
+        exchange_symbol: value_string(market, "market_id", ""),
+        product_symbol: if product_type == "spot" {
+            format!("{base}-{quote}-SPOT")
+        } else {
+            format!("{base}-{quote}-SWAP")
+        },
+        product_type: product_type.to_string(),
+        exchange_type: non_empty_string(market, "market_type")
+            .unwrap_or_else(|| product_type.to_string()),
+        price_precision: lighter_precision(market, "price_decimals", "supported_price_decimals"),
+        size_precision: lighter_precision(market, "size_decimals", "supported_size_decimals"),
+        min_size: value_string(market, "min_base_amount", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: value_string(market, "min_quote_amount", "0"),
+        size_per_contract: "1".to_string(),
+    })
+}
+
+async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = MexcClient::new(None, None, timeout)?;
+    let spot = client
+        .public_request("get_spot_exchange_info", vec![])
+        .await?;
+    let contracts = client
+        .public_request("get_contract_details", vec![])
+        .await?;
+    let mut rows = Vec::new();
+    for market in response_array(&spot, &["symbols"]) {
+        let status = value_string(market, "status", "");
+        if (!status.is_empty() && !matches!(status.as_str(), "1" | "TRADING"))
+            || market.get("isSpotTradingAllowed").and_then(Value::as_bool) == Some(false)
+        {
+            continue;
+        }
+        let base = required_string(market, "baseAsset")?;
+        let quote = required_string(market, "quoteAsset")?;
+        rows.push(MarketInfo {
+            exchange: "mexc".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SPOT"),
+            product_type: "spot".to_string(),
+            exchange_type: "spot".to_string(),
+            price_precision: decimal_precision(value_i32(market, "quotePrecision", 0)),
+            size_precision: value_string(market, "baseSizePrecision", "0"),
+            min_size: value_string(market, "baseSizePrecision", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: value_string(market, "quoteAmountPrecision", "0"),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    let contract_data = contracts.data.get("data").unwrap_or(&Value::Null);
+    let contract_rows = if contract_data.is_object() {
+        vec![contract_data]
+    } else {
+        value_array(Some(contract_data)).iter().collect()
+    };
+    for market in contract_rows {
+        let state = market.get("state");
+        if state.is_some_and(|value| {
+            !value.is_null() && value.as_i64() != Some(0) && value.as_str() != Some("0")
+        }) || market.get("apiAllowed").and_then(Value::as_bool) == Some(false)
+        {
+            continue;
+        }
+        let base = required_string(market, "baseCoin")?;
+        let quote = required_string(market, "quoteCoin")?;
+        rows.push(MarketInfo {
+            exchange: "mexc".to_string(),
+            exchange_symbol: required_string(market, "symbol")?,
+            product_symbol: format!("{base}-{quote}-SWAP"),
+            product_type: "swap".to_string(),
+            exchange_type: "perpetual".to_string(),
+            price_precision: value_string(market, "priceUnit", "0"),
+            size_precision: value_string(market, "volUnit", "0"),
+            min_size: value_string(market, "minVol", "0"),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: value_string(market, "contractSize", "1"),
+        });
+    }
+    Ok(rows)
+}
+
+async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = OkxClient::new(None, None, None, "0".to_string(), timeout)?;
+    let mut rows = Vec::new();
+    for (instrument_type, product_type) in
+        [("SWAP", "swap"), ("SPOT", "spot"), ("FUTURES", "futures")]
+    {
+        let response = client
+            .public_request(
+                "get_public_instruments",
+                vec![("instType".to_string(), instrument_type.to_string())],
+            )
+            .await?;
+        for market in response_array(&response, &["data"]) {
+            let exchange_symbol = required_string(market, "instId")?;
+            let parts = exchange_symbol.split('-').collect::<Vec<_>>();
+            if parts.len() < 2 {
+                continue;
+            }
+            let base = if product_type == "spot" {
+                required_string(market, "baseCcy")?
+            } else {
+                parts[0].to_string()
+            };
+            let quote = if product_type == "spot" {
+                required_string(market, "quoteCcy")?
+            } else {
+                parts[1].to_string()
+            };
+            rows.push(MarketInfo {
+                exchange: "okx".to_string(),
+                product_symbol: if product_type == "spot" {
+                    format!("{exchange_symbol}-SPOT")
+                } else {
+                    exchange_symbol.clone()
+                },
+                exchange_symbol,
+                product_type: product_type.to_string(),
+                exchange_type: value_string(market, "instType", ""),
+                price_precision: value_string(market, "tickSz", "0"),
+                size_precision: value_string(market, "lotSz", "0"),
+                min_size: value_string(market, "minSz", "0"),
+                base_currency: base,
+                quote_currency: quote,
+                min_notional: "0".to_string(),
+                size_per_contract: if product_type == "swap" {
+                    value_string(market, "ctVal", "1")
+                } else {
+                    "1".to_string()
+                },
+            });
+        }
+    }
+    Ok(rows)
+}
+
+fn response_array<'a>(response: &'a ValidatedResponse, path: &[&str]) -> &'a [Value] {
+    let mut value = &response.data;
+    for key in path {
+        value = value.get(*key).unwrap_or(&Value::Null);
+    }
+    value_array(Some(value))
+}
+
+fn value_array(value: Option<&Value>) -> &[Value] {
+    value.and_then(Value::as_array).map_or(&[], Vec::as_slice)
+}
+
+fn required_string(value: &Value, key: &str) -> Result<String> {
+    value
+        .get(key)
+        .filter(|value| !value.is_null())
+        .map(json_string)
+        .ok_or_else(|| DcexError::Decode(format!("missing product table field: {key}")))
+}
+
+fn non_empty_string(value: &Value, key: &str) -> Option<String> {
+    let value = value.get(key).filter(|value| !value.is_null())?;
+    let value = json_string(value);
+    (!value.is_empty()).then_some(value)
+}
+
+fn value_string(value: &Value, key: &str, default: &str) -> String {
+    value
+        .get(key)
+        .filter(|value| !value.is_null())
+        .map_or_else(|| default.to_string(), json_string)
+}
+
+fn json_string(value: &Value) -> String {
+    match value {
+        Value::String(value) => value.clone(),
+        _ => value.to_string(),
+    }
+}
+
+fn value_i32(value: &Value, key: &str, default: i32) -> i32 {
+    value
+        .get(key)
+        .and_then(|value| {
+            value
+                .as_i64()
+                .and_then(|value| i32::try_from(value).ok())
+                .or_else(|| value.as_str()?.parse().ok())
+        })
+        .unwrap_or(default)
+}
+
+fn find_filter<'a>(filters: &'a [Value], filter_types: &[&str]) -> &'a Value {
+    filters
+        .iter()
+        .find(|value| {
+            value
+                .get("filterType")
+                .and_then(Value::as_str)
+                .is_some_and(|value| filter_types.contains(&value))
+        })
+        .unwrap_or(&Value::Null)
+}
+
+fn split_last(value: &str, separator: char) -> Result<(String, String)> {
+    value
+        .rsplit_once(separator)
+        .map(|(left, right)| (left.to_string(), right.to_string()))
+        .ok_or_else(|| DcexError::Decode(format!("invalid exchange symbol: {value}")))
+}
+
+fn decimal_precision(decimal_places: i32) -> String {
+    match decimal_places {
+        i32::MIN..=-1 => 10_i128
+            .checked_pow(decimal_places.unsigned_abs())
+            .map_or_else(
+                || reverse_decimal_places(decimal_places).to_string(),
+                |value| value.to_string(),
+            ),
+        0 => "1".to_string(),
+        1..=4 => format!(
+            "0.{}1",
+            "0".repeat(usize::try_from(decimal_places - 1).expect("positive precision"))
+        ),
+        _ => format!("1e-{decimal_places:02}"),
+    }
+}
+
+fn decimal_precision_or_zero(decimal_places: i32) -> String {
+    if decimal_places > 0 {
+        decimal_precision(decimal_places)
+    } else {
+        "0".to_string()
+    }
+}
+
+fn python_float_string(value: &str) -> String {
+    value.parse::<f64>().map_or_else(
+        |_| value.to_string(),
+        |value| {
+            if value.fract() == 0.0 {
+                format!("{value:.1}")
+            } else {
+                value.to_string()
+            }
+        },
+    )
+}
+
+fn first_non_empty(first: String, second: String) -> String {
+    if first.is_empty() {
+        second
+    } else {
+        first
+    }
+}
+
+fn binance_product_symbol(base: &str, quote: &str, symbol: &str, spot: bool) -> String {
+    if spot {
+        return format!("{base}-{quote}-SPOT");
+    }
+    symbol.split_once('_').map_or_else(
+        || format!("{base}-{quote}-SWAP"),
+        |(_, expiry)| format!("{base}-{quote}-{expiry}-SWAP"),
+    )
+}
+
+fn bitmex_product_symbol(typ: &str, symbol: &str, base: &str, quote: &str) -> String {
+    match typ {
+        "IFXXXP" => format!("{base}-{quote}-SPOT"),
+        "FFWCSX" => format!("{base}-{quote}-SWAP"),
+        "FFCCSX" => {
+            let pair = format!("{base}{quote}");
+            let expiry = symbol
+                .strip_prefix(&pair)
+                .or_else(|| symbol.strip_prefix(base))
+                .unwrap_or(symbol);
+            format!("{base}-{quote}-{expiry}-SWAP")
+        }
+        _ => symbol.to_string(),
+    }
+}
+
+fn bybit_product_symbol(
+    category: &str,
+    base: &mut String,
+    quote: &str,
+    symbol: &str,
+    parts: &[&str],
+) -> String {
+    if category == "spot" {
+        return format!("{base}-{quote}-SPOT");
+    }
+    if let Some(expiry) = parts.get(1) {
+        if category == "inverse" {
+            *base = parts[0].to_string();
+        }
+        format!("{base}-{quote}-{expiry}-SWAP")
+    } else {
+        let _ = symbol;
+        format!("{base}-{quote}-SWAP")
+    }
+}
+
+fn normalize_kucoin_currency(value: &str) -> String {
+    if value == "XBT" {
+        "BTC".to_string()
+    } else {
+        value.to_string()
+    }
+}
+
+fn normalize_kraken_currency(value: &str) -> String {
+    let alias = match value {
+        "XXBT" | "XBT" => Some("BTC"),
+        "XDG" => Some("DOGE"),
+        "ZUSD" => Some("USD"),
+        "ZEUR" => Some("EUR"),
+        "ZGBP" => Some("GBP"),
+        "ZJPY" => Some("JPY"),
+        "ZCAD" => Some("CAD"),
+        "ZAUD" => Some("AUD"),
+        _ => None,
+    };
+    if let Some(alias) = alias {
+        return alias.to_string();
+    }
+    if value.len() > 3 && (value.starts_with('X') || value.starts_with('Z')) {
+        return normalize_kraken_currency(&value[1..]);
+    }
+    value.to_string()
+}
+
+fn kraken_size_precision(market: &Value) -> String {
+    let precision = value_i32(market, "contractValueTradePrecision", 0);
+    if precision > 0 {
+        decimal_precision(precision)
+    } else {
+        "1".to_string()
+    }
+}
+
+fn kraken_futures_product(
+    symbol: &str,
+    base: &str,
+    quote: &str,
+    instrument_type: &str,
+    market: &Value,
+) -> (String, String) {
+    let parts = symbol.split('_').collect::<Vec<_>>();
+    let inverse = if instrument_type == "futures_inverse" {
+        "-INVERSE"
+    } else {
+        ""
+    };
+    let last_trading_time = market
+        .get("lastTradingTime")
+        .is_some_and(|value| !value.is_null() && value != "" && value != false);
+    if last_trading_time {
+        if let Some(expiry) = parts.get(2).filter(|value| !value.is_empty()) {
+            return (
+                format!("{base}-{quote}-{expiry}{inverse}-SWAP"),
+                "futures".to_string(),
+            );
+        }
+        return (
+            format!("{base}-{quote}{inverse}-SWAP"),
+            "futures".to_string(),
+        );
+    }
+    (format!("{base}-{quote}{inverse}-SWAP"), "swap".to_string())
+}
+
+fn lighter_precision(market: &Value, key: &str, fallback: &str) -> String {
+    let decimals = market
+        .get(key)
+        .or_else(|| market.get(fallback))
+        .and_then(|value| {
+            value
+                .as_i64()
+                .and_then(|value| i32::try_from(value).ok())
+                .or_else(|| value.as_str()?.parse().ok())
+        })
+        .unwrap_or(0);
+    decimal_precision(decimals)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn normalizes_exchange_specific_currency_aliases() {
+        assert_eq!(normalize_kucoin_currency("XBT"), "BTC");
+        assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
+        assert_eq!(normalize_kraken_currency("ZUSD"), "USD");
+    }
+
+    #[test]
+    fn preserves_python_precision_formatting() {
+        assert_eq!(decimal_precision(3), "0.001");
+        assert_eq!(decimal_precision(5), "1e-05");
+        assert_eq!(decimal_precision(8), "1e-08");
+        assert_eq!(python_float_string("10.00000000"), "10.0");
+    }
+
+    #[test]
+    fn builds_kraken_dated_inverse_product_symbol() {
+        let market = serde_json::json!({"lastTradingTime": "2026-06-01"});
+        assert_eq!(
+            kraken_futures_product("FI_XBTUSD_260601", "BTC", "USD", "futures_inverse", &market,),
+            (
+                "BTC-USD-260601-INVERSE-SWAP".to_string(),
+                "futures".to_string(),
+            )
+        );
+    }
+
+    #[test]
+    fn canonical_symbols_cover_exchange_specific_formats() {
+        assert_eq!(
+            binance_product_symbol("BTC", "USDT", "BTCUSDT", false),
+            "BTC-USDT-SWAP"
+        );
+        assert_eq!(
+            binance_product_symbol("BTC", "USDT", "BTCUSDT_260626", false),
+            "BTC-USDT-260626-SWAP"
+        );
+        assert_eq!(
+            bitmex_product_symbol("FFCCSX", "XBTUSDZ26", "XBT", "USD"),
+            "XBT-USD-Z26-SWAP"
+        );
+
+        let mut inverse_base = "BTC".to_string();
+        assert_eq!(
+            bybit_product_symbol(
+                "inverse",
+                &mut inverse_base,
+                "USD",
+                "BTC-27MAR26",
+                &["BTC", "27MAR26"],
+            ),
+            "BTC-USD-27MAR26-SWAP"
+        );
+        assert_eq!(normalize_kucoin_currency("XBT"), "BTC");
+        assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
+    }
+
+    #[test]
+    fn product_table_indexes_non_text_exchange_symbols() {
+        let table = crate::product_table::ProductTable::new(vec![
+            MarketInfo {
+                exchange: "hyperliquid".to_string(),
+                exchange_symbol: "[\"BTC\", 0]".to_string(),
+                product_symbol: "BTC-USD-SWAP".to_string(),
+                product_type: "swap".to_string(),
+                exchange_type: "perpetual".to_string(),
+                price_precision: "0.001".to_string(),
+                size_precision: "0.001".to_string(),
+                min_size: "0.001".to_string(),
+                base_currency: "BTC".to_string(),
+                quote_currency: "USD".to_string(),
+                min_notional: "0".to_string(),
+                size_per_contract: "1".to_string(),
+            },
+            MarketInfo {
+                exchange: "lighter".to_string(),
+                exchange_symbol: "42".to_string(),
+                product_symbol: "BTC-USDC-SWAP".to_string(),
+                product_type: "swap".to_string(),
+                exchange_type: "swap".to_string(),
+                price_precision: "0.01".to_string(),
+                size_precision: "0.001".to_string(),
+                min_size: "0".to_string(),
+                base_currency: "BTC".to_string(),
+                quote_currency: "USDC".to_string(),
+                min_notional: "0".to_string(),
+                size_per_contract: "1".to_string(),
+            },
+        ]);
+
+        assert_eq!(
+            table
+                .get_exchange_symbol("hyperliquid", "BTC-USD-SWAP")
+                .expect("Hyperliquid asset mapping"),
+            "[\"BTC\", 0]"
+        );
+        assert_eq!(
+            table
+                .get_exchange_symbol("lighter", "BTC-USDC-SWAP")
+                .expect("Lighter market id"),
+            "42"
+        );
+    }
+}

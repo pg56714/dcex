@@ -5,10 +5,9 @@ This module provides the ProductTableManager class for managing standardized
 product information across multiple cryptocurrency exchanges.
 """
 
-import asyncio
-
 import polars as pl
 
+from ... import _native
 from ...product_table._query import ProductTableError, ProductTableQueryMixin
 from ...registry import ASYNC_EXCHANGES
 from . import fetch
@@ -41,8 +40,8 @@ class ProductTableManager(ProductTableQueryMixin):
         - min_size: The minimum order size allowed on the exchange.
         - min_notional: The minimum notional value required for an order.
 
-    The pure query/index methods live in :class:`ProductTableQueryMixin`; this
-    class only adds the asynchronous fetch/initialise layer.
+    Fetching, normalization, indexing, and querying are implemented by the Rust
+    core. This class preserves the asynchronous Python API and Polars output.
     """
 
     _instance = {}
@@ -92,27 +91,13 @@ class ProductTableManager(ProductTableQueryMixin):
         Returns:
             Combined Polars DataFrame containing all product information.
         """
-        functions = (
-            list(VALID_EXCHANGES)
-            if exchange_name is None
-            else [func for func in VALID_EXCHANGES if func.__name__ == exchange_name]
-        )
-        results = await asyncio.gather(
-            *[func() for func in functions],
-            return_exceptions=True,
-        )
-
-        product_tables: list[pl.DataFrame] = []
-        for result in results:
-            if isinstance(result, asyncio.CancelledError):
-                raise result
-            if isinstance(result, pl.DataFrame):
-                product_tables.append(result)
-
-        if not product_tables:
+        try:
+            rows = await _native.fetch_product_table_async(exchange_name)
+        except (RuntimeError, ValueError) as exc:
+            raise ProductTableError(str(exc)) from exc
+        if not rows:
             raise ProductTableError("Failed to fetch product tables from any exchange")
-
-        return pl.concat(product_tables, how="vertical")
+        return pl.DataFrame(rows)
 
     async def refresh(self, exchange_name: str | None = None) -> None:
         """
