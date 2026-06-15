@@ -36,10 +36,13 @@ jobs:
         run: cargo fmt --all --check
 
       - name: Rust check
-        run: cargo check --workspace
+        run: cargo check --workspace --all-features
 
       - name: Rust tests
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Build native Python extension
+        run: uv run maturin develop --release
 
       - name: Lint (ruff)
         run: uv run ruff check .

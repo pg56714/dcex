@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+*.pdb
 
 # Distribution / packaging
 .Python
@@ -74,6 +75,7 @@ docs/_build/
 # PyBuilder
 .pybuilder/
 target/
+/.maturin-dist/
 
 # Jupyter Notebook
 .ipynb_checkpoints
