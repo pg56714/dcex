@@ -6,7 +6,7 @@
 
 > Originally created and maintained by the same contributor, this fork continues active development, building upon the original foundation with enhanced design, unified DEX + CEX support, and fixes for previously unresolved issues.
 
-A high-performance and lightweight Python library for interacting with cryptocurrency exchanges. dcex offers synchronous and asynchronous clients across multiple major exchanges, designed for speed, modularity, and ease of use.
+A high-performance and lightweight Python and Rust library for interacting with cryptocurrency exchanges. dcex offers synchronous and asynchronous Python clients backed by a Rust core, plus direct Rust APIs for low-level HTTP, signing, and exchange integrations.
 
 Scope note: dcex focuses on market data, account queries, and trading/order APIs. External withdrawal creation endpoints are not currently wrapped, and options support is limited to exchange-specific APIs rather than the unified Product Table Manager.
 
@@ -15,6 +15,8 @@ Scope note: dcex focuses on market data, account queries, and trading/order APIs
 [![PyPI](https://img.shields.io/pypi/v/dcex)](https://badge.fury.io/py/dcex)
 
 ## Installation
+
+Python:
 
 ```bash
 pip install dcex
@@ -26,9 +28,17 @@ or use `uv` to manage the project:
 uv add dcex
 ```
 
+Rust:
+
+```toml
+[dependencies]
+dcex = "0.21.2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+```
+
 ## Quick Start
 
-### Synchronous Usage
+### Python Synchronous Usage
 
 ```python
 import dcex
@@ -39,7 +49,7 @@ klines = client.get_klines(product_symbol="BTC-USDT-SWAP", interval="1m")
 print(klines)
 ```
 
-### Asynchronous Usage
+### Python Asynchronous Usage
 
 ```python
 import os
@@ -69,6 +79,31 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+### Rust Usage
+
+```rust
+use std::time::Duration;
+
+use dcex::exchanges::binance::{BinanceClient, BinanceMarket};
+use dcex::http::HttpMethod;
+
+#[tokio::main]
+async fn main() -> dcex::Result<()> {
+    let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
+    let response = client
+        .request_raw(
+            HttpMethod::Get,
+            BinanceMarket::Spot,
+            "/api/v3/time",
+            Vec::new(),
+            false,
+        )
+        .await?;
+    println!("{}", response.text()?);
+    Ok(())
+}
+```
+
 ## Supported Exchanges
 
 | Exchange        | Sync Support | Async Support |
@@ -92,8 +127,9 @@ if __name__ == "__main__":
 ## Key Features
 
 - Product Table Manager for unifying trading instruments across exchanges
-- Sync and async API clients with consistent interfaces where available
-- Low-overhead HTTP clients for market data, account queries, and trading workflows
+- Sync and async Python API clients with consistent interfaces where available
+- Native Rust core for exchange HTTP, signing, serialization, and response validation
+- Direct Rust crate (`dcex`) for applications that do not need the Python layer
 - Opt-in live test suites for public, private, stateful, and generated-report endpoints
 
 ## What is Product Table Manager (PTM)?
@@ -157,6 +193,28 @@ For live, private, stateful, and generated-report test commands, see the
 
 Examples are under `examples/sync` and `examples/async`. See
 [examples/README.md](examples/README.md) for the example conventions.
+
+## Benchmarking
+
+Public HTTP benchmarks are live network measurements, so results depend on
+exchange latency and local network conditions. Benchmark scripts are kept in the
+repo, but benchmark output files are not committed.
+
+| Layer | Command | Output |
+| ----- | ------- | ------ |
+| Rust direct crate | `cargo run -p dcex --example public_http_benchmark --release` | Markdown table |
+| Python wrapper + PyO3 bridge | `uv run python examples/benchmark_public_http.py --iterations 20` | Markdown table |
+| Optional local CSV output | `uv run python examples/benchmark_public_http.py --csv benchmark.csv` | Ignored local CSV file |
+
+Use `DCEX_BENCH_ITERATIONS` and `DCEX_BENCH_WARMUP` for the Rust example when
+you need a longer run.
+
+## Release Publishing
+
+The release workflow publishes only when Commitizen creates a version bump on
+`main`. A bumped release builds Python wheels, publishes the Rust crate
+(`dcex`) to crates.io, and publishes the Python package to PyPI after the crate
+publish succeeds. If no version bump is detected, neither registry is updated.
 
 ## License
 

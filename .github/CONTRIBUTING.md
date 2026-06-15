@@ -79,6 +79,9 @@ uv run pytest tests/sync_support/okx tests/async_support/okx -m "live and privat
 The CI workflow runs these checks:
 
 ```sh
+cargo fmt --all --check
+cargo check --workspace --all-features
+cargo test --workspace --all-features
 uv run ruff check .
 uv run ruff format --check .
 uv run pyright
@@ -126,6 +129,15 @@ uv run cz commit
 ```
 
 Versioning and changelog updates are handled by the release workflow after changes are merged.
+
+## Release Publishing
+
+The release workflow publishes only when Commitizen creates a new version on
+`main`. For a bumped release, GitHub Actions builds Python artifacts, publishes
+the Rust crate `dcex` to crates.io, and publishes the Python package to PyPI
+after the crate publish succeeds. Required registry credentials are
+`CARGO_REGISTRY_TOKEN` for crates.io and PyPI Trusted Publishing for the PyPI
+job.
 
 ## Issues and Feature Requests
 
