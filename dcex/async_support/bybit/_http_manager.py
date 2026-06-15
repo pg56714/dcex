@@ -10,11 +10,12 @@ import hashlib
 import hmac
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal, Self
+from typing import Any, Literal, Self, cast
 
 import httpx
 import msgspec
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -27,6 +28,7 @@ SUBDOMAIN_MAINNET = "api"
 DOMAIN_MAIN = "bybit"
 TLD_MAIN = "com"
 TIME_ENDPOINT = "/v5/market/time"
+_native = load_native()
 
 
 def _extract_server_time_ms(data: dict[str, Any]) -> int | None:
@@ -121,6 +123,8 @@ class HTTPManager(BaseHTTPManager):
     sync_server_time: bool = field(default=True)
     timestamp_offset_ms: int = field(default=0, repr=False)
     _time_offset_synced: bool = field(default=False, init=False, repr=False)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """
@@ -134,9 +138,26 @@ class HTTPManager(BaseHTTPManager):
             self.ptm = await ProductTableManager.get_instance(Common.BYBIT)
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=subdomain, DOMAIN=self.domain, TLD=self.tld)
+        native_client_type = getattr(_native, "BybitHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                recv_window=self.recv_window,
+                sync_server_time=self.sync_server_time,
+                timeout=self.timeout,
+                base_url=self.endpoint,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     async def _sync_time_offset(self) -> None:
         if self._time_offset_synced or not self.sync_server_time:
@@ -220,7 +241,9 @@ class HTTPManager(BaseHTTPManager):
         if query is None:
             query = {}
 
-        timestamp = await self._timestamp(signed)
+        request_path = path
+        uses_native = self._uses_native_transport()
+        timestamp = int(generate_timestamp()) if uses_native else await self._timestamp(signed)
 
         if method.upper() == "GET":
             if query:
@@ -237,8 +260,9 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret):
                 raise ValueError("Signed request requires API Key and Secret.")
-            signature = self._auth(payload, timestamp)
-            headers = get_header(self.api_key, signature, timestamp, self.recv_window)
+            if not uses_native:
+                signature = self._auth(payload, timestamp)
+                headers = get_header(self.api_key, signature, timestamp, self.recv_window)
         else:
             headers = get_header_no_sign()
 
@@ -247,14 +271,34 @@ class HTTPManager(BaseHTTPManager):
         response = None
 
         try:
-            if method.upper() == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method.upper() == "POST":
-                response = await self.session.post(url, headers=headers, content=payload)
+            if uses_native:
+                params = [
+                    (key, str(value)) for key, value in sorted(query.items()) if value is not None
+                ]
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    request_path,
+                    params,
+                    payload.encode() if method.upper() != "GET" else None,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+                if method.upper() == "GET":
+                    response = await self.session.get(url, headers=headers)
+                elif method.upper() == "POST":
+                    response = await self.session.post(url, headers=headers, content=payload)
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except httpx.HTTPError as e:
+        except (httpx.HTTPError, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

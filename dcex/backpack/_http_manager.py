@@ -13,11 +13,14 @@ import requests
 from Crypto.PublicKey import ECC
 from Crypto.Signature import eddsa
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+
+_native = load_native()
 
 RequestPayload = Mapping[str, Any] | Sequence[Mapping[str, Any]]
 
@@ -44,6 +47,20 @@ def _json_body(query: RequestPayload | None) -> str:
     if query is None:
         return ""
     return json.dumps(query, separators=(",", ":"), ensure_ascii=False)
+
+
+def _native_items(payload: Mapping[str, Any]) -> list[tuple[str, str]]:
+    return [(key, _format_value(value)) for key, value in _filtered_query(payload).items()]
+
+
+def _native_signature_payload(
+    payload: RequestPayload | None,
+) -> list[list[tuple[str, str]]] | None:
+    if payload is None:
+        return None
+    if isinstance(payload, Mapping):
+        return [_native_items(payload)]
+    return [_native_items(item) for item in payload]
 
 
 def _signature_chunks(instruction: str, payload: RequestPayload | None) -> list[str]:
@@ -93,12 +110,30 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "BackpackHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                window=self.window,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BACKPACK)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def _headers(
         self,
@@ -153,12 +188,40 @@ class HTTPManager(BaseHTTPManager):
             url = f"{url}?{query_string}"
         body = _json_body(body_payload) if body_payload is not None else None
         signed_payload = body_payload if body_payload is not None else query_payload
-        request_headers = self._headers(signed, instruction, signed_payload, headers)
+        request_headers = (
+            {"Accept": "application/json", "Content-Type": "application/json"}
+            if self._uses_native_transport()
+            else self._headers(signed, instruction, signed_payload, headers)
+        )
+        if self._uses_native_transport() and signed:
+            if not self.api_key or not self.api_secret:
+                raise ValueError("Signed Backpack requests require api_key and api_secret.")
+            if not instruction:
+                raise ValueError("Signed Backpack requests require an instruction.")
 
         response = None
         try:
             self._log_request(method, url)
-            if method_upper == "GET":
+            if self._uses_native_transport():
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    request_path,
+                    _native_items(query_payload) if query_payload is not None else [],
+                    body.encode() if body is not None else None,
+                    signed,
+                    instruction,
+                    _native_signature_payload(signed_payload),
+                    {key: value for key, value in (headers or {}).items() if value},
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method_upper == "GET":
                 response = self.session.get(url, headers=request_headers, timeout=self.timeout)
             elif method_upper == "POST":
                 response = self.session.post(
@@ -183,7 +246,7 @@ class HTTPManager(BaseHTTPManager):
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except requests.RequestException as exc:
+        except (requests.RequestException, RuntimeError) as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {query}",

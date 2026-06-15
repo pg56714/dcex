@@ -1,98 +1,72 @@
+"""BitMart async market data HTTP client backed by Rust."""
+
 from typing import Any
 
+from ..._native_http import NativeResponse
 from ...utils.common import Common
-from ...utils.timeframe_utils import bitmart_convert_timeframe
 from ._http_manager import HTTPManager
-from .endpoints.market import FuturesMarket, SpotMarket
 
 
 class MarketHTTP(HTTPManager):
     """HTTP client for BitMart market-related API endpoints."""
 
-    async def get_spot_currencies(self) -> dict[str, Any]:
-        """
-        Get spot currencies.
+    async def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed BitMart public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("BitMart native client is required for public market methods.")
+        status, headers, body = await self._native_client.public_request_async(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
 
-        Returns:
-            dict: Spot currencies data
-        """
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.GET_SPOT_CURRENCIES,
-            query=None,
-            signed=False,
-        )
-        return res
+    def _exchange_symbol(self, product_symbol: str, *, spot: bool) -> str:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return self.ptm.get_exchange_symbol(Common.BITMART, product_symbol)
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            return f"{parts[0]}_{parts[1]}" if spot else f"{parts[0]}{parts[1]}"
+        return product_symbol
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            params.append((key, str(value)))
+        return params
+
+    async def get_spot_currencies(self) -> dict[str, Any]:
+        """Get spot currencies."""
+        return await self._native_public("get_spot_currencies", [])
 
     async def get_trading_pairs(self) -> dict[str, Any]:
-        """
-        Get trading pairs.
-
-        Returns:
-            dict: Trading pairs data
-        """
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.GET_TRADING_PAIRS,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get trading pairs."""
+        return await self._native_public("get_trading_pairs", [])
 
     async def get_trading_pairs_details(self) -> dict[str, Any]:
-        """
-        Get trading pairs details.
-
-        Returns:
-            dict: Trading pairs details data
-        """
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.GET_TRADING_PAIRS_DETAILS,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get trading pairs details."""
+        return await self._native_public("get_trading_pairs_details", [])
 
     async def get_ticker_of_all_pairs(self) -> dict[str, Any]:
-        """
-        Get ticker of all pairs.
-
-        Returns:
-            dict: Ticker data for all pairs
-        """
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.GET_TICKER_OF_ALL_PAIRS,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get ticker of all pairs."""
+        return await self._native_public("get_ticker_of_all_pairs", [])
 
     async def get_ticker_of_a_pair(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
-        """
-        Get ticker of a specific pair.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
-
-        Returns:
-            dict: Ticker data for the pair
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.GET_TICKER_OF_A_PAIR,
-            query=payload,
-            signed=False,
+        """Get ticker of a specific pair."""
+        return await self._native_public(
+            "get_ticker_of_a_pair",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=True)),
         )
-        return res
 
     async def get_spot_kline(
         self,
@@ -102,88 +76,41 @@ class MarketHTTP(HTTPManager):
         after: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get spot kline data.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
-            interval: Kline interval
-            before: Before timestamp
-            after: After timestamp
-            limit: Number of klines to return
-
-        Returns:
-            dict: Spot kline data
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-        if interval is not None:
-            payload["step"] = str(bitmart_convert_timeframe(interval))
-        if before is not None:
-            payload["before"] = str(before)
-        if after is not None:
-            payload["after"] = str(after)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.GET_SPOT_KLINE,
-            query=payload,
-            signed=False,
+        """Get spot kline data."""
+        return await self._native_public(
+            "get_spot_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=True),
+                interval=interval,
+                before=before,
+                after=after,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_contracts_details(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get contracts details.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
-
-        Returns:
-            dict: Contracts details data
-        """
-        payload = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMART, product_symbol)
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_CONTRACTS_DETAILS,
-            query=payload,
-            signed=False,
+        """Get contracts details."""
+        return await self._native_public(
+            "get_contracts_details",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False)
+                if product_symbol is not None
+                else None,
+            ),
         )
-        return res
 
     async def get_depth(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
-        """
-        Get order book depth.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
-
-        Returns:
-            dict: Order book depth data
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_DEPTH,
-            query=payload,
-            signed=False,
+        """Get order book depth."""
+        return await self._native_public(
+            "get_depth",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     async def get_contract_kline(
         self,
@@ -192,46 +119,23 @@ class MarketHTTP(HTTPManager):
         start_time: int,
         end_time: int,
     ) -> dict[str, Any]:
-        """
-        Get contract kline data.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
-            interval: Kline interval
-            start_time: Start time in milliseconds
-            end_time: End time in milliseconds
-
-        Returns:
-            dict: Contract kline data
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "step": bitmart_convert_timeframe(interval),
-            "start_time": start_time,
-            "end_time": end_time,
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_CONTRACTS_KLINE,
-            query=payload,
-            signed=False,
+        """Get contract kline data."""
+        return await self._native_public(
+            "get_contract_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False),
+                interval=interval,
+                start_time=start_time,
+                end_time=end_time,
+            ),
         )
-        return res
 
     async def get_open_interest(self, product_symbol: str) -> dict[str, Any]:
         """Get futures contract open interest."""
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_OPEN_INTEREST,
-            query=payload,
-            signed=False,
+        return await self._native_public(
+            "get_open_interest",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     async def get_mark_price_kline(
         self,
@@ -241,85 +145,43 @@ class MarketHTTP(HTTPManager):
         end_time: int,
     ) -> dict[str, Any]:
         """Get futures mark price kline data."""
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "step": bitmart_convert_timeframe(interval),
-            "start_time": start_time,
-            "end_time": end_time,
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_MARK_PRICE_KLINE,
-            query=payload,
-            signed=False,
+        return await self._native_public(
+            "get_mark_price_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False),
+                interval=interval,
+                start_time=start_time,
+                end_time=end_time,
+            ),
         )
-        return res
 
     async def get_leverage_bracket(self, product_symbol: str) -> dict[str, Any]:
         """Get futures contract leverage bracket."""
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_LEVERAGE_BRACKET,
-            query=payload,
-            signed=False,
+        return await self._native_public(
+            "get_leverage_bracket",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     async def get_current_funding_rate(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
-        """
-        Get current funding rate.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
-
-        Returns:
-            dict: Current funding rate data
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_CURRENT_FUNDING_RATE,
-            query=payload,
-            signed=False,
+        """Get current funding rate."""
+        return await self._native_public(
+            "get_current_funding_rate",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     async def get_funding_rate_history(
         self,
         product_symbol: str,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get funding rate history.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTC-USDT')
-            limit: Number of records to return
-
-        Returns:
-            dict: Funding rate history data
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.GET_FUNDING_RATE_HISTORY,
-            query=payload,
-            signed=False,
+        """Get funding rate history."""
+        return await self._native_public(
+            "get_funding_rate_history",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False),
+                limit=limit,
+            ),
         )
-        return res

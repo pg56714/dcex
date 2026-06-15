@@ -9,11 +9,12 @@ import hashlib
 import hmac
 import logging
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 
 import msgspec
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -26,6 +27,7 @@ SUBDOMAIN_MAINNET = "api"
 DOMAIN_MAIN = "bybit"
 TLD_MAIN = "com"
 TIME_ENDPOINT = "/v5/market/time"
+_native = load_native()
 
 
 def _extract_server_time_ms(data: dict[str, Any]) -> int | None:
@@ -118,6 +120,8 @@ class HTTPManager(BaseHTTPManager):
     sync_server_time: bool = field(default=True)
     timestamp_offset_ms: int = field(default=0, repr=False)
     _time_offset_synced: bool = field(default=False, init=False, repr=False)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """
@@ -129,9 +133,26 @@ class HTTPManager(BaseHTTPManager):
 
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=subdomain, DOMAIN=self.domain, TLD=self.tld)
+        native_client_type = getattr(_native, "BybitHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                recv_window=self.recv_window,
+                sync_server_time=self.sync_server_time,
+                timeout=self.timeout,
+                base_url=self.endpoint,
+            )
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BYBIT)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def _sync_time_offset(self) -> None:
         if self._time_offset_synced or not self.sync_server_time:
@@ -205,7 +226,9 @@ class HTTPManager(BaseHTTPManager):
         if query is None:
             query = {}
 
-        timestamp = self._timestamp(signed)
+        request_path = path
+        uses_native = self._uses_native_transport()
+        timestamp = int(generate_timestamp()) if uses_native else self._timestamp(signed)
 
         if method.upper() == "GET":
             if query:
@@ -222,8 +245,9 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret):
                 raise ValueError("Signed request requires API Key and Secret.")
-            signature = self._auth(payload, timestamp)
-            headers = get_header(self.api_key, signature, timestamp, self.recv_window)
+            if not uses_native:
+                signature = self._auth(payload, timestamp)
+                headers = get_header(self.api_key, signature, timestamp, self.recv_window)
         else:
             headers = get_header_no_sign()
 
@@ -231,14 +255,34 @@ class HTTPManager(BaseHTTPManager):
         self._log_request(method, url)
 
         try:
-            if method.upper() == "GET":
-                response = self.session.get(url, headers=headers, timeout=self.timeout)
-            elif method.upper() == "POST":
-                response = self.session.post(
-                    url, data=payload, headers=headers, timeout=self.timeout
+            if uses_native:
+                params = [
+                    (key, str(value)) for key, value in sorted(query.items()) if value is not None
+                ]
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    request_path,
+                    params,
+                    payload.encode() if method.upper() != "GET" else None,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
                 )
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+                if method.upper() == "GET":
+                    response = self.session.get(url, headers=headers, timeout=self.timeout)
+                elif method.upper() == "POST":
+                    response = self.session.post(
+                        url, data=payload, headers=headers, timeout=self.timeout
+                    )
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
 
             self._store_response_headers(response)
             try:
@@ -275,7 +319,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 return data
 
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.RequestException, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {payload}",

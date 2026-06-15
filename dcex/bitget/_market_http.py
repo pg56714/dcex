@@ -1,36 +1,72 @@
-"""Bitget public market-data HTTP client."""
+"""Bitget public market-data HTTP client backed by Rust."""
 
 from typing import Any
 
+from .._native_http import NativeResponse
 from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.market import FuturesMarket, SpotMarket
 
 
 class MarketHTTP(HTTPManager):
     """HTTP client for Bitget public market-data APIs."""
 
+    def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Bitget public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Bitget native client is required for public market methods.")
+        status, headers, body = self._native_client.public_request(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _exchange_symbol(self, product_symbol: str) -> str:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            return f"{parts[0]}{parts[1]}"
+        return product_symbol
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            params.append((key, str(value)))
+        return params
+
     def get_spot_coins(self, coin: str | None = None) -> dict[str, Any]:
         """Retrieve Bitget spot coin metadata."""
-        return self._request("GET", SpotMarket.COINS, {"coin": coin}, signed=False)
+        return self._native_public("get_spot_coins", self._params(coin=coin))
 
     def get_spot_symbols(self, product_symbol: str | None = None) -> dict[str, Any]:
         """Retrieve Bitget spot symbol metadata."""
-        symbol = (
-            self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
-            if product_symbol is not None
-            else None
+        return self._native_public(
+            "get_spot_symbols",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol)
+                if product_symbol is not None
+                else None,
+            ),
         )
-        return self._request("GET", SpotMarket.SYMBOLS, {"symbol": symbol}, signed=False)
 
     def get_spot_tickers(self, product_symbol: str | None = None) -> dict[str, Any]:
         """Retrieve Bitget spot ticker data."""
-        symbol = (
-            self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
-            if product_symbol is not None
-            else None
+        return self._native_public(
+            "get_spot_tickers",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol)
+                if product_symbol is not None
+                else None,
+            ),
         )
-        return self._request("GET", SpotMarket.TICKERS, {"symbol": symbol}, signed=False)
 
     def get_spot_orderbook(
         self,
@@ -39,12 +75,14 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot orderbook depth."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "type": type_,
-            "limit": limit,
-        }
-        return self._request("GET", SpotMarket.ORDERBOOK, payload, signed=False)
+        return self._native_public(
+            "get_spot_orderbook",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                type=type_,
+                limit=limit,
+            ),
+        )
 
     def get_spot_kline(
         self,
@@ -55,14 +93,16 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot candles."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "granularity": granularity,
-            "startTime": startTime,
-            "endTime": endTime,
-            "limit": limit,
-        }
-        return self._request("GET", SpotMarket.CANDLES, payload, signed=False)
+        return self._native_public(
+            "get_spot_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                granularity=granularity,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
 
     def get_spot_history_kline(
         self,
@@ -73,14 +113,16 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical spot candles."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "granularity": granularity,
-            "startTime": startTime,
-            "endTime": endTime,
-            "limit": limit,
-        }
-        return self._request("GET", SpotMarket.HISTORY_CANDLES, payload, signed=False)
+        return self._native_public(
+            "get_spot_history_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                granularity=granularity,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
 
     def get_spot_recent_trades(
         self,
@@ -88,11 +130,10 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget recent spot trades."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "limit": limit,
-        }
-        return self._request("GET", SpotMarket.RECENT_TRADES, payload, signed=False)
+        return self._native_public(
+            "get_spot_recent_trades",
+            self._params(product_symbol=self._exchange_symbol(product_symbol), limit=limit),
+        )
 
     def get_spot_market_trades(
         self,
@@ -103,14 +144,16 @@ class MarketHTTP(HTTPManager):
         endTime: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical spot market trades."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "limit": limit,
-            "idLessThan": idLessThan,
-            "startTime": startTime,
-            "endTime": endTime,
-        }
-        return self._request("GET", SpotMarket.MARKET_TRADES, payload, signed=False)
+        return self._native_public(
+            "get_spot_market_trades",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                limit=limit,
+                idLessThan=idLessThan,
+                startTime=startTime,
+                endTime=endTime,
+            ),
+        )
 
     def get_futures_contracts(
         self,
@@ -118,16 +161,14 @@ class MarketHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget futures contract metadata."""
-        symbol = (
-            self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
-            if product_symbol is not None
-            else None
-        )
-        return self._request(
-            "GET",
-            FuturesMarket.CONTRACTS,
-            {"symbol": symbol, "productType": productType},
-            signed=False,
+        return self._native_public(
+            "get_futures_contracts",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol)
+                if product_symbol is not None
+                else None,
+                productType=productType,
+            ),
         )
 
     def get_futures_ticker(
@@ -136,19 +177,19 @@ class MarketHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget futures ticker for one symbol."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-        }
-        return self._request("GET", FuturesMarket.TICKER, payload, signed=False)
+        return self._native_public(
+            "get_futures_ticker",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                productType=productType,
+            ),
+        )
 
     def get_futures_tickers(self, productType: str = "USDT-FUTURES") -> dict[str, Any]:
         """Retrieve Bitget futures tickers."""
-        return self._request(
-            "GET",
-            FuturesMarket.TICKERS,
-            {"productType": productType},
-            signed=False,
+        return self._native_public(
+            "get_futures_tickers",
+            self._params(productType=productType),
         )
 
     def get_futures_orderbook(
@@ -159,13 +200,15 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures orderbook depth."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "precision": precision,
-            "limit": limit,
-        }
-        return self._request("GET", FuturesMarket.ORDERBOOK, payload, signed=False)
+        return self._native_public(
+            "get_futures_orderbook",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                productType=productType,
+                precision=precision,
+                limit=limit,
+            ),
+        )
 
     def get_futures_kline(
         self,
@@ -177,15 +220,17 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures candles."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "granularity": granularity,
-            "startTime": startTime,
-            "endTime": endTime,
-            "limit": limit,
-        }
-        return self._request("GET", FuturesMarket.CANDLES, payload, signed=False)
+        return self._native_public(
+            "get_futures_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                productType=productType,
+                granularity=granularity,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
 
     def get_futures_history_kline(
         self,
@@ -197,15 +242,17 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical futures candles."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "granularity": granularity,
-            "startTime": startTime,
-            "endTime": endTime,
-            "limit": limit,
-        }
-        return self._request("GET", FuturesMarket.HISTORY_CANDLES, payload, signed=False)
+        return self._native_public(
+            "get_futures_history_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                productType=productType,
+                granularity=granularity,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
 
     def get_futures_recent_trades(
         self,
@@ -214,12 +261,14 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget recent futures trades."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "limit": limit,
-        }
-        return self._request("GET", FuturesMarket.RECENT_TRADES, payload, signed=False)
+        return self._native_public(
+            "get_futures_recent_trades",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                productType=productType,
+                limit=limit,
+            ),
+        )
 
     def get_futures_current_funding_rate(
         self,
@@ -227,16 +276,14 @@ class MarketHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget current futures funding rate."""
-        symbol = (
-            self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
-            if product_symbol is not None
-            else None
-        )
-        return self._request(
-            "GET",
-            FuturesMarket.CURRENT_FUNDING_RATE,
-            {"symbol": symbol, "productType": productType},
-            signed=False,
+        return self._native_public(
+            "get_futures_current_funding_rate",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol)
+                if product_symbol is not None
+                else None,
+                productType=productType,
+            ),
         )
 
     def get_futures_history_funding_rate(
@@ -247,13 +294,15 @@ class MarketHTTP(HTTPManager):
         pageNo: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical futures funding rates."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "pageSize": pageSize,
-            "pageNo": pageNo,
-        }
-        return self._request("GET", FuturesMarket.HISTORY_FUNDING_RATE, payload, signed=False)
+        return self._native_public(
+            "get_futures_history_funding_rate",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                productType=productType,
+                pageSize=pageSize,
+                pageNo=pageNo,
+            ),
+        )
 
     def get_futures_open_interest(
         self,
@@ -261,8 +310,10 @@ class MarketHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget futures open interest."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-        }
-        return self._request("GET", FuturesMarket.OPEN_INTEREST, payload, signed=False)
+        return self._native_public(
+            "get_futures_open_interest",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol),
+                productType=productType,
+            ),
+        )

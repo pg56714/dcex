@@ -12,15 +12,18 @@ import logging
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Literal, Self
+from typing import Any, Literal, Self, cast
 
 import httpx
 import msgspec
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 
 def _format_query_string(query: dict[str, Any] | None) -> str:
@@ -61,6 +64,8 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(default=None, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """
@@ -72,9 +77,24 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.GATEIO)
+        native_client_type = getattr(_native, "GateioHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     def _resolve_path(
         self, path_template: str | Enum, path_params: dict[str, Any] | None = None
@@ -177,6 +197,7 @@ class HTTPManager(BaseHTTPManager):
         url = self.base_url + full_path
 
         timestamp = str(int(time.time()))
+        uses_native = self._uses_native_transport()
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -185,14 +206,15 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret):
                 raise ValueError("Signed request requires API Key and Secret.")
-            sign = self._sign(method, full_path, query, body, timestamp)
-            headers.update(
-                {
-                    "KEY": self.api_key,
-                    "Timestamp": timestamp,
-                    "SIGN": sign,
-                }
-            )
+            if not uses_native:
+                sign = self._sign(method, full_path, query, body, timestamp)
+                headers.update(
+                    {
+                        "KEY": self.api_key,
+                        "Timestamp": timestamp,
+                        "SIGN": sign,
+                    }
+                )
 
         self._log_request(method, url)
 
@@ -203,24 +225,41 @@ class HTTPManager(BaseHTTPManager):
             if method_upper in ("POST", "PUT", "PATCH") and body:
                 body_string = msgspec.json.encode(body).decode("utf-8")
 
-            if method_upper == "GET":
-                response = await self.session.get(url, headers=headers, params=query_params)
-            elif method_upper == "POST":
-                response = await self.session.post(
-                    url, headers=headers, params=query_params, content=body_string
+            if uses_native:
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    full_path,
+                    [(key, str(value)) for key, value in query.items()],
+                    body_string.encode() if body_string and body else None,
+                    signed,
                 )
-            elif method_upper == "PUT":
-                response = await self.session.put(
-                    url, headers=headers, params=query_params, content=body_string
-                )
-            elif method_upper == "DELETE":
-                response = await self.session.delete(url, headers=headers, params=query_params)
-            elif method_upper == "PATCH":
-                response = await self.session.patch(
-                    url, headers=headers, params=query_params, content=body_string
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
                 )
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+                if method_upper == "GET":
+                    response = await self.session.get(url, headers=headers, params=query_params)
+                elif method_upper == "POST":
+                    response = await self.session.post(
+                        url, headers=headers, params=query_params, content=body_string
+                    )
+                elif method_upper == "PUT":
+                    response = await self.session.put(
+                        url, headers=headers, params=query_params, content=body_string
+                    )
+                elif method_upper == "DELETE":
+                    response = await self.session.delete(url, headers=headers, params=query_params)
+                elif method_upper == "PATCH":
+                    response = await self.session.patch(
+                        url, headers=headers, params=query_params, content=body_string
+                    )
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
 
         except FailedRequestError:
             raise

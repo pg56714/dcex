@@ -7,16 +7,19 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Literal
-from urllib.parse import urlencode
+from typing import Any, Literal, cast
+from urllib.parse import parse_qsl, urlencode
 
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+
+_native = load_native()
 
 
 def _format_value(value: object) -> str:
@@ -73,12 +76,30 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "BitgetHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                passphrase=self.passphrase,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BITGET)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def _headers(
         self,
@@ -131,32 +152,54 @@ class HTTPManager(BaseHTTPManager):
         if query_string:
             url = f"{url}?{query_string}"
 
-        headers = self._headers(method, request_path, query_string, body, signed)
         response = None
         try:
             self._log_request(method, url)
-            method_upper = method.upper()
-            if method_upper == "GET":
-                response = self.session.get(url, headers=headers, timeout=self.timeout)
-            elif method_upper == "POST":
-                response = self.session.post(
-                    url,
-                    headers=headers,
-                    data=body,
-                    timeout=self.timeout,
+            if self._uses_native_transport():
+                if signed and not (self.api_key and self.api_secret and self.passphrase):
+                    raise ValueError(
+                        "Signed Bitget requests require api_key, api_secret, and passphrase."
+                    )
+                params = parse_qsl(query_string, keep_blank_values=True) if query_string else []
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    request_path,
+                    params,
+                    body.encode() if body else None,
+                    signed,
                 )
-            elif method_upper == "PUT":
-                response = self.session.put(
-                    url,
-                    headers=headers,
-                    data=body,
-                    timeout=self.timeout,
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
                 )
-            elif method_upper == "DELETE":
-                response = self.session.delete(url, headers=headers, timeout=self.timeout)
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
-        except requests.RequestException as exc:
+                headers = self._headers(method, request_path, query_string, body, signed)
+                method_upper = method.upper()
+                if method_upper == "GET":
+                    response = self.session.get(url, headers=headers, timeout=self.timeout)
+                elif method_upper == "POST":
+                    response = self.session.post(
+                        url,
+                        headers=headers,
+                        data=body,
+                        timeout=self.timeout,
+                    )
+                elif method_upper == "PUT":
+                    response = self.session.put(
+                        url,
+                        headers=headers,
+                        data=body,
+                        timeout=self.timeout,
+                    )
+                elif method_upper == "DELETE":
+                    response = self.session.delete(url, headers=headers, timeout=self.timeout)
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
+        except (requests.RequestException, RuntimeError) as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

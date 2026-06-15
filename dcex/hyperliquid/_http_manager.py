@@ -3,19 +3,22 @@
 import logging
 from dataclasses import dataclass, field
 from types import TracebackType
-from typing import Any
+from typing import Any, cast
 
 import msgspec
 import requests
 from coincurve import PrivateKey
 from Crypto.Hash import keccak
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.address_utils import address_to_bytes
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+
+_native = load_native()
 
 HTTP_URL = "https://{SUBDOMAIN}.{DOMAIN}.{TLD}"
 SUBDOMAIN_MAIN = "api"
@@ -55,6 +58,8 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session | None = field(init=False, default=None)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize the HTTP manager with synchronous client and configuration."""
@@ -62,8 +67,24 @@ class HTTPManager(BaseHTTPManager):
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)
         self.session = requests.Session()
+        native_client_type = getattr(_native, "HyperliquidHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                testnet=self.testnet,
+                wallet_address=self.wallet_address,
+                private_key=self.private_key,
+                timeout=self.timeout,
+                endpoint=self.endpoint,
+            )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.HYPERLIQUID)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def __enter__(self) -> "HTTPManager":
         """Enter context manager, returning the manager itself."""
@@ -343,13 +364,15 @@ class HTTPManager(BaseHTTPManager):
         query = dict(query or {})
 
         timestamp = int(generate_timestamp())
+        uses_native = self._uses_native_transport()
 
         # Add signing fields before building URL/body so GET also carries signature
         if signed:
             if not (self.wallet_address and self.private_key):
                 raise ValueError("Signed request requires Address and Private Key of wallet.")
-            query["nonce"] = timestamp
-            query["signature"] = self._auth(query, timestamp)
+            if not uses_native:
+                query["nonce"] = timestamp
+                query["signature"] = self._auth(query, timestamp)
 
         headers = get_header()
 
@@ -359,7 +382,28 @@ class HTTPManager(BaseHTTPManager):
         session = self._ensure_session()
 
         try:
-            if method.upper() == "GET":
+            if uses_native:
+                action_msgpack = (
+                    msgspec.msgpack.encode(query["action"])
+                    if signed and "action" in query
+                    else None
+                )
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    path,
+                    msgspec.json.encode(query),
+                    action_msgpack,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method.upper() == "GET":
                 if query:
                     from urllib.parse import urlencode
 
@@ -374,7 +418,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.RequestException, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

@@ -4,6 +4,7 @@ from typing import Any
 
 import msgspec
 
+from .._native_http import NativeResponse
 from ..utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoint.market import Market
@@ -12,6 +13,27 @@ from .endpoint.path import Path
 
 class MarketHTTP(HTTPManager):
     """HTTP client for market-related operations on Hyperliquid exchange."""
+
+    def _request(
+        self,
+        method: str,
+        path: str,
+        query: dict[str, Any] | None = None,
+        signed: bool = True,
+    ) -> dict[str, Any]:
+        if (
+            method.upper() == "POST"
+            and str(path) == str(Path.INFO)
+            and not signed
+            and self._native_client is not None
+        ):
+            status, headers, body = self._native_client.public_request(
+                msgspec.json.encode(query or {})
+            )
+            response = NativeResponse(status, dict(headers), bytes(body))
+            self._store_response_headers(response)
+            return response.json()
+        return super()._request(method, path, query, signed)
 
     def get_meta(
         self,

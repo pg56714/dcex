@@ -4,17 +4,20 @@ import hmac
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, cast
 from urllib.parse import urlencode
 
 import msgspec
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+
+_native = load_native()
 
 
 def _sign(plain: bytes, key: bytes) -> str:
@@ -38,6 +41,8 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _encrypted_passphrase: str | None = field(default=None, init=False, repr=False)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
@@ -47,9 +52,27 @@ class HTTPManager(BaseHTTPManager):
             self._encrypted_passphrase = _sign(
                 self.passphrase.encode("utf-8"), self.api_secret.encode("utf-8")
             )
+        native_client_type = getattr(_native, "KucoinHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                passphrase=self.passphrase,
+                timeout=self.timeout,
+                spot_base_url=self.base_url,
+                futures_base_url=self.futures_base_url,
+            )
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.KUCOIN)
+
+    def _uses_native_transport(self, request_base_url: str) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+            and request_base_url in {self.base_url, self.futures_base_url}
+        )
 
     def _generate_headers(self, timestamp: str, signature: str) -> dict[str, str]:
         """Generate headers for KuCoin API requests."""
@@ -84,48 +107,71 @@ class HTTPManager(BaseHTTPManager):
     ) -> dict[str, Any]:
         """Make HTTP request to KuCoin API."""
         timestamp = str(int(time.time() * 1000))
+        method_upper = method.upper()
         body = ""
         request_path = path
         signature_path = path
 
-        if method.upper() == "GET":
+        if method_upper == "GET":
             if query:
                 request_path = f"{path}?{urlencode(query)}"
                 signature_path = request_path
-        elif method.upper() in {"POST", "PUT"}:
+        elif method_upper in {"POST", "PUT"}:
             body = msgspec.json.encode(query).decode("utf-8") if query else ""
-        elif method.upper() == "DELETE":
+        elif method_upper == "DELETE":
             if query:
                 query_string = urlencode(query)
                 request_path = f"{path}?{query_string}"
                 signature_path = request_path
 
+        request_base_url = base_url or self.base_url
+        uses_native = self._uses_native_transport(request_base_url)
         signature = ""
         if signed:
             if not (self.api_key and self.api_secret and self.passphrase):
                 raise ValueError("Signed request requires API Key, Secret, and Passphrase.")
 
-            payload = self._create_signature_payload(timestamp, method, signature_path, body)
-            signature = _sign(payload.encode("utf-8"), self.api_secret.encode("utf-8"))
+            if not uses_native:
+                payload = self._create_signature_payload(timestamp, method, signature_path, body)
+                signature = _sign(payload.encode("utf-8"), self.api_secret.encode("utf-8"))
 
         response = None
-        url = f"{base_url or self.base_url}{request_path}"
+        url = f"{request_base_url}{request_path}"
         try:
-            headers = self._generate_headers(timestamp, signature)
-            method_upper = method.upper()
-
-            if method_upper == "GET":
+            if uses_native:
+                market = "futures" if request_base_url == self.futures_base_url else "spot"
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    market,
+                    path,
+                    [(key, str(value)) for key, value in (query or {}).items()],
+                    body.encode() if body else None,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method_upper == "GET":
+                headers = self._generate_headers(timestamp, signature)
                 response = self.session.get(url, headers=headers, timeout=self.timeout)
             elif method_upper == "POST":
+                headers = self._generate_headers(timestamp, signature)
                 response = self.session.post(url, headers=headers, data=body, timeout=self.timeout)
             elif method_upper == "PUT":
+                headers = self._generate_headers(timestamp, signature)
                 response = self.session.put(url, headers=headers, data=body, timeout=self.timeout)
             elif method_upper == "DELETE":
+                headers = self._generate_headers(timestamp, signature)
                 response = self.session.delete(url, headers=headers, timeout=self.timeout)
             else:
                 raise ValueError(f"Unsupported method: {method}")
 
-        except requests.RequestException as e:
+        except (requests.RequestException, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

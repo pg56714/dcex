@@ -2,11 +2,12 @@ import hashlib
 import hmac
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal, Self
+from typing import Any, Literal, Self, cast
 
 import httpx
 import msgspec
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -15,6 +16,8 @@ from ..product_table.manager import ProductTableManager
 from .endpoints.account import FundingAccount, FuturesAccount
 from .endpoints.market import FuturesMarket, SpotMarket
 from .endpoints.trade import FuturesTrade, SpotTrade
+
+_native = load_native()
 
 
 def sign_message(timestamp: int, memo: str, body: str, secret_key: str) -> str:
@@ -50,6 +53,8 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     api_map = {
         "https://api-cloud.bitmart.com": {
@@ -74,9 +79,37 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMART)
+        native_client_type = getattr(_native, "BitmartHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                memo=self.memo,
+                timeout=self.timeout,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    @staticmethod
+    def _native_market(
+        path: FundingAccount
+        | FuturesAccount
+        | SpotMarket
+        | FuturesMarket
+        | SpotTrade
+        | FuturesTrade,
+    ) -> str:
+        if type(path) in {FuturesTrade, FuturesMarket, FuturesAccount}:
+            return "futures"
+        return "spot"
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     def _get_base_url(
         self,
@@ -159,12 +192,13 @@ class HTTPManager(BaseHTTPManager):
             else ""
         )
 
-        if signed:
-            if not (self.api_key and self.api_secret and self.memo):
-                raise ValueError("Signed request requires API Key and Secret and Memo.")
+        if signed and not (self.api_key and self.api_secret and self.memo):
+            raise ValueError("Signed request requires API Key and Secret and Memo.")
 
-            sign = sign_message(int(timestamp), self.memo, body, self.api_secret)
-            headers = get_header(self.api_key, sign, int(timestamp), self.memo)
+        if signed:
+            memo = cast(str, self.memo)
+            sign = sign_message(int(timestamp), memo, body, cast(str, self.api_secret))
+            headers = get_header(cast(str, self.api_key), sign, int(timestamp), memo)
         else:
             headers = get_header_no_sign()
 
@@ -172,19 +206,45 @@ class HTTPManager(BaseHTTPManager):
 
         response = None
         try:
-            if method.upper() == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method.upper() == "POST":
-                # Use data instead of json to ensure exact body matches signature
-                response = await self.session.post(
-                    url,
-                    content=body,
-                    headers=headers,
+            if self._uses_native_transport():
+                params = [
+                    (
+                        key,
+                        str(value).lower() if isinstance(value, bool) else str(value),
+                    )
+                    for key, value in sorted(query.items())
+                    if value is not None
+                ]
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    self._native_market(path),
+                    str(path),
+                    params,
+                    body.encode() if method.upper() == "POST" else None,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
                 )
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+                if method.upper() == "GET":
+                    response = await self.session.get(url, headers=headers)
+                elif method.upper() == "POST":
+                    # Use data instead of json to ensure exact body matches signature
+                    response = await self.session.post(
+                        url,
+                        content=body,
+                        headers=headers,
+                    )
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except httpx.HTTPError as e:
+        except (httpx.HTTPError, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

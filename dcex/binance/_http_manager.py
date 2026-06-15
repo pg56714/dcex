@@ -1,9 +1,11 @@
 import hashlib
 import hmac
+import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from importlib import import_module
+from typing import Any, cast
 from urllib.parse import urlencode
 
 import requests
@@ -16,6 +18,11 @@ from ..utils.helpers import generate_timestamp
 from .endpoints.account import FuturesAccount, SpotAccount, WalletAsset
 from .endpoints.market import FuturesMarket, SpotMarket
 from .endpoints.trade import FuturesTrade, SpotTrade
+
+try:
+    _native = import_module("dcex._native")
+except ImportError:
+    _native = None
 
 
 @dataclass
@@ -36,6 +43,8 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     api_map = {
         "https://fapi.binance.com": {
@@ -54,6 +63,13 @@ class HTTPManager(BaseHTTPManager):
     def __post_init__(self) -> None:
         """Initialize the HTTP manager after dataclass creation."""
         self._logger = self._setup_logger(self.logger)
+
+        if self.use_native and _native is not None:
+            self._native_client = _native.BinanceHttpClient(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+            )
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BINANCE)
@@ -102,6 +118,29 @@ class HTTPManager(BaseHTTPManager):
         """
         return {"X-MBX-APIKEY": self.api_key} if self.api_key else {}
 
+    @staticmethod
+    def _native_market(
+        path: (
+            SpotAccount
+            | FuturesAccount
+            | WalletAsset
+            | SpotMarket
+            | FuturesMarket
+            | SpotTrade
+            | FuturesTrade
+        ),
+    ) -> str:
+        if type(path) in {FuturesTrade, FuturesMarket, FuturesAccount}:
+            return "futures"
+        return "spot"
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
+
     def _request(
         self,
         method: str,
@@ -134,84 +173,117 @@ class HTTPManager(BaseHTTPManager):
             FailedRequestError: If the API request fails or returns an error.
         """
         query = dict(query or {})
+        if signed and not (self.api_key and self.api_secret):
+            raise ValueError("Signed request requires API Key and Secret.")
 
-        if signed:
-            if not (self.api_key and self.api_secret):
-                raise ValueError("Signed request requires API Key and Secret.")
-            query["timestamp"] = int(time.time() * 1000)
-            query["recvWindow"] = 5000
-            query["signature"] = self._sign(query)
-
+        base_url = self._get_base_url(path)
+        url = f"{base_url}{path}"
+        self._log_request(method, url)
+        uses_native = self._uses_native_transport()
+        native_client = self._native_client
         response = None
         try:
-            base_url = self._get_base_url(path)
-            url = f"{base_url}{path}"
-            self._log_request(method, url)
-            if method.upper() == "GET":
-                url += f"?{urlencode(query)}" if query else ""
-                response = self.session.get(url, headers=self._headers(), timeout=self.timeout)
-            elif method.upper() == "POST":
-                response = self.session.post(
-                    url, headers=self._headers(), timeout=self.timeout, data=query
+            if uses_native:
+                status_code, response_headers, body = cast(Any, native_client).request_raw(
+                    method,
+                    self._native_market(path),
+                    str(path),
+                    [(str(key), str(value)) for key, value in query.items()],
+                    signed,
                 )
-            elif method.upper() == "PUT":
-                response = self.session.put(
-                    url, headers=self._headers(), timeout=self.timeout, data=query
-                )
-            elif method.upper() == "DELETE":
-                url += f"?{urlencode(query)}" if query else ""
-                response = self.session.delete(url, headers=self._headers(), timeout=self.timeout)
+                response_headers = dict(response_headers)
+                response_text = bytes(body).decode(errors="replace")
+                self.last_response_headers = response_headers
             else:
-                raise ValueError(f"Unsupported method: {method}")
+                if signed:
+                    query["timestamp"] = int(time.time() * 1000)
+                    query["recvWindow"] = 5000
+                    query["signature"] = self._sign(query)
 
-            self._store_response_headers(response)
-            try:
-                data = response.json()
-            except Exception as exc:
-                raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"Failed to decode JSON response: {exc}",
-                    status_code=response.status_code,
-                    time=str(generate_timestamp(iso_format=True)),
-                    resp_headers=dict(response.headers),
-                ) from exc
+                if method.upper() == "GET":
+                    url += f"?{urlencode(query)}" if query else ""
+                    response = self.session.get(
+                        url,
+                        headers=self._headers(),
+                        timeout=self.timeout,
+                    )
+                elif method.upper() == "POST":
+                    response = self.session.post(
+                        url,
+                        headers=self._headers(),
+                        timeout=self.timeout,
+                        data=query,
+                    )
+                elif method.upper() == "PUT":
+                    response = self.session.put(
+                        url,
+                        headers=self._headers(),
+                        timeout=self.timeout,
+                        data=query,
+                    )
+                elif method.upper() == "DELETE":
+                    url += f"?{urlencode(query)}" if query else ""
+                    response = self.session.delete(
+                        url,
+                        headers=self._headers(),
+                        timeout=self.timeout,
+                    )
+                else:
+                    raise ValueError(f"Unsupported method: {method}")
 
-            timestamp = generate_timestamp(iso_format=True)
-            if isinstance(data, dict) and "code" in data and str(data["code"]) != "200":
-                code = data.get("code", "Unknown")
-                error_message = data.get("msg", "Unknown error")
-                self._log_failed_request(f"BINANCE API Error: [{code}] {error_message}", code)
-                raise FailedRequestError(
-                    request=f"{method} {url} | Body: {query}",
-                    message=f"BINANCE API Error: [{code}] {error_message}",
-                    status_code=response.status_code,
-                    time=str(timestamp),
-                    resp_headers=dict(response.headers),
-                )
-
-            # If http status is not 2xx (like 403, 404)
-            if not response.status_code // 100 == 2:
-                self._log_failed_request(
-                    f"HTTP Error {response.status_code}: {response.text}", response.status_code
-                )
-                raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {response.text}",
-                    status_code=response.status_code,
-                    time=str(timestamp),
-                    resp_headers=dict(response.headers),
-                )
-            else:
-                return data
-        except requests.exceptions.RequestException as e:
-            status_code, resp_headers = self._exception_response_details(e)
+                response_headers = self._store_response_headers(response)
+                status_code = response.status_code
+                response_text = response.text
+        except (requests.exceptions.RequestException, RuntimeError) as exc:
+            status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Params: {query}",
-                message=f"Request failed: {str(e)}",
+                message=f"Request failed: {str(exc)}",
                 status_code=status_code,
                 time=query.get("timestamp", "Unknown"),
                 resp_headers=resp_headers,
-            ) from e
+            ) from exc
+
+        try:
+            if uses_native:
+                data = json.loads(body)
+            else:
+                data = cast(Any, response).json()
+        except Exception as exc:
+            raise FailedRequestError(
+                request=f"{method.upper()} {url} | Body: {query}",
+                message=f"Failed to decode JSON response: {exc}",
+                status_code=status_code,
+                time=str(generate_timestamp(iso_format=True)),
+                resp_headers=response_headers,
+            ) from exc
+
+        timestamp = generate_timestamp(iso_format=True)
+        if isinstance(data, dict) and "code" in data and str(data["code"]) != "200":
+            code = data.get("code", "Unknown")
+            error_message = data.get("msg", "Unknown error")
+            self._log_failed_request(f"BINANCE API Error: [{code}] {error_message}", code)
+            raise FailedRequestError(
+                request=f"{method} {url} | Body: {query}",
+                message=f"BINANCE API Error: [{code}] {error_message}",
+                status_code=status_code,
+                time=str(timestamp),
+                resp_headers=response_headers,
+            )
+
+        if not status_code // 100 == 2:
+            self._log_failed_request(
+                f"HTTP Error {status_code}: {response_text}",
+                status_code,
+            )
+            raise FailedRequestError(
+                request=f"{method.upper()} {url} | Body: {query}",
+                message=f"HTTP Error {status_code}: {response_text}",
+                status_code=status_code,
+                time=str(timestamp),
+                resp_headers=response_headers,
+            )
+        return data
 
     def close(self) -> None:
         """Close the HTTP session."""

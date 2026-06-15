@@ -1,11 +1,47 @@
+"""OKX public HTTP client backed by Rust."""
+
 from typing import Any
 
+from .._native_http import NativeResponse
 from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.public import Public
 
 
 class PublicHTTP(HTTPManager):
+    """HTTP client for OKX public data operations."""
+
+    def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed OKX public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("OKX native client is required for public methods.")
+        status, headers, body = self._native_client.public_request(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _exchange_symbol(self, product_symbol: str) -> str:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            return f"{parts[0]}-{parts[1]}" if parts[2] == "SPOT" else product_symbol
+        return product_symbol
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            params.append((key, str(value)))
+        return params
+
     def get_public_instruments(
         self,
         instType: str,
@@ -13,60 +49,19 @@ class PublicHTTP(HTTPManager):
         instFamily: str | None = None,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get public instrument information.
-
-        Args:
-            instType: Instrument type
-            uly: Underlying asset symbol
-            instFamily: Instrument family
-            product_symbol: Product symbol
-
-        Returns:
-            Dictionary containing instrument information.
-        """
-        payload: dict[str, Any] = {
-            "instType": instType,
-        }
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_INSTRUMENT_INFO,
-            query=payload,
-            signed=False,
+        """Get public instrument information."""
+        inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
+        return self._native_public(
+            "get_public_instruments",
+            self._params(instType=instType, uly=uly, instFamily=instFamily, instId=inst_id),
         )
-        return res
 
-    def get_funding_rate(
-        self,
-        product_symbol: str,
-    ) -> dict[str, Any]:
-        """
-        Get current funding rate for a trading pair.
-
-        Args:
-            product_symbol: Trading pair symbol
-
-        Returns:
-            Dictionary containing funding rate information.
-        """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_FUNDING_RATE,
-            query=payload,
-            signed=False,
+    def get_funding_rate(self, product_symbol: str) -> dict[str, Any]:
+        """Get current funding rate for a trading pair."""
+        return self._native_public(
+            "get_funding_rate",
+            self._params(instId=self._exchange_symbol(product_symbol)),
         )
-        return res
 
     def get_funding_rate_history(
         self,
@@ -75,35 +70,16 @@ class PublicHTTP(HTTPManager):
         after: str | None = None,
         limit: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get historical funding rates for a trading pair.
-
-        Args:
-            product_symbol: Trading pair symbol
-            before: Pagination parameter - timestamp before this value
-            after: Pagination parameter - timestamp after this value
-            limit: Number of results to return
-
-        Returns:
-            Dictionary containing historical funding rate data.
-        """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if before is not None:
-            payload["before"] = before
-        if after is not None:
-            payload["after"] = after
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_FUNDING_RATE_HISTORY,
-            query=payload,
-            signed=False,
+        """Get historical funding rates for a trading pair."""
+        return self._native_public(
+            "get_funding_rate_history",
+            self._params(
+                instId=self._exchange_symbol(product_symbol),
+                before=before,
+                after=after,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_open_interest(
         self,
@@ -113,21 +89,11 @@ class PublicHTTP(HTTPManager):
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
         """Get public open interest data."""
-        payload: dict[str, Any] = {"instType": instType}
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_OPEN_INTEREST,
-            query=payload,
-            signed=False,
+        inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
+        return self._native_public(
+            "get_open_interest",
+            self._params(instType=instType, uly=uly, instFamily=instFamily, instId=inst_id),
         )
-        return res
 
     def get_position_tiers(
         self,
@@ -139,59 +105,28 @@ class PublicHTTP(HTTPManager):
         ccy: str | None = None,
         tier: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get position tiers information.
-
-        Args:
-            instType: Instrument type.
-            tdMode: Trading mode.
-            instFamily: Instrument family.
-            uly: Underlying.
-            product_symbol: Trading pair symbol.
-            ccy: Currency.
-            tier: Tier level.
-
-        Returns:
-            Dictionary containing position tiers information.
-        """
-        payload: dict[str, Any] = {"instType": instType, "tdMode": tdMode}
-        exchange_symbol = (
-            self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-            if product_symbol is not None
-            else None
-        )
-        if exchange_symbol is not None and instFamily is None and uly is None:
-            symbol_parts = exchange_symbol.split("-")
+        """Get position tiers information."""
+        inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
+        if inst_id is not None and instFamily is None and uly is None:
+            symbol_parts = inst_id.split("-")
             if len(symbol_parts) >= 2:
                 instFamily = "-".join(symbol_parts[:2])
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if uly is not None:
-            payload["uly"] = uly
-        if product_symbol is not None:
-            payload["instId"] = exchange_symbol
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if tier is not None:
-            payload["tier"] = tier
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_POSITION_TIERS,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_position_tiers",
+            self._params(
+                instType=instType,
+                tdMode=tdMode,
+                instFamily=instFamily,
+                uly=uly,
+                instId=inst_id,
+                ccy=ccy,
+                tier=tier,
+            ),
         )
-        return res
 
     def get_trading_data_support_coin(self) -> dict[str, Any]:
         """Get currencies supported by OKX trading data endpoints."""
-        res = self._request(
-            method="GET",
-            path=Public.GET_TRADING_DATA_SUPPORT_COIN,
-            query={},
-            signed=False,
-        )
-        return res
+        return self._native_public("get_trading_data_support_coin", [])
 
     def get_taker_volume(
         self,
@@ -202,23 +137,10 @@ class PublicHTTP(HTTPManager):
         period: str = "5m",
     ) -> dict[str, Any]:
         """Get taker volume by currency and instrument type."""
-        payload: dict[str, Any] = {
-            "ccy": ccy,
-            "instType": instType,
-            "period": period,
-        }
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_TAKER_VOLUME,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_taker_volume",
+            self._params(ccy=ccy, instType=instType, begin=begin, end=end, period=period),
         )
-        return res
 
     def get_contract_taker_volume(
         self,
@@ -228,22 +150,15 @@ class PublicHTTP(HTTPManager):
         end: int | None = None,
     ) -> dict[str, Any]:
         """Get contract taker volume history."""
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "period": period,
-        }
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_CONTRACT_TAKER_VOLUME,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_contract_taker_volume",
+            self._params(
+                instId=self._exchange_symbol(product_symbol),
+                period=period,
+                begin=begin,
+                end=end,
+            ),
         )
-        return res
 
     def get_long_short_ratio(
         self,
@@ -253,19 +168,10 @@ class PublicHTTP(HTTPManager):
         end: int | None = None,
     ) -> dict[str, Any]:
         """Get long and short account ratio by currency."""
-        payload: dict[str, Any] = {"ccy": ccy, "period": period}
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_LONG_SHORT_RATIO,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_long_short_ratio",
+            self._params(ccy=ccy, period=period, begin=begin, end=end),
         )
-        return res
 
     def get_contract_long_short_ratio(
         self,
@@ -275,22 +181,15 @@ class PublicHTTP(HTTPManager):
         end: int | None = None,
     ) -> dict[str, Any]:
         """Get contract long and short account ratio."""
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "period": period,
-        }
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_CONTRACT_LONG_SHORT_RATIO,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_contract_long_short_ratio",
+            self._params(
+                instId=self._exchange_symbol(product_symbol),
+                period=period,
+                begin=begin,
+                end=end,
+            ),
         )
-        return res
 
     def get_top_trader_long_short_account_ratio(
         self,
@@ -300,22 +199,15 @@ class PublicHTTP(HTTPManager):
         end: int | None = None,
     ) -> dict[str, Any]:
         """Get top trader contract long and short account ratio."""
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "period": period,
-        }
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_TOP_TRADER_LONG_SHORT_ACCOUNT_RATIO,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_top_trader_long_short_account_ratio",
+            self._params(
+                instId=self._exchange_symbol(product_symbol),
+                period=period,
+                begin=begin,
+                end=end,
+            ),
         )
-        return res
 
     def get_top_trader_long_short_position_ratio(
         self,
@@ -325,22 +217,15 @@ class PublicHTTP(HTTPManager):
         end: int | None = None,
     ) -> dict[str, Any]:
         """Get top trader contract long and short position ratio."""
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "period": period,
-        }
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_TOP_TRADER_LONG_SHORT_POSITION_RATIO,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_top_trader_long_short_position_ratio",
+            self._params(
+                instId=self._exchange_symbol(product_symbol),
+                period=period,
+                begin=begin,
+                end=end,
+            ),
         )
-        return res
 
     def get_contracts_open_interest_and_volume(
         self,
@@ -350,19 +235,10 @@ class PublicHTTP(HTTPManager):
         end: int | None = None,
     ) -> dict[str, Any]:
         """Get contracts open interest and volume by currency."""
-        payload: dict[str, Any] = {"ccy": ccy, "period": period}
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_CONTRACTS_OPEN_INTEREST_VOLUME,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_contracts_open_interest_and_volume",
+            self._params(ccy=ccy, period=period, begin=begin, end=end),
         )
-        return res
 
     def get_contract_open_interest_history(
         self,
@@ -372,19 +248,12 @@ class PublicHTTP(HTTPManager):
         end: int | None = None,
     ) -> dict[str, Any]:
         """Get contract open interest history."""
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "period": period,
-        }
-        if begin is not None:
-            payload["begin"] = str(begin)
-        if end is not None:
-            payload["end"] = str(end)
-
-        res = self._request(
-            method="GET",
-            path=Public.GET_CONTRACT_OPEN_INTEREST_HISTORY,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_contract_open_interest_history",
+            self._params(
+                instId=self._exchange_symbol(product_symbol),
+                period=period,
+                begin=begin,
+                end=end,
+            ),
         )
-        return res

@@ -1,120 +1,72 @@
-"""Bitmart market data HTTP client."""
+"""Bitmart market data HTTP client backed by Rust."""
 
 from typing import Any
 
+from .._native_http import NativeResponse
 from ..utils.common import Common
-from ..utils.timeframe_utils import bitmart_convert_timeframe
 from ._http_manager import HTTPManager
-from .endpoints.market import FuturesMarket, SpotMarket
 
 
 class MarketHTTP(HTTPManager):
-    """
-    Market data HTTP client for Bitmart.
+    """Market data HTTP client for Bitmart."""
 
-    This class provides methods to access market data including
-    currencies, trading pairs, tickers, klines, and futures data.
-    """
+    def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed BitMart public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("BitMart native client is required for public market methods.")
+        status, headers, body = self._native_client.public_request(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _exchange_symbol(self, product_symbol: str, *, spot: bool) -> str:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return self.ptm.get_exchange_symbol(Common.BITMART, product_symbol)
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            return f"{parts[0]}_{parts[1]}" if spot else f"{parts[0]}{parts[1]}"
+        return product_symbol
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            params.append((key, str(value)))
+        return params
 
     def get_spot_currencies(self) -> dict[str, Any]:
-        """
-        Get all available spot currencies.
-
-        Returns:
-            Dict containing spot currencies information
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        res = self._request(
-            method="GET",
-            path=SpotMarket.GET_SPOT_CURRENCIES,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get all available spot currencies."""
+        return self._native_public("get_spot_currencies", [])
 
     def get_trading_pairs(self) -> dict[str, Any]:
-        """
-        Get all available trading pairs.
-
-        Returns:
-            Dict containing trading pairs information
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        res = self._request(
-            method="GET",
-            path=SpotMarket.GET_TRADING_PAIRS,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get all available trading pairs."""
+        return self._native_public("get_trading_pairs", [])
 
     def get_trading_pairs_details(self) -> dict[str, Any]:
-        """
-        Get detailed information for all trading pairs.
-
-        Returns:
-            Dict containing detailed trading pairs information
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        res = self._request(
-            method="GET",
-            path=SpotMarket.GET_TRADING_PAIRS_DETAILS,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get detailed information for all trading pairs."""
+        return self._native_public("get_trading_pairs_details", [])
 
     def get_ticker_of_all_pairs(self) -> dict[str, Any]:
-        """
-        Get ticker information for all trading pairs.
-
-        Returns:
-            Dict containing ticker information for all pairs
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        res = self._request(
-            method="GET",
-            path=SpotMarket.GET_TICKER_OF_ALL_PAIRS,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get ticker information for all trading pairs."""
+        return self._native_public("get_ticker_of_all_pairs", [])
 
     def get_ticker_of_a_pair(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
-        """
-        Get ticker information for a specific trading pair.
-
-        Args:
-            product_symbol: Trading pair symbol
-
-        Returns:
-            Dict containing ticker information for the specified pair
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = self._request(
-            method="GET",
-            path=SpotMarket.GET_TICKER_OF_A_PAIR,
-            query=payload,
-            signed=False,
+        """Get ticker information for a specific trading pair."""
+        return self._native_public(
+            "get_ticker_of_a_pair",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=True)),
         )
-        return res
 
     def get_spot_kline(
         self,
@@ -124,97 +76,41 @@ class MarketHTTP(HTTPManager):
         after: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get spot kline (candlestick) data for a trading pair.
-
-        Args:
-            product_symbol: Trading pair symbol
-            interval: Time interval for kline data
-            before: Start timestamp (optional)
-            after: End timestamp (optional)
-            limit: Maximum number of records (optional)
-
-        Returns:
-            Dict containing kline data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-        if interval is not None:
-            payload["step"] = str(bitmart_convert_timeframe(interval))
-        if before is not None:
-            payload["before"] = str(before)
-        if after is not None:
-            payload["after"] = str(after)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = self._request(
-            method="GET",
-            path=SpotMarket.GET_SPOT_KLINE,
-            query=payload,
-            signed=False,
+        """Get spot kline data for a trading pair."""
+        return self._native_public(
+            "get_spot_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=True),
+                interval=interval,
+                before=before,
+                after=after,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_contracts_details(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get futures contract details.
-
-        Args:
-            product_symbol: Contract symbol (optional)
-
-        Returns:
-            Dict containing contract details
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMART, product_symbol)
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_CONTRACTS_DETAILS,
-            query=payload,
-            signed=False,
+        """Get futures contract details."""
+        return self._native_public(
+            "get_contracts_details",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False)
+                if product_symbol is not None
+                else None,
+            ),
         )
-        return res
 
     def get_depth(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
-        """
-        Get order book depth for a futures contract.
-
-        Args:
-            product_symbol: Contract symbol
-
-        Returns:
-            Dict containing order book depth data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_DEPTH,
-            query=payload,
-            signed=False,
+        """Get order book depth for a futures contract."""
+        return self._native_public(
+            "get_depth",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     def get_contract_kline(
         self,
@@ -223,49 +119,23 @@ class MarketHTTP(HTTPManager):
         start_time: int,
         end_time: int,
     ) -> dict[str, Any]:
-        """
-        Get futures contract kline data.
-
-        Args:
-            product_symbol: Contract symbol
-            interval: Time interval for kline data
-            start_time: Start timestamp
-            end_time: End timestamp
-
-        Returns:
-            Dict containing contract kline data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "step": bitmart_convert_timeframe(interval),
-            "start_time": start_time,
-            "end_time": end_time,
-        }
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_CONTRACTS_KLINE,
-            query=payload,
-            signed=False,
+        """Get futures contract kline data."""
+        return self._native_public(
+            "get_contract_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False),
+                interval=interval,
+                start_time=start_time,
+                end_time=end_time,
+            ),
         )
-        return res
 
     def get_open_interest(self, product_symbol: str) -> dict[str, Any]:
         """Get futures contract open interest."""
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_OPEN_INTEREST,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_open_interest",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     def get_mark_price_kline(
         self,
@@ -275,91 +145,43 @@ class MarketHTTP(HTTPManager):
         end_time: int,
     ) -> dict[str, Any]:
         """Get futures mark price kline data."""
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-            "step": bitmart_convert_timeframe(interval),
-            "start_time": start_time,
-            "end_time": end_time,
-        }
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_MARK_PRICE_KLINE,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_mark_price_kline",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False),
+                interval=interval,
+                start_time=start_time,
+                end_time=end_time,
+            ),
         )
-        return res
 
     def get_leverage_bracket(self, product_symbol: str) -> dict[str, Any]:
         """Get futures contract leverage bracket."""
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_LEVERAGE_BRACKET,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_leverage_bracket",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     def get_current_funding_rate(
         self,
         product_symbol: str,
     ) -> dict[str, Any]:
-        """
-        Get current funding rate for a futures contract.
-
-        Args:
-            product_symbol: Contract symbol
-
-        Returns:
-            Dict containing current funding rate information
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_CURRENT_FUNDING_RATE,
-            query=payload,
-            signed=False,
+        """Get current funding rate for a futures contract."""
+        return self._native_public(
+            "get_current_funding_rate",
+            self._params(product_symbol=self._exchange_symbol(product_symbol, spot=False)),
         )
-        return res
 
     def get_funding_rate_history(
         self,
         product_symbol: str,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get funding rate history for a futures contract.
-
-        Args:
-            product_symbol: Contract symbol
-            limit: Maximum number of records (optional)
-
-        Returns:
-            Dict containing funding rate history
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMART, product_symbol),
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.GET_FUNDING_RATE_HISTORY,
-            query=payload,
-            signed=False,
+        """Get funding rate history for a futures contract."""
+        return self._native_public(
+            "get_funding_rate_history",
+            self._params(
+                product_symbol=self._exchange_symbol(product_symbol, spot=False),
+                limit=limit,
+            ),
         )
-        return res

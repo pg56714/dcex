@@ -1,7 +1,8 @@
 """Lighter public market-data HTTP client."""
 
-from typing import Any
+from typing import Any, Literal
 
+from .._native_http import NativeResponse
 from ._http_manager import HTTPManager
 from .endpoints.market import Public
 
@@ -12,6 +13,45 @@ def _auth_header(authorization: str | None) -> dict[str, str] | None:
 
 class MarketHTTP(HTTPManager):
     """HTTP client for Lighter public REST APIs."""
+
+    @staticmethod
+    def _native_params(query: dict[str, Any] | None) -> list[tuple[str, str]]:
+        params: list[tuple[str, str]] = []
+        for key, value in (query or {}).items():
+            if value is None:
+                continue
+            if isinstance(value, bool):
+                value = str(value).lower()
+            params.append((key, str(value)))
+        return params
+
+    def _request(
+        self,
+        method: Literal["GET", "POST"],
+        path: str,
+        query: dict[str, Any] | None = None,
+        body: dict[str, Any] | None = None,
+        signed: bool = False,
+        headers: dict[str, str] | None = None,
+        content_type: Literal["json", "form"] = "json",
+    ) -> dict[str, Any] | list[Any]:
+        if (
+            method.upper() == "GET"
+            and not signed
+            and body is None
+            and content_type == "json"
+            and self._native_client is not None
+        ):
+            native_headers = {key: value for key, value in (headers or {}).items() if value}
+            status, response_headers, response_body = self._native_client.public_request(
+                str(path),
+                self._native_params(query),
+                native_headers,
+            )
+            response = NativeResponse(status, dict(response_headers), bytes(response_body))
+            self._store_response_headers(response)
+            return response.json()
+        return super()._request(method, path, query, body, signed, headers, content_type)
 
     def get_info(self) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter API service info."""

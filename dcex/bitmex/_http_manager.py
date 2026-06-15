@@ -12,17 +12,20 @@ import logging
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any
-from urllib.parse import urlencode
+from typing import Any, cast
+from urllib.parse import parse_qsl, urlencode
 
 import msgspec
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+
+_native = load_native()
 
 
 @dataclass
@@ -55,6 +58,8 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """
@@ -64,9 +69,24 @@ class HTTPManager(BaseHTTPManager):
         preloads the product table for symbol conversion.
         """
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "BitmexHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BITMEX)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def _sign(self, method: str, path: str, expires: int, body: str = "") -> str:
         """
@@ -161,43 +181,68 @@ class HTTPManager(BaseHTTPManager):
             full_path = path
             self._log_request(method, url)
 
-            if method.upper() == "GET":
-                if query:
-                    query_string = urlencode(query)
-                    url += f"?{query_string}"
-                    full_path += f"?{query_string}"
-                response = self.session.get(
-                    url,
-                    headers=self._headers(method, full_path, signed=signed),
-                    timeout=self.timeout,
+            if self._uses_native_transport():
+                params = (
+                    parse_qsl(urlencode(query), keep_blank_values=True)
+                    if query and method.upper() == "GET"
+                    else []
                 )
-            elif method.upper() == "POST":
-                body = msgspec.json.encode(query).decode("utf-8") if query else ""
-                response = self.session.post(
-                    url,
-                    headers=self._headers(method, full_path, body, signed=signed),
-                    data=body,
-                    timeout=self.timeout,
+                body_bytes = (
+                    msgspec.json.encode(query) if query and method.upper() != "GET" else None
                 )
-            elif method.upper() == "PUT":
-                body = msgspec.json.encode(query).decode("utf-8") if query else ""
-                response = self.session.put(
-                    url,
-                    headers=self._headers(method, full_path, body, signed=signed),
-                    data=body,
-                    timeout=self.timeout,
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    path,
+                    params,
+                    body_bytes,
+                    signed,
                 )
-            elif method.upper() == "DELETE":
-                body = msgspec.json.encode(query).decode("utf-8") if query else ""
-                response = self.session.request(
-                    method="DELETE",
-                    url=url,
-                    headers=self._headers(method, full_path, body, signed=signed),
-                    data=body,
-                    timeout=self.timeout,
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
                 )
             else:
-                raise ValueError(f"Unsupported method: {method}")
+                if method.upper() == "GET":
+                    if query:
+                        query_string = urlencode(query)
+                        url += f"?{query_string}"
+                        full_path += f"?{query_string}"
+                    response = self.session.get(
+                        url,
+                        headers=self._headers(method, full_path, signed=signed),
+                        timeout=self.timeout,
+                    )
+                elif method.upper() == "POST":
+                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    response = self.session.post(
+                        url,
+                        headers=self._headers(method, full_path, body, signed=signed),
+                        data=body,
+                        timeout=self.timeout,
+                    )
+                elif method.upper() == "PUT":
+                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    response = self.session.put(
+                        url,
+                        headers=self._headers(method, full_path, body, signed=signed),
+                        data=body,
+                        timeout=self.timeout,
+                    )
+                elif method.upper() == "DELETE":
+                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    response = self.session.request(
+                        method="DELETE",
+                        url=url,
+                        headers=self._headers(method, full_path, body, signed=signed),
+                        data=body,
+                        timeout=self.timeout,
+                    )
+                else:
+                    raise ValueError(f"Unsupported method: {method}")
 
             self._store_response_headers(response)
             try:
@@ -230,7 +275,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 return data
 
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.RequestException, RuntimeError) as e:
             timestamp = str(generate_timestamp(iso_format=True))
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(

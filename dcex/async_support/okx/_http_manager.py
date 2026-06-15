@@ -4,16 +4,19 @@ import base64
 import hmac
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Self
+from typing import Any, Self, cast
 
 import httpx
 import msgspec
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 
 def _sign(message: str, secretKey: str) -> str:
@@ -136,6 +139,8 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """
@@ -147,9 +152,26 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.OKX)
+        native_client_type = getattr(_native, "OkxHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                passphrase=self.passphrase,
+                flag=self.flag,
+                timeout=self.timeout,
+                base_url=self.base_api,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     async def _request(
         self,
@@ -179,11 +201,13 @@ class HTTPManager(BaseHTTPManager):
         if query is None:
             query = {}
 
-        if method.upper() == "GET" and query and isinstance(query, dict):
-            path += parse_params_to_str(query)
+        method_upper = method.upper()
+        request_path = path
+        if method_upper == "GET" and query and isinstance(query, dict):
+            request_path += parse_params_to_str(query)
 
         timestamp = generate_timestamp(iso_format=True)
-        body = query if method.upper() == "POST" else ""
+        body = query if method_upper == "POST" else ""
         body_str = (
             msgspec.json.encode(body).decode("utf-8") if isinstance(body, (dict, list)) else body
         )
@@ -191,29 +215,62 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret and self.passphrase):
                 raise ValueError("Signed request requires API Key and Secret and Passphrase.")
-            sign = _sign(pre_hash(str(timestamp), method.upper(), path, body_str), self.api_secret)
-            headers = get_header(self.api_key, sign, str(timestamp), self.passphrase, self.flag)
+            if not self._uses_native_transport():
+                sign = _sign(
+                    pre_hash(str(timestamp), method_upper, request_path, body_str),
+                    self.api_secret,
+                )
+                headers = get_header(
+                    self.api_key,
+                    sign,
+                    str(timestamp),
+                    self.passphrase,
+                    self.flag,
+                )
+            else:
+                headers = get_header_no_sign(self.flag)
         else:
             headers = get_header_no_sign(self.flag)
 
-        url = self.base_api + path
+        url = self.base_api + request_path
         self._log_request(method, url)
 
         try:
             if self.session is None:
                 raise ValueError("Session is not initialized")
-            if method.upper() == "GET":
+            if self._uses_native_transport():
+                params = (
+                    [(key, str(value)) for key, value in query.items()]
+                    if method_upper == "GET" and isinstance(query, dict)
+                    else []
+                )
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    path,
+                    params,
+                    body_str.encode() if method_upper == "POST" else None,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method_upper == "GET":
                 response = await self.session.get(url, headers=headers)
-            elif method.upper() == "POST":
+            elif method_upper == "POST":
                 # Send exactly the same JSON string used for signing to avoid signature mismatch
                 response = await self.session.post(url, headers=headers, content=body_str)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except httpx.HTTPError as e:
+        except (httpx.HTTPError, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
-                request=f"{method.upper()} {url} | Body: {query}",
+                request=f"{method_upper} {url} | Body: {query}",
                 message=f"Request failed: {str(e)}",
                 status_code=status_code,
                 time=str(timestamp),
@@ -225,7 +282,7 @@ class HTTPManager(BaseHTTPManager):
                 data = response.json()
             except Exception as exc:
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"Failed to decode JSON response: {exc}",
                     status_code=response.status_code,
                     time=str(timestamp),
@@ -233,7 +290,7 @@ class HTTPManager(BaseHTTPManager):
                 ) from exc
             if not isinstance(data, dict):
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"Unexpected response type: {type(data).__name__}",
                     status_code=response.status_code,
                     time=str(timestamp),
@@ -244,7 +301,7 @@ class HTTPManager(BaseHTTPManager):
                 api_code, error_message = _okx_error_details(data)
                 self._log_failed_request(f"OKX API Error: [{api_code}] {error_message}", api_code)
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"OKX API Error: [{api_code}] {error_message}",
                     status_code=response.status_code,
                     time=str(timestamp),
@@ -253,7 +310,7 @@ class HTTPManager(BaseHTTPManager):
 
             if not response.status_code // 100 == 2:
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"HTTP Error {response.status_code}: {response.text}",
                     status_code=response.status_code,
                     time=str(timestamp),

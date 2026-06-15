@@ -1,30 +1,43 @@
+"""Binance public market API wrappers backed by Rust."""
+
 from typing import Any
 
-from ..utils.common import Common
+from .._native_http import NativeResponse
 from ._http_manager import HTTPManager
-from .endpoints.market import FuturesMarket, SpotMarket
 from .enums import BinanceProductType
 
 
 class MarketHTTP(HTTPManager):
     """HTTP client for Binance market data API endpoints."""
 
+    def _native_public(self, method_name: str, params: list[tuple[str, str]]) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Binance public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Binance native client is required for public market methods.")
+        status, headers, body = self._native_client.public_request(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            if isinstance(value, list):
+                params.extend((key, str(item)) for item in value)
+            else:
+                params.append((key, str(value)))
+        return params
+
     def get_server_time(self, market_type: str = BinanceProductType.SPOT) -> dict[str, Any]:
-        """
-        Get Binance server time for spot or futures.
-
-        Args:
-            market_type: Market type ("spot" or "swap").
-
-        Returns:
-            dict[str, Any]: Server time response.
-        """
-        path = (
-            SpotMarket.SERVER_TIME
-            if str(market_type) == BinanceProductType.SPOT.value
-            else FuturesMarket.SERVER_TIME
+        """Get Binance server time for spot or futures."""
+        return self._native_public(
+            "get_server_time",
+            self._params(market_type=str(market_type)),
         )
-        return self._request(method="GET", path=path, query={}, signed=False)
 
     def get_spot_exchange_info(
         self,
@@ -32,102 +45,37 @@ class MarketHTTP(HTTPManager):
         product_symbols: list[str] | None = None,
         symbolStatus: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get spot trading exchange information from Binance.
-
-        Args:
-            product_symbol: Single trading pair symbol (e.g., 'BTCUSDT').
-            product_symbols: List of trading pair symbols.
-            symbolStatus: Filter symbols by trading status. Valid values:
-                TRADING, HALT, BREAK. Cannot be used with symbols or symbol.
-
-        Returns:
-            dict[str, Any]: Exchange information including trading rules and symbols.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        payload: dict[str, Any] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-        if product_symbols is not None:
-            formatted_symbols = [
-                self.ptm.get_exchange_symbol(Common.BINANCE, symbol) for symbol in product_symbols
-            ]
-            payload["symbols"] = str(formatted_symbols).replace("'", '"')
-        if symbolStatus is not None:
-            payload["symbolStatus"] = symbolStatus
-
-        res = self._request(
-            method="GET",
-            path=SpotMarket.EXCHANGE_INFO,
-            query=payload,
-            signed=False,
+        """Get spot trading exchange information from Binance."""
+        return self._native_public(
+            "get_spot_exchange_info",
+            self._params(
+                product_symbol=product_symbol,
+                product_symbols=product_symbols,
+                symbolStatus=symbolStatus,
+            ),
         )
-        return res
 
     def get_spot_orderbook(
         self,
         product_symbol: str,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get spot order book data from Binance.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            limit: Number of orders to return (max: 5000, default: 100).
-
-        Returns:
-            dict[str, Any]: Order book data with bids and asks.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-        res = self._request(
-            method="GET",
-            path=SpotMarket.ORDERBOOK,
-            query=payload,
-            signed=False,
+        """Get spot order book data from Binance."""
+        return self._native_public(
+            "get_spot_orderbook",
+            self._params(product_symbol=product_symbol, limit=limit),
         )
-        return res
 
     def get_spot_trades(
         self,
         product_symbol: str,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get recent spot trades from Binance.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            limit: Number of trades to return (max: 1000, default: 500).
-
-        Returns:
-            dict[str, Any]: Recent trades data.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = self._request(
-            method="GET",
-            path=SpotMarket.TRADES,
-            query=payload,
-            signed=False,
+        """Get recent spot trades from Binance."""
+        return self._native_public(
+            "get_spot_trades",
+            self._params(product_symbol=product_symbol, limit=limit),
         )
-        return res
 
     def get_spot_price(
         self,
@@ -135,35 +83,15 @@ class MarketHTTP(HTTPManager):
         product_symbols: list[str] | None = None,
         symbolStatus: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get latest spot price for a symbol, symbols, or all symbols.
-
-        Args:
-            product_symbol: Single trading pair symbol.
-            product_symbols: List of trading pair symbols.
-            symbolStatus: Filter symbols by trading status.
-
-        Returns:
-            dict[str, Any]: Latest price information.
-        """
-        payload: dict[str, Any] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-        if product_symbols is not None:
-            formatted_symbols = [
-                self.ptm.get_exchange_symbol(Common.BINANCE, symbol) for symbol in product_symbols
-            ]
-            payload["symbols"] = str(formatted_symbols).replace("'", '"')
-        if symbolStatus is not None:
-            payload["symbolStatus"] = symbolStatus
-
-        res = self._request(
-            method="GET",
-            path=SpotMarket.PRICE,
-            query=payload,
-            signed=False,
+        """Get latest spot price for a symbol, symbols, or all symbols."""
+        return self._native_public(
+            "get_spot_price",
+            self._params(
+                product_symbol=product_symbol,
+                product_symbols=product_symbols,
+                symbolStatus=symbolStatus,
+            ),
         )
-        return res
 
     def get_klines(
         self,
@@ -172,114 +100,40 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get kline/candlestick data from Binance.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            interval: Kline interval (e.g., '1m', '5m', '1h', '1d').
-            start_time: Start time in milliseconds since epoch.
-            limit: Number of klines to return (max: 1500, default: 500).
-
-        Returns:
-            dict[str, Any]: Kline data with OHLCV information.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "interval": interval,
-        }
-        if start_time is not None:
-            payload["startTime"] = str(start_time)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = self._request(
-            method="GET",
-            path=SpotMarket.KLINES
-            if self.ptm.get_exchange_type(Common.BINANCE, product_symbol=product_symbol)
-            == BinanceProductType.SPOT
-            else FuturesMarket.KLINES,
-            query=payload,
-            signed=False,
+        """Get kline/candlestick data from Binance."""
+        return self._native_public(
+            "get_klines",
+            self._params(
+                product_symbol=product_symbol,
+                interval=interval,
+                start_time=start_time,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_futures_exchange_info(self) -> dict[str, Any]:
-        """
-        Get futures trading exchange information from Binance.
-
-        Returns:
-            dict[str, Any]: Futures exchange information including trading rules and symbols.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.EXCHANGE_INFO,
-            query=None,
-            signed=False,
-        )
-        return res
+        """Get futures trading exchange information from Binance."""
+        return self._native_public("get_futures_exchange_info", [])
 
     def get_futures_ticker(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get futures ticker data from Binance.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT'). If None, returns all symbols.
-
-        Returns:
-            dict[str, Any]: Ticker data with price and volume information.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        payload: dict[str, Any] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.BOOK_TICKER,
-            query=payload,
-            signed=False,
+        """Get futures ticker data from Binance."""
+        return self._native_public(
+            "get_futures_ticker",
+            self._params(product_symbol=product_symbol),
         )
-        return res
 
     def get_futures_premium_index(
         self,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get futures premium index data from Binance.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT'). If None, returns all symbols.
-
-        Returns:
-            dict[str, Any]: Premium index data.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        payload: dict[str, Any] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.PREMIUM_INDEX,
-            query=payload,
-            signed=False,
+        """Get futures premium index data from Binance."""
+        return self._native_public(
+            "get_futures_premium_index",
+            self._params(product_symbol=product_symbol),
         )
-        return res
 
     def get_futures_funding_rate(
         self,
@@ -288,57 +142,22 @@ class MarketHTTP(HTTPManager):
         endTime: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get futures funding rate history from Binance.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            startTime: Start time in milliseconds since epoch.
-            endTime: End time in milliseconds since epoch.
-            limit: Number of records to return (max: 1000, default: 100).
-
-        Returns:
-            dict[str, Any]: Funding rate history data.
-
-        Raises:
-            FailedRequestError: If the API request fails.
-        """
-        payload: dict[str, Any] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = self._request(
-            method="GET",
-            path=FuturesMarket.FUNDING_RATE_HISTORY,
-            query=payload,
-            signed=False,
+        """Get futures funding rate history from Binance."""
+        return self._native_public(
+            "get_futures_funding_rate",
+            self._params(
+                product_symbol=product_symbol,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_futures_open_interest(self, product_symbol: str) -> dict[str, Any]:
-        """
-        Get current futures open interest for a symbol.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-
-        Returns:
-            dict[str, Any]: Open interest data.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        return self._request(
-            method="GET",
-            path=FuturesMarket.OPEN_INTEREST,
-            query=payload,
-            signed=False,
+        """Get current futures open interest for a symbol."""
+        return self._native_public(
+            "get_futures_open_interest",
+            self._params(product_symbol=product_symbol),
         )
 
     def get_futures_open_interest_history(
@@ -349,35 +168,16 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get futures open interest statistics history.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            period: Data period (e.g., '5m', '1h', '1d').
-            limit: Number of records to return.
-            startTime: Start time in milliseconds.
-            endTime: End time in milliseconds.
-
-        Returns:
-            dict[str, Any]: Open interest statistics history.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "period": period,
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-
-        return self._request(
-            method="GET",
-            path=FuturesMarket.OPEN_INTEREST_HISTORY,
-            query=payload,
-            signed=False,
+        """Get futures open interest statistics history."""
+        return self._native_public(
+            "get_futures_open_interest_history",
+            self._params(
+                product_symbol=product_symbol,
+                period=period,
+                limit=limit,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
 
     def get_futures_global_long_short_account_ratio(
@@ -388,35 +188,16 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get global futures long/short account ratio history.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            period: Data period (e.g., '5m', '1h', '1d').
-            limit: Number of records to return.
-            startTime: Start time in milliseconds.
-            endTime: End time in milliseconds.
-
-        Returns:
-            dict[str, Any]: Long/short account ratio history.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "period": period,
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-
-        return self._request(
-            method="GET",
-            path=FuturesMarket.GLOBAL_LONG_SHORT_ACCOUNT_RATIO,
-            query=payload,
-            signed=False,
+        """Get global futures long/short account ratio history."""
+        return self._native_public(
+            "get_futures_global_long_short_account_ratio",
+            self._params(
+                product_symbol=product_symbol,
+                period=period,
+                limit=limit,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
 
     def get_futures_top_long_short_account_ratio(
@@ -427,35 +208,16 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get top trader futures long/short account ratio history.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            period: Data period (e.g., '5m', '1h', '1d').
-            limit: Number of records to return.
-            startTime: Start time in milliseconds.
-            endTime: End time in milliseconds.
-
-        Returns:
-            dict[str, Any]: Top trader account ratio history.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "period": period,
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-
-        return self._request(
-            method="GET",
-            path=FuturesMarket.TOP_LONG_SHORT_ACCOUNT_RATIO,
-            query=payload,
-            signed=False,
+        """Get top trader futures long/short account ratio history."""
+        return self._native_public(
+            "get_futures_top_long_short_account_ratio",
+            self._params(
+                product_symbol=product_symbol,
+                period=period,
+                limit=limit,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
 
     def get_futures_top_long_short_position_ratio(
@@ -466,35 +228,16 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get top trader futures long/short position ratio history.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            period: Data period (e.g., '5m', '1h', '1d').
-            limit: Number of records to return.
-            startTime: Start time in milliseconds.
-            endTime: End time in milliseconds.
-
-        Returns:
-            dict[str, Any]: Top trader position ratio history.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "period": period,
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-
-        return self._request(
-            method="GET",
-            path=FuturesMarket.TOP_LONG_SHORT_POSITION_RATIO,
-            query=payload,
-            signed=False,
+        """Get top trader futures long/short position ratio history."""
+        return self._native_public(
+            "get_futures_top_long_short_position_ratio",
+            self._params(
+                product_symbol=product_symbol,
+                period=period,
+                limit=limit,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
 
     def get_futures_taker_buy_sell_volume(
@@ -505,35 +248,16 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get futures taker buy/sell volume history.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., 'BTCUSDT').
-            period: Data period (e.g., '5m', '1h', '1d').
-            limit: Number of records to return.
-            startTime: Start time in milliseconds.
-            endTime: End time in milliseconds.
-
-        Returns:
-            dict[str, Any]: Taker buy/sell volume history.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "period": period,
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-
-        return self._request(
-            method="GET",
-            path=FuturesMarket.TAKER_LONG_SHORT_RATIO,
-            query=payload,
-            signed=False,
+        """Get futures taker buy/sell volume history."""
+        return self._native_public(
+            "get_futures_taker_buy_sell_volume",
+            self._params(
+                product_symbol=product_symbol,
+                period=period,
+                limit=limit,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
 
     def get_futures_basis(
@@ -545,35 +269,15 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get futures basis history.
-
-        Args:
-            product_symbol: Trading pair symbol used as Binance pair (e.g., 'BTCUSDT').
-            contractType: Contract type (CURRENT_QUARTER, NEXT_QUARTER, PERPETUAL).
-            period: Data period (e.g., '5m', '1h', '1d').
-            limit: Number of records to return.
-            startTime: Start time in milliseconds.
-            endTime: End time in milliseconds.
-
-        Returns:
-            dict[str, Any]: Futures basis history.
-        """
-        payload: dict[str, Any] = {
-            "pair": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "contractType": contractType,
-            "period": period,
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-
-        return self._request(
-            method="GET",
-            path=FuturesMarket.BASIS,
-            query=payload,
-            signed=False,
+        """Get futures basis history."""
+        return self._native_public(
+            "get_futures_basis",
+            self._params(
+                product_symbol=product_symbol,
+                contractType=contractType,
+                period=period,
+                limit=limit,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )

@@ -2,19 +2,22 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Self
+from typing import Any, Self, cast
 
 import httpx
 import msgspec
 from coincurve import PrivateKey
 from Crypto.Hash import keccak
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.address_utils import address_to_bytes
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 HTTP_URL = "https://{SUBDOMAIN}.{DOMAIN}.{TLD}"
 SUBDOMAIN_MAIN = "api"
@@ -54,6 +57,8 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """
@@ -67,9 +72,25 @@ class HTTPManager(BaseHTTPManager):
             self.ptm = await ProductTableManager.get_instance(Common.HYPERLIQUID)
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)
+        native_client_type = getattr(_native, "HyperliquidHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                testnet=self.testnet,
+                wallet_address=self.wallet_address,
+                private_key=self.private_key,
+                timeout=self.timeout,
+                endpoint=self.endpoint,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     async def _get_ptm(self) -> ProductTableManager:
         """Lazily obtain the product table manager instance."""
@@ -335,15 +356,17 @@ class HTTPManager(BaseHTTPManager):
         query = dict(query or {})
 
         timestamp = int(generate_timestamp())
+        uses_native = self._uses_native_transport()
 
         # Add signing fields before building URL/body so GET also carries signature
         if signed:
             if not (self.wallet_address and self.private_key):
                 raise ValueError("Signed request requires Address and Private Key of wallet.")
-            query["nonce"] = timestamp
-            query["signature"] = self._auth(query, timestamp)
+            if not uses_native:
+                query["nonce"] = timestamp
+                query["signature"] = self._auth(query, timestamp)
 
-        if method.upper() == "GET":
+        if method.upper() == "GET" and not uses_native:
             if query:
                 from urllib.parse import urlencode
 
@@ -360,7 +383,28 @@ class HTTPManager(BaseHTTPManager):
         try:
             if self.session is None:
                 raise ValueError("Session is not initialized")
-            if method.upper() == "GET":
+            if uses_native:
+                action_msgpack = (
+                    msgspec.msgpack.encode(query["action"])
+                    if signed and "action" in query
+                    else None
+                )
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    path,
+                    msgspec.json.encode(query),
+                    action_msgpack,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method.upper() == "GET":
                 response = await self.session.get(url, headers=headers)
             elif method.upper() == "POST":
                 response = await self.session.post(
@@ -369,7 +413,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except httpx.HTTPError as e:
+        except (httpx.HTTPError, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

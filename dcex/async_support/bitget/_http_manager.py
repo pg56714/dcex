@@ -7,16 +7,19 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Literal, Self
-from urllib.parse import urlencode
+from typing import Any, Literal, Self, cast
+from urllib.parse import parse_qsl, urlencode
 
 import httpx
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 
 def _format_value(value: object) -> str:
@@ -73,15 +76,33 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(default=None, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITGET)
+        native_client_type = getattr(_native, "BitgetHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                passphrase=self.passphrase,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     def _headers(
         self,
@@ -139,22 +160,44 @@ class HTTPManager(BaseHTTPManager):
         if query_string:
             url = f"{url}?{query_string}"
 
-        headers = self._headers(method, request_path, query_string, body, signed)
         response = None
         try:
             self._log_request(method, url)
-            method_upper = method.upper()
-            if method_upper == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method_upper == "POST":
-                response = await self.session.post(url, headers=headers, content=body)
-            elif method_upper == "PUT":
-                response = await self.session.put(url, headers=headers, content=body)
-            elif method_upper == "DELETE":
-                response = await self.session.delete(url, headers=headers)
+            if self._uses_native_transport():
+                if signed and not (self.api_key and self.api_secret and self.passphrase):
+                    raise ValueError(
+                        "Signed Bitget requests require api_key, api_secret, and passphrase."
+                    )
+                params = parse_qsl(query_string, keep_blank_values=True) if query_string else []
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    request_path,
+                    params,
+                    body.encode() if body else None,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
-        except httpx.RequestError as exc:
+                headers = self._headers(method, request_path, query_string, body, signed)
+                method_upper = method.upper()
+                if method_upper == "GET":
+                    response = await self.session.get(url, headers=headers)
+                elif method_upper == "POST":
+                    response = await self.session.post(url, headers=headers, content=body)
+                elif method_upper == "PUT":
+                    response = await self.session.put(url, headers=headers, content=body)
+                elif method_upper == "DELETE":
+                    response = await self.session.delete(url, headers=headers)
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
+        except (httpx.RequestError, RuntimeError) as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

@@ -2,17 +2,20 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal, Self
+from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
 import httpx
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...lighter.signer_client import SignerClient
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 
 def _format_value(value: object) -> str:
@@ -45,15 +48,30 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False, repr=False)
     _signer: SignerClient | None = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "LighterHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.LIGHTER)
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     async def __aenter__(self) -> Self:
         if self.session is None or self.session.is_closed:
@@ -102,7 +120,25 @@ class HTTPManager(BaseHTTPManager):
         try:
             self._log_request(method, url)
             method_upper = method.upper()
-            if method_upper == "GET":
+            if self._uses_native_transport():
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    request_path,
+                    [(key, _format_value(value)) for key, value in filtered_query.items()],
+                    [(key, _format_value(value)) for key, value in _filtered_query(body).items()],
+                    signed,
+                    {key: value for key, value in (headers or {}).items() if value},
+                    content_type,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method_upper == "GET":
                 response = await self.session.get(url, headers=request_headers)
             elif method_upper == "POST":
                 response = await self.session.post(
@@ -112,7 +148,7 @@ class HTTPManager(BaseHTTPManager):
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except httpx.RequestError as exc:
+        except (httpx.RequestError, RuntimeError) as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

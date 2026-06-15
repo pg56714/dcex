@@ -1,14 +1,46 @@
-"""OKX Market HTTP client for market data operations."""
+"""OKX Market async HTTP client backed by Rust."""
 
 from typing import Any
 
+from ..._native_http import NativeResponse
 from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.market import Market
 
 
 class MarketHTTP(HTTPManager):
-    """HTTP client for OKX market data operations."""
+    """Async HTTP client for OKX market data operations."""
+
+    async def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed OKX public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("OKX native client is required for market methods.")
+        status, headers, body = await self._native_client.public_request_async(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _exchange_symbol(self, product_symbol: str) -> str:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            return f"{parts[0]}-{parts[1]}" if parts[2] == "SPOT" else product_symbol
+        return product_symbol
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            params.append((key, str(value)))
+        return params
 
     async def get_candles_ticks(
         self,
@@ -18,67 +50,28 @@ class MarketHTTP(HTTPManager):
         before: str | None = None,
         limit: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get candlestick data.
-
-        Args:
-            product_symbol: Trading pair symbol
-            bar: Bar size (1m, 3m, 5m, 15m, 30m, 1H, 2H, 4H, 6H, 12H, 1D, 1W, 1M, 3M, 6M, 1Y)
-            after: Pagination parameter - records after this ID
-            before: Pagination parameter - records before this ID
-            limit: Number of results per request (max 300)
-
-        Returns:
-            Dict containing candlestick data
-        """
-        payload = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if bar is not None:
-            payload["bar"] = bar
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_KLINE,
-            query=payload,
-            signed=False,
+        """Get candlestick data."""
+        return await self._native_public(
+            "get_candles_ticks",
+            self._params(
+                instId=self._exchange_symbol(product_symbol),
+                bar=bar,
+                after=after,
+                before=before,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_orderbook(
         self,
         product_symbol: str,
         sz: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get order book data.
-
-        Args:
-            product_symbol: Trading pair symbol
-            sz: Number of results per request (max 400)
-
-        Returns:
-            Dict containing order book data
-        """
-        payload = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if sz is not None:
-            payload["sz"] = sz
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_ORDERBOOK,
-            query=payload,
-            signed=False,
+        """Get order book data."""
+        return await self._native_public(
+            "get_orderbook",
+            self._params(instId=self._exchange_symbol(product_symbol), sz=sz),
         )
-        return res
 
     async def get_tickers(
         self,
@@ -86,58 +79,19 @@ class MarketHTTP(HTTPManager):
         uly: str | None = None,
         instFamily: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get ticker data.
-
-        Args:
-            instType: Instrument type (SPOT, SWAP, FUTURES, OPTION)
-            uly: Underlying asset
-            instFamily: Instrument family
-
-        Returns:
-            Dict containing ticker data
-        """
-        payload = {
-            "instType": instType,
-        }
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_TICKERS,
-            query=payload,
-            signed=False,
+        """Get ticker data."""
+        return await self._native_public(
+            "get_tickers",
+            self._params(instType=instType, uly=uly, instFamily=instFamily),
         )
-        return res
 
     async def get_public_trades(
         self,
         product_symbol: str,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get public trades data.
-
-        Args:
-            product_symbol: Trading pair symbol
-            limit: Number of results per request (max 500)
-
-        Returns:
-            Dict containing public trades data
-        """
-        payload = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_PUBLIC_TRADES,
-            query=payload,
-            signed=False,
+        """Get public trades data."""
+        return await self._native_public(
+            "get_public_trades",
+            self._params(instId=self._exchange_symbol(product_symbol), limit=limit),
         )
-        return res

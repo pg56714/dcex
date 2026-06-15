@@ -6,16 +6,20 @@ import hmac
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, cast
 from urllib.parse import urlencode
 
+import msgspec
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+
+_native = load_native()
 
 AuthType = Literal["spot", "futures"]
 
@@ -52,6 +56,16 @@ def _filtered_query(query: dict[str, Any] | None) -> dict[str, Any]:
 
 def _encoded_query(query: dict[str, Any]) -> str:
     return urlencode(query, doseq=True)
+
+
+def _native_params(query: dict[str, Any]) -> list[tuple[str, str]]:
+    params: list[tuple[str, str]] = []
+    for key, value in query.items():
+        if isinstance(value, (list, tuple)):
+            params.extend((key, str(item)) for item in value)
+        else:
+            params.append((key, str(value)))
+    return params
 
 
 def _spot_signature(path: str, payload: dict[str, Any], api_secret: str) -> str:
@@ -93,13 +107,34 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "KrakenHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                spot_api_key=self._spot_api_key,
+                spot_api_secret=self._spot_api_secret,
+                futures_api_key=self._futures_api_key,
+                futures_api_secret=self._futures_api_secret,
+                timeout=self.timeout,
+                spot_base_url=self.base_url,
+                futures_base_url=self.futures_base_url,
+            )
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.KRAKEN)
+
+    def _uses_native_transport(self, request_base_url: str) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+            and request_base_url in {self.base_url, self.futures_base_url}
+        )
 
     @property
     def _spot_api_key(self) -> str | None:
@@ -165,58 +200,99 @@ class HTTPManager(BaseHTTPManager):
         filtered_query = _filtered_query(query)
         selected_auth_type = auth_type or self._infer_auth_type(request_path, base_url)
         encoded_query = _encoded_query(filtered_query)
+        request_base_url = base_url or self.base_url
 
         if filtered_query:
             request_path = f"{request_path}?{encoded_query}"
 
-        url = f"{base_url or self.base_url}{request_path}"
+        url = f"{request_base_url}{request_path}"
         response = None
         try:
             self._log_request(method, url)
-            body: str | None = None
-            headers = {"Accept": "application/json"}
-            if signed and selected_auth_type == "spot":
-                if method.upper() != "POST":
-                    raise ValueError("Signed Kraken spot requests must use POST.")
-                nonce = str(time.time_ns())
-                spot_payload: dict[str, Any] = {"nonce": nonce}
-                spot_payload.update(filtered_query)
-                body = _encoded_query(spot_payload)
-                headers = self._spot_headers(str(path), spot_payload)
-                url = f"{base_url or self.base_url}{path}"
-            elif signed and selected_auth_type == "futures":
-                nonce = str(time.time_ns())
-                body = encoded_query
-                headers = self._futures_headers(str(path), encoded_query, nonce)
-                if method.upper() in {"GET", "DELETE"} and encoded_query:
-                    url = f"{base_url or self.base_url}{path}?{encoded_query}"
-                else:
-                    url = f"{base_url or self.base_url}{path}"
-
             method_upper = method.upper()
-            if method_upper == "GET":
-                response = self.session.get(url, headers=headers, timeout=self.timeout)
-            elif method_upper == "POST":
-                response = self.session.post(
-                    url,
-                    headers=headers,
-                    data=body if signed else None,
-                    json=None if signed else (filtered_query or None),
-                    timeout=self.timeout,
+            if signed and selected_auth_type == "spot" and method_upper != "POST":
+                raise ValueError("Signed Kraken spot requests must use POST.")
+            if (
+                signed
+                and selected_auth_type == "spot"
+                and not (self._spot_api_key and self._spot_api_secret)
+            ):
+                raise ValueError(
+                    "Signed Kraken spot requests require spot_api_key and spot_api_secret."
                 )
-            elif method_upper == "PUT":
-                response = self.session.put(
-                    url,
-                    headers=headers,
-                    data=body if signed else None,
-                    json=None if signed else (filtered_query or None),
-                    timeout=self.timeout,
+            if (
+                signed
+                and selected_auth_type == "futures"
+                and not (self._futures_api_key and self._futures_api_secret)
+            ):
+                raise ValueError(
+                    "Signed Kraken futures requests require futures_api_key and futures_api_secret."
                 )
-            elif method_upper == "DELETE":
-                response = self.session.delete(url, headers=headers, timeout=self.timeout)
+
+            if self._uses_native_transport(request_base_url):
+                json_body = (
+                    msgspec.json.encode(filtered_query)
+                    if method_upper in {"POST", "PUT"} and filtered_query and not signed
+                    else None
+                )
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    selected_auth_type,
+                    str(path),
+                    _native_params(filtered_query),
+                    json_body,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
             else:
-                raise ValueError(f"Unsupported method: {method}")
-        except requests.RequestException as e:
+                body: str | None = None
+                headers = {"Accept": "application/json"}
+                if signed and selected_auth_type == "spot":
+                    nonce = str(time.time_ns())
+                    spot_payload: dict[str, Any] = {"nonce": nonce}
+                    spot_payload.update(filtered_query)
+                    body = _encoded_query(spot_payload)
+                    headers = self._spot_headers(str(path), spot_payload)
+                    url = f"{request_base_url}{path}"
+                elif signed and selected_auth_type == "futures":
+                    nonce = str(time.time_ns())
+                    body = encoded_query
+                    headers = self._futures_headers(str(path), encoded_query, nonce)
+                    if method_upper in {"GET", "DELETE"} and encoded_query:
+                        url = f"{request_base_url}{path}?{encoded_query}"
+                    else:
+                        url = f"{request_base_url}{path}"
+
+                if method_upper == "GET":
+                    response = self.session.get(url, headers=headers, timeout=self.timeout)
+                elif method_upper == "POST":
+                    response = self.session.post(
+                        url,
+                        headers=headers,
+                        data=body if signed else None,
+                        json=None if signed else (filtered_query or None),
+                        timeout=self.timeout,
+                    )
+                elif method_upper == "PUT":
+                    response = self.session.put(
+                        url,
+                        headers=headers,
+                        data=body if signed else None,
+                        json=None if signed else (filtered_query or None),
+                        timeout=self.timeout,
+                    )
+                elif method_upper == "DELETE":
+                    response = self.session.delete(url, headers=headers, timeout=self.timeout)
+                else:
+                    raise ValueError(f"Unsupported method: {method}")
+        except (requests.RequestException, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

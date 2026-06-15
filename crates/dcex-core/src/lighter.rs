@@ -2,10 +2,13 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 use std::sync::OnceLock;
 
+use base64::Engine;
+use serde_json::{Map, Value};
+
 use crate::{DcexError, Result};
 
 const GOLDILOCKS_ORDER: u64 = 0xffff_ffff_0000_0001;
-const GOLDILOCKS_ORDER_U128: u128 = GOLDILOCKS_ORDER as u128;
+const GOLDILOCKS_EPSILON: u64 = 0xffff_ffff;
 const FP5_ROOT: u64 = 1_041_288_259_238_279_555;
 const FP5_ZERO: Fp5 = [0, 0, 0, 0, 0];
 const FP5_ONE: Fp5 = [1, 0, 0, 0, 0];
@@ -211,15 +214,45 @@ fn field(value: u64) -> u64 {
 }
 
 fn add_mod(left: u64, right: u64) -> u64 {
-    ((left as u128 + right as u128) % GOLDILOCKS_ORDER_U128) as u64
+    let (sum, carry) = left.overflowing_add(right);
+    let reduced = if carry {
+        sum.wrapping_add(GOLDILOCKS_EPSILON)
+    } else {
+        sum
+    };
+    if reduced >= GOLDILOCKS_ORDER {
+        reduced - GOLDILOCKS_ORDER
+    } else {
+        reduced
+    }
 }
 
 fn sub_mod(left: u64, right: u64) -> u64 {
-    ((left as u128 + GOLDILOCKS_ORDER_U128 - right as u128) % GOLDILOCKS_ORDER_U128) as u64
+    let (difference, borrow) = left.overflowing_sub(right);
+    if borrow {
+        difference.wrapping_sub(GOLDILOCKS_EPSILON)
+    } else {
+        difference
+    }
 }
 
 fn mul_mod(left: u64, right: u64) -> u64 {
-    ((left as u128 * right as u128) % GOLDILOCKS_ORDER_U128) as u64
+    reduce_u128(left as u128 * right as u128)
+}
+
+fn reduce_u128(value: u128) -> u64 {
+    let low = value as u64;
+    let high = (value >> 64) as u64;
+    let high_low = high & GOLDILOCKS_EPSILON;
+    let high_high = high >> 32;
+
+    let (difference, borrow) = low.overflowing_sub(high_high);
+    let difference = if borrow {
+        difference.wrapping_sub(GOLDILOCKS_EPSILON)
+    } else {
+        difference
+    };
+    add_mod(difference, high_low * GOLDILOCKS_EPSILON)
 }
 
 fn pow_mod(mut base: u64, mut exponent: u64) -> u64 {
@@ -446,15 +479,38 @@ impl Point {
     }
 }
 
-fn point_mul(point: &Point, scalar: &BigUint) -> Point {
-    let mut result = NEUTRAL;
-    let mut addend = *point;
-    for byte in scalar.to_bytes_le() {
-        for bit in 0..8 {
-            if (byte >> bit) & 1 == 1 {
-                result = result.add(&addend);
+fn generator_table() -> &'static Vec<[Point; 16]> {
+    static TABLE: OnceLock<Vec<[Point; 16]>> = OnceLock::new();
+    TABLE.get_or_init(|| {
+        let mut windows = Vec::with_capacity(80);
+        let mut base = GENERATOR;
+        for _ in 0..80 {
+            let mut table = [NEUTRAL; 16];
+            table[1] = base;
+            for index in 2..16 {
+                table[index] = table[index - 1].add(&base);
             }
-            addend = addend.double();
+            windows.push(table);
+            for _ in 0..4 {
+                base = base.double();
+            }
+        }
+        windows
+    })
+}
+
+fn generator_mul(scalar: &BigUint) -> Point {
+    let bytes = scalar.to_bytes_le();
+    let mut result = NEUTRAL;
+    for (window_index, table) in generator_table().iter().enumerate() {
+        let byte = bytes.get(window_index / 2).copied().unwrap_or_default();
+        let digit = if window_index % 2 == 0 {
+            byte & 0x0f
+        } else {
+            byte >> 4
+        };
+        if digit != 0 {
+            result = result.add(&table[digit as usize]);
         }
     }
     result
@@ -496,12 +552,97 @@ pub fn public_key_bytes(private_key: &BigUint) -> Result<[u8; 40]> {
             "Lighter private scalar is outside the valid range.".to_string(),
         ));
     }
-    Ok(encode_fp5(&point_mul(&GENERATOR, private_key).encode()))
+    Ok(encode_fp5(&generator_mul(private_key).encode()))
 }
 
 pub fn poseidon_hash_bytes(values: &[u64]) -> [u8; 40] {
     let hash = poseidon_hash(values, 5);
     encode_fp5(&[hash[0], hash[1], hash[2], hash[3], hash[4]])
+}
+
+pub fn transaction_hash(values: &[i128], attributes: &[(u64, u64)]) -> [u8; 40] {
+    let values = values.iter().map(|value| *value as u64).collect::<Vec<_>>();
+    let transaction_hash = poseidon_hash_bytes(&values);
+    if attributes.is_empty() {
+        return transaction_hash;
+    }
+
+    let mut attributes = attributes.to_vec();
+    attributes.sort_by_key(|(attribute_type, _)| *attribute_type);
+    attributes.truncate(4);
+    let mut attribute_values = Vec::with_capacity(8);
+    for index in 0..4 {
+        if let Some((attribute_type, value)) = attributes.get(index) {
+            attribute_values.extend_from_slice(&[*attribute_type, *value]);
+        } else {
+            attribute_values.extend_from_slice(&[0, 0]);
+        }
+    }
+    let attributes_hash = poseidon_hash_bytes(&attribute_values);
+    let combined = transaction_hash
+        .chunks_exact(8)
+        .chain(attributes_hash.chunks_exact(8))
+        .map(|chunk| u64::from_le_bytes(chunk.try_into().expect("8-byte chunk")))
+        .collect::<Vec<_>>();
+    poseidon_hash_bytes(&combined)
+}
+
+pub fn sign_transaction_payload(
+    values: &[i128],
+    attributes: &[(u64, u64)],
+    payload_json: &[u8],
+    private_key: &[u8],
+    nonce: &[u8],
+) -> Result<(Vec<u8>, [u8; 40])> {
+    let message_hash = transaction_hash(values, attributes);
+    let private_key = private_key_from_bytes(private_key)?;
+    let nonce = scalar_from_bytes(nonce, "Lighter nonce scalar")?;
+    let signature = schnorr_sign_with_nonce(&message_hash, &private_key, &nonce)?;
+    let mut payload: Value = serde_json::from_slice(payload_json)
+        .map_err(|error| DcexError::Decode(error.to_string()))?;
+    let payload = payload.as_object_mut().ok_or_else(|| {
+        DcexError::InvalidInput("Lighter transaction payload must be a JSON object.".to_string())
+    })?;
+    payload.insert(
+        "Sig".to_string(),
+        Value::String(base64::engine::general_purpose::STANDARD.encode(signature)),
+    );
+    if attributes.is_empty() {
+        payload.insert("L2TxAttributes".to_string(), Value::Null);
+    } else {
+        let attributes = attributes
+            .iter()
+            .map(|(key, value)| (key.to_string(), Value::from(*value)))
+            .collect::<Map<_, _>>();
+        payload.insert("L2TxAttributes".to_string(), Value::Object(attributes));
+    }
+    let payload =
+        serde_json::to_vec(&payload).map_err(|error| DcexError::Decode(error.to_string()))?;
+    Ok((payload, message_hash))
+}
+
+pub fn auth_token(
+    expiry: u64,
+    account_index: u64,
+    api_key_index: u64,
+    private_key: &[u8],
+    nonce: &[u8],
+) -> Result<String> {
+    let message = format!("{expiry}:{account_index}:{api_key_index}");
+    let fields = message
+        .as_bytes()
+        .chunks(8)
+        .map(|chunk| {
+            let mut bytes = [0u8; 8];
+            bytes[..chunk.len()].copy_from_slice(chunk);
+            u64::from_le_bytes(bytes)
+        })
+        .collect::<Vec<_>>();
+    let message_hash = poseidon_hash_bytes(&fields);
+    let private_key = private_key_from_bytes(private_key)?;
+    let nonce = scalar_from_bytes(nonce, "Lighter nonce scalar")?;
+    let signature = schnorr_sign_with_nonce(&message_hash, &private_key, &nonce)?;
+    Ok(format!("{message}:{}", hex::encode(signature)))
 }
 
 pub fn schnorr_sign_with_nonce(
@@ -530,7 +671,7 @@ pub fn schnorr_sign_with_nonce(
         message[index] = u64::from_le_bytes(chunk.try_into().expect("8-byte chunk"));
     }
 
-    let encoded_r = point_mul(&GENERATOR, nonce).encode();
+    let encoded_r = generator_mul(nonce).encode();
     let mut challenge_input = Vec::with_capacity(10);
     challenge_input.extend_from_slice(&encoded_r);
     challenge_input.extend_from_slice(&message);
@@ -657,5 +798,12 @@ mod tests {
                 6775027260348937828,
             ]
         );
+    }
+
+    #[test]
+    fn transaction_attributes_change_hash() {
+        let plain = transaction_hash(&[304, 15, -1], &[]);
+        let attributed = transaction_hash(&[304, 15, -1], &[(4, 1)]);
+        assert_ne!(plain, attributed);
     }
 }

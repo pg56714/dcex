@@ -1,152 +1,77 @@
-"""KuCoin Spot Market HTTP client."""
+"""KuCoin Spot and Futures Market async HTTP client backed by Rust."""
 
 from typing import Any
 
+from ..._native_http import NativeResponse
 from ...utils.common import Common
-from ...utils.timeframe_utils import kucoin_convert_timeframe
 from ._http_manager import HTTPManager
-from .endpoints.market import FuturesMarket, SpotMarket
-
-
-def _kucoin_futures_granularity(timeframe: str) -> int:
-    """Convert standard timeframe strings to KuCoin futures granularity seconds."""
-    mapping = {
-        "1m": 60,
-        "5m": 300,
-        "15m": 900,
-        "30m": 1800,
-        "1h": 3600,
-        "2h": 7200,
-        "4h": 14400,
-        "8h": 28800,
-        "12h": 43200,
-        "1d": 86400,
-        "1w": 604800,
-    }
-    try:
-        return mapping[timeframe]
-    except KeyError as exc:
-        raise ValueError("timeframe not supported") from exc
 
 
 class MarketHTTP(HTTPManager):
-    """
-    HTTP client for KuCoin Spot Market API operations.
+    """Async HTTP client for KuCoin public market API operations."""
 
-    This class provides methods for retrieving market data including
-    instrument information, tickers, orderbook data, trade history,
-    and candlestick/K-line data.
-    """
-
-    async def get_spot_instrument_info(
+    async def _native_public(
         self,
-    ) -> dict[str, Any]:
-        """
-        Retrieve trading instrument information.
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed KuCoin public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("KuCoin native client is required for public market methods.")
+        status, headers, body = await self._native_client.public_request_async(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
 
-        Returns:
-            List of available trading instruments from KuCoin API.
-        """
-        payload: dict[str, Any] = {}
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.INSTRUMENT_INFO,
-            query=payload,
-            signed=False,
+    def _exchange_symbol(self, product_symbol: str, *, futures: bool = False) -> str:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            return f"{parts[0]}{parts[1]}" if futures else f"{parts[0]}-{parts[1]}"
+        return product_symbol
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            if key == "from_":
+                key = "from"
+            params.append((key, str(value)))
+        return params
+
+    async def get_spot_instrument_info(self) -> dict[str, Any]:
+        """Retrieve trading instrument information."""
+        return await self._native_public("get_spot_instrument_info", [])
+
+    async def get_spot_ticker(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve single ticker information for a specific trading pair."""
+        return await self._native_public(
+            "get_spot_ticker",
+            self._params(symbol=self._exchange_symbol(product_symbol)),
         )
-        return res
 
-    async def get_spot_ticker(
-        self,
-        product_symbol: str,
-    ) -> dict[str, Any]:
-        """
-        Retrieve single ticker information for a specific trading pair.
+    async def get_spot_all_tickers(self) -> dict[str, Any]:
+        """Retrieve ticker information for all trading pairs."""
+        return await self._native_public("get_spot_all_tickers", [])
 
-        Args:
-            product_symbol: Trading pair symbol (e.g., "BTC-USDT-SPOT").
-
-        Returns:
-            Ticker information for the specified trading pair.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.TICKER,
-            query=payload,
-            signed=False,
+    async def get_spot_orderbook(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve orderbook data for a specific trading pair."""
+        return await self._native_public(
+            "get_spot_orderbook",
+            self._params(symbol=self._exchange_symbol(product_symbol)),
         )
-        return res
 
-    async def get_spot_all_tickers(
-        self,
-    ) -> dict[str, Any]:
-        """
-        Retrieve ticker information for all trading pairs.
-
-        Returns:
-            Ticker information for all available trading pairs.
-        """
-        payload: dict[str, Any] = {}
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.ALL_TICKERS,
-            query=payload,
-            signed=False,
+    async def get_spot_public_trades(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve public trade history for a specific trading pair."""
+        return await self._native_public(
+            "get_spot_public_trades",
+            self._params(symbol=self._exchange_symbol(product_symbol)),
         )
-        return res
-
-    async def get_spot_orderbook(
-        self,
-        product_symbol: str,
-    ) -> dict[str, Any]:
-        """
-        Retrieve orderbook data for a specific trading pair.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., "BTC-USDT-SPOT").
-
-        Returns:
-            Orderbook data for the specified trading pair.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.ORDERBOOK,
-            query=payload,
-        )
-        return res
-
-    async def get_spot_public_trades(
-        self,
-        product_symbol: str,
-    ) -> dict[str, Any]:
-        """
-        Retrieve public trade history for a specific trading pair.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., "BTC-USDT-SPOT").
-
-        Returns:
-            Public trade history for the specified trading pair.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.PUBLIC_TRADES,
-            query=payload,
-            signed=False,
-        )
-        return res
 
     async def get_spot_kline(
         self,
@@ -155,76 +80,34 @@ class MarketHTTP(HTTPManager):
         startAt: int | None = None,
         endAt: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Retrieve candlestick/K-line data for a specific trading pair.
-
-        Args:
-            product_symbol: Trading pair symbol (e.g., "BTC-USDT-SPOT").
-            timeframe: Timeframe type (e.g., "1m", "5m", "1h", "1d").
-            startAt: Optional start time in milliseconds.
-            endAt: Optional end time in milliseconds.
-
-        Returns:
-            Candlestick/K-line data for the specified trading pair and timeframe.
-        """
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-            "type": kucoin_convert_timeframe(timeframe),
-        }
-
-        if startAt is not None:
-            payload["startAt"] = startAt
-        if endAt is not None:
-            payload["endAt"] = endAt
-
-        res = await self._request(
-            method="GET",
-            path=SpotMarket.KLINE,
-            query=payload,
-            signed=False,
+        """Retrieve candlestick/K-line data for a specific trading pair."""
+        return await self._native_public(
+            "get_spot_kline",
+            self._params(
+                symbol=self._exchange_symbol(product_symbol),
+                timeframe=timeframe,
+                startAt=startAt,
+                endAt=endAt,
+            ),
         )
-        return res
 
     async def get_futures_contracts(self) -> dict[str, Any]:
         """Retrieve active KuCoin futures contracts."""
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.CONTRACTS,
-            signed=False,
-            base_url=self.futures_base_url,
-        )
-        return res
+        return await self._native_public("get_futures_contracts", [])
 
-    async def get_futures_contract(
-        self,
-        product_symbol: str,
-    ) -> dict[str, Any]:
+    async def get_futures_contract(self, product_symbol: str) -> dict[str, Any]:
         """Retrieve one KuCoin futures contract."""
-        exchange_symbol = self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.CONTRACT.format(symbol=exchange_symbol),
-            signed=False,
-            base_url=self.futures_base_url,
+        return await self._native_public(
+            "get_futures_contract",
+            self._params(symbol=self._exchange_symbol(product_symbol, futures=True)),
         )
-        return res
 
-    async def get_futures_ticker(
-        self,
-        product_symbol: str,
-    ) -> dict[str, Any]:
+    async def get_futures_ticker(self, product_symbol: str) -> dict[str, Any]:
         """Retrieve one KuCoin futures ticker."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-        }
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.TICKER,
-            query=payload,
-            signed=False,
-            base_url=self.futures_base_url,
+        return await self._native_public(
+            "get_futures_ticker",
+            self._params(symbol=self._exchange_symbol(product_symbol, futures=True)),
         )
-        return res
 
     async def get_futures_orderbook(
         self,
@@ -232,39 +115,20 @@ class MarketHTTP(HTTPManager):
         depth: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve KuCoin futures orderbook."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-        }
-        path = (
-            FuturesMarket.PART_ORDERBOOK.format(size=depth)
-            if depth is not None
-            else FuturesMarket.ORDERBOOK
+        return await self._native_public(
+            "get_futures_orderbook",
+            self._params(
+                symbol=self._exchange_symbol(product_symbol, futures=True),
+                depth=depth,
+            ),
         )
-        res = await self._request(
-            method="GET",
-            path=path,
-            query=payload,
-            signed=False,
-            base_url=self.futures_base_url,
-        )
-        return res
 
-    async def get_futures_public_trades(
-        self,
-        product_symbol: str,
-    ) -> dict[str, Any]:
+    async def get_futures_public_trades(self, product_symbol: str) -> dict[str, Any]:
         """Retrieve KuCoin futures public trade history."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-        }
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.PUBLIC_TRADES,
-            query=payload,
-            signed=False,
-            base_url=self.futures_base_url,
+        return await self._native_public(
+            "get_futures_public_trades",
+            self._params(symbol=self._exchange_symbol(product_symbol, futures=True)),
         )
-        return res
 
     async def get_futures_kline(
         self,
@@ -274,23 +138,15 @@ class MarketHTTP(HTTPManager):
         to: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve KuCoin futures candlestick/K-line data."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-            "granularity": _kucoin_futures_granularity(timeframe),
-        }
-        if from_ is not None:
-            payload["from"] = from_
-        if to is not None:
-            payload["to"] = to
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.KLINE,
-            query=payload,
-            signed=False,
-            base_url=self.futures_base_url,
+        return await self._native_public(
+            "get_futures_kline",
+            self._params(
+                symbol=self._exchange_symbol(product_symbol, futures=True),
+                timeframe=timeframe,
+                from_=from_,
+                to=to,
+            ),
         )
-        return res
 
     async def get_futures_open_interest(
         self,
@@ -301,21 +157,13 @@ class MarketHTTP(HTTPManager):
         pageSize: int | None = None,
     ) -> dict[str, Any]:
         """Get futures open interest history."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol),
-            "interval": interval,
-        }
-        if startAt is not None:
-            payload["startAt"] = startAt
-        if endAt is not None:
-            payload["endAt"] = endAt
-        if pageSize is not None:
-            payload["pageSize"] = pageSize
-
-        res = await self._request(
-            method="GET",
-            path=FuturesMarket.OPEN_INTEREST,
-            query=payload,
-            signed=False,
+        return await self._native_public(
+            "get_futures_open_interest",
+            self._params(
+                symbol=self._exchange_symbol(product_symbol, futures=True),
+                interval=interval,
+                startAt=startAt,
+                endAt=endAt,
+                pageSize=pageSize,
+            ),
         )
-        return res

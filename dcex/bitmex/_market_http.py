@@ -2,18 +2,45 @@ from typing import Any
 
 import msgspec
 
+from .._native_http import NativeResponse
 from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.market import Market
 
 
 class MarketHTTP(HTTPManager):
-    """
-    BitMEX Market HTTP client for market data operations.
+    """BitMEX Market HTTP client for market data operations."""
 
-    This class provides methods for retrieving market data including
-    instrument information, orderbook, trades, tickers, klines, and funding data.
-    """
+    def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed BitMEX public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("BitMEX native client is required for public market methods.")
+        status, headers, body = self._native_client.public_request(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _exchange_symbol(self, product_symbol: str) -> str:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            return f"{parts[0]}{parts[1]}"
+        return product_symbol
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            params.append((key, str(value)))
+        return params
 
     def get_instrument_info(
         self,
@@ -21,73 +48,28 @@ class MarketHTTP(HTTPManager):
         filter: dict[str, Any] | None = None,
         count: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get instrument information for trading pairs.
-
-        Args:
-            product_symbol: Trading symbol to filter by
-            filter: Additional filter criteria as a dictionary
-            count: Maximum number of results to return
-
-        Returns:
-            Dict containing instrument information
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload: dict[str, str | int | list[str] | float | bool] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
-        if filter is not None:
-            payload["filter"] = msgspec.json.encode(filter).decode("utf-8")
-        if count is not None:
-            payload["count"] = count
-
-        path = (
-            Market.INSTRUMENT_INFO
-            if product_symbol is not None or filter is not None or count is not None
-            else Market.ACTIVE_INSTRUMENTS
+        """Get instrument information for trading pairs."""
+        return self._native_public(
+            "get_instrument_info",
+            self._params(
+                product_symbol=(
+                    self._exchange_symbol(product_symbol) if product_symbol is not None else None
+                ),
+                filter=msgspec.json.encode(filter).decode("utf-8") if filter is not None else None,
+                count=count,
+            ),
         )
-
-        res = self._request(
-            method="GET",
-            path=path,
-            query=payload,
-            signed=False,
-        )
-        return res
 
     def get_orderbook(
         self,
         product_symbol: str,
         depth: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get orderbook data for a trading pair.
-
-        Args:
-            product_symbol: Trading symbol to get orderbook for
-            depth: Number of price levels to return
-
-        Returns:
-            Dict containing orderbook data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload: dict[str, str | int | list[str] | float | bool] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol),
-        }
-        if depth is not None:
-            payload["depth"] = depth
-
-        res = self._request(
-            method="GET",
-            path=Market.ORDERBOOK,
-            query=payload,
-            signed=False,
+        """Get orderbook data for a trading pair."""
+        return self._native_public(
+            "get_orderbook",
+            self._params(product_symbol=self._exchange_symbol(product_symbol), depth=depth),
         )
-        return res
 
     def get_trades(
         self,
@@ -100,50 +82,22 @@ class MarketHTTP(HTTPManager):
         startTime: str | None = None,
         endTime: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get recent trades for trading pairs.
-
-        Args:
-            product_symbol: Trading symbol to filter by
-            filter: Additional filter criteria as a dictionary
-            columns: Specific columns to return
-            count: Maximum number of results to return
-            start: Starting index for pagination
-            reverse: Whether to reverse the order of results
-            startTime: Start time for the query (ISO format)
-            endTime: End time for the query (ISO format)
-
-        Returns:
-            Dict containing trade data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload: dict[str, str | int | list[str] | float | bool] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
-        if filter is not None:
-            payload["filter"] = str(filter)
-        if columns is not None:
-            payload["columns"] = columns
-        if count is not None:
-            payload["count"] = count
-        if start is not None:
-            payload["start"] = start
-        if reverse is not None:
-            payload["reverse"] = reverse
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-
-        res = self._request(
-            method="GET",
-            path=Market.TRADE,
-            query=payload,
-            signed=False,
+        """Get recent trades for trading pairs."""
+        return self._native_public(
+            "get_trades",
+            self._params(
+                product_symbol=(
+                    self._exchange_symbol(product_symbol) if product_symbol is not None else None
+                ),
+                filter=str(filter) if filter is not None else None,
+                columns=columns,
+                count=count,
+                start=start,
+                reverse=reverse,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
-        return res
 
     def get_ticker(
         self,
@@ -158,56 +112,22 @@ class MarketHTTP(HTTPManager):
         startTime: str | None = None,
         endTime: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get ticker data for trading pairs.
-
-        Args:
-            binSize: Time interval for bucketed data
-            partial: Whether to include partial data
-            symbol: Trading symbol to filter by
-            filter: Additional filter criteria as a dictionary
-            columns: Specific columns to return
-            count: Maximum number of results to return
-            start: Starting index for pagination
-            reverse: Whether to reverse the order of results
-            startTime: Start time for the query (ISO format)
-            endTime: End time for the query (ISO format)
-
-        Returns:
-            Dict containing ticker data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload: dict[str, str | int | list[str] | float | bool] = {}
-        if binSize is not None:
-            payload["binSize"] = binSize
-        if partial is not None:
-            payload["partial"] = partial
-        if symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, symbol)
-        if filter is not None:
-            payload["filter"] = str(filter)
-        if columns is not None:
-            payload["columns"] = columns
-        if count is not None:
-            payload["count"] = count
-        if start is not None:
-            payload["start"] = start
-        if reverse is not None:
-            payload["reverse"] = reverse
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-
-        res = self._request(
-            method="GET",
-            path=Market.TICKER,
-            query=payload,
-            signed=False,
+        """Get ticker data for trading pairs."""
+        return self._native_public(
+            "get_ticker",
+            self._params(
+                binSize=binSize,
+                partial=partial,
+                symbol=self._exchange_symbol(symbol) if symbol is not None else None,
+                filter=str(filter) if filter is not None else None,
+                columns=columns,
+                count=count,
+                start=start,
+                reverse=reverse,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
-        return res
 
     def get_kline(
         self,
@@ -222,56 +142,22 @@ class MarketHTTP(HTTPManager):
         startTime: str | None = None,
         endTime: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get candlestick/kline data for trading pairs.
-
-        Args:
-            binSize: Time interval for bucketed data
-            partial: Whether to include partial data
-            symbol: Trading symbol to filter by
-            filter: Additional filter criteria as a dictionary
-            columns: Specific columns to return
-            count: Maximum number of results to return
-            start: Starting index for pagination
-            reverse: Whether to reverse the order of results
-            startTime: Start time for the query (ISO format)
-            endTime: End time for the query (ISO format)
-
-        Returns:
-            Dict containing kline data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload: dict[str, str | int | list[str] | float | bool] = {}
-        if binSize is not None:
-            payload["binSize"] = binSize
-        if partial is not None:
-            payload["partial"] = partial
-        if symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, symbol)
-        if filter is not None:
-            payload["filter"] = str(filter)
-        if columns is not None:
-            payload["columns"] = columns
-        if count is not None:
-            payload["count"] = count
-        if start is not None:
-            payload["start"] = start
-        if reverse is not None:
-            payload["reverse"] = reverse
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-
-        res = self._request(
-            method="GET",
-            path=Market.KLINE,
-            query=payload,
-            signed=False,
+        """Get candlestick/kline data for trading pairs."""
+        return self._native_public(
+            "get_kline",
+            self._params(
+                binSize=binSize,
+                partial=partial,
+                symbol=self._exchange_symbol(symbol) if symbol is not None else None,
+                filter=str(filter) if filter is not None else None,
+                columns=columns,
+                count=count,
+                start=start,
+                reverse=reverse,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
-        return res
 
     def get_funding(
         self,
@@ -284,50 +170,22 @@ class MarketHTTP(HTTPManager):
         startTime: str | None = None,
         endTime: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get funding rate data for perpetual contracts.
-
-        Args:
-            product_symbol: Trading symbol to filter by
-            filter: Additional filter criteria as a dictionary
-            columns: Specific columns to return
-            count: Maximum number of results to return
-            start: Starting index for pagination
-            reverse: Whether to reverse the order of results
-            startTime: Start time for the query (ISO format)
-            endTime: End time for the query (ISO format)
-
-        Returns:
-            Dict containing funding data
-
-        Raises:
-            FailedRequestError: If the API request fails
-        """
-        payload: dict[str, str | int | list[str] | float | bool] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
-        if filter is not None:
-            payload["filter"] = str(filter)
-        if columns is not None:
-            payload["columns"] = columns
-        if count is not None:
-            payload["count"] = count
-        if start is not None:
-            payload["start"] = start
-        if reverse is not None:
-            payload["reverse"] = reverse
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-
-        res = self._request(
-            method="GET",
-            path=Market.FUNDING,
-            query=payload,
-            signed=False,
+        """Get funding rate data for perpetual contracts."""
+        return self._native_public(
+            "get_funding",
+            self._params(
+                product_symbol=(
+                    self._exchange_symbol(product_symbol) if product_symbol is not None else None
+                ),
+                filter=str(filter) if filter is not None else None,
+                columns=columns,
+                count=count,
+                start=start,
+                reverse=reverse,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
-        return res
 
     def get_liquidations(
         self,
@@ -341,28 +199,18 @@ class MarketHTTP(HTTPManager):
         endTime: str | None = None,
     ) -> dict[str, Any]:
         """Get liquidation orders."""
-        payload: dict[str, str | int | list[str] | float | bool] = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BITMEX, product_symbol)
-        if filter is not None:
-            payload["filter"] = msgspec.json.encode(filter).decode("utf-8")
-        if columns is not None:
-            payload["columns"] = columns
-        if count is not None:
-            payload["count"] = count
-        if start is not None:
-            payload["start"] = start
-        if reverse is not None:
-            payload["reverse"] = reverse
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-
-        res = self._request(
-            method="GET",
-            path=Market.LIQUIDATION,
-            query=payload,
-            signed=False,
+        return self._native_public(
+            "get_liquidations",
+            self._params(
+                product_symbol=(
+                    self._exchange_symbol(product_symbol) if product_symbol is not None else None
+                ),
+                filter=msgspec.json.encode(filter).decode("utf-8") if filter is not None else None,
+                columns=columns,
+                count=count,
+                start=start,
+                reverse=reverse,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
-        return res

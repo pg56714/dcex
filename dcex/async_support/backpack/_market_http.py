@@ -1,7 +1,9 @@
 """Backpack public market-data async HTTP client."""
 
-from typing import Any
+from collections.abc import Mapping
+from typing import Any, Literal
 
+from ..._native_http import NativeResponse
 from ...utils.common import Common
 from ._http_manager import HTTPManager
 from .endpoints.market import Public
@@ -9,6 +11,46 @@ from .endpoints.market import Public
 
 class MarketHTTP(HTTPManager):
     """Async HTTP client for Backpack public REST APIs."""
+
+    @staticmethod
+    def _native_params(query: dict[str, Any] | None) -> list[tuple[str, str]]:
+        params: list[tuple[str, str]] = []
+        for key, value in (query or {}).items():
+            if value is None:
+                continue
+            if isinstance(value, bool):
+                value = str(value).lower()
+            params.append((key, str(value)))
+        return params
+
+    async def _request(
+        self,
+        method: Literal["GET", "POST", "PATCH", "DELETE"],
+        path: str,
+        query: dict[str, Any] | None = None,
+        signed: bool = False,
+        instruction: str | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        if (
+            method.upper() == "GET"
+            and not signed
+            and instruction is None
+            and headers is None
+            and self._native_client is not None
+        ):
+            (
+                status,
+                response_headers,
+                response_body,
+            ) = await self._native_client.public_request_async(
+                str(path),
+                self._native_params(query),
+            )
+            response = NativeResponse(status, dict(response_headers), bytes(response_body))
+            self._store_response_headers(response)
+            return response.json()
+        return await super()._request(method, path, query, signed, instruction, headers)
 
     def _symbol(self, product_symbol: str) -> str:
         if "_" in product_symbol:

@@ -6,11 +6,12 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Literal, Self
-from urllib.parse import urlencode
+from typing import Any, Literal, Self, cast
+from urllib.parse import parse_qsl, urlencode
 
 import httpx
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -18,6 +19,7 @@ from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
 RequestPayload = dict[str, Any] | list[Any]
+_native = load_native()
 
 
 def _format_value(value: object) -> str:
@@ -46,6 +48,10 @@ def _json_body(query: RequestPayload) -> str:
     return json.dumps(query, separators=(",", ":"), ensure_ascii=False) if query else ""
 
 
+def _query_pairs(query: dict[str, Any]) -> list[tuple[str, str]]:
+    return parse_qsl(_encoded_query(query), keep_blank_values=True)
+
+
 def _sign(payload: str, api_secret: str) -> str:
     return hmac.new(api_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
 
@@ -65,15 +71,32 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(default=None, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.MEXC)
+        if self.use_native and _native is not None and self._native_client is None:
+            self._native_client = _native.MexcHttpClient(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+                base_url=self.base_url,
+                contract_base_url=self.contract_base_url,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     async def __aenter__(self) -> Self:
         if self.session is None or self.session.is_closed:
@@ -174,35 +197,62 @@ class HTTPManager(BaseHTTPManager):
         base_url = (self.contract_base_url or self.base_url) if api == "contract" else self.base_url
         url = f"{base_url}{request_path}"
 
-        if api == "contract":
-            query_string, body, headers = self._prepare_contract_request(
-                method,
-                filtered_query,
-                signed,
-            )
-        else:
-            if not isinstance(filtered_query, dict):
-                raise TypeError("MEXC Spot requests require a mapping query.")
-            query_string, body, headers = self._prepare_spot_request(filtered_query, signed)
-
-        if query_string:
-            url = f"{url}?{query_string}"
-
         response = None
         try:
             self._log_request(method, url)
-            method_upper = method.upper()
-            if method_upper == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method_upper == "POST":
-                response = await self.session.post(url, headers=headers, content=body)
-            elif method_upper == "PUT":
-                response = await self.session.put(url, headers=headers, content=body)
-            elif method_upper == "DELETE":
-                response = await self.session.delete(url, headers=headers)
+            if self._uses_native_transport():
+                if api == "spot" and not isinstance(filtered_query, dict):
+                    raise TypeError("MEXC Spot requests require a mapping query.")
+                params = _query_pairs(filtered_query) if isinstance(filtered_query, dict) else []
+                body = None
+                if api == "contract" and method.upper() not in {"GET", "DELETE"}:
+                    body = _json_body(filtered_query).encode()
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    api,
+                    request_path,
+                    params,
+                    body,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
-        except httpx.RequestError as exc:
+                if api == "contract":
+                    query_string, body, headers = self._prepare_contract_request(
+                        method,
+                        filtered_query,
+                        signed,
+                    )
+                else:
+                    if not isinstance(filtered_query, dict):
+                        raise TypeError("MEXC Spot requests require a mapping query.")
+                    query_string, body, headers = self._prepare_spot_request(
+                        filtered_query,
+                        signed,
+                    )
+
+                if query_string:
+                    url = f"{url}?{query_string}"
+
+                method_upper = method.upper()
+                if method_upper == "GET":
+                    response = await self.session.get(url, headers=headers)
+                elif method_upper == "POST":
+                    response = await self.session.post(url, headers=headers, content=body)
+                elif method_upper == "PUT":
+                    response = await self.session.put(url, headers=headers, content=body)
+                elif method_upper == "DELETE":
+                    response = await self.session.delete(url, headers=headers)
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
+        except (httpx.RequestError, RuntimeError) as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

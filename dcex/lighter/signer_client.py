@@ -1,15 +1,13 @@
-"""
-Pure Python signer for Lighter private requests.
-
-The signer implements the transaction hashing and ECgFp5 Schnorr signatures
-used by the public Lighter signing specification without a native library.
-"""
+"""Lighter private-request signer backed by Rust with a Python fallback."""
 
 from __future__ import annotations
 
 import base64
+import importlib
 import json
+import secrets
 import time
+from types import ModuleType
 from typing import Any
 
 import requests
@@ -22,8 +20,17 @@ from ._crypto import (
 )
 
 _UINT64_MASK = (1 << 64) - 1
+_SCALAR_ORDER = int(
+    "106799351671714695104148491657179270274505774058172723015913968518"
+    "5762082554198619328292418486241"
+)
 _DEFAULT_TX_EXPIRY_MS = 590_000
 _DEFAULT_ORDER_EXPIRY_MS = 28 * 24 * 60 * 60 * 1000
+
+try:
+    _NATIVE: ModuleType | None = importlib.import_module("dcex._native")
+except ImportError:
+    _NATIVE = None
 
 
 def _field(value: int) -> int:
@@ -121,6 +128,16 @@ class SignerClient:
         attributes: dict[int, int],
         api_key_index: int,
     ) -> tuple[int, str, str, None]:
+        if _NATIVE is not None and hasattr(_NATIVE, "lighter_sign_transaction"):
+            nonce_scalar = secrets.randbelow(_SCALAR_ORDER - 1) + 1
+            tx_info, message_hash = _NATIVE.lighter_sign_transaction(
+                values,
+                list(attributes.items()),
+                json.dumps(payload, separators=(",", ":")).encode(),
+                self._private_key(api_key_index).to_bytes(40, "little"),
+                nonce_scalar.to_bytes(40, "little"),
+            )
+            return tx_type, bytes(tx_info).decode(), bytes(message_hash).hex(), None
         message_hash = _transaction_hash(values, attributes)
         payload["Sig"] = base64.b64encode(
             schnorr_sign(message_hash, self._private_key(api_key_index))
@@ -146,6 +163,16 @@ class SignerClient:
             timestamp = int(time.time())
         expiry = deadline + timestamp
         message = f"{expiry}:{self.account_index}:{api_key_index}"
+        if _NATIVE is not None and hasattr(_NATIVE, "lighter_auth_token"):
+            nonce_scalar = secrets.randbelow(_SCALAR_ORDER - 1) + 1
+            token = _NATIVE.lighter_auth_token(
+                expiry,
+                self.account_index,
+                api_key_index,
+                self._private_key(api_key_index).to_bytes(40, "little"),
+                nonce_scalar.to_bytes(40, "little"),
+            )
+            return str(token), None
         encoded = message.encode()
         fields = [
             int.from_bytes(encoded[offset : offset + 8].ljust(8, b"\0"), "little")

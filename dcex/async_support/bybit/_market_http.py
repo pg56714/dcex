@@ -1,35 +1,54 @@
-"""
-Bybit market data HTTP client module.
-
-This module provides the MarketHTTP class for interacting with Bybit's
-market data API endpoints, including instruments, klines, orderbook,
-tickers, and other market-related data.
-"""
+"""Bybit market data HTTP client module backed by Rust."""
 
 from typing import Any
 
+from ..._native_http import NativeResponse
 from ...utils.common import Common
-from ...utils.timeframe_utils import bybit_convert_timeframe
 from ._http_manager import HTTPManager
-from .endpoints.market import Market
 
 
 class MarketHTTP(HTTPManager):
-    """
-    Bybit market data HTTP client.
+    """Bybit market data HTTP client."""
 
-    This class provides methods for interacting with Bybit's market data
-    API endpoints, including:
-    - Instrument information
-    - Kline/candlestick data
-    - Order book data
-    - Ticker information
-    - Funding rate history
-    - Public trade history
-    - Risk limit information
+    async def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Bybit public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Bybit native client is required for public market methods.")
+        status, headers, body = await self._native_client.public_request_async(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
 
-    Inherits from HTTPManager for HTTP request handling and authentication.
-    """
+    def _symbol_category(self, product_symbol: str, category: str = "linear") -> tuple[str, str]:
+        """Map product symbol through PTM when available."""
+        if hasattr(self, "ptm"):
+            return (
+                self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
+                self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
+            )
+        parts = product_symbol.split("-")
+        if len(parts) >= 3:
+            quote = parts[1]
+            kind = parts[2]
+            mapped_category = (
+                "spot" if kind == "SPOT" else ("inverse" if quote == "USD" else category)
+            )
+            return f"{parts[0]}{quote}", mapped_category
+        return product_symbol, category
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            params.append((key, str(value)))
+        return params
 
     async def get_instruments_info(
         self,
@@ -40,42 +59,21 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get instruments information.
-
-        Args:
-            category: Instrument category (spot, linear, inverse, option)
-            product_symbol: Optional product symbol to filter results
-            status: Optional instrument status to filter results
-            baseCoin: Optional base coin to filter results
-            limit: Optional maximum number of results
-            cursor: Optional cursor for pagination
-
-        Returns:
-            Dict containing instruments information
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-        }
+        """Get instruments information."""
+        symbol = None
         if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        if status is not None:
-            payload["status"] = status
-        if baseCoin is not None:
-            payload["baseCoin"] = baseCoin
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if cursor is not None:
-            payload["cursor"] = cursor
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_INSTRUMENTS_INFO,
-            query=payload,
-            signed=False,
+            symbol, category = self._symbol_category(product_symbol, category)
+        return await self._native_public(
+            "get_instruments_info",
+            self._params(
+                category=category,
+                symbol=symbol,
+                status=status,
+                baseCoin=baseCoin,
+                limit=limit,
+                cursor=cursor,
+            ),
         )
-        return res
 
     async def get_kline(
         self,
@@ -84,65 +82,30 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get kline/candlestick data.
-
-        Args:
-            product_symbol: Product symbol
-            interval: Kline interval
-            startTime: Optional start time timestamp
-            limit: Optional maximum number of klines
-
-        Returns:
-            Dict containing kline data
-        """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "interval": bybit_convert_timeframe(interval),
-        }
-        if startTime is not None:
-            payload["start"] = str(startTime)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_KLINE,
-            query=payload,
-            signed=False,
+        """Get kline/candlestick data."""
+        symbol, category = self._symbol_category(product_symbol)
+        return await self._native_public(
+            "get_kline",
+            self._params(
+                symbol=symbol,
+                category=category,
+                interval=interval,
+                startTime=startTime,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_orderbook(
         self,
         product_symbol: str,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get order book data.
-
-        Args:
-            product_symbol: Product symbol
-            limit: Optional maximum number of order book levels
-
-        Returns:
-            Dict containing order book data
-        """
-        payload = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_ORDERBOOK,
-            query=payload,
-            signed=False,
+        """Get order book data."""
+        symbol, category = self._symbol_category(product_symbol)
+        return await self._native_public(
+            "get_orderbook",
+            self._params(category=category, symbol=symbol, limit=limit),
         )
-        return res
 
     async def get_tickers(
         self,
@@ -150,33 +113,14 @@ class MarketHTTP(HTTPManager):
         product_symbol: str | None = None,
         baseCoin: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get ticker information.
-
-        Args:
-            category: Instrument category (spot, linear, inverse, option)
-            product_symbol: Optional product symbol to filter results
-            baseCoin: Optional base coin to filter results
-
-        Returns:
-            Dict containing ticker information
-        """
-        payload = {
-            "category": category,
-        }
+        """Get ticker information."""
+        symbol = None
         if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        if baseCoin is not None:
-            payload["baseCoin"] = baseCoin
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_TICKERS,
-            query=payload,
-            signed=False,
+            symbol, category = self._symbol_category(product_symbol, category)
+        return await self._native_public(
+            "get_tickers",
+            self._params(category=category, symbol=symbol, baseCoin=baseCoin),
         )
-        return res
 
     async def get_funding_rate_history(
         self,
@@ -184,63 +128,24 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get funding rate history.
-
-        Args:
-            product_symbol: Product symbol
-            startTime: Optional start time timestamp
-            limit: Optional maximum number of records
-
-        Returns:
-            Dict containing funding rate history
-        """
-        payload = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-        }
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_FUNDING_RATE_HISTORY,
-            query=payload,
-            signed=False,
+        """Get funding rate history."""
+        symbol, category = self._symbol_category(product_symbol)
+        return await self._native_public(
+            "get_funding_rate_history",
+            self._params(category=category, symbol=symbol, startTime=startTime, limit=limit),
         )
-        return res
 
     async def get_public_trade_history(
         self,
         product_symbol: str,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get public trade history.
-
-        Args:
-            product_symbol: Product symbol
-            limit: Optional maximum number of trades
-
-        Returns:
-            Dict containing public trade history
-        """
-        payload = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-        }
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_PUBLIC_TRADE_HISTORY,
-            query=payload,
-            signed=False,
+        """Get public trade history."""
+        symbol, category = self._symbol_category(product_symbol)
+        return await self._native_public(
+            "get_public_trade_history",
+            self._params(category=category, symbol=symbol, limit=limit),
         )
-        return res
 
     async def get_open_interest(
         self,
@@ -251,41 +156,20 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get open interest history.
-
-        Args:
-            product_symbol: Product symbol
-            intervalTime: Interval time (5min, 15min, 30min, 1h, 4h, 1d)
-            startTime: Optional start timestamp in milliseconds
-            endTime: Optional end timestamp in milliseconds
-            limit: Optional maximum number of records
-            cursor: Optional pagination cursor
-
-        Returns:
-            Dict containing open interest data
-        """
-        payload: dict[str, Any] = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "intervalTime": intervalTime,
-        }
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if cursor is not None:
-            payload["cursor"] = cursor
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_OPEN_INTEREST,
-            query=payload,
-            signed=False,
+        """Get open interest history."""
+        symbol, category = self._symbol_category(product_symbol)
+        return await self._native_public(
+            "get_open_interest",
+            self._params(
+                category=category,
+                symbol=symbol,
+                intervalTime=intervalTime,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+                cursor=cursor,
+            ),
         )
-        return res
 
     async def get_long_short_ratio(
         self,
@@ -296,41 +180,20 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get long/short account ratio history.
-
-        Args:
-            product_symbol: Product symbol
-            period: Data recording period (5min, 15min, 30min, 1h, 4h, 1d)
-            startTime: Optional start timestamp in milliseconds
-            endTime: Optional end timestamp in milliseconds
-            limit: Optional maximum number of records
-            cursor: Optional pagination cursor
-
-        Returns:
-            Dict containing long/short ratio data
-        """
-        payload: dict[str, Any] = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "period": period,
-        }
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if cursor is not None:
-            payload["cursor"] = cursor
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_LONG_SHORT_RATIO,
-            query=payload,
-            signed=False,
+        """Get long/short account ratio history."""
+        symbol, category = self._symbol_category(product_symbol)
+        return await self._native_public(
+            "get_long_short_ratio",
+            self._params(
+                category=category,
+                symbol=symbol,
+                period=period,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+                cursor=cursor,
+            ),
         )
-        return res
 
     async def get_historical_volatility(
         self,
@@ -340,58 +203,21 @@ class MarketHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get historical volatility data.
-
-        Args:
-            category: Instrument category
-            baseCoin: Optional base coin
-            period: Optional period
-            startTime: Optional start timestamp in milliseconds
-            endTime: Optional end timestamp in milliseconds
-
-        Returns:
-            Dict containing historical volatility data
-        """
-        payload: dict[str, Any] = {"category": category}
-        if baseCoin is not None:
-            payload["baseCoin"] = baseCoin
-        if period is not None:
-            payload["period"] = str(period)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_HISTORICAL_VOLATILITY,
-            query=payload,
-            signed=False,
+        """Get historical volatility data."""
+        return await self._native_public(
+            "get_historical_volatility",
+            self._params(
+                category=category,
+                baseCoin=baseCoin,
+                period=period,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
-        return res
 
     async def get_insurance_pool(self, coin: str | None = None) -> dict[str, Any]:
-        """
-        Get insurance pool data.
-
-        Args:
-            coin: Optional coin filter
-
-        Returns:
-            Dict containing insurance pool data
-        """
-        payload: dict[str, Any] = {}
-        if coin is not None:
-            payload["coin"] = coin
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_INSURANCE_POOL,
-            query=payload,
-            signed=False,
-        )
-        return res
+        """Get insurance pool data."""
+        return await self._native_public("get_insurance_pool", self._params(coin=coin))
 
     async def get_delivery_price(
         self,
@@ -401,93 +227,46 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get delivery price data.
-
-        Args:
-            category: Instrument category
-            product_symbol: Optional product symbol
-            baseCoin: Optional base coin
-            limit: Optional maximum number of records
-            cursor: Optional pagination cursor
-
-        Returns:
-            Dict containing delivery price data
-        """
-        payload: dict[str, Any] = {"category": category}
+        """Get delivery price data."""
+        symbol = None
         if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        if baseCoin is not None:
-            payload["baseCoin"] = baseCoin
-        if limit is not None:
-            payload["limit"] = str(limit)
-        if cursor is not None:
-            payload["cursor"] = cursor
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_DELIVERY_PRICE,
-            query=payload,
-            signed=False,
+            symbol, category = self._symbol_category(product_symbol, category)
+        return await self._native_public(
+            "get_delivery_price",
+            self._params(
+                category=category,
+                symbol=symbol,
+                baseCoin=baseCoin,
+                limit=limit,
+                cursor=cursor,
+            ),
         )
-        return res
 
     async def get_order_price_limit(
         self,
         product_symbol: str,
         category: str = "linear",
     ) -> dict[str, Any]:
-        """
-        Get order price limit data.
-
-        Args:
-            product_symbol: Product symbol
-            category: Instrument category
-
-        Returns:
-            Dict containing order price limit data
-        """
-        payload: dict[str, Any] = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol) or category,
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_ORDER_PRICE_LIMIT,
-            query=payload,
-            signed=False,
+        """Get order price limit data."""
+        symbol, category = self._symbol_category(product_symbol, category)
+        return await self._native_public(
+            "get_order_price_limit",
+            self._params(category=category, symbol=symbol),
         )
-        return res
 
     async def get_adl_alert(
         self,
         category: str = "linear",
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get ADL alert data.
-
-        Args:
-            category: Instrument category
-            product_symbol: Optional product symbol
-
-        Returns:
-            Dict containing ADL alert data
-        """
-        payload: dict[str, Any] = {"category": category}
+        """Get ADL alert data."""
+        symbol = None
         if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_ADL_ALERT,
-            query=payload,
-            signed=False,
+            symbol, category = self._symbol_category(product_symbol, category)
+        return await self._native_public(
+            "get_adl_alert",
+            self._params(category=category, symbol=symbol),
         )
-        return res
 
     async def get_risk_limit(
         self,
@@ -495,28 +274,11 @@ class MarketHTTP(HTTPManager):
         product_symbol: str | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get risk limit information.
-
-        Args:
-            category: Instrument category (linear, inverse)
-            product_symbol: Optional product symbol to filter results
-            cursor: Optional cursor for pagination
-
-        Returns:
-            Dict containing risk limit information
-        """
-        payload = {"category": category}
-
+        """Get risk limit information."""
+        symbol = None
         if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-        if cursor is not None:
-            payload["cursor"] = cursor
-
-        res = await self._request(
-            method="GET",
-            path=Market.GET_RISK_MARKET,
-            query=payload,
-            signed=False,
+            symbol, _ = self._symbol_category(product_symbol, category)
+        return await self._native_public(
+            "get_risk_limit",
+            self._params(category=category, symbol=symbol, cursor=cursor),
         )
-        return res

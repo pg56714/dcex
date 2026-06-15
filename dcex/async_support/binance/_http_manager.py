@@ -1,9 +1,11 @@
 import hashlib
 import hmac
+import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Self
+from importlib import import_module
+from typing import Any, Self, cast
 from urllib.parse import urlencode
 
 import httpx
@@ -17,6 +19,11 @@ from .endpoints.account import FuturesAccount, SpotAccount, WalletAsset
 from .endpoints.market import FuturesMarket, SpotMarket
 from .endpoints.trade import FuturesTrade, SpotTrade
 
+try:
+    _native = import_module("dcex._native")
+except ImportError:
+    _native = None
+
 
 @dataclass
 class HTTPManager(BaseHTTPManager):
@@ -29,6 +36,8 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(default=None, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     api_map = {
         "https://fapi.binance.com": {
@@ -48,6 +57,12 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINANCE)
+        if self.use_native and _native is not None and self._native_client is None:
+            self._native_client = _native.BinanceHttpClient(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
@@ -78,6 +93,29 @@ class HTTPManager(BaseHTTPManager):
     def _headers(self) -> dict[str, str]:
         return {"X-MBX-APIKEY": self.api_key} if self.api_key else {}
 
+    @staticmethod
+    def _native_market(
+        path: (
+            SpotAccount
+            | FuturesAccount
+            | WalletAsset
+            | SpotMarket
+            | FuturesMarket
+            | SpotTrade
+            | FuturesTrade
+        ),
+    ) -> str:
+        if type(path) in {FuturesTrade, FuturesMarket, FuturesAccount}:
+            return "futures"
+        return "spot"
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
+
     async def _request(
         self,
         method: str,
@@ -97,80 +135,111 @@ class HTTPManager(BaseHTTPManager):
             await self.async_init()
 
         query = dict(query or {})
+        if signed and not (self.api_key and self.api_secret):
+            raise ValueError("Signed request requires API Key and Secret.")
 
-        if signed:
-            if not (self.api_key and self.api_secret):
-                raise ValueError("Signed request requires API Key and Secret.")
-            query["timestamp"] = int(time.time() * 1000)
-            query["recvWindow"] = 5000
-            query["signature"] = self._sign(query)
+        if self.session is None:
+            raise ValueError("Session is not initialized")
 
+        base_url = self._get_base_url(path)
+        url = f"{base_url}{path}"
+        self._log_request(method, url)
+        uses_native = self._uses_native_transport()
+        native_client = self._native_client
         response = None
         try:
-            if self.session is None:
-                raise ValueError("Session is not initialized")
-            base_url = self._get_base_url(path)
-            url = f"{base_url}{path}"
-            self._log_request(method, url)
-            if method.upper() == "GET":
-                url += f"?{urlencode(query)}" if query else ""
-                response = await self.session.get(url, headers=self._headers())
-            elif method.upper() == "POST":
-                response = await self.session.post(url, headers=self._headers(), data=query)
-            elif method.upper() == "PUT":
-                response = await self.session.put(url, headers=self._headers(), data=query)
-            elif method.upper() == "DELETE":
-                url += f"?{urlencode(query)}" if query else ""
-                response = await self.session.delete(url, headers=self._headers())
+            if uses_native:
+                status_code, response_headers, body = await cast(
+                    Any,
+                    native_client,
+                ).request_raw_async(
+                    method,
+                    self._native_market(path),
+                    str(path),
+                    [(str(key), str(value)) for key, value in query.items()],
+                    signed,
+                )
+                response_headers = dict(response_headers)
+                response_text = bytes(body).decode(errors="replace")
+                self.last_response_headers = response_headers
             else:
-                raise ValueError(f"Unsupported method: {method}")
+                if signed:
+                    query["timestamp"] = int(time.time() * 1000)
+                    query["recvWindow"] = 5000
+                    query["signature"] = self._sign(query)
 
-        except httpx.RequestError as e:
-            status_code, resp_headers = self._exception_response_details(e)
+                if method.upper() == "GET":
+                    url += f"?{urlencode(query)}" if query else ""
+                    response = await self.session.get(url, headers=self._headers())
+                elif method.upper() == "POST":
+                    response = await self.session.post(
+                        url,
+                        headers=self._headers(),
+                        data=query,
+                    )
+                elif method.upper() == "PUT":
+                    response = await self.session.put(
+                        url,
+                        headers=self._headers(),
+                        data=query,
+                    )
+                elif method.upper() == "DELETE":
+                    url += f"?{urlencode(query)}" if query else ""
+                    response = await self.session.delete(url, headers=self._headers())
+                else:
+                    raise ValueError(f"Unsupported method: {method}")
+
+                response_headers = self._store_response_headers(response)
+                status_code = response.status_code
+                response_text = response.text
+        except (httpx.RequestError, RuntimeError) as exc:
+            status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Params: {query}",
-                message=f"Request failed: {str(e)}",
+                message=f"Request failed: {str(exc)}",
                 status_code=status_code,
                 time=str(query.get("timestamp", "Unknown")),
                 resp_headers=resp_headers,
-            ) from e
-        else:
-            self._store_response_headers(response)
-            try:
-                data = response.json()
-            except Exception as exc:
-                raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"Failed to decode JSON response: {exc}",
-                    status_code=response.status_code,
-                    time=str(generate_timestamp(iso_format=True)),
-                    resp_headers=dict(response.headers),
-                ) from exc
+            ) from exc
 
-            timestamp = generate_timestamp(iso_format=True)
+        try:
+            if uses_native:
+                data = json.loads(body)
+            else:
+                data = cast(Any, response).json()
+        except Exception as exc:
+            raise FailedRequestError(
+                request=f"{method.upper()} {url} | Body: {query}",
+                message=f"Failed to decode JSON response: {exc}",
+                status_code=status_code,
+                time=str(generate_timestamp(iso_format=True)),
+                resp_headers=response_headers,
+            ) from exc
 
-            if isinstance(data, dict) and "code" in data and str(data["code"]) != "200":
-                code = data.get("code", "Unknown")
-                error_message = data.get("msg", "Unknown error")
-                self._log_failed_request(f"BINANCE API Error: [{code}] {error_message}", code)
-                raise FailedRequestError(
-                    request=f"{method} {url} | Body: {query}",
-                    message=f"BINANCE API Error: [{code}] {error_message}",
-                    status_code=response.status_code,
-                    time=str(timestamp),
-                    resp_headers=dict(response.headers),
-                )
+        timestamp = generate_timestamp(iso_format=True)
+        if isinstance(data, dict) and "code" in data and str(data["code"]) != "200":
+            code = data.get("code", "Unknown")
+            error_message = data.get("msg", "Unknown error")
+            self._log_failed_request(f"BINANCE API Error: [{code}] {error_message}", code)
+            raise FailedRequestError(
+                request=f"{method} {url} | Body: {query}",
+                message=f"BINANCE API Error: [{code}] {error_message}",
+                status_code=status_code,
+                time=str(timestamp),
+                resp_headers=response_headers,
+            )
 
-            if not response.status_code // 100 == 2:
-                self._log_failed_request(
-                    f"HTTP Error {response.status_code}: {response.text}", response.status_code
-                )
-                raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {response.text}",
-                    status_code=response.status_code,
-                    time=str(timestamp),
-                    resp_headers=dict(response.headers),
-                )
+        if not status_code // 100 == 2:
+            self._log_failed_request(
+                f"HTTP Error {status_code}: {response_text}",
+                status_code,
+            )
+            raise FailedRequestError(
+                request=f"{method.upper()} {url} | Body: {query}",
+                message=f"HTTP Error {status_code}: {response_text}",
+                status_code=status_code,
+                time=str(timestamp),
+                resp_headers=response_headers,
+            )
 
-            return data
+        return data

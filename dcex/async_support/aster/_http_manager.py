@@ -5,11 +5,12 @@ import threading
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, Self
+from typing import Any, Self, cast
 from urllib.parse import urlencode
 
 import httpx
 
+from ..._native_http import NativeResponse, load_native
 from ...aster._http_manager import AsterPath, _filtered_query, sign_message
 from ...aster.endpoints.account import FuturesAccount, SpotAccount
 from ...aster.endpoints.market import FuturesMarket, SpotMarket
@@ -19,6 +20,8 @@ from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 
 @dataclass
@@ -39,15 +42,34 @@ class HTTPManager(BaseHTTPManager):
     preload_product_table: bool = field(default=True)
     _nonce_lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
     _last_nonce: int = field(default=0, init=False, repr=False)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """Initialize the asynchronous Aster HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "AsterHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                user_address=self.user_address,
+                signer_address=self.signer_address,
+                private_key=self.private_key,
+                timeout=self.timeout,
+                spot_base_url=self.spot_base_url,
+                futures_base_url=self.futures_base_url,
+            )
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.ASTER)
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     def _get_base_url(self, path: AsterPath) -> str:
         if isinstance(path, SpotMarket | SpotAccount | SpotTrade):
@@ -98,10 +120,20 @@ class HTTPManager(BaseHTTPManager):
 
         method_upper = method.upper()
         include_user = isinstance(path, FuturesMarket | FuturesAccount | FuturesTrade)
+        uses_native = self._uses_native_transport()
+        if signed and uses_native:
+            if not self.signer_address or not self.private_key:
+                raise ValueError("Signed Aster requests require signer_address and private_key.")
+            if include_user and not self.user_address:
+                raise ValueError("Signed Aster futures requests require user_address.")
         params = (
-            self._signed_query(query, include_user=include_user)
-            if signed
-            else _filtered_query(query)
+            _filtered_query(query)
+            if uses_native
+            else (
+                self._signed_query(query, include_user=include_user)
+                if signed
+                else _filtered_query(query)
+            )
         )
         url = f"{self._get_base_url(path)}{path}"
         headers = {"Accept": "application/json"}
@@ -110,7 +142,24 @@ class HTTPManager(BaseHTTPManager):
         response = None
         try:
             self._log_request(method_upper, url)
-            if method_upper == "GET":
+            if uses_native:
+                market = "futures" if include_user else "spot"
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    market,
+                    str(path),
+                    list(params.items()),
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method_upper == "GET":
                 response = await self.session.get(url, params=params, headers=headers)
             else:
                 response = await self.session.request(
@@ -119,7 +168,7 @@ class HTTPManager(BaseHTTPManager):
                     data=params,
                     headers=headers,
                 )
-        except httpx.RequestError as exc:
+        except (httpx.RequestError, RuntimeError) as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {params}",

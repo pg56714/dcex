@@ -182,6 +182,7 @@ def test_zero_private_key_is_rejected() -> None:
 def test_create_order_payload_uses_lighter_wire_format(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(signer_module.time, "time", lambda: 1_000.0)
     monkeypatch.setattr(signer_module, "schnorr_sign", lambda *_args: bytes(range(80)))
+    monkeypatch.setattr(signer_module, "_NATIVE", None)
     client = SignerClient(
         url="https://mainnet.zklighter.elliot.ai",
         account_index=12,
@@ -228,7 +229,33 @@ def test_create_order_payload_uses_lighter_wire_format(monkeypatch: pytest.Monke
     }
 
 
-def test_auth_token_is_fully_python_signed(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_native_transaction_signing_builds_wire_payload() -> None:
+    native = pytest.importorskip("dcex._native")
+    if not hasattr(native, "lighter_sign_transaction"):
+        pytest.skip("native transaction signer is unavailable")
+    client = SignerClient(
+        url="https://mainnet.zklighter.elliot.ai",
+        account_index=12,
+        api_private_keys={3: "01" + "00" * 39},
+    )
+
+    tx_type, tx_info, tx_hash, error = client.sign_cancel_order(
+        market_index=4,
+        order_index=5,
+        skip_nonce=1,
+        nonce=6,
+        api_key_index=3,
+    )
+
+    payload = json.loads(tx_info)
+    assert error is None
+    assert tx_type == 15
+    assert len(tx_hash) == 80
+    assert len(base64.b64decode(payload["Sig"])) == 80
+    assert payload["L2TxAttributes"] == {"4": 1}
+
+
+def test_auth_token_is_locally_signed(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(signer_module.time, "time", lambda: 1_000.0)
     client = SignerClient(
         url="https://mainnet.zklighter.elliot.ai",

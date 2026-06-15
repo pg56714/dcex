@@ -2,17 +2,20 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, cast
 from urllib.parse import urlencode
 
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
 from .signer_client import SignerClient
+
+_native = load_native()
 
 
 def _format_value(value: object) -> str:
@@ -45,12 +48,27 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False, repr=False)
     _signer: SignerClient | None = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "LighterHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.LIGHTER)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def _request(
         self,
@@ -87,7 +105,25 @@ class HTTPManager(BaseHTTPManager):
         try:
             self._log_request(method, url)
             method_upper = method.upper()
-            if method_upper == "GET":
+            if self._uses_native_transport():
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    request_path,
+                    [(key, _format_value(value)) for key, value in filtered_query.items()],
+                    [(key, _format_value(value)) for key, value in _filtered_query(body).items()],
+                    signed,
+                    {key: value for key, value in (headers or {}).items() if value},
+                    content_type,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method_upper == "GET":
                 response = self.session.get(url, headers=request_headers, timeout=self.timeout)
             elif method_upper == "POST":
                 response = self.session.post(
@@ -98,7 +134,7 @@ class HTTPManager(BaseHTTPManager):
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except requests.RequestException as exc:
+        except (requests.RequestException, RuntimeError) as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

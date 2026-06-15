@@ -2,16 +2,19 @@ import base64
 import hmac
 import logging
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 
 import msgspec
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+
+_native = load_native()
 
 
 def _sign(message: str, secretKey: str) -> str:
@@ -154,6 +157,8 @@ class HTTPManager(BaseHTTPManager):
     session: requests.Session = field(default_factory=requests.Session, init=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """
@@ -162,9 +167,26 @@ class HTTPManager(BaseHTTPManager):
         Sets up logger and optionally preloads the product table.
         """
         self._logger = self._setup_logger(self.logger)
+        native_client_type = getattr(_native, "OkxHttpClient", None)
+        if self.use_native and native_client_type is not None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                passphrase=self.passphrase,
+                flag=self.flag,
+                timeout=self.timeout,
+                base_url=self.base_api,
+            )
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.OKX)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def _request(
         self,
@@ -192,15 +214,17 @@ class HTTPManager(BaseHTTPManager):
         if query is None:
             query = {}
 
-        if method.upper() == "GET":
+        method_upper = method.upper()
+        request_path = path
+        if method_upper == "GET":
             if isinstance(query, dict):
-                path += parse_params_to_str(query)
+                request_path += parse_params_to_str(query)
             else:
                 # For GET requests with list query, convert to empty dict
-                path += parse_params_to_str({})
+                request_path += parse_params_to_str({})
 
         timestamp = generate_timestamp(iso_format=True)
-        body = query if method.upper() == "POST" else ""
+        body = query if method_upper == "POST" else ""
         body_str = (
             msgspec.json.encode(body).decode("utf-8") if isinstance(body, (dict, list)) else body
         )
@@ -208,18 +232,51 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret and self.passphrase):
                 raise ValueError("Signed request requires API Key and Secret and Passphrase.")
-            sign = _sign(pre_hash(timestamp, method.upper(), path, body_str), self.api_secret)
-            headers = get_header(self.api_key, sign, timestamp, self.passphrase, self.flag)
+            if not self._uses_native_transport():
+                sign = _sign(
+                    pre_hash(timestamp, method_upper, request_path, body_str),
+                    self.api_secret,
+                )
+                headers = get_header(
+                    self.api_key,
+                    sign,
+                    timestamp,
+                    self.passphrase,
+                    self.flag,
+                )
+            else:
+                headers = get_header_no_sign(self.flag)
         else:
             headers = get_header_no_sign(self.flag)
 
-        url = self.base_api + path
+        url = self.base_api + request_path
         self._log_request(method, url)
 
         try:
-            if method.upper() == "GET":
+            if self._uses_native_transport():
+                params = (
+                    [(key, str(value)) for key, value in query.items()]
+                    if method_upper == "GET" and isinstance(query, dict)
+                    else []
+                )
+                status, response_headers, response_body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    path,
+                    params,
+                    body_str.encode() if method_upper == "POST" else None,
+                    signed,
+                )
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
+                )
+            elif method_upper == "GET":
                 response = self.session.get(url, headers=headers, timeout=self.timeout)
-            elif method.upper() == "POST":
+            elif method_upper == "POST":
                 response = self.session.post(
                     url,
                     data=body_str,
@@ -228,10 +285,10 @@ class HTTPManager(BaseHTTPManager):
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.RequestException, RuntimeError) as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
-                request=f"{method.upper()} {url} | Body: {query}",
+                request=f"{method_upper} {url} | Body: {query}",
                 message=f"Request failed: {str(e)}",
                 status_code=status_code,
                 time=str(timestamp),
@@ -243,7 +300,7 @@ class HTTPManager(BaseHTTPManager):
                 data = response.json()
             except Exception as exc:
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"Failed to decode JSON response: {exc}",
                     status_code=response.status_code,
                     time=str(timestamp),
@@ -251,7 +308,7 @@ class HTTPManager(BaseHTTPManager):
                 ) from exc
             if not isinstance(data, dict):
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"Unexpected response type: {type(data).__name__}",
                     status_code=response.status_code,
                     time=str(timestamp),
@@ -262,7 +319,7 @@ class HTTPManager(BaseHTTPManager):
                 api_code, error_message = _okx_error_details(data)
                 self._log_failed_request(f"OKX API Error: [{api_code}] {error_message}", api_code)
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"OKX API Error: [{api_code}] {error_message}",
                     status_code=response.status_code,
                     time=str(timestamp),
@@ -271,7 +328,7 @@ class HTTPManager(BaseHTTPManager):
 
             if not response.status_code // 100 == 2:
                 raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
+                    request=f"{method_upper} {url} | Body: {query}",
                     message=f"HTTP Error {response.status_code}: {response.text}",
                     status_code=response.status_code,
                     time=str(timestamp),

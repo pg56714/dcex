@@ -4,17 +4,20 @@ import logging
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Literal, Self
-from urllib.parse import urlencode
+from typing import Any, Literal, Self, cast
+from urllib.parse import parse_qsl, urlencode
 
 import httpx
 import msgspec
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 
 @dataclass
@@ -48,6 +51,8 @@ class HTTPManager(BaseHTTPManager):
     session: httpx.AsyncClient | None = field(init=False, default=None)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """
@@ -65,9 +70,24 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMEX)
+        native_client_type = getattr(_native, "BitmexHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     def _sign(self, method: str, path: str, expires: int, body: str = "") -> str:
         """
@@ -164,40 +184,66 @@ class HTTPManager(BaseHTTPManager):
             full_path = path
             self._log_request(method, url)
 
-            if method.upper() == "GET":
-                if query:
-                    query_string = urlencode(query)
-                    url += f"?{query_string}"
-                    full_path += f"?{query_string}"
-                response = await self.session.get(
-                    url, headers=self._headers(method, full_path, signed=signed)
+            if self._uses_native_transport():
+                params = (
+                    parse_qsl(urlencode(query), keep_blank_values=True)
+                    if query and method.upper() == "GET"
+                    else []
                 )
-            elif method.upper() == "POST":
-                body = msgspec.json.encode(query).decode("utf-8") if query else ""
-                response = await self.session.post(
-                    url,
-                    headers=self._headers(method, full_path, body, signed=signed),
-                    content=body,
+                body_bytes = (
+                    msgspec.json.encode(query) if query and method.upper() != "GET" else None
                 )
-            elif method.upper() == "PUT":
-                body = msgspec.json.encode(query).decode("utf-8") if query else ""
-                response = await self.session.put(
-                    url,
-                    headers=self._headers(method, full_path, body, signed=signed),
-                    content=body,
+                status, response_headers, response_body = await cast(
+                    Any,
+                    self._native_client,
+                ).request_raw_async(
+                    method,
+                    path,
+                    params,
+                    body_bytes,
+                    signed,
                 )
-            elif method.upper() == "DELETE":
-                body = msgspec.json.encode(query).decode("utf-8") if query else ""
-                response = await self.session.request(
-                    method="DELETE",
-                    url=url,
-                    headers=self._headers(method, full_path, body, signed=signed),
-                    content=body,
+                response = NativeResponse(
+                    status,
+                    dict(response_headers),
+                    bytes(response_body),
                 )
             else:
-                raise ValueError(f"Unsupported method: {method}")
+                if method.upper() == "GET":
+                    if query:
+                        query_string = urlencode(query)
+                        url += f"?{query_string}"
+                        full_path += f"?{query_string}"
+                    response = await self.session.get(
+                        url,
+                        headers=self._headers(method, full_path, signed=signed),
+                    )
+                elif method.upper() == "POST":
+                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    response = await self.session.post(
+                        url,
+                        headers=self._headers(method, full_path, body, signed=signed),
+                        content=body,
+                    )
+                elif method.upper() == "PUT":
+                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    response = await self.session.put(
+                        url,
+                        headers=self._headers(method, full_path, body, signed=signed),
+                        content=body,
+                    )
+                elif method.upper() == "DELETE":
+                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    response = await self.session.request(
+                        method="DELETE",
+                        url=url,
+                        headers=self._headers(method, full_path, body, signed=signed),
+                        content=body,
+                    )
+                else:
+                    raise ValueError(f"Unsupported method: {method}")
 
-        except httpx.RequestError as e:
+        except (httpx.RequestError, RuntimeError) as e:
             timestamp = generate_timestamp(iso_format=True)
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(

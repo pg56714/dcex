@@ -106,6 +106,32 @@ class FakeAsyncSession:
         return FakeAsyncResponse()
 
 
+class FakeSyncNativePublicClient:
+    def __init__(self, calls: list[dict[str, Any]]) -> None:
+        self.calls = calls
+
+    def public_request(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], bytes]:
+        self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
+        return 200, {"x-response": "native"}, b'{"ok":true}'
+
+
+class FakeAsyncNativePublicClient:
+    def __init__(self, calls: list[dict[str, Any]]) -> None:
+        self.calls = calls
+
+    async def public_request_async(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], bytes]:
+        self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
+        return 200, {"x-response": "native"}, b'{"ok":true}'
+
+
 class FakeSyncHyperliquidMarket:
     def __init__(self, *args: object, **kwargs: object) -> None:
         return None
@@ -320,6 +346,8 @@ def _wire_sync(client: Any) -> list[dict[str, Any]]:
         return {"ok": True}
 
     client._request = fake_request
+    if hasattr(client, "_native_public"):
+        client._native_client = FakeSyncNativePublicClient(calls)
     return calls
 
 
@@ -347,6 +375,8 @@ def _wire_async(client: Any) -> list[dict[str, Any]]:
         return {"ok": True}
 
     client._request = fake_request
+    if hasattr(client, "_native_public"):
+        client._native_client = FakeAsyncNativePublicClient(calls)
     return calls
 
 

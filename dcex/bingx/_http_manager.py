@@ -6,15 +6,18 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, cast
 from urllib.parse import urlencode
 
 import requests
 
+from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
+
+_native = load_native()
 
 
 def get_header(api_key: str) -> dict[str, str]:
@@ -85,12 +88,28 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     base_url: str = field(default="https://open-api.bingx.com")
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize the HTTP manager."""
         self._logger = self.logger or logging.getLogger(__name__)
+        if self.use_native and _native is not None:
+            self._native_client = _native.BingxHttpClient(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BINGX)
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is requests.Session
+        )
 
     def _request(
         self,
@@ -101,45 +120,59 @@ class HTTPManager(BaseHTTPManager):
         request_headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         """Make an HTTP request to BingX API."""
-        if signed:
-            if not (self.api_key and self.api_secret):
-                raise ValueError("Signed request requires API Key and Secret.")
+        if signed and not (self.api_key and self.api_secret):
+            raise ValueError("Signed request requires API Key and Secret.")
 
-            sign_payload, urlpa = signed_param_strings(query or {})
-            url = (
-                f"{self.base_url}{path}?{urlpa}&signature={get_sign(self.api_secret, sign_payload)}"
-            )
-            headers = get_header(self.api_key)
-        else:
-            headers = request_headers or get_header_no_sign()
-            url = self.base_url + path
-            if query:
-                sorted_query = urlencode(_prepare_query(query))
-                url += "?" + sorted_query if sorted_query else ""
-
-        response = None
+        uses_native = self._uses_native_transport()
+        url = self.base_url + path
         try:
-            method_upper = method.upper()
-            if method_upper == "GET":
-                response = self.session.get(url, headers=headers, timeout=self.timeout)
-            elif method_upper == "POST":
-                response = self.session.post(url, headers=headers, timeout=self.timeout)
-            elif method_upper == "PUT":
-                response = self.session.put(url, headers=headers, timeout=self.timeout)
-            elif method_upper == "DELETE":
-                response = self.session.delete(url, headers=headers, timeout=self.timeout)
+            if uses_native:
+                status, response_headers, body = cast(
+                    Any,
+                    self._native_client,
+                ).request_raw(
+                    method,
+                    path,
+                    list(_prepare_query(query or {}).items()),
+                    signed,
+                    None if signed else request_headers or get_header_no_sign(),
+                )
+                response = NativeResponse(status, dict(response_headers), bytes(body))
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+                if signed:
+                    sign_payload, urlpa = signed_param_strings(query or {})
+                    url = (
+                        f"{url}?{urlpa}&signature="
+                        f"{get_sign(cast(str, self.api_secret), sign_payload)}"
+                    )
+                    headers = get_header(cast(str, self.api_key))
+                else:
+                    headers = request_headers or get_header_no_sign()
+                    if query:
+                        sorted_query = urlencode(_prepare_query(query))
+                        url += "?" + sorted_query if sorted_query else ""
 
-        except requests.RequestException as e:
-            status_code, resp_headers = self._exception_response_details(e)
+                method_upper = method.upper()
+                if method_upper == "GET":
+                    response = self.session.get(url, headers=headers, timeout=self.timeout)
+                elif method_upper == "POST":
+                    response = self.session.post(url, headers=headers, timeout=self.timeout)
+                elif method_upper == "PUT":
+                    response = self.session.put(url, headers=headers, timeout=self.timeout)
+                elif method_upper == "DELETE":
+                    response = self.session.delete(url, headers=headers, timeout=self.timeout)
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
+
+        except (requests.RequestException, RuntimeError) as exc:
+            status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Request failed: {e}",
+                message=f"Request failed: {exc}",
                 status_code=status_code,
                 time=str(int(time.time() * 1000)),
                 resp_headers=resp_headers,
-            ) from e
+            ) from exc
         else:
             self._store_response_headers(response)
             try:

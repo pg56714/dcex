@@ -6,15 +6,18 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Self
+from typing import Any, Self, cast
 from urllib.parse import urlencode
 
 import httpx
 
+from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ..product_table.manager import ProductTableManager
+
+_native = load_native()
 
 
 def get_header(api_key: str) -> dict[str, str]:
@@ -85,6 +88,8 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     base_url: str = field(default="https://open-api.bingx.com")
+    use_native: bool = field(default=True)
+    _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """
@@ -96,9 +101,23 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self.logger or logging.getLogger(__name__)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINGX)
+        if self.use_native and _native is not None and self._native_client is None:
+            self._native_client = _native.BingxHttpClient(
+                api_key=self.api_key,
+                api_secret=self.api_secret,
+                timeout=self.timeout,
+                base_url=self.base_url,
+            )
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
+
+    def _uses_native_transport(self) -> bool:
+        return (
+            self.use_native
+            and self._native_client is not None
+            and type(self.session) is httpx.AsyncClient
+        )
 
     async def _request(
         self,
@@ -128,56 +147,82 @@ class HTTPManager(BaseHTTPManager):
         if self.session is None or self.session.is_closed:
             await self.async_init()
 
-        if signed:
-            if not (self.api_key and self.api_secret):
-                raise ValueError("Signed request requires API Key and Secret.")
+        if signed and not (self.api_key and self.api_secret):
+            raise ValueError("Signed request requires API Key and Secret.")
 
-            sign_payload, urlpa = signed_param_strings(query or {})
-            url = (
-                f"{self.base_url}{path}?{urlpa}&signature={get_sign(self.api_secret, sign_payload)}"
-            )
-            headers = get_header(self.api_key)
-        else:
-            headers = request_headers or get_header_no_sign()
-            url = self.base_url + path
-            if query:
-                sorted_query = urlencode(_prepare_query(query))
-                url += "?" + sorted_query if sorted_query else ""
-
+        uses_native = self._uses_native_transport()
+        url = self.base_url + path
         try:
             if self.session is None:
                 raise ValueError("Session is not initialized. Call async_init() first.")
 
-            if method.upper() == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method.upper() == "POST":
-                if signed:
-                    response = await self.session.post(url, headers=headers)
-                else:
-                    response = await self.session.post(
-                        url, headers=headers, json=query if query else {}
-                    )
-            elif method.upper() == "PUT":
-                if signed:
-                    response = await self.session.put(url, headers=headers)
-                else:
-                    response = await self.session.put(
-                        url, headers=headers, json=query if query else {}
-                    )
-            elif method.upper() == "DELETE":
-                response = await self.session.delete(url, headers=headers)
+            if uses_native:
+                json_body = None
+                if not signed and method.upper() in {"POST", "PUT"}:
+                    json_body = json.dumps(
+                        query or {},
+                        separators=(",", ":"),
+                        ensure_ascii=False,
+                    ).encode()
+                status, response_headers, body = await cast(
+                    Any, self._native_client
+                ).request_raw_async(
+                    method,
+                    path,
+                    list(_prepare_query(query or {}).items()),
+                    signed,
+                    None if signed else request_headers or get_header_no_sign(),
+                    json_body,
+                )
+                response = NativeResponse(status, dict(response_headers), bytes(body))
             else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+                if signed:
+                    sign_payload, urlpa = signed_param_strings(query or {})
+                    url = (
+                        f"{url}?{urlpa}&signature="
+                        f"{get_sign(cast(str, self.api_secret), sign_payload)}"
+                    )
+                    headers = get_header(cast(str, self.api_key))
+                else:
+                    headers = request_headers or get_header_no_sign()
+                    if query:
+                        sorted_query = urlencode(_prepare_query(query))
+                        url += "?" + sorted_query if sorted_query else ""
 
-        except httpx.HTTPError as e:
-            status_code, resp_headers = self._exception_response_details(e)
+                if method.upper() == "GET":
+                    response = await self.session.get(url, headers=headers)
+                elif method.upper() == "POST":
+                    if signed:
+                        response = await self.session.post(url, headers=headers)
+                    else:
+                        response = await self.session.post(
+                            url,
+                            headers=headers,
+                            json=query if query else {},
+                        )
+                elif method.upper() == "PUT":
+                    if signed:
+                        response = await self.session.put(url, headers=headers)
+                    else:
+                        response = await self.session.put(
+                            url,
+                            headers=headers,
+                            json=query if query else {},
+                        )
+                elif method.upper() == "DELETE":
+                    response = await self.session.delete(url, headers=headers)
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
+
+        except (httpx.HTTPError, RuntimeError) as exc:
+            status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Request failed: {str(e)}",
+                message=f"Request failed: {str(exc)}",
                 status_code=status_code,
                 time=str(int(time.time() * 1000)),
                 resp_headers=resp_headers,
-            ) from e
+            ) from exc
         else:
             self._store_response_headers(response)
             try:

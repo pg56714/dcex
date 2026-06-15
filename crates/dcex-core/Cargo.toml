@@ -1,12 +1,36 @@
 [package]
-name = "dcex-core"
-description = "Rust core primitives for dcex."
+name = "dcex"
+description = "Rust trading library for dcex exchange integrations."
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
+readme = "README.md"
 repository.workspace = true
 version.workspace = true
+keywords = ["crypto", "trading", "exchange", "http"]
+categories = ["api-bindings", "web-programming::http-client"]
 
 [dependencies]
+base64 = "0.22"
+ed25519-dalek = { version = "2.2", default-features = false, features = [
+  "fast",
+  "std",
+] }
+hex = "0.4"
+hmac = "0.12"
 num-bigint = "0.4"
 num-traits = "0.2"
+reqwest = { version = "0.12", default-features = false, features = [
+  "brotli",
+  "charset",
+  "deflate",
+  "gzip",
+  "http2",
+  "json",
+  "rustls-tls",
+] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
+url = "2"
