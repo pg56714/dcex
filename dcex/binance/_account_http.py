@@ -1,20 +1,44 @@
 from typing import Any, cast
 
-from ..utils.common import Common
+from .._native_http import NativeResponse
 from ._http_manager import HTTPManager
-from .endpoints.account import FuturesAccount, SpotAccount, WalletAsset
 from .enums import BinanceProductType
 
 
 class AccountHTTP(HTTPManager):
     """HTTP client for Binance account-related API endpoints."""
 
-    def _listen_key_path(self, market_type: str) -> FuturesAccount:
+    def _native_private(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Binance private method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Binance native client is required for private account methods.")
+        status, headers, body = self._native_client.private_request(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            if isinstance(value, bool):
+                value = str(value).lower()
+            params.append((key, str(value)))
+        return params
+
+    @staticmethod
+    def _ensure_futures_listen_key(market_type: str) -> None:
         if str(market_type) == BinanceProductType.SPOT.value:
             raise NotImplementedError(
                 "Binance Spot user data streams are subscribed through the WebSocket API."
             )
-        return FuturesAccount.USER_DATA_STREAM
 
     def get_account_balance(
         self,
@@ -29,14 +53,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             dict: Account balance information
         """
-        res = self._request(
-            method="GET",
-            path=SpotAccount.ACCOUNT_BALANCE
-            if market_type == BinanceProductType.SPOT
-            else FuturesAccount.ACCOUNT_BALANCE,
-            query={},
+        return self._native_private(
+            "get_account_balance",
+            self._params(market_type=str(market_type)),
         )
-        return res
 
     def get_income_history(
         self,
@@ -61,26 +81,17 @@ class AccountHTTP(HTTPManager):
         Returns:
             dict: Income history data
         """
-        payload = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-        if incomeType is not None:
-            payload["incomeType"] = incomeType
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-        if page is not None:
-            payload["page"] = page
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=FuturesAccount.INCOME_HISTORY,
-            query=payload,
+        return self._native_private(
+            "get_income_history",
+            self._params(
+                product_symbol=product_symbol,
+                incomeType=incomeType,
+                startTime=startTime,
+                endTime=endTime,
+                page=page,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_futures_account_info(self) -> dict:
         """
@@ -89,27 +100,18 @@ class AccountHTTP(HTTPManager):
         Returns:
             dict: Futures account information.
         """
-        res = self._request(
-            method="GET",
-            path=FuturesAccount.ACCOUNT_INFO,
-            query={},
-        )
-        return res
+        return self._native_private("get_futures_account_info", [])
 
     def get_wallet_balance(
         self,
         quoteAsset: str | None = None,
     ) -> list[dict[str, Any]]:
         """Get the estimated balance of every activated Binance wallet."""
-        payload = {}
-        if quoteAsset is not None:
-            payload["quoteAsset"] = quoteAsset
         return cast(
             list[dict[str, Any]],
-            self._request(
-                method="GET",
-                path=WalletAsset.WALLET_BALANCE,
-                query=payload,
+            self._native_private(
+                "get_wallet_balance",
+                self._params(quoteAsset=quoteAsset),
             ),
         )
 
@@ -119,21 +121,11 @@ class AccountHTTP(HTTPManager):
         needBtcValuation: bool | str | None = None,
     ) -> list[dict[str, Any]]:
         """Get assets held in the Binance Funding Wallet."""
-        payload = {}
-        if asset is not None:
-            payload["asset"] = asset
-        if needBtcValuation is not None:
-            payload["needBtcValuation"] = (
-                str(needBtcValuation).lower()
-                if isinstance(needBtcValuation, bool)
-                else needBtcValuation
-            )
         return cast(
             list[dict[str, Any]],
-            self._request(
-                method="POST",
-                path=WalletAsset.FUNDING_WALLET,
-                query=payload,
+            self._native_private(
+                "get_funding_wallet",
+                self._params(asset=asset, needBtcValuation=needBtcValuation),
             ),
         )
 
@@ -146,19 +138,15 @@ class AccountHTTP(HTTPManager):
         toSymbol: str | None = None,
     ) -> dict:
         """Transfer an asset between Binance account wallets."""
-        payload = {
-            "type": type_,
-            "asset": asset,
-            "amount": amount,
-        }
-        if fromSymbol is not None:
-            payload["fromSymbol"] = fromSymbol
-        if toSymbol is not None:
-            payload["toSymbol"] = toSymbol
-        return self._request(
-            method="POST",
-            path=WalletAsset.UNIVERSAL_TRANSFER,
-            query=payload,
+        return self._native_private(
+            "create_universal_transfer",
+            self._params(
+                type=type_,
+                asset=asset,
+                amount=amount,
+                fromSymbol=fromSymbol,
+                toSymbol=toSymbol,
+            ),
         )
 
     def get_universal_transfer_history(
@@ -172,23 +160,17 @@ class AccountHTTP(HTTPManager):
         toSymbol: str | None = None,
     ) -> dict:
         """Get Binance universal transfer records."""
-        payload: dict[str, Any] = {"type": type_}
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-        if current is not None:
-            payload["current"] = current
-        if size is not None:
-            payload["size"] = size
-        if fromSymbol is not None:
-            payload["fromSymbol"] = fromSymbol
-        if toSymbol is not None:
-            payload["toSymbol"] = toSymbol
-        return self._request(
-            method="GET",
-            path=WalletAsset.UNIVERSAL_TRANSFER,
-            query=payload,
+        return self._native_private(
+            "get_universal_transfer_history",
+            self._params(
+                type=type_,
+                startTime=startTime,
+                endTime=endTime,
+                current=current,
+                size=size,
+                fromSymbol=fromSymbol,
+                toSymbol=toSymbol,
+            ),
         )
 
     def get_listen_key(self, market_type: str = BinanceProductType.SWAP) -> str:
@@ -201,8 +183,8 @@ class AccountHTTP(HTTPManager):
         Returns:
             str: User data stream listen key.
         """
-        path = self._listen_key_path(market_type)
-        res = self._request(method="POST", path=path, query={}, signed=False)
+        self._ensure_futures_listen_key(market_type)
+        res = self._native_private("create_futures_listen_key", [])
         return res["listenKey"]
 
     def keep_alive_listen_key(
@@ -220,12 +202,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             dict: Binance response.
         """
-        path = self._listen_key_path(market_type)
-        return self._request(
-            method="PUT",
-            path=path,
-            query={"listenKey": listen_key},
-            signed=False,
+        self._ensure_futures_listen_key(market_type)
+        return self._native_private(
+            "keep_alive_futures_listen_key",
+            self._params(listenKey=listen_key),
         )
 
     def close_listen_key(
@@ -243,10 +223,8 @@ class AccountHTTP(HTTPManager):
         Returns:
             dict: Binance response.
         """
-        path = self._listen_key_path(market_type)
-        return self._request(
-            method="DELETE",
-            path=path,
-            query={"listenKey": listen_key},
-            signed=False,
+        self._ensure_futures_listen_key(market_type)
+        return self._native_private(
+            "close_futures_listen_key",
+            self._params(listenKey=listen_key),
         )

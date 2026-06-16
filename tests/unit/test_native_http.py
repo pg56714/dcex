@@ -330,6 +330,124 @@ async def test_async_binance_public_wrapper_uses_native_dispatcher() -> None:
     assert received.get_nowait()["path"] == "/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=2"
 
 
+def test_sync_binance_private_trade_wrapper_uses_native_dispatcher() -> None:
+    native = pytest.importorskip("dcex._native")
+    from dcex.binance.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            api_secret="secret",
+            preload_product_table=False,
+        )
+        client._native_client = native.BinanceHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            spot_base_url=base_url,
+            futures_base_url=base_url,
+        )
+        result = client.place_limit_buy_order(
+            product_symbol="BTC-USDT-SPOT",
+            quantity="1",
+            price="100",
+        )
+
+    client.close()
+    request = received.get_nowait()
+    body = dict(parse_qsl(request["body"]))
+    assert result == {"ok": True}
+    assert request["path"] == "/api/v3/order"
+    assert request["api_key"] == "api-key"
+    assert body["symbol"] == "BTCUSDT"
+    assert body["side"] == "BUY"
+    assert body["type"] == "LIMIT"
+    assert body["timeInForce"] == "GTC"
+    assert "signature" in body
+
+
+def test_binance_native_dispatcher_uses_product_table_symbols() -> None:
+    native = pytest.importorskip("dcex._native")
+    from dcex.binance.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            api_secret="secret",
+            preload_product_table=False,
+        )
+        client._native_client = native.BinanceHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            spot_base_url=base_url,
+            futures_base_url=base_url,
+        )
+        client._native_client.set_product_table(
+            native.ProductTable(
+                [
+                    {
+                        "exchange": "binance",
+                        "exchange_symbol": "BTCUSDT_250627",
+                        "product_symbol": "BTC-USDT-250627",
+                        "product_type": "futures",
+                        "exchange_type": "delivery",
+                        "price_precision": "0.1",
+                        "size_precision": "0.001",
+                        "min_size": "0.001",
+                        "base_currency": "BTC",
+                        "quote_currency": "USDT",
+                        "min_notional": "0",
+                        "size_per_contract": "1",
+                    }
+                ]
+            )
+        )
+        result = client.place_limit_buy_order(
+            product_symbol="BTC-USDT-250627",
+            quantity="1",
+            price="100",
+        )
+
+    client.close()
+    request = received.get_nowait()
+    body = dict(parse_qsl(request["body"]))
+    assert result == {"ok": True}
+    assert request["path"] == "/fapi/v1/order"
+    assert body["symbol"] == "BTCUSDT_250627"
+    assert body["side"] == "BUY"
+
+
+@pytest.mark.asyncio
+async def test_async_binance_private_account_wrapper_uses_native_dispatcher() -> None:
+    native = pytest.importorskip("dcex._native")
+    from dcex.async_support.binance.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            api_secret="secret",
+            preload_product_table=False,
+        )
+        await client.async_init()
+        client._native_client = native.BinanceHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            spot_base_url=base_url,
+            futures_base_url=base_url,
+        )
+        result = await client.get_account_balance(market_type="swap")
+
+    await client.close()
+    request = received.get_nowait()
+    query = dict(parse_qsl(urlsplit(request["path"]).query))
+    assert result == {"ok": True}
+    assert urlsplit(request["path"]).path == "/fapi/v3/balance"
+    assert request["api_key"] == "api-key"
+    assert "signature" in query
+
+
 def test_native_bingx_signed_request() -> None:
     native = pytest.importorskip("dcex._native")
 

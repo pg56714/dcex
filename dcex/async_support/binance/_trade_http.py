@@ -1,156 +1,41 @@
+from typing import Any
+
+from ..._native_http import NativeResponse
 from ...enums import OrderSide
-from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.trade import FuturesTrade, SpotTrade
 from .enums import BinanceProductType
 
 
 class TradeHTTP(HTTPManager):
     """HTTP client for Binance trading API endpoints."""
 
-    def _is_spot_product(self, product_symbol: str) -> bool:
-        return (
-            str(self.ptm.get_product_type(Common.BINANCE, product_symbol=product_symbol))
-            == BinanceProductType.SPOT.value
-        )
-
-    def _order_endpoint(
-        self, product_symbol: str, *, test: bool = False
-    ) -> SpotTrade | FuturesTrade:
-        if self._is_spot_product(product_symbol):
-            return SpotTrade.TEST_ORDER if test else SpotTrade.PLACE_CANCEL_QUERY_ORDER
-        return FuturesTrade.TEST_ORDER if test else FuturesTrade.PLACE_CANCEL_QUERY_ORDER
-
-    def _build_order_payload(
+    async def _native_private(
         self,
-        product_symbol: str,
-        side: OrderSide | str,
-        type_: str,
-        quantity: str | None = None,
-        quoteOrderQty: str | None = None,
-        price: str | None = None,
-        timeInForce: str | None = None,
-        positionSide: str | None = None,
-        reduceOnly: str | None = None,
-        stopPrice: str | None = None,
-        closePosition: str | None = None,
-        activationPrice: str | None = None,
-        callbackRate: str | None = None,
-        workingType: str | None = None,
-        priceProtect: str | None = None,
-        newClientOrderId: str | None = None,
-        newOrderRespType: str | None = None,
-        priceMatch: str | None = None,
-        selfTradePreventionMode: str | None = None,
-        goodTillDate: int | None = None,
-    ) -> dict[str, str]:
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "side": OrderSide.from_any(side).to_exchange(Common.BINANCE),
-            "type": type_,
-        }
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Binance private method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Binance native client is required for private trade methods.")
+        status, headers, body = await self._native_client.private_request_async(method_name, params)
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
 
-        if quantity is not None:
-            payload["quantity"] = quantity
-        if quoteOrderQty is not None:
-            payload["quoteOrderQty"] = quoteOrderQty
-        if price is not None:
-            payload["price"] = price
-        if timeInForce is not None:
-            payload["timeInForce"] = timeInForce
-        if positionSide is not None:
-            payload["positionSide"] = positionSide
-        if reduceOnly is not None:
-            payload["reduceOnly"] = reduceOnly
-        if stopPrice is not None:
-            payload["stopPrice"] = stopPrice
-        if closePosition is not None:
-            payload["closePosition"] = closePosition
-        if activationPrice is not None:
-            payload["activationPrice"] = activationPrice
-        if callbackRate is not None:
-            payload["callbackRate"] = callbackRate
-        if workingType is not None:
-            payload["workingType"] = workingType
-        if priceProtect is not None:
-            payload["priceProtect"] = priceProtect
-        if newClientOrderId is not None:
-            payload["newClientOrderId"] = newClientOrderId
-        if newOrderRespType is not None:
-            payload["newOrderRespType"] = newOrderRespType
-        if priceMatch is not None:
-            payload["priceMatch"] = priceMatch
-        if selfTradePreventionMode is not None:
-            payload["selfTradePreventionMode"] = selfTradePreventionMode
-        if goodTillDate is not None:
-            payload["goodTillDate"] = str(goodTillDate)
+    @staticmethod
+    def _params(**kwargs: object) -> list[tuple[str, str]]:
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            if isinstance(value, bool):
+                value = str(value).lower()
+            params.append((key, str(value)))
+        return params
 
-        return payload
-
-    def _build_futures_algo_order_payload(
-        self,
-        product_symbol: str,
-        side: OrderSide | str,
-        type_: str,
-        quantity: str | None = None,
-        triggerPrice: str | None = None,
-        price: str | None = None,
-        timeInForce: str | None = None,
-        positionSide: str | None = None,
-        closePosition: str | None = None,
-        priceProtect: str | None = None,
-        reduceOnly: str | None = None,
-        activatePrice: str | None = None,
-        callbackRate: str | None = None,
-        clientAlgoId: str | None = None,
-        newOrderRespType: str | None = None,
-        workingType: str | None = None,
-        priceMatch: str | None = None,
-        selfTradePreventionMode: str | None = None,
-        goodTillDate: int | None = None,
-        algoType: str = "CONDITIONAL",
-    ) -> dict[str, str]:
-        payload = {
-            "algoType": algoType,
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "side": OrderSide.from_any(side).to_exchange(Common.BINANCE),
-            "type": type_,
-        }
-
-        if quantity is not None:
-            payload["quantity"] = quantity
-        if triggerPrice is not None:
-            payload["triggerPrice"] = triggerPrice
-        if price is not None:
-            payload["price"] = price
-        if timeInForce is not None:
-            payload["timeInForce"] = timeInForce
-        if positionSide is not None:
-            payload["positionSide"] = positionSide
-        if closePosition is not None:
-            payload["closePosition"] = closePosition
-        if priceProtect is not None:
-            payload["priceProtect"] = priceProtect
-        if reduceOnly is not None:
-            payload["reduceOnly"] = reduceOnly
-        if activatePrice is not None:
-            payload["activatePrice"] = activatePrice
-        if callbackRate is not None:
-            payload["callbackRate"] = callbackRate
-        if clientAlgoId is not None:
-            payload["clientAlgoId"] = clientAlgoId
-        if newOrderRespType is not None:
-            payload["newOrderRespType"] = newOrderRespType
-        if workingType is not None:
-            payload["workingType"] = workingType
-        if priceMatch is not None:
-            payload["priceMatch"] = priceMatch
-        if selfTradePreventionMode is not None:
-            payload["selfTradePreventionMode"] = selfTradePreventionMode
-        if goodTillDate is not None:
-            payload["goodTillDate"] = str(goodTillDate)
-
-        return payload
+    @staticmethod
+    def _side(side: OrderSide | str) -> str:
+        return OrderSide.from_any(side).value
 
     async def set_leverage(
         self,
@@ -167,17 +52,10 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Leverage setting result
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-            "leverage": leverage,
-        }
-
-        res = await self._request(
-            method="POST",
-            path=FuturesTrade.SET_LEVERAGE,
-            query=payload,
+        return await self._native_private(
+            "set_leverage",
+            self._params(product_symbol=product_symbol, leverage=leverage),
         )
-        return res
 
     async def place_order(
         self,
@@ -230,34 +108,31 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order placement result
         """
-        payload = self._build_order_payload(
-            product_symbol=product_symbol,
-            side=side,
-            type_=type_,
-            quantity=quantity,
-            quoteOrderQty=quoteOrderQty,
-            price=price,
-            timeInForce=timeInForce,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
-            stopPrice=stopPrice,
-            closePosition=closePosition,
-            activationPrice=activationPrice,
-            callbackRate=callbackRate,
-            workingType=workingType,
-            priceProtect=priceProtect,
-            newClientOrderId=newClientOrderId,
-            newOrderRespType=newOrderRespType,
-            priceMatch=priceMatch,
-            selfTradePreventionMode=selfTradePreventionMode,
-            goodTillDate=goodTillDate,
+        return await self._native_private(
+            "place_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type_=type_,
+                quantity=quantity,
+                quoteOrderQty=quoteOrderQty,
+                price=price,
+                timeInForce=timeInForce,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+                stopPrice=stopPrice,
+                closePosition=closePosition,
+                activationPrice=activationPrice,
+                callbackRate=callbackRate,
+                workingType=workingType,
+                priceProtect=priceProtect,
+                newClientOrderId=newClientOrderId,
+                newOrderRespType=newOrderRespType,
+                priceMatch=priceMatch,
+                selfTradePreventionMode=selfTradePreventionMode,
+                goodTillDate=goodTillDate,
+            ),
         )
-        res = await self._request(
-            method="POST",
-            path=self._order_endpoint(product_symbol),
-            query=payload,
-        )
-        return res
 
     async def test_order(
         self,
@@ -288,32 +163,30 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Empty response or commission information, depending on Binance options.
         """
-        payload = self._build_order_payload(
-            product_symbol=product_symbol,
-            side=side,
-            type_=type_,
-            quantity=quantity,
-            quoteOrderQty=quoteOrderQty,
-            price=price,
-            timeInForce=timeInForce,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
-            stopPrice=stopPrice,
-            closePosition=closePosition,
-            activationPrice=activationPrice,
-            callbackRate=callbackRate,
-            workingType=workingType,
-            priceProtect=priceProtect,
-            newClientOrderId=newClientOrderId,
-            newOrderRespType=newOrderRespType,
-            priceMatch=priceMatch,
-            selfTradePreventionMode=selfTradePreventionMode,
-            goodTillDate=goodTillDate,
-        )
-        return await self._request(
-            method="POST",
-            path=self._order_endpoint(product_symbol, test=True),
-            query=payload,
+        return await self._native_private(
+            "test_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type_=type_,
+                quantity=quantity,
+                quoteOrderQty=quoteOrderQty,
+                price=price,
+                timeInForce=timeInForce,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+                stopPrice=stopPrice,
+                closePosition=closePosition,
+                activationPrice=activationPrice,
+                callbackRate=callbackRate,
+                workingType=workingType,
+                priceProtect=priceProtect,
+                newClientOrderId=newClientOrderId,
+                newOrderRespType=newOrderRespType,
+                priceMatch=priceMatch,
+                selfTradePreventionMode=selfTradePreventionMode,
+                goodTillDate=goodTillDate,
+            ),
         )
 
     async def place_futures_algo_order(
@@ -344,32 +217,30 @@ class TradeHTTP(HTTPManager):
 
         This endpoint is used by Binance for futures TP/SL and trailing stop orders.
         """
-        payload = self._build_futures_algo_order_payload(
-            product_symbol=product_symbol,
-            side=side,
-            type_=type_,
-            quantity=quantity,
-            triggerPrice=triggerPrice,
-            price=price,
-            timeInForce=timeInForce,
-            positionSide=positionSide,
-            closePosition=closePosition,
-            priceProtect=priceProtect,
-            reduceOnly=reduceOnly,
-            activatePrice=activatePrice,
-            callbackRate=callbackRate,
-            clientAlgoId=clientAlgoId,
-            newOrderRespType=newOrderRespType,
-            workingType=workingType,
-            priceMatch=priceMatch,
-            selfTradePreventionMode=selfTradePreventionMode,
-            goodTillDate=goodTillDate,
-            algoType=algoType,
-        )
-        return await self._request(
-            method="POST",
-            path=FuturesTrade.PLACE_CANCEL_QUERY_ALGO_ORDER,
-            query=payload,
+        return await self._native_private(
+            "place_futures_algo_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type_=type_,
+                quantity=quantity,
+                triggerPrice=triggerPrice,
+                price=price,
+                timeInForce=timeInForce,
+                positionSide=positionSide,
+                closePosition=closePosition,
+                priceProtect=priceProtect,
+                reduceOnly=reduceOnly,
+                activatePrice=activatePrice,
+                callbackRate=callbackRate,
+                clientAlgoId=clientAlgoId,
+                newOrderRespType=newOrderRespType,
+                workingType=workingType,
+                priceMatch=priceMatch,
+                selfTradePreventionMode=selfTradePreventionMode,
+                goodTillDate=goodTillDate,
+                algoType=algoType,
+            ),
         )
 
     async def cancel_futures_algo_order(
@@ -380,11 +251,9 @@ class TradeHTTP(HTTPManager):
         """
         Cancel a USD-M futures conditional algo order.
         """
-        payload = self._algo_order_id_payload(algoId=algoId, clientAlgoId=clientAlgoId)
-        return await self._request(
-            method="DELETE",
-            path=FuturesTrade.PLACE_CANCEL_QUERY_ALGO_ORDER,
-            query=payload,
+        return await self._native_private(
+            "cancel_futures_algo_order",
+            self._params(algoId=algoId, clientAlgoId=clientAlgoId),
         )
 
     async def get_futures_algo_order(
@@ -395,27 +264,10 @@ class TradeHTTP(HTTPManager):
         """
         Get a USD-M futures conditional algo order.
         """
-        payload = self._algo_order_id_payload(algoId=algoId, clientAlgoId=clientAlgoId)
-        return await self._request(
-            method="GET",
-            path=FuturesTrade.PLACE_CANCEL_QUERY_ALGO_ORDER,
-            query=payload,
+        return await self._native_private(
+            "get_futures_algo_order",
+            self._params(algoId=algoId, clientAlgoId=clientAlgoId),
         )
-
-    def _algo_order_id_payload(
-        self,
-        algoId: int | str | None = None,
-        clientAlgoId: str | None = None,
-    ) -> dict[str, str]:
-        if algoId is None and clientAlgoId is None:
-            raise ValueError("Either algoId or clientAlgoId is required.")
-
-        payload = {}
-        if algoId is not None:
-            payload["algoId"] = str(algoId)
-        if clientAlgoId is not None:
-            payload["clientAlgoId"] = clientAlgoId
-        return payload
 
     async def get_all_open_futures_algo_orders(
         self,
@@ -426,18 +278,13 @@ class TradeHTTP(HTTPManager):
         """
         Get open USD-M futures conditional algo orders.
         """
-        payload = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-        if algoType is not None:
-            payload["algoType"] = algoType
-        if algoId is not None:
-            payload["algoId"] = str(algoId)
-
-        return await self._request(
-            method="GET",
-            path=FuturesTrade.OPEN_ALGO_ORDERS,
-            query=payload,
+        return await self._native_private(
+            "get_all_open_futures_algo_orders",
+            self._params(
+                product_symbol=product_symbol,
+                algoType=algoType,
+                algoId=algoId,
+            ),
         )
 
     async def get_all_futures_algo_orders(
@@ -451,35 +298,24 @@ class TradeHTTP(HTTPManager):
         """
         Get historical USD-M futures conditional algo orders.
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        if algoId is not None:
-            payload["algoId"] = str(algoId)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        return await self._request(
-            method="GET",
-            path=FuturesTrade.ALL_ALGO_ORDERS,
-            query=payload,
+        return await self._native_private(
+            "get_all_futures_algo_orders",
+            self._params(
+                product_symbol=product_symbol,
+                algoId=algoId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
         )
 
     async def cancel_all_open_futures_algo_orders(self, product_symbol: str) -> dict:
         """
         Cancel all open USD-M futures conditional algo orders for a symbol.
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        return await self._request(
-            method="DELETE",
-            path=FuturesTrade.CANCEL_ALL_OPEN_ALGO_ORDERS,
-            query=payload,
+        return await self._native_private(
+            "cancel_all_open_futures_algo_orders",
+            self._params(product_symbol=product_symbol),
         )
 
     async def place_market_order(
@@ -505,14 +341,16 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order placement result
         """
-        return await self.place_order(
-            product_symbol=product_symbol,
-            side=side,
-            type_="MARKET",
-            quantity=quantity,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
-            newOrderRespType=newOrderRespType,
+        return await self._native_private(
+            "place_market_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                quantity=quantity,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+                newOrderRespType=newOrderRespType,
+            ),
         )
 
     async def place_market_buy_order(
@@ -535,13 +373,15 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order placement result
         """
-        return await self.place_market_order(
-            product_symbol=product_symbol,
-            side="BUY",
-            quantity=quantity,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
-            newOrderRespType=newOrderRespType,
+        return await self._native_private(
+            "place_market_buy_order",
+            self._params(
+                product_symbol=product_symbol,
+                quantity=quantity,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+                newOrderRespType=newOrderRespType,
+            ),
         )
 
     async def place_market_sell_order(
@@ -564,13 +404,15 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order placement result
         """
-        return await self.place_market_order(
-            product_symbol=product_symbol,
-            side="SELL",
-            quantity=quantity,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
-            newOrderRespType=newOrderRespType,
+        return await self._native_private(
+            "place_market_sell_order",
+            self._params(
+                product_symbol=product_symbol,
+                quantity=quantity,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+                newOrderRespType=newOrderRespType,
+            ),
         )
 
     async def place_limit_order(
@@ -598,15 +440,17 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order placement result
         """
-        return await self.place_order(
-            product_symbol=product_symbol,
-            side=side,
-            type_="LIMIT",
-            quantity=quantity,
-            price=price,
-            timeInForce=timeInForce,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
+        return await self._native_private(
+            "place_limit_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                quantity=quantity,
+                price=price,
+                timeInForce=timeInForce,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+            ),
         )
 
     async def place_limit_buy_order(
@@ -618,14 +462,16 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
-        return await self.place_limit_order(
-            product_symbol=product_symbol,
-            side="BUY",
-            quantity=quantity,
-            price=price,
-            timeInForce=timeInForce,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
+        return await self._native_private(
+            "place_limit_buy_order",
+            self._params(
+                product_symbol=product_symbol,
+                quantity=quantity,
+                price=price,
+                timeInForce=timeInForce,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+            ),
         )
 
     async def place_limit_sell_order(
@@ -637,14 +483,16 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
-        return await self.place_limit_order(
-            product_symbol=product_symbol,
-            side="SELL",
-            quantity=quantity,
-            price=price,
-            timeInForce=timeInForce,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
+        return await self._native_private(
+            "place_limit_sell_order",
+            self._params(
+                product_symbol=product_symbol,
+                quantity=quantity,
+                price=price,
+                timeInForce=timeInForce,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+            ),
         )
 
     async def place_post_only_limit_order(
@@ -656,24 +504,16 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
-        if self._is_spot_product(product_symbol):
-            return await self.place_order(
+        return await self._native_private(
+            "place_post_only_limit_order",
+            self._params(
                 product_symbol=product_symbol,
-                side=side,
-                type_="LIMIT_MAKER",
+                side=self._side(side),
                 quantity=quantity,
                 price=price,
-            )
-
-        return await self.place_order(
-            product_symbol=product_symbol,
-            side=side,
-            type_="LIMIT",
-            quantity=quantity,
-            price=price,
-            timeInForce="GTX",  # GTX = Post Only
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+            ),
         )
 
     async def place_post_only_limit_buy_order(
@@ -684,13 +524,15 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
-        return await self.place_post_only_limit_order(
-            product_symbol=product_symbol,
-            side="BUY",
-            quantity=quantity,
-            price=price,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
+        return await self._native_private(
+            "place_post_only_limit_buy_order",
+            self._params(
+                product_symbol=product_symbol,
+                quantity=quantity,
+                price=price,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+            ),
         )
 
     async def place_post_only_limit_sell_order(
@@ -701,13 +543,15 @@ class TradeHTTP(HTTPManager):
         positionSide: str | None = None,
         reduceOnly: str | None = None,
     ) -> dict:
-        return await self.place_post_only_limit_order(
-            product_symbol=product_symbol,
-            side="SELL",
-            quantity=quantity,
-            price=price,
-            positionSide=positionSide,
-            reduceOnly=reduceOnly,
+        return await self._native_private(
+            "place_post_only_limit_sell_order",
+            self._params(
+                product_symbol=product_symbol,
+                quantity=quantity,
+                price=price,
+                positionSide=positionSide,
+                reduceOnly=reduceOnly,
+            ),
         )
 
     async def cancel_order(
@@ -727,23 +571,14 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Cancellation result
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        if orderId is not None:
-            payload["orderId"] = str(orderId)
-        if origClientOrderId is not None:
-            payload["origClientOrderId"] = origClientOrderId
-
-        res = await self._request(
-            method="DELETE",
-            path=SpotTrade.PLACE_CANCEL_QUERY_ORDER
-            if self.ptm.get_product_type(Common.BINANCE, product_symbol=product_symbol)
-            == BinanceProductType.SPOT
-            else FuturesTrade.PLACE_CANCEL_QUERY_ORDER,
-            query=payload,
+        return await self._native_private(
+            "cancel_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                origClientOrderId=origClientOrderId,
+            ),
         )
-        return res
 
     async def get_order(
         self,
@@ -762,23 +597,14 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Order information
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        if orderId is not None:
-            payload["orderId"] = str(orderId)
-        if origClientOrderId is not None:
-            payload["origClientOrderId"] = origClientOrderId
-
-        res = await self._request(
-            method="GET",
-            path=SpotTrade.PLACE_CANCEL_QUERY_ORDER
-            if self.ptm.get_product_type(Common.BINANCE, product_symbol=product_symbol)
-            == BinanceProductType.SPOT
-            else FuturesTrade.PLACE_CANCEL_QUERY_ORDER,
-            query=payload,
+        return await self._native_private(
+            "get_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                origClientOrderId=origClientOrderId,
+            ),
         )
-        return res
 
     async def get_open_orders(
         self,
@@ -795,27 +621,14 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: List of open orders
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-
-        path: SpotTrade | FuturesTrade = SpotTrade.OPEN_ORDER
-        if not self._is_spot_product(product_symbol):
-            if orderId is not None:
-                payload["orderId"] = orderId
-                path = FuturesTrade.QUERY_OPEN_ORDER
-            elif origClientOrderId is not None:
-                payload["origClientOrderId"] = origClientOrderId
-                path = FuturesTrade.QUERY_OPEN_ORDER
-            else:
-                path = FuturesTrade.OPEN_ORDERS
-
-        res = await self._request(
-            method="GET",
-            path=path,
-            query=payload,
+        return await self._native_private(
+            "get_open_orders",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                origClientOrderId=origClientOrderId,
+            ),
         )
-        return res
 
     async def get_all_open_orders(
         self,
@@ -832,22 +645,13 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Open order list.
         """
-        payload = {}
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol)
-            path: SpotTrade | FuturesTrade = (
-                SpotTrade.OPEN_ORDER
-                if self._is_spot_product(product_symbol)
-                else FuturesTrade.OPEN_ORDERS
-            )
-        else:
-            path = (
-                SpotTrade.OPEN_ORDER
-                if str(market_type) == BinanceProductType.SPOT.value
-                else FuturesTrade.OPEN_ORDERS
-            )
-
-        return await self._request(method="GET", path=path, query=payload)
+        return await self._native_private(
+            "get_all_open_orders",
+            self._params(
+                product_symbol=product_symbol,
+                market_type=str(market_type),
+            ),
+        )
 
     async def cancel_all_open_orders(
         self,
@@ -862,19 +666,10 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Cancellation result
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-
-        res = await self._request(
-            method="DELETE",
-            path=SpotTrade.OPEN_ORDER
-            if self.ptm.get_product_type(Common.BINANCE, product_symbol=product_symbol)
-            == BinanceProductType.SPOT
-            else FuturesTrade.CANCEL_ALL_OPEN_ORDERS,
-            query=payload,
+        return await self._native_private(
+            "cancel_all_open_orders",
+            self._params(product_symbol=product_symbol),
         )
-        return res
 
     async def get_future_all_order(
         self,
@@ -897,12 +692,15 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: All orders data
         """
-        return await self.get_all_orders(
-            product_symbol=product_symbol,
-            orderId=orderId,
-            startTime=startTime,
-            endTime=endTime,
-            limit=limit,
+        return await self._native_private(
+            "get_future_all_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
         )
 
     async def get_all_orders(
@@ -926,26 +724,16 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Historical order data.
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        if orderId is not None:
-            payload["orderId"] = str(orderId)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=SpotTrade.ALL_ORDERS
-            if self._is_spot_product(product_symbol)
-            else FuturesTrade.QUERY_ALL_ORDERS,
-            query=payload,
+        return await self._native_private(
+            "get_all_orders",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_account_trades(
         self,
@@ -970,28 +758,17 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Account trade fills.
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-        if orderId is not None and self._is_spot_product(product_symbol):
-            payload["orderId"] = str(orderId)
-        if startTime is not None:
-            payload["startTime"] = str(startTime)
-        if endTime is not None:
-            payload["endTime"] = str(endTime)
-        if fromId is not None:
-            payload["fromId"] = str(fromId)
-        if limit is not None:
-            payload["limit"] = str(limit)
-
-        res = await self._request(
-            method="GET",
-            path=SpotTrade.ACCOUNT_TRADES
-            if self._is_spot_product(product_symbol)
-            else FuturesTrade.ACCOUNT_TRADES,
-            query=payload,
+        return await self._native_private(
+            "get_account_trades",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+                fromId=fromId,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_future_position(
         self,
@@ -1006,13 +783,7 @@ class TradeHTTP(HTTPManager):
         Returns:
             dict: Position information
         """
-        payload = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BINANCE, product_symbol),
-        }
-
-        res = await self._request(
-            method="GET",
-            path=FuturesTrade.POSITION_INFO,
-            query=payload,
+        return await self._native_private(
+            "get_future_position",
+            self._params(product_symbol=product_symbol),
         )
-        return res

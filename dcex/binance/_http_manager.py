@@ -73,6 +73,8 @@ class HTTPManager(BaseHTTPManager):
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BINANCE)
+            if self._native_client is not None:
+                self._native_client.set_product_table(self.ptm._native_table)
 
     def _get_base_url(
         self,

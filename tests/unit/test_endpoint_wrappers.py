@@ -110,18 +110,38 @@ class FakeSyncNativePublicClient:
     def __init__(self, calls: list[dict[str, Any]]) -> None:
         self.calls = calls
 
+    @staticmethod
+    def _body(method_name: str) -> bytes:
+        if "listen_key" in method_name:
+            return b'{"listenKey":"test-listen-key"}'
+        return b'{"ok":true}'
+
     def public_request(
         self,
         method_name: str,
         params: list[tuple[str, str]],
     ) -> tuple[int, dict[str, str], bytes]:
         self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
-        return 200, {"x-response": "native"}, b'{"ok":true}'
+        return 200, {"x-response": "native"}, self._body(method_name)
+
+    def private_request(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], bytes]:
+        self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
+        return 200, {"x-response": "native"}, self._body(method_name)
 
 
 class FakeAsyncNativePublicClient:
     def __init__(self, calls: list[dict[str, Any]]) -> None:
         self.calls = calls
+
+    @staticmethod
+    def _body(method_name: str) -> bytes:
+        if "listen_key" in method_name:
+            return b'{"listenKey":"test-listen-key"}'
+        return b'{"ok":true}'
 
     async def public_request_async(
         self,
@@ -129,7 +149,15 @@ class FakeAsyncNativePublicClient:
         params: list[tuple[str, str]],
     ) -> tuple[int, dict[str, str], bytes]:
         self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
-        return 200, {"x-response": "native"}, b'{"ok":true}'
+        return 200, {"x-response": "native"}, self._body(method_name)
+
+    async def private_request_async(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], bytes]:
+        self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
+        return 200, {"x-response": "native"}, self._body(method_name)
 
 
 class FakeSyncHyperliquidMarket:

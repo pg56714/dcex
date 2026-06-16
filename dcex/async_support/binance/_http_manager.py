@@ -63,6 +63,8 @@ class HTTPManager(BaseHTTPManager):
                 api_secret=self.api_secret,
                 timeout=self.timeout,
             )
+        if self.preload_product_table and self._native_client is not None:
+            self._native_client.set_product_table(self.ptm._native_table)
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self

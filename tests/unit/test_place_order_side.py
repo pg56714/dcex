@@ -67,13 +67,51 @@ def _wire_async(manager: Any) -> dict[str, Any]:
     return captured
 
 
+def _wire_native(manager: Any) -> dict[str, Any]:
+    """Capture parameters sent through a sync native private dispatcher."""
+    captured: dict[str, Any] = {}
+
+    class NativeClient:
+        def private_request(
+            self,
+            method_name: str,
+            params: list[tuple[str, str]],
+        ) -> tuple[int, dict[str, str], bytes]:
+            captured.clear()
+            captured["method_name"] = method_name
+            captured.update(params)
+            return 200, {}, b"{}"
+
+    manager._native_client = NativeClient()
+    return captured
+
+
+def _wire_native_async(manager: Any) -> dict[str, Any]:
+    """Capture parameters sent through an async native private dispatcher."""
+    captured: dict[str, Any] = {}
+
+    class NativeClient:
+        async def private_request_async(
+            self,
+            method_name: str,
+            params: list[tuple[str, str]],
+        ) -> tuple[int, dict[str, str], bytes]:
+            captured.clear()
+            captured["method_name"] = method_name
+            captured.update(params)
+            return 200, {}, b"{}"
+
+    manager._native_client = NativeClient()
+    return captured
+
+
 def test_binance_side_conversion() -> None:
     from dcex.binance._trade_http import TradeHTTP
 
     m = TradeHTTP(preload_product_table=False)
-    cap = _wire(m)
+    cap = _wire_native(m)
     m.place_market_buy_order(product_symbol="BTC-USDT-SPOT", quantity="1")
-    assert cap["side"] == "BUY"
+    assert cap["method_name"] == "place_market_buy_order"
     m.place_order(product_symbol="BTC-USDT-SPOT", side=OrderSide.SELL, type_="MARKET", quantity="1")
     assert cap["side"] == "SELL"
 
@@ -142,7 +180,7 @@ async def test_async_binance_side_conversion() -> None:
     from dcex.async_support.binance._trade_http import TradeHTTP
 
     m = TradeHTTP(preload_product_table=False)
-    cap = _wire_async(m)
+    cap = _wire_native_async(m)
     await m.place_order(
         product_symbol="BTC-USDT-SPOT", side=OrderSide.SELL, type_="MARKET", quantity="1"
     )
@@ -220,6 +258,6 @@ def test_invalid_side_rejected(bad: str) -> None:
     from dcex.binance._trade_http import TradeHTTP
 
     m = TradeHTTP(preload_product_table=False)
-    _wire(m)
+    _wire_native(m)
     with pytest.raises(ValueError, match="Unknown order side"):
         m.place_order(product_symbol="BTC-USDT-SPOT", side=bad, type_="MARKET", quantity="1")
