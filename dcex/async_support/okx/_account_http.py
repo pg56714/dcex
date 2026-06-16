@@ -1,8 +1,6 @@
 from typing import Any
 
-from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.account import Account
 
 
 class AccountHTTP(HTTPManager):
@@ -27,22 +25,12 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing instruments information
         """
-        payload = {
-            "instType": instType,
-        }
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if uly is not None:
-            payload["uly"] = uly
-
-        res = await self._request(
-            method="GET",
-            path=Account.GET_INSTRUMENTS,
-            query=payload,
+        return await self._native_private(
+            "get_account_instruments",
+            self._native_params(
+                instType=instType, product_symbol=product_symbol, instFamily=instFamily, uly=uly
+            ),
         )
-        return res
 
     async def get_account_balance(
         self,
@@ -57,19 +45,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing account balance information
         """
-        payload = {}
-        if ccy is not None:
-            coinName = ",".join(ccy)
-            payload = {
-                "ccy": coinName,
-            }
-
-        res = await self._request(
-            method="GET",
-            path=Account.ACCOUNT_INFO,
-            query=payload,
+        return await self._native_private(
+            "get_account_balance",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     async def get_positions(
         self,
@@ -87,18 +66,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing positions information
         """
-        payload = {}
-        if instType is not None:
-            payload["instType"] = instType
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-
-        res = await self._request(
-            method="GET",
-            path=Account.POSITION_INFO,
-            query=payload,
+        return await self._native_private(
+            "get_positions",
+            self._native_params(instType=instType, product_symbol=product_symbol),
         )
-        return res
 
     async def get_positions_history(
         self,
@@ -126,28 +97,18 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing positions history
         """
-        payload = {}
-        if instType is not None:
-            payload["instType"] = instType
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if mgnMode is not None:
-            payload["mgnMode"] = mgnMode
-        if type is not None:
-            payload["type"] = type
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = await self._request(
-            method="GET",
-            path=Account.POSITIONS_HISTORY,
-            query=payload,
+        return await self._native_private(
+            "get_positions_history",
+            self._native_params(
+                instType=instType,
+                product_symbol=product_symbol,
+                mgnMode=mgnMode,
+                type=type,
+                after=after,
+                before=before,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_position_risk(
         self,
@@ -162,16 +123,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing position risk information
         """
-        payload = {}
-        if instType is not None:
-            payload["instType"] = instType
-
-        res = await self._request(
-            method="GET",
-            path=Account.POSITION_RISK,
-            query=payload,
+        return await self._native_private(
+            "get_position_risk",
+            self._native_params(instType=instType),
         )
-        return res
 
     async def get_account_bills(
         self,
@@ -204,34 +159,21 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing account bills information
         """
-        payload = {}
-        if instType is not None:
-            payload["instType"] = instType
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if mgnMode is not None:
-            payload["mgnMode"] = mgnMode
-        if ctType is not None:
-            payload["ctType"] = ctType
-        if type is not None:
-            payload["type"] = type
-        if subType is not None:
-            payload["subType"] = subType
-        if begin is not None:
-            payload["begin"] = begin
-        if end is not None:
-            payload["end"] = end
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = await self._request(
-            method="GET",
-            path=Account.BILLS_DETAIL,
-            query=payload,
+        return await self._native_private(
+            "get_account_bills",
+            self._native_params(
+                instType=instType,
+                product_symbol=product_symbol,
+                ccy=ccy,
+                mgnMode=mgnMode,
+                ctType=ctType,
+                type=type,
+                subType=subType,
+                begin=begin,
+                end=end,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_account_bills_archive(
         self,
@@ -264,34 +206,21 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing archived account bills information
         """
-        payload = {}
-        if instType is not None:
-            payload["instType"] = instType
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if mgnMode is not None:
-            payload["mgnMode"] = mgnMode
-        if ctType is not None:
-            payload["ctType"] = ctType
-        if type is not None:
-            payload["type"] = type
-        if subType is not None:
-            payload["subType"] = subType
-        if begin is not None:
-            payload["begin"] = begin
-        if end is not None:
-            payload["end"] = end
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = await self._request(
-            method="GET",
-            path=Account.BILLS_ARCHIVE,
-            query=payload,
+        return await self._native_private(
+            "get_account_bills_archive",
+            self._native_params(
+                instType=instType,
+                product_symbol=product_symbol,
+                ccy=ccy,
+                mgnMode=mgnMode,
+                ctType=ctType,
+                type=type,
+                subType=subType,
+                begin=begin,
+                end=end,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_account_bills_history_archive(
         self,
@@ -308,17 +237,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing bills history archive information
         """
-        payload = {
-            "year": year,
-            "quarter": quarter,
-        }
-
-        res = await self._request(
-            method="GET",
-            path=Account.BILLS_HISTORY_ARCHIVE,
-            query=payload,
+        return await self._native_private(
+            "get_account_bills_history_archive",
+            self._native_params(year=year, quarter=quarter),
         )
-        return res
 
     async def post_account_bills_history_archive(
         self,
@@ -335,17 +257,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing archive generation result
         """
-        payload = {
-            "year": year,
-            "quarter": quarter,
-        }
-
-        res = await self._request(
-            method="POST",
-            path=Account.BILLS_HISTORY_ARCHIVE,
-            query=payload,
+        return await self._native_private(
+            "post_account_bills_history_archive",
+            self._native_params(year=year, quarter=quarter),
         )
-        return res
 
     async def get_account_config(self) -> dict[str, Any]:
         """
@@ -354,12 +269,7 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing account configuration information
         """
-        res = await self._request(
-            method="GET",
-            path=Account.ACCOUNT_CONFIG,
-            query={},
-        )
-        return res
+        return await self._native_private("get_account_config", [])
 
     async def set_position_mode(self, posMode: str) -> dict[str, Any]:
         """
@@ -371,16 +281,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing operation result
         """
-        payload = {
-            "posMode": posMode,
-        }
-
-        res = await self._request(
-            method="POST",
-            path=Account.POSITION_MODE,
-            query=payload,
+        return await self._native_private(
+            "set_position_mode",
+            self._native_params(posMode=posMode),
         )
-        return res
 
     async def set_leverage(
         self,
@@ -406,23 +310,16 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing operation result
         """
-        payload = {
-            "lever": lever,
-            "mgnMode": mgnMode,
-        }
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if posSide is not None:
-            payload["posSide"] = posSide
-
-        res = await self._request(
-            method="POST",
-            path=Account.SET_LEVERAGE,
-            query=payload,
+        return await self._native_private(
+            "set_leverage",
+            self._native_params(
+                lever=lever,
+                mgnMode=mgnMode,
+                product_symbol=product_symbol,
+                ccy=ccy,
+                posSide=posSide,
+            ),
         )
-        return res
 
     async def get_max_order_size(
         self,
@@ -446,23 +343,12 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing maximum order size information
         """
-        payload = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "tdMode": tdMode,
-        }
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if px is not None:
-            payload["px"] = px
-        if leverage is not None:
-            payload["leverage"] = leverage
-
-        res = await self._request(
-            method="GET",
-            path=Account.MAX_TRADE_SIZE,
-            query=payload,
+        return await self._native_private(
+            "get_max_order_size",
+            self._native_params(
+                product_symbol=product_symbol, tdMode=tdMode, ccy=ccy, px=px, leverage=leverage
+            ),
         )
-        return res
 
     async def get_max_avail_size(
         self,
@@ -486,23 +372,12 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing maximum available size information
         """
-        payload = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "tdMode": tdMode,
-        }
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if reduceOnly is not None:
-            payload["reduceOnly"] = reduceOnly
-        if px is not None:
-            payload["px"] = px
-
-        res = await self._request(
-            method="GET",
-            path=Account.MAX_AVAIL_SIZE,
-            query=payload,
+        return await self._native_private(
+            "get_max_avail_size",
+            self._native_params(
+                product_symbol=product_symbol, tdMode=tdMode, ccy=ccy, reduceOnly=reduceOnly, px=px
+            ),
         )
-        return res
 
     async def get_leverage(
         self,
@@ -524,20 +399,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing leverage information
         """
-        payload = {
-            "mgnMode": mgnMode,
-        }
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ccy is not None:
-            payload["ccy"] = ccy
-
-        res = await self._request(
-            method="GET",
-            path=Account.GET_LEVERAGE,
-            query=payload,
+        return await self._native_private(
+            "get_leverage",
+            self._native_params(mgnMode=mgnMode, product_symbol=product_symbol, ccy=ccy),
         )
-        return res
 
     async def get_adjust_leverage(
         self,
@@ -562,24 +427,17 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing adjust leverage information
         """
-        payload = {
-            "instType": instType,
-            "mgnMode": mgnMode,
-            "lever": lever,
-        }
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if posSide is not None:
-            payload["posSide"] = posSide
-
-        res = await self._request(
-            method="GET",
-            path=Account.GET_ADJUST_LEVERAGE,
-            query=payload,
+        return await self._native_private(
+            "get_adjust_leverage",
+            self._native_params(
+                instType=instType,
+                mgnMode=mgnMode,
+                lever=lever,
+                product_symbol=product_symbol,
+                ccy=ccy,
+                posSide=posSide,
+            ),
         )
-        return res
 
     async def get_max_loan(
         self,
@@ -600,22 +458,12 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing maximum loan information
         """
-        payload = {
-            "mgnMode": mgnMode,
-        }
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if mgnCcy is not None:
-            payload["mgnCcy"] = mgnCcy
-
-        res = await self._request(
-            method="GET",
-            path=Account.MAX_LOAN,
-            query=payload,
+        return await self._native_private(
+            "get_max_loan",
+            self._native_params(
+                mgnMode=mgnMode, product_symbol=product_symbol, ccy=ccy, mgnCcy=mgnCcy
+            ),
         )
-        return res
 
     async def get_fee_rates(
         self,
@@ -640,24 +488,16 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing fee rates information
         """
-        payload = {
-            "instType": instType,
-        }
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if ruleType is not None:
-            payload["ruleType"] = ruleType
-
-        res = await self._request(
-            method="GET",
-            path=Account.FEE_RATES,
-            query=payload,
+        return await self._native_private(
+            "get_fee_rates",
+            self._native_params(
+                instType=instType,
+                ruleType=ruleType,
+                product_symbol=product_symbol,
+                uly=uly,
+                instFamily=instFamily,
+            ),
         )
-        return res
 
     async def get_interest_accrued(
         self,
@@ -682,26 +522,17 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing interest accrued information
         """
-        payload = {}
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if mgnMode is not None:
-            payload["mgnMode"] = mgnMode
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = await self._request(
-            method="GET",
-            path=Account.INTEREST_ACCRUED,
-            query=payload,
+        return await self._native_private(
+            "get_interest_accrued",
+            self._native_params(
+                ccy=ccy,
+                product_symbol=product_symbol,
+                mgnMode=mgnMode,
+                after=after,
+                before=before,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_interest_rate(
         self,
@@ -716,16 +547,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing interest rate information
         """
-        payload = {}
-        if ccy is not None:
-            payload["ccy"] = ccy
-
-        res = await self._request(
-            method="GET",
-            path=Account.INTEREST_RATE,
-            query=payload,
+        return await self._native_private(
+            "get_interest_rate",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     async def set_greeks(
         self,
@@ -740,16 +565,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing operation result
         """
-        payload = {
-            "greeksType": greeksType,
-        }
-
-        res = await self._request(
-            method="POST",
-            path=Account.SET_GREEKS,
-            query=payload,
+        return await self._native_private(
+            "set_greeks",
+            self._native_params(greeksType=greeksType),
         )
-        return res
 
     async def get_max_withdrawal(
         self,
@@ -764,19 +583,10 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing maximum withdrawal information
         """
-        payload = {}
-        if ccy is not None:
-            ccyName = ",".join(ccy)
-            payload = {
-                "ccy": ccyName,
-            }
-
-        res = await self._request(
-            method="GET",
-            path=Account.MAX_WITHDRAWAL,
-            query=payload,
+        return await self._native_private(
+            "get_max_withdrawal",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     async def get_interest_limits(
         self,
@@ -791,13 +601,7 @@ class AccountHTTP(HTTPManager):
         Returns:
             Dict containing interest limits information
         """
-        payload = {}
-        if ccy is not None:
-            payload["ccy"] = ccy
-
-        res = await self._request(
-            method="GET",
-            path=Account.INTEREST_LIMITS,
-            query=payload,
+        return await self._native_private(
+            "get_interest_limits",
+            self._native_params(ccy=ccy),
         )
-        return res

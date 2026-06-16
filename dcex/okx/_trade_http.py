@@ -1,9 +1,7 @@
 from typing import Any
 
 from ..enums import OrderSide
-from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.trade import Trade
 
 
 class TradeHTTP(HTTPManager):
@@ -54,44 +52,28 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing order placement result.
         """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "tdMode": tdMode,
-            "side": OrderSide.from_any(side).to_exchange(Common.OKX),
-            "ordType": ordType,
-            "sz": sz,
-        }
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if clOrdId is not None:
-            payload["clOrdId"] = clOrdId
-        if posSide is not None:
-            payload["posSide"] = posSide
-        if px is not None:
-            payload["px"] = px
-        if pxUsd is not None:
-            payload["pxUsd"] = pxUsd
-        if pxVol is not None:
-            payload["pxVol"] = pxVol
-        if reduceOnly is not None:
-            payload["reduceOnly"] = reduceOnly
-        if tgtCcy is not None:
-            payload["tgtCcy"] = tgtCcy
-        if banAmend is not None:
-            payload["banAmend"] = banAmend
-        if quickMgnType is not None:
-            payload["quickMgnType"] = quickMgnType
-        if stpId is not None:
-            payload["stpId"] = stpId
-        if stpMode is not None:
-            payload["stpMode"] = stpMode
-        if tag is not None:
-            payload["tag"] = tag
-
-        return self._request(
-            method="POST",
-            path=Trade.PLACE_ORDER,
-            query=payload,
+        return self._native_private(
+            "place_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                side=side,
+                ordType=ordType,
+                sz=sz,
+                ccy=ccy,
+                clOrdId=clOrdId,
+                posSide=posSide,
+                px=px,
+                pxUsd=pxUsd,
+                pxVol=pxVol,
+                reduceOnly=reduceOnly,
+                tgtCcy=tgtCcy,
+                banAmend=banAmend,
+                quickMgnType=quickMgnType,
+                stpId=stpId,
+                stpMode=stpMode,
+                tag=tag,
+            ),
         )
 
     def place_batch_orders(
@@ -108,10 +90,9 @@ class TradeHTTP(HTTPManager):
             Dict containing batch order placement results
         """
 
-        return self._request(
-            method="POST",
-            path=Trade.PLACE_BATCH_ORDERS,
-            query=orders,
+        return self._native_private(
+            "place_batch_orders",
+            self._native_params(orders=orders),
         )
 
     def place_market_order(
@@ -139,15 +120,17 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing order placement result.
         """
-        return self.place_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side=side,
-            ordType="market",
-            sz=sz,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_market_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                side=side,
+                sz=sz,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_market_buy_order(
@@ -173,14 +156,16 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_market_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side="buy",
-            sz=sz,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_market_buy_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                sz=sz,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_market_sell_order(
@@ -206,14 +191,16 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_market_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side="sell",
-            sz=sz,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_market_sell_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                sz=sz,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_limit_order(
@@ -243,16 +230,18 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side=side,
-            ordType="limit",
-            sz=sz,
-            px=px,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_limit_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                side=side,
+                sz=sz,
+                px=px,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_limit_buy_order(
@@ -280,15 +269,17 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_limit_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side="buy",
-            sz=sz,
-            px=px,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_limit_buy_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                sz=sz,
+                px=px,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_limit_sell_order(
@@ -316,15 +307,17 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_limit_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side="sell",
-            sz=sz,
-            px=px,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_limit_sell_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                sz=sz,
+                px=px,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_post_only_limit_order(
@@ -354,16 +347,18 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side=side,
-            ordType="post_only",
-            sz=sz,
-            px=px,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_post_only_limit_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                side=side,
+                sz=sz,
+                px=px,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_post_only_limit_buy_order(
@@ -391,15 +386,17 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_post_only_limit_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side="buy",
-            sz=sz,
-            px=px,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_post_only_limit_buy_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                sz=sz,
+                px=px,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def place_post_only_limit_sell_order(
@@ -427,15 +424,17 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dict containing order placement result
         """
-        return self.place_post_only_limit_order(
-            product_symbol=product_symbol,
-            tdMode=tdMode,
-            side="sell",
-            sz=sz,
-            px=px,
-            posSide=posSide,
-            reduceOnly=reduceOnly,
-            ccy=ccy,
+        return self._native_private(
+            "place_post_only_limit_sell_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                sz=sz,
+                px=px,
+                posSide=posSide,
+                reduceOnly=reduceOnly,
+                ccy=ccy,
+            ),
         )
 
     def cancel_order(
@@ -455,18 +454,9 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing cancellation result.
         """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if ordId is not None:
-            payload["ordId"] = ordId
-        if clOrdId is not None:
-            payload["clOrdId"] = clOrdId
-
-        return self._request(
-            method="POST",
-            path=Trade.CANCEL_ORDER,
-            query=payload,
+        return self._native_private(
+            "cancel_order",
+            self._native_params(product_symbol=product_symbol, ordId=ordId, clOrdId=clOrdId),
         )
 
     def cancel_batch_orders(
@@ -482,10 +472,9 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing batch cancellation result.
         """
-        return self._request(
-            method="POST",
-            path=Trade.CANCEL_BATCH_ORDERS,
-            query=orders,
+        return self._native_private(
+            "cancel_batch_orders",
+            self._native_params(orders=orders),
         )
 
     def cancel_all_orders(
@@ -501,39 +490,9 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing cancellation result.
         """
-        payload: list[dict[str, Any]] = []
-
-        all_orders = self.get_order_list()
-        all_orders = all_orders["data"]
-        if product_symbol is not None:
-            exchange_symbol = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-            payload.extend(
-                [
-                    {
-                        "instId": order["instId"],
-                        "ordId": order["ordId"],
-                        "clOrdId": order["clOrdId"],
-                    }
-                    for order in all_orders
-                    if order["instId"] == exchange_symbol
-                ]
-            )
-        else:
-            payload.extend(
-                [
-                    {
-                        "instId": order["instId"],
-                        "ordId": order["ordId"],
-                        "clOrdId": order["clOrdId"],
-                    }
-                    for order in all_orders
-                ]
-            )
-
-        return self._request(
-            method="POST",
-            path=Trade.CANCEL_BATCH_ORDERS,
-            query=payload,
+        return self._native_private(
+            "cancel_all_orders",
+            self._native_params(product_symbol=product_symbol),
         )
 
     def amend_order(
@@ -565,30 +524,19 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing order amendment result.
         """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if ordId is not None:
-            payload["ordId"] = ordId
-        if clOrdId is not None:
-            payload["clOrdId"] = clOrdId
-        if newSz is not None:
-            payload["newSz"] = newSz
-        if newPx is not None:
-            payload["newPx"] = newPx
-        if newPxUsd is not None:
-            payload["newPxUsd"] = newPxUsd
-        if newPxVol is not None:
-            payload["newPxVol"] = newPxVol
-        if cxlOnFail is not None:
-            payload["cxlOnFail"] = cxlOnFail
-        if reqId is not None:
-            payload["reqId"] = reqId
-
-        return self._request(
-            method="POST",
-            path=Trade.AMEND_ORDER,
-            query=payload,
+        return self._native_private(
+            "amend_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                ordId=ordId,
+                clOrdId=clOrdId,
+                newSz=newSz,
+                newPx=newPx,
+                newPxUsd=newPxUsd,
+                newPxVol=newPxVol,
+                cxlOnFail=cxlOnFail,
+                reqId=reqId,
+            ),
         )
 
     def amend_multiple_orders(
@@ -604,10 +552,9 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing multiple orders amendment result.
         """
-        return self._request(
-            method="POST",
-            path=Trade.AMEND_BATCH_ORDER,
-            query=orders,
+        return self._native_private(
+            "amend_multiple_orders",
+            self._native_params(orders=orders),
         )
 
     def close_positions(
@@ -633,23 +580,16 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing position closing result.
         """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-            "mgnMode": mgnMode,
-        }
-        if posSide is not None:
-            payload["posSide"] = posSide
-        if autoCxl is not None:
-            payload["autoCxl"] = autoCxl
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if tag is not None:
-            payload["tag"] = tag
-
-        return self._request(
-            method="POST",
-            path=Trade.CLOSE_POSITION,
-            query=payload,
+        return self._native_private(
+            "close_positions",
+            self._native_params(
+                product_symbol=product_symbol,
+                mgnMode=mgnMode,
+                posSide=posSide,
+                autoCxl=autoCxl,
+                ccy=ccy,
+                tag=tag,
+            ),
         )
 
     def get_order(
@@ -669,20 +609,10 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing order information.
         """
-        payload: dict[str, Any] = {
-            "instId": self.ptm.get_exchange_symbol(Common.OKX, product_symbol),
-        }
-        if ordId is not None:
-            payload["ordId"] = ordId
-        if clOrdId is not None:
-            payload["clOrdId"] = clOrdId
-
-        res = self._request(
-            method="GET",
-            path=Trade.ORDER_INFO,
-            query=payload,
+        return self._native_private(
+            "get_order",
+            self._native_params(product_symbol=product_symbol, ordId=ordId, clOrdId=clOrdId),
         )
-        return res
 
     def get_order_list(
         self,
@@ -709,28 +639,18 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing order list.
         """
-        payload: dict[str, Any] = {}
-        if instType is not None:
-            payload["instType"] = instType
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ordType is not None:
-            payload["ordType"] = ordType
-        if state is not None:
-            payload["state"] = state
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Trade.ORDERS_PENDING,
-            query=payload,
+        return self._native_private(
+            "get_order_list",
+            self._native_params(
+                instType=instType,
+                uly=uly,
+                instFamily=instFamily,
+                product_symbol=product_symbol,
+                ordType=ordType,
+                state=state,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_orders_history(
         self,
@@ -763,34 +683,21 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing orders history.
         """
-        payload: dict[str, Any] = {
-            "instType": instType,
-        }
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ordType is not None:
-            payload["ordType"] = ordType
-        if state is not None:
-            payload["state"] = state
-        if category is not None:
-            payload["category"] = category
-        if begin is not None:
-            payload["begin"] = begin
-        if end is not None:
-            payload["end"] = end
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Trade.ORDERS_HISTORY,
-            query=payload,
+        return self._native_private(
+            "get_orders_history",
+            self._native_params(
+                instType=instType,
+                uly=uly,
+                instFamily=instFamily,
+                product_symbol=product_symbol,
+                ordType=ordType,
+                state=state,
+                category=category,
+                begin=begin,
+                end=end,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_orders_history_archive(
         self,
@@ -823,34 +730,21 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing orders history archive.
         """
-        payload: dict[str, Any] = {
-            "instType": instType,
-        }
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ordType is not None:
-            payload["ordType"] = ordType
-        if state is not None:
-            payload["state"] = state
-        if category is not None:
-            payload["category"] = category
-        if begin is not None:
-            payload["begin"] = begin
-        if end is not None:
-            payload["end"] = end
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Trade.ORDERS_HISTORY_ARCHIVE,
-            query=payload,
+        return self._native_private(
+            "get_orders_history_archive",
+            self._native_params(
+                instType=instType,
+                uly=uly,
+                instFamily=instFamily,
+                product_symbol=product_symbol,
+                ordType=ordType,
+                state=state,
+                category=category,
+                begin=begin,
+                end=end,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_fills(
         self,
@@ -881,32 +775,20 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing fills information.
         """
-        payload: dict[str, Any] = {}
-        if instType is not None:
-            payload["instType"] = instType
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ordId is not None:
-            payload["ordId"] = ordId
-        if subType is not None:
-            payload["subType"] = subType
-        if begin is not None:
-            payload["begin"] = begin
-        if end is not None:
-            payload["end"] = end
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Trade.ORDER_FILLS,
-            query=payload,
+        return self._native_private(
+            "get_fills",
+            self._native_params(
+                instType=instType,
+                uly=uly,
+                instFamily=instFamily,
+                product_symbol=product_symbol,
+                ordId=ordId,
+                subType=subType,
+                begin=begin,
+                end=end,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_fills_history(
         self,
@@ -937,32 +819,20 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing fills history.
         """
-        payload: dict[str, Any] = {
-            "instType": instType,
-        }
-        if uly is not None:
-            payload["uly"] = uly
-        if instFamily is not None:
-            payload["instFamily"] = instFamily
-        if product_symbol is not None:
-            payload["instId"] = self.ptm.get_exchange_symbol(Common.OKX, product_symbol)
-        if ordId is not None:
-            payload["ordId"] = ordId
-        if subType is not None:
-            payload["subType"] = subType
-        if begin is not None:
-            payload["begin"] = begin
-        if end is not None:
-            payload["end"] = end
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Trade.ORDERS_FILLS_HISTORY,
-            query=payload,
+        return self._native_private(
+            "get_fills_history",
+            self._native_params(
+                instType=instType,
+                uly=uly,
+                instFamily=instFamily,
+                product_symbol=product_symbol,
+                ordId=ordId,
+                subType=subType,
+                begin=begin,
+                end=end,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_account_rate_limit(self) -> dict[str, Any]:
         """
@@ -971,9 +841,4 @@ class TradeHTTP(HTTPManager):
         Returns:
             Dictionary containing account rate limit information.
         """
-        res = self._request(
-            method="GET",
-            path=Trade.ACCOUNT_RATE_LIMIT,
-            query={},
-        )
-        return res
+        return self._native_private("get_account_rate_limit", [])

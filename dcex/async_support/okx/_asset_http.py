@@ -1,7 +1,6 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
-from .endpoints.asset import Asset
 
 
 class AssetHTTP(HTTPManager):
@@ -18,19 +17,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing currency information from OKX API.
         """
-        payload = {}
-        if ccy is not None:
-            ccyName = ",".join(ccy)
-            payload = {
-                "ccy": ccyName,
-            }
-
-        res = await self._request(
-            method="GET",
-            path=Asset.CURRENCY_INFO,
-            query=payload,
+        return await self._native_private(
+            "get_currencies",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     async def get_balances(
         self,
@@ -45,19 +35,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing balance information from OKX API.
         """
-        payload = {}
-        if ccy is not None:
-            ccyName = ",".join(ccy)
-            payload = {
-                "ccy": ccyName,
-            }
-
-        res = await self._request(
-            method="GET",
-            path=Asset.GET_BALANCES,
-            query=payload,
+        return await self._native_private(
+            "get_balances",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     async def get_asset_valuation(
         self,
@@ -72,19 +53,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing asset valuation information from OKX API.
         """
-        payload = {}
-        if ccy is not None:
-            ccyName = ",".join(ccy)
-            payload = {
-                "ccy": ccyName,
-            }
-
-        res = await self._request(
-            method="GET",
-            path=Asset.ASSET_VALUATION,
-            query=payload,
+        return await self._native_private(
+            "get_asset_valuation",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     async def funds_transfer(
         self,
@@ -111,31 +83,18 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing transfer result from OKX API.
         """
-        account_map = {
-            "FUND": "6",
-            "TRADING": "18",
-        }
-
-        payload = {
-            "ccy": ccy,
-            "amt": amt,
-            "from": account_map.get(from_account),
-            "to": account_map.get(to_account),
-        }
-
-        if type is not None:
-            payload["type"] = type
-        if subAcct is not None:
-            payload["subAcct"] = subAcct
-        if loanTrans is not None:
-            payload["loanTrans"] = loanTrans
-
-        res = await self._request(
-            method="POST",
-            path=Asset.FUNDS_TRANSFER,
-            query=payload,
+        return await self._native_private(
+            "funds_transfer",
+            self._native_params(
+                ccy=ccy,
+                amt=amt,
+                from_account=from_account,
+                to_account=to_account,
+                type=type,
+                subAcct=subAcct,
+                loanTrans=loanTrans,
+            ),
         )
-        return res
 
     async def get_transfer_state(
         self,
@@ -154,20 +113,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing transfer state information from OKX API.
         """
-        payload = {}
-        if transId is not None:
-            payload["transId"] = transId
-        if clientId is not None:
-            payload["clientId"] = clientId
-        if type is not None:
-            payload["type"] = type
-
-        res = await self._request(
-            method="GET",
-            path=Asset.TRANSFER_STATE,
-            query=payload,
+        return await self._native_private(
+            "get_transfer_state",
+            self._native_params(transId=transId, clientId=clientId, type=type),
         )
-        return res
 
     async def get_bills(
         self,
@@ -190,24 +139,12 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing bills information from OKX API.
         """
-        payload = {}
-        if type is not None:
-            payload["type"] = type
-        if clientId is not None:
-            payload["clientId"] = clientId
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = await self._request(
-            method="GET",
-            path=Asset.BILLS_INFO,
-            query=payload,
+        return await self._native_private(
+            "get_bills",
+            self._native_params(
+                type=type, clientId=clientId, after=after, before=before, limit=limit
+            ),
         )
-        return res
 
     async def get_deposit_address(
         self,
@@ -222,16 +159,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing deposit address information from OKX API.
         """
-        payload = {
-            "ccy": ccy,
-        }
-
-        res = await self._request(
-            method="GET",
-            path=Asset.DEPOSIT_ADDRESS,
-            query=payload,
+        return await self._native_private(
+            "get_deposit_address",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     async def get_deposit_history(
         self,
@@ -262,32 +193,20 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing deposit history information from OKX API.
         """
-        payload = {}
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if depId is not None:
-            payload["depId"] = depId
-        if fromWdId is not None:
-            payload["fromWdId"] = fromWdId
-        if txId is not None:
-            payload["txId"] = txId
-        if type is not None:
-            payload["type"] = type
-        if state is not None:
-            payload["state"] = state
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = await self._request(
-            method="GET",
-            path=Asset.DEPOSIT_HISTORY,
-            query=payload,
+        return await self._native_private(
+            "get_deposit_history",
+            self._native_params(
+                ccy=ccy,
+                depId=depId,
+                fromWdId=fromWdId,
+                txId=txId,
+                type=type,
+                state=state,
+                after=after,
+                before=before,
+                limit=limit,
+            ),
         )
-        return res
 
     async def get_deposit_withdraw_status(
         self,
@@ -322,25 +241,10 @@ class AssetHTTP(HTTPManager):
                 raise ValueError(
                     f"{', '.join(missing)} required when querying deposit status by txId."
                 )
-
-        payload = {}
-        if wdId is not None:
-            payload["wdId"] = wdId
-        if txId is not None:
-            payload["txId"] = txId
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if to is not None:
-            payload["to"] = to
-        if chain is not None:
-            payload["chain"] = chain
-
-        res = await self._request(
-            method="GET",
-            path=Asset.GET_DEPOSIT_WITHDRAW_STATUS,
-            query=payload,
+        return await self._native_private(
+            "get_deposit_withdraw_status",
+            self._native_params(wdId=wdId, txId=txId, ccy=ccy, to=to, chain=chain),
         )
-        return res
 
     async def get_exchange_list(self) -> dict[str, Any]:
         """
@@ -349,12 +253,7 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing exchange list information from OKX API.
         """
-        res = await self._request(
-            method="GET",
-            path=Asset.EXCHANGE_LIST,
-            query={},
-        )
-        return res
+        return await self._native_private("get_exchange_list", [])
 
     async def post_monthly_statement(
         self,
@@ -369,16 +268,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing monthly statement generation result from OKX API.
         """
-        payload = {}
-        if month is not None:
-            payload["month"] = month
-
-        res = await self._request(
-            method="POST",
-            path=Asset.MONTHLY_STATEMENT,
-            query=payload,
+        return await self._native_private(
+            "post_monthly_statement",
+            self._native_params(month=month),
         )
-        return res
 
     async def get_monthly_statement(
         self,
@@ -393,16 +286,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing monthly statement information from OKX API.
         """
-        payload = {
-            "month": month,
-        }
-
-        res = await self._request(
-            method="GET",
-            path=Asset.MONTHLY_STATEMENT,
-            query=payload,
+        return await self._native_private(
+            "get_monthly_statement",
+            self._native_params(month=month),
         )
-        return res
 
     async def get_convert_currencies(self) -> dict[str, Any]:
         """
@@ -411,12 +298,7 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing convertible currencies information from OKX API.
         """
-        res = await self._request(
-            method="GET",
-            path=Asset.GET_CURRENCIES,
-            query={},
-        )
-        return res
+        return await self._native_private("get_convert_currencies", [])
 
     async def get_convert_history(
         self,
@@ -439,21 +321,9 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dict containing convert trade history from OKX API.
         """
-        payload = {}
-        if clTReqId is not None:
-            payload["clTReqId"] = clTReqId
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-        if tag is not None:
-            payload["tag"] = tag
-
-        res = await self._request(
-            method="GET",
-            path=Asset.CONVERT_HISTORY,
-            query=payload,
+        return await self._native_private(
+            "get_convert_history",
+            self._native_params(
+                clTReqId=clTReqId, after=after, before=before, limit=limit, tag=tag
+            ),
         )
-        return res

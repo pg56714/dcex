@@ -2380,6 +2380,10 @@ impl PythonOkxHttpClient {
         })
     }
 
+    fn set_product_table(&mut self, table: PyRef<'_, PythonProductTable>) {
+        self.client.set_product_table(table.table.clone());
+    }
+
     #[pyo3(signature = (method, path, params=None, body=None, signed=true))]
     fn request_raw(
         &self,
@@ -2449,6 +2453,40 @@ impl PythonOkxHttpClient {
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .public_request(&method_name, params)
+                .await
+                .map_err(to_py_runtime_error)
+                .and_then(python_validated_response)
+        })
+    }
+
+    #[pyo3(signature = (method_name, params=None))]
+    fn private_request(
+        &self,
+        py: Python<'_>,
+        method_name: String,
+        params: Option<Vec<(String, String)>>,
+    ) -> PyResult<PythonHttpResponse> {
+        let client = self.client.clone();
+        let params = params.unwrap_or_default();
+        py.allow_threads(|| {
+            block_on(async move { client.private_request(&method_name, params).await })
+        })
+        .map_err(to_py_runtime_error)
+        .and_then(python_validated_response)
+    }
+
+    #[pyo3(signature = (method_name, params=None))]
+    fn private_request_async<'py>(
+        &self,
+        py: Python<'py>,
+        method_name: String,
+        params: Option<Vec<(String, String)>>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        let params = params.unwrap_or_default();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .private_request(&method_name, params)
                 .await
                 .map_err(to_py_runtime_error)
                 .and_then(python_validated_response)

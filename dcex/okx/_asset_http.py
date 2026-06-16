@@ -1,7 +1,6 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
-from .endpoints.asset import Asset
 
 
 class AssetHTTP(HTTPManager):
@@ -18,17 +17,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing currency information.
         """
-        payload: dict[str, Any] = {}
-        if ccy is not None:
-            ccyName = ",".join(ccy)
-            payload["ccy"] = ccyName
-
-        res = self._request(
-            method="GET",
-            path=Asset.CURRENCY_INFO,
-            query=payload,
+        return self._native_private(
+            "get_currencies",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     def get_balances(
         self,
@@ -43,17 +35,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing balance information.
         """
-        payload: dict[str, Any] = {}
-        if ccy is not None:
-            ccyName = ",".join(ccy)
-            payload["ccy"] = ccyName
-
-        res = self._request(
-            method="GET",
-            path=Asset.GET_BALANCES,
-            query=payload,
+        return self._native_private(
+            "get_balances",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     def get_asset_valuation(
         self,
@@ -68,17 +53,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing asset valuation information.
         """
-        payload: dict[str, Any] = {}
-        if ccy is not None:
-            ccyName = ",".join(ccy)
-            payload["ccy"] = ccyName
-
-        res = self._request(
-            method="GET",
-            path=Asset.ASSET_VALUATION,
-            query=payload,
+        return self._native_private(
+            "get_asset_valuation",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     def funds_transfer(
         self,
@@ -105,31 +83,18 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing transfer result.
         """
-        account_map = {
-            "FUND": "6",
-            "TRADING": "18",
-        }
-
-        payload: dict[str, Any] = {
-            "ccy": ccy,
-            "amt": amt,
-            "from": account_map.get(from_account),
-            "to": account_map.get(to_account),
-        }
-
-        if type is not None:
-            payload["type"] = type
-        if subAcct is not None:
-            payload["subAcct"] = subAcct
-        if loanTrans is not None:
-            payload["loanTrans"] = loanTrans
-
-        res = self._request(
-            method="POST",
-            path=Asset.FUNDS_TRANSFER,
-            query=payload,
+        return self._native_private(
+            "funds_transfer",
+            self._native_params(
+                ccy=ccy,
+                amt=amt,
+                from_account=from_account,
+                to_account=to_account,
+                type=type,
+                subAcct=subAcct,
+                loanTrans=loanTrans,
+            ),
         )
-        return res
 
     def get_transfer_state(
         self,
@@ -148,20 +113,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing transfer state information.
         """
-        payload: dict[str, Any] = {}
-        if transId is not None:
-            payload["transId"] = transId
-        if clientId is not None:
-            payload["clientId"] = clientId
-        if type is not None:
-            payload["type"] = type
-
-        res = self._request(
-            method="GET",
-            path=Asset.TRANSFER_STATE,
-            query=payload,
+        return self._native_private(
+            "get_transfer_state",
+            self._native_params(transId=transId, clientId=clientId, type=type),
         )
-        return res
 
     def get_bills(
         self,
@@ -184,24 +139,12 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing bills information.
         """
-        payload: dict[str, Any] = {}
-        if type is not None:
-            payload["type"] = type
-        if clientId is not None:
-            payload["clientId"] = clientId
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Asset.BILLS_INFO,
-            query=payload,
+        return self._native_private(
+            "get_bills",
+            self._native_params(
+                type=type, clientId=clientId, after=after, before=before, limit=limit
+            ),
         )
-        return res
 
     def get_deposit_address(
         self,
@@ -216,16 +159,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing deposit address information.
         """
-        payload: dict[str, Any] = {
-            "ccy": ccy,
-        }
-
-        res = self._request(
-            method="GET",
-            path=Asset.DEPOSIT_ADDRESS,
-            query=payload,
+        return self._native_private(
+            "get_deposit_address",
+            self._native_params(ccy=ccy),
         )
-        return res
 
     def get_deposit_history(
         self,
@@ -256,32 +193,20 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing deposit history.
         """
-        payload: dict[str, Any] = {}
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if depId is not None:
-            payload["depId"] = depId
-        if fromWdId is not None:
-            payload["fromWdId"] = fromWdId
-        if txId is not None:
-            payload["txId"] = txId
-        if type is not None:
-            payload["type"] = type
-        if state is not None:
-            payload["state"] = state
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Asset.DEPOSIT_HISTORY,
-            query=payload,
+        return self._native_private(
+            "get_deposit_history",
+            self._native_params(
+                ccy=ccy,
+                depId=depId,
+                fromWdId=fromWdId,
+                txId=txId,
+                type=type,
+                state=state,
+                after=after,
+                before=before,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_deposit_withdraw_status(
         self,
@@ -316,25 +241,10 @@ class AssetHTTP(HTTPManager):
                 raise ValueError(
                     f"{', '.join(missing)} required when querying deposit status by txId."
                 )
-
-        payload: dict[str, Any] = {}
-        if wdId is not None:
-            payload["wdId"] = wdId
-        if txId is not None:
-            payload["txId"] = txId
-        if ccy is not None:
-            payload["ccy"] = ccy
-        if to is not None:
-            payload["to"] = to
-        if chain is not None:
-            payload["chain"] = chain
-
-        res = self._request(
-            method="GET",
-            path=Asset.GET_DEPOSIT_WITHDRAW_STATUS,
-            query=payload,
+        return self._native_private(
+            "get_deposit_withdraw_status",
+            self._native_params(wdId=wdId, txId=txId, ccy=ccy, to=to, chain=chain),
         )
-        return res
 
     def get_exchange_list(self) -> dict[str, Any]:
         """
@@ -343,12 +253,7 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing exchange list.
         """
-        res = self._request(
-            method="GET",
-            path=Asset.EXCHANGE_LIST,
-            query={},
-        )
-        return res
+        return self._native_private("get_exchange_list", [])
 
     def post_monthly_statement(
         self,
@@ -363,16 +268,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing monthly statement request result.
         """
-        payload: dict[str, Any] = {}
-        if month is not None:
-            payload["month"] = month
-
-        res = self._request(
-            method="POST",
-            path=Asset.MONTHLY_STATEMENT,
-            query=payload,
+        return self._native_private(
+            "post_monthly_statement",
+            self._native_params(month=month),
         )
-        return res
 
     def get_monthly_statement(
         self,
@@ -387,16 +286,10 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing monthly statement.
         """
-        payload: dict[str, Any] = {
-            "month": month,
-        }
-
-        res = self._request(
-            method="GET",
-            path=Asset.MONTHLY_STATEMENT,
-            query=payload,
+        return self._native_private(
+            "get_monthly_statement",
+            self._native_params(month=month),
         )
-        return res
 
     def get_convert_currencies(self) -> dict[str, Any]:
         """
@@ -405,13 +298,7 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing convert currencies information.
         """
-        payload: dict[str, Any] = {}
-        res = self._request(
-            method="GET",
-            path=Asset.GET_CURRENCIES,
-            query=payload,
-        )
-        return res
+        return self._native_private("get_convert_currencies", [])
 
     def get_convert_history(
         self,
@@ -434,21 +321,9 @@ class AssetHTTP(HTTPManager):
         Returns:
             Dictionary containing convert trade history.
         """
-        payload: dict[str, Any] = {}
-        if clTReqId is not None:
-            payload["clTReqId"] = clTReqId
-        if after is not None:
-            payload["after"] = after
-        if before is not None:
-            payload["before"] = before
-        if limit is not None:
-            payload["limit"] = limit
-        if tag is not None:
-            payload["tag"] = tag
-
-        res = self._request(
-            method="GET",
-            path=Asset.CONVERT_HISTORY,
-            query=payload,
+        return self._native_private(
+            "get_convert_history",
+            self._native_params(
+                clTReqId=clTReqId, after=after, before=before, limit=limit, tag=tag
+            ),
         )
-        return res
