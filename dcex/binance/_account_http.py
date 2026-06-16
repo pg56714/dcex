@@ -1,6 +1,8 @@
 from typing import Any, cast
 
 from .._native_http import NativeResponse
+from ..utils.errors import FailedRequestError
+from ..utils.helpers import generate_timestamp
 from ._http_manager import HTTPManager
 from .enums import BinanceProductType
 
@@ -16,7 +18,15 @@ class AccountHTTP(HTTPManager):
         """Call a Rust-backed Binance private method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("Binance native client is required for private account methods.")
-        status, headers, body = self._native_client.private_request(method_name, params)
+        try:
+            status, headers, body = self._native_client.private_request(method_name, params)
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"BINANCE {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(generate_timestamp(iso_format=True)),
+            ) from exc
         response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
         return response.json()
