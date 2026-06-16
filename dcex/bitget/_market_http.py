@@ -3,7 +3,6 @@
 from typing import Any
 
 from .._native_http import NativeResponse
-from ..utils.common import Common
 from ._http_manager import HTTPManager
 
 
@@ -22,15 +21,6 @@ class MarketHTTP(HTTPManager):
         response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
         return response.json()
-
-    def _exchange_symbol(self, product_symbol: str) -> str:
-        """Map product symbol through PTM when available."""
-        if hasattr(self, "ptm"):
-            return self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            return f"{parts[0]}{parts[1]}"
-        return product_symbol
 
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
@@ -51,9 +41,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_spot_symbols",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol)
-                if product_symbol is not None
-                else None,
+                product_symbol=product_symbol if product_symbol is not None else None,
             ),
         )
 
@@ -62,9 +50,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_spot_tickers",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol)
-                if product_symbol is not None
-                else None,
+                product_symbol=product_symbol if product_symbol is not None else None,
             ),
         )
 
@@ -78,7 +64,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_spot_orderbook",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 type=type_,
                 limit=limit,
             ),
@@ -96,7 +82,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_spot_kline",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 granularity=granularity,
                 startTime=startTime,
                 endTime=endTime,
@@ -116,7 +102,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_spot_history_kline",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 granularity=granularity,
                 startTime=startTime,
                 endTime=endTime,
@@ -132,7 +118,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Bitget recent spot trades."""
         return self._native_public(
             "get_spot_recent_trades",
-            self._params(product_symbol=self._exchange_symbol(product_symbol), limit=limit),
+            self._params(product_symbol=product_symbol, limit=limit),
         )
 
     def get_spot_market_trades(
@@ -147,7 +133,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_spot_market_trades",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 limit=limit,
                 idLessThan=idLessThan,
                 startTime=startTime,
@@ -164,9 +150,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_contracts",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol)
-                if product_symbol is not None
-                else None,
+                product_symbol=product_symbol if product_symbol is not None else None,
                 productType=productType,
             ),
         )
@@ -180,7 +164,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_ticker",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 productType=productType,
             ),
         )
@@ -203,7 +187,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_orderbook",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 productType=productType,
                 precision=precision,
                 limit=limit,
@@ -223,7 +207,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_kline",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 productType=productType,
                 granularity=granularity,
                 startTime=startTime,
@@ -245,7 +229,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_history_kline",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 productType=productType,
                 granularity=granularity,
                 startTime=startTime,
@@ -264,7 +248,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_recent_trades",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 productType=productType,
                 limit=limit,
             ),
@@ -279,9 +263,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_current_funding_rate",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol)
-                if product_symbol is not None
-                else None,
+                product_symbol=product_symbol if product_symbol is not None else None,
                 productType=productType,
             ),
         )
@@ -297,7 +279,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_history_funding_rate",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 productType=productType,
                 pageSize=pageSize,
                 pageNo=pageNo,
@@ -313,7 +295,7 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_futures_open_interest",
             self._params(
-                product_symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 productType=productType,
             ),
         )

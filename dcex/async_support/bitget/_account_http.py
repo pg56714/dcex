@@ -1,10 +1,8 @@
-"""Bitget private account async HTTP client."""
+"""Bitget private account async HTTP client backed by Rust."""
 
 from typing import Any
 
-from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.account import CommonAccount, FuturesAccount, SpotAccount, UtaAccount
 
 
 class AccountHTTP(HTTPManager):
@@ -12,23 +10,18 @@ class AccountHTTP(HTTPManager):
 
     async def get_all_account_balance(self) -> dict[str, Any]:
         """Retrieve Bitget all-account balance overview."""
-        return await self._request("GET", CommonAccount.ALL_ACCOUNT_BALANCE, signed=True)
+        return await self._native_private("get_all_account_balance", [])
 
     async def get_funding_assets(
         self,
         coin: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget funding account assets."""
-        return await self._request(
-            "GET",
-            CommonAccount.FUNDING_ASSETS,
-            {"coin": coin},
-            signed=True,
-        )
+        return await self._native_private("get_funding_assets", self._native_params(coin=coin))
 
     async def get_spot_account_info(self) -> dict[str, Any]:
         """Retrieve Bitget spot account information."""
-        return await self._request("GET", SpotAccount.INFO, signed=True)
+        return await self._native_private("get_spot_account_info", [])
 
     async def get_spot_account_assets(
         self,
@@ -36,8 +29,10 @@ class AccountHTTP(HTTPManager):
         assetType: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot account assets."""
-        payload: dict[str, Any] = {"coin": coin, "assetType": assetType}
-        return await self._request("GET", SpotAccount.ASSETS, payload, signed=True)
+        return await self._native_private(
+            "get_spot_account_assets",
+            self._native_params(coin=coin, assetType=assetType),
+        )
 
     async def get_spot_account_bills(
         self,
@@ -50,16 +45,18 @@ class AccountHTTP(HTTPManager):
         idLessThan: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot account bills."""
-        payload: dict[str, Any] = {
-            "coin": coin,
-            "groupType": groupType,
-            "businessType": businessType,
-            "startTime": startTime,
-            "endTime": endTime,
-            "limit": limit,
-            "idLessThan": idLessThan,
-        }
-        return await self._request("GET", SpotAccount.BILLS, payload, signed=True)
+        return await self._native_private(
+            "get_spot_account_bills",
+            self._native_params(
+                coin=coin,
+                groupType=groupType,
+                businessType=businessType,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+                idLessThan=idLessThan,
+            ),
+        )
 
     async def transfer(
         self,
@@ -71,15 +68,17 @@ class AccountHTTP(HTTPManager):
         clientOid: str | None = None,
     ) -> dict[str, Any]:
         """Transfer assets between Bitget account types."""
-        payload: dict[str, Any] = {
-            "coin": coin,
-            "amount": amount,
-            "fromType": fromType,
-            "toType": toType,
-            "symbol": symbol,
-            "clientOid": clientOid,
-        }
-        return await self._request("POST", SpotAccount.TRANSFER, payload, signed=True)
+        return await self._native_private(
+            "transfer",
+            self._native_params(
+                coin=coin,
+                amount=amount,
+                fromType=fromType,
+                toType=toType,
+                symbol=symbol,
+                clientOid=clientOid,
+            ),
+        )
 
     async def get_transfer_records(
         self,
@@ -93,17 +92,19 @@ class AccountHTTP(HTTPManager):
         idLessThan: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget account transfer records."""
-        payload: dict[str, Any] = {
-            "coin": coin,
-            "fromType": fromType,
-            "startTime": startTime,
-            "endTime": endTime,
-            "clientOid": clientOid,
-            "pageNum": pageNum,
-            "limit": limit,
-            "idLessThan": idLessThan,
-        }
-        return await self._request("GET", SpotAccount.TRANSFER_RECORDS, payload, signed=True)
+        return await self._native_private(
+            "get_transfer_records",
+            self._native_params(
+                coin=coin,
+                fromType=fromType,
+                startTime=startTime,
+                endTime=endTime,
+                clientOid=clientOid,
+                pageNum=pageNum,
+                limit=limit,
+                idLessThan=idLessThan,
+            ),
+        )
 
     async def get_transferable_coins(
         self,
@@ -111,8 +112,10 @@ class AccountHTTP(HTTPManager):
         toType: str,
     ) -> dict[str, Any]:
         """Retrieve coins transferable between Bitget account types."""
-        payload: dict[str, Any] = {"fromType": fromType, "toType": toType}
-        return await self._request("GET", SpotAccount.TRANSFER_COIN_INFO, payload, signed=True)
+        return await self._native_private(
+            "get_transferable_coins",
+            self._native_params(fromType=fromType, toType=toType),
+        )
 
     async def get_deposit_records(
         self,
@@ -124,23 +127,25 @@ class AccountHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget deposit records."""
-        payload: dict[str, Any] = {
-            "coin": coin,
-            "orderId": orderId,
-            "startTime": startTime,
-            "endTime": endTime,
-            "idLessThan": idLessThan,
-            "limit": limit,
-        }
-        return await self._request("GET", SpotAccount.DEPOSIT_RECORDS, payload, signed=True)
+        return await self._native_private(
+            "get_deposit_records",
+            self._native_params(
+                coin=coin,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+                idLessThan=idLessThan,
+                limit=limit,
+            ),
+        )
 
     async def get_uta_account_assets(self) -> dict[str, Any]:
         """Retrieve Bitget UTA account assets."""
-        return await self._request("GET", UtaAccount.ASSETS, signed=True)
+        return await self._native_private("get_uta_account_assets", [])
 
     async def get_uta_account_info(self) -> dict[str, Any]:
         """Retrieve Bitget UTA API account information."""
-        return await self._request("GET", UtaAccount.INFO, signed=True)
+        return await self._native_private("get_uta_account_info", [])
 
     async def set_uta_leverage(
         self,
@@ -155,30 +160,26 @@ class AccountHTTP(HTTPManager):
         shortLeverage: str | int | None = None,
     ) -> dict[str, Any]:
         """Set Bitget UTA leverage."""
-        payload: dict[str, Any] = {
-            "category": category,
-            "symbol": symbol
-            or (
-                self.ptm.get_exchange_symbol(Common.BITGET, product_symbol)
-                if product_symbol is not None
-                else None
+        return await self._native_private(
+            "set_uta_leverage",
+            self._native_params(
+                category=category,
+                leverage=leverage,
+                product_symbol=product_symbol,
+                symbol=symbol,
+                coin=coin,
+                posSide=posSide,
+                marginMode=marginMode,
+                longLeverage=longLeverage,
+                shortLeverage=shortLeverage,
             ),
-            "leverage": str(leverage),
-            "coin": coin,
-            "posSide": posSide,
-            "marginMode": marginMode,
-            "longLeverage": str(longLeverage) if longLeverage is not None else None,
-            "shortLeverage": str(shortLeverage) if shortLeverage is not None else None,
-        }
-        return await self._request("POST", UtaAccount.SET_LEVERAGE, payload, signed=True)
+        )
 
     async def set_uta_hold_mode(self, holdMode: str) -> dict[str, Any]:
         """Set Bitget UTA holding mode."""
-        return await self._request(
-            "POST",
-            UtaAccount.SET_HOLD_MODE,
-            {"holdMode": holdMode},
-            signed=True,
+        return await self._native_private(
+            "set_uta_hold_mode",
+            self._native_params(holdMode=holdMode),
         )
 
     async def get_futures_account(
@@ -188,23 +189,23 @@ class AccountHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve one Bitget futures account."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "marginCoin": marginCoin,
-        }
-        return await self._request("GET", FuturesAccount.ACCOUNT, payload, signed=True)
+        return await self._native_private(
+            "get_futures_account",
+            self._native_params(
+                product_symbol=product_symbol,
+                productType=productType,
+                marginCoin=marginCoin,
+            ),
+        )
 
     async def get_futures_accounts(
         self,
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Retrieve Bitget futures accounts."""
-        return await self._request(
-            "GET",
-            FuturesAccount.ACCOUNTS,
-            {"productType": productType},
-            signed=True,
+        return await self._native_private(
+            "get_futures_accounts",
+            self._native_params(productType=productType),
         )
 
     async def get_futures_account_bills(
@@ -218,16 +219,18 @@ class AccountHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures account bills."""
-        payload: dict[str, Any] = {
-            "productType": productType,
-            "symbol": symbol,
-            "marginCoin": marginCoin,
-            "startTime": startTime,
-            "endTime": endTime,
-            "lastEndId": lastEndId,
-            "limit": limit,
-        }
-        return await self._request("GET", FuturesAccount.BILLS, payload, signed=True)
+        return await self._native_private(
+            "get_futures_account_bills",
+            self._native_params(
+                productType=productType,
+                symbol=symbol,
+                marginCoin=marginCoin,
+                startTime=startTime,
+                endTime=endTime,
+                lastEndId=lastEndId,
+                limit=limit,
+            ),
+        )
 
     async def set_futures_leverage(
         self,
@@ -238,14 +241,16 @@ class AccountHTTP(HTTPManager):
         holdSide: str | None = None,
     ) -> dict[str, Any]:
         """Set Bitget futures leverage."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "marginCoin": marginCoin,
-            "leverage": leverage,
-            "holdSide": holdSide,
-        }
-        return await self._request("POST", FuturesAccount.SET_LEVERAGE, payload, signed=True)
+        return await self._native_private(
+            "set_futures_leverage",
+            self._native_params(
+                product_symbol=product_symbol,
+                productType=productType,
+                marginCoin=marginCoin,
+                leverage=leverage,
+                holdSide=holdSide,
+            ),
+        )
 
     async def set_futures_margin_mode(
         self,
@@ -255,13 +260,15 @@ class AccountHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Set Bitget futures margin mode."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "marginCoin": marginCoin,
-            "marginMode": marginMode,
-        }
-        return await self._request("POST", FuturesAccount.SET_MARGIN_MODE, payload, signed=True)
+        return await self._native_private(
+            "set_futures_margin_mode",
+            self._native_params(
+                product_symbol=product_symbol,
+                productType=productType,
+                marginCoin=marginCoin,
+                marginMode=marginMode,
+            ),
+        )
 
     async def set_futures_position_mode(
         self,
@@ -269,8 +276,10 @@ class AccountHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
     ) -> dict[str, Any]:
         """Set Bitget futures position mode."""
-        payload: dict[str, Any] = {"productType": productType, "posMode": posMode}
-        return await self._request("POST", FuturesAccount.SET_POSITION_MODE, payload, signed=True)
+        return await self._native_private(
+            "set_futures_position_mode",
+            self._native_params(productType=productType, posMode=posMode),
+        )
 
     async def get_futures_positions(
         self,
@@ -278,8 +287,10 @@ class AccountHTTP(HTTPManager):
         marginCoin: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve all Bitget futures positions."""
-        payload: dict[str, Any] = {"productType": productType, "marginCoin": marginCoin}
-        return await self._request("GET", FuturesAccount.ALL_POSITIONS, payload, signed=True)
+        return await self._native_private(
+            "get_futures_positions",
+            self._native_params(productType=productType, marginCoin=marginCoin),
+        )
 
     async def get_futures_position(
         self,
@@ -288,9 +299,11 @@ class AccountHTTP(HTTPManager):
         marginCoin: str = "USDT",
     ) -> dict[str, Any]:
         """Retrieve one Bitget futures position."""
-        payload: dict[str, Any] = {
-            "symbol": self.ptm.get_exchange_symbol(Common.BITGET, product_symbol),
-            "productType": productType,
-            "marginCoin": marginCoin,
-        }
-        return await self._request("GET", FuturesAccount.SINGLE_POSITION, payload, signed=True)
+        return await self._native_private(
+            "get_futures_position",
+            self._native_params(
+                product_symbol=product_symbol,
+                productType=productType,
+                marginCoin=marginCoin,
+            ),
+        )
