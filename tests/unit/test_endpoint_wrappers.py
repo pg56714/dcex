@@ -931,8 +931,9 @@ def test_sync_bybit_post_only_forwards_position_idx() -> None:
     )
 
     assert result == {"ok": True}
-    assert calls[0]["query"]["timeInForce"] == "PostOnly"
-    assert calls[0]["query"]["positionIdx"] == "1"
+    assert calls[0]["method"] == "NATIVE_PRIVATE"
+    assert calls[0]["path"] == "place_post_only_limit_buy_order"
+    assert dict(calls[0]["query"])["positionIdx"] == "1"
 
 
 def test_sync_bitmart_modify_limit_order_uses_documented_payload_types() -> None:

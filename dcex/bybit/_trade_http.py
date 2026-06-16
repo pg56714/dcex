@@ -1,30 +1,13 @@
-"""
-Bybit Trade HTTP client.
-
-This module provides HTTP client functionality for trading operations
-on the Bybit exchange, including order management, execution queries,
-and spot margin trading functionality.
-"""
+"""Bybit trade HTTP client backed by Rust."""
 
 from typing import Any
 
 from ..enums import OrderSide
-from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.trade import SpotMarginTrade, Trade
 
 
 class TradeHTTP(HTTPManager):
-    """
-    HTTP client for Bybit trading operations.
-
-    This class handles all trading-related API requests including:
-    - Order placement and management
-    - Order cancellation (single and batch)
-    - Order history and execution queries
-    - Borrow quota checks
-    - Spot margin trading operations
-    """
+    """HTTP client for Bybit trading operations."""
 
     def place_order(
         self,
@@ -54,93 +37,36 @@ class TradeHTTP(HTTPManager):
         slOrderType: str | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place an order.
-
-        Args:
-            product_symbol: Product symbol to trade
-            side: Order side ("Buy" or "Sell")
-            orderType: Order type ("Market", "Limit", etc.)
-            qty: Order quantity
-            price: Order price (required for limit orders)
-            isLeverage: Whether to use leverage (0 or 1)
-            marketUnit: Market unit for the order
-            triggerDirection: Trigger direction for conditional orders
-            orderFilter: Order filter
-            triggerPrice: Trigger price for conditional orders
-            triggerBy: Trigger by price type
-            orderIv: Order implied volatility
-            timeInForce: Time in force ("GTC", "IOC", "FOK")
-            takeProfit: Take profit price
-            stopLoss: Stop loss price
-            tpTriggerBy: Take profit trigger by
-            slTriggerBy: Stop loss trigger by
-            reduceOnly: Whether this is a reduce-only order
-            closeOnTrigger: Whether to close on trigger
-            tpslMode: TP/SL mode
-            tpLimitPrice: Take profit limit price
-            slLimitPrice: Stop loss limit price
-            tpOrderType: Take profit order type
-            slOrderType: Stop loss order type
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        payload = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "side": OrderSide.from_any(side).to_exchange(Common.BYBIT),
-            "orderType": orderType,
-            "qty": qty,
-        }
-        if price is not None:
-            payload["price"] = price
-        if isLeverage is not None:
-            payload["isLeverage"] = str(isLeverage)
-        if marketUnit is not None:
-            payload["marketUnit"] = marketUnit
-        if triggerDirection is not None:
-            payload["triggerDirection"] = str(triggerDirection)
-        if orderFilter is not None:
-            payload["orderFilter"] = orderFilter
-        if triggerPrice is not None:
-            payload["triggerPrice"] = triggerPrice
-        if triggerBy is not None:
-            payload["triggerBy"] = triggerBy
-        if orderIv is not None:
-            payload["orderIv"] = orderIv
-        if timeInForce is not None:
-            payload["timeInForce"] = timeInForce
-        if takeProfit is not None:
-            payload["takeProfit"] = takeProfit
-        if stopLoss is not None:
-            payload["stopLoss"] = stopLoss
-        if tpTriggerBy is not None:
-            payload["tpTriggerBy"] = tpTriggerBy
-        if slTriggerBy is not None:
-            payload["slTriggerBy"] = slTriggerBy
-        if reduceOnly is not None:
-            payload["reduceOnly"] = str(reduceOnly)
-        if closeOnTrigger is not None:
-            payload["closeOnTrigger"] = str(closeOnTrigger)
-        if tpslMode is not None:
-            payload["tpslMode"] = tpslMode
-        if tpLimitPrice is not None:
-            payload["tpLimitPrice"] = tpLimitPrice
-        if slLimitPrice is not None:
-            payload["slLimitPrice"] = slLimitPrice
-        if tpOrderType is not None:
-            payload["tpOrderType"] = tpOrderType
-        if slOrderType is not None:
-            payload["slOrderType"] = slOrderType
-        if positionIdx is not None:
-            payload["positionIdx"] = str(positionIdx)
-
-        return self._request(
-            method="POST",
-            path=Trade.PLACE_ORDER,
-            query=payload,
+        """Place an order."""
+        return self._native_private(
+            "place_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                orderType=orderType,
+                qty=qty,
+                price=price,
+                isLeverage=isLeverage,
+                marketUnit=marketUnit,
+                triggerDirection=triggerDirection,
+                orderFilter=orderFilter,
+                triggerPrice=triggerPrice,
+                triggerBy=triggerBy,
+                orderIv=orderIv,
+                timeInForce=timeInForce,
+                takeProfit=takeProfit,
+                stopLoss=stopLoss,
+                tpTriggerBy=tpTriggerBy,
+                slTriggerBy=slTriggerBy,
+                reduceOnly=reduceOnly,
+                closeOnTrigger=closeOnTrigger,
+                tpslMode=tpslMode,
+                tpLimitPrice=tpLimitPrice,
+                slLimitPrice=slLimitPrice,
+                tpOrderType=tpOrderType,
+                slOrderType=slOrderType,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_market_order(
@@ -152,28 +78,17 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a market order.
-
-        Args:
-            product_symbol: Product symbol to trade
-            side: Order side ("Buy" or "Sell")
-            qty: Order quantity
-            reduceOnly: Whether this is a reduce-only order
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_order(
-            product_symbol=product_symbol,
-            side=side,
-            orderType="Market",
-            qty=qty,
-            reduceOnly=reduceOnly,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a market order."""
+        return self._native_private(
+            "place_market_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                qty=qty,
+                reduceOnly=reduceOnly,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_market_buy_order(
@@ -184,26 +99,16 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a market buy order.
-
-        Args:
-            product_symbol: Product symbol to buy
-            qty: Order quantity
-            reduceOnly: Whether this is a reduce-only order
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_market_order(
-            product_symbol=product_symbol,
-            side="Buy",
-            qty=qty,
-            reduceOnly=reduceOnly,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a market buy order."""
+        return self._native_private(
+            "place_market_buy_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                qty=qty,
+                reduceOnly=reduceOnly,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_market_sell_order(
@@ -214,26 +119,16 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a market sell order.
-
-        Args:
-            product_symbol: Product symbol to sell
-            qty: Order quantity
-            reduceOnly: Whether this is a reduce-only order
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_market_order(
-            product_symbol=product_symbol,
-            side="Sell",
-            qty=qty,
-            reduceOnly=reduceOnly,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a market sell order."""
+        return self._native_private(
+            "place_market_sell_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                qty=qty,
+                reduceOnly=reduceOnly,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_limit_order(
@@ -247,32 +142,19 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a limit order.
-
-        Args:
-            product_symbol: Product symbol to trade
-            side: Order side ("Buy" or "Sell")
-            qty: Order quantity
-            price: Order price
-            reduceOnly: Whether this is a reduce-only order
-            timeInForce: Time in force ("GTC", "IOC", "FOK")
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_order(
-            product_symbol=product_symbol,
-            side=side,
-            orderType="Limit",
-            qty=qty,
-            price=price,
-            reduceOnly=reduceOnly,
-            timeInForce=timeInForce,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a limit order."""
+        return self._native_private(
+            "place_limit_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                qty=qty,
+                price=price,
+                reduceOnly=reduceOnly,
+                timeInForce=timeInForce,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_limit_buy_order(
@@ -285,30 +167,18 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a limit buy order.
-
-        Args:
-            product_symbol: Product symbol to buy
-            qty: Order quantity
-            price: Order price
-            reduceOnly: Whether this is a reduce-only order
-            timeInForce: Time in force ("GTC", "IOC", "FOK")
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_limit_order(
-            product_symbol=product_symbol,
-            side="Buy",
-            qty=qty,
-            price=price,
-            reduceOnly=reduceOnly,
-            timeInForce=timeInForce,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a limit buy order."""
+        return self._native_private(
+            "place_limit_buy_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                qty=qty,
+                price=price,
+                reduceOnly=reduceOnly,
+                timeInForce=timeInForce,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_limit_sell_order(
@@ -321,30 +191,18 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a limit sell order.
-
-        Args:
-            product_symbol: Product symbol to sell
-            qty: Order quantity
-            price: Order price
-            reduceOnly: Whether this is a reduce-only order
-            timeInForce: Time in force ("GTC", "IOC", "FOK")
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_limit_order(
-            product_symbol=product_symbol,
-            side="Sell",
-            qty=qty,
-            price=price,
-            reduceOnly=reduceOnly,
-            timeInForce=timeInForce,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a limit sell order."""
+        return self._native_private(
+            "place_limit_sell_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                qty=qty,
+                price=price,
+                reduceOnly=reduceOnly,
+                timeInForce=timeInForce,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_post_only_limit_order(
@@ -357,30 +215,18 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a post-only limit order.
-
-        Args:
-            product_symbol: Product symbol to trade
-            side: Order side ("Buy" or "Sell")
-            qty: Order quantity
-            price: Order price
-            reduceOnly: Whether this is a reduce-only order
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_limit_order(
-            product_symbol=product_symbol,
-            side=side,
-            qty=qty,
-            price=price,
-            reduceOnly=reduceOnly,
-            timeInForce="PostOnly",
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a post-only limit order."""
+        return self._native_private(
+            "place_post_only_limit_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                qty=qty,
+                price=price,
+                reduceOnly=reduceOnly,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_post_only_limit_buy_order(
@@ -392,28 +238,17 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a post-only limit buy order.
-
-        Args:
-            product_symbol: Product symbol to buy
-            qty: Order quantity
-            price: Order price
-            reduceOnly: Whether this is a reduce-only order
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_post_only_limit_order(
-            product_symbol=product_symbol,
-            side="Buy",
-            qty=qty,
-            price=price,
-            reduceOnly=reduceOnly,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a post-only limit buy order."""
+        return self._native_private(
+            "place_post_only_limit_buy_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                qty=qty,
+                price=price,
+                reduceOnly=reduceOnly,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def place_post_only_limit_sell_order(
@@ -425,28 +260,17 @@ class TradeHTTP(HTTPManager):
         isLeverage: int | None = None,
         positionIdx: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a post-only limit sell order.
-
-        Args:
-            product_symbol: Product symbol to sell
-            qty: Order quantity
-            price: Order price
-            reduceOnly: Whether this is a reduce-only order
-            isLeverage: Whether to use leverage (0 or 1)
-            positionIdx: Position index
-
-        Returns:
-            dict[str, Any]: API response containing order information
-        """
-        return self.place_post_only_limit_order(
-            product_symbol=product_symbol,
-            side="Sell",
-            qty=qty,
-            price=price,
-            reduceOnly=reduceOnly,
-            isLeverage=isLeverage,
-            positionIdx=positionIdx,
+        """Place a post-only limit sell order."""
+        return self._native_private(
+            "place_post_only_limit_sell_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                qty=qty,
+                price=price,
+                reduceOnly=reduceOnly,
+                isLeverage=isLeverage,
+                positionIdx=positionIdx,
+            ),
         )
 
     def amend_order(
@@ -467,66 +291,26 @@ class TradeHTTP(HTTPManager):
         tpLimitPrice: str | None = None,
         slLimitPrice: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Amend an existing order.
-
-        Args:
-            product_symbol: Product symbol
-            orderId: Order ID to amend
-            orderLinkId: Order link ID to amend
-            orderIv: Order implied volatility
-            triggerPrice: Trigger price for conditional orders
-            qty: New order quantity
-            price: New order price
-            tpslMode: TP/SL mode
-            takeProfit: Take profit price
-            stopLoss: Stop loss price
-            tpTriggerBy: Take profit trigger by
-            slTriggerBy: Stop loss trigger by
-            triggerBy: Trigger by price type
-            tpLimitPrice: Take profit limit price
-            slLimitPrice: Stop loss limit price
-
-        Returns:
-            dict[str, Any]: API response confirming the amendment
-        """
-        payload: dict[str, Any] = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-        }
-        if orderId is not None:
-            payload["orderId"] = orderId
-        if orderLinkId is not None:
-            payload["orderLinkId"] = orderLinkId
-        if orderIv is not None:
-            payload["orderIv"] = orderIv
-        if triggerPrice is not None:
-            payload["triggerPrice"] = triggerPrice
-        if qty is not None:
-            payload["qty"] = qty
-        if price is not None:
-            payload["price"] = price
-        if tpslMode is not None:
-            payload["tpslMode"] = tpslMode
-        if takeProfit is not None:
-            payload["takeProfit"] = takeProfit
-        if stopLoss is not None:
-            payload["stopLoss"] = stopLoss
-        if tpTriggerBy is not None:
-            payload["tpTriggerBy"] = tpTriggerBy
-        if slTriggerBy is not None:
-            payload["slTriggerBy"] = slTriggerBy
-        if triggerBy is not None:
-            payload["triggerBy"] = triggerBy
-        if tpLimitPrice is not None:
-            payload["tpLimitPrice"] = tpLimitPrice
-        if slLimitPrice is not None:
-            payload["slLimitPrice"] = slLimitPrice
-
-        return self._request(
-            method="POST",
-            path=Trade.AMEND_ORDER,
-            query=payload,
+        """Amend an existing order."""
+        return self._native_private(
+            "amend_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                orderLinkId=orderLinkId,
+                orderIv=orderIv,
+                triggerPrice=triggerPrice,
+                qty=qty,
+                price=price,
+                tpslMode=tpslMode,
+                takeProfit=takeProfit,
+                stopLoss=stopLoss,
+                tpTriggerBy=tpTriggerBy,
+                slTriggerBy=slTriggerBy,
+                triggerBy=triggerBy,
+                tpLimitPrice=tpLimitPrice,
+                slLimitPrice=slLimitPrice,
+            ),
         )
 
     def cancel_order(
@@ -534,27 +318,10 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         orderId: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Cancel an order.
-
-        Args:
-            product_symbol: Product symbol
-            orderId: Order ID to cancel
-
-        Returns:
-            dict[str, Any]: API response confirming the cancellation
-        """
-        payload: dict[str, Any] = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-        }
-        if orderId is not None:
-            payload["orderId"] = orderId
-
-        return self._request(
-            method="POST",
-            path=Trade.CANCEL_ORDER,
-            query=payload,
+        """Cancel an order."""
+        return self._native_private(
+            "cancel_order",
+            self._native_params(product_symbol=product_symbol, orderId=orderId),
         )
 
     def get_open_orders(
@@ -565,65 +332,27 @@ class TradeHTTP(HTTPManager):
         baseCoin: str | None = None,
         limit: int = 20,
     ) -> dict[str, Any]:
-        """
-        Get open orders.
-
-        Args:
-            category: Product category (linear, option, spot, inverse)
-            product_symbol: Product symbol to filter by
-            settleCoin: Settlement coin to filter by
-            baseCoin: Base coin to filter by
-            limit: Maximum number of records to return (default: 20)
-
-        Returns:
-            dict[str, Any]: API response containing open orders
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-            "limit": limit,
-        }
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        else:
-            if baseCoin is not None:
-                payload["baseCoin"] = baseCoin
-            if settleCoin is not None:
-                payload["settleCoin"] = settleCoin
-            elif category == "linear":
-                payload["settleCoin"] = "USDT"
-
-        res = self._request(
-            method="GET",
-            path=Trade.GET_OPEN_ORDERS,
-            query=payload,
+        """Get open orders."""
+        return self._native_private(
+            "get_open_orders",
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                settleCoin=settleCoin,
+                baseCoin=baseCoin,
+                limit=limit,
+            ),
         )
-        return res
 
     def cancel_batch_orders(
         self,
         request: list[dict[str, Any]],
         category: str = "linear",
     ) -> dict[str, Any]:
-        """
-        Cancel multiple orders in batch.
-
-        Args:
-            request: List of order cancellation requests
-            category: Product category (linear, option, spot, inverse)
-
-        Returns:
-            dict[str, Any]: API response confirming batch cancellations
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-            "request": request,
-        }
-
-        return self._request(
-            method="POST",
-            path=Trade.CANCEL_BATCH_ORDERS,
-            query=payload,
+        """Cancel multiple orders in batch."""
+        return self._native_private(
+            "cancel_batch_orders",
+            self._native_params(request=request, category=category),
         )
 
     def cancel_all_orders(
@@ -631,27 +360,10 @@ class TradeHTTP(HTTPManager):
         category: str = "linear",
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Cancel all orders.
-
-        Args:
-            category: Product category (linear, option, spot, inverse)
-            product_symbol: Product symbol to cancel orders for
-
-        Returns:
-            dict[str, Any]: API response confirming all cancellations
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-        }
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-
-        return self._request(
-            method="POST",
-            path=Trade.CANCEL_ALL_ORDERS,
-            query=payload,
+        """Cancel all orders."""
+        return self._native_private(
+            "cancel_all_orders",
+            self._native_params(category=category, product_symbol=product_symbol),
         )
 
     def get_order_history(
@@ -663,41 +375,18 @@ class TradeHTTP(HTTPManager):
         cursor: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get order history.
-
-        Args:
-            category: Product category (linear, option, spot, inverse)
-            product_symbol: Product symbol to filter by
-            orderId: Order ID to filter by
-            startTime: Start timestamp in milliseconds
-            cursor: Cursor for pagination
-            limit: Maximum number of records to return
-
-        Returns:
-            dict[str, Any]: API response containing order history
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-        }
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        if orderId is not None:
-            payload["orderId"] = orderId
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if cursor is not None:
-            payload["cursor"] = cursor
-        if limit is not None:
-            payload["limit"] = limit
-
-        res = self._request(
-            method="GET",
-            path=Trade.GET_ORDER_HISTORY,
-            query=payload,
+        """Get order history."""
+        return self._native_private(
+            "get_order_history",
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                orderId=orderId,
+                startTime=startTime,
+                cursor=cursor,
+                limit=limit,
+            ),
         )
-        return res
 
     def get_execution_list(
         self,
@@ -706,59 +395,26 @@ class TradeHTTP(HTTPManager):
         startTime: int | None = None,
         limit: int = 50,
     ) -> dict[str, Any]:
-        """
-        Get execution list.
-
-        Args:
-            category: Product category (linear, option, spot, inverse)
-            product_symbol: Product symbol to filter by
-            startTime: Start timestamp in milliseconds
-            limit: Maximum number of records to return (default: 50)
-
-        Returns:
-            dict[str, Any]: API response containing execution list
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-            "limit": limit,
-        }
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        if startTime is not None:
-            payload["startTime"] = startTime
-
-        res = self._request(
-            method="GET",
-            path=Trade.GET_EXECUTION_LIST,
-            query=payload,
+        """Get execution list."""
+        return self._native_private(
+            "get_execution_list",
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                startTime=startTime,
+                limit=limit,
+            ),
         )
-        return res
 
     def place_batch_order(
         self,
         request: list[dict[str, Any]],
         category: str = "linear",
     ) -> dict[str, Any]:
-        """
-        Place multiple orders in batch.
-
-        Args:
-            request: List of order placement requests
-            category: Product category (linear, option, spot, inverse)
-
-        Returns:
-            dict[str, Any]: API response containing batch order results
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-            "request": request,
-        }
-
-        return self._request(
-            method="POST",
-            path=Trade.BATCH_PLACE_ORDER,
-            query=payload,
+        """Place multiple orders in batch."""
+        return self._native_private(
+            "place_batch_order",
+            self._native_params(request=request, category=category),
         )
 
     def amend_batch_order(
@@ -766,25 +422,10 @@ class TradeHTTP(HTTPManager):
         request: list[dict[str, Any]],
         category: str = "linear",
     ) -> dict[str, Any]:
-        """
-        Amend multiple orders in batch.
-
-        Args:
-            request: List of order amendment requests
-            category: Product category (linear, option, spot, inverse)
-
-        Returns:
-            dict[str, Any]: API response containing batch amendment results
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-            "request": request,
-        }
-
-        return self._request(
-            method="POST",
-            path=Trade.BATCH_AMEND_ORDER,
-            query=payload,
+        """Amend multiple orders in batch."""
+        return self._native_private(
+            "amend_batch_order",
+            self._native_params(request=request, category=category),
         )
 
     def get_borrow_quota(
@@ -792,81 +433,32 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         side: OrderSide | str,
     ) -> dict[str, Any]:
-        """
-        Get borrow quota for spot trading.
-
-        Args:
-            product_symbol: Product symbol
-            side: Order side ("Buy" or "Sell")
-
-        Returns:
-            dict[str, Any]: API response containing borrow quota information
-        """
-        payload = {
-            "category": "spot",
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "side": OrderSide.from_any(side).to_exchange(Common.BYBIT),
-        }
-
-        res = self._request(
-            method="GET",
-            path=Trade.GET_BORROW_QUOTA,
-            query=payload,
+        """Get borrow quota for spot trading."""
+        return self._native_private(
+            "get_borrow_quota",
+            self._native_params(product_symbol=product_symbol, side=side),
         )
-        return res
 
-    # Spot margin trade methods
     def get_vip_margin_data(
         self,
         vipLevel: str | None = None,
         currency: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get VIP margin data.
-
-        Args:
-            vipLevel: VIP level to query
-            currency: Currency symbol to filter by
-
-        Returns:
-            dict[str, Any]: API response containing VIP margin data
-        """
-        payload: dict[str, Any] = {}
-        if vipLevel is not None:
-            payload["vipLevel"] = vipLevel
-        if currency is not None:
-            payload["currency"] = currency
-
-        res = self._request(
-            method="GET",
-            path=SpotMarginTrade.VIP_MARGIN_DATA,
-            query=payload,
+        """Get VIP margin data."""
+        return self._native_private(
+            "get_vip_margin_data",
+            self._native_params(vipLevel=vipLevel, currency=currency),
         )
-        return res
 
     def get_collateral(
         self,
         currency: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get collateral information.
-
-        Args:
-            currency: Currency symbol to get collateral info for
-
-        Returns:
-            dict[str, Any]: API response containing collateral information
-        """
-        payload: dict[str, Any] = {}
-        if currency is not None:
-            payload["currency"] = currency
-
-        res = self._request(
-            method="GET",
-            path=SpotMarginTrade.GET_COLLATERAL,
-            query=payload,
+        """Get collateral information."""
+        return self._native_private(
+            "get_collateral",
+            self._native_params(currency=currency),
         )
-        return res
 
     def get_historical_interest_rate(
         self,
@@ -875,45 +467,17 @@ class TradeHTTP(HTTPManager):
         startTime: int | None = None,
         endTime: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Get historical interest rate.
-
-        Args:
-            currency: Currency symbol
-            vipLevel: VIP level to query
-            startTime: Start timestamp in milliseconds
-            endTime: End timestamp in milliseconds
-
-        Returns:
-            dict[str, Any]: API response containing historical interest rates
-        """
-        payload: dict[str, Any] = {
-            "currency": currency,
-        }
-        if vipLevel is not None:
-            payload["vipLevel"] = vipLevel
-        if startTime is not None:
-            payload["startTime"] = startTime
-        if endTime is not None:
-            payload["endTime"] = endTime
-
-        res = self._request(
-            method="GET",
-            path=SpotMarginTrade.HISTORICAL_INTEREST,
-            query=payload,
+        """Get historical interest rate."""
+        return self._native_private(
+            "get_historical_interest_rate",
+            self._native_params(
+                currency=currency,
+                vipLevel=vipLevel,
+                startTime=startTime,
+                endTime=endTime,
+            ),
         )
-        return res
 
     def get_status_and_leverage(self) -> dict[str, Any]:
-        """
-        Get spot margin trading status and leverage.
-
-        Returns:
-            dict[str, Any]: API response containing status and leverage information
-        """
-        res = self._request(
-            method="GET",
-            path=SpotMarginTrade.STATUS_AND_LEVERAGE,
-            query={},
-        )
-        return res
+        """Get spot margin trading status and leverage."""
+        return self._native_private("get_status_and_leverage", [])

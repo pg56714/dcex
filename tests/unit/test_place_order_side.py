@@ -120,11 +120,12 @@ def test_bybit_side_conversion() -> None:
     from dcex.bybit._trade_http import TradeHTTP
 
     m = TradeHTTP(preload_product_table=False)
-    cap = _wire(m)
+    cap = _wire_native(m)
     m.place_order(product_symbol="BTC-USDT-SWAP", side="buy", orderType="Market", qty="1")
-    assert cap["side"] == "Buy"
+    assert cap["method_name"] == "place_order"
+    assert cap["side"] == "buy"
     m.place_order(product_symbol="BTC-USDT-SWAP", side=OrderSide.SELL, orderType="Market", qty="1")
-    assert cap["side"] == "Sell"
+    assert cap["side"] == "SELL"
 
 
 def test_okx_side_conversion() -> None:
@@ -192,9 +193,10 @@ async def test_async_bybit_side_conversion() -> None:
     from dcex.async_support.bybit._trade_http import TradeHTTP
 
     m = TradeHTTP(preload_product_table=False)
-    cap = _wire_async(m)
+    cap = _wire_native_async(m)
     await m.place_order(product_symbol="BTC-USDT-SWAP", side="buy", orderType="Market", qty="1")
-    assert cap["side"] == "Buy"
+    assert cap["method_name"] == "place_order"
+    assert cap["side"] == "buy"
 
 
 @pytest.mark.asyncio

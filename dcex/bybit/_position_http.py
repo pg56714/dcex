@@ -1,28 +1,12 @@
-"""
-Bybit Position HTTP client.
-
-This module provides HTTP client functionality for position management
-operations on the Bybit exchange, including position queries, leverage
-settings, and PnL history.
-"""
+"""Bybit position HTTP client backed by Rust."""
 
 from typing import Any
 
-from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.position import Position
 
 
 class PositionHTTP(HTTPManager):
-    """
-    HTTP client for Bybit position operations.
-
-    This class handles all position-related API requests including:
-    - Position list queries
-    - Leverage settings
-    - Position mode switching
-    - Closed PnL history
-    """
+    """HTTP client for Bybit position operations."""
 
     def get_positions(
         self,
@@ -31,63 +15,27 @@ class PositionHTTP(HTTPManager):
         settleCoin: str | None = None,
         limit: int = 20,
     ) -> dict[str, Any]:
-        """
-        Get positions list.
-
-        Args:
-            category: Product category (linear, inverse, option)
-            product_symbol: Product symbol to filter by
-            settleCoin: Settlement coin to filter by
-            limit: Maximum number of records to return (default: 20)
-
-        Returns:
-            dict[str, Any]: API response containing positions
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-            "limit": limit,
-        }
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        if settleCoin is not None:
-            payload["settleCoin"] = settleCoin
-
-        res = self._request(
-            method="GET",
-            path=Position.GET_POSITIONS,
-            query=payload,
+        """Get positions list."""
+        return self._native_private(
+            "get_positions",
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                settleCoin=settleCoin,
+                limit=limit,
+            ),
         )
-        return res
 
     def set_leverage(
         self,
         product_symbol: str,
         leverage: str,
     ) -> dict[str, Any]:
-        """
-        Set leverage for a product.
-
-        Args:
-            product_symbol: Product symbol
-            leverage: Leverage value to set
-
-        Returns:
-            dict[str, Any]: API response confirming the leverage setting
-        """
-        payload = {
-            "category": self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            "symbol": self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-            "buyLeverage": leverage,
-            "sellLeverage": leverage,
-        }
-
-        res = self._request(
-            method="POST",
-            path=Position.SET_LEVERAGE,
-            query=payload,
+        """Set leverage for a product."""
+        return self._native_private(
+            "set_leverage",
+            self._native_params(product_symbol=product_symbol, leverage=leverage),
         )
-        return res
 
     def switch_position_mode(
         self,
@@ -95,32 +43,11 @@ class PositionHTTP(HTTPManager):
         product_symbol: str | None = None,
         coin: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Switch position mode.
-
-        Args:
-            mode: Position mode (0: Merged Single, 3: Both Sides)
-            product_symbol: Product symbol to apply mode to
-            coin: Coin to apply mode to
-
-        Returns:
-            dict[str, Any]: API response confirming the mode switch
-        """
-        payload = {
-            "category": "linear",
-            "mode": mode,
-        }
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-        if coin is not None:
-            payload["coin"] = coin
-
-        res = self._request(
-            method="POST",
-            path=Position.SWITCH_POSITION_MODE,
-            query=payload,
+        """Switch position mode."""
+        return self._native_private(
+            "switch_position_mode",
+            self._native_params(mode=mode, product_symbol=product_symbol, coin=coin),
         )
-        return res
 
     def get_closed_pnl(
         self,
@@ -129,31 +56,13 @@ class PositionHTTP(HTTPManager):
         startTime: int | None = None,
         limit: int = 20,
     ) -> dict[str, Any]:
-        """
-        Get closed PnL history.
-
-        Args:
-            category: Product category
-            product_symbol: Product symbol to filter by
-            startTime: Start timestamp in milliseconds
-            limit: Maximum number of records to return (default: 20)
-
-        Returns:
-            dict[str, Any]: API response containing closed PnL history
-        """
-        payload: dict[str, Any] = {
-            "category": category,
-            "limit": limit,
-        }
-        if product_symbol is not None:
-            payload["symbol"] = self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol)
-            payload["category"] = self.ptm.get_exchange_type(Common.BYBIT, product_symbol)
-        if startTime is not None:
-            payload["startTime"] = startTime
-
-        res = self._request(
-            method="GET",
-            path=Position.GET_CLOSED_PNL,
-            query=payload,
+        """Get closed PnL history."""
+        return self._native_private(
+            "get_closed_pnl",
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                startTime=startTime,
+                limit=limit,
+            ),
         )
-        return res

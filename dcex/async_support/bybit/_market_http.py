@@ -3,7 +3,6 @@
 from typing import Any
 
 from ..._native_http import NativeResponse
-from ...utils.common import Common
 from ._http_manager import HTTPManager
 
 
@@ -22,23 +21,6 @@ class MarketHTTP(HTTPManager):
         response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
         return response.json()
-
-    def _symbol_category(self, product_symbol: str, category: str = "linear") -> tuple[str, str]:
-        """Map product symbol through PTM when available."""
-        if hasattr(self, "ptm"):
-            return (
-                self.ptm.get_exchange_symbol(Common.BYBIT, product_symbol),
-                self.ptm.get_exchange_type(Common.BYBIT, product_symbol),
-            )
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            quote = parts[1]
-            kind = parts[2]
-            mapped_category = (
-                "spot" if kind == "SPOT" else ("inverse" if quote == "USD" else category)
-            )
-            return f"{parts[0]}{quote}", mapped_category
-        return product_symbol, category
 
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
@@ -60,14 +42,11 @@ class MarketHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get instruments information."""
-        symbol = None
-        if product_symbol is not None:
-            symbol, category = self._symbol_category(product_symbol, category)
         return await self._native_public(
             "get_instruments_info",
             self._params(
                 category=category,
-                symbol=symbol,
+                product_symbol=product_symbol,
                 status=status,
                 baseCoin=baseCoin,
                 limit=limit,
@@ -83,12 +62,10 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Get kline/candlestick data."""
-        symbol, category = self._symbol_category(product_symbol)
         return await self._native_public(
             "get_kline",
             self._params(
-                symbol=symbol,
-                category=category,
+                product_symbol=product_symbol,
                 interval=interval,
                 startTime=startTime,
                 limit=limit,
@@ -101,10 +78,9 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Get order book data."""
-        symbol, category = self._symbol_category(product_symbol)
         return await self._native_public(
             "get_orderbook",
-            self._params(category=category, symbol=symbol, limit=limit),
+            self._params(product_symbol=product_symbol, limit=limit),
         )
 
     async def get_tickers(
@@ -114,12 +90,9 @@ class MarketHTTP(HTTPManager):
         baseCoin: str | None = None,
     ) -> dict[str, Any]:
         """Get ticker information."""
-        symbol = None
-        if product_symbol is not None:
-            symbol, category = self._symbol_category(product_symbol, category)
         return await self._native_public(
             "get_tickers",
-            self._params(category=category, symbol=symbol, baseCoin=baseCoin),
+            self._params(category=category, product_symbol=product_symbol, baseCoin=baseCoin),
         )
 
     async def get_funding_rate_history(
@@ -129,10 +102,9 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Get funding rate history."""
-        symbol, category = self._symbol_category(product_symbol)
         return await self._native_public(
             "get_funding_rate_history",
-            self._params(category=category, symbol=symbol, startTime=startTime, limit=limit),
+            self._params(product_symbol=product_symbol, startTime=startTime, limit=limit),
         )
 
     async def get_public_trade_history(
@@ -141,10 +113,9 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Get public trade history."""
-        symbol, category = self._symbol_category(product_symbol)
         return await self._native_public(
             "get_public_trade_history",
-            self._params(category=category, symbol=symbol, limit=limit),
+            self._params(product_symbol=product_symbol, limit=limit),
         )
 
     async def get_open_interest(
@@ -157,12 +128,10 @@ class MarketHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get open interest history."""
-        symbol, category = self._symbol_category(product_symbol)
         return await self._native_public(
             "get_open_interest",
             self._params(
-                category=category,
-                symbol=symbol,
+                product_symbol=product_symbol,
                 intervalTime=intervalTime,
                 startTime=startTime,
                 endTime=endTime,
@@ -181,12 +150,10 @@ class MarketHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get long/short account ratio history."""
-        symbol, category = self._symbol_category(product_symbol)
         return await self._native_public(
             "get_long_short_ratio",
             self._params(
-                category=category,
-                symbol=symbol,
+                product_symbol=product_symbol,
                 period=period,
                 startTime=startTime,
                 endTime=endTime,
@@ -228,14 +195,11 @@ class MarketHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get delivery price data."""
-        symbol = None
-        if product_symbol is not None:
-            symbol, category = self._symbol_category(product_symbol, category)
         return await self._native_public(
             "get_delivery_price",
             self._params(
                 category=category,
-                symbol=symbol,
+                product_symbol=product_symbol,
                 baseCoin=baseCoin,
                 limit=limit,
                 cursor=cursor,
@@ -248,10 +212,9 @@ class MarketHTTP(HTTPManager):
         category: str = "linear",
     ) -> dict[str, Any]:
         """Get order price limit data."""
-        symbol, category = self._symbol_category(product_symbol, category)
         return await self._native_public(
             "get_order_price_limit",
-            self._params(category=category, symbol=symbol),
+            self._params(category=category, product_symbol=product_symbol),
         )
 
     async def get_adl_alert(
@@ -260,12 +223,9 @@ class MarketHTTP(HTTPManager):
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
         """Get ADL alert data."""
-        symbol = None
-        if product_symbol is not None:
-            symbol, category = self._symbol_category(product_symbol, category)
         return await self._native_public(
             "get_adl_alert",
-            self._params(category=category, symbol=symbol),
+            self._params(category=category, product_symbol=product_symbol),
         )
 
     async def get_risk_limit(
@@ -275,10 +235,7 @@ class MarketHTTP(HTTPManager):
         cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get risk limit information."""
-        symbol = None
-        if product_symbol is not None:
-            symbol, _ = self._symbol_category(product_symbol, category)
         return await self._native_public(
             "get_risk_limit",
-            self._params(category=category, symbol=symbol, cursor=cursor),
+            self._params(category=category, product_symbol=product_symbol, cursor=cursor),
         )
