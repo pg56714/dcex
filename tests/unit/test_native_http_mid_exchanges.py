@@ -456,6 +456,40 @@ def test_sync_bitmex_public_wrapper_uses_native_dispatcher() -> None:
     assert received.get_nowait()["path"] == "/api/v1/orderBook/L2?symbol=XBTUSD&depth=25"
 
 
+def test_native_bitmex_private_limit_order_builds_json_body() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server() as (base_url, received):
+        client = native.BitmexHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            base_url=base_url,
+        )
+        status, _headers, body = client.private_request(
+            "place_limit_buy_order",
+            [
+                ("product_symbol", "XBT-USD-SWAP"),
+                ("orderQty", "100"),
+                ("price", "1.5"),
+            ],
+        )
+
+    request = received.get_nowait()
+    payload = json.loads(request["body"])
+    assert status == 200
+    assert json.loads(body) == {"ok": True}
+    assert request["path"] == "/api/v2/order"
+    assert payload == {
+        "ordType": "Limit",
+        "orderQty": 100,
+        "price": 1.5,
+        "side": "Buy",
+        "symbol": "XBTUSD",
+        "timeInForce": "GoodTillCancel",
+    }
+
+
 @pytest.mark.asyncio
 async def test_async_bitmex_public_wrapper_uses_native_dispatcher() -> None:
     from dcex.async_support.bitmex.client import Client

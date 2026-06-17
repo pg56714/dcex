@@ -165,8 +165,9 @@ def test_bitmex_side_conversion() -> None:
     from dcex.bitmex._trade_http import TradeHTTP
 
     m = TradeHTTP(preload_product_table=False)
-    cap = _wire(m)
+    cap = _wire_native(m)
     m.place_order(product_symbol="XBT-USD-SWAP", side=OrderSide.BUY, ordType="Market", orderQty=1)
+    assert cap["method_name"] == "place_order"
     assert cap["side"] == "Buy"
 
 
@@ -246,8 +247,9 @@ async def test_async_bitmex_side_conversion() -> None:
     from dcex.async_support.bitmex._trade_http import TradeHTTP
 
     m = TradeHTTP(preload_product_table=False)
-    cap = _wire_async(m)
+    cap = _wire_native_async(m)
     await m.place_order(product_symbol="XBT-USD-SWAP", side=OrderSide.BUY, ordType="Market")
+    assert cap["method_name"] == "place_order"
     assert cap["side"] == "Buy"
 
 
