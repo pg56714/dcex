@@ -252,6 +252,109 @@ async def test_async_mexc_manager_uses_native_contract_transport() -> None:
     assert request["body"] == '[{"orderId":"1"},{"orderId":"2"}]'
 
 
+def test_native_mexc_public_dispatcher_normalizes_product_symbol() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server() as (base_url, received):
+        client = native.MexcHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            base_url=base_url,
+            contract_base_url=base_url,
+        )
+        status, _headers, body = client.public_request(
+            "get_contract_depth",
+            [("product_symbol", "BTC-USDT-SWAP"), ("limit", "5")],
+        )
+
+    request = received.get_nowait()
+    assert status == 200
+    assert json.loads(body) == {"ok": True}
+    assert request["path"] == "/api/v1/contract/depth/BTC_USDT?limit=5"
+
+
+def test_native_mexc_private_spot_batch_order_converts_product_symbols() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server() as (base_url, received):
+        client = native.MexcHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            base_url=base_url,
+            contract_base_url=base_url,
+        )
+        status, _headers, body = client.private_request(
+            "place_spot_batch_orders",
+            [
+                (
+                    "batchOrders",
+                    json.dumps(
+                        [
+                            {
+                                "product_symbol": "BTC-USDT-SPOT",
+                                "side": "BUY",
+                                "type": "LIMIT_MAKER",
+                                "quantity": "1",
+                                "price": "1",
+                            }
+                        ],
+                        separators=(",", ":"),
+                    ),
+                )
+            ],
+        )
+
+    request = received.get_nowait()
+    query = dict(parse_qsl(urlsplit(request["path"]).query))
+    batch_orders = json.loads(query["batchOrders"])
+    assert status == 200
+    assert json.loads(body) == {"ok": True}
+    assert urlsplit(request["path"]).path == "/api/v3/batchOrders"
+    assert batch_orders[0]["symbol"] == "BTCUSDT"
+    assert "product_symbol" not in batch_orders[0]
+    assert "signature" in query
+
+
+def test_native_mexc_private_contract_order_builds_json_body() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server() as (base_url, received):
+        client = native.MexcHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            base_url=base_url,
+            contract_base_url=base_url,
+        )
+        status, _headers, body = client.private_request(
+            "place_contract_order",
+            [
+                ("product_symbol", "BTC-USDT-SWAP"),
+                ("side", "1"),
+                ("type", "2"),
+                ("openType", "2"),
+                ("vol", "1"),
+                ("price", "100"),
+                ("leverage", "50"),
+                ("reduceOnly", "false"),
+            ],
+        )
+
+    request = received.get_nowait()
+    payload = json.loads(request["body"])
+    assert status == 200
+    assert json.loads(body) == {"ok": True}
+    assert request["path"] == "/api/v1/private/order/create"
+    assert payload["symbol"] == "BTC_USDT"
+    assert payload["side"] == 1
+    assert payload["type"] == 2
+    assert payload["openType"] == 2
+    assert payload["vol"] == 1
+    assert payload["reduceOnly"] is False
+
+
 def test_native_bitmex_signed_get() -> None:
     native = pytest.importorskip("dcex._native")
 

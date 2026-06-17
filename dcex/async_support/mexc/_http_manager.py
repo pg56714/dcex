@@ -79,14 +79,21 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.MEXC)
-        if self.use_native and _native is not None and self._native_client is None:
-            self._native_client = _native.MexcHttpClient(
+        native_client_type = getattr(_native, "MexcHttpClient", None)
+        if self.use_native and native_client_type is not None and self._native_client is None:
+            self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
                 timeout=self.timeout,
                 base_url=self.base_url,
                 contract_base_url=self.contract_base_url,
             )
+        if (
+            self.preload_product_table
+            and self._native_client is not None
+            and hasattr(self._native_client, "set_product_table")
+        ):
+            self._native_client.set_product_table(self.ptm._native_table)
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
@@ -97,6 +104,51 @@ class HTTPManager(BaseHTTPManager):
             and self._native_client is not None
             and type(self.session) is httpx.AsyncClient
         )
+
+    async def _native_private(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed MEXC private method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("MEXC native client is required for private methods.")
+        if not hasattr(self._native_client, "private_request_async"):
+            raise RuntimeError("MEXC native client private_request_async is unavailable.")
+        try:
+            status, headers, body = await self._native_client.private_request_async(
+                method_name,
+                params,
+            )
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"MEXC {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(generate_timestamp(iso_format=True)),
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    @staticmethod
+    def _native_params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            if key == "type_":
+                key = "type"
+            enum_value = getattr(value, "value", None)
+            if enum_value is not None:
+                value = enum_value
+            if isinstance(value, bool):
+                value = str(value).lower()
+            elif isinstance(value, (list, dict)):
+                value = json.dumps(value, separators=(",", ":"), ensure_ascii=False)
+            params.append((key, str(value)))
+        return params
 
     async def __aenter__(self) -> Self:
         if self.session is None or self.session.is_closed:
