@@ -32,18 +32,20 @@ class MarketHTTP(HTTPManager):
         instruction: str | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> dict[str, Any] | list[Any] | str:
+        native_client = self._native_client
         if (
             method.upper() == "GET"
             and not signed
             and instruction is None
             and headers is None
-            and self._native_client is not None
+            and native_client is not None
+            and self._uses_native_transport()
         ):
             (
                 status,
                 response_headers,
                 response_body,
-            ) = await self._native_client.public_request_async(
+            ) = await native_client.public_request_async(
                 str(path),
                 self._native_params(query),
             )

@@ -43,7 +43,7 @@ impl OkxClient {
                 PUBLIC_OPEN_INTEREST
             }
             "get_position_tiers" => {
-                normalize_inst_id_query(&mut params);
+                normalize_position_tiers_query(&mut params);
                 PUBLIC_POSITION_TIERS
             }
             "get_trading_data_support_coin" => PUBLIC_TRADING_DATA_SUPPORT_COIN,
@@ -78,5 +78,26 @@ impl OkxClient {
         };
         self.request(HttpMethod::Get, path, params, None, false)
             .await
+    }
+}
+
+fn normalize_position_tiers_query(params: &mut Vec<(String, String)>) {
+    normalize_inst_id_query(params);
+    if params
+        .iter()
+        .any(|(key, _)| key == "instFamily" || key == "uly")
+    {
+        return;
+    }
+    let Some(inst_id) = params
+        .iter()
+        .find(|(key, _)| key == "instId")
+        .map(|(_, value)| value)
+    else {
+        return;
+    };
+    let mut parts = inst_id.split('-');
+    if let (Some(base), Some(quote)) = (parts.next(), parts.next()) {
+        params.push(("instFamily".to_string(), format!("{base}-{quote}")));
     }
 }

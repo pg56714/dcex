@@ -238,7 +238,10 @@ fn push_required_or_override(
     params: &KrakenParams,
     fallback_key: &str,
 ) -> Result<()> {
-    let value = override_value.unwrap_or(params.required(fallback_key)?);
+    let value = match override_value {
+        Some(value) => value,
+        None => params.required(fallback_key)?,
+    };
     query.push((key.to_string(), value.to_string()));
     Ok(())
 }
@@ -250,4 +253,33 @@ fn push_required_param(
 ) -> Result<()> {
     query.push((key.to_string(), params.required(key)?.to_string()));
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn push_required_or_override_uses_override_without_fallback_key() {
+        let params = KrakenParams::from_pairs(Vec::new());
+        let mut query = Vec::new();
+
+        push_required_or_override(&mut query, "side", Some("buy"), &params, "side")
+            .expect("override should be enough");
+
+        assert_eq!(query, vec![("side".to_string(), "buy".to_string())]);
+    }
+
+    #[test]
+    fn push_required_or_override_requires_fallback_without_override() {
+        let params = KrakenParams::from_pairs(Vec::new());
+        let mut query = Vec::new();
+
+        let error = push_required_or_override(&mut query, "side", None, &params, "side")
+            .expect_err("fallback should be required");
+
+        assert!(error
+            .to_string()
+            .contains("missing required parameter: side"));
+    }
 }

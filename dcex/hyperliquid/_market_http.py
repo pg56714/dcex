@@ -21,15 +21,15 @@ class MarketHTTP(HTTPManager):
         query: dict[str, Any] | None = None,
         signed: bool = True,
     ) -> dict[str, Any]:
+        native_client = self._native_client
         if (
             method.upper() == "POST"
             and str(path) == str(Path.INFO)
             and not signed
-            and self._native_client is not None
+            and native_client is not None
+            and self._uses_native_transport()
         ):
-            status, headers, body = self._native_client.public_request(
-                msgspec.json.encode(query or {})
-            )
+            status, headers, body = native_client.public_request(msgspec.json.encode(query or {}))
             response = NativeResponse(status, dict(headers), bytes(body))
             self._store_response_headers(response)
             return response.json()

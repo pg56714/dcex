@@ -35,19 +35,21 @@ class MarketHTTP(HTTPManager):
         headers: dict[str, str] | None = None,
         content_type: Literal["json", "form"] = "json",
     ) -> dict[str, Any] | list[Any]:
+        native_client = self._native_client
         if (
             method.upper() == "GET"
             and not signed
             and body is None
             and content_type == "json"
-            and self._native_client is not None
+            and native_client is not None
+            and self._uses_native_transport()
         ):
             native_headers = {key: value for key, value in (headers or {}).items() if value}
             (
                 status,
                 response_headers,
                 response_body,
-            ) = await self._native_client.public_request_async(
+            ) = await native_client.public_request_async(
                 str(path),
                 self._native_params(query),
                 native_headers,
