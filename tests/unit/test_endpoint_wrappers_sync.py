@@ -115,11 +115,13 @@ def test_sync_bitmart_modify_limit_order_uses_documented_payload_types() -> None
         size=1,
     )
 
-    query = calls[0]["query"]
+    query = dict(calls[0]["query"])
     assert result == {"ok": True}
-    assert query["order_id"] == 123456
+    assert calls[0]["method"] == "NATIVE_PRIVATE"
+    assert calls[0]["path"] == "modify_limit_order"
+    assert query["order_id"] == "123456"
     assert query["price"] == "100.1"
-    assert query["size"] == 1
+    assert query["size"] == "1"
 
 
 @pytest.mark.parametrize(

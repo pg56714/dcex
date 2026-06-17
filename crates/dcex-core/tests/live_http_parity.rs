@@ -3,6 +3,7 @@ mod live_http_parity {
 
     mod binance;
     mod bitget;
+    mod bitmart;
     mod bybit;
     mod kraken;
     mod mexc;

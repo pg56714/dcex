@@ -121,11 +121,13 @@ async def test_async_bitmart_modify_limit_order_uses_documented_payload_types() 
         size=1,
     )
 
-    query = calls[0]["query"]
+    query = dict(calls[0]["query"])
     assert result == {"ok": True}
-    assert query["order_id"] == 123456
+    assert calls[0]["method"] == "NATIVE_PRIVATE"
+    assert calls[0]["path"] == "modify_limit_order"
+    assert query["order_id"] == "123456"
     assert query["price"] == "100.1"
-    assert query["size"] == 1
+    assert query["size"] == "1"
 
 
 @pytest.mark.parametrize(
@@ -164,7 +166,7 @@ async def test_async_bitmart_post_only_buy_reads_position_response_data() -> Non
     )
 
     assert result == {"ok": True}
-    assert calls[0]["query"]["side"] == 2
+    assert dict(calls[0]["query"])["side"] == "2"
 
 
 @pytest.mark.parametrize(
