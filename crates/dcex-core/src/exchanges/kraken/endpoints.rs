@@ -1,0 +1,39 @@
+pub(super) const SPOT_BASE_URL: &str = "https://api.kraken.com";
+pub(super) const FUTURES_BASE_URL: &str = "https://futures.kraken.com";
+
+pub(super) const SPOT_SERVER_TIME: &str = "/0/public/Time";
+pub(super) const SPOT_ASSET_PAIRS: &str = "/0/public/AssetPairs";
+pub(super) const SPOT_TICKER: &str = "/0/public/Ticker";
+pub(super) const SPOT_ORDERBOOK: &str = "/0/public/Depth";
+pub(super) const SPOT_PUBLIC_TRADES: &str = "/0/public/Trades";
+pub(super) const SPOT_OHLC: &str = "/0/public/OHLC";
+pub(super) const FUTURES_INSTRUMENTS: &str = "/derivatives/api/v3/instruments";
+pub(super) const FUTURES_TICKERS: &str = "/derivatives/api/v3/tickers";
+pub(super) const FUTURES_ORDERBOOK: &str = "/derivatives/api/v3/orderbook";
+pub(super) const FUTURES_PUBLIC_TRADES: &str = "/derivatives/api/v3/history";
+pub(super) const FUTURES_CANDLES: &str = "/api/charts/v1";
+
+pub(super) const SPOT_BALANCE: &str = "/0/private/Balance";
+pub(super) const SPOT_TRADE_BALANCE: &str = "/0/private/TradeBalance";
+pub(super) const SPOT_OPEN_POSITIONS: &str = "/0/private/OpenPositions";
+pub(super) const SPOT_LEDGERS: &str = "/0/private/Ledgers";
+pub(super) const SPOT_TRADE_VOLUME: &str = "/0/private/TradeVolume";
+pub(super) const SPOT_WALLET_TRANSFER: &str = "/0/private/WalletTransfer";
+pub(super) const FUTURES_ACCOUNTS: &str = "/derivatives/api/v3/accounts";
+pub(super) const FUTURES_OPEN_POSITIONS: &str = "/derivatives/api/v3/openpositions";
+pub(super) const FUTURES_FILLS: &str = "/derivatives/api/v3/fills";
+pub(super) const FUTURES_TRANSFER: &str = "/derivatives/api/v3/transfer";
+pub(super) const FUTURES_WITHDRAWAL: &str = "/derivatives/api/v3/withdrawal";
+
+pub(super) const SPOT_ADD_ORDER: &str = "/0/private/AddOrder";
+pub(super) const SPOT_CANCEL_ORDER: &str = "/0/private/CancelOrder";
+pub(super) const SPOT_CANCEL_ALL: &str = "/0/private/CancelAll";
+pub(super) const SPOT_OPEN_ORDERS: &str = "/0/private/OpenOrders";
+pub(super) const SPOT_CLOSED_ORDERS: &str = "/0/private/ClosedOrders";
+pub(super) const SPOT_QUERY_ORDERS: &str = "/0/private/QueryOrders";
+pub(super) const SPOT_TRADES_HISTORY: &str = "/0/private/TradesHistory";
+pub(super) const FUTURES_SEND_ORDER: &str = "/derivatives/api/v3/sendorder";
+pub(super) const FUTURES_CANCEL_ORDER: &str = "/derivatives/api/v3/cancelorder";
+pub(super) const FUTURES_CANCEL_ALL: &str = "/derivatives/api/v3/cancelallorders";
+pub(super) const FUTURES_OPEN_ORDERS: &str = "/derivatives/api/v3/openorders";
+pub(super) const FUTURES_ORDER_STATUS: &str = "/derivatives/api/v3/orders/status";

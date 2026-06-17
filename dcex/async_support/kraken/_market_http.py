@@ -3,7 +3,6 @@
 from typing import Any
 
 from ..._native_http import NativeResponse
-from ...utils.common import Common
 from ._http_manager import HTTPManager
 
 
@@ -23,35 +22,6 @@ class MarketHTTP(HTTPManager):
         self._store_response_headers(response)
         return response.json()
 
-    def _exchange_symbol(self, product_symbol: str) -> str:
-        """Map product symbol through PTM when available."""
-        if hasattr(self, "ptm"):
-            return self.ptm.get_exchange_symbol(Common.KRAKEN, product_symbol)
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            base = "XBT" if parts[0] == "BTC" else parts[0]
-            quote = "XBT" if parts[1] == "BTC" else parts[1]
-            prefix = "PF_" if parts[2] != "SPOT" else ""
-            return f"{prefix}{base}{quote}"
-        return product_symbol
-
-    @staticmethod
-    def _params(**kwargs: object) -> list[tuple[str, str]]:
-        """Convert optional Python arguments into native string pairs."""
-        params: list[tuple[str, str]] = []
-        for key, value in kwargs.items():
-            if value is None:
-                continue
-            if key == "from_":
-                key = "from"
-            if isinstance(value, bool):
-                params.append((key, str(value).lower()))
-            elif isinstance(value, (list, tuple)):
-                params.extend((key, str(item)) for item in value)
-            else:
-                params.append((key, str(value)))
-        return params
-
     async def get_server_time(self) -> dict[str, Any]:
         """Retrieve Kraken spot server time."""
         return await self._native_public("get_server_time", [])
@@ -64,7 +34,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken spot tradable asset pairs."""
         return await self._native_public(
             "get_spot_asset_pairs",
-            self._params(pair=pair, info=info),
+            self._native_params(pair=pair, info=info),
         )
 
     async def get_spot_ticker(
@@ -75,10 +45,10 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken spot ticker data for one pair or all pairs."""
         if product_symbol is not None and pair is not None:
             raise ValueError("Specify either product_symbol or pair, not both.")
-        resolved_pair = (
-            self._exchange_symbol(product_symbol) if product_symbol is not None else pair
+        return await self._native_public(
+            "get_spot_ticker",
+            self._native_params(product_symbol=product_symbol, pair=pair),
         )
-        return await self._native_public("get_spot_ticker", self._params(pair=resolved_pair))
 
     async def get_spot_orderbook(
         self,
@@ -88,7 +58,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken spot orderbook data."""
         return await self._native_public(
             "get_spot_orderbook",
-            self._params(pair=self._exchange_symbol(product_symbol), count=count),
+            self._native_params(product_symbol=product_symbol, count=count),
         )
 
     async def get_spot_public_trades(
@@ -99,7 +69,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken spot public trades."""
         return await self._native_public(
             "get_spot_public_trades",
-            self._params(pair=self._exchange_symbol(product_symbol), since=since),
+            self._native_params(product_symbol=product_symbol, since=since),
         )
 
     async def get_spot_kline(
@@ -111,11 +81,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken spot OHLC candles."""
         return await self._native_public(
             "get_spot_kline",
-            self._params(
-                pair=self._exchange_symbol(product_symbol),
-                interval=interval,
-                since=since,
-            ),
+            self._native_params(product_symbol=product_symbol, interval=interval, since=since),
         )
 
     async def get_futures_instruments(
@@ -126,7 +92,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken Futures instruments."""
         return await self._native_public(
             "get_futures_instruments",
-            self._params(contractType=contractType, expired=expired),
+            self._native_params(contractType=contractType, expired=expired),
         )
 
     async def get_futures_tickers(
@@ -135,10 +101,9 @@ class MarketHTTP(HTTPManager):
         contractType: str | list[str] | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken Futures ticker data for one symbol or all symbols."""
-        symbol = self._exchange_symbol(product_symbol) if product_symbol is not None else None
         return await self._native_public(
             "get_futures_tickers",
-            self._params(symbol=symbol, contractType=contractType),
+            self._native_params(product_symbol=product_symbol, contractType=contractType),
         )
 
     async def get_futures_orderbook(
@@ -148,7 +113,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken Futures orderbook data."""
         return await self._native_public(
             "get_futures_orderbook",
-            self._params(symbol=self._exchange_symbol(product_symbol)),
+            self._native_params(product_symbol=product_symbol),
         )
 
     async def get_futures_public_trades(
@@ -159,7 +124,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken Futures recent public trade history."""
         return await self._native_public(
             "get_futures_public_trades",
-            self._params(symbol=self._exchange_symbol(product_symbol), lastTime=lastTime),
+            self._native_params(product_symbol=product_symbol, lastTime=lastTime),
         )
 
     async def get_futures_kline(
@@ -174,8 +139,8 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken Futures chart candles."""
         return await self._native_public(
             "get_futures_kline",
-            self._params(
-                symbol=self._exchange_symbol(product_symbol),
+            self._native_params(
+                product_symbol=product_symbol,
                 timeframe=timeframe,
                 tick_type=tick_type,
                 from_=from_,

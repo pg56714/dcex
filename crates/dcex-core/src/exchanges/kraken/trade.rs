@@ -1,0 +1,253 @@
+use crate::exchange::ValidatedResponse;
+use crate::Result;
+
+use super::client::{KrakenAuth, KrakenClient};
+use super::endpoints::*;
+use super::params::{push_optional, require_one_identifier, KrakenParams};
+
+impl KrakenClient {
+    pub(super) async fn trade_private_request(
+        &self,
+        method_name: &str,
+        params: &KrakenParams,
+    ) -> Result<Option<ValidatedResponse>> {
+        let result = match method_name {
+            "place_spot_order" => self.place_spot_order_with(params, None, None, None).await,
+            "place_spot_market_order" => {
+                self.place_spot_order_with(params, None, Some("market"), None)
+                    .await
+            }
+            "place_spot_market_buy_order" => {
+                self.place_spot_order_with(params, Some("buy"), Some("market"), None)
+                    .await
+            }
+            "place_spot_market_sell_order" => {
+                self.place_spot_order_with(params, Some("sell"), Some("market"), None)
+                    .await
+            }
+            "place_spot_limit_order" => {
+                self.place_spot_order_with(params, None, Some("limit"), None)
+                    .await
+            }
+            "place_spot_limit_buy_order" => {
+                self.place_spot_order_with(params, Some("buy"), Some("limit"), None)
+                    .await
+            }
+            "place_spot_limit_sell_order" => {
+                self.place_spot_order_with(params, Some("sell"), Some("limit"), None)
+                    .await
+            }
+            "place_spot_post_only_limit_order" => {
+                self.place_spot_order_with(params, None, Some("limit"), Some("post"))
+                    .await
+            }
+            "place_spot_post_only_limit_buy_order" => {
+                self.place_spot_order_with(params, Some("buy"), Some("limit"), Some("post"))
+                    .await
+            }
+            "place_spot_post_only_limit_sell_order" => {
+                self.place_spot_order_with(params, Some("sell"), Some("limit"), Some("post"))
+                    .await
+            }
+            "get_spot_open_orders" => {
+                self.private_post(
+                    KrakenAuth::Spot,
+                    SPOT_OPEN_ORDERS,
+                    params.only(&["trades", "userref", "cl_ord_id"]),
+                )
+                .await
+            }
+            "get_spot_closed_orders" => {
+                self.private_post(
+                    KrakenAuth::Spot,
+                    SPOT_CLOSED_ORDERS,
+                    params.only(&["trades", "userref", "start", "end", "ofs", "closetime"]),
+                )
+                .await
+            }
+            "get_spot_orders" => {
+                self.private_post(
+                    KrakenAuth::Spot,
+                    SPOT_QUERY_ORDERS,
+                    params.only(&["txid", "trades", "userref"]),
+                )
+                .await
+            }
+            "get_spot_trade_history" => {
+                let mut query = params.only(&[
+                    "trades",
+                    "start",
+                    "end",
+                    "ofs",
+                    "without_count",
+                    "consolidate_taker",
+                ]);
+                push_optional(
+                    &mut query,
+                    "type",
+                    params.get("type").or_else(|| params.get("type_")),
+                );
+                self.private_post(KrakenAuth::Spot, SPOT_TRADES_HISTORY, query)
+                    .await
+            }
+            "cancel_spot_order" => {
+                require_one_identifier(params, &["txid", "userref", "cl_ord_id"])?;
+                self.private_post(
+                    KrakenAuth::Spot,
+                    SPOT_CANCEL_ORDER,
+                    params.only(&["txid", "userref", "cl_ord_id"]),
+                )
+                .await
+            }
+            "cancel_spot_all_orders" => {
+                self.private_post(KrakenAuth::Spot, SPOT_CANCEL_ALL, Vec::new())
+                    .await
+            }
+            "place_futures_order" => {
+                self.place_futures_order_with(params, None, None, None)
+                    .await
+            }
+            "place_futures_market_order" => {
+                self.place_futures_order_with(params, None, Some("mkt"), None)
+                    .await
+            }
+            "place_futures_market_buy_order" => {
+                self.place_futures_order_with(params, Some("buy"), Some("mkt"), None)
+                    .await
+            }
+            "place_futures_market_sell_order" => {
+                self.place_futures_order_with(params, Some("sell"), Some("mkt"), None)
+                    .await
+            }
+            "place_futures_limit_order" => {
+                self.place_futures_order_with(params, None, Some("lmt"), Some("price"))
+                    .await
+            }
+            "place_futures_limit_buy_order" => {
+                self.place_futures_order_with(params, Some("buy"), Some("lmt"), Some("price"))
+                    .await
+            }
+            "place_futures_limit_sell_order" => {
+                self.place_futures_order_with(params, Some("sell"), Some("lmt"), Some("price"))
+                    .await
+            }
+            "place_futures_post_only_limit_order" => {
+                self.place_futures_order_with(params, None, Some("post"), Some("price"))
+                    .await
+            }
+            "place_futures_post_only_limit_buy_order" => {
+                self.place_futures_order_with(params, Some("buy"), Some("post"), Some("price"))
+                    .await
+            }
+            "place_futures_post_only_limit_sell_order" => {
+                self.place_futures_order_with(params, Some("sell"), Some("post"), Some("price"))
+                    .await
+            }
+            "get_futures_open_orders" => {
+                self.private_get(KrakenAuth::Futures, FUTURES_OPEN_ORDERS, Vec::new())
+                    .await
+            }
+            "get_futures_order_status" => {
+                self.private_post(
+                    KrakenAuth::Futures,
+                    FUTURES_ORDER_STATUS,
+                    params.only(&["orderIds", "cliOrdIds"]),
+                )
+                .await
+            }
+            "cancel_futures_order" => {
+                require_one_identifier(params, &["order_id", "cliOrdId"])?;
+                self.private_post(
+                    KrakenAuth::Futures,
+                    FUTURES_CANCEL_ORDER,
+                    params.only(&["order_id", "cliOrdId"]),
+                )
+                .await
+            }
+            "cancel_futures_all_orders" => {
+                let mut query = Vec::new();
+                self.push_product_symbol(&mut query, params, "symbol", "PF_")?;
+                self.private_post(KrakenAuth::Futures, FUTURES_CANCEL_ALL, query)
+                    .await
+            }
+            _ => return Ok(None),
+        };
+
+        Ok(Some(result?))
+    }
+
+    async fn place_spot_order_with(
+        &self,
+        params: &KrakenParams,
+        side: Option<&str>,
+        ordertype: Option<&str>,
+        oflags: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        let mut query = Vec::new();
+        self.push_required_product_symbol(&mut query, params, "pair", "")?;
+        push_required_or_override(&mut query, "type", side, params, "side")?;
+        push_required_or_override(&mut query, "ordertype", ordertype, params, "ordertype")?;
+        push_required_param(&mut query, params, "volume")?;
+        push_optional(&mut query, "price", params.get("price"));
+        push_optional(&mut query, "price2", params.get("price2"));
+        push_optional(&mut query, "leverage", params.get("leverage"));
+        push_optional(&mut query, "oflags", params.get("oflags").or(oflags));
+        push_optional(&mut query, "timeinforce", params.get("timeinforce"));
+        push_optional(&mut query, "expiretm", params.get("expiretm"));
+        push_optional(&mut query, "starttm", params.get("starttm"));
+        push_optional(&mut query, "reduce_only", params.get("reduce_only"));
+        push_optional(&mut query, "userref", params.get("userref"));
+        push_optional(&mut query, "cl_ord_id", params.get("cl_ord_id"));
+        push_optional(&mut query, "validate", params.get("validate"));
+
+        self.private_post(KrakenAuth::Spot, SPOT_ADD_ORDER, query)
+            .await
+    }
+
+    async fn place_futures_order_with(
+        &self,
+        params: &KrakenParams,
+        side: Option<&str>,
+        order_type: Option<&str>,
+        limit_price_alias: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        let mut query = Vec::new();
+        self.push_required_product_symbol(&mut query, params, "symbol", "PF_")?;
+        push_required_or_override(&mut query, "side", side, params, "side")?;
+        push_required_or_override(&mut query, "orderType", order_type, params, "orderType")?;
+        push_required_param(&mut query, params, "size")?;
+
+        let limit_price = params
+            .get("limitPrice")
+            .or_else(|| limit_price_alias.and_then(|alias| params.get(alias)));
+        push_optional(&mut query, "limitPrice", limit_price);
+        push_optional(&mut query, "stopPrice", params.get("stopPrice"));
+        push_optional(&mut query, "cliOrdId", params.get("cliOrdId"));
+        push_optional(&mut query, "triggerSignal", params.get("triggerSignal"));
+        push_optional(&mut query, "reduceOnly", params.get("reduceOnly"));
+
+        self.private_post(KrakenAuth::Futures, FUTURES_SEND_ORDER, query)
+            .await
+    }
+}
+
+fn push_required_or_override(
+    query: &mut Vec<(String, String)>,
+    key: &str,
+    override_value: Option<&str>,
+    params: &KrakenParams,
+    fallback_key: &str,
+) -> Result<()> {
+    let value = override_value.unwrap_or(params.required(fallback_key)?);
+    query.push((key.to_string(), value.to_string()));
+    Ok(())
+}
+
+fn push_required_param(
+    query: &mut Vec<(String, String)>,
+    params: &KrakenParams,
+    key: &str,
+) -> Result<()> {
+    query.push((key.to_string(), params.required(key)?.to_string()));
+    Ok(())
+}
