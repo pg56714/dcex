@@ -179,10 +179,7 @@ impl BitmartClient {
                 .await
             }
             "cancel_contract_order" => {
-                let mut body = Map::new();
-                self.insert_required_symbol(&mut body, params, false)?;
-                insert_optional_integer(&mut body, "order_id", params.get("order_id"));
-                insert_optional_string(&mut body, "client_order_id", params.get("client_order_id"));
+                let body = self.contract_cancel_order_body_from_params(params)?;
                 self.post_private(
                     BitmartMarket::Futures,
                     FUTURES_CANCEL_ORDER,
@@ -292,29 +289,44 @@ impl BitmartClient {
         side_override: Option<&str>,
         type_override: Option<&str>,
     ) -> Result<ValidatedResponse> {
+        let body = self.spot_order_body_from_params(params, side_override, type_override)?;
+        self.post_private(BitmartMarket::Spot, SPOT_SUBMIT_ORDER, Value::Object(body))
+            .await
+    }
+
+    pub(super) fn spot_order_body_from_params(
+        &self,
+        params: &BitmartParams,
+        side_override: Option<&str>,
+        type_override: Option<&str>,
+    ) -> Result<Map<String, Value>> {
         let mut body = Map::new();
         self.insert_required_symbol(&mut body, params, true)?;
-        body.insert(
-            "side".to_string(),
-            Value::String(
-                side_override
-                    .unwrap_or(params.required("side")?)
-                    .to_lowercase(),
-            ),
-        );
-        body.insert(
-            "type".to_string(),
-            Value::String(
-                type_override
-                    .unwrap_or(params.required("type")?)
-                    .to_string(),
-            ),
-        );
+        let side = match side_override {
+            Some(side) => side,
+            None => params.required("side")?,
+        };
+        let order_type = match type_override {
+            Some(order_type) => order_type,
+            None => params.required("type")?,
+        };
+        body.insert("side".to_string(), Value::String(side.to_lowercase()));
+        body.insert("type".to_string(), Value::String(order_type.to_string()));
         for key in SPOT_ORDER_KEYS {
             insert_optional_string(&mut body, key, params.get(key));
         }
-        self.post_private(BitmartMarket::Spot, SPOT_SUBMIT_ORDER, Value::Object(body))
-            .await
+        Ok(body)
+    }
+
+    pub(super) fn contract_cancel_order_body_from_params(
+        &self,
+        params: &BitmartParams,
+    ) -> Result<Map<String, Value>> {
+        let mut body = Map::new();
+        self.insert_required_symbol(&mut body, params, false)?;
+        insert_optional_string(&mut body, "order_id", params.get("order_id"));
+        insert_optional_string(&mut body, "client_order_id", params.get("client_order_id"));
+        Ok(body)
     }
 
     async fn spot_history_request(

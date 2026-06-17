@@ -68,3 +68,47 @@ fn contract_modify_limit_order_keeps_numeric_payload_types() {
         })
     );
 }
+
+#[test]
+fn spot_limit_buy_shortcut_does_not_require_side_param() {
+    let client = BitmartClient::new(None, None, None, Duration::from_secs(1)).expect("client");
+    let params = params::BitmartParams::from_pairs(vec![
+        ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+        ("size".to_string(), "1".to_string()),
+        ("price".to_string(), "100".to_string()),
+    ]);
+    let body = client
+        .spot_order_body_from_params(&params, Some("buy"), Some("limit"))
+        .expect("body");
+
+    assert_eq!(
+        Value::Object(body),
+        json!({
+            "symbol": "BTC_USDT",
+            "side": "buy",
+            "type": "limit",
+            "size": "1",
+            "price": "100"
+        })
+    );
+}
+
+#[test]
+fn contract_cancel_order_keeps_order_id_as_string() {
+    let client = BitmartClient::new(None, None, None, Duration::from_secs(1)).expect("client");
+    let params = params::BitmartParams::from_pairs(vec![
+        ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+        ("order_id".to_string(), "3000378272670421".to_string()),
+    ]);
+    let body = client
+        .contract_cancel_order_body_from_params(&params)
+        .expect("body");
+
+    assert_eq!(
+        Value::Object(body),
+        json!({
+            "symbol": "BTCUSDT",
+            "order_id": "3000378272670421"
+        })
+    );
+}
