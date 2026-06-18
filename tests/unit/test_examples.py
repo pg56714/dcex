@@ -17,6 +17,7 @@ MIGRATED_EXCHANGES = (
     "bybit",
     "gateio",
     "kraken",
+    "kucoin",
     "mexc",
     "okx",
 )

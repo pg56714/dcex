@@ -171,9 +171,10 @@ testpaths = ["tests"]
 
 [tool.pyright]
 exclude = [
-  ".venv",
-  "tests",
-  "examples",
+    ".venv",
+    ".uv-cache",
+    "tests",
+    "examples",
 ]
 typeCheckingMode = "basic"
 venv = ".venv"

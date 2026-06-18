@@ -3,7 +3,6 @@
 from typing import Any
 
 from ..._native_http import NativeResponse
-from ...utils.common import Common
 from ._http_manager import HTTPManager
 
 
@@ -22,15 +21,6 @@ class MarketHTTP(HTTPManager):
         response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
         return response.json()
-
-    def _exchange_symbol(self, product_symbol: str, *, futures: bool = False) -> str:
-        """Map product symbol through PTM when available."""
-        if hasattr(self, "ptm"):
-            return self.ptm.get_exchange_symbol(Common.KUCOIN, product_symbol)
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            return f"{parts[0]}{parts[1]}" if futures else f"{parts[0]}-{parts[1]}"
-        return product_symbol
 
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
@@ -52,7 +42,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve single ticker information for a specific trading pair."""
         return await self._native_public(
             "get_spot_ticker",
-            self._params(symbol=self._exchange_symbol(product_symbol)),
+            self._params(product_symbol=product_symbol),
         )
 
     async def get_spot_all_tickers(self) -> dict[str, Any]:
@@ -63,14 +53,14 @@ class MarketHTTP(HTTPManager):
         """Retrieve orderbook data for a specific trading pair."""
         return await self._native_public(
             "get_spot_orderbook",
-            self._params(symbol=self._exchange_symbol(product_symbol)),
+            self._params(product_symbol=product_symbol),
         )
 
     async def get_spot_public_trades(self, product_symbol: str) -> dict[str, Any]:
         """Retrieve public trade history for a specific trading pair."""
         return await self._native_public(
             "get_spot_public_trades",
-            self._params(symbol=self._exchange_symbol(product_symbol)),
+            self._params(product_symbol=product_symbol),
         )
 
     async def get_spot_kline(
@@ -84,7 +74,7 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_spot_kline",
             self._params(
-                symbol=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 timeframe=timeframe,
                 startAt=startAt,
                 endAt=endAt,
@@ -99,14 +89,14 @@ class MarketHTTP(HTTPManager):
         """Retrieve one KuCoin futures contract."""
         return await self._native_public(
             "get_futures_contract",
-            self._params(symbol=self._exchange_symbol(product_symbol, futures=True)),
+            self._params(product_symbol=product_symbol),
         )
 
     async def get_futures_ticker(self, product_symbol: str) -> dict[str, Any]:
         """Retrieve one KuCoin futures ticker."""
         return await self._native_public(
             "get_futures_ticker",
-            self._params(symbol=self._exchange_symbol(product_symbol, futures=True)),
+            self._params(product_symbol=product_symbol),
         )
 
     async def get_futures_orderbook(
@@ -118,7 +108,7 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_futures_orderbook",
             self._params(
-                symbol=self._exchange_symbol(product_symbol, futures=True),
+                product_symbol=product_symbol,
                 depth=depth,
             ),
         )
@@ -127,7 +117,7 @@ class MarketHTTP(HTTPManager):
         """Retrieve KuCoin futures public trade history."""
         return await self._native_public(
             "get_futures_public_trades",
-            self._params(symbol=self._exchange_symbol(product_symbol, futures=True)),
+            self._params(product_symbol=product_symbol),
         )
 
     async def get_futures_kline(
@@ -141,7 +131,7 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_futures_kline",
             self._params(
-                symbol=self._exchange_symbol(product_symbol, futures=True),
+                product_symbol=product_symbol,
                 timeframe=timeframe,
                 from_=from_,
                 to=to,
@@ -160,7 +150,7 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_futures_open_interest",
             self._params(
-                symbol=self._exchange_symbol(product_symbol, futures=True),
+                product_symbol=product_symbol,
                 interval=interval,
                 startAt=startAt,
                 endAt=endAt,

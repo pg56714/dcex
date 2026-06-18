@@ -11,6 +11,6 @@ async fn main() -> dcex::Result<()> {
             ("limit".to_string(), "5".to_string()),
         ])
         .await?;
-    println!("{}", serde_json::to_string_pretty(&response.data)?);
+    println!("{}", response.data);
     Ok(())
 }
