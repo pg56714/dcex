@@ -104,7 +104,41 @@ async fn mexc_public_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.public_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_contract_deals,
+                        get_contract_depth,
+                        get_contract_depth_commits,
+                        get_contract_details,
+                        get_contract_fair_price,
+                        get_contract_fair_price_kline,
+                        get_contract_funding_rate,
+                        get_contract_funding_rate_history,
+                        get_contract_index_price,
+                        get_contract_index_price_kline,
+                        get_contract_kline,
+                        get_contract_risk_reverse,
+                        get_contract_risk_reverse_history,
+                        get_contract_ticker,
+                        get_contract_time,
+                        get_spot_agg_trades,
+                        get_spot_avg_price,
+                        get_spot_book_ticker,
+                        get_spot_default_symbols,
+                        get_spot_exchange_info,
+                        get_spot_klines,
+                        get_spot_orderbook,
+                        get_spot_recent_trades,
+                        get_spot_ticker_24hr,
+                        get_spot_ticker_price,
+                        get_spot_time,
+                        ping,
+                    ]
+                )
+            }
         },
     )
     .await
@@ -248,7 +282,43 @@ async fn mexc_private_read_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.private_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_contract_asset,
+                        get_contract_assets,
+                        get_contract_funding_records,
+                        get_contract_history_orders,
+                        get_contract_history_positions,
+                        get_contract_leverage,
+                        get_contract_open_orders,
+                        get_contract_open_positions,
+                        get_contract_order_deals,
+                        get_contract_plan_orders,
+                        get_contract_position_mode,
+                        get_contract_risk_limits,
+                        get_contract_stop_orders,
+                        get_contract_trading_fee_rate,
+                        get_contract_transfer_records,
+                        get_currency_info,
+                        get_deposit_address,
+                        get_deposit_history,
+                        get_internal_transfer_history,
+                        get_kyc_status,
+                        get_spot_account,
+                        get_spot_all_orders,
+                        get_spot_mx_deduct_status,
+                        get_spot_my_trades,
+                        get_spot_open_orders,
+                        get_spot_self_symbols,
+                        get_spot_symbol_commission,
+                        get_user_universal_transfer_history,
+                        get_withdraw_history,
+                    ]
+                )
+            }
         },
     )
     .await

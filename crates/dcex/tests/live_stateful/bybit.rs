@@ -30,10 +30,7 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
 
     let orderbook = client
-        .public_request(
-            "get_orderbook",
-            params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
-        )
+        .get_orderbook(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
         .await?;
     let details = fetch_trading_details(Exchange::Bybit, "bybit", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
@@ -45,14 +42,11 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
     };
 
     let order_result = client
-        .private_request(
-            "place_post_only_limit_buy_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SPOT),
-                ("qty", quantity.as_str()),
-                ("price", price.as_str()),
-            ]),
-        )
+        .place_post_only_limit_buy_order(params(&[
+            ("product_symbol", BTC_USDT_SPOT),
+            ("qty", quantity.as_str()),
+            ("price", price.as_str()),
+        ]))
         .await;
     let order = match order_result {
         Ok(order) => order,
@@ -65,13 +59,10 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
     let cancel_result = client
-        .private_request(
-            "cancel_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SPOT),
-                ("orderId", order_id.as_str()),
-            ]),
-        )
+        .cancel_order(params(&[
+            ("product_symbol", BTC_USDT_SPOT),
+            ("orderId", order_id.as_str()),
+        ]))
         .await;
     return_bybit_transfer(&client, transferred).await?;
     let cancel = cancel_result?;
@@ -100,10 +91,7 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
     let position_response = client
-        .private_request(
-            "get_positions",
-            params(&[("product_symbol", BTC_USDT_SWAP)]),
-        )
+        .get_positions(params(&[("product_symbol", BTC_USDT_SWAP)]))
         .await?;
     if bybit_swap_position_abs_from(&position_response.data) > 0.0 {
         eprintln!("skipping Bybit swap live stateful order; BTC-USDT swap position exists");
@@ -112,10 +100,7 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     let position_idx = bybit_long_position_idx(&position_response.data);
 
     let orderbook = client
-        .public_request(
-            "get_orderbook",
-            params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "5")]),
-        )
+        .get_orderbook(params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "5")]))
         .await?;
     let details = fetch_trading_details(Exchange::Bybit, "bybit", BTC_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
@@ -136,20 +121,15 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     if let Some(position_idx) = position_idx {
         push(&mut order_params, "positionIdx", position_idx);
     }
-    let order = client
-        .private_request("place_post_only_limit_buy_order", order_params)
-        .await?;
+    let order = client.place_post_only_limit_buy_order(order_params).await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
     let cancel = client
-        .private_request(
-            "cancel_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SWAP),
-                ("orderId", order_id.as_str()),
-            ]),
-        )
+        .cancel_order(params(&[
+            ("product_symbol", BTC_USDT_SWAP),
+            ("orderId", order_id.as_str()),
+        ]))
         .await?;
     assert_success(&cancel);
 
@@ -160,9 +140,7 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     if let Some(position_idx) = position_idx {
         push(&mut open_params, "positionIdx", position_idx);
     }
-    let opened = client
-        .private_request("place_market_buy_order", open_params)
-        .await?;
+    let opened = client.place_market_buy_order(open_params).await?;
     assert_success(&opened);
     let opened_id = require_order_id(&opened.data, &["orderId"])?;
     eprintln!("Bybit swap market open orderId={opened_id}");
@@ -176,9 +154,7 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     if let Some(position_idx) = position_idx {
         push(&mut close_params, "positionIdx", position_idx);
     }
-    let closed = client
-        .private_request("place_market_sell_order", close_params)
-        .await?;
+    let closed = client.place_market_sell_order(close_params).await?;
     assert_success(&closed);
     let closed_id = require_order_id(&closed.data, &["orderId"])?;
     eprintln!("Bybit swap market close orderId={closed_id}");
@@ -204,15 +180,12 @@ async fn ensure_unified_usdt(client: &BybitClient, required: f64) -> dcex::Resul
     }
     let amount = format_transfer_amount_ceil(needed, 4);
     let response = client
-        .private_request(
-            "create_internal_transfer",
-            params(&[
-                ("coin", "USDT"),
-                ("amount", amount.as_str()),
-                ("fromAccountType", "FUND"),
-                ("toAccountType", "UNIFIED"),
-            ]),
-        )
+        .create_internal_transfer(params(&[
+            ("coin", "USDT"),
+            ("amount", amount.as_str()),
+            ("fromAccountType", "FUND"),
+            ("toAccountType", "UNIFIED"),
+        ]))
         .await?;
     assert_success(&response);
     sleep(Duration::from_secs(2)).await;
@@ -229,15 +202,12 @@ async fn return_bybit_transfer(client: &BybitClient, amount: f64) -> dcex::Resul
         return Ok(());
     }
     let response = client
-        .private_request(
-            "create_internal_transfer",
-            params(&[
-                ("coin", "USDT"),
-                ("amount", amount.as_str()),
-                ("fromAccountType", "UNIFIED"),
-                ("toAccountType", "FUND"),
-            ]),
-        )
+        .create_internal_transfer(params(&[
+            ("coin", "USDT"),
+            ("amount", amount.as_str()),
+            ("fromAccountType", "UNIFIED"),
+            ("toAccountType", "FUND"),
+        ]))
         .await?;
     assert_success(&response);
     Ok(())
@@ -245,10 +215,7 @@ async fn return_bybit_transfer(client: &BybitClient, amount: f64) -> dcex::Resul
 
 async fn account_usdt(client: &BybitClient, account_type: &str) -> dcex::Result<f64> {
     let response = client
-        .private_request(
-            "get_coin_balance",
-            params(&[("accountType", account_type), ("coin", "USDT")]),
-        )
+        .get_coin_balance(params(&[("accountType", account_type), ("coin", "USDT")]))
         .await?;
     Ok(asset_amount(
         &response.data,
@@ -264,30 +231,27 @@ async fn account_usdt(client: &BybitClient, account_type: &str) -> dcex::Result<
 
 async fn bybit_open_swap_orders(client: &BybitClient) -> dcex::Result<bool> {
     let response = client
-        .private_request(
-            "get_open_orders",
-            params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "20")]),
-        )
+        .get_open_orders(params(&[
+            ("product_symbol", BTC_USDT_SWAP),
+            ("limit", "20"),
+        ]))
         .await?;
     Ok(contains_non_empty_array(&response.data, &["list"]))
 }
 
 async fn bybit_swap_position_abs(client: &BybitClient) -> dcex::Result<f64> {
     let response = client
-        .private_request(
-            "get_positions",
-            params(&[("product_symbol", BTC_USDT_SWAP)]),
-        )
+        .get_positions(params(&[("product_symbol", BTC_USDT_SWAP)]))
         .await?;
     Ok(bybit_swap_position_abs_from(&response.data))
 }
 
 async fn set_bybit_swap_leverage(client: &BybitClient) -> dcex::Result<()> {
     match client
-        .private_request(
-            "set_leverage",
-            params(&[("product_symbol", BTC_USDT_SWAP), ("leverage", "50")]),
-        )
+        .set_leverage(params(&[
+            ("product_symbol", BTC_USDT_SWAP),
+            ("leverage", "50"),
+        ]))
         .await
     {
         Ok(response) => {
@@ -318,10 +282,10 @@ async fn assert_bybit_swap_records(
 
     let has_execution = wait_for_non_empty_records(
         || {
-            client.private_request(
-                "get_execution_list",
-                params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "20")]),
-            )
+            client.get_execution_list(params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("limit", "20"),
+            ]))
         },
         &["list"],
     )
@@ -336,14 +300,11 @@ async fn assert_bybit_swap_records(
 async fn wait_for_bybit_order_history(client: &BybitClient, order_id: &str) -> dcex::Result<bool> {
     wait_for_non_empty_records(
         || {
-            client.private_request(
-                "get_order_history",
-                params(&[
-                    ("product_symbol", BTC_USDT_SWAP),
-                    ("orderId", order_id),
-                    ("limit", "20"),
-                ]),
-            )
+            client.get_order_history(params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("orderId", order_id),
+                ("limit", "20"),
+            ]))
         },
         &["list"],
     )

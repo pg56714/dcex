@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use dcex::exchange::ValidatedResponse;
 use dcex::exchanges::bitmart::BitmartClient;
 
 use super::common::{
@@ -58,7 +59,7 @@ async fn bitmart_public_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.public_request(case.method, case.params).await }
+            async move { bitmart_public_case(&client, case).await }
         },
     )
     .await
@@ -121,7 +122,26 @@ async fn bitmart_private_read_live_parity() -> dcex::Result<()> {
     ];
     for case in cases {
         let method = case.method;
-        match client.private_request(method, case.params).await {
+        match request_case!(
+            client,
+            case,
+            [
+                get_account_balance,
+                get_account_currencies,
+                get_contract_assets,
+                get_contract_open_order,
+                get_contract_order_history,
+                get_contract_position,
+                get_contract_trade,
+                get_contract_transaction_history,
+                get_contract_transfer_list,
+                get_deposit_address,
+                get_spot_account_orders,
+                get_spot_account_trade_list,
+                get_spot_open_orders,
+                get_spot_wallet,
+            ]
+        ) {
             Ok(response) => {
                 assert!((200..300).contains(&response.status), "{response:?}");
                 assert!(!response.data.is_null(), "{response:?}");
@@ -142,4 +162,98 @@ fn is_bitmart_account_restriction(error: &dcex::DcexError) -> bool {
     message.contains("33136")
         || message.contains("60052")
         || message.to_lowercase().contains("personal verification")
+}
+
+async fn bitmart_public_case(
+    client: &BitmartClient,
+    case: Case,
+) -> dcex::Result<ValidatedResponse> {
+    let params = Params(case.params);
+    match case.method {
+        "get_spot_currencies" => client.get_spot_currencies().await,
+        "get_trading_pairs" => client.get_trading_pairs().await,
+        "get_trading_pairs_details" => client.get_trading_pairs_details().await,
+        "get_ticker_of_all_pairs" => client.get_ticker_of_all_pairs().await,
+        "get_ticker_of_a_pair" => {
+            client
+                .get_ticker_of_a_pair(params.required("product_symbol")?)
+                .await
+        }
+        "get_spot_kline" => {
+            client
+                .get_spot_kline(
+                    params.required("product_symbol")?,
+                    params.required("interval")?,
+                    params.get("before"),
+                    params.get("after"),
+                    params.get("limit"),
+                )
+                .await
+        }
+        "get_contracts_details" => {
+            client
+                .get_contracts_details(params.get("product_symbol"))
+                .await
+        }
+        "get_depth" => client.get_depth(params.required("product_symbol")?).await,
+        "get_contract_kline" => {
+            client
+                .get_contract_kline(
+                    params.required("product_symbol")?,
+                    params.required("interval")?,
+                    params.required("start_time")?,
+                    params.required("end_time")?,
+                )
+                .await
+        }
+        "get_open_interest" => {
+            client
+                .get_open_interest(params.required("product_symbol")?)
+                .await
+        }
+        "get_mark_price_kline" => {
+            client
+                .get_mark_price_kline(
+                    params.required("product_symbol")?,
+                    params.required("interval")?,
+                    params.required("start_time")?,
+                    params.required("end_time")?,
+                )
+                .await
+        }
+        "get_leverage_bracket" => {
+            client
+                .get_leverage_bracket(params.required("product_symbol")?)
+                .await
+        }
+        "get_current_funding_rate" => {
+            client
+                .get_current_funding_rate(params.required("product_symbol")?)
+                .await
+        }
+        "get_funding_rate_history" => {
+            client
+                .get_funding_rate_history(params.required("product_symbol")?, params.get("limit"))
+                .await
+        }
+        method => Err(dcex::DcexError::InvalidInput(format!(
+            "unsupported BitMart public test method: {method}",
+        ))),
+    }
+}
+
+struct Params(Vec<(String, String)>);
+
+impl Params {
+    fn get(&self, key: &str) -> Option<&str> {
+        self.0
+            .iter()
+            .find(|(candidate, _)| candidate == key)
+            .map(|(_, value)| value.as_str())
+    }
+
+    fn required(&self, key: &str) -> dcex::Result<&str> {
+        self.get(key)
+            .ok_or_else(|| dcex::DcexError::InvalidInput(format!("missing {key}")))
+    }
 }

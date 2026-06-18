@@ -57,7 +57,32 @@ async fn okx_public_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.public_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_candles_ticks,
+                        get_contract_long_short_ratio,
+                        get_contract_open_interest_history,
+                        get_contract_taker_volume,
+                        get_contracts_open_interest_and_volume,
+                        get_funding_rate,
+                        get_funding_rate_history,
+                        get_long_short_ratio,
+                        get_open_interest,
+                        get_orderbook,
+                        get_position_tiers,
+                        get_public_instruments,
+                        get_public_trades,
+                        get_taker_volume,
+                        get_tickers,
+                        get_top_trader_long_short_account_ratio,
+                        get_top_trader_long_short_position_ratio,
+                        get_trading_data_support_coin,
+                    ]
+                )
+            }
         },
     )
     .await
@@ -144,7 +169,41 @@ async fn okx_private_read_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.private_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_account_balance,
+                        get_account_bills,
+                        get_account_bills_archive,
+                        get_account_config,
+                        get_account_instruments,
+                        get_adjust_leverage,
+                        get_asset_valuation,
+                        get_balances,
+                        get_bills,
+                        get_convert_currencies,
+                        get_convert_history,
+                        get_currencies,
+                        get_deposit_address,
+                        get_deposit_history,
+                        get_exchange_list,
+                        get_fee_rates,
+                        get_interest_accrued,
+                        get_interest_limits,
+                        get_interest_rate,
+                        get_leverage,
+                        get_max_avail_size,
+                        get_max_loan,
+                        get_max_order_size,
+                        get_max_withdrawal,
+                        get_position_risk,
+                        get_positions,
+                        get_positions_history,
+                    ]
+                )
+            }
         },
     )
     .await

@@ -63,7 +63,28 @@ async fn bybit_public_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.public_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_adl_alert,
+                        get_delivery_price,
+                        get_funding_rate_history,
+                        get_historical_volatility,
+                        get_instruments_info,
+                        get_insurance_pool,
+                        get_kline,
+                        get_long_short_ratio,
+                        get_open_interest,
+                        get_order_price_limit,
+                        get_orderbook,
+                        get_public_trade_history,
+                        get_risk_limit,
+                        get_tickers,
+                    ]
+                )
+            }
         },
     )
     .await
@@ -114,7 +135,35 @@ async fn bybit_private_read_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.private_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_account_info,
+                        get_borrow_history,
+                        get_coin_balance,
+                        get_coin_info,
+                        get_coins_balance,
+                        get_closed_pnl,
+                        get_collateral_info,
+                        get_deposit_records,
+                        get_fee_rates,
+                        get_internal_deposit_records,
+                        get_internal_transfer_records,
+                        get_master_deposit_address,
+                        get_positions,
+                        get_spot_asset_info,
+                        get_sub_uid,
+                        get_transaction_log,
+                        get_transferable_amount,
+                        get_transferable_coin,
+                        get_universal_transfer_records,
+                        get_wallet_balance,
+                        get_withdrawable_amount,
+                    ]
+                )
+            }
         },
     )
     .await

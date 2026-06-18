@@ -121,7 +121,32 @@ async fn bitget_public_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.public_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_futures_contracts,
+                        get_futures_current_funding_rate,
+                        get_futures_history_funding_rate,
+                        get_futures_history_kline,
+                        get_futures_kline,
+                        get_futures_open_interest,
+                        get_futures_orderbook,
+                        get_futures_recent_trades,
+                        get_futures_ticker,
+                        get_futures_tickers,
+                        get_spot_coins,
+                        get_spot_history_kline,
+                        get_spot_kline,
+                        get_spot_market_trades,
+                        get_spot_orderbook,
+                        get_spot_recent_trades,
+                        get_spot_symbols,
+                        get_spot_tickers,
+                    ]
+                )
+            }
         },
     )
     .await
@@ -190,7 +215,31 @@ async fn bitget_private_read_live_parity() -> dcex::Result<()> {
     ];
     for case in cases {
         let method = case.method;
-        match client.private_request(method, case.params).await {
+        match request_case!(
+            client,
+            case,
+            [
+                get_all_account_balance,
+                get_deposit_records,
+                get_funding_assets,
+                get_futures_account,
+                get_futures_account_bills,
+                get_futures_accounts,
+                get_futures_fills,
+                get_futures_history_orders,
+                get_futures_open_orders,
+                get_futures_position,
+                get_futures_positions,
+                get_spot_account_assets,
+                get_spot_account_bills,
+                get_spot_account_info,
+                get_spot_fills,
+                get_spot_history_orders,
+                get_spot_open_orders,
+                get_transfer_records,
+                get_transferable_coins,
+            ]
+        ) {
             Ok(response) => {
                 assert!((200..300).contains(&response.status), "{response:?}");
                 assert!(!response.data.is_null(), "{response:?}");

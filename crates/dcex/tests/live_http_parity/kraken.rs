@@ -45,7 +45,25 @@ async fn kraken_public_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.public_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_futures_instruments,
+                        get_futures_kline,
+                        get_futures_orderbook,
+                        get_futures_public_trades,
+                        get_futures_tickers,
+                        get_server_time,
+                        get_spot_asset_pairs,
+                        get_spot_kline,
+                        get_spot_orderbook,
+                        get_spot_public_trades,
+                        get_spot_ticker,
+                    ]
+                )
+            }
         },
     )
     .await
@@ -97,7 +115,26 @@ async fn kraken_private_read_live_parity() -> dcex::Result<()> {
         ],
         |case| {
             let client = client.clone();
-            async move { client.private_request(case.method, case.params).await }
+            async move {
+                request_case!(
+                    client,
+                    case,
+                    [
+                        get_futures_accounts,
+                        get_futures_fills,
+                        get_futures_open_orders,
+                        get_futures_open_positions,
+                        get_spot_account_balance,
+                        get_spot_closed_orders,
+                        get_spot_ledgers,
+                        get_spot_open_orders,
+                        get_spot_open_positions,
+                        get_spot_trade_balance,
+                        get_spot_trade_history,
+                        get_spot_trade_volume,
+                    ]
+                )
+            }
         },
     )
     .await

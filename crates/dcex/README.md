@@ -42,6 +42,21 @@ async fn main() -> dcex::Result<()> {
 }
 ```
 
+## Exchange Examples
+
+Read-only public examples are available for the migrated exchange clients:
+
+```sh
+cargo run -p dcex --example binance_public
+cargo run -p dcex --example bybit_public
+cargo run -p dcex --example okx_public
+cargo run -p dcex --example bitget_public
+cargo run -p dcex --example kraken_public
+cargo run -p dcex --example mexc_public
+cargo run -p dcex --example bitmart_public
+cargo run -p dcex --example bitmex_public
+```
+
 ## Benchmark
 
 Run the live public HTTP benchmark from the workspace root:

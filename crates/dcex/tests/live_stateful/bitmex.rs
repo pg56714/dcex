@@ -37,57 +37,43 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client
-        .public_request(
-            "get_orderbook",
-            params(&[("product_symbol", XBT_USDT_SWAP), ("depth", "10")]),
-        )
-        .await?;
+    let orderbook = client.get_orderbook(XBT_USDT_SWAP, Some("10")).await?;
     let details = fetch_trading_details(Exchange::BitMEX, "bitmex", XBT_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
 
     let order = client
-        .private_request(
-            "place_post_only_buy_order",
-            params(&[
-                ("product_symbol", XBT_USDT_SWAP),
-                ("orderQty", quantity.as_str()),
-                ("price", price.as_str()),
-                ("clOrdID", unique_client_id("dcexrs").as_str()),
-            ]),
-        )
+        .place_post_only_buy_order(params(&[
+            ("product_symbol", XBT_USDT_SWAP),
+            ("orderQty", quantity.as_str()),
+            ("price", price.as_str()),
+            ("clOrdID", unique_client_id("dcexrs").as_str()),
+        ]))
         .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderID"])?;
 
     let cancel = client
-        .private_request("cancel_order", params(&[("orderID", order_id.as_str())]))
+        .cancel_order(params(&[("orderID", order_id.as_str())]))
         .await?;
     assert_success(&cancel);
 
     let opened = client
-        .private_request(
-            "place_market_buy_order",
-            params(&[
-                ("product_symbol", XBT_USDT_SWAP),
-                ("orderQty", quantity.as_str()),
-                ("clOrdID", unique_client_id("dcexrs").as_str()),
-            ]),
-        )
+        .place_market_buy_order(params(&[
+            ("product_symbol", XBT_USDT_SWAP),
+            ("orderQty", quantity.as_str()),
+            ("clOrdID", unique_client_id("dcexrs").as_str()),
+        ]))
         .await?;
     assert_success(&opened);
     assert!(wait_for_positive_position(|| bitmex_position_abs(&client)).await? > 0.0);
 
     let closed = client
-        .private_request(
-            "place_market_sell_order",
-            params(&[
-                ("product_symbol", XBT_USDT_SWAP),
-                ("orderQty", quantity.as_str()),
-                ("clOrdID", unique_client_id("dcexrs").as_str()),
-            ]),
-        )
+        .place_market_sell_order(params(&[
+            ("product_symbol", XBT_USDT_SWAP),
+            ("orderQty", quantity.as_str()),
+            ("clOrdID", unique_client_id("dcexrs").as_str()),
+        ]))
         .await?;
     assert_success(&closed);
     sleep(Duration::from_secs(1)).await;
@@ -100,25 +86,19 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
 
 async fn bitmex_open_orders(client: &BitmexClient) -> dcex::Result<bool> {
     let response = client
-        .private_request(
-            "get_order",
-            params(&[
-                ("product_symbol", XBT_USDT_SWAP),
-                ("filter", "{\"open\":true}"),
-                ("count", "100"),
-                ("reverse", "true"),
-            ]),
-        )
+        .get_order(params(&[
+            ("product_symbol", XBT_USDT_SWAP),
+            ("filter", "{\"open\":true}"),
+            ("count", "100"),
+            ("reverse", "true"),
+        ]))
         .await?;
     Ok(contains_non_empty_array(&response.data, &["data"]))
 }
 
 async fn bitmex_position_abs(client: &BitmexClient) -> dcex::Result<f64> {
     let response = client
-        .private_request(
-            "get_positions",
-            params(&[("filter", "{\"symbol\":\"XBTUSDT\"}")]),
-        )
+        .get_positions(params(&[("filter", "{\"symbol\":\"XBTUSDT\"}")]))
         .await?;
     Ok(sum_abs_values_for_symbols(
         &response.data,
@@ -129,8 +109,6 @@ async fn bitmex_position_abs(client: &BitmexClient) -> dcex::Result<f64> {
 }
 
 async fn bitmex_available_margin(client: &BitmexClient) -> dcex::Result<f64> {
-    let response = client
-        .private_request("get_margin", params(&[("currency", "USDt")]))
-        .await?;
+    let response = client.get_margin(params(&[("currency", "USDt")])).await?;
     Ok(super::common::find_f64(&response.data, &["availableMargin"]).unwrap_or(0.0))
 }

@@ -29,30 +29,24 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
 
     let orderbook = client
-        .public_request(
-            "get_spot_orderbook",
-            params(&[("product_symbol", BTC_USDT_SPOT), ("count", "5")]),
-        )
+        .get_spot_orderbook(params(&[("product_symbol", BTC_USDT_SPOT), ("count", "5")]))
         .await?;
     let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
 
     let order = client
-        .private_request(
-            "place_spot_post_only_limit_buy_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SPOT),
-                ("volume", quantity.as_str()),
-                ("price", price.as_str()),
-            ]),
-        )
+        .place_spot_post_only_limit_buy_order(params(&[
+            ("product_symbol", BTC_USDT_SPOT),
+            ("volume", quantity.as_str()),
+            ("price", price.as_str()),
+        ]))
         .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["txid"])?;
 
     let cancel = client
-        .private_request("cancel_spot_order", params(&[("txid", order_id.as_str())]))
+        .cancel_spot_order(params(&[("txid", order_id.as_str())]))
         .await?;
     assert_success(&cancel);
     Ok(())
@@ -84,10 +78,7 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let orderbook = client
-        .public_request(
-            "get_futures_orderbook",
-            params(&[("product_symbol", BTC_USD_SWAP)]),
-        )
+        .get_futures_orderbook(params(&[("product_symbol", BTC_USD_SWAP)]))
         .await?;
     let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USD_SWAP).await?;
     let price = kraken_futures_post_only_buy_price(&orderbook.data)?;
@@ -98,34 +89,25 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
     };
 
     let order = client
-        .private_request(
-            "place_futures_post_only_limit_buy_order",
-            params(&[
-                ("product_symbol", BTC_USD_SWAP),
-                ("size", quantity.as_str()),
-                ("price", price.as_str()),
-            ]),
-        )
+        .place_futures_post_only_limit_buy_order(params(&[
+            ("product_symbol", BTC_USD_SWAP),
+            ("size", quantity.as_str()),
+            ("price", price.as_str()),
+        ]))
         .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["order_id"])?;
 
     let cancel = client
-        .private_request(
-            "cancel_futures_order",
-            params(&[("order_id", order_id.as_str())]),
-        )
+        .cancel_futures_order(params(&[("order_id", order_id.as_str())]))
         .await?;
     assert_success(&cancel);
 
     let opened = client
-        .private_request(
-            "place_futures_market_buy_order",
-            params(&[
-                ("product_symbol", BTC_USD_SWAP),
-                ("size", quantity.as_str()),
-            ]),
-        )
+        .place_futures_market_buy_order(params(&[
+            ("product_symbol", BTC_USD_SWAP),
+            ("size", quantity.as_str()),
+        ]))
         .await?;
     assert_success(&opened);
     let opened_id = require_order_id(&opened.data, &["order_id"])?;
@@ -133,14 +115,11 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
     assert!(wait_for_positive_position(|| kraken_futures_position_abs(&client)).await? > 0.0);
 
     let closed = client
-        .private_request(
-            "place_futures_market_sell_order",
-            params(&[
-                ("product_symbol", BTC_USD_SWAP),
-                ("size", quantity.as_str()),
-                ("reduceOnly", "true"),
-            ]),
-        )
+        .place_futures_market_sell_order(params(&[
+            ("product_symbol", BTC_USD_SWAP),
+            ("size", quantity.as_str()),
+            ("reduceOnly", "true"),
+        ]))
         .await?;
     assert_success(&closed);
     let closed_id = require_order_id(&closed.data, &["order_id"])?;
@@ -155,16 +134,12 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 async fn kraken_futures_open_orders(client: &KrakenClient) -> dcex::Result<bool> {
-    let response = client
-        .private_request("get_futures_open_orders", Vec::new())
-        .await?;
+    let response = client.get_futures_open_orders(Vec::new()).await?;
     Ok(contains_non_empty_array(&response.data, &["openOrders"]))
 }
 
 async fn kraken_futures_position_abs(client: &KrakenClient) -> dcex::Result<f64> {
-    let response = client
-        .private_request("get_futures_open_positions", Vec::new())
-        .await?;
+    let response = client.get_futures_open_positions(Vec::new()).await?;
     Ok(sum_abs_values_for_symbols(
         &response.data,
         &["symbol"],
@@ -177,9 +152,7 @@ async fn ensure_kraken_futures_margin(
     client: &KrakenClient,
     required: f64,
 ) -> dcex::Result<Option<f64>> {
-    let accounts = client
-        .private_request("get_futures_accounts", Vec::new())
-        .await?;
+    let accounts = client.get_futures_accounts(Vec::new()).await?;
     let flex = kraken_flex_available(&accounts.data);
     if flex >= required {
         return Ok(Some(0.0));
@@ -191,15 +164,12 @@ async fn ensure_kraken_futures_margin(
     }
     let amount = format_transfer_amount_ceil(needed, 8);
     let response = client
-        .private_request(
-            "futures_wallet_transfer",
-            params(&[
-                ("amount", amount.as_str()),
-                ("fromAccount", "cash"),
-                ("toAccount", "flex"),
-                ("unit", "USDT"),
-            ]),
-        )
+        .futures_wallet_transfer(params(&[
+            ("amount", amount.as_str()),
+            ("fromAccount", "cash"),
+            ("toAccount", "flex"),
+            ("unit", "USDT"),
+        ]))
         .await?;
     assert_success(&response);
     sleep(Duration::from_secs(2)).await;
@@ -210,24 +180,19 @@ async fn return_kraken_futures_margin(client: &KrakenClient, amount: f64) -> dce
     if amount <= 0.0 {
         return Ok(());
     }
-    let accounts = client
-        .private_request("get_futures_accounts", Vec::new())
-        .await?;
+    let accounts = client.get_futures_accounts(Vec::new()).await?;
     let amount = amount.min(kraken_flex_available(&accounts.data));
     if amount <= 0.0 {
         return Ok(());
     }
     let amount = format_transfer_amount_ceil(amount, 8);
     let response = client
-        .private_request(
-            "futures_wallet_transfer",
-            params(&[
-                ("amount", amount.as_str()),
-                ("fromAccount", "flex"),
-                ("toAccount", "cash"),
-                ("unit", "USDT"),
-            ]),
-        )
+        .futures_wallet_transfer(params(&[
+            ("amount", amount.as_str()),
+            ("fromAccount", "flex"),
+            ("toAccount", "cash"),
+            ("unit", "USDT"),
+        ]))
         .await?;
     assert_success(&response);
     Ok(())
@@ -239,25 +204,16 @@ async fn assert_kraken_futures_records(
     closed_id: &str,
 ) -> dcex::Result<()> {
     let opened_status = client
-        .private_request(
-            "get_futures_order_status",
-            params(&[("orderIds", opened_id)]),
-        )
+        .get_futures_order_status(params(&[("orderIds", opened_id)]))
         .await?;
     assert_success(&opened_status);
     let closed_status = client
-        .private_request(
-            "get_futures_order_status",
-            params(&[("orderIds", closed_id)]),
-        )
+        .get_futures_order_status(params(&[("orderIds", closed_id)]))
         .await?;
     assert_success(&closed_status);
 
-    let has_fills = wait_for_non_empty_records(
-        || client.private_request("get_futures_fills", Vec::new()),
-        &["fills"],
-    )
-    .await?;
+    let has_fills =
+        wait_for_non_empty_records(|| client.get_futures_fills(Vec::new()), &["fills"]).await?;
     assert!(
         has_fills,
         "Kraken futures fills endpoint did not return fills"

@@ -12,7 +12,7 @@ name = "dcex_native"
 crate-type = ["cdylib"]
 
 [dependencies]
-dcex = { path = "../dcex-core" }
+dcex = { path = "../dcex" }
 pyo3 = { version = "0.23.5", features = ["extension-module"] }
 pyo3-async-runtimes = { version = "0.23.0", features = ["tokio-runtime"] }
 serde_json = "1"

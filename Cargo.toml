@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/dcex-core", "crates/dcex-python"]
+members = ["crates/dcex", "crates/dcex-python"]
 resolver = "2"
 
 [workspace.package]

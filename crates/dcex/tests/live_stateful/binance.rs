@@ -6,7 +6,7 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    format_transfer_amount, minimum_order_quantity, params, parse_positive, post_only_buy_price,
+    format_transfer_amount, minimum_order_quantity, parse_positive, post_only_buy_price,
     price_below_market, require_env, require_live_trading, require_order_id, sum_abs_values,
     wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
@@ -30,12 +30,7 @@ async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    let orderbook = client
-        .public_request(
-            "get_spot_orderbook",
-            params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
-        )
-        .await?;
+    let orderbook = client.get_spot_orderbook(BTC_USDT_SPOT, Some(5)).await?;
     let details = fetch_trading_details(Exchange::Binance, "binance", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
@@ -50,13 +45,12 @@ async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
     };
 
     let order_result = client
-        .private_request(
-            "place_post_only_limit_buy_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SPOT),
-                ("quantity", quantity.as_str()),
-                ("price", price.as_str()),
-            ]),
+        .place_post_only_limit_buy_order(
+            BTC_USDT_SPOT,
+            quantity.as_str(),
+            price.as_str(),
+            None,
+            None,
         )
         .await;
     let order = match order_result {
@@ -70,13 +64,7 @@ async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
     let cancel_result = client
-        .private_request(
-            "cancel_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SPOT),
-                ("orderId", order_id.as_str()),
-            ]),
-        )
+        .cancel_order(BTC_USDT_SPOT, Some(order_id.as_str()), None)
         .await;
     return_binance_transfer(&client, &transfer).await?;
     let cancel = cancel_result?;
@@ -106,12 +94,7 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let ticker = client
-        .public_request(
-            "get_futures_ticker",
-            params(&[("product_symbol", BTC_USDT_SWAP)]),
-        )
-        .await?;
+    let ticker = client.get_futures_ticker(Some(BTC_USDT_SWAP)).await?;
     let details = fetch_trading_details(Exchange::Binance, "binance", BTC_USDT_SWAP).await?;
     let bid = find_f64(&ticker.data, &["bidPrice", "bid"]).ok_or_else(|| {
         dcex::DcexError::Decode(format!("Binance futures ticker has no bid: {ticker:?}"))
@@ -124,49 +107,29 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     };
 
     let order = client
-        .private_request(
-            "place_post_only_limit_buy_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SWAP),
-                ("quantity", quantity.as_str()),
-                ("price", price.as_str()),
-            ]),
+        .place_post_only_limit_buy_order(
+            BTC_USDT_SWAP,
+            quantity.as_str(),
+            price.as_str(),
+            None,
+            None,
         )
         .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
     let cancel = client
-        .private_request(
-            "cancel_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SWAP),
-                ("orderId", order_id.as_str()),
-            ]),
-        )
+        .cancel_order(BTC_USDT_SWAP, Some(order_id.as_str()), None)
         .await?;
     assert_success(&cancel);
 
     let opened = client
-        .private_request(
-            "place_market_buy_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SWAP),
-                ("quantity", quantity.as_str()),
-            ]),
-        )
+        .place_market_buy_order(BTC_USDT_SWAP, quantity.as_str(), None, None, None)
         .await?;
     assert_success(&opened);
     assert!(wait_for_positive_position(|| futures_position_abs(&client)).await? > 0.0);
 
     let closed = client
-        .private_request(
-            "place_market_sell_order",
-            params(&[
-                ("product_symbol", BTC_USDT_SWAP),
-                ("quantity", quantity.as_str()),
-                ("reduceOnly", "true"),
-            ]),
-        )
+        .place_market_sell_order(BTC_USDT_SWAP, quantity.as_str(), None, Some("true"), None)
         .await?;
     assert_success(&closed);
     assert_eq!(
@@ -201,14 +164,7 @@ async fn ensure_spot_usdt(
         if available >= needed {
             let amount = format_transfer_amount(needed);
             let response = client
-                .private_request(
-                    "create_universal_transfer",
-                    params(&[
-                        ("type", transfer_type),
-                        ("asset", "USDT"),
-                        ("amount", amount.as_str()),
-                    ]),
-                )
+                .create_universal_transfer(transfer_type, "USDT", amount.as_str(), None, None)
                 .await?;
             assert_success(&response);
             sleep(Duration::from_secs(1)).await;
@@ -246,14 +202,7 @@ async fn ensure_futures_usdt(
         if available >= needed {
             let amount = format_transfer_amount(needed);
             let response = client
-                .private_request(
-                    "create_universal_transfer",
-                    params(&[
-                        ("type", transfer_type),
-                        ("asset", "USDT"),
-                        ("amount", amount.as_str()),
-                    ]),
-                )
+                .create_universal_transfer(transfer_type, "USDT", amount.as_str(), None, None)
                 .await?;
             assert_success(&response);
             sleep(Duration::from_secs(1)).await;
@@ -287,40 +236,26 @@ async fn return_binance_transfer(
     }
     let amount = format_transfer_amount(amount);
     let response = client
-        .private_request(
-            "create_universal_transfer",
-            params(&[
-                ("type", transfer.transfer_type),
-                ("asset", "USDT"),
-                ("amount", amount.as_str()),
-            ]),
-        )
+        .create_universal_transfer(transfer.transfer_type, "USDT", amount.as_str(), None, None)
         .await?;
     assert_success(&response);
     Ok(())
 }
 
 async fn spot_usdt(client: &BinanceClient) -> dcex::Result<f64> {
-    let response = client
-        .private_request("get_account_balance", params(&[("market_type", "spot")]))
-        .await?;
+    let response = client.get_account_balance("spot").await?;
     Ok(asset_amount(&response.data, "USDT", &["free", "available"]))
 }
 
 async fn funding_usdt(client: &BinanceClient) -> dcex::Result<f64> {
     let response = client
-        .private_request(
-            "get_funding_wallet",
-            params(&[("asset", "USDT"), ("needBtcValuation", "false")]),
-        )
+        .get_funding_wallet(Some("USDT"), Some("false"))
         .await?;
     Ok(asset_amount(&response.data, "USDT", &["free", "available"]))
 }
 
 async fn futures_usdt(client: &BinanceClient) -> dcex::Result<f64> {
-    let response = client
-        .private_request("get_account_balance", params(&[("market_type", "swap")]))
-        .await?;
+    let response = client.get_account_balance("swap").await?;
     Ok(asset_amount(
         &response.data,
         "USDT",
@@ -329,22 +264,12 @@ async fn futures_usdt(client: &BinanceClient) -> dcex::Result<f64> {
 }
 
 async fn futures_position_abs(client: &BinanceClient) -> dcex::Result<f64> {
-    let response = client
-        .private_request(
-            "get_future_position",
-            params(&[("product_symbol", BTC_USDT_SWAP)]),
-        )
-        .await?;
+    let response = client.get_future_position(BTC_USDT_SWAP).await?;
     Ok(sum_abs_values(&response.data, &["positionAmt"]))
 }
 
 async fn binance_open_swap_orders(client: &BinanceClient) -> dcex::Result<bool> {
-    let response = client
-        .private_request(
-            "get_open_orders",
-            params(&[("product_symbol", BTC_USDT_SWAP)]),
-        )
-        .await?;
+    let response = client.get_open_orders(BTC_USDT_SWAP, None, None).await?;
     Ok(contains_non_empty_array(
         &response.data,
         &["data", "orders"],
