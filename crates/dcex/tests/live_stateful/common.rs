@@ -482,6 +482,7 @@ fn first_price_in_array(data: &Value) -> Option<f64> {
         Value::Array(values) => values.first().and_then(value_as_f64),
         Value::Object(object) => object
             .get("price")
+            .or_else(|| object.get("p"))
             .or_else(|| object.get("Price"))
             .and_then(value_as_f64),
         _ => value_as_f64(first),

@@ -6,6 +6,7 @@ mod live_stateful {
     mod bitmart;
     mod bitmex;
     mod bybit;
+    mod gateio;
     mod kraken;
     mod mexc;
     mod okx;

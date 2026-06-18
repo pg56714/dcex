@@ -35,9 +35,11 @@ async def test_async_gateio_batch_order_uses_list_body() -> None:
     )
 
     assert result == {"ok": True}
-    assert isinstance(calls[0]["body"], list)
-    assert calls[0]["body"][0]["contract"] == "BTC_USDT"
-    assert "orders" not in calls[0]["body"]
+    assert calls[0]["method"] == "NATIVE_PRIVATE"
+    assert calls[0]["path"] == "place_futures_batch_order"
+    assert dict(calls[0]["query"])["orders"] == (
+        '[{"product_symbol":"BTC-USDT-SWAP","size":1,"price":"100"}]'
+    )
 
 
 @pytest.mark.asyncio

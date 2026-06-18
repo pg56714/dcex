@@ -3,7 +3,6 @@
 from typing import Any
 
 from ..._native_http import NativeResponse
-from ...utils.common import Common
 from ._http_manager import HTTPManager
 
 
@@ -23,27 +22,6 @@ class MarketHTTP(HTTPManager):
         self._store_response_headers(response)
         return response.json()
 
-    def _exchange_symbol(self, product_symbol: str) -> str:
-        """Map product symbol through PTM when available."""
-        if hasattr(self, "ptm"):
-            return self.ptm.get_exchange_symbol(Common.GATEIO, product_symbol)
-        parts = product_symbol.split("-")
-        if len(parts) >= 3:
-            return f"{parts[0]}_{parts[1]}"
-        return product_symbol
-
-    @staticmethod
-    def _params(**kwargs: object) -> list[tuple[str, str]]:
-        """Convert optional Python arguments into native string pairs."""
-        params: list[tuple[str, str]] = []
-        for key, value in kwargs.items():
-            if value is None:
-                continue
-            if key == "from_":
-                key = "from"
-            params.append((key, str(value)))
-        return params
-
     async def get_all_futures_contracts(
         self,
         ccy: str = "usdt",
@@ -53,7 +31,7 @@ class MarketHTTP(HTTPManager):
         """Get all futures contracts."""
         return await self._native_public(
             "get_all_futures_contracts",
-            self._params(settle=ccy, limit=limit, offset=offset),
+            self._native_params(settle=ccy, limit=limit, offset=offset),
         )
 
     async def get_a_single_futures_contract(
@@ -64,7 +42,7 @@ class MarketHTTP(HTTPManager):
         """Get a single futures contract information."""
         return await self._native_public(
             "get_a_single_futures_contract",
-            self._params(settle=ccy, contract=self._exchange_symbol(product_symbol)),
+            self._native_params(settle=ccy, product_symbol=product_symbol),
         )
 
     async def get_contract_order_book(
@@ -79,10 +57,10 @@ class MarketHTTP(HTTPManager):
         """Get contract order book."""
         return await self._native_public(
             "get_contract_order_book",
-            self._params(
+            self._native_params(
                 settle=ccy,
                 path=path,
-                contract=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 interval=interval,
                 limit=limit,
                 with_id=with_id if with_id else None,
@@ -102,10 +80,10 @@ class MarketHTTP(HTTPManager):
         """Get contract kline/candlestick data."""
         return await self._native_public(
             "get_contract_kline",
-            self._params(
+            self._native_params(
                 settle=ccy,
                 path=path,
-                contract=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 from_=from_timestamp,
                 to=to_timestamp,
                 limit=limit,
@@ -122,10 +100,10 @@ class MarketHTTP(HTTPManager):
         """Get contract ticker information."""
         return await self._native_public(
             "get_contract_list_tickers",
-            self._params(
+            self._native_params(
                 settle=ccy,
                 path=path,
-                contract=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
             ),
         )
 
@@ -140,9 +118,9 @@ class MarketHTTP(HTTPManager):
         """Get futures funding rate history."""
         return await self._native_public(
             "get_futures_funding_rate_history",
-            self._params(
+            self._native_params(
                 settle=ccy,
-                contract=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 limit=limit,
                 from_=from_timestamp,
                 to=to_timestamp,
@@ -160,9 +138,9 @@ class MarketHTTP(HTTPManager):
         """Get futures contract statistics."""
         return await self._native_public(
             "get_futures_contract_stats",
-            self._params(
+            self._native_params(
                 settle=ccy,
-                contract=self._exchange_symbol(product_symbol),
+                product_symbol=product_symbol,
                 interval=interval,
                 from_=from_timestamp,
                 limit=limit,
@@ -173,7 +151,7 @@ class MarketHTTP(HTTPManager):
         """Get all delivery contracts."""
         return await self._native_public(
             "get_all_delivery_contracts",
-            self._params(settle="usdt"),
+            self._native_params(settle="usdt"),
         )
 
     async def get_spot_all_currency_pairs(self) -> dict[str, Any]:
@@ -190,8 +168,8 @@ class MarketHTTP(HTTPManager):
         """Get spot order book."""
         return await self._native_public(
             "get_spot_order_book",
-            self._params(
-                currency_pair=self._exchange_symbol(product_symbol),
+            self._native_params(
+                product_symbol=product_symbol,
                 interval=interval,
                 limit=limit,
                 with_id=with_id if with_id else None,
@@ -209,8 +187,8 @@ class MarketHTTP(HTTPManager):
         """Get spot kline/candlestick data."""
         return await self._native_public(
             "get_spot_kline",
-            self._params(
-                currency_pair=self._exchange_symbol(product_symbol),
+            self._native_params(
+                product_symbol=product_symbol,
                 from_=from_timestamp,
                 to=to_timestamp,
                 limit=limit,
@@ -226,8 +204,8 @@ class MarketHTTP(HTTPManager):
         """Get spot ticker information."""
         return await self._native_public(
             "get_spot_list_tickers",
-            self._params(
-                currency_pair=self._exchange_symbol(product_symbol),
+            self._native_params(
+                product_symbol=product_symbol,
                 timezone=timezone,
             ),
         )
