@@ -9,7 +9,7 @@ use super::common::{
     assert_success, contains_non_empty_array, fetch_trading_details, find_f64, first_bid_price,
     format_transfer_amount_ceil, minimum_order_quantity, params, post_only_buy_price, require_env,
     require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
+    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
 };
 
 #[tokio::test]
@@ -128,6 +128,8 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
         )
         .await?;
     assert_success(&opened);
+    let opened_id = require_order_id(&opened.data, &["order_id"])?;
+    eprintln!("Kraken futures market open order_id={opened_id}");
     assert!(wait_for_positive_position(|| kraken_futures_position_abs(&client)).await? > 0.0);
 
     let closed = client
@@ -141,10 +143,13 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
         )
         .await?;
     assert_success(&closed);
+    let closed_id = require_order_id(&closed.data, &["order_id"])?;
+    eprintln!("Kraken futures market close order_id={closed_id}");
     assert_eq!(
         wait_for_flat_position(|| kraken_futures_position_abs(&client)).await?,
         0.0
     );
+    assert_kraken_futures_records(&client, &opened_id, &closed_id).await?;
     return_kraken_futures_margin(&client, transferred).await?;
     Ok(())
 }
@@ -225,6 +230,38 @@ async fn return_kraken_futures_margin(client: &KrakenClient, amount: f64) -> dce
         )
         .await?;
     assert_success(&response);
+    Ok(())
+}
+
+async fn assert_kraken_futures_records(
+    client: &KrakenClient,
+    opened_id: &str,
+    closed_id: &str,
+) -> dcex::Result<()> {
+    let opened_status = client
+        .private_request(
+            "get_futures_order_status",
+            params(&[("orderIds", opened_id)]),
+        )
+        .await?;
+    assert_success(&opened_status);
+    let closed_status = client
+        .private_request(
+            "get_futures_order_status",
+            params(&[("orderIds", closed_id)]),
+        )
+        .await?;
+    assert_success(&closed_status);
+
+    let has_fills = wait_for_non_empty_records(
+        || client.private_request("get_futures_fills", Vec::new()),
+        &["fills"],
+    )
+    .await?;
+    assert!(
+        has_fills,
+        "Kraken futures fills endpoint did not return fills"
+    );
     Ok(())
 }
 

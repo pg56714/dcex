@@ -329,6 +329,22 @@ where
     Ok(latest)
 }
 
+pub(crate) async fn wait_for_non_empty_records<F, Fut>(mut read: F, keys: &[&str]) -> Result<bool>
+where
+    F: FnMut() -> Fut,
+    Fut: Future<Output = Result<ValidatedResponse>>,
+{
+    let mut response = read().await?;
+    for _ in 0..10 {
+        if contains_non_empty_array(&response.data, keys) {
+            return Ok(true);
+        }
+        sleep(Duration::from_secs(1)).await;
+        response = read().await?;
+    }
+    Ok(false)
+}
+
 fn first_book_price(data: &Value, array_keys: &[&str], object_side: Option<&str>) -> Result<f64> {
     first_book_price_value(data, array_keys, object_side).ok_or_else(|| {
         DcexError::Decode(format!(

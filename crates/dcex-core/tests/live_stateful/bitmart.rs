@@ -9,7 +9,7 @@ use super::common::{
     fetch_trading_details, find_f64, format_transfer_amount, minimum_order_quantity_with_step,
     params, post_only_buy_price, price_below_market, require_env, require_live_trading,
     require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
-    wait_for_positive_position, DOGE_USDT_SPOT, DOGE_USDT_SWAP,
+    wait_for_non_empty_records, wait_for_positive_position, DOGE_USDT_SPOT, DOGE_USDT_SWAP,
 };
 
 const BITMART_CONTRACT_LEVERAGE: &str = "50";
@@ -183,6 +183,8 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
         )
         .await?;
     assert_success(&opened);
+    let opened_id = require_order_id(&opened.data, &["order_id", "orderId"])?;
+    eprintln!("BitMart contract market open order_id={opened_id}");
     assert!(wait_for_positive_position(|| bitmart_contract_position_abs(&client)).await? > 0.0);
 
     let closed = client
@@ -198,10 +200,13 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
         )
         .await?;
     assert_success(&closed);
+    let closed_id = require_order_id(&closed.data, &["order_id", "orderId"])?;
+    eprintln!("BitMart contract market close order_id={closed_id}");
     assert_eq!(
         wait_for_flat_position(|| bitmart_contract_position_abs(&client)).await?,
         0.0
     );
+    assert_bitmart_contract_records(&client, &opened_id, &closed_id).await?;
     return_bitmart_contract_transfer(&client, transferred).await?;
     Ok(())
 }
@@ -266,6 +271,67 @@ async fn return_bitmart_contract_transfer(client: &BitmartClient, amount: f64) -
         )
         .await?;
     assert_success(&response);
+    Ok(())
+}
+
+async fn assert_bitmart_contract_records(
+    client: &BitmartClient,
+    opened_id: &str,
+    closed_id: &str,
+) -> dcex::Result<()> {
+    let opened_detail = client
+        .private_request(
+            "get_contract_order_detail",
+            params(&[("product_symbol", DOGE_USDT_SWAP), ("order_id", opened_id)]),
+        )
+        .await?;
+    assert_success(&opened_detail);
+
+    let closed_detail = client
+        .private_request(
+            "get_contract_order_detail",
+            params(&[("product_symbol", DOGE_USDT_SWAP), ("order_id", closed_id)]),
+        )
+        .await?;
+    assert_success(&closed_detail);
+
+    let has_history = wait_for_non_empty_records(
+        || {
+            client.private_request(
+                "get_contract_order_history",
+                params(&[("product_symbol", DOGE_USDT_SWAP)]),
+            )
+        },
+        &["data"],
+    )
+    .await?;
+    assert!(
+        has_history,
+        "BitMart contract order history did not return records"
+    );
+
+    let has_trades = wait_for_non_empty_records(
+        || {
+            client.private_request(
+                "get_contract_trade",
+                params(&[("product_symbol", DOGE_USDT_SWAP)]),
+            )
+        },
+        &["data"],
+    )
+    .await?;
+    assert!(
+        has_trades,
+        "BitMart contract trade endpoint did not return fills"
+    );
+
+    let transaction_history = client
+        .private_request(
+            "get_contract_transaction_history",
+            params(&[("product_symbol", DOGE_USDT_SWAP), ("page_size", "20")]),
+        )
+        .await?;
+    assert_success(&transaction_history);
     Ok(())
 }
 

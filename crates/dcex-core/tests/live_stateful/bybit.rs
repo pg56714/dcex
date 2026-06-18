@@ -9,8 +9,8 @@ use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details,
     format_transfer_amount_ceil, minimum_order_quantity, params, parse_positive,
     post_only_buy_price, push, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_non_empty_records,
+    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 #[tokio::test]
@@ -120,7 +120,10 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     let details = fetch_trading_details(Exchange::Bybit, "bybit", BTC_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
-    let transferred = match ensure_unified_usdt(&client, 10.0).await? {
+    set_bybit_swap_leverage(&client).await?;
+    let notional = parse_positive(&price, "price")? * parse_positive(&quantity, "quantity")? / 0.95;
+    let required_usdt = (notional / 50.0 * 2.0).max(5.0);
+    let transferred = match ensure_unified_usdt(&client, required_usdt).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -161,6 +164,8 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
         .private_request("place_market_buy_order", open_params)
         .await?;
     assert_success(&opened);
+    let opened_id = require_order_id(&opened.data, &["orderId"])?;
+    eprintln!("Bybit swap market open orderId={opened_id}");
     assert!(wait_for_positive_position(|| bybit_swap_position_abs(&client)).await? > 0.0);
 
     let mut close_params = params(&[
@@ -175,10 +180,13 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
         .private_request("place_market_sell_order", close_params)
         .await?;
     assert_success(&closed);
+    let closed_id = require_order_id(&closed.data, &["orderId"])?;
+    eprintln!("Bybit swap market close orderId={closed_id}");
     assert_eq!(
         wait_for_flat_position(|| bybit_swap_position_abs(&client)).await?,
         0.0
     );
+    assert_bybit_swap_records(&client, &opened_id, &closed_id).await?;
 
     return_bybit_transfer(&client, transferred).await?;
     Ok(())
@@ -272,6 +280,74 @@ async fn bybit_swap_position_abs(client: &BybitClient) -> dcex::Result<f64> {
         )
         .await?;
     Ok(bybit_swap_position_abs_from(&response.data))
+}
+
+async fn set_bybit_swap_leverage(client: &BybitClient) -> dcex::Result<()> {
+    match client
+        .private_request(
+            "set_leverage",
+            params(&[("product_symbol", BTC_USDT_SWAP), ("leverage", "50")]),
+        )
+        .await
+    {
+        Ok(response) => {
+            assert_success(&response);
+            Ok(())
+        }
+        Err(error) if error.to_string().contains("110043") => Ok(()),
+        Err(error) => Err(error),
+    }
+}
+
+async fn assert_bybit_swap_records(
+    client: &BybitClient,
+    opened_id: &str,
+    closed_id: &str,
+) -> dcex::Result<()> {
+    let has_opened_history = wait_for_bybit_order_history(client, opened_id).await?;
+    assert!(
+        has_opened_history,
+        "Bybit opened market order was not found in order history"
+    );
+
+    let has_closed_history = wait_for_bybit_order_history(client, closed_id).await?;
+    assert!(
+        has_closed_history,
+        "Bybit closed market order was not found in order history"
+    );
+
+    let has_execution = wait_for_non_empty_records(
+        || {
+            client.private_request(
+                "get_execution_list",
+                params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "20")]),
+            )
+        },
+        &["list"],
+    )
+    .await?;
+    assert!(
+        has_execution,
+        "Bybit swap execution list did not return fills"
+    );
+    Ok(())
+}
+
+async fn wait_for_bybit_order_history(client: &BybitClient, order_id: &str) -> dcex::Result<bool> {
+    wait_for_non_empty_records(
+        || {
+            client.private_request(
+                "get_order_history",
+                params(&[
+                    ("product_symbol", BTC_USDT_SWAP),
+                    ("orderId", order_id),
+                    ("limit", "20"),
+                ]),
+            )
+        },
+        &["list"],
+    )
+    .await
 }
 
 fn bybit_swap_position_abs_from(data: &Value) -> f64 {
