@@ -8,6 +8,7 @@ mod private;
 mod signing;
 mod trade;
 mod trading;
+mod wrappers;
 
 pub use client::BitmexClient;
 

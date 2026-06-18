@@ -8,5 +8,6 @@ mod position;
 mod private;
 mod signing;
 mod trade;
+mod wrappers;
 
 pub use client::BybitClient;
