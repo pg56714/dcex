@@ -2,12 +2,15 @@ use std::time::Duration;
 
 use dcex::exchange::Exchange;
 use dcex::exchanges::bybit::BybitClient;
+use serde_json::Value;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, fetch_trading_details, format_transfer_amount_ceil,
-    minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
-    require_live_trading, require_order_id, BTC_USDT_SPOT,
+    assert_success, asset_amount, contains_non_empty_array, fetch_trading_details,
+    format_transfer_amount_ceil, minimum_order_quantity, params, parse_positive,
+    post_only_buy_price, push, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 #[tokio::test]
@@ -73,6 +76,111 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
     return_bybit_transfer(&client, transferred).await?;
     let cancel = cancel_result?;
     assert_success(&cancel);
+    Ok(())
+}
+
+#[tokio::test]
+async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
+    if !require_live_trading() {
+        return Ok(());
+    }
+    let Some(keys) = require_env(&["BYBIT_API_KEY", "BYBIT_API_SECRET"]) else {
+        return Ok(());
+    };
+    let client = BybitClient::new(
+        Some(keys[0].clone()),
+        Some(keys[1].clone()),
+        5_000,
+        true,
+        Duration::from_secs(20),
+    )?;
+
+    if bybit_open_swap_orders(&client).await? {
+        eprintln!("skipping Bybit swap live stateful order; open BTC-USDT swap orders exist");
+        return Ok(());
+    }
+    let position_response = client
+        .private_request(
+            "get_positions",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+    if bybit_swap_position_abs_from(&position_response.data) > 0.0 {
+        eprintln!("skipping Bybit swap live stateful order; BTC-USDT swap position exists");
+        return Ok(());
+    }
+    let position_idx = bybit_long_position_idx(&position_response.data);
+
+    let orderbook = client
+        .public_request(
+            "get_orderbook",
+            params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "5")]),
+        )
+        .await?;
+    let details = fetch_trading_details(Exchange::Bybit, "bybit", BTC_USDT_SWAP).await?;
+    let price = post_only_buy_price(&orderbook.data, &details)?;
+    let quantity = minimum_order_quantity(&price, &details)?;
+    let transferred = match ensure_unified_usdt(&client, 10.0).await? {
+        Some(amount) => amount,
+        None => return Ok(()),
+    };
+
+    let mut order_params = params(&[
+        ("product_symbol", BTC_USDT_SWAP),
+        ("qty", quantity.as_str()),
+        ("price", price.as_str()),
+    ]);
+    if let Some(position_idx) = position_idx {
+        push(&mut order_params, "positionIdx", position_idx);
+    }
+    let order = client
+        .private_request("place_post_only_limit_buy_order", order_params)
+        .await?;
+    assert_success(&order);
+    let order_id = require_order_id(&order.data, &["orderId"])?;
+
+    let cancel = client
+        .private_request(
+            "cancel_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("orderId", order_id.as_str()),
+            ]),
+        )
+        .await?;
+    assert_success(&cancel);
+
+    let mut open_params = params(&[
+        ("product_symbol", BTC_USDT_SWAP),
+        ("qty", quantity.as_str()),
+    ]);
+    if let Some(position_idx) = position_idx {
+        push(&mut open_params, "positionIdx", position_idx);
+    }
+    let opened = client
+        .private_request("place_market_buy_order", open_params)
+        .await?;
+    assert_success(&opened);
+    assert!(wait_for_positive_position(|| bybit_swap_position_abs(&client)).await? > 0.0);
+
+    let mut close_params = params(&[
+        ("product_symbol", BTC_USDT_SWAP),
+        ("qty", quantity.as_str()),
+        ("reduceOnly", "true"),
+    ]);
+    if let Some(position_idx) = position_idx {
+        push(&mut close_params, "positionIdx", position_idx);
+    }
+    let closed = client
+        .private_request("place_market_sell_order", close_params)
+        .await?;
+    assert_success(&closed);
+    assert_eq!(
+        wait_for_flat_position(|| bybit_swap_position_abs(&client)).await?,
+        0.0
+    );
+
+    return_bybit_transfer(&client, transferred).await?;
     Ok(())
 }
 
@@ -144,4 +252,58 @@ async fn account_usdt(client: &BybitClient, account_type: &str) -> dcex::Result<
             "availableBalance",
         ],
     ))
+}
+
+async fn bybit_open_swap_orders(client: &BybitClient) -> dcex::Result<bool> {
+    let response = client
+        .private_request(
+            "get_open_orders",
+            params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "20")]),
+        )
+        .await?;
+    Ok(contains_non_empty_array(&response.data, &["list"]))
+}
+
+async fn bybit_swap_position_abs(client: &BybitClient) -> dcex::Result<f64> {
+    let response = client
+        .private_request(
+            "get_positions",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+    Ok(bybit_swap_position_abs_from(&response.data))
+}
+
+fn bybit_swap_position_abs_from(data: &Value) -> f64 {
+    sum_abs_values_for_symbols(data, &["symbol"], &["BTCUSDT"], &["size"])
+}
+
+fn bybit_long_position_idx(data: &Value) -> Option<&'static str> {
+    if bybit_has_position_idx(data, "1") || bybit_has_position_idx(data, "2") {
+        Some("1")
+    } else {
+        None
+    }
+}
+
+fn bybit_has_position_idx(data: &Value, expected: &str) -> bool {
+    match data {
+        Value::Object(object) => {
+            object
+                .get("positionIdx")
+                .and_then(|value| match value {
+                    Value::Number(value) => Some(value.to_string()),
+                    Value::String(value) => Some(value.clone()),
+                    _ => None,
+                })
+                .is_some_and(|value| value == expected)
+                || object
+                    .values()
+                    .any(|value| bybit_has_position_idx(value, expected))
+        }
+        Value::Array(values) => values
+            .iter()
+            .any(|value| bybit_has_position_idx(value, expected)),
+        _ => false,
+    }
 }

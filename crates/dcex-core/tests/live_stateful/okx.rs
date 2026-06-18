@@ -5,9 +5,10 @@ use dcex::exchanges::okx::OkxClient;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, fetch_trading_details, format_transfer_amount,
-    minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
-    require_live_trading, require_order_id, BTC_USDT_SPOT,
+    assert_success, asset_amount, contains_non_empty_array, fetch_trading_details,
+    format_transfer_amount, minimum_order_quantity, params, parse_positive, post_only_buy_price,
+    require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
+    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 #[tokio::test]
@@ -74,6 +75,110 @@ async fn okx_direct_live_stateful_order() -> dcex::Result<()> {
     return_okx_transfer(&client, transferred).await?;
     let cancel = cancel_result?;
     assert_success(&cancel);
+    Ok(())
+}
+
+#[tokio::test]
+async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
+    if !require_live_trading() {
+        return Ok(());
+    }
+    let Some(keys) = require_env(&["OKX_API_KEY", "OKX_API_SECRET", "OKX_PASSPHRASE"]) else {
+        return Ok(());
+    };
+    let client = OkxClient::new(
+        Some(keys[0].clone()),
+        Some(keys[1].clone()),
+        Some(keys[2].clone()),
+        "0".to_string(),
+        Duration::from_secs(20),
+    )?;
+
+    if okx_open_swap_orders(&client).await? {
+        eprintln!("skipping OKX swap live stateful order; open BTC-USDT swap orders exist");
+        return Ok(());
+    }
+    if okx_swap_position_abs(&client).await? > 0.0 {
+        eprintln!("skipping OKX swap live stateful order; BTC-USDT swap position exists");
+        return Ok(());
+    }
+
+    let orderbook = client
+        .public_request(
+            "get_orderbook",
+            params(&[("product_symbol", BTC_USDT_SWAP), ("sz", "5")]),
+        )
+        .await?;
+    let details = fetch_trading_details(Exchange::Okx, "okx", BTC_USDT_SWAP).await?;
+    let price = post_only_buy_price(&orderbook.data, &details)?;
+    let quantity = minimum_order_quantity(&price, &details)?;
+    let leverage = client
+        .private_request(
+            "set_leverage",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("lever", "50"),
+                ("mgnMode", "cross"),
+            ]),
+        )
+        .await?;
+    assert_success(&leverage);
+    let transferred = match ensure_trading_usdt(&client, 25.0).await? {
+        Some(amount) => amount,
+        None => return Ok(()),
+    };
+
+    let order = client
+        .private_request(
+            "place_post_only_limit_buy_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("tdMode", "cross"),
+                ("sz", quantity.as_str()),
+                ("px", price.as_str()),
+            ]),
+        )
+        .await?;
+    assert_success(&order);
+    let order_id = require_order_id(&order.data, &["ordId"])?;
+
+    let cancel = client
+        .private_request(
+            "cancel_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("ordId", order_id.as_str()),
+            ]),
+        )
+        .await?;
+    assert_success(&cancel);
+
+    let opened = client
+        .private_request(
+            "place_market_buy_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("tdMode", "cross"),
+                ("sz", quantity.as_str()),
+            ]),
+        )
+        .await?;
+    assert_success(&opened);
+    assert!(wait_for_positive_position(|| okx_swap_position_abs(&client)).await? > 0.0);
+
+    let closed = client
+        .private_request(
+            "close_positions",
+            params(&[("product_symbol", BTC_USDT_SWAP), ("mgnMode", "cross")]),
+        )
+        .await?;
+    assert_success(&closed);
+    assert_eq!(
+        wait_for_flat_position(|| okx_swap_position_abs(&client)).await?,
+        0.0
+    );
+
+    return_okx_transfer(&client, transferred).await?;
     Ok(())
 }
 
@@ -147,5 +252,30 @@ async fn funding_usdt(client: &OkxClient) -> dcex::Result<f64> {
         &response.data,
         "USDT",
         &["availBal", "availEq", "bal"],
+    ))
+}
+
+async fn okx_open_swap_orders(client: &OkxClient) -> dcex::Result<bool> {
+    let response = client
+        .private_request(
+            "get_order_list",
+            params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "20")]),
+        )
+        .await?;
+    Ok(contains_non_empty_array(&response.data, &["data"]))
+}
+
+async fn okx_swap_position_abs(client: &OkxClient) -> dcex::Result<f64> {
+    let response = client
+        .private_request(
+            "get_positions",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+    Ok(sum_abs_values_for_symbols(
+        &response.data,
+        &["instId"],
+        &[BTC_USDT_SWAP],
+        &["pos"],
     ))
 }

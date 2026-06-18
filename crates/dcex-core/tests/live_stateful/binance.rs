@@ -5,9 +5,10 @@ use dcex::exchanges::binance::BinanceClient;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, fetch_trading_details, format_transfer_amount,
-    minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
-    require_live_trading, require_order_id, BTC_USDT_SPOT,
+    assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
+    format_transfer_amount, minimum_order_quantity, params, parse_positive, post_only_buy_price,
+    price_below_market, require_env, require_live_trading, require_order_id, sum_abs_values,
+    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 struct TransferBack {
@@ -83,6 +84,99 @@ async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
     Ok(())
 }
 
+#[tokio::test]
+async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
+    if !require_live_trading() {
+        return Ok(());
+    }
+    let Some(keys) = require_env(&["BINANCE_API_KEY", "BINANCE_API_SECRET"]) else {
+        return Ok(());
+    };
+    let client = BinanceClient::new(
+        Some(keys[0].clone()),
+        Some(keys[1].clone()),
+        Duration::from_secs(20),
+    )?;
+    if binance_open_swap_orders(&client).await? {
+        eprintln!("skipping Binance futures live stateful order; open BTC-USDT swap orders exist");
+        return Ok(());
+    }
+    if futures_position_abs(&client).await? > 0.0 {
+        eprintln!("skipping Binance futures live stateful order; BTC-USDT swap position exists");
+        return Ok(());
+    }
+
+    let ticker = client
+        .public_request(
+            "get_futures_ticker",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+    let details = fetch_trading_details(Exchange::Binance, "binance", BTC_USDT_SWAP).await?;
+    let bid = find_f64(&ticker.data, &["bidPrice", "bid"]).ok_or_else(|| {
+        dcex::DcexError::Decode(format!("Binance futures ticker has no bid: {ticker:?}"))
+    })?;
+    let price = price_below_market(bid, &details, 0.95)?;
+    let quantity = minimum_order_quantity(&price, &details)?;
+    let transfer = match ensure_futures_usdt(&client, 10.0).await? {
+        Some(transfer) => transfer,
+        None => return Ok(()),
+    };
+
+    let order = client
+        .private_request(
+            "place_post_only_limit_buy_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("quantity", quantity.as_str()),
+                ("price", price.as_str()),
+            ]),
+        )
+        .await?;
+    assert_success(&order);
+    let order_id = require_order_id(&order.data, &["orderId"])?;
+    let cancel = client
+        .private_request(
+            "cancel_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("orderId", order_id.as_str()),
+            ]),
+        )
+        .await?;
+    assert_success(&cancel);
+
+    let opened = client
+        .private_request(
+            "place_market_buy_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("quantity", quantity.as_str()),
+            ]),
+        )
+        .await?;
+    assert_success(&opened);
+    assert!(wait_for_positive_position(|| futures_position_abs(&client)).await? > 0.0);
+
+    let closed = client
+        .private_request(
+            "place_market_sell_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("quantity", quantity.as_str()),
+                ("reduceOnly", "true"),
+            ]),
+        )
+        .await?;
+    assert_success(&closed);
+    assert_eq!(
+        wait_for_flat_position(|| futures_position_abs(&client)).await?,
+        0.0
+    );
+    return_binance_transfer(&client, &transfer).await?;
+    Ok(())
+}
+
 async fn ensure_spot_usdt(
     client: &BinanceClient,
     required: f64,
@@ -128,6 +222,51 @@ async fn ensure_spot_usdt(
     Ok(None)
 }
 
+async fn ensure_futures_usdt(
+    client: &BinanceClient,
+    required: f64,
+) -> dcex::Result<Option<TransferBack>> {
+    let futures = futures_usdt(client).await?;
+    if futures >= required {
+        return Ok(Some(TransferBack {
+            amount: "0".to_string(),
+            transfer_type: "",
+        }));
+    }
+    let needed = required - futures;
+    let sources = [
+        (
+            funding_usdt(client).await?,
+            "FUNDING_UMFUTURE",
+            "UMFUTURE_FUNDING",
+        ),
+        (spot_usdt(client).await?, "MAIN_UMFUTURE", "UMFUTURE_MAIN"),
+    ];
+    for (available, transfer_type, reverse_type) in sources {
+        if available >= needed {
+            let amount = format_transfer_amount(needed);
+            let response = client
+                .private_request(
+                    "create_universal_transfer",
+                    params(&[
+                        ("type", transfer_type),
+                        ("asset", "USDT"),
+                        ("amount", amount.as_str()),
+                    ]),
+                )
+                .await?;
+            assert_success(&response);
+            sleep(Duration::from_secs(1)).await;
+            return Ok(Some(TransferBack {
+                amount,
+                transfer_type: reverse_type,
+            }));
+        }
+    }
+    eprintln!("skipping Binance futures live stateful order; insufficient transferable USDT");
+    Ok(None)
+}
+
 async fn return_binance_transfer(
     client: &BinanceClient,
     transfer: &TransferBack,
@@ -135,13 +274,25 @@ async fn return_binance_transfer(
     if transfer.amount == "0" {
         return Ok(());
     }
+    let requested = parse_positive(&transfer.amount, "transfer amount")?;
+    let available = match transfer.transfer_type.split('_').next() {
+        Some("FUNDING") => funding_usdt(client).await?,
+        Some("MAIN") => spot_usdt(client).await?,
+        Some("UMFUTURE") => futures_usdt(client).await?,
+        _ => requested,
+    };
+    let amount = requested.min(available);
+    if amount <= 0.0 {
+        return Ok(());
+    }
+    let amount = format_transfer_amount(amount);
     let response = client
         .private_request(
             "create_universal_transfer",
             params(&[
                 ("type", transfer.transfer_type),
                 ("asset", "USDT"),
-                ("amount", transfer.amount.as_str()),
+                ("amount", amount.as_str()),
             ]),
         )
         .await?;
@@ -174,5 +325,28 @@ async fn futures_usdt(client: &BinanceClient) -> dcex::Result<f64> {
         &response.data,
         "USDT",
         &["availableBalance", "available", "free"],
+    ))
+}
+
+async fn futures_position_abs(client: &BinanceClient) -> dcex::Result<f64> {
+    let response = client
+        .private_request(
+            "get_future_position",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+    Ok(sum_abs_values(&response.data, &["positionAmt"]))
+}
+
+async fn binance_open_swap_orders(client: &BinanceClient) -> dcex::Result<bool> {
+    let response = client
+        .private_request(
+            "get_open_orders",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+    Ok(contains_non_empty_array(
+        &response.data,
+        &["data", "orders"],
     ))
 }

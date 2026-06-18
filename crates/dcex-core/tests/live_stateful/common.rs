@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::future::Future;
 use std::sync::OnceLock;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -6,9 +7,13 @@ use dcex::exchange::{Exchange, ValidatedResponse};
 use dcex::product_table::{ProductTable, TradingDetails};
 use dcex::{DcexError, Result};
 use serde_json::Value;
+use tokio::time::{sleep, Duration};
 
 pub(crate) const BTC_USDT_SPOT: &str = "BTC-USDT-SPOT";
+pub(crate) const BTC_USDT_SWAP: &str = "BTC-USDT-SWAP";
+pub(crate) const BTC_USD_SWAP: &str = "BTC-USD-SWAP";
 pub(crate) const DOGE_USDT_SPOT: &str = "DOGE-USDT-SPOT";
+pub(crate) const DOGE_USDT_SWAP: &str = "DOGE-USDT-SWAP";
 pub(crate) const XBT_USDT_SWAP: &str = "XBT-USDT-SWAP";
 
 pub(crate) type Params = Vec<(String, String)>;
@@ -111,6 +116,8 @@ pub(crate) fn asset_amount(data: &Value, asset: &str, amount_keys: &[&str]) -> f
                 .get("asset")
                 .or_else(|| object.get("ccy"))
                 .or_else(|| object.get("coin"))
+                .or_else(|| object.get("currency"))
+                .or_else(|| object.get("marginCoin"))
                 .and_then(Value::as_str)
                 == Some(asset);
             if matches_asset {
@@ -214,6 +221,112 @@ pub(crate) fn account_restriction(error: &DcexError, patterns: &[&str]) -> bool 
     patterns
         .iter()
         .any(|pattern| message.contains(&pattern.to_lowercase()))
+}
+
+pub(crate) fn contains_non_empty_array(data: &Value, keys: &[&str]) -> bool {
+    match data {
+        Value::Object(object) => {
+            for key in keys {
+                if object
+                    .get(*key)
+                    .and_then(Value::as_array)
+                    .is_some_and(|values| !values.is_empty())
+                {
+                    return true;
+                }
+            }
+            object
+                .values()
+                .any(|value| contains_non_empty_array(value, keys))
+        }
+        Value::Array(values) => !values.is_empty(),
+        _ => false,
+    }
+}
+
+pub(crate) fn sum_abs_values(data: &Value, keys: &[&str]) -> f64 {
+    match data {
+        Value::Object(object) => {
+            let own = keys
+                .iter()
+                .filter_map(|key| object.get(*key))
+                .filter_map(value_as_f64)
+                .map(f64::abs)
+                .sum::<f64>();
+            own + object
+                .values()
+                .map(|value| sum_abs_values(value, keys))
+                .sum::<f64>()
+        }
+        Value::Array(values) => values
+            .iter()
+            .map(|value| sum_abs_values(value, keys))
+            .sum::<f64>(),
+        _ => 0.0,
+    }
+}
+
+pub(crate) fn sum_abs_values_for_symbols(
+    data: &Value,
+    symbol_keys: &[&str],
+    symbols: &[&str],
+    value_keys: &[&str],
+) -> f64 {
+    match data {
+        Value::Object(object) => {
+            let own = if object_matches_symbol(object, symbol_keys, symbols) {
+                value_keys
+                    .iter()
+                    .filter_map(|key| object.get(*key))
+                    .filter_map(value_as_f64)
+                    .map(f64::abs)
+                    .sum::<f64>()
+            } else {
+                0.0
+            };
+            own + object
+                .values()
+                .map(|value| sum_abs_values_for_symbols(value, symbol_keys, symbols, value_keys))
+                .sum::<f64>()
+        }
+        Value::Array(values) => values
+            .iter()
+            .map(|value| sum_abs_values_for_symbols(value, symbol_keys, symbols, value_keys))
+            .sum::<f64>(),
+        _ => 0.0,
+    }
+}
+
+pub(crate) async fn wait_for_positive_position<F, Fut>(mut read: F) -> Result<f64>
+where
+    F: FnMut() -> Fut,
+    Fut: Future<Output = Result<f64>>,
+{
+    let mut latest = read().await?;
+    for _ in 0..10 {
+        if latest > 0.0 {
+            return Ok(latest);
+        }
+        sleep(Duration::from_secs(1)).await;
+        latest = read().await?;
+    }
+    Ok(latest)
+}
+
+pub(crate) async fn wait_for_flat_position<F, Fut>(mut read: F) -> Result<f64>
+where
+    F: FnMut() -> Fut,
+    Fut: Future<Output = Result<f64>>,
+{
+    let mut latest = read().await?;
+    for _ in 0..10 {
+        if latest.abs() <= 1e-12 {
+            return Ok(latest);
+        }
+        sleep(Duration::from_secs(1)).await;
+        latest = read().await?;
+    }
+    Ok(latest)
 }
 
 fn first_book_price(data: &Value, array_keys: &[&str], object_side: Option<&str>) -> Result<f64> {
@@ -334,6 +447,19 @@ fn value_as_f64(value: &Value) -> Option<f64> {
         Value::String(value) => value.parse().ok(),
         _ => None,
     }
+}
+
+fn object_matches_symbol(
+    object: &serde_json::Map<String, Value>,
+    symbol_keys: &[&str],
+    symbols: &[&str],
+) -> bool {
+    symbol_keys.iter().any(|key| {
+        object
+            .get(*key)
+            .and_then(value_to_string)
+            .is_some_and(|value| symbols.iter().any(|symbol| symbol == &value))
+    })
 }
 
 fn value_to_string(value: &Value) -> Option<String> {
