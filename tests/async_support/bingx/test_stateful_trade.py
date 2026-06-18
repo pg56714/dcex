@@ -1,6 +1,7 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
 import asyncio
+import logging
 import os
 import uuid
 from contextlib import suppress
@@ -21,6 +22,7 @@ SWAP_SYMBOL = "BTC-USDT-SWAP"
 FUND_ACCOUNT = "fund"
 SPOT_ACCOUNT = "spot"
 SWAP_ACCOUNT = "USDTMPerp"
+LOGGER = logging.getLogger(__name__)
 
 pytestmark = [
     pytest.mark.asyncio,
@@ -83,8 +85,8 @@ async def _spot_available(client: Client, asset: str) -> Decimal:
 
 
 async def _fund_available(client: Client, asset: str) -> Decimal:
-    balances = (await client.get_fund_account_balance(asset=asset)).get("data", {}).get(
-        "assets", []
+    balances = (
+        (await client.get_fund_account_balance(asset=asset)).get("data", {}).get("assets", [])
     )
     for item in balances:
         if item.get("asset") == asset:
@@ -108,6 +110,24 @@ async def _transferable(
         if item.get("asset") == asset:
             return _dec(item.get("availableTransferAmount", item.get("amount")))
     return Decimal("0")
+
+
+async def _account_available_usdt(client: Client, account: str) -> Decimal:
+    if account == FUND_ACCOUNT:
+        return await _fund_available(client, "USDT")
+    if account == SPOT_ACCOUNT:
+        return await _spot_available(client, "USDT")
+    if account == SWAP_ACCOUNT:
+        return await _swap_available_usdt(client)
+    return Decimal("0")
+
+
+def _transfer_sources(to_account: str) -> tuple[str, ...]:
+    if to_account == SPOT_ACCOUNT:
+        return (FUND_ACCOUNT, SWAP_ACCOUNT)
+    if to_account == SWAP_ACCOUNT:
+        return (FUND_ACCOUNT, SPOT_ACCOUNT)
+    return (FUND_ACCOUNT, SPOT_ACCOUNT, SWAP_ACCOUNT)
 
 
 async def _asset_transfer(
@@ -138,15 +158,39 @@ async def _ensure_usdt_for_account(
     if current_available >= required:
         return
 
-    amount = max(required - current_available + Decimal("0.5"), Decimal("1"))
-    source_available = min(
-        await _fund_available(client, "USDT"),
-        await _transferable(client, FUND_ACCOUNT, to_account, "USDT"),
-    )
-    if source_available < amount:
-        pytest.skip(f"Insufficient BingX fund USDT to transfer into {to_account}.")
+    for from_account in _transfer_sources(to_account):
+        current_available = await _account_available_usdt(client, to_account)
+        if current_available >= required:
+            return
+        amount = max(required - current_available + Decimal("0.5"), Decimal("1"))
+        try:
+            transferable = await _transferable(client, from_account, to_account, "USDT")
+            source_available = await _account_available_usdt(client, from_account)
+        except Exception as error:
+            LOGGER.info(
+                "Skipping BingX transfer route %s->%s; transferable amount unavailable: %s",
+                from_account,
+                to_account,
+                error,
+            )
+            continue
+        available = min(transferable, source_available)
+        if available <= 0:
+            continue
 
-    await _asset_transfer(client, FUND_ACCOUNT, to_account, "USDT", amount)
+        try:
+            await _asset_transfer(client, from_account, to_account, "USDT", min(amount, available))
+        except Exception as error:
+            LOGGER.info(
+                "Skipping BingX transfer route %s->%s; transfer failed: %s",
+                from_account,
+                to_account,
+                error,
+            )
+            continue
+
+    if await _account_available_usdt(client, to_account) < required:
+        pytest.skip(f"Insufficient transferable BingX USDT to transfer into {to_account}.")
 
 
 async def _swap_open_orders(client: Client) -> list[dict]:
@@ -243,7 +287,7 @@ async def _ensure_spot_usdt(client: Client, quantity: str, price: str) -> None:
         current_available=await _spot_available(client, "USDT"),
     )
     if await _spot_available(client, "USDT") < required:
-        pytest.skip("BingX spot USDT remains insufficient after fund transfer.")
+        pytest.skip("BingX spot USDT remains insufficient after internal transfer.")
 
 
 async def _spot_market_buy_delta(client: Client, quote_amount: Decimal) -> Decimal:
@@ -295,10 +339,7 @@ async def _swap_fillable_limit_sell_price(client: Client) -> float:
 
 async def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
     required = (
-        Decimal(quantity)
-        * await _swap_current_price(client)
-        / Decimal("10")
-        * Decimal("1.75")
+        Decimal(quantity) * await _swap_current_price(client) / Decimal("10") * Decimal("1.75")
     )
     await _ensure_usdt_for_account(
         client=client,
@@ -307,7 +348,7 @@ async def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
         current_available=await _swap_available_usdt(client),
     )
     if await _swap_available_usdt(client) < required:
-        pytest.skip("BingX swap USDT remains insufficient after fund transfer.")
+        pytest.skip("BingX swap USDT remains insufficient after internal transfer.")
 
 
 def _position_id(positions: list[dict], side: str) -> str | None:
@@ -389,13 +430,9 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             clientOrderId=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
+        assert await client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
         assert (
-            await client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
-            is not None
-        )
-        assert (
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
-            is not None
+            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
         )
         order_id = None
     finally:
@@ -431,8 +468,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["orderId"]
         assert (
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
-            is not None
+            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
         )
         order_id = None
     finally:
@@ -449,8 +485,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["orderId"]
         assert (
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
-            is not None
+            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
         )
         order_id = None
     finally:
@@ -586,8 +621,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
     leverage = (await client.get_leverage(product_symbol=SWAP_SYMBOL))["data"]
     mode = (await client.get_position_mode())["data"]["dualSidePosition"]
     assert (
-        await client.change_margin_type(product_symbol=SWAP_SYMBOL, marginType=margin)
-        is not None
+        await client.change_margin_type(product_symbol=SWAP_SYMBOL, marginType=margin) is not None
     )
     assert (
         await client.set_leverage(
@@ -637,12 +671,10 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.get_order_detail(product_symbol=SWAP_SYMBOL, orderId=order_id)
-            is not None
+            await client.get_order_detail(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
         )
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
-            is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
         )
         order_id = None
     finally:
@@ -680,8 +712,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
-            is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
         )
         order_id = None
     finally:
@@ -699,8 +730,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
-            is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
         )
         order_id = None
     finally:
@@ -725,8 +755,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["order"]["orderId"]
         assert (
-            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id)
-            is not None
+            await client.cancel_swap_order(product_symbol=SWAP_SYMBOL, orderId=order_id) is not None
         )
         order_id = None
     finally:

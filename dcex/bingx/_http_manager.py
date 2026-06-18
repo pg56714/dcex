@@ -103,6 +103,10 @@ class HTTPManager(BaseHTTPManager):
             )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BINGX)
+            if self._native_client is not None and hasattr(
+                self._native_client, "set_product_table"
+            ):
+                self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
         return (
@@ -110,6 +114,46 @@ class HTTPManager(BaseHTTPManager):
             and self._native_client is not None
             and type(self.session) is requests.Session
         )
+
+    def _native_private(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed BingX private method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("BingX native client is required for private methods.")
+        if not hasattr(self._native_client, "private_request"):
+            raise RuntimeError("BingX native client private_request is unavailable.")
+        try:
+            status, headers, body = self._native_client.private_request(method_name, params)
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"BingX {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(int(time.time() * 1000)),
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    @staticmethod
+    def _native_params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            enum_value = getattr(value, "value", None)
+            if enum_value is not None:
+                value = enum_value
+            if isinstance(value, bool):
+                value = str(value).lower()
+            elif isinstance(value, dict | list | tuple):
+                value = json.dumps(value, separators=(",", ":"), ensure_ascii=False)
+            params.append((key, str(value)))
+        return params
 
     def _request(
         self,

@@ -131,6 +131,82 @@ async def test_async_bingx_public_wrapper_uses_native_dispatcher() -> None:
     )
 
 
+def test_native_bingx_private_spot_order_uses_dispatcher() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server({"code": 0, "data": {"orderId": "1"}}) as (base_url, received):
+        client = native.BingxHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            base_url=base_url,
+        )
+        status, _headers, body = client.private_request(
+            "place_spot_limit_buy_order",
+            [
+                ("product_symbol", "BTC-USDT-SPOT"),
+                ("quantity", "0.001"),
+                ("price", "100"),
+            ],
+        )
+
+    request = received.get_nowait()
+    query = dict(parse_qsl(urlsplit(request["path"]).query))
+    assert status == 200
+    assert json.loads(body) == {"code": 0, "data": {"orderId": "1"}}
+    assert urlsplit(request["path"]).path == "/openApi/spot/v1/trade/order"
+    assert request["bingx_api_key"] == "api-key"
+    assert query["symbol"] == "BTC-USDT"
+    assert query["side"] == "BUY"
+    assert query["type"] == "LIMIT"
+    assert query["quantity"] == "0.001"
+    assert query["price"] == "100"
+    assert "timestamp" in query
+    assert "signature" in query
+
+
+def test_native_bingx_private_batch_order_normalizes_numbers() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server({"code": 0, "data": {"orders": []}}) as (base_url, received):
+        client = native.BingxHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            timeout=2,
+            base_url=base_url,
+        )
+        status, _headers, body = client.private_request(
+            "place_swap_batch_order",
+            [
+                (
+                    "batchOrders",
+                    json.dumps(
+                        [
+                            {
+                                "symbol": "BTC-USDT",
+                                "side": "BUY",
+                                "type": "LIMIT",
+                                "quantity": "0.001",
+                                "price": "100",
+                            }
+                        ],
+                        separators=(",", ":"),
+                    ),
+                )
+            ],
+        )
+
+    request = received.get_nowait()
+    query = dict(parse_qsl(urlsplit(request["path"]).query))
+    orders = json.loads(query["batchOrders"])
+    assert status == 200
+    assert json.loads(body) == {"code": 0, "data": {"orders": []}}
+    assert urlsplit(request["path"]).path == "/openApi/swap/v2/trade/batchOrders"
+    assert orders[0]["quantity"] == 0.001
+    assert orders[0]["price"] == 100
+    assert "signature" in query
+
+
 def test_native_mexc_spot_signed_request() -> None:
     native = pytest.importorskip("dcex._native")
 

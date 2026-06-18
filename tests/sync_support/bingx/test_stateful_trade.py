@@ -1,5 +1,6 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
+import logging
 import os
 import time
 import uuid
@@ -19,6 +20,7 @@ SWAP_SYMBOL = "BTC-USDT-SWAP"
 FUND_ACCOUNT = "fund"
 SPOT_ACCOUNT = "spot"
 SWAP_ACCOUNT = "USDTMPerp"
+LOGGER = logging.getLogger(__name__)
 
 pytestmark = [
     pytest.mark.private,
@@ -90,6 +92,24 @@ def _transferable(client: Client, from_account: str, to_account: str, asset: str
         if item.get("asset") == asset:
             return _dec(item.get("availableTransferAmount", item.get("amount")))
     return Decimal("0")
+
+
+def _account_available_usdt(client: Client, account: str) -> Decimal:
+    if account == FUND_ACCOUNT:
+        return _fund_available(client, "USDT")
+    if account == SPOT_ACCOUNT:
+        return _spot_available(client, "USDT")
+    if account == SWAP_ACCOUNT:
+        return _swap_available_usdt(client)
+    return Decimal("0")
+
+
+def _transfer_sources(to_account: str) -> tuple[str, ...]:
+    if to_account == SPOT_ACCOUNT:
+        return (FUND_ACCOUNT, SWAP_ACCOUNT)
+    if to_account == SWAP_ACCOUNT:
+        return (FUND_ACCOUNT, SPOT_ACCOUNT)
+    return (FUND_ACCOUNT, SPOT_ACCOUNT, SWAP_ACCOUNT)
 
 
 def _swap_open_orders(client: Client) -> list[dict]:
@@ -224,7 +244,7 @@ def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
         current_available=_swap_available_usdt(client),
     )
     if _swap_available_usdt(client) < required:
-        pytest.skip("BingX swap USDT remains insufficient after fund transfer.")
+        pytest.skip("BingX swap USDT remains insufficient after internal transfer.")
 
 
 def _swap_fillable_limit_buy_price(client: Client) -> float:
@@ -267,20 +287,45 @@ def _ensure_usdt_for_account(
     if current_available >= required:
         return
 
-    transferable = _transferable(client, FUND_ACCOUNT, to_account, "USDT")
-    fund_available = _fund_available(client, "USDT")
-    source_available = min(transferable, fund_available) if fund_available > 0 else transferable
-    amount = max(required - current_available + Decimal("0.5"), Decimal("1"))
-    if source_available < amount:
-        pytest.skip(f"Insufficient BingX fund USDT to transfer into {to_account}.")
+    for from_account in _transfer_sources(to_account):
+        current_available = _account_available_usdt(client, to_account)
+        if current_available >= required:
+            return
+        amount = max(required - current_available + Decimal("0.5"), Decimal("1"))
+        try:
+            transferable = _transferable(client, from_account, to_account, "USDT")
+            source_available = _account_available_usdt(client, from_account)
+        except Exception as error:
+            LOGGER.info(
+                "Skipping BingX transfer route %s->%s; transferable amount unavailable: %s",
+                from_account,
+                to_account,
+                error,
+            )
+            continue
+        available = min(transferable, source_available)
+        if available <= 0:
+            continue
 
-    client.asset_transfer(
-        fromAccount=FUND_ACCOUNT,
-        toAccount=to_account,
-        asset="USDT",
-        amount=_fmt(amount),
-    )
-    time.sleep(2)
+        try:
+            client.asset_transfer(
+                fromAccount=from_account,
+                toAccount=to_account,
+                asset="USDT",
+                amount=_fmt(min(amount, available)),
+            )
+        except Exception as error:
+            LOGGER.info(
+                "Skipping BingX transfer route %s->%s; transfer failed: %s",
+                from_account,
+                to_account,
+                error,
+            )
+            continue
+        time.sleep(2)
+
+    if _account_available_usdt(client, to_account) < required:
+        pytest.skip(f"Insufficient transferable BingX USDT to transfer into {to_account}.")
 
 
 def _ensure_swap_usdt(client: Client, quantity: str, price: str) -> None:
@@ -292,7 +337,7 @@ def _ensure_swap_usdt(client: Client, quantity: str, price: str) -> None:
         current_available=_swap_available_usdt(client),
     )
     if _swap_available_usdt(client) < required:
-        pytest.skip("BingX swap USDT remains insufficient after fund transfer.")
+        pytest.skip("BingX swap USDT remains insufficient after internal transfer.")
 
 
 def _ensure_spot_usdt(client: Client, quantity: str, price: str) -> None:
@@ -304,7 +349,7 @@ def _ensure_spot_usdt(client: Client, quantity: str, price: str) -> None:
         current_available=_spot_available(client, "USDT"),
     )
     if _spot_available(client, "USDT") < required:
-        pytest.skip("BingX spot USDT remains insufficient after fund transfer.")
+        pytest.skip("BingX spot USDT remains insufficient after internal transfer.")
 
 
 @pytest.mark.private
