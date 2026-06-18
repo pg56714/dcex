@@ -8,6 +8,18 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 EXAMPLES = ROOT / "examples"
+MIGRATED_EXCHANGES = (
+    "binance",
+    "bingx",
+    "bitget",
+    "bitmart",
+    "bitmex",
+    "bybit",
+    "gateio",
+    "kraken",
+    "mexc",
+    "okx",
+)
 MUTATING_EXAMPLE_PREFIXES = (
     "amend",
     "cancel",
@@ -54,6 +66,18 @@ def test_python_examples_use_main_entrypoints() -> None:
         }
         assert "main" in function_names, path
         assert not any(name.startswith("test_") for name in function_names), path
+
+
+def test_migrated_exchanges_have_sync_and_async_examples() -> None:
+    missing: list[str] = []
+    for exchange in MIGRATED_EXCHANGES:
+        for mode in ("sync", "async"):
+            for suffix in ("public", "private_readonly"):
+                path = EXAMPLES / mode / f"{exchange}_{suffix}.py"
+                if not path.exists():
+                    missing.append(str(path.relative_to(ROOT)))
+
+    assert missing == []
 
 
 def test_examples_do_not_call_mutating_client_methods() -> None:
