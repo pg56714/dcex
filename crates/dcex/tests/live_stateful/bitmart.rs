@@ -6,13 +6,15 @@ use tokio::time::sleep;
 
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
-    fetch_trading_details, find_f64, format_transfer_amount, minimum_order_quantity_with_step,
-    params, post_only_buy_price, price_below_market, require_env, require_live_trading,
-    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    fetch_trading_details, find_f64, format_transfer_amount, leveraged_margin_required,
+    minimum_order_quantity_with_step, params, parse_positive, post_only_buy_price,
+    price_below_market, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_non_empty_records, wait_for_positive_position, DOGE_USDT_SPOT, DOGE_USDT_SWAP,
 };
 
 const BITMART_CONTRACT_LEVERAGE: &str = "50";
+const BITMART_CONTRACT_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
 async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
@@ -103,7 +105,14 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
     let details = fetch_trading_details(Exchange::BitMart, "bitmart", DOGE_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let size = minimum_order_quantity_with_step(&price, &details, Some(&details.min_size))?;
-    let transferred = match ensure_bitmart_contract_usdt(&client).await? {
+    let market_price_estimate = parse_positive(&price, "price")? / 0.95;
+    let required_usdt = leveraged_margin_required(
+        market_price_estimate,
+        &size,
+        &details,
+        BITMART_CONTRACT_LEVERAGE_VALUE,
+    )?;
+    let transferred = match ensure_bitmart_contract_usdt(&client, required_usdt).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -205,20 +214,32 @@ async fn bitmart_contract_position_abs(client: &BitmartClient) -> dcex::Result<f
     ))
 }
 
-async fn ensure_bitmart_contract_usdt(client: &BitmartClient) -> dcex::Result<Option<f64>> {
-    if bitmart_contract_usdt(client).await? >= 1.0 {
+async fn ensure_bitmart_contract_usdt(
+    client: &BitmartClient,
+    required: f64,
+) -> dcex::Result<Option<f64>> {
+    let contract = bitmart_contract_usdt(client).await?;
+    if contract >= required {
         return Ok(Some(0.0));
     }
-    if bitmart_spot_usdt(client).await? < 2.0 {
-        eprintln!("skipping BitMart contract live stateful order; insufficient transferable USDT");
+    let needed = required - contract;
+    let spot = bitmart_spot_usdt(client).await?;
+    if spot < needed {
+        eprintln!(
+            "skipping BitMart contract live stateful order; insufficient transferable USDT, required={required:.8}, contract={contract:.8}, spot={spot:.8}"
+        );
         return Ok(None);
     }
+    let amount = format_transfer_amount(needed);
     let response = client
-        .transfer_contract(params(&[("amount", "2"), ("type", "spot_to_contract")]))
+        .transfer_contract(params(&[
+            ("amount", amount.as_str()),
+            ("type", "spot_to_contract"),
+        ]))
         .await?;
     assert_success(&response);
     sleep(Duration::from_secs(2)).await;
-    Ok(Some(2.0))
+    Ok(Some(needed))
 }
 
 async fn return_bitmart_contract_transfer(client: &BitmartClient, amount: f64) -> dcex::Result<()> {

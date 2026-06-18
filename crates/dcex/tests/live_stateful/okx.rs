@@ -6,10 +6,14 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details,
-    format_transfer_amount, minimum_order_quantity, params, parse_positive, post_only_buy_price,
-    require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
-    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    format_transfer_amount, leveraged_margin_required, minimum_order_quantity, params,
+    parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
+
+const OKX_SWAP_LEVERAGE: &str = "50";
+const OKX_SWAP_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
 async fn okx_direct_live_stateful_order() -> dcex::Result<()> {
@@ -103,12 +107,19 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
     let leverage = client
         .set_leverage(params(&[
             ("product_symbol", BTC_USDT_SWAP),
-            ("lever", "50"),
+            ("lever", OKX_SWAP_LEVERAGE),
             ("mgnMode", "cross"),
         ]))
         .await?;
     assert_success(&leverage);
-    let transferred = match ensure_trading_usdt(&client, 25.0).await? {
+    let market_price_estimate = parse_positive(&price, "price")? / 0.95;
+    let required_usdt = leveraged_margin_required(
+        market_price_estimate,
+        &quantity,
+        &details,
+        OKX_SWAP_LEVERAGE_VALUE,
+    )?;
+    let transferred = match ensure_trading_usdt(&client, required_usdt).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -164,8 +175,11 @@ async fn ensure_trading_usdt(client: &OkxClient, required: f64) -> dcex::Result<
         return Ok(Some(0.0));
     }
     let needed = required - trading;
-    if funding_usdt(client).await? < needed {
-        eprintln!("skipping OKX live stateful order; insufficient transferable USDT");
+    let funding = funding_usdt(client).await?;
+    if funding < needed {
+        eprintln!(
+            "skipping OKX live stateful order; insufficient transferable USDT, required={required:.8}, trading={trading:.8}, funding={funding:.8}"
+        );
         return Ok(None);
     }
     let amount = format_transfer_amount(needed);

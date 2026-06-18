@@ -6,13 +6,14 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    format_transfer_amount, minimum_order_quantity, params, post_only_buy_price,
-    price_below_market, require_env, require_live_trading, require_order_id,
+    format_transfer_amount, leveraged_margin_required, minimum_order_quantity, params,
+    post_only_buy_price, price_below_market, require_env, require_live_trading, require_order_id,
     sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const MEXC_CONTRACT_LEVERAGE: &str = "50";
+const MEXC_CONTRACT_LEVERAGE_VALUE: f64 = 50.0;
 const MEXC_CONTRACT_OPEN_TYPE: &str = "2";
 
 #[tokio::test]
@@ -88,7 +89,9 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     let details = fetch_trading_details(Exchange::Mexc, "mexc", BTC_USDT_SWAP).await?;
     let price = price_below_market(bid, &details, 0.50)?;
     let quantity = minimum_order_quantity(&price, &details)?;
-    let transferred = match ensure_mexc_contract_usdt(&client, 0.5).await? {
+    let required_usdt =
+        leveraged_margin_required(bid, &quantity, &details, MEXC_CONTRACT_LEVERAGE_VALUE)?;
+    let transferred = match ensure_mexc_contract_usdt(&client, required_usdt).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -173,18 +176,23 @@ async fn ensure_mexc_contract_usdt(
     if futures >= required {
         return Ok(Some(0.0));
     }
-    let amount = 1.0;
-    if mexc_spot_usdt(client).await? < amount {
-        eprintln!("skipping MEXC contract live stateful order; insufficient transferable USDT");
+    let needed = required - futures;
+    let spot = mexc_spot_usdt(client).await?;
+    if spot < needed {
+        eprintln!(
+            "skipping MEXC contract live stateful order; insufficient transferable USDT, required={required:.8}, futures={futures:.8}, spot={spot:.8}"
+        );
         return Ok(None);
     }
-    mexc_transfer(client, "SPOT", "FUTURES", amount).await?;
+    mexc_transfer(client, "SPOT", "FUTURES", needed).await?;
     sleep(Duration::from_secs(3)).await;
     if mexc_contract_usdt(client).await? < required {
-        eprintln!("skipping MEXC contract live stateful order; futures USDT remains insufficient");
+        eprintln!(
+            "skipping MEXC contract live stateful order; futures USDT remains insufficient, required={required:.8}"
+        );
         return Ok(None);
     }
-    Ok(Some(amount))
+    Ok(Some(needed))
 }
 
 async fn return_mexc_contract_transfer(client: &MexcClient, amount: f64) -> dcex::Result<()> {

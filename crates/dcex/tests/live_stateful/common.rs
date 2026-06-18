@@ -191,6 +191,37 @@ pub(crate) fn minimum_order_quantity(price: &str, details: &TradingDetails) -> R
     minimum_order_quantity_with_step(price, details, None)
 }
 
+pub(crate) fn order_notional(
+    price: impl Into<f64>,
+    quantity: &str,
+    details: &TradingDetails,
+) -> Result<f64> {
+    let price = price.into();
+    if !price.is_finite() || price <= 0.0 {
+        return Err(DcexError::Decode(format!("invalid price: {price}")));
+    }
+    let quantity = positive_decimal(quantity, "quantity")?;
+    let size_per_contract = non_negative_decimal(&details.size_per_contract, "size_per_contract")?;
+    let size_per_contract = if size_per_contract > 0.0 {
+        size_per_contract
+    } else {
+        1.0
+    };
+    Ok(price * quantity * size_per_contract)
+}
+
+pub(crate) fn leveraged_margin_required(
+    price: impl Into<f64>,
+    quantity: &str,
+    details: &TradingDetails,
+    leverage: f64,
+) -> Result<f64> {
+    if !leverage.is_finite() || leverage <= 0.0 {
+        return Err(DcexError::Decode(format!("invalid leverage: {leverage}")));
+    }
+    Ok(order_notional(price, quantity, details)? / leverage * 1.25)
+}
+
 pub(crate) fn minimum_order_quantity_with_step(
     price: &str,
     details: &TradingDetails,

@@ -7,10 +7,13 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, contains_non_empty_array, fetch_trading_details, find_f64, first_bid_price,
-    format_transfer_amount_ceil, minimum_order_quantity, params, post_only_buy_price, require_env,
-    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
-    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
+    format_transfer_amount_ceil, leveraged_margin_required, minimum_order_quantity, params,
+    post_only_buy_price, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_non_empty_records,
+    wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
 };
+
+const KRAKEN_FUTURES_MARGIN_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
 async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
@@ -81,9 +84,16 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
         .get_futures_orderbook(params(&[("product_symbol", BTC_USD_SWAP)]))
         .await?;
     let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USD_SWAP).await?;
+    let bid = first_bid_price(&orderbook.data)?;
     let price = kraken_futures_post_only_buy_price(&orderbook.data)?;
     let quantity = kraken_futures_quantity(&details);
-    let transferred = match ensure_kraken_futures_margin(&client, 0.5).await? {
+    let required_usdt = leveraged_margin_required(
+        bid,
+        &quantity,
+        &details,
+        KRAKEN_FUTURES_MARGIN_LEVERAGE_VALUE,
+    )?;
+    let transferred = match ensure_kraken_futures_margin(&client, required_usdt).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -158,8 +168,11 @@ async fn ensure_kraken_futures_margin(
         return Ok(Some(0.0));
     }
     let needed = required - flex;
-    if kraken_cash_available(&accounts.data, "usdt") < needed {
-        eprintln!("skipping Kraken futures live stateful order; insufficient cash USDT");
+    let cash = kraken_cash_available(&accounts.data, "usdt");
+    if cash < needed {
+        eprintln!(
+            "skipping Kraken futures live stateful order; insufficient cash USDT, required={required:.8}, flex={flex:.8}, cash={cash:.8}"
+        );
         return Ok(None);
     }
     let amount = format_transfer_amount_ceil(needed, 8);

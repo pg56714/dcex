@@ -7,12 +7,15 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, bitget_unified_account_error, contains_non_empty_array,
-    fetch_trading_details, minimum_order_quantity, params, post_only_buy_price, push, require_env,
+    fetch_trading_details, format_transfer_amount, leveraged_margin_required,
+    minimum_order_quantity, params, parse_positive, post_only_buy_price, push, require_env,
     require_live_trading, require_order_id, sum_abs_values_for_symbols, unique_client_id,
     wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const BITGET_FUTURES_PRODUCT_TYPE: &str = "USDT-FUTURES";
+const BITGET_SWAP_LEVERAGE: &str = "50";
+const BITGET_SWAP_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
 async fn bitget_direct_live_stateful_order() -> dcex::Result<()> {
@@ -119,7 +122,15 @@ async fn bitget_swap_direct_live_stateful_order() -> dcex::Result<()> {
     let details = fetch_trading_details(Exchange::Bitget, "bitget", BTC_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
-    let transferred = match ensure_bitget_futures_margin(&client, uta).await? {
+    set_bitget_swap_leverage(&client, uta).await?;
+    let market_price_estimate = parse_positive(&price, "price")? / 0.95;
+    let required_usdt = leveraged_margin_required(
+        market_price_estimate,
+        &quantity,
+        &details,
+        BITGET_SWAP_LEVERAGE_VALUE,
+    )?;
+    let transferred = match ensure_bitget_futures_margin(&client, uta, required_usdt).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -211,22 +222,31 @@ async fn bitget_swap_position_abs(client: &BitgetClient, uta: bool) -> dcex::Res
 async fn ensure_bitget_futures_margin(
     client: &BitgetClient,
     uta: bool,
+    required: f64,
 ) -> dcex::Result<Option<f64>> {
-    if bitget_futures_usdt(client, uta).await? >= 1.0 {
+    let futures = bitget_futures_usdt(client, uta).await?;
+    if futures >= required {
         return Ok(Some(0.0));
     }
+    let needed = required - futures;
     if uta {
-        eprintln!("skipping Bitget UTA swap live stateful order; insufficient USDT");
+        eprintln!(
+            "skipping Bitget UTA swap live stateful order; insufficient USDT, required={required:.8}, futures={futures:.8}"
+        );
         return Ok(None);
     }
-    if bitget_spot_usdt(client).await? < 2.0 {
-        eprintln!("skipping Bitget swap live stateful order; insufficient transferable USDT");
+    let spot = bitget_spot_usdt(client).await?;
+    if spot < needed {
+        eprintln!(
+            "skipping Bitget swap live stateful order; insufficient transferable USDT, required={required:.8}, futures={futures:.8}, spot={spot:.8}"
+        );
         return Ok(None);
     }
+    let amount = format_transfer_amount(needed);
     let response = client
         .transfer(params(&[
             ("coin", "USDT"),
-            ("amount", "2"),
+            ("amount", amount.as_str()),
             ("fromType", "spot"),
             ("toType", "usdt_futures"),
             ("clientOid", unique_client_id("dcexrs").as_str()),
@@ -234,7 +254,7 @@ async fn ensure_bitget_futures_margin(
         .await?;
     assert_success(&response);
     sleep(Duration::from_secs(2)).await;
-    Ok(Some(2.0))
+    Ok(Some(needed))
 }
 
 async fn return_bitget_futures_margin(
@@ -250,10 +270,7 @@ async fn return_bitget_futures_margin(
     if amount <= 0.0 {
         return Ok(());
     }
-    let amount = format!("{amount:.6}")
-        .trim_end_matches('0')
-        .trim_end_matches('.')
-        .to_string();
+    let amount = format_transfer_amount(amount);
     let response = client
         .transfer(params(&[
             ("coin", "USDT"),
@@ -325,6 +342,36 @@ async fn bitget_place_swap_post_only_buy(
             ("clientOid", unique_client_id("dcexrs").as_str()),
         ]))
         .await
+}
+
+async fn set_bitget_swap_leverage(client: &BitgetClient, uta: bool) -> dcex::Result<()> {
+    let result = if uta {
+        client
+            .set_uta_leverage(params(&[
+                ("category", BITGET_FUTURES_PRODUCT_TYPE),
+                ("product_symbol", BTC_USDT_SWAP),
+                ("leverage", BITGET_SWAP_LEVERAGE),
+                ("marginMode", "crossed"),
+            ]))
+            .await
+    } else {
+        client
+            .set_futures_leverage(params(&[
+                ("product_symbol", BTC_USDT_SWAP),
+                ("productType", BITGET_FUTURES_PRODUCT_TYPE),
+                ("marginCoin", "USDT"),
+                ("leverage", BITGET_SWAP_LEVERAGE),
+            ]))
+            .await
+    };
+    match result {
+        Ok(response) => {
+            assert_success(&response);
+            Ok(())
+        }
+        Err(error) if error.to_string().contains("leverage is the same") => Ok(()),
+        Err(error) => Err(error),
+    }
 }
 
 async fn bitget_cancel_swap_order(

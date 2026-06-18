@@ -7,11 +7,14 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details,
-    format_transfer_amount_ceil, minimum_order_quantity, params, parse_positive,
-    post_only_buy_price, push, require_env, require_live_trading, require_order_id,
+    format_transfer_amount_ceil, leveraged_margin_required, minimum_order_quantity, params,
+    parse_positive, post_only_buy_price, push, require_env, require_live_trading, require_order_id,
     sum_abs_values_for_symbols, wait_for_flat_position, wait_for_non_empty_records,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
+
+const BYBIT_SWAP_LEVERAGE: &str = "50";
+const BYBIT_SWAP_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
 async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
@@ -106,8 +109,13 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     set_bybit_swap_leverage(&client).await?;
-    let notional = parse_positive(&price, "price")? * parse_positive(&quantity, "quantity")? / 0.95;
-    let required_usdt = (notional / 50.0 * 2.0).max(5.0);
+    let market_price_estimate = parse_positive(&price, "price")? / 0.95;
+    let required_usdt = leveraged_margin_required(
+        market_price_estimate,
+        &quantity,
+        &details,
+        BYBIT_SWAP_LEVERAGE_VALUE,
+    )?;
     let transferred = match ensure_unified_usdt(&client, required_usdt).await? {
         Some(amount) => amount,
         None => return Ok(()),
@@ -175,7 +183,9 @@ async fn ensure_unified_usdt(client: &BybitClient, required: f64) -> dcex::Resul
     }
     let needed = required - unified;
     if account_usdt(client, "FUND").await? < needed {
-        eprintln!("skipping Bybit live stateful order; insufficient transferable USDT");
+        eprintln!(
+            "skipping Bybit live stateful order; insufficient transferable USDT, required={required:.8}, unified={unified:.8}"
+        );
         return Ok(None);
     }
     let amount = format_transfer_amount_ceil(needed, 4);
@@ -250,7 +260,7 @@ async fn set_bybit_swap_leverage(client: &BybitClient) -> dcex::Result<()> {
     match client
         .set_leverage(params(&[
             ("product_symbol", BTC_USDT_SWAP),
-            ("leverage", "50"),
+            ("leverage", BYBIT_SWAP_LEVERAGE),
         ]))
         .await
     {

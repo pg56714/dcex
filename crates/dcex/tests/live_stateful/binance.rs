@@ -6,15 +6,19 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    format_transfer_amount, minimum_order_quantity, parse_positive, post_only_buy_price,
-    price_below_market, require_env, require_live_trading, require_order_id, sum_abs_values,
-    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    format_transfer_amount, leveraged_margin_required, minimum_order_quantity, parse_positive,
+    post_only_buy_price, price_below_market, require_env, require_live_trading, require_order_id,
+    sum_abs_values, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 struct TransferBack {
     amount: String,
     transfer_type: &'static str,
 }
+
+const BINANCE_FUTURES_LEVERAGE: &str = "50";
+const BINANCE_FUTURES_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
 async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
@@ -101,7 +105,13 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     })?;
     let price = price_below_market(bid, &details, 0.95)?;
     let quantity = minimum_order_quantity(&price, &details)?;
-    let transfer = match ensure_futures_usdt(&client, 10.0).await? {
+    let leverage = client
+        .set_leverage(BTC_USDT_SWAP, BINANCE_FUTURES_LEVERAGE)
+        .await?;
+    assert_success(&leverage);
+    let required_usdt =
+        leveraged_margin_required(bid, &quantity, &details, BINANCE_FUTURES_LEVERAGE_VALUE)?;
+    let transfer = match ensure_futures_usdt(&client, required_usdt).await? {
         Some(transfer) => transfer,
         None => return Ok(()),
     };
@@ -174,7 +184,9 @@ async fn ensure_spot_usdt(
             }));
         }
     }
-    eprintln!("skipping Binance live stateful order; insufficient transferable USDT");
+    eprintln!(
+        "skipping Binance live stateful order; insufficient transferable USDT, required={required:.8}"
+    );
     Ok(None)
 }
 
@@ -212,7 +224,9 @@ async fn ensure_futures_usdt(
             }));
         }
     }
-    eprintln!("skipping Binance futures live stateful order; insufficient transferable USDT");
+    eprintln!(
+        "skipping Binance futures live stateful order; insufficient transferable USDT, required={required:.8}"
+    );
     Ok(None)
 }
 
