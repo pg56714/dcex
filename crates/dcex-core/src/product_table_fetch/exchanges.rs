@@ -441,7 +441,9 @@ pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
                 min_size: value_string(lot, "minOrderQty", "0"),
                 base_currency: base,
                 quote_currency: quote,
-                min_notional: if category == "inverse" {
+                min_notional: if category == "spot" {
+                    value_string(lot, "minOrderAmt", "0")
+                } else if category == "inverse" {
                     "0".to_string()
                 } else {
                     value_string(lot, "minNotionalValue", "0")

@@ -1,7 +1,7 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use crate::exchange::{ExchangeHttpClient, ValidatedResponse};
+use crate::exchange::{unix_timestamp_ms, ExchangeHttpClient, ValidatedResponse};
 use crate::http::{block_on, HttpMethod, HttpRequest, HttpResponse};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
@@ -10,7 +10,7 @@ use super::endpoints::*;
 use super::params::{
     exchange_symbol_fallback, is_canonical_product_symbol, market_for_product_symbol_fallback,
 };
-use super::signing::{BinanceResponseValidator, BinanceSigner};
+use super::signing::{extract_server_time_ms, BinanceResponseValidator, BinanceSigner};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinanceMarket {
@@ -33,6 +33,7 @@ pub struct BinanceClient {
     futures_base_url: String,
     spot_base_url: String,
     api_key: Option<String>,
+    timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
     product_table: Option<Arc<ProductTable>>,
 }
 
@@ -58,6 +59,7 @@ impl BinanceClient {
         spot_base_url: String,
         futures_base_url: String,
     ) -> Result<Self> {
+        let timestamp_offset_ms = Arc::new(Mutex::new(None));
         let mut inner =
             ExchangeHttpClient::new(timeout)?.with_validator(Arc::new(BinanceResponseValidator));
         let api_key_header = api_key.clone();
@@ -65,6 +67,7 @@ impl BinanceClient {
             inner = inner.with_signer(Arc::new(BinanceSigner {
                 api_key,
                 api_secret,
+                timestamp_offset_ms: timestamp_offset_ms.clone(),
             }));
         }
         Ok(Self {
@@ -72,6 +75,7 @@ impl BinanceClient {
             futures_base_url,
             spot_base_url,
             api_key: api_key_header,
+            timestamp_offset_ms,
             product_table: None,
         })
     }
@@ -93,6 +97,9 @@ impl BinanceClient {
         params: Vec<(String, String)>,
         signed: bool,
     ) -> Result<ValidatedResponse> {
+        if signed {
+            self.sync_server_time(market).await?;
+        }
         let request = self.build_request(method, market, path, params);
         self.inner.execute(request, signed).await
     }
@@ -105,8 +112,42 @@ impl BinanceClient {
         params: Vec<(String, String)>,
         signed: bool,
     ) -> Result<HttpResponse> {
+        if signed {
+            self.sync_server_time(market).await?;
+        }
         let request = self.build_request(method, market, path, params);
         self.inner.execute_raw(request, signed).await
+    }
+
+    async fn sync_server_time(&self, market: BinanceMarket) -> Result<()> {
+        {
+            let offset = self.timestamp_offset_ms.lock().map_err(|error| {
+                DcexError::Runtime(format!("Binance timestamp offset lock poisoned: {error}"))
+            })?;
+            if offset.is_some() {
+                return Ok(());
+            }
+        }
+
+        let local_start = unix_timestamp_ms()?;
+        let path = match market {
+            BinanceMarket::Futures => FUTURES_SERVER_TIME,
+            BinanceMarket::Spot => SPOT_SERVER_TIME,
+        };
+        let request = self.build_request(HttpMethod::Get, market, path, Vec::new());
+        let response = self.inner.execute(request, false).await?;
+        let local_end = unix_timestamp_ms()?;
+        let server_time = extract_server_time_ms(&response.data).ok_or_else(|| {
+            DcexError::Decode(format!(
+                "Binance server time response did not include serverTime: {response:?}"
+            ))
+        })?;
+        let midpoint = ((local_start + local_end) / 2) as i64;
+        let mut offset = self.timestamp_offset_ms.lock().map_err(|error| {
+            DcexError::Runtime(format!("Binance timestamp offset lock poisoned: {error}"))
+        })?;
+        *offset = Some(server_time as i64 - midpoint);
+        Ok(())
     }
 
     fn build_request(

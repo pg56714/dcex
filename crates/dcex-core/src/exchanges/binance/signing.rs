@@ -1,3 +1,5 @@
+use std::sync::{Arc, Mutex};
+
 use serde_json::Value;
 use url::form_urlencoded;
 
@@ -10,10 +12,12 @@ use crate::{DcexError, Result};
 pub(super) struct BinanceSigner {
     pub(super) api_key: String,
     pub(super) api_secret: String,
+    pub(super) timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
 }
 
 impl RequestSigner for BinanceSigner {
     fn sign(&self, request: &mut HttpRequest, timestamp_ms: u64) -> Result<()> {
+        let timestamp_ms = self.adjust_timestamp(timestamp_ms)?;
         let params = match &mut request.body {
             RequestBody::Empty => &mut request.query,
             RequestBody::Form(params) => params,
@@ -32,6 +36,18 @@ impl RequestSigner for BinanceSigner {
             .headers
             .insert("X-MBX-APIKEY".to_string(), self.api_key.clone());
         Ok(())
+    }
+}
+
+impl BinanceSigner {
+    fn adjust_timestamp(&self, timestamp_ms: u64) -> Result<u64> {
+        let offset = self.timestamp_offset_ms.lock().map_err(|error| {
+            DcexError::Runtime(format!("Binance timestamp offset lock poisoned: {error}"))
+        })?;
+        let Some(offset) = *offset else {
+            return Ok(timestamp_ms);
+        };
+        Ok((timestamp_ms as i64 + offset).max(0) as u64)
     }
 }
 
@@ -82,4 +98,14 @@ pub(super) fn json_value_string(value: &Value) -> String {
         Value::String(value) => value.clone(),
         _ => value.to_string(),
     }
+}
+
+pub(super) fn extract_server_time_ms(data: &Value) -> Option<u64> {
+    data.as_object()
+        .and_then(|object| object.get("serverTime"))
+        .and_then(|value| match value {
+            Value::Number(value) => value.as_u64(),
+            Value::String(value) => value.parse().ok(),
+            _ => None,
+        })
 }

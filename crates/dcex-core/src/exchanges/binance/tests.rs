@@ -1,3 +1,4 @@
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use super::client::{BinanceClient, BinanceMarket};
@@ -14,6 +15,7 @@ fn signer_matches_python_implementation() {
     let signer = BinanceSigner {
         api_key: "api-key".to_string(),
         api_secret: "secret".to_string(),
+        timestamp_offset_ms: Arc::new(Mutex::new(None)),
     };
     let mut request = HttpRequest::new(HttpMethod::Get, SPOT_BASE_URL, "/api/v3/order");
     request.query = vec![
@@ -41,6 +43,29 @@ fn signer_matches_python_implementation() {
     assert_eq!(
         request.headers.get("X-MBX-APIKEY").map(String::as_str),
         Some("api-key")
+    );
+}
+
+#[test]
+fn signer_applies_timestamp_offset() {
+    let signer = BinanceSigner {
+        api_key: "api-key".to_string(),
+        api_secret: "secret".to_string(),
+        timestamp_offset_ms: Arc::new(Mutex::new(Some(-1_500))),
+    };
+    let mut request = HttpRequest::new(HttpMethod::Get, SPOT_BASE_URL, "/api/v3/order");
+
+    signer
+        .sign(&mut request, 1_700_000_000_000)
+        .expect("signature");
+
+    assert_eq!(
+        request
+            .query
+            .iter()
+            .find(|(key, _)| key == "timestamp")
+            .map(|(_, value)| value.as_str()),
+        Some("1699999998500")
     );
 }
 
