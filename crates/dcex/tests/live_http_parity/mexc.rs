@@ -7,6 +7,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn mexc_public_live_parity() -> dcex::Result<()> {
     let client = MexcClient::new(None, None, Duration::from_secs(20))?;
     run_cases(
@@ -145,6 +146,7 @@ async fn mexc_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn mexc_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&["MEXC_API_KEY", "MEXC_API_SECRET"]) else {
         return Ok(());

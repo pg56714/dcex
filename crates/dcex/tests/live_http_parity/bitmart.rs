@@ -8,6 +8,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitmart_public_live_parity() -> dcex::Result<()> {
     let client = BitmartClient::new(None, None, None, Duration::from_secs(20))?;
     let end_time = (now_ms() / 1000).to_string();
@@ -66,6 +67,7 @@ async fn bitmart_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitmart_private_read_live_parity() -> dcex::Result<()> {
     if !live_http_enabled() {
         eprintln!("skipping live private parity test; set RUN_LIVE_HTTP_TESTS=1");

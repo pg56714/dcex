@@ -5,6 +5,7 @@ use dcex::exchanges::kraken::KrakenClient;
 use super::common::{require_env, run_cases, run_private_cases, Case, BTC_USDT_SPOT, BTC_USD_SWAP};
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn kraken_public_live_parity() -> dcex::Result<()> {
     let client = KrakenClient::new(None, None, None, None, Duration::from_secs(20))?;
     run_cases(
@@ -70,6 +71,7 @@ async fn kraken_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn kraken_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&[
         "KRAKEN_SPOT_API_KEY",

@@ -7,6 +7,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bingx_public_live_parity() -> dcex::Result<()> {
     let client = BingxClient::new(None, None, Duration::from_secs(20))?;
     run_cases(
@@ -116,6 +117,7 @@ async fn bingx_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bingx_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&["BINGX_API_KEY", "BINGX_API_SECRET"]) else {
         return Ok(());

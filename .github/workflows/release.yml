@@ -1,4 +1,4 @@
-name: Release and Publish
+name: Release Python Package
 
 on:
   push:
@@ -53,13 +53,13 @@ jobs:
           echo "Bumped version: ${{ steps.cz.outputs.version }}"
           echo "Has bump: ${{ steps.check_bump.outputs.has_bump }}"
 
-      - name: Release
+      - name: Create Python GitHub Release
         if: ${{ steps.check_bump.outputs.has_bump == 'true' }}
         uses: softprops/action-gh-release@v3
         with:
           body_path: "body.md"
           tag_name: ${{ steps.cz.outputs.version }}
-          name: ${{ steps.cz.outputs.version }}
+          name: Python ${{ steps.cz.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -111,27 +111,8 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  publish_rust_crate:
-    needs: bump_version
-    if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          ref: ${{ needs.bump_version.outputs.cz_version }}
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Publish dcex to crates.io
-        run: cargo publish -p dcex --locked --token "${{ secrets.CARGO_REGISTRY_TOKEN }}"
-
   publish_if_bumped:
-    needs: [bump_version, build_python_artifacts, publish_rust_crate]
+    needs: [bump_version, build_python_artifacts]
     if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
     runs-on: ubuntu-latest
     permissions:

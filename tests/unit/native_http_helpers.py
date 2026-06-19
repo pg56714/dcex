@@ -88,7 +88,12 @@ def _http_server(
             if content_length:
                 request["body"] = self.rfile.read(content_length).decode()
             received.put(request)
-            body = json.dumps(response_payload, separators=(",", ":")).encode()
+            payload = (
+                {"serverTime": 1}
+                if self.path.split("?", 1)[0] in {"/api/v3/time", "/fapi/v1/time"}
+                else response_payload
+            )
+            body = json.dumps(payload, separators=(",", ":")).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("X-Response", "native")

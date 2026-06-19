@@ -8,6 +8,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitget_public_live_parity() -> dcex::Result<()> {
     let client = BitgetClient::new(None, None, None, Duration::from_secs(20))?;
     let end_time = now_ms().to_string();
@@ -153,6 +154,7 @@ async fn bitget_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitget_private_read_live_parity() -> dcex::Result<()> {
     if !live_http_enabled() {
         eprintln!("skipping live private parity test; set RUN_LIVE_HTTP_TESTS=1");

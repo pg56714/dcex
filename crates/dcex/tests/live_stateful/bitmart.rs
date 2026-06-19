@@ -17,6 +17,7 @@ const BITMART_CONTRACT_LEVERAGE: &str = "50";
 const BITMART_CONTRACT_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());
@@ -76,6 +77,7 @@ async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());

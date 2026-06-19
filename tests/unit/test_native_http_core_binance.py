@@ -4,6 +4,7 @@ import base64
 import hashlib
 import hmac
 import json
+from typing import Any
 from urllib.parse import parse_qsl, urlsplit
 
 import msgspec
@@ -12,6 +13,14 @@ from Crypto.PublicKey import ECC
 from Crypto.Signature import eddsa
 
 from tests.unit.native_http_helpers import _http_server
+
+
+def _next_non_binance_time_request(received) -> dict[str, Any]:  # noqa: ANN001
+    while True:
+        request = received.get_nowait()
+        path = urlsplit(request["path"]).path
+        if path not in {"/api/v3/time", "/fapi/v1/time"}:
+            return request
 
 
 def test_native_sync_http_client() -> None:
@@ -80,7 +89,7 @@ def test_native_binance_signed_request() -> None:
             True,
         )
 
-    request = received.get_nowait()
+    request = _next_non_binance_time_request(received)
     signed_query, signature = request["path"].split("?", 1)[1].rsplit("&signature=", 1)
     expected_signature = hmac.new(
         b"secret",
@@ -236,7 +245,7 @@ def test_sync_binance_private_trade_wrapper_uses_native_dispatcher() -> None:
         )
 
     client.close()
-    request = received.get_nowait()
+    request = _next_non_binance_time_request(received)
     body = dict(parse_qsl(request["body"]))
     assert result == {"ok": True}
     assert request["path"] == "/api/v3/order"
@@ -292,7 +301,7 @@ def test_binance_native_dispatcher_uses_product_table_symbols() -> None:
         )
 
     client.close()
-    request = received.get_nowait()
+    request = _next_non_binance_time_request(received)
     body = dict(parse_qsl(request["body"]))
     assert result == {"ok": True}
     assert request["path"] == "/fapi/v1/order"
@@ -322,7 +331,7 @@ async def test_async_binance_private_account_wrapper_uses_native_dispatcher() ->
         result = await client.get_account_balance(market_type="swap")
 
     await client.close()
-    request = received.get_nowait()
+    request = _next_non_binance_time_request(received)
     query = dict(parse_qsl(urlsplit(request["path"]).query))
     assert result == {"ok": True}
     assert urlsplit(request["path"]).path == "/fapi/v3/balance"

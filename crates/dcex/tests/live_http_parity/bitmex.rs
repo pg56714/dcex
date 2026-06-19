@@ -8,6 +8,7 @@ use super::common::{require_env, run_cases, run_private_cases, Case};
 const XBT_USDT_SWAP: &str = "XBT-USDT-SWAP";
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitmex_public_live_parity() -> dcex::Result<()> {
     let client = BitmexClient::new(None, None, Duration::from_secs(20))?;
     run_cases(
@@ -48,6 +49,7 @@ async fn bitmex_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitmex_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&["BITMEX_API_KEY", "BITMEX_API_SECRET"]) else {
         return Ok(());

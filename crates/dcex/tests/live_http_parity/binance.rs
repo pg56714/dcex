@@ -8,6 +8,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn binance_public_live_parity() -> dcex::Result<()> {
     let client = BinanceClient::new(None, None, Duration::from_secs(20))?;
     run_cases(
@@ -103,6 +104,7 @@ async fn binance_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn binance_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&["BINANCE_API_KEY", "BINANCE_API_SECRET"]) else {
         return Ok(());

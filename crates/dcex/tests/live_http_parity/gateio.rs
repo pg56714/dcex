@@ -7,6 +7,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn gateio_public_live_parity() -> dcex::Result<()> {
     let client = GateioClient::new(None, None, Duration::from_secs(20))?;
     run_cases(
@@ -87,6 +88,7 @@ async fn gateio_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn gateio_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&["GATEIO_API_KEY", "GATEIO_API_SECRET"]) else {
         return Ok(());

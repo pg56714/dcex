@@ -12,6 +12,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());

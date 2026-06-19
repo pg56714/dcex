@@ -222,10 +222,13 @@ baseline ref. Use `DCEX_BENCH_ITERATIONS`, `DCEX_BENCH_WARMUP`, and
 
 ## Release Publishing
 
-The release workflow publishes only when Commitizen creates a version bump on
-`main`. A bumped release builds Python wheels, publishes the Rust crate
-(`dcex`) to crates.io, and publishes the Python package to PyPI after the crate
-publish succeeds. If no version bump is detected, neither registry is updated.
+The Python release workflow publishes only when Commitizen creates a version
+bump on `main`. A bumped Python release builds wheels and publishes the Python
+package to PyPI. If no version bump is detected, PyPI is not updated.
+
+The Rust crate has an independent version in `crates/dcex/Cargo.toml` and is
+published from `rust-v*` tags. For example, `rust-v0.1.0` publishes crate
+version `0.1.0` to crates.io and creates a separate GitHub Release.
 
 ## License
 

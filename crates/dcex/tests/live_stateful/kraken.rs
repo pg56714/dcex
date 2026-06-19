@@ -16,6 +16,7 @@ use super::common::{
 const KRAKEN_FUTURES_MARGIN_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());
@@ -56,6 +57,7 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());

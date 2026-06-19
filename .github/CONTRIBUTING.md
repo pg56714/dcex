@@ -132,12 +132,14 @@ Versioning and changelog updates are handled by the release workflow after chang
 
 ## Release Publishing
 
-The release workflow publishes only when Commitizen creates a new version on
-`main`. For a bumped release, GitHub Actions builds Python artifacts, publishes
-the Rust crate `dcex` to crates.io, and publishes the Python package to PyPI
-after the crate publish succeeds. Required registry credentials are
-`CARGO_REGISTRY_TOKEN` for crates.io and PyPI Trusted Publishing for the PyPI
-job.
+The Python release workflow publishes only when Commitizen creates a new
+version on `main`. For a bumped Python release, GitHub Actions builds Python
+artifacts and publishes the package to PyPI using Trusted Publishing.
+
+The Rust crate `dcex` is versioned independently in `crates/dcex/Cargo.toml`
+and published from matching `rust-v*` tags. For example, tag `rust-v0.1.0`
+publishes crate version `0.1.0` to crates.io. Required Rust registry
+credentials are provided through `CARGO_REGISTRY_TOKEN`.
 
 ## Issues and Feature Requests
 

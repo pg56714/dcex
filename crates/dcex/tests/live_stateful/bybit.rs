@@ -17,6 +17,7 @@ const BYBIT_SWAP_LEVERAGE: &str = "50";
 const BYBIT_SWAP_LEVERAGE_VALUE: f64 = 50.0;
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());
@@ -74,6 +75,7 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());

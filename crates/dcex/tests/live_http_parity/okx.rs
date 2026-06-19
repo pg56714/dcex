@@ -7,6 +7,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn okx_public_live_parity() -> dcex::Result<()> {
     let client = OkxClient::new(None, None, None, "0".to_string(), Duration::from_secs(20))?;
     run_cases(
@@ -89,6 +90,7 @@ async fn okx_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn okx_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&["OKX_API_KEY", "OKX_API_SECRET", "OKX_PASSPHRASE"]) else {
         return Ok(());

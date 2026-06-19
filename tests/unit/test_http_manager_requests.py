@@ -368,49 +368,30 @@ async def test_async_hyperliquid_signed_request_does_not_mutate_query(
 
 
 @pytest.mark.asyncio
-async def test_async_hyperliquid_lazily_loads_product_table(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_async_hyperliquid_public_wrapper_uses_native_dispatcher() -> None:
     from dcex.async_support.hyperliquid._market_http import MarketHTTP
-    from dcex.utils.common import Common
 
-    hyperliquid_http = import_module("dcex.async_support.hyperliquid._http_manager")
-    get_instance_calls: list[str] = []
+    class _NativeClient:
+        def __init__(self) -> None:
+            self.calls: list[tuple[str, list[tuple[str, str]]]] = []
 
-    class _ProductTable:
-        def get_exchange_symbol(self, exchange: str, product_symbol: str) -> str:
-            assert exchange == Common.HYPERLIQUID
-            assert product_symbol == "BTC-USDC-SWAP"
-            return '["BTC", 0]'
+        async def public_request_async(
+            self,
+            method_name: str,
+            params: list[tuple[str, str]],
+        ) -> tuple[int, dict[str, str], bytes]:
+            self.calls.append((method_name, params))
+            return 200, {"x-response": "native"}, b'{"levels":[]}'
 
-    async def get_instance(cls: type[Any], exchange_name: str) -> _ProductTable:
-        get_instance_calls.append(exchange_name)
-        return _ProductTable()
-
-    monkeypatch.setattr(
-        hyperliquid_http.ProductTableManager,
-        "get_instance",
-        classmethod(get_instance),
-    )
+    native_client = _NativeClient()
     client = MarketHTTP(preload_product_table=False)
-    client.endpoint = "https://api.hyperliquid.xyz"
-    session = _AsyncCaptureSession(payload={"levels": []})
-    client.session = session
+    client._native_client = native_client
 
     result = await client.get_l2book("BTC-USDC-SWAP")
 
     assert result == {"levels": []}
-    assert get_instance_calls == [Common.HYPERLIQUID]
-    assert session.calls == [
-        (
-            "POST",
-            "https://api.hyperliquid.xyz/info",
-            {
-                "headers": {"Content-Type": "application/json"},
-                "json": {"type": "l2Book", "coin": "BTC"},
-            },
-        )
-    ]
+    assert native_client.calls == [("get_l2book", [("product_symbol", "BTC-USDC-SWAP")])]
+    assert client.last_response_headers == {"x-response": "native"}
 
 
 def test_bingx_listen_key_uses_managed_request_path() -> None:

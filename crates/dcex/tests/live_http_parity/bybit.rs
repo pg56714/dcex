@@ -7,6 +7,7 @@ use super::common::{
 };
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bybit_public_live_parity() -> dcex::Result<()> {
     let client = BybitClient::new(None, None, 5_000, true, Duration::from_secs(20))?;
     run_cases(
@@ -91,6 +92,7 @@ async fn bybit_public_live_parity() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bybit_private_read_live_parity() -> dcex::Result<()> {
     let Some(keys) = require_env(&["BYBIT_API_KEY", "BYBIT_API_SECRET"]) else {
         return Ok(());

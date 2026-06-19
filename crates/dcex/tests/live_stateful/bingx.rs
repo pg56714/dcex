@@ -19,6 +19,7 @@ const BINGX_SWAP_ACCOUNT: &str = "USDTMPerp";
 const BINGX_LEVERAGE_VALUE: f64 = 10.0;
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bingx_spot_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());
@@ -77,6 +78,7 @@ async fn bingx_spot_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 #[tokio::test]
+#[ignore = "requires live exchange API access"]
 async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());
