@@ -202,8 +202,11 @@ benchmark output files are not committed.
 
 Recorded local CPU-bound sample (`.\.venv\Scripts\python.exe examples\benchmark_core_local.py --iterations 20`, 2026-06-19):
 
-| Operation | PyO3 bridge speedup | Rust native speedup |
-| --------- | ------------------- | ------------------- |
+Speedups are measured against the pure Python fallback implementation for the
+same local CPU-bound operation.
+
+| Operation | PyO3 bridge speedup vs Python fallback | Rust native speedup vs Python fallback |
+| --------- | -------------------------------------- | -------------------------------------- |
 | Cryptographic hash | 89.06x | 85.50x |
 | Schnorr signature | 496.43x | 448.37x |
 | Transaction payload signing | 309.08x | 368.78x |

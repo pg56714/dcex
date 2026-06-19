@@ -259,8 +259,8 @@ def _benchmark_pair(
 
 
 def _print_markdown(rows: list[dict[str, str | float]]) -> None:
-    print("| Operation | PyO3 bridge speedup | Rust native speedup |")
-    print("| --------- | ------------------- | ------------------- |")
+    print("| Operation | PyO3 bridge speedup vs Python fallback | Rust native speedup vs Python fallback |")
+    print("| --------- | -------------------------------------- | -------------------------------------- |")
     for row in rows:
         print(
             f"| {row['operation']} | {float(row['pyo3_speedup']):.2f}x | "
