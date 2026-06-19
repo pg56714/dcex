@@ -37,10 +37,12 @@ def test_sync_hyperliquid_builder_fee_payload_matches_docs() -> None:
         fee_ten_bp=10,
     )
 
-    action = calls[0]["query"]["action"]
     assert result == {"ok": True}
-    assert action["builder"] == {"b": builder_address, "f": 10}
-    assert "feeTenBp" not in action
+    assert calls[0]["method"] == "NATIVE_PRIVATE"
+    assert calls[0]["path"] == "place_order"
+    params = dict(calls[0]["query"])
+    assert params["builder_address"] == builder_address
+    assert params["fee_ten_bp"] == "10"
 
 
 def test_sync_hyperliquid_builder_fee_requires_address_and_fee() -> None:
@@ -82,9 +84,12 @@ def test_sync_hyperliquid_market_order_uses_ioc_limit_payload(
 
     client.place_future_market_buy_order(product_symbol="BTC-USD-SWAP", size="1")
 
-    order = calls[0]["query"]["action"]["orders"][0]
-    assert order["p"] == "103"
-    assert order["t"] == {"limit": {"tif": "Ioc"}}
+    assert calls[0]["method"] == "NATIVE_PRIVATE"
+    assert calls[0]["path"] == "place_future_market_buy_order"
+    assert dict(calls[0]["query"]) == {
+        "product_symbol": "BTC-USD-SWAP",
+        "size": "1",
+    }
 
 
 def test_sync_bybit_post_only_forwards_position_idx() -> None:

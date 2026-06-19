@@ -78,6 +78,11 @@ class HTTPManager(BaseHTTPManager):
             )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.HYPERLIQUID)
+            if self._native_client is not None and hasattr(
+                self._native_client,
+                "set_product_table",
+            ):
+                self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
         return (
@@ -109,7 +114,75 @@ class HTTPManager(BaseHTTPManager):
         """Lazily obtain the product table manager instance."""
         if self.ptm is None:
             self.ptm = ProductTableManager.get_instance(Common.HYPERLIQUID)
+            if self._native_client is not None and hasattr(
+                self._native_client,
+                "set_product_table",
+            ):
+                self._native_client.set_product_table(self.ptm._native_table)
         return self.ptm
+
+    def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Hyperliquid public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Hyperliquid native client is required for public methods.")
+        if not hasattr(self._native_client, "public_request"):
+            raise RuntimeError("Hyperliquid native client public_request is unavailable.")
+        try:
+            status, headers, body = self._native_client.public_request(method_name, params)
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"HYPERLIQUID {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(generate_timestamp(iso_format=True)),
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _native_private(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Hyperliquid private method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Hyperliquid native client is required for private methods.")
+        if not hasattr(self._native_client, "private_request"):
+            raise RuntimeError("Hyperliquid native client private_request is unavailable.")
+        try:
+            status, headers, body = self._native_client.private_request(method_name, params)
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"HYPERLIQUID {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(generate_timestamp(iso_format=True)),
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    @staticmethod
+    def _native_params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if key == "self" or value is None:
+                continue
+            enum_value = getattr(value, "value", None)
+            if enum_value is not None:
+                value = enum_value
+            if isinstance(value, bool):
+                value = str(value).lower()
+            elif isinstance(value, (list, dict)):
+                value = msgspec.json.encode(value).decode("utf-8")
+            params.append((key, str(value)))
+        return params
 
     def _auth(self, query: dict[str, Any], timestamp: int) -> dict[str, str | int]:
         """

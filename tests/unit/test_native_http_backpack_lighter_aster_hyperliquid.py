@@ -278,6 +278,62 @@ def test_native_hyperliquid_signed_request() -> None:
     assert payload["signature"] == expected
 
 
+def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> None:
+    native = pytest.importorskip("dcex._native")
+    builder_address = "0x0000000000000000000000000000000000000002"
+
+    with _http_server({"ok": True}) as (base_url, received):
+        client = native.HyperliquidHttpClient(
+            wallet_address="0x" + "22" * 20,
+            private_key="0x" + "11" * 32,
+            timeout=2,
+            endpoint=base_url,
+        )
+        status, _headers, body = client.private_request(
+            "place_order",
+            [
+                ("product_symbol", "BTC-USD-SWAP"),
+                ("isBuy", "true"),
+                ("price", "100"),
+                ("size", "1"),
+                ("reduceOnly", "false"),
+                ("builder_address", builder_address),
+                ("fee_ten_bp", "10"),
+            ],
+        )
+
+    request = received.get_nowait()
+    action = json.loads(request["body"])["action"]
+    assert status == 200
+    assert json.loads(body) == {"ok": True}
+    assert action["builder"] == {"b": builder_address, "f": 10}
+    assert "feeTenBp" not in action
+
+
+def test_native_hyperliquid_market_order_uses_ioc_limit_payload() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server([{}, [{"midPx": "100.0"}]]) as (base_url, received):
+        client = native.HyperliquidHttpClient(
+            wallet_address="0x" + "22" * 20,
+            private_key="0x" + "11" * 32,
+            timeout=2,
+            endpoint=base_url,
+        )
+        client.private_request(
+            "place_future_market_buy_order",
+            [("product_symbol", "BTC-USD-SWAP"), ("size", "1")],
+        )
+
+    assert received.get_nowait()["path"] == "/info"
+    exchange_request = received.get_nowait()
+    action = json.loads(exchange_request["body"])["action"]
+    order = action["orders"][0]
+    assert exchange_request["path"] == "/exchange"
+    assert order["p"] == "103"
+    assert order["t"] == {"limit": {"tif": "Ioc"}}
+
+
 def test_sync_hyperliquid_manager_uses_native_transport() -> None:
     from dcex.hyperliquid._http_manager import HTTPManager
 

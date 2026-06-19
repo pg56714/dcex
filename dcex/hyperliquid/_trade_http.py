@@ -1,30 +1,12 @@
-"""Trading-related HTTP API client for Hyperliquid exchange."""
+"""Trading-related HTTP API client for Hyperliquid exchange backed by Rust."""
 
-from decimal import ROUND_DOWN, ROUND_UP, Decimal
 from typing import Any
 
-import msgspec
-
-from ..utils.common import Common
 from ._http_manager import HTTPManager
-from ._market_http import MarketHTTP
-from .endpoint.path import Path
-from .endpoint.trade import Trade
 
 
 class TradeHTTP(HTTPManager):
     """HTTP client for trading operations on Hyperliquid exchange."""
-
-    def _format_market_order_price(self, price: str, isBuy: bool) -> str:
-        """Format an aggressive IOC price within Hyperliquid precision rules."""
-        value = Decimal(str(price))
-        if value <= 0:
-            return "0"
-
-        rounding = ROUND_UP if isBuy else ROUND_DOWN
-        precision_step = Decimal(1).scaleb(value.adjusted() - 4)
-        rounded = value.quantize(precision_step, rounding=rounding)
-        return format(rounded.normalize(), "f")
 
     def place_order(
         self,
@@ -44,82 +26,10 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place an order on the exchange.
-
-        Args:
-            product_symbol: Product symbol
-            isBuy: Whether this is a buy order
-            price: Order price
-            size: Order size
-            reduceOnly: Whether this is a reduce-only order
-            tif: Time in force
-            isMarket: Whether this is a market order
-            triggerPx: Trigger price for conditional orders
-            tpsl: Take profit/stop loss
-            cloid: Client order ID
-            grouping: Order grouping
-            builder_address: Builder address
-            fee_ten_bp: Fee rate in units of 1/10 basis point (e.g. 10 = 1 bp)
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing order placement result
-        """
-        action = {
-            "type": Trade.ORDER,
-            "orders": [
-                {
-                    "a": msgspec.json.decode(
-                        self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-                    )[1],
-                    "b": isBuy,
-                    "p": price,
-                    "s": size,
-                    "r": reduceOnly,
-                }
-            ],
-            "grouping": grouping,
-        }
-
-        if tif is not None or isMarket:
-            t = {}
-            if tif is not None:
-                t["limit"] = {"tif": tif}
-            else:
-                t["trigger"] = {
-                    "isMarket": isMarket,
-                    "triggerPx": triggerPx,
-                    "tpsl": tpsl,
-                }
-            action["orders"][0]["t"] = t
-
-        if cloid is not None:
-            action["orders"][0]["c"] = cloid
+        """Place an order on the exchange."""
         if (builder_address is None) != (fee_ten_bp is None):
             raise ValueError("builder_address and fee_ten_bp must be provided together")
-        if builder_address is not None:
-            action["builder"] = {"b": builder_address, "f": fee_ten_bp}
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
-        )
-        return res
+        return self._native_private("place_order", self._native_params(**locals()))
 
     def place_future_market_order(
         self,
@@ -131,61 +41,10 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a future market order.
-
-        Args:
-            product_symbol: Product symbol
-            isBuy: Whether this is a buy order
-            size: Order size
-            triggerPx: Trigger price for conditional orders
-            tpsl: Take profit/stop loss
-
-        Returns:
-            Dict containing order placement result
-        """
-        market_http = MarketHTTP(
-            testnet=self.testnet,
-            subdomain=self.subdomain,
-            tld=self.tld,
-            timeout=self.timeout,
-            preload_product_table=False,
-        )
-        try:
-            result: Any = market_http.get_meta_and_asset_ctxs()
-        finally:
-            market_http.close()
-        exchange_symbol = msgspec.json.decode(
-            self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-        )[1]
-        asset_contexts = result[1]
-        mid_price = Decimal(str(asset_contexts[exchange_symbol]["midPx"]))
-        slippage_multiplier = Decimal("1.03") if isBuy else Decimal("0.97")
-        price = self._format_market_order_price(str(mid_price * slippage_multiplier), isBuy)
-
-        if triggerPx is not None or tpsl is not None:
-            return self.place_order(
-                product_symbol=product_symbol,
-                isBuy=isBuy,
-                price=price,
-                size=size,
-                reduceOnly=False,
-                isMarket=True,
-                triggerPx=triggerPx,
-                tpsl=tpsl,
-                vaultAddress=vaultAddress,
-                expireAfter=expireAfter,
-            )
-
-        return self.place_order(
-            product_symbol=product_symbol,
-            isBuy=isBuy,
-            price=price,
-            size=size,
-            reduceOnly=False,
-            tif="Ioc",
-            vaultAddress=vaultAddress,
-            expireAfter=expireAfter,
+        """Place a future market order."""
+        return self._native_private(
+            "place_future_market_order",
+            self._native_params(**locals()),
         )
 
     def place_future_market_buy_order(
@@ -197,26 +56,10 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a future market buy order.
-
-        Args:
-            product_symbol: Product symbol
-            size: Order size
-            triggerPx: Trigger price for conditional orders
-            tpsl: Take profit/stop loss
-
-        Returns:
-            Dict containing order placement result
-        """
-        return self.place_future_market_order(
-            product_symbol=product_symbol,
-            isBuy=True,
-            size=size,
-            triggerPx=triggerPx,
-            tpsl=tpsl,
-            vaultAddress=vaultAddress,
-            expireAfter=expireAfter,
+        """Place a future market buy order."""
+        return self._native_private(
+            "place_future_market_buy_order",
+            self._native_params(**locals()),
         )
 
     def place_future_market_sell_order(
@@ -228,26 +71,10 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a future market sell order.
-
-        Args:
-            product_symbol: Product symbol
-            size: Order size
-            triggerPx: Trigger price for conditional orders
-            tpsl: Take profit/stop loss
-
-        Returns:
-            Dict containing order placement result
-        """
-        return self.place_future_market_order(
-            product_symbol=product_symbol,
-            isBuy=False,
-            size=size,
-            triggerPx=triggerPx,
-            tpsl=tpsl,
-            vaultAddress=vaultAddress,
-            expireAfter=expireAfter,
+        """Place a future market sell order."""
+        return self._native_private(
+            "place_future_market_sell_order",
+            self._native_params(**locals()),
         )
 
     def place_future_limit_order(
@@ -258,26 +85,10 @@ class TradeHTTP(HTTPManager):
         size: str,
         tif: str,
     ) -> dict[str, Any]:
-        """
-        Place a future limit order.
-
-        Args:
-            product_symbol: Product symbol
-            isBuy: Whether this is a buy order
-            price: Order price
-            size: Order size
-            tif: Time in force
-
-        Returns:
-            Dict containing order placement result
-        """
-        return self.place_order(
-            product_symbol=product_symbol,
-            isBuy=isBuy,
-            price=price,
-            size=size,
-            reduceOnly=False,
-            tif=tif,
+        """Place a future limit order."""
+        return self._native_private(
+            "place_future_limit_order",
+            self._native_params(**locals()),
         )
 
     def place_future_limit_buy_order(
@@ -287,25 +98,10 @@ class TradeHTTP(HTTPManager):
         size: str,
         tif: str,
     ) -> dict[str, Any]:
-        """
-        Place a future limit buy order.
-
-        Args:
-            product_symbol: Product symbol
-            price: Order price
-            size: Order size
-            tif: Time in force
-
-        Returns:
-            Dict containing order placement result
-        """
-        return self.place_order(
-            product_symbol=product_symbol,
-            isBuy=True,
-            price=price,
-            size=size,
-            reduceOnly=False,
-            tif=tif,
+        """Place a future limit buy order."""
+        return self._native_private(
+            "place_future_limit_buy_order",
+            self._native_params(**locals()),
         )
 
     def place_future_limit_sell_order(
@@ -315,25 +111,10 @@ class TradeHTTP(HTTPManager):
         size: str,
         tif: str,
     ) -> dict[str, Any]:
-        """
-        Place a future limit sell order.
-
-        Args:
-            product_symbol: Product symbol
-            price: Order price
-            size: Order size
-            tif: Time in force
-
-        Returns:
-            Dict containing order placement result
-        """
-        return self.place_order(
-            product_symbol=product_symbol,
-            isBuy=False,
-            price=price,
-            size=size,
-            reduceOnly=False,
-            tif=tif,
+        """Place a future limit sell order."""
+        return self._native_private(
+            "place_future_limit_sell_order",
+            self._native_params(**locals()),
         )
 
     def cancel_order(
@@ -343,47 +124,8 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Cancel an order by order ID.
-
-        Args:
-            product_symbol: Product symbol
-            oid: Order ID
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing cancellation result
-        """
-        action = {
-            "type": Trade.CANCEL,
-            "cancels": [
-                {
-                    "a": msgspec.json.decode(
-                        self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-                    )[1],
-                    "o": oid,
-                }
-            ],
-        }
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
-        )
-        return res
+        """Cancel an order by order ID."""
+        return self._native_private("cancel_order", self._native_params(**locals()))
 
     def cancel_order_by_cloid(
         self,
@@ -392,47 +134,11 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Cancel an order by client order ID.
-
-        Args:
-            product_symbol: Product symbol
-            cloid: Client order ID
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing cancellation result
-        """
-        action = {
-            "type": Trade.CANCELBYCLOID,
-            "cancels": [
-                {
-                    "asset": msgspec.json.decode(
-                        self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-                    )[1],
-                    "cloid": cloid,
-                }
-            ],
-        }
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
+        """Cancel an order by client order ID."""
+        return self._native_private(
+            "cancel_order_by_cloid",
+            self._native_params(**locals()),
         )
-        return res
 
     def schedule_cancel(
         self,
@@ -440,39 +146,8 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Schedule order cancellation.
-
-        Args:
-            time: Cancellation time
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing scheduling result
-        """
-        action = {
-            "type": Trade.SCHEDULECANCEL,
-            "time": time,
-        }
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
-        )
-        return res
+        """Schedule order cancellation."""
+        return self._native_private("schedule_cancel", self._native_params(**locals()))
 
     def modify_order(
         self,
@@ -490,108 +165,20 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Modify an existing order.
-
-        Args:
-            oid: Order ID to modify
-            product_symbol: Product symbol
-            isBuy: Whether this is a buy order
-            price: Order price
-            size: Order size
-            reduceOnly: Whether this is a reduce-only order
-            tif: Time in force
-            isMarket: Whether this is a market order
-            triggerPx: Trigger price for conditional orders
-            tpsl: Take profit/stop loss
-            cloid: Client order ID
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing modification result
-        """
-        action = {
-            "type": Trade.MODIFY,
-            "oid": oid,
-            "order": {
-                "a": msgspec.json.decode(
-                    self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-                )[1],
-                "b": isBuy,
-                "p": price,
-                "s": size,
-                "r": reduceOnly,
-            },
-        }
-
-        if tif is not None or isMarket:
-            t = {}
-            if tif is not None:
-                t["limit"] = {"tif": tif}
-            else:
-                t["trigger"] = {
-                    "isMarket": isMarket,
-                    "triggerPx": triggerPx,
-                    "tpsl": tpsl,
-                }
-            action["order"]["t"] = t
-        if cloid is not None:
-            action["order"]["c"] = cloid
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
-        )
-        return res
+        """Modify an existing order."""
+        return self._native_private("modify_order", self._native_params(**locals()))
 
     def modify_batch_orders(
-        self, modifies: list, vaultAddress: str | None = None, expireAfter: int | None = None
+        self,
+        modifies: list,
+        vaultAddress: str | None = None,
+        expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Modify multiple orders in batch.
-
-        Args:
-            modifies: List of order modifications
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing batch modification result
-        """
-        action = {"type": Trade.BATCHMODIFY, "modifies": modifies}
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
+        """Modify multiple orders in batch."""
+        return self._native_private(
+            "modify_batch_orders",
+            self._native_params(**locals()),
         )
-        return res
 
     def update_leverage(
         self,
@@ -601,45 +188,8 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Update leverage for a product.
-
-        Args:
-            product_symbol: Product symbol
-            isCross: Whether to use cross margin
-            leverage: Leverage value
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing leverage update result
-        """
-        action = {
-            "type": Trade.UPDATELEVERAGE,
-            "asset": msgspec.json.decode(
-                self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-            )[1],
-            "isCross": isCross,
-            "leverage": leverage,
-        }
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
-        )
-        return res
+        """Update leverage for a product."""
+        return self._native_private("update_leverage", self._native_params(**locals()))
 
     def update_isolate_margin(
         self,
@@ -649,45 +199,11 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Update isolated margin for a product.
-
-        Args:
-            product_symbol: Product symbol
-            isBuy: Whether this is a buy position
-            ntli: Net total long interest
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing margin update result
-        """
-        action = {
-            "type": Trade.UPDATEISOLATEMARGIN,
-            "asset": msgspec.json.decode(
-                self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-            )[1],
-            "isBuy": isBuy,
-            "ntli": ntli,
-        }
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
+        """Update isolated margin for a product."""
+        return self._native_private(
+            "update_isolate_margin",
+            self._native_params(**locals()),
         )
-        return res
 
     def place_twap_order(
         self,
@@ -700,54 +216,8 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Place a TWAP (Time-Weighted Average Price) order.
-
-        Args:
-            product_symbol: Product symbol
-            isBuy: Whether this is a buy order
-            size: Order size
-            reduceOnly: Whether this is a reduce-only order
-            minutes: Duration in minutes
-            randomize: Whether to randomize execution
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing TWAP order placement result
-        """
-        action = {
-            "type": Trade.TWAPORDER,
-            "twap": {
-                "a": msgspec.json.decode(
-                    self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-                )[1],
-                "b": isBuy,
-                "s": size,
-                "r": reduceOnly,
-                "m": minutes,
-                "t": randomize,
-            },
-        }
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
-        )
-        return res
+        """Place a TWAP order."""
+        return self._native_private("place_twap_order", self._native_params(**locals()))
 
     def cancel_twap_order(
         self,
@@ -756,41 +226,5 @@ class TradeHTTP(HTTPManager):
         vaultAddress: str | None = None,
         expireAfter: int | None = None,
     ) -> dict[str, Any]:
-        """
-        Cancel a TWAP order.
-
-        Args:
-            product_symbol: Product symbol
-            twap_id: TWAP order ID
-            vaultAddress: Vault address
-            expireAfter: Expiration timestamp
-
-        Returns:
-            Dict containing TWAP cancellation result
-        """
-        action = {
-            "type": Trade.TWAPCANCEL,
-            "a": msgspec.json.decode(
-                self._get_ptm().get_exchange_symbol(Common.HYPERLIQUID, product_symbol)
-            )[1],
-            "t": twap_id,
-        }
-
-        payload = {
-            "action": action,
-            "nonce": "",
-            "signature": "",
-        }
-
-        if vaultAddress is not None:
-            payload["vaultAddress"] = vaultAddress
-        if expireAfter is not None:
-            payload["expireAfter"] = expireAfter
-
-        res = self._request(
-            method="POST",
-            path=Path.EXCHANGE,
-            query=payload,
-            signed=True,
-        )
-        return res
+        """Cancel a TWAP order."""
+        return self._native_private("cancel_twap_order", self._native_params(**locals()))

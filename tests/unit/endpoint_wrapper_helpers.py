@@ -825,8 +825,10 @@ def _patch_async_case(client: Any, case: EndpointCase) -> None:
 def _patch_hyperliquid_market(monkeypatch: pytest.MonkeyPatch) -> None:
     sync_trade = import_module("dcex.hyperliquid._trade_http")
     async_trade = import_module("dcex.async_support.hyperliquid._trade_http")
-    monkeypatch.setattr(sync_trade, "MarketHTTP", FakeSyncHyperliquidMarket)
-    monkeypatch.setattr(async_trade, "MarketHTTP", FakeAsyncHyperliquidMarket)
+    if hasattr(sync_trade, "MarketHTTP"):
+        monkeypatch.setattr(sync_trade, "MarketHTTP", FakeSyncHyperliquidMarket)
+    if hasattr(async_trade, "MarketHTTP"):
+        monkeypatch.setattr(async_trade, "MarketHTTP", FakeAsyncHyperliquidMarket)
 
 
 def _patch_lighter_signer(client: Any) -> None:

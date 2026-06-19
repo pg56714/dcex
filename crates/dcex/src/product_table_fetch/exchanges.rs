@@ -555,12 +555,8 @@ fn parse_gateio_contracts(
 
 pub(super) async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = HyperliquidClient::new(false, None, None, timeout)?;
-    let perpetual = client
-        .public_request(br#"{"type":"meta"}"#.to_vec())
-        .await?;
-    let spot = client
-        .public_request(br#"{"type":"spotMeta"}"#.to_vec())
-        .await?;
+    let perpetual = client.public_request("get_meta", Vec::new()).await?;
+    let spot = client.public_request("get_spot_meta", Vec::new()).await?;
     let mut rows = Vec::new();
     for (index, market) in response_array(&perpetual, &["universe"]).iter().enumerate() {
         let coin = required_string(market, "name")?;

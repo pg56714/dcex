@@ -3,7 +3,7 @@
 import asyncio
 import os
 import uuid
-from decimal import ROUND_DOWN, Decimal
+from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import msgspec
 import pytest
@@ -93,6 +93,13 @@ async def _post_only_buy_price(client: Client) -> str:
 
 async def _post_only_sell_price(client: Client) -> str:
     return str(int(await _mid_price(client) * Decimal("1.1")))
+
+
+def _format_hyperliquid_price(value: Decimal, rounding: str) -> str:
+    if value <= 0:
+        return "0"
+    precision_step = Decimal(1).scaleb(value.adjusted() - 4)
+    return format(value.quantize(precision_step, rounding=rounding).normalize(), "f")
 
 
 def _size() -> str:
@@ -245,7 +252,7 @@ async def _spot_post_only_buy_price(client: Client) -> str:
     best_bid = Decimal(
         str((await client.get_l2book(product_symbol=SPOT_SYMBOL))["levels"][0][0]["px"])
     )
-    return format((best_bid * Decimal("0.8")).quantize(Decimal("0.000001")), "f")
+    return _format_hyperliquid_price(best_bid * Decimal("0.8"), ROUND_DOWN)
 
 
 async def _spot_post_only_buy(client: Client) -> tuple[str, str]:
@@ -258,16 +265,22 @@ async def _spot_aggressive_buy(client: Client) -> tuple[str, str]:
     best_ask = Decimal(
         str((await client.get_l2book(product_symbol=SPOT_SYMBOL))["levels"][1][0]["px"])
     )
-    price = (best_ask * Decimal("1.025")).quantize(Decimal("0.000001"))
+    price = Decimal(_format_hyperliquid_price(best_ask * Decimal("1.025"), ROUND_UP))
     size = int((SPOT_ORDER_NOTIONAL / price).to_integral_value(rounding=ROUND_DOWN))
     return str(size), format(price, "f")
 
 
-async def _spot_aggressive_sell_price(client: Client) -> str:
-    best_bid = Decimal(
-        str((await client.get_l2book(product_symbol=SPOT_SYMBOL))["levels"][0][0]["px"])
-    )
-    return format((best_bid * Decimal("0.975")).quantize(Decimal("0.000001")), "f")
+async def _spot_aggressive_sell_price(client: Client, size: Decimal | None = None) -> str:
+    bids = (await client.get_l2book(product_symbol=SPOT_SYMBOL))["levels"][0]
+    target = size or Decimal("1")
+    cumulative = Decimal("0")
+    price = Decimal(str(bids[0]["px"]))
+    for level in bids:
+        price = Decimal(str(level["px"]))
+        cumulative += Decimal(str(level["sz"]))
+        if cumulative >= target:
+            break
+    return _format_hyperliquid_price(price * Decimal("0.975"), ROUND_DOWN)
 
 
 async def _close_spot_test_delta(
@@ -282,7 +295,7 @@ async def _close_spot_test_delta(
     sell = await client.place_order(
         product_symbol=SPOT_SYMBOL,
         isBuy=False,
-        price=await _spot_aggressive_sell_price(client),
+        price=await _spot_aggressive_sell_price(client, Decimal(sell_size)),
         size=str(sell_size),
         reduceOnly=False,
         tif="Ioc",
@@ -571,7 +584,7 @@ async def test_spot_market_round_trip(client):
         sell = await client.place_order(
             product_symbol=SPOT_SYMBOL,
             isBuy=False,
-            price=await _spot_aggressive_sell_price(client),
+            price=await _spot_aggressive_sell_price(client, Decimal(sell_size)),
             size=str(sell_size),
             reduceOnly=False,
             tif="Ioc",
