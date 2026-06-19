@@ -87,7 +87,7 @@ fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
 
 pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = BackpackClient::new(None, None, 5_000, timeout)?;
-    let response = client.public_request("/api/v1/markets", vec![]).await?;
+    let response = client.public_request("get_markets", vec![]).await?;
     let mut rows = Vec::new();
     for market in value_array(Some(&response.data)) {
         if market.get("visible").and_then(Value::as_bool) == Some(false)

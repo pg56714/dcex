@@ -3,7 +3,6 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
-from .endpoints.account import Account, BorrowLend, Capital
 
 
 class AccountHTTP(HTTPManager):
@@ -11,16 +10,13 @@ class AccountHTTP(HTTPManager):
 
     async def get_account(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack account settings and limits."""
-        return await self._request("GET", Account.ACCOUNT, signed=True, instruction="accountQuery")
+        return await self._native_private("get_account", [])
 
     async def get_max_borrow_quantity(self, symbol: str) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack max borrow quantity."""
-        return await self._request(
-            "GET",
-            Account.MAX_BORROW_QUANTITY,
-            {"symbol": symbol},
-            signed=True,
-            instruction="maxBorrowQuantity",
+        return await self._native_private(
+            "get_max_borrow_quantity",
+            self._native_params(symbol=symbol),
         )
 
     async def get_max_order_quantity(
@@ -34,20 +30,9 @@ class AccountHTTP(HTTPManager):
         autoLendRedeem: bool | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack max order quantity."""
-        return await self._request(
-            "GET",
-            Account.MAX_ORDER_QUANTITY,
-            {
-                "symbol": symbol,
-                "side": side,
-                "price": price,
-                "reduceOnly": reduceOnly,
-                "autoBorrow": autoBorrow,
-                "autoBorrowRepay": autoBorrowRepay,
-                "autoLendRedeem": autoLendRedeem,
-            },
-            signed=True,
-            instruction="maxOrderQuantity",
+        return await self._native_private(
+            "get_max_order_quantity",
+            self._native_params(**locals()),
         )
 
     async def get_max_withdrawal_quantity(
@@ -57,26 +42,14 @@ class AccountHTTP(HTTPManager):
         autoLendRedeem: bool | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack max withdrawal quantity."""
-        return await self._request(
-            "GET",
-            Account.MAX_WITHDRAWAL_QUANTITY,
-            {
-                "symbol": symbol,
-                "autoBorrow": autoBorrow,
-                "autoLendRedeem": autoLendRedeem,
-            },
-            signed=True,
-            instruction="maxWithdrawalQuantity",
+        return await self._native_private(
+            "get_max_withdrawal_quantity",
+            self._native_params(**locals()),
         )
 
     async def get_borrow_lend_positions(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend positions."""
-        return await self._request(
-            "GET",
-            BorrowLend.POSITIONS,
-            signed=True,
-            instruction="borrowLendPositionQuery",
-        )
+        return await self._native_private("get_borrow_lend_positions", [])
 
     async def get_borrow_history(
         self,
@@ -87,18 +60,9 @@ class AccountHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend operation history."""
-        return await self._request(
-            "GET",
-            BorrowLend.BORROW_HISTORY,
-            {
-                "symbol": symbol,
-                "side": side,
-                "limit": limit,
-                "offset": offset,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="borrowHistoryQueryAll",
+        return await self._native_private(
+            "get_borrow_history",
+            self._native_params(**locals()),
         )
 
     async def get_interest_history(
@@ -109,17 +73,9 @@ class AccountHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend interest history."""
-        return await self._request(
-            "GET",
-            BorrowLend.INTEREST_HISTORY,
-            {
-                "symbol": symbol,
-                "limit": limit,
-                "offset": offset,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="interestHistoryQueryAll",
+        return await self._native_private(
+            "get_interest_history",
+            self._native_params(**locals()),
         )
 
     async def get_borrow_position_history(
@@ -132,43 +88,22 @@ class AccountHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend position history."""
-        return await self._request(
-            "GET",
-            BorrowLend.POSITION_HISTORY,
-            {
-                "symbol": symbol,
-                "side": side,
-                "state": state,
-                "limit": limit,
-                "offset": offset,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="borrowPositionHistoryQueryAll",
+        return await self._native_private(
+            "get_borrow_position_history",
+            self._native_params(**locals()),
         )
 
     async def get_balances(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack balances."""
-        return await self._request("GET", Capital.BALANCES, signed=True, instruction="balanceQuery")
+        return await self._native_private("get_balances", [])
 
     async def convert_dust(self, symbol: str) -> dict[str, Any] | list[Any] | str:
         """Convert a Backpack dust balance to USDC."""
-        return await self._request(
-            "POST",
-            Capital.CONVERT_DUST,
-            {"symbol": symbol},
-            signed=True,
-            instruction="convertDust",
-        )
+        return await self._native_private("convert_dust", self._native_params(symbol=symbol))
 
     async def get_private_collateral(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack private collateral data."""
-        return await self._request(
-            "GET",
-            Capital.COLLATERAL,
-            signed=True,
-            instruction="collateralQuery",
-        )
+        return await self._native_private("get_private_collateral", [])
 
     async def get_deposits(
         self,
@@ -179,28 +114,16 @@ class AccountHTTP(HTTPManager):
         excludePlatform: bool | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack deposit history."""
-        return await self._request(
-            "GET",
-            Capital.DEPOSITS,
-            {
-                "from": from_,
-                "to": to,
-                "limit": limit,
-                "offset": offset,
-                "excludePlatform": excludePlatform,
-            },
-            signed=True,
-            instruction="depositQueryAll",
+        return await self._native_private(
+            "get_deposits",
+            self._native_params(**locals()),
         )
 
     async def get_deposit_address(self, blockchain: str) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack deposit address for a blockchain."""
-        return await self._request(
-            "GET",
-            Capital.DEPOSIT_ADDRESS,
-            {"blockchain": blockchain},
-            signed=True,
-            instruction="depositAddressQuery",
+        return await self._native_private(
+            "get_deposit_address",
+            self._native_params(blockchain=blockchain),
         )
 
     async def get_withdrawals(
@@ -213,19 +136,9 @@ class AccountHTTP(HTTPManager):
         offset: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack withdrawal history."""
-        return await self._request(
-            "GET",
-            Capital.WITHDRAWALS,
-            {
-                "id": id,
-                "clientId": clientId,
-                "from": from_,
-                "to": to,
-                "limit": limit,
-                "offset": offset,
-            },
-            signed=True,
-            instruction="withdrawalQueryAll",
+        return await self._native_private(
+            "get_withdrawals",
+            self._native_params(**locals()),
         )
 
     async def get_dust_conversion_history(
@@ -237,18 +150,9 @@ class AccountHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack dust conversion history."""
-        return await self._request(
-            "GET",
-            Capital.DUST_CONVERSION_HISTORY,
-            {
-                "id": id,
-                "symbol": symbol,
-                "limit": limit,
-                "offset": offset,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="dustHistoryQueryAll",
+        return await self._native_private(
+            "get_dust_conversion_history",
+            self._native_params(**locals()),
         )
 
     async def get_settlement_history(
@@ -259,15 +163,7 @@ class AccountHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack settlement history."""
-        return await self._request(
-            "GET",
-            Capital.SETTLEMENT_HISTORY,
-            {
-                "limit": limit,
-                "offset": offset,
-                "source": source,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="settlementHistoryQueryAll",
+        return await self._native_private(
+            "get_settlement_history",
+            self._native_params(**locals()),
         )

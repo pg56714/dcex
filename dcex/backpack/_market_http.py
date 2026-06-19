@@ -2,36 +2,12 @@
 
 from typing import Any
 
-from .._native_http import NativeResponse
 from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.market import Public
 
 
 class MarketHTTP(HTTPManager):
     """HTTP client for Backpack public REST APIs."""
-
-    def _native_public(
-        self,
-        path: str,
-        params: list[tuple[str, str]] | None = None,
-    ) -> dict[str, Any] | list[Any] | str:
-        """Call a Rust-backed Backpack public endpoint and decode its JSON body."""
-        if self._native_client is None:
-            raise RuntimeError("Backpack native client is required for public market methods.")
-        status, headers, body = self._native_client.public_request(path, params or [])
-        response = NativeResponse(status, dict(headers), bytes(body))
-        self._store_response_headers(response)
-        return response.json()
-
-    @staticmethod
-    def _params(**kwargs: object) -> list[tuple[str, str]]:
-        params: list[tuple[str, str]] = []
-        for key, value in kwargs.items():
-            if value is None:
-                continue
-            params.append((key, str(value)))
-        return params
 
     def _symbol(self, product_symbol: str) -> str:
         if "_" in product_symbol:
@@ -45,15 +21,15 @@ class MarketHTTP(HTTPManager):
 
     def get_assets(self, country: str | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack asset metadata."""
-        return self._native_public(Public.ASSETS, self._params(country=country))
+        return self._native_public("get_assets", self._native_params(country=country))
 
     def get_collateral(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack public collateral parameters."""
-        return self._native_public(Public.COLLATERAL)
+        return self._native_public("get_collateral", [])
 
     def get_borrow_lend_markets(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend markets."""
-        return self._native_public(Public.BORROW_LEND_MARKETS)
+        return self._native_public("get_borrow_lend_markets", [])
 
     def get_borrow_lend_market_history(
         self,
@@ -62,23 +38,23 @@ class MarketHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend market history."""
         return self._native_public(
-            Public.BORROW_LEND_MARKET_HISTORY,
-            self._params(interval=interval, symbol=symbol),
+            "get_borrow_lend_market_history",
+            self._native_params(interval=interval, symbol=symbol),
         )
 
     def get_borrow_lend_apy(self, tierId: int | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend APY rates."""
-        return self._native_public(Public.BORROW_LEND_APY, self._params(tierId=tierId))
+        return self._native_public("get_borrow_lend_apy", self._native_params(tierId=tierId))
 
     def get_markets(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack markets."""
-        return self._native_public(Public.MARKETS)
+        return self._native_public("get_markets", [])
 
     def get_market(self, product_symbol: str) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack market."""
         return self._native_public(
-            Public.MARKET,
-            self._params(symbol=self._symbol(product_symbol)),
+            "get_market",
+            self._native_params(product_symbol=product_symbol),
         )
 
     def get_order_book_depth(
@@ -88,17 +64,17 @@ class MarketHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack order book depth."""
         return self._native_public(
-            Public.DEPTH,
-            self._params(symbol=self._symbol(product_symbol), limit=limit),
+            "get_order_book_depth",
+            self._native_params(product_symbol=product_symbol, limit=limit),
         )
 
     def get_market_sessions(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack market sessions."""
-        return self._native_public(Public.MARKET_SESSIONS)
+        return self._native_public("get_market_sessions", [])
 
     def get_securities(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack securities."""
-        return self._native_public(Public.SECURITIES)
+        return self._native_public("get_securities", [])
 
     def get_mark_prices(
         self,
@@ -106,10 +82,9 @@ class MarketHTTP(HTTPManager):
         marketType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack mark prices."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
         return self._native_public(
-            Public.MARK_PRICES,
-            self._params(symbol=symbol, marketType=marketType),
+            "get_mark_prices",
+            self._native_params(product_symbol=product_symbol, marketType=marketType),
         )
 
     def get_open_interest(
@@ -117,8 +92,10 @@ class MarketHTTP(HTTPManager):
         product_symbol: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack open interest."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return self._native_public(Public.OPEN_INTEREST, self._params(symbol=symbol))
+        return self._native_public(
+            "get_open_interest",
+            self._native_params(product_symbol=product_symbol),
+        )
 
     def get_funding_rates(
         self,
@@ -128,8 +105,8 @@ class MarketHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack historical funding rates."""
         return self._native_public(
-            Public.FUNDING_RATES,
-            self._params(symbol=self._symbol(product_symbol), limit=limit, offset=offset),
+            "get_funding_rates",
+            self._native_params(product_symbol=product_symbol, limit=limit, offset=offset),
         )
 
     def get_klines(
@@ -142,9 +119,9 @@ class MarketHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack candlesticks."""
         return self._native_public(
-            Public.KLINES,
-            self._params(
-                symbol=self._symbol(product_symbol),
+            "get_klines",
+            self._native_params(
+                product_symbol=product_symbol,
                 interval=interval,
                 startTime=startTime,
                 endTime=endTime,
@@ -159,29 +136,29 @@ class MarketHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack ticker."""
         return self._native_public(
-            Public.TICKER,
-            self._params(symbol=self._symbol(product_symbol), interval=interval),
+            "get_ticker",
+            self._native_params(product_symbol=product_symbol, interval=interval),
         )
 
     def get_tickers(self, interval: str | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack tickers."""
-        return self._native_public(Public.TICKERS, self._params(interval=interval))
+        return self._native_public("get_tickers", self._native_params(interval=interval))
 
     def get_status(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack system status."""
-        return self._native_public(Public.STATUS)
+        return self._native_public("get_status", [])
 
     def ping(self) -> dict[str, Any] | list[Any] | str:
         """Ping Backpack REST API."""
-        return self._native_public(Public.PING)
+        return self._native_public("ping", [])
 
     def get_time(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack system time."""
-        return self._native_public(Public.TIME)
+        return self._native_public("get_time", [])
 
     def get_wallets(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack public wallet addresses."""
-        return self._native_public(Public.WALLETS)
+        return self._native_public("get_wallets", [])
 
     def get_recent_trades(
         self,
@@ -190,8 +167,8 @@ class MarketHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack recent public trades."""
         return self._native_public(
-            Public.TRADES,
-            self._params(symbol=self._symbol(product_symbol), limit=limit),
+            "get_recent_trades",
+            self._native_params(product_symbol=product_symbol, limit=limit),
         )
 
     def get_historical_trades(
@@ -202,6 +179,6 @@ class MarketHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack historical public trades."""
         return self._native_public(
-            Public.HISTORICAL_TRADES,
-            self._params(symbol=self._symbol(product_symbol), limit=limit, offset=offset),
+            "get_historical_trades",
+            self._native_params(product_symbol=product_symbol, limit=limit, offset=offset),
         )

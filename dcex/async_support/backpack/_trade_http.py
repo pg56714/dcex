@@ -4,7 +4,6 @@ from typing import Any
 
 from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.trade import Order, Position
 
 
 class TradeHTTP(HTTPManager):
@@ -24,12 +23,13 @@ class TradeHTTP(HTTPManager):
         """Retrieve one Backpack open order."""
         if orderId is None and clientId is None:
             raise ValueError("Specify orderId or clientId.")
-        return await self._request(
-            "GET",
-            Order.ORDER,
-            {"symbol": self._symbol(product_symbol), "orderId": orderId, "clientId": clientId},
-            signed=True,
-            instruction="orderQuery",
+        return await self._native_private(
+            "get_open_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                clientId=clientId,
+            ),
         )
 
     async def place_order(
@@ -51,28 +51,9 @@ class TradeHTTP(HTTPManager):
         autoLendRedeem: bool | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place a Backpack order."""
-        return await self._request(
-            "POST",
-            Order.ORDER,
-            {
-                "symbol": self._symbol(product_symbol),
-                "side": side,
-                "orderType": orderType,
-                "quantity": quantity,
-                "price": price,
-                "quoteQuantity": quoteQuantity,
-                "clientId": clientId,
-                "timeInForce": timeInForce,
-                "postOnly": postOnly,
-                "reduceOnly": reduceOnly,
-                "selfTradePrevention": selfTradePrevention,
-                "autoBorrow": autoBorrow,
-                "autoBorrowRepay": autoBorrowRepay,
-                "autoLend": autoLend,
-                "autoLendRedeem": autoLendRedeem,
-            },
-            signed=True,
-            instruction="orderExecute",
+        return await self._native_private(
+            "place_order",
+            self._native_params(**locals()),
         )
 
     async def place_market_order(
@@ -89,18 +70,9 @@ class TradeHTTP(HTTPManager):
         autoLendRedeem: bool | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place a Backpack market order."""
-        return await self.place_order(
-            product_symbol,
-            side,
-            "Market",
-            quantity=quantity,
-            quoteQuantity=quoteQuantity,
-            clientId=clientId,
-            reduceOnly=reduceOnly,
-            autoBorrow=autoBorrow,
-            autoBorrowRepay=autoBorrowRepay,
-            autoLend=autoLend,
-            autoLendRedeem=autoLendRedeem,
+        return await self._native_private(
+            "place_market_order",
+            self._native_params(**locals()),
         )
 
     async def place_limit_order(
@@ -119,20 +91,9 @@ class TradeHTTP(HTTPManager):
         autoLendRedeem: bool | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place a Backpack limit order."""
-        return await self.place_order(
-            product_symbol,
-            side,
-            "Limit",
-            quantity=quantity,
-            price=price,
-            timeInForce=timeInForce,
-            clientId=clientId,
-            postOnly=postOnly,
-            reduceOnly=reduceOnly,
-            autoBorrow=autoBorrow,
-            autoBorrowRepay=autoBorrowRepay,
-            autoLend=autoLend,
-            autoLendRedeem=autoLendRedeem,
+        return await self._native_private(
+            "place_limit_order",
+            self._native_params(**locals()),
         )
 
     async def cancel_order(
@@ -144,12 +105,13 @@ class TradeHTTP(HTTPManager):
         """Cancel one Backpack open order."""
         if orderId is None and clientId is None:
             raise ValueError("Specify orderId or clientId.")
-        return await self._request(
-            "DELETE",
-            Order.ORDER,
-            {"symbol": self._symbol(product_symbol), "orderId": orderId, "clientId": clientId},
-            signed=True,
-            instruction="orderCancel",
+        return await self._native_private(
+            "cancel_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                clientId=clientId,
+            ),
         )
 
     async def place_batch_orders(
@@ -157,23 +119,9 @@ class TradeHTTP(HTTPManager):
         orders: list[dict[str, Any]],
     ) -> dict[str, Any] | list[Any] | str:
         """Place Backpack batch orders."""
-        resolved_orders = [
-            {
-                **order,
-                "symbol": self._symbol(order["product_symbol"])
-                if "product_symbol" in order
-                else order.get("symbol"),
-            }
-            for order in orders
-        ]
-        for order in resolved_orders:
-            order.pop("product_symbol", None)
-        return await self._request(
-            "POST",
-            Order.ORDERS,
-            resolved_orders,
-            signed=True,
-            instruction="orderExecute",
+        return await self._native_private(
+            "place_batch_orders",
+            self._native_params(orders=orders),
         )
 
     async def get_open_orders(
@@ -182,13 +130,9 @@ class TradeHTTP(HTTPManager):
         marketType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack open orders."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "GET",
-            Order.ORDERS,
-            {"symbol": symbol, "marketType": marketType},
-            signed=True,
-            instruction="orderQueryAll",
+        return await self._native_private(
+            "get_open_orders",
+            self._native_params(product_symbol=product_symbol, marketType=marketType),
         )
 
     async def cancel_open_orders(
@@ -197,13 +141,9 @@ class TradeHTTP(HTTPManager):
         marketType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Cancel Backpack open orders."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "DELETE",
-            Order.ORDERS,
-            {"symbol": symbol, "marketType": marketType},
-            signed=True,
-            instruction="orderCancelAll",
+        return await self._native_private(
+            "cancel_open_orders",
+            self._native_params(product_symbol=product_symbol, marketType=marketType),
         )
 
     async def get_fill_history(
@@ -216,20 +156,9 @@ class TradeHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack fill history."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "GET",
-            Order.FILLS,
-            {
-                "symbol": symbol,
-                "orderId": orderId,
-                "limit": limit,
-                "offset": offset,
-                "marketType": marketType,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="fillHistoryQueryAll",
+        return await self._native_private(
+            "get_fill_history",
+            self._native_params(**locals()),
         )
 
     async def get_order_history(
@@ -242,20 +171,9 @@ class TradeHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack order history."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "GET",
-            Order.ORDER_HISTORY,
-            {
-                "symbol": symbol,
-                "orderId": orderId,
-                "limit": limit,
-                "offset": offset,
-                "marketType": marketType,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="orderHistoryQueryAll",
+        return await self._native_private(
+            "get_order_history",
+            self._native_params(**locals()),
         )
 
     async def get_open_positions(
@@ -263,13 +181,9 @@ class TradeHTTP(HTTPManager):
         product_symbol: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack open positions."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "GET",
-            Position.POSITION,
-            {"symbol": symbol},
-            signed=True,
-            instruction="positionQuery",
+        return await self._native_private(
+            "get_open_positions",
+            self._native_params(product_symbol=product_symbol),
         )
 
     async def get_funding_payments(
@@ -281,19 +195,9 @@ class TradeHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack funding payments."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "GET",
-            Position.FUNDING,
-            {
-                "symbol": symbol,
-                "subaccountId": subaccountId,
-                "limit": limit,
-                "offset": offset,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="fundingHistoryQueryAll",
+        return await self._native_private(
+            "get_funding_payments",
+            self._native_params(**locals()),
         )
 
     async def get_position_history(
@@ -306,18 +210,7 @@ class TradeHTTP(HTTPManager):
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack position history."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "GET",
-            Position.POSITION_HISTORY,
-            {
-                "symbol": symbol,
-                "state": state,
-                "marketType": marketType,
-                "limit": limit,
-                "offset": offset,
-                "sortDirection": sortDirection,
-            },
-            signed=True,
-            instruction="positionHistoryQueryAll",
+        return await self._native_private(
+            "get_position_history",
+            self._native_params(**locals()),
         )

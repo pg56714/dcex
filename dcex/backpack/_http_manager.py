@@ -50,7 +50,13 @@ def _json_body(query: RequestPayload | None) -> str:
 
 
 def _native_items(payload: Mapping[str, Any]) -> list[tuple[str, str]]:
-    return [(key, _format_value(value)) for key, value in _filtered_query(payload).items()]
+    items: list[tuple[str, str]] = []
+    for key, value in _filtered_query(payload).items():
+        if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
+            items.extend((key, _format_value(item)) for item in value)
+        else:
+            items.append((key, _format_value(value)))
+    return items
 
 
 def _native_signature_payload(
@@ -127,6 +133,11 @@ class HTTPManager(BaseHTTPManager):
             )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.BACKPACK)
+            if self._native_client is not None and hasattr(
+                self._native_client,
+                "set_product_table",
+            ):
+                self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
         return (
@@ -134,6 +145,77 @@ class HTTPManager(BaseHTTPManager):
             and self._native_client is not None
             and type(self.session) is requests.Session
         )
+
+    def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Backpack public method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Backpack native client is required for public methods.")
+        if not hasattr(self._native_client, "public_request"):
+            raise RuntimeError("Backpack native client public_request is unavailable.")
+        try:
+            status, headers, body = self._native_client.public_request(method_name, params)
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"BACKPACK {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(generate_timestamp(iso_format=True)),
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _native_private(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> Any:  # noqa: ANN401
+        """Call a Rust-backed Backpack private method and decode its JSON body."""
+        if self._native_client is None:
+            raise RuntimeError("Backpack native client is required for private methods.")
+        if not hasattr(self._native_client, "private_request"):
+            raise RuntimeError("Backpack native client private_request is unavailable.")
+        try:
+            status, headers, body = self._native_client.private_request(method_name, params)
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"BACKPACK {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(generate_timestamp(iso_format=True)),
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    @staticmethod
+    def _native_params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if key == "self" or value is None:
+                continue
+            if key == "from_":
+                key = "from"
+            enum_value = getattr(value, "value", None)
+            if enum_value is not None:
+                value = enum_value
+            if isinstance(value, bool):
+                params.append((key, str(value).lower()))
+            elif isinstance(value, Mapping):
+                params.append((key, _json_body(value)))
+            elif isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
+                if key == "orders":
+                    params.append((key, _json_body(value)))
+                else:
+                    params.extend((key, _format_value(item)) for item in value)
+            else:
+                params.append((key, _format_value(value)))
+        return params
 
     def _headers(
         self,

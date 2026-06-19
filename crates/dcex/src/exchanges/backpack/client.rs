@@ -1,14 +1,18 @@
 use std::collections::BTreeMap;
+use std::sync::Arc;
 use std::time::Duration;
 
-use base64::Engine;
-use ed25519_dalek::{Signer, SigningKey};
+use ed25519_dalek::SigningKey;
+use serde_json::Value;
 
 use crate::exchange::{unix_timestamp_ms, ValidatedResponse};
 use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody};
+use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
-const BASE_URL: &str = "https://api.backpack.exchange";
+use super::endpoints::BASE_URL;
+use super::params::signature_payload_from_value;
+use super::signing::{decode_signing_key, encode_params, http_method_name, signature_header};
 
 pub type SignaturePayload = Vec<Vec<(String, String)>>;
 
@@ -19,6 +23,7 @@ pub struct BackpackClient {
     api_key: Option<String>,
     signing_key: Option<SigningKey>,
     window: u64,
+    product_table: Option<Arc<ProductTable>>,
 }
 
 impl BackpackClient {
@@ -47,7 +52,17 @@ impl BackpackClient {
             api_key,
             signing_key,
             window,
+            product_table: None,
         })
+    }
+
+    pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
+        self.product_table = Some(Arc::new(product_table));
+        self
+    }
+
+    pub fn set_product_table(&mut self, product_table: ProductTable) {
+        self.product_table = Some(Arc::new(product_table));
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -75,7 +90,11 @@ impl BackpackClient {
             )
             .await?;
         response.ensure_success()?;
-        let data = response.json()?;
+        let data = match response.json() {
+            Ok(data) => data,
+            Err(DcexError::Decode(_)) => Value::String(response.text()?),
+            Err(error) => return Err(error),
+        };
         Ok(ValidatedResponse {
             status: response.status,
             headers: response.headers,
@@ -140,7 +159,7 @@ impl BackpackClient {
         })
     }
 
-    pub async fn public_request(
+    pub async fn public_path_request(
         &self,
         path: impl Into<String>,
         params: Vec<(String, String)>,
@@ -158,8 +177,83 @@ impl BackpackClient {
         .await
     }
 
+    pub(super) async fn public_get(
+        &self,
+        path: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        self.public_path_request(path, params).await
+    }
+
+    pub(super) async fn private_get(
+        &self,
+        path: &str,
+        params: Vec<(String, String)>,
+        instruction: &str,
+    ) -> Result<ValidatedResponse> {
+        let signature_payload = if params.is_empty() {
+            None
+        } else {
+            Some(vec![params.clone()])
+        };
+        self.request(
+            HttpMethod::Get,
+            path,
+            params,
+            None,
+            true,
+            Some(instruction.to_string()),
+            signature_payload,
+            BTreeMap::new(),
+        )
+        .await
+    }
+
+    pub(super) async fn private_post_value(
+        &self,
+        path: &str,
+        body: Value,
+        instruction: &str,
+    ) -> Result<ValidatedResponse> {
+        self.private_body_request(HttpMethod::Post, path, body, instruction)
+            .await
+    }
+
+    pub(super) async fn private_delete_value(
+        &self,
+        path: &str,
+        body: Value,
+        instruction: &str,
+    ) -> Result<ValidatedResponse> {
+        self.private_body_request(HttpMethod::Delete, path, body, instruction)
+            .await
+    }
+
+    async fn private_body_request(
+        &self,
+        method: HttpMethod,
+        path: &str,
+        body: Value,
+        instruction: &str,
+    ) -> Result<ValidatedResponse> {
+        let signature_payload = signature_payload_from_value(&body);
+        let body = serde_json::to_vec(&body)
+            .map_err(|error| DcexError::InvalidInput(format!("invalid JSON body: {error}")))?;
+        self.request(
+            method,
+            path,
+            Vec::new(),
+            Some(body),
+            true,
+            Some(instruction.to_string()),
+            Some(signature_payload),
+            BTreeMap::new(),
+        )
+        .await
+    }
+
     #[allow(clippy::too_many_arguments)]
-    fn build_request(
+    pub(super) fn build_request(
         &self,
         method: HttpMethod,
         path: impl Into<String>,
@@ -221,19 +315,19 @@ impl BackpackClient {
                     "Signed Backpack requests require an instruction.".to_string(),
                 )
             })?;
-            let message = signature_message(
-                instruction,
-                signature_payload.unwrap_or_default(),
-                timestamp,
-                self.window,
-            );
-            let signature = signing_key.sign(message.as_bytes());
+            let signature_payload = signature_payload.unwrap_or_default().to_vec();
             request
                 .headers
                 .insert("X-API-Key".to_string(), api_key.to_string());
             request.headers.insert(
                 "X-Signature".to_string(),
-                base64::engine::general_purpose::STANDARD.encode(signature.to_bytes()),
+                signature_header(
+                    signing_key,
+                    instruction,
+                    &signature_payload,
+                    timestamp,
+                    self.window,
+                ),
             );
             request
                 .headers
@@ -244,111 +338,26 @@ impl BackpackClient {
         }
         Ok(request)
     }
-}
 
-fn decode_signing_key(api_secret: &str) -> Result<SigningKey> {
-    let seed = base64::engine::general_purpose::STANDARD
-        .decode(api_secret)
-        .map_err(|error| {
-            DcexError::InvalidInput(format!("invalid Backpack API secret: {error}"))
-        })?;
-    let seed: [u8; 32] = seed.try_into().map_err(|seed: Vec<u8>| {
-        DcexError::InvalidInput(format!(
-            "Backpack API secret must decode to 32 bytes, got {}",
-            seed.len()
-        ))
-    })?;
-    Ok(SigningKey::from_bytes(&seed))
-}
-
-fn encode_params(params: &[(String, String)]) -> String {
-    url::form_urlencoded::Serializer::new(String::new())
-        .extend_pairs(
-            params
-                .iter()
-                .map(|(key, value)| (key.as_str(), value.as_str())),
-        )
-        .finish()
-}
-
-fn signature_message(
-    instruction: &str,
-    payload: &[Vec<(String, String)>],
-    timestamp: &str,
-    window: u64,
-) -> String {
-    let chunks = if payload.is_empty() {
-        vec![format!("instruction={instruction}")]
-    } else {
-        payload
-            .iter()
-            .map(|item| {
-                let mut sorted = item.clone();
-                sorted.sort_by(|left, right| left.0.cmp(&right.0));
-                let query = encode_params(&sorted);
-                if query.is_empty() {
-                    format!("instruction={instruction}")
-                } else {
-                    format!("instruction={instruction}&{query}")
-                }
-            })
-            .collect()
-    };
-    format!("{}&timestamp={timestamp}&window={window}", chunks.join("&"))
-}
-
-const fn http_method_name(method: HttpMethod) -> &'static str {
-    match method {
-        HttpMethod::Delete => "DELETE",
-        HttpMethod::Get => "GET",
-        HttpMethod::Patch => "PATCH",
-        HttpMethod::Post => "POST",
-        HttpMethod::Put => "PUT",
+    pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if product_symbol.contains('_') {
+            return Ok(product_symbol.to_string());
+        }
+        if product_symbol.contains('-') {
+            if let Some(table) = &self.product_table {
+                return table.get_exchange_symbol("backpack", product_symbol);
+            }
+            return Ok(exchange_symbol_fallback(product_symbol));
+        }
+        Ok(product_symbol.to_string())
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn signature_matches_python_vector() {
-        let client = BackpackClient::new(
-            Some(base64::engine::general_purpose::STANDARD.encode([b'2'; 32])),
-            Some(base64::engine::general_purpose::STANDARD.encode([b'1'; 32])),
-            5_000,
-            Duration::from_secs(1),
-        )
-        .expect("client");
-        let request = client
-            .build_request(
-                HttpMethod::Get,
-                "/api/v1/order",
-                vec![
-                    ("symbol".to_string(), "BTC_USDC".to_string()),
-                    ("orderId".to_string(), "test-order-id".to_string()),
-                ],
-                None,
-                true,
-                Some("orderQuery"),
-                Some(&[vec![
-                    ("symbol".to_string(), "BTC_USDC".to_string()),
-                    ("orderId".to_string(), "test-order-id".to_string()),
-                ]]),
-                BTreeMap::new(),
-                "1700000000000",
-            )
-            .expect("request");
-
-        assert_eq!(
-            request.headers.get("X-Signature").map(String::as_str),
-            Some(
-                "rzPMmBB/3emqFrFFImSTG2B42lnb/wa7k8+/5GEfCbPsnD4Ekp3i54huIhYxkkdH2wqP5nYxvMUEWaDp9l6ZAw=="
-            )
-        );
-        assert_eq!(
-            request.path,
-            "/api/v1/order?symbol=BTC_USDC&orderId=test-order-id"
-        );
+fn exchange_symbol_fallback(product_symbol: &str) -> String {
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    match parts.as_slice() {
+        [base, quote, "SPOT"] => format!("{base}_{quote}"),
+        [base, quote, ..] => format!("{base}_{quote}_PERP"),
+        _ => product_symbol.to_string(),
     }
 }

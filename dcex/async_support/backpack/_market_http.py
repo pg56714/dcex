@@ -1,58 +1,13 @@
 """Backpack public market-data async HTTP client."""
 
-from collections.abc import Mapping
-from typing import Any, Literal
+from typing import Any
 
-from ..._native_http import NativeResponse
 from ...utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.market import Public
 
 
 class MarketHTTP(HTTPManager):
     """Async HTTP client for Backpack public REST APIs."""
-
-    @staticmethod
-    def _native_params(query: dict[str, Any] | None) -> list[tuple[str, str]]:
-        params: list[tuple[str, str]] = []
-        for key, value in (query or {}).items():
-            if value is None:
-                continue
-            if isinstance(value, bool):
-                value = str(value).lower()
-            params.append((key, str(value)))
-        return params
-
-    async def _request(
-        self,
-        method: Literal["GET", "POST", "PATCH", "DELETE"],
-        path: str,
-        query: dict[str, Any] | None = None,
-        signed: bool = False,
-        instruction: str | None = None,
-        headers: Mapping[str, str] | None = None,
-    ) -> dict[str, Any] | list[Any] | str:
-        native_client = self._native_client
-        if (
-            method.upper() == "GET"
-            and not signed
-            and instruction is None
-            and headers is None
-            and native_client is not None
-            and self._uses_native_transport()
-        ):
-            (
-                status,
-                response_headers,
-                response_body,
-            ) = await native_client.public_request_async(
-                str(path),
-                self._native_params(query),
-            )
-            response = NativeResponse(status, dict(response_headers), bytes(response_body))
-            self._store_response_headers(response)
-            return response.json()
-        return await super()._request(method, path, query, signed, instruction, headers)
 
     def _symbol(self, product_symbol: str) -> str:
         if "_" in product_symbol:
@@ -61,15 +16,15 @@ class MarketHTTP(HTTPManager):
 
     async def get_assets(self, country: str | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack asset metadata."""
-        return await self._request("GET", Public.ASSETS, {"country": country}, signed=False)
+        return await self._native_public("get_assets", self._native_params(country=country))
 
     async def get_collateral(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack public collateral parameters."""
-        return await self._request("GET", Public.COLLATERAL, signed=False)
+        return await self._native_public("get_collateral", [])
 
     async def get_borrow_lend_markets(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend markets."""
-        return await self._request("GET", Public.BORROW_LEND_MARKETS, signed=False)
+        return await self._native_public("get_borrow_lend_markets", [])
 
     async def get_borrow_lend_market_history(
         self,
@@ -77,11 +32,9 @@ class MarketHTTP(HTTPManager):
         symbol: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend market history."""
-        return await self._request(
-            "GET",
-            Public.BORROW_LEND_MARKET_HISTORY,
-            {"interval": interval, "symbol": symbol},
-            signed=False,
+        return await self._native_public(
+            "get_borrow_lend_market_history",
+            self._native_params(interval=interval, symbol=symbol),
         )
 
     async def get_borrow_lend_apy(
@@ -89,19 +42,20 @@ class MarketHTTP(HTTPManager):
         tierId: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend APY rates."""
-        return await self._request("GET", Public.BORROW_LEND_APY, {"tierId": tierId}, signed=False)
+        return await self._native_public(
+            "get_borrow_lend_apy",
+            self._native_params(tierId=tierId),
+        )
 
     async def get_markets(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack markets."""
-        return await self._request("GET", Public.MARKETS, signed=False)
+        return await self._native_public("get_markets", [])
 
     async def get_market(self, product_symbol: str) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack market."""
-        return await self._request(
-            "GET",
-            Public.MARKET,
-            {"symbol": self._symbol(product_symbol)},
-            signed=False,
+        return await self._native_public(
+            "get_market",
+            self._native_params(product_symbol=product_symbol),
         )
 
     async def get_order_book_depth(
@@ -110,20 +64,18 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack order book depth."""
-        return await self._request(
-            "GET",
-            Public.DEPTH,
-            {"symbol": self._symbol(product_symbol), "limit": limit},
-            signed=False,
+        return await self._native_public(
+            "get_order_book_depth",
+            self._native_params(product_symbol=product_symbol, limit=limit),
         )
 
     async def get_market_sessions(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack market sessions."""
-        return await self._request("GET", Public.MARKET_SESSIONS, signed=False)
+        return await self._native_public("get_market_sessions", [])
 
     async def get_securities(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack securities."""
-        return await self._request("GET", Public.SECURITIES, signed=False)
+        return await self._native_public("get_securities", [])
 
     async def get_mark_prices(
         self,
@@ -131,12 +83,9 @@ class MarketHTTP(HTTPManager):
         marketType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack mark prices."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request(
-            "GET",
-            Public.MARK_PRICES,
-            {"symbol": symbol, "marketType": marketType},
-            signed=False,
+        return await self._native_public(
+            "get_mark_prices",
+            self._native_params(product_symbol=product_symbol, marketType=marketType),
         )
 
     async def get_open_interest(
@@ -144,8 +93,10 @@ class MarketHTTP(HTTPManager):
         product_symbol: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack open interest."""
-        symbol = self._symbol(product_symbol) if product_symbol is not None else None
-        return await self._request("GET", Public.OPEN_INTEREST, {"symbol": symbol}, signed=False)
+        return await self._native_public(
+            "get_open_interest",
+            self._native_params(product_symbol=product_symbol),
+        )
 
     async def get_funding_rates(
         self,
@@ -154,11 +105,9 @@ class MarketHTTP(HTTPManager):
         offset: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack historical funding rates."""
-        return await self._request(
-            "GET",
-            Public.FUNDING_RATES,
-            {"symbol": self._symbol(product_symbol), "limit": limit, "offset": offset},
-            signed=False,
+        return await self._native_public(
+            "get_funding_rates",
+            self._native_params(product_symbol=product_symbol, limit=limit, offset=offset),
         )
 
     async def get_klines(
@@ -170,17 +119,15 @@ class MarketHTTP(HTTPManager):
         priceType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack candlesticks."""
-        return await self._request(
-            "GET",
-            Public.KLINES,
-            {
-                "symbol": self._symbol(product_symbol),
-                "interval": interval,
-                "startTime": startTime,
-                "endTime": endTime,
-                "priceType": priceType,
-            },
-            signed=False,
+        return await self._native_public(
+            "get_klines",
+            self._native_params(
+                product_symbol=product_symbol,
+                interval=interval,
+                startTime=startTime,
+                endTime=endTime,
+                priceType=priceType,
+            ),
         )
 
     async def get_ticker(
@@ -189,32 +136,30 @@ class MarketHTTP(HTTPManager):
         interval: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack ticker."""
-        return await self._request(
-            "GET",
-            Public.TICKER,
-            {"symbol": self._symbol(product_symbol), "interval": interval},
-            signed=False,
+        return await self._native_public(
+            "get_ticker",
+            self._native_params(product_symbol=product_symbol, interval=interval),
         )
 
     async def get_tickers(self, interval: str | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack tickers."""
-        return await self._request("GET", Public.TICKERS, {"interval": interval}, signed=False)
+        return await self._native_public("get_tickers", self._native_params(interval=interval))
 
     async def get_status(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack system status."""
-        return await self._request("GET", Public.STATUS, signed=False)
+        return await self._native_public("get_status", [])
 
     async def ping(self) -> dict[str, Any] | list[Any] | str:
         """Ping Backpack REST API."""
-        return await self._request("GET", Public.PING, signed=False)
+        return await self._native_public("ping", [])
 
     async def get_time(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack system time."""
-        return await self._request("GET", Public.TIME, signed=False)
+        return await self._native_public("get_time", [])
 
     async def get_wallets(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack public wallet addresses."""
-        return await self._request("GET", Public.WALLETS, signed=False)
+        return await self._native_public("get_wallets", [])
 
     async def get_recent_trades(
         self,
@@ -222,11 +167,9 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack recent public trades."""
-        return await self._request(
-            "GET",
-            Public.TRADES,
-            {"symbol": self._symbol(product_symbol), "limit": limit},
-            signed=False,
+        return await self._native_public(
+            "get_recent_trades",
+            self._native_params(product_symbol=product_symbol, limit=limit),
         )
 
     async def get_historical_trades(
@@ -236,9 +179,7 @@ class MarketHTTP(HTTPManager):
         offset: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack historical public trades."""
-        return await self._request(
-            "GET",
-            Public.HISTORICAL_TRADES,
-            {"symbol": self._symbol(product_symbol), "limit": limit, "offset": offset},
-            signed=False,
+        return await self._native_public(
+            "get_historical_trades",
+            self._native_params(product_symbol=product_symbol, limit=limit, offset=offset),
         )
