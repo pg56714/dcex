@@ -64,7 +64,6 @@ name = "cz_conventional_commits"
 tag_format = "$version"
 update_changelog_on_bump = true
 version_provider = "uv"
-version_files = ["Cargo.toml:^version ="]
 version_scheme = "pep440"
 
 [tool.ruff] # https://docs.astral.sh/ruff/settings/#top-level

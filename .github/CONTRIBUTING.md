@@ -140,6 +140,9 @@ The Rust crate `dcex` is versioned independently in `crates/dcex/Cargo.toml`
 and published from matching `rust-v*` tags. For example, tag `rust-v0.1.0`
 publishes crate version `0.1.0` to crates.io. Required Rust registry
 credentials are provided through `CARGO_REGISTRY_TOKEN`.
+The `crates/dcex-python` package is an internal PyO3 build crate and is not
+published to crates.io; the Python package version is managed only in
+`pyproject.toml`.
 
 ## Issues and Feature Requests
 

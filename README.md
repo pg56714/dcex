@@ -249,6 +249,9 @@ package to PyPI. If no version bump is detected, PyPI is not updated.
 The Rust crate has an independent version in `crates/dcex/Cargo.toml` and is
 published from `rust-v*` tags. For example, `rust-v0.1.0` publishes crate
 version `0.1.0` to crates.io and creates a separate GitHub Release.
+The `crates/dcex-python` package is an internal PyO3 build crate and is not
+published to crates.io; the Python package version is managed only in
+`pyproject.toml`.
 
 ## License
 

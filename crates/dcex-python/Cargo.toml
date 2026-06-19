@@ -4,8 +4,9 @@ description = "PyO3 bindings for dcex."
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
+publish = false
 repository.workspace = true
-version.workspace = true
+version = "0.0.0"
 
 [lib]
 name = "dcex_native"

@@ -239,7 +239,7 @@ dependencies = [
 
 [[package]]
 name = "dcex-python"
-version = "0.21.2"
+version = "0.0.0"
 dependencies = [
  "dcex",
  "pyo3",
