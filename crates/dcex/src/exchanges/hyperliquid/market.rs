@@ -62,7 +62,7 @@ impl HyperliquidClient {
         self.info_payload(payload).await
     }
 
-    pub(super) async fn get_meta_and_asset_ctxs(&self) -> Result<ValidatedResponse> {
+    pub(super) async fn get_meta_and_asset_ctxs_raw(&self) -> Result<ValidatedResponse> {
         self.info_payload(json!({"type": "metaAndAssetCtxs"})).await
     }
 }

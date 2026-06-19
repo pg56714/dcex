@@ -350,7 +350,7 @@ impl HyperliquidClient {
 
     async fn mid_price(&self, product_symbol: &str) -> Result<f64> {
         let asset_id = self.asset_id(product_symbol)? as usize;
-        let response = self.get_meta_and_asset_ctxs().await?;
+        let response = self.get_meta_and_asset_ctxs_raw().await?;
         let contexts = response
             .data
             .as_array()

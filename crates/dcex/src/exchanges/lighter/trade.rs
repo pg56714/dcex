@@ -52,42 +52,42 @@ impl LighterClient {
             )),
             "create_order" | "place_order" => Ok(Some(
                 self.submit_signed_tx(
-                    self.sign_create_order(params).await?,
+                    self.sign_create_order_from_params(params).await?,
                     params.optional_bool("price_protection")?,
                 )
                 .await?,
             )),
             "cancel_order" => Ok(Some(
                 self.submit_signed_tx(
-                    self.sign_cancel_order(params).await?,
+                    self.sign_cancel_order_from_params(params).await?,
                     params.optional_bool("price_protection")?,
                 )
                 .await?,
             )),
             "modify_order" => Ok(Some(
                 self.submit_signed_tx(
-                    self.sign_modify_order(params).await?,
+                    self.sign_modify_order_from_params(params).await?,
                     params.optional_bool("price_protection")?,
                 )
                 .await?,
             )),
             "cancel_all_orders" => Ok(Some(
                 self.submit_signed_tx(
-                    self.sign_cancel_all_orders(params).await?,
+                    self.sign_cancel_all_orders_from_params(params).await?,
                     params.optional_bool("price_protection")?,
                 )
                 .await?,
             )),
             "update_leverage" => Ok(Some(
                 self.submit_signed_tx(
-                    self.sign_update_leverage(params).await?,
+                    self.sign_update_leverage_from_params(params).await?,
                     params.optional_bool("price_protection")?,
                 )
                 .await?,
             )),
             "update_margin" => Ok(Some(
                 self.submit_signed_tx(
-                    self.sign_update_margin(params).await?,
+                    self.sign_update_margin_from_params(params).await?,
                     params.optional_bool("price_protection")?,
                 )
                 .await?,
@@ -102,19 +102,22 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
         match method_name {
-            "sign_create_order" => self.sign_create_order(params).await,
-            "sign_cancel_order" => self.sign_cancel_order(params).await,
-            "sign_modify_order" => self.sign_modify_order(params).await,
-            "sign_cancel_all_orders" => self.sign_cancel_all_orders(params).await,
-            "sign_update_leverage" => self.sign_update_leverage(params).await,
-            "sign_update_margin" => self.sign_update_margin(params).await,
+            "sign_create_order" => self.sign_create_order_from_params(params).await,
+            "sign_cancel_order" => self.sign_cancel_order_from_params(params).await,
+            "sign_modify_order" => self.sign_modify_order_from_params(params).await,
+            "sign_cancel_all_orders" => self.sign_cancel_all_orders_from_params(params).await,
+            "sign_update_leverage" => self.sign_update_leverage_from_params(params).await,
+            "sign_update_margin" => self.sign_update_margin_from_params(params).await,
             _ => Err(DcexError::InvalidInput(format!(
                 "unsupported Lighter sign method: {method_name}"
             ))),
         }
     }
 
-    async fn sign_create_order(&self, params: &LighterParams) -> Result<LighterSignedTransaction> {
+    async fn sign_create_order_from_params(
+        &self,
+        params: &LighterParams,
+    ) -> Result<LighterSignedTransaction> {
         let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
         let nonce = self
             .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
@@ -179,7 +182,10 @@ impl LighterClient {
         self.sign_tx(14, values, payload, attrs, api_key_index)
     }
 
-    async fn sign_cancel_order(&self, params: &LighterParams) -> Result<LighterSignedTransaction> {
+    async fn sign_cancel_order_from_params(
+        &self,
+        params: &LighterParams,
+    ) -> Result<LighterSignedTransaction> {
         let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
         let nonce = self
             .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
@@ -215,7 +221,10 @@ impl LighterClient {
         self.sign_tx(15, values, payload, attrs, api_key_index)
     }
 
-    async fn sign_modify_order(&self, params: &LighterParams) -> Result<LighterSignedTransaction> {
+    async fn sign_modify_order_from_params(
+        &self,
+        params: &LighterParams,
+    ) -> Result<LighterSignedTransaction> {
         let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
         let nonce = self
             .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
@@ -262,7 +271,7 @@ impl LighterClient {
         self.sign_tx(17, values, payload, attrs, api_key_index)
     }
 
-    async fn sign_cancel_all_orders(
+    async fn sign_cancel_all_orders_from_params(
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
@@ -301,7 +310,7 @@ impl LighterClient {
         self.sign_tx(16, values, payload, attrs, api_key_index)
     }
 
-    async fn sign_update_leverage(
+    async fn sign_update_leverage_from_params(
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
@@ -343,7 +352,10 @@ impl LighterClient {
         self.sign_tx(20, values, payload, attrs, api_key_index)
     }
 
-    async fn sign_update_margin(&self, params: &LighterParams) -> Result<LighterSignedTransaction> {
+    async fn sign_update_margin_from_params(
+        &self,
+        params: &LighterParams,
+    ) -> Result<LighterSignedTransaction> {
         let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
         let nonce = self
             .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
