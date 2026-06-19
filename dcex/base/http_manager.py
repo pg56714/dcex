@@ -15,6 +15,7 @@ only removes duplicated boilerplate.
 """
 
 import logging
+import re
 from typing import ClassVar
 
 from ..utils.common import Common
@@ -88,8 +89,17 @@ class BaseHTTPManager:
         exception: BaseException,
     ) -> tuple[str | int, dict[str, str] | None]:
         """Extract response metadata carried by a transport exception."""
+        raw_status = getattr(exception, "status_code", None)
+        if raw_status is not None:
+            status_code = raw_status if isinstance(raw_status, (str, int)) else str(raw_status)
+            headers = getattr(exception, "resp_headers", None)
+            return status_code, dict(headers) if headers is not None else None
+
         response = getattr(exception, "response", None)
         if response is None:
+            match = re.search(r"HTTP request failed with status (\d+)", str(exception))
+            if match is not None:
+                return int(match.group(1)), None
             return "Unknown", None
 
         raw_status = getattr(response, "status_code", "Unknown")

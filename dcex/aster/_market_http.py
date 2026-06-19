@@ -5,7 +5,6 @@ from typing import Any
 from .._native_http import NativeResponse
 from ..utils.common import Common
 from ._http_manager import HTTPManager
-from .endpoints.market import SpotMarket
 
 
 class MarketHTTP(HTTPManager):
@@ -36,7 +35,10 @@ class MarketHTTP(HTTPManager):
     def _symbol(self, product_symbol: str) -> str:
         if "-" not in product_symbol:
             return product_symbol
-        return self.ptm.get_exchange_symbol(Common.ASTER, product_symbol)
+        ptm = getattr(self, "ptm", None)
+        if ptm is None:
+            return product_symbol
+        return ptm.get_exchange_symbol(Common.ASTER, product_symbol)
 
     def ping_spot(self) -> dict[str, Any] | list[Any]:
         """Test Aster spot API connectivity."""
@@ -329,10 +331,9 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve signed Aster spot commission rates."""
-        return self._request(
-            "GET",
-            SpotMarket.COMMISSION_RATE,
-            {"symbol": self._symbol(product_symbol)},
+        return self._native_private(
+            "get_spot_commission_rate",
+            self._native_params(product_symbol=product_symbol),
         )
 
     def get_spot_withdraw_fee(

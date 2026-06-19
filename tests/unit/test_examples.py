@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 EXAMPLES = ROOT / "examples"
 MIGRATED_EXCHANGES = (
+    "aster",
     "backpack",
     "binance",
     "bingx",

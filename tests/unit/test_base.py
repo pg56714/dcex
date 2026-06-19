@@ -23,3 +23,13 @@ def test_setup_logger_uses_supplied_logger() -> None:
 
     custom = logging.getLogger("custom-test-logger")
     assert Dummy()._setup_logger(custom) is custom
+
+
+def test_exception_response_details_extracts_native_http_status() -> None:
+    """Native Rust HTTP errors expose the status in the RuntimeError message."""
+    status_code, headers = BaseHTTPManager._exception_response_details(
+        RuntimeError("HTTP request failed with status 400: bad request"),
+    )
+
+    assert status_code == 400
+    assert headers is None

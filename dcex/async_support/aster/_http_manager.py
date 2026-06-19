@@ -3,7 +3,7 @@
 import logging
 import threading
 import time
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Self, cast
 from urllib.parse import urlencode
@@ -11,7 +11,13 @@ from urllib.parse import urlencode
 import httpx
 
 from ..._native_http import NativeResponse, load_native
-from ...aster._http_manager import AsterPath, _filtered_query, sign_message
+from ...aster._http_manager import (
+    _NATIVE_PRIVATE_REQUESTS,
+    AsterPath,
+    _filtered_query,
+    _format_value,
+    sign_message,
+)
 from ...aster.endpoints.account import FuturesAccount, SpotAccount
 from ...aster.endpoints.market import FuturesMarket, SpotMarket
 from ...aster.endpoints.trade import FuturesTrade, SpotTrade
@@ -60,6 +66,11 @@ class HTTPManager(BaseHTTPManager):
             )
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.ASTER)
+            if self._native_client is not None and hasattr(
+                self._native_client,
+                "set_product_table",
+            ):
+                self._native_client.set_product_table(self.ptm._native_table)
         if self.session is None or self.session.is_closed:
             self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
@@ -70,6 +81,97 @@ class HTTPManager(BaseHTTPManager):
             and self._native_client is not None
             and type(self.session) is httpx.AsyncClient
         )
+
+    async def _native_response(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+        *,
+        private: bool,
+    ) -> dict[str, Any] | list[Any]:
+        if self._native_client is None:
+            await self.async_init()
+        if self._native_client is None:
+            raise RuntimeError("Aster native client is required.")
+        method = "private_request_async" if private else "public_request_async"
+        if not hasattr(self._native_client, method):
+            raise RuntimeError(f"Aster native client {method} is unavailable.")
+        request_summary = self._native_request_summary(method_name, params)
+        try:
+            status, headers, body = await getattr(self._native_client, method)(
+                method_name,
+                params,
+            )
+        except RuntimeError as exc:
+            status_code, resp_headers = self._exception_response_details(exc)
+            raise FailedRequestError(
+                request=request_summary,
+                message=str(exc),
+                status_code=status_code,
+                time=str(generate_timestamp(iso_format=True)),
+                resp_headers=resp_headers,
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    async def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> dict[str, Any] | list[Any]:
+        return await self._native_response(method_name, params, private=False)
+
+    async def _native_private(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> dict[str, Any] | list[Any]:
+        return await self._native_response(method_name, params, private=True)
+
+    def _native_request_summary(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> str:
+        if method_name == "transfer_spot_futures":
+            market = dict(params).get("market", "spot").lower()
+            spec = (
+                "POST",
+                SpotAccount.TRANSFER if market == "spot" else FuturesAccount.TRANSFER,
+            )
+        else:
+            spec = _NATIVE_PRIVATE_REQUESTS.get(method_name)
+        if spec is None:
+            return f"GET {self.spot_base_url}/{method_name} | Body: {params}"
+        method, path = spec
+        return f"{method} {self._get_base_url(path)}{path} | Body: {params}"
+
+    @staticmethod
+    def _native_params(**kwargs: object) -> list[tuple[str, str]]:
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if key == "self" or value is None:
+                continue
+            if key == "type_":
+                key = "type"
+            elif key == "from_":
+                key = "from"
+            enum_value = getattr(value, "value", None)
+            if enum_value is not None:
+                value = enum_value
+            if (
+                key == "symbols"
+                and isinstance(value, Sequence)
+                and not isinstance(
+                    value,
+                    str | bytes | bytearray,
+                )
+            ):
+                params.extend((key, str(item)) for item in value)
+            else:
+                params.append((key, _format_value(value)))
+        return params
 
     def _get_base_url(self, path: AsterPath) -> str:
         if isinstance(path, SpotMarket | SpotAccount | SpotTrade):
