@@ -32,7 +32,7 @@ Rust:
 
 ```toml
 [dependencies]
-dcex = "0.21.2"
+dcex = "0.1.0"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
@@ -176,7 +176,8 @@ print(product_symbol)
 
 ## Contributing
 
-We welcome contributions. Please see our [Contributing Guide](.github/CONTRIBUTING.md) for details.
+Contributions are welcome through GitHub issues and pull requests. Run the
+default test suite before opening a pull request.
 
 ## Testing
 
@@ -186,8 +187,9 @@ The default test suite is offline and does not require exchange API keys or netw
 uv run pytest
 ```
 
-For live, private, stateful, and generated-report test commands, see the
-[Contributing Guide](.github/CONTRIBUTING.md#testing).
+Live, private, stateful, and generated-report tests use the pytest markers
+configured in `pyproject.toml`. These tests are opt-in because they can require
+network access, exchange credentials, or account state.
 
 ## Examples
 
@@ -205,8 +207,8 @@ Recorded local CPU-bound sample (`.\.venv\Scripts\python.exe examples\benchmark_
 Speedups are measured against the pure Python fallback implementation for the
 same local CPU-bound operation.
 
-| Operation | PyO3 bridge speedup vs Python fallback | Rust native speedup vs Python fallback |
-| --------- | -------------------------------------- | -------------------------------------- |
+| Operation | PyO3 bridge speedup | Rust native speedup |
+| --------- | ------------------- | ------------------- |
 | Cryptographic hash | 89.06x | 85.50x |
 | Schnorr signature | 496.43x | 448.37x |
 | Transaction payload signing | 309.08x | 368.78x |
