@@ -272,16 +272,16 @@ impl KucoinClient {
             SPOT_ORDER_BOOL_KEYS,
         );
         self.insert_required_body_symbol(&mut body, params, false)?;
-        insert_required_string(
-            &mut body,
-            "side",
-            side_override.unwrap_or(params.required("side")?),
-        );
-        insert_required_string(
-            &mut body,
-            "type",
-            type_override.unwrap_or(params.required("type")?),
-        );
+        let side = match side_override {
+            Some(side) => side,
+            None => params.required("side")?,
+        };
+        let order_type = match type_override {
+            Some(order_type) => order_type,
+            None => params.required("type")?,
+        };
+        insert_required_string(&mut body, "side", side);
+        insert_required_string(&mut body, "type", order_type);
         insert_truthy_bool(&mut body, "postOnly", post_only);
         self.private_post(KucoinMarket::Spot, SPOT_PLACE_ORDER, Value::Object(body))
             .await
@@ -335,16 +335,16 @@ impl KucoinClient {
             FUTURES_ORDER_BOOL_KEYS,
         );
         self.insert_required_body_symbol(&mut body, params, true)?;
-        insert_required_string(
-            &mut body,
-            "side",
-            side_override.unwrap_or(params.required("side")?),
-        );
-        insert_required_string(
-            &mut body,
-            "type",
-            type_override.unwrap_or(params.required("type")?),
-        );
+        let side = match side_override {
+            Some(side) => side,
+            None => params.required("side")?,
+        };
+        let order_type = match type_override {
+            Some(order_type) => order_type,
+            None => params.required("type")?,
+        };
+        insert_required_string(&mut body, "side", side);
+        insert_required_string(&mut body, "type", order_type);
         insert_required_integer(&mut body, "size", params.required("size")?);
         insert_truthy_bool(&mut body, "postOnly", post_only);
         self.private_post(

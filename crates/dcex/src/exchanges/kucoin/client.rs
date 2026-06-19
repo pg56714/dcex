@@ -130,16 +130,6 @@ impl KucoinClient {
         })
     }
 
-    pub(super) async fn public_get(
-        &self,
-        market: KucoinMarket,
-        path: impl Into<String>,
-        params: Vec<(String, String)>,
-    ) -> Result<ValidatedResponse> {
-        self.request(HttpMethod::Get, market, path, params, None, false)
-            .await
-    }
-
     pub(super) async fn private_get(
         &self,
         market: KucoinMarket,
