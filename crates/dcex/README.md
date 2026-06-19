@@ -65,6 +65,13 @@ Run the live public HTTP benchmark from the workspace root:
 cargo run -p dcex --example public_http_benchmark --release
 ```
 
-Set `DCEX_BENCH_ITERATIONS` and `DCEX_BENCH_WARMUP` to change the run length.
+Run the local CPU-bound benchmark from the workspace root:
+
+```sh
+cargo run -p dcex --example core_local_benchmark --release
+```
+
+Set `DCEX_BENCH_ITERATIONS`, `DCEX_BENCH_WARMUP`, and
+`DCEX_BENCH_INNER_LOOPS` to change the run length.
 Set `DCEX_BENCH_OUTPUT=json` when another script needs machine-readable
 results.
