@@ -200,14 +200,25 @@ Public HTTP benchmarks are live network measurements, so results depend on
 exchange latency and local network conditions. Benchmark scripts are kept in the
 repo, but benchmark output files are not committed.
 
+Recorded sample (`uv run python examples/benchmark_public_http.py --iterations 20`, 2026-06-19):
+
+| Target | Iterations | Median ms | Mean ms | Min ms | Max ms | Median vs main |
+| ------ | ---------- | --------- | ------- | ------ | ------ | -------------- |
+| main native Python | 20 | 49.275 | 50.212 | 47.293 | 55.561 | 1.00x |
+| PyO3 Python wrapper | 20 | 46.998 | 48.918 | 45.664 | 86.677 | 1.05x |
+| Rust native | 20 | 46.916 | 46.884 | 45.249 | 48.730 | 1.05x |
+
 | Layer | Command | Output |
 | ----- | ------- | ------ |
-| Rust direct crate | `cargo run -p dcex --example public_http_benchmark --release` | Markdown table |
-| Python wrapper + PyO3 bridge | `uv run python examples/benchmark_public_http.py --iterations 20` | Markdown table |
+| main native Python vs PyO3 vs Rust native | `uv run python examples/benchmark_public_http.py --iterations 20` | Markdown table |
+| Rust native only | `cargo run -p dcex --example public_http_benchmark --release` | Markdown table |
 | Optional local CSV output | `uv run python examples/benchmark_public_http.py --csv benchmark.csv` | Ignored local CSV file |
 
-Use `DCEX_BENCH_ITERATIONS` and `DCEX_BENCH_WARMUP` for the Rust example when
-you need a longer run.
+The Python benchmark archives the local `main` git ref for the native Python
+baseline, then measures the current PyO3-backed Python wrapper and the Rust
+crate benchmark in one table. Use `--main-ref` when you need a different local
+baseline ref. Use `DCEX_BENCH_ITERATIONS`, `DCEX_BENCH_WARMUP`, and
+`DCEX_BENCH_OUTPUT=json` for the Rust-only example when needed.
 
 ## Release Publishing
 

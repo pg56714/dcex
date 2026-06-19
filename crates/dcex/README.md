@@ -66,3 +66,5 @@ cargo run -p dcex --example public_http_benchmark --release
 ```
 
 Set `DCEX_BENCH_ITERATIONS` and `DCEX_BENCH_WARMUP` to change the run length.
+Set `DCEX_BENCH_OUTPUT=json` when another script needs machine-readable
+results.

@@ -3,11 +3,18 @@ use std::time::{Duration, Instant};
 
 use dcex::exchanges::binance::BinanceClient;
 
-fn env_usize(name: &str, default: usize) -> usize {
+fn env_positive_usize(name: &str, default: usize) -> usize {
     env::var(name)
         .ok()
         .and_then(|value| value.parse::<usize>().ok())
         .filter(|value| *value > 0)
+        .unwrap_or(default)
+}
+
+fn env_nonnegative_usize(name: &str, default: usize) -> usize {
+    env::var(name)
+        .ok()
+        .and_then(|value| value.parse::<usize>().ok())
         .unwrap_or(default)
 }
 
@@ -27,8 +34,8 @@ fn median_duration_ms(values: &mut [f64]) -> f64 {
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let iterations = env_usize("DCEX_BENCH_ITERATIONS", 20);
-    let warmup = env_usize("DCEX_BENCH_WARMUP", 3);
+    let iterations = env_positive_usize("DCEX_BENCH_ITERATIONS", 20);
+    let warmup = env_nonnegative_usize("DCEX_BENCH_WARMUP", 3);
     let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
 
     for _ in 0..warmup {
@@ -47,9 +54,26 @@ async fn main() -> dcex::Result<()> {
     let max = elapsed_ms.iter().copied().fold(f64::NEG_INFINITY, f64::max);
     let median = median_duration_ms(&mut elapsed_ms);
 
-    println!("| Target | Iterations | Median ms | Mean ms | Min ms | Max ms |");
-    println!("| ------ | ---------- | --------- | ------- | ------ | ------ |");
-    println!("| Rust direct | {iterations} | {median:.3} | {mean:.3} | {min:.3} | {max:.3} |");
+    if env::var("DCEX_BENCH_OUTPUT")
+        .map(|value| value.eq_ignore_ascii_case("json"))
+        .unwrap_or(false)
+    {
+        println!(
+            "{}",
+            serde_json::json!({
+                "target": "Rust native",
+                "iterations": iterations,
+                "median_ms": median,
+                "mean_ms": mean,
+                "min_ms": min,
+                "max_ms": max,
+            })
+        );
+    } else {
+        println!("| Target | Iterations | Median ms | Mean ms | Min ms | Max ms |");
+        println!("| ------ | ---------- | --------- | ------- | ------ | ------ |");
+        println!("| Rust native | {iterations} | {median:.3} | {mean:.3} | {min:.3} | {max:.3} |");
+    }
 
     Ok(())
 }
