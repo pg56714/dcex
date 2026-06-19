@@ -26,7 +26,17 @@ ENDPOINT_FILE_SUFFIXES = (
     "_trade_http.py",
     "_trading_http.py",
 )
-NO_REQUEST_METHODS = {"check_client", "create_auth_token", "get_listen_key"}
+NO_REQUEST_METHODS = {
+    "check_client",
+    "create_auth_token",
+    "get_listen_key",
+    "sign_cancel_all_orders",
+    "sign_cancel_order",
+    "sign_create_order",
+    "sign_modify_order",
+    "sign_update_leverage",
+    "sign_update_margin",
+}
 
 
 @dataclass(frozen=True)
@@ -345,7 +355,7 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
             private_key="0x" + "1" * 64,
         )
     elif exchange == "lighter":
-        kwargs.update(account_index=1, api_key_index=2, api_private_key="1" * 64)
+        kwargs.update(account_index=1, api_key_index=2, api_private_key="1" * 80)
     return kwargs
 
 
@@ -650,6 +660,7 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         "margin_mode",
         "direction",
         "tx_type",
+        "usdc_amount",
     }:
         return 1
     if name in {"orderQty", "leverage", "lever", "ntli", "minutes"}:

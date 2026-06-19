@@ -1,4 +1,4 @@
-"""Lighter synchronous HTTP manager."""
+"""Lighter synchronous HTTP manager backed by the Rust core."""
 
 import logging
 from dataclasses import dataclass, field
@@ -45,7 +45,7 @@ class HTTPManager(BaseHTTPManager):
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     session: requests.Session = field(default_factory=requests.Session, init=False)
-    ptm: ProductTableManager = field(init=False, repr=False)
+    ptm: ProductTableManager | None = field(init=False, default=None, repr=False)
     _signer: SignerClient | None = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -59,9 +59,17 @@ class HTTPManager(BaseHTTPManager):
             self._native_client = native_client_type(
                 timeout=self.timeout,
                 base_url=self.base_url,
+                account_index=self.account_index,
+                api_key_index=self.api_key_index,
+                api_private_key=self.api_private_key,
             )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.LIGHTER)
+            if self._native_client is not None and hasattr(
+                self._native_client,
+                "set_product_table",
+            ):
+                self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
         return (
@@ -69,6 +77,73 @@ class HTTPManager(BaseHTTPManager):
             and self._native_client is not None
             and type(self.session) is requests.Session
         )
+
+    @staticmethod
+    def _native_params(**kwargs: object) -> list[tuple[str, str]]:
+        """Convert optional Python arguments into native string pairs."""
+        params: list[tuple[str, str]] = []
+        for key, value in kwargs.items():
+            if key == "self" or value is None:
+                continue
+            enum_value = getattr(value, "value", None)
+            if enum_value is not None:
+                value = enum_value
+            params.append((key, _format_value(value)))
+        return params
+
+    def _native_call(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+        private: bool,
+    ) -> dict[str, Any] | list[Any]:
+        """Call a Rust-backed Lighter method and decode its JSON body."""
+        native_client = self._native_client
+        method = "private_request" if private else "public_request"
+        if native_client is None or not hasattr(native_client, method):
+            raise RuntimeError(f"Lighter native client {method} is unavailable.")
+        try:
+            status, headers, body = getattr(native_client, method)(method_name, params)
+        except RuntimeError as exc:
+            raise FailedRequestError(
+                request=f"LIGHTER {method_name} | Params: {params}",
+                message=str(exc),
+                status_code="Unknown",
+                time=str(generate_timestamp(iso_format=True)),
+            ) from exc
+        response = NativeResponse(status, dict(headers), bytes(body))
+        self._store_response_headers(response)
+        return response.json()
+
+    def _native_public(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> dict[str, Any] | list[Any]:
+        """Call a Rust-backed Lighter public method."""
+        return self._native_call(method_name, params, private=False)
+
+    def _native_private(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> dict[str, Any] | list[Any]:
+        """Call a Rust-backed Lighter private method."""
+        return self._native_call(method_name, params, private=True)
+
+    def _native_sign(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign a Lighter transaction via Rust, falling back to the legacy signer in tests."""
+        native_client = self._native_client
+        if native_client is not None and hasattr(native_client, "sign_request"):
+            return cast(tuple[Any, Any, Any, Any], native_client.sign_request(method_name, params))
+        signer = self._private_signer()
+        kwargs = dict(params)
+        method = getattr(signer, method_name)
+        return cast(tuple[Any, Any, Any, Any], method(**_coerced_lighter_sign_kwargs(kwargs)))
 
     def _request(
         self,
@@ -80,9 +155,9 @@ class HTTPManager(BaseHTTPManager):
         headers: dict[str, str] | None = None,
         content_type: Literal["json", "form"] = "json",
     ) -> dict[str, Any] | list[Any]:
-        """Make an HTTP request to Lighter REST APIs."""
+        """Make a raw HTTP request to Lighter REST APIs."""
         if signed:
-            raise ValueError("Signed Lighter requests are not implemented yet.")
+            raise ValueError("Signed raw Lighter requests are not implemented; use native methods.")
 
         request_path = str(path)
         filtered_query = _filtered_query(query)
@@ -214,6 +289,9 @@ class HTTPManager(BaseHTTPManager):
     ) -> str:
         if authorization:
             return authorization
+        native_client = self._native_client
+        if native_client is not None and hasattr(native_client, "create_auth_token"):
+            return str(native_client.create_auth_token(deadline, api_key_index))
         signer = self._private_signer()
         kwargs: dict[str, int] = {"api_key_index": self._private_api_key_index(api_key_index)}
         if deadline is not None:
@@ -224,6 +302,18 @@ class HTTPManager(BaseHTTPManager):
         if token is None:
             raise ValueError("Lighter auth token creation returned no token.")
         return token
+
+    def _native_check_client(self) -> str | None:
+        native_client = self._native_client
+        if native_client is not None and hasattr(native_client, "check_client"):
+            return cast(str | None, native_client.check_client())
+        signer = self._private_signer()
+        response = self._request(
+            "GET",
+            "/api/v1/apikeys",
+            {"account_index": self._private_account_index()},
+        )
+        return signer.check_client_data(response)
 
     def _signed_tx(
         self,
@@ -258,3 +348,38 @@ class HTTPManager(BaseHTTPManager):
         """Close the HTTP session."""
         self.close_signer()
         self.session.close()
+
+
+def _coerced_lighter_sign_kwargs(values: dict[str, str]) -> dict[str, Any]:
+    int_keys = {
+        "api_key_index",
+        "base_amount",
+        "client_order_index",
+        "direction",
+        "fraction",
+        "integrator_account_index",
+        "integrator_maker_fee",
+        "integrator_taker_fee",
+        "margin_mode",
+        "market_index",
+        "nonce",
+        "order_expiry",
+        "order_index",
+        "order_type",
+        "price",
+        "skip_nonce",
+        "time_in_force",
+        "timestamp_ms",
+        "trigger_price",
+        "usdc_amount",
+    }
+    bool_keys = {"is_ask", "reduce_only"}
+    result: dict[str, Any] = {}
+    for key, value in values.items():
+        if key in int_keys:
+            result[key] = int(value)
+        elif key in bool_keys:
+            result[key] = value in {"true", "True", "1"}
+        else:
+            result[key] = value
+    return result

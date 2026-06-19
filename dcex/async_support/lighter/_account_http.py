@@ -1,9 +1,8 @@
-"""Lighter async private account HTTP client."""
+"""Lighter async private account HTTP client backed by Rust."""
 
 from typing import Any
 
 from ._http_manager import HTTPManager
-from .endpoints.market import Public
 
 
 class AccountHTTP(HTTPManager):
@@ -19,13 +18,7 @@ class AccountHTTP(HTTPManager):
 
     async def check_client(self) -> str | None:
         """Verify the configured API key against the Lighter signer client."""
-        signer = self._private_signer()
-        response = await self._request(
-            "GET",
-            Public.API_KEYS,
-            {"account_index": self._private_account_index()},
-        )
-        return signer.check_client_data(response)
+        return await self._native_check_client()
 
     async def get_account_limits(
         self,
@@ -33,13 +26,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve private Lighter account limits."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.ACCOUNT_LIMITS,
-            {"account_index": account_index},
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_account_limits", self._native_params(**locals()))
 
     async def get_account_active_orders(
         self,
@@ -49,16 +36,9 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve private Lighter active orders."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.ACCOUNT_ACTIVE_ORDERS,
-            {
-                "account_index": account_index,
-                "market_id": market_id,
-                "market_type": market_type,
-            },
-            headers={"Authorization": self._auth_token(authorization)},
+        return await self._native_private(
+            "get_account_active_orders",
+            self._native_params(**locals()),
         )
 
     async def get_account_inactive_orders(
@@ -73,20 +53,9 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve private Lighter inactive orders."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.ACCOUNT_INACTIVE_ORDERS,
-            {
-                "account_index": account_index,
-                "market_id": market_id,
-                "ask_filter": ask_filter,
-                "between_timestamps": between_timestamps,
-                "cursor": cursor,
-                "limit": limit,
-                "market_type": market_type,
-            },
-            headers={"Authorization": self._auth_token(authorization)},
+        return await self._native_private(
+            "get_account_inactive_orders",
+            self._native_params(**locals()),
         )
 
     async def get_deposit_history(
@@ -98,18 +67,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter deposit history."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.DEPOSIT_HISTORY,
-            {
-                "account_index": account_index,
-                "l1_address": l1_address,
-                "cursor": cursor,
-                "filter": filter,
-            },
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_deposit_history", self._native_params(**locals()))
 
     async def get_export(
         self,
@@ -124,22 +82,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Export Lighter trade or funding records."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.EXPORT,
-            {
-                "account_index": account_index,
-                "type": type_,
-                "market_id": market_id,
-                "start_timestamp": start_timestamp,
-                "end_timestamp": end_timestamp,
-                "side": side,
-                "role": role,
-                "trade_type": trade_type,
-            },
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_export", self._native_params(**locals()))
 
     async def get_fastwithdraw_info(
         self,
@@ -147,13 +90,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter fast-withdraw information."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.FASTWITHDRAW_INFO,
-            {"account_index": account_index},
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_fastwithdraw_info", self._native_params(**locals()))
 
     async def get_l1_metadata(
         self,
@@ -161,12 +98,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter L1 metadata."""
-        return await self._request(
-            "GET",
-            Public.L1_METADATA,
-            {"l1_address": l1_address},
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_l1_metadata", self._native_params(**locals()))
 
     async def get_liquidations(
         self,
@@ -177,18 +109,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter account liquidations."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.LIQUIDATIONS,
-            {
-                "account_index": account_index,
-                "market_id": market_id,
-                "cursor": cursor,
-                "limit": limit,
-            },
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_liquidations", self._native_params(**locals()))
 
     async def get_referral_points(
         self,
@@ -196,13 +117,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter referral points."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.REFERRAL_POINTS,
-            {"account_index": account_index},
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_referral_points", self._native_params(**locals()))
 
     async def get_referral_user_referrals(
         self,
@@ -215,20 +130,9 @@ class AccountHTTP(HTTPManager):
         auth: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter user referral records."""
-        if authorization is None and auth is None and self.api_private_key is not None:
-            authorization = self._auth_token()
-        return await self._request(
-            "GET",
-            Public.REFERRAL_USER_REFERRALS,
-            {
-                "l1_address": l1_address,
-                "cursor": cursor,
-                "auth": auth,
-                "stats_start_timestamp": stats_start_timestamp,
-                "stats_end_timestamp": stats_end_timestamp,
-                "limit": limit,
-            },
-            headers={"Authorization": authorization} if authorization is not None else None,
+        return await self._native_private(
+            "get_referral_user_referrals",
+            self._native_params(**locals()),
         )
 
     async def get_transfer_history(
@@ -239,18 +143,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter transfer history."""
-        account_index = self._private_account_index(account_index)
-        headers = (
-            {"Authorization": self._auth_token(authorization)}
-            if authorization is not None or self.api_private_key is not None
-            else None
-        )
-        return await self._request(
-            "GET",
-            Public.TRANSFER_HISTORY,
-            {"account_index": account_index, "cursor": cursor, "type": type_},
-            headers=headers,
-        )
+        return await self._native_private("get_transfer_history", self._native_params(**locals()))
 
     async def get_transfer_fee_info(
         self,
@@ -259,13 +152,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter transfer fee information."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.TRANSFER_FEE_INFO,
-            {"account_index": account_index, "to_account_index": to_account_index},
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_transfer_fee_info", self._native_params(**locals()))
 
     async def get_withdraw_history(
         self,
@@ -275,13 +162,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter withdrawal history."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.WITHDRAW_HISTORY,
-            {"account_index": account_index, "cursor": cursor, "filter": filter},
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_withdraw_history", self._native_params(**locals()))
 
     async def get_position_funding(
         self,
@@ -295,21 +176,7 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter position funding records."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.POSITION_FUNDING,
-            {
-                "account_index": account_index,
-                "market_id": market_id,
-                "cursor": cursor,
-                "limit": limit,
-                "side": side,
-                "start_timestamp": start_timestamp,
-                "end_timestamp": end_timestamp,
-            },
-            headers={"Authorization": self._auth_token(authorization)},
-        )
+        return await self._native_private("get_position_funding", self._native_params(**locals()))
 
     async def get_leases(
         self,
@@ -320,20 +187,7 @@ class AccountHTTP(HTTPManager):
         auth: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter account leases."""
-        account_index = self._private_account_index(account_index)
-        if authorization is None and auth is None and self.api_private_key is not None:
-            authorization = self._auth_token()
-        return await self._request(
-            "GET",
-            Public.LEASES,
-            {
-                "account_index": account_index,
-                "cursor": cursor,
-                "limit": limit,
-                "auth": auth,
-            },
-            headers={"Authorization": authorization} if authorization is not None else None,
-        )
+        return await self._native_private("get_leases", self._native_params(**locals()))
 
     async def get_partner_stats(
         self,
@@ -342,16 +196,7 @@ class AccountHTTP(HTTPManager):
         end_timestamp: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter partner statistics."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.PARTNER_STATS,
-            {
-                "account_index": account_index,
-                "start_timestamp": start_timestamp,
-                "end_timestamp": end_timestamp,
-            },
-        )
+        return await self._native_private("get_partner_stats", self._native_params(**locals()))
 
     async def get_maker_only_api_keys(
         self,
@@ -359,12 +204,9 @@ class AccountHTTP(HTTPManager):
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter maker-only API key settings."""
-        account_index = self._private_account_index(account_index)
-        return await self._request(
-            "GET",
-            Public.GET_MAKER_ONLY_API_KEYS,
-            {"account_index": account_index},
-            headers={"Authorization": self._auth_token(authorization)},
+        return await self._native_private(
+            "get_maker_only_api_keys",
+            self._native_params(**locals()),
         )
 
     async def get_next_nonce(
@@ -373,11 +215,4 @@ class AccountHTTP(HTTPManager):
         api_key_index: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve the next nonce for a Lighter API key."""
-        return await self._request(
-            "GET",
-            Public.NEXT_NONCE,
-            {
-                "account_index": self._private_account_index(account_index),
-                "api_key_index": self._private_api_key_index(api_key_index),
-            },
-        )
+        return await self._native_private("get_next_nonce", self._native_params(**locals()))

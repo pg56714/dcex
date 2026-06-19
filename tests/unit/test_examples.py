@@ -19,6 +19,7 @@ MIGRATED_EXCHANGES = (
     "hyperliquid",
     "kraken",
     "kucoin",
+    "lighter",
     "mexc",
     "okx",
 )

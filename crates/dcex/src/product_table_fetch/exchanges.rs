@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::time::Duration;
 
 use serde_json::Value;
@@ -767,7 +767,7 @@ pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
 pub(super) async fn fetch_lighter(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = LighterClient::new(timeout)?;
     let response = client
-        .public_request("/api/v1/orderBookDetails", Vec::new(), BTreeMap::new())
+        .public_request("get_order_book_details", Vec::new())
         .await?;
     let mut rows = Vec::new();
     for (key, product_type) in [

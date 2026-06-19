@@ -17,6 +17,7 @@ ed25519-dalek = { version = "2.2", default-features = false, features = [
   "std",
 ] }
 hex = "0.4"
+getrandom = "0.2"
 hmac = "0.12"
 num-bigint = "0.4"
 num-traits = "0.2"
