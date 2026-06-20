@@ -4,13 +4,11 @@ from __future__ import annotations
 
 import argparse
 import csv
-import io
 import json
 import os
 import statistics
 import subprocess
 import sys
-import tarfile
 import tempfile
 import time
 from collections.abc import Callable
@@ -18,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_BASELINE_VERSION = "0.21.2"
 CSV_FIELDS = [
     "target",
     "iterations",
@@ -25,10 +24,10 @@ CSV_FIELDS = [
     "mean_ms",
     "min_ms",
     "max_ms",
-    "median_vs_main",
+    "median_vs_baseline",
 ]
 
-MAIN_PYTHON_BENCHMARK = r"""
+PYPI_PYTHON_BENCHMARK = r"""
 from __future__ import annotations
 
 import argparse
@@ -77,7 +76,7 @@ def main() -> None:
     client = dcex.binance(preload_product_table=False, timeout=args.timeout)
     try:
         row = measure(
-            "main native Python",
+            "native Python baseline",
             lambda: client.get_server_time("spot"),
             iterations=args.iterations,
             warmup=args.warmup,
@@ -145,6 +144,8 @@ def _run_json_command(
         cwd=cwd,
         env=env,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         check=False,
     )
@@ -163,33 +164,52 @@ def _run_json_command(
     raise SystemExit(f"{context} did not emit a JSON benchmark row:\n{completed.stdout}")
 
 
-def _extract_git_ref(ref: str, destination: Path) -> None:
-    completed = subprocess.run(  # noqa: S603
-        ["git", "-C", str(ROOT), "archive", "--format=tar", ref],  # noqa: S607
-        capture_output=True,
-        check=False,
-    )
+def _install_pypi_baseline(version: str, target: Path) -> None:
+    try:
+        completed = subprocess.run(  # noqa: S603
+            [  # noqa: S607
+                "uv",
+                "pip",
+                "install",
+                "--python",
+                sys.executable,
+                "--target",
+                str(target),
+                "--no-sources",
+                f"dcex=={version}",
+            ],
+            cwd=ROOT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            check=False,
+        )
+    except FileNotFoundError as exc:  # pragma: no cover - local tooling guard
+        raise SystemExit("uv is required to install the PyPI benchmark baseline.") from exc
+
     if completed.returncode != 0:
-        stderr = completed.stderr.decode(errors="replace")
-        raise SystemExit(f"Unable to archive git ref {ref!r}:\n{stderr}")
+        raise SystemExit(
+            f"Unable to install PyPI baseline dcex=={version}\n"
+            f"stdout:\n{completed.stdout}\n"
+            f"stderr:\n{completed.stderr}"
+        )
 
-    with tarfile.open(fileobj=io.BytesIO(completed.stdout), mode="r:") as archive:
-        archive.extractall(destination, filter="data")
 
-
-def _benchmark_main_python(args: argparse.Namespace) -> dict[str, str | int | float]:
-    with tempfile.TemporaryDirectory(prefix="dcex-main-bench-") as temp_name:
-        checkout = Path(temp_name)
-        _extract_git_ref(args.main_ref, checkout)
+def _benchmark_pypi_python(args: argparse.Namespace) -> dict[str, str | int | float]:
+    with tempfile.TemporaryDirectory(prefix="dcex-pypi-bench-") as temp_name:
+        temp_root = Path(temp_name)
+        baseline_site = temp_root / "site"
+        _install_pypi_baseline(args.baseline_version, baseline_site)
 
         env = os.environ.copy()
-        env["PYTHONPATH"] = str(checkout)
+        env["PYTHONPATH"] = str(baseline_site)
 
         row = _run_json_command(
             [
                 sys.executable,
                 "-c",
-                MAIN_PYTHON_BENCHMARK,
+                PYPI_PYTHON_BENCHMARK,
                 "--iterations",
                 str(args.iterations),
                 "--warmup",
@@ -197,11 +217,11 @@ def _benchmark_main_python(args: argparse.Namespace) -> dict[str, str | int | fl
                 "--timeout",
                 str(args.timeout),
             ],
-            cwd=checkout,
+            cwd=temp_root,
             env=env,
-            context=f"main native Python benchmark from {args.main_ref}",
+            context=f"PyPI dcex=={args.baseline_version} native Python benchmark",
         )
-    return _normalise_row(row, "main native Python")
+    return _normalise_row(row, f"dcex {args.baseline_version} native Python")
 
 
 def _benchmark_pyo3_python(args: argparse.Namespace) -> dict[str, str | int | float]:
@@ -246,12 +266,12 @@ def _benchmark_rust_native(args: argparse.Namespace) -> dict[str, str | int | fl
 
 
 def _add_speedups(rows: list[dict[str, str | int | float]]) -> None:
-    baseline = next(row for row in rows if row["target"] == "main native Python")
+    baseline = rows[0]
     baseline_median = float(baseline["median_ms"])
 
     for row in rows:
         median_ms = float(row["median_ms"])
-        row["median_vs_main"] = baseline_median / median_ms if median_ms > 0 else "n/a"
+        row["median_vs_baseline"] = baseline_median / median_ms if median_ms > 0 else "n/a"
 
 
 def _format_speedup(value: str | int | float) -> str:
@@ -260,15 +280,17 @@ def _format_speedup(value: str | int | float) -> str:
     return value
 
 
-def _print_markdown(rows: list[dict[str, str | int | float]]) -> None:
-    print("| Target | Iterations | Median ms | Mean ms | Min ms | Max ms | Median vs main |")
-    print("| ------ | ---------- | --------- | ------- | ------ | ------ | -------------- |")
+def _print_markdown(rows: list[dict[str, str | int | float]], baseline_version: str) -> None:
+    print(f"Baseline: PyPI `dcex=={baseline_version}` native Python implementation = 1.00x.")
+    print()
+    print("| Target | Iterations | Median ms | Mean ms | Min ms | Max ms | Median vs baseline |")
+    print("| ------ | ---------- | --------- | ------- | ------ | ------ | ------------------ |")
     for row in rows:
         print(
             f"| {row['target']} | {row['iterations']} | "
             f"{float(row['median_ms']):.3f} | {float(row['mean_ms']):.3f} | "
             f"{float(row['min_ms']):.3f} | {float(row['max_ms']):.3f} | "
-            f"{_format_speedup(row['median_vs_main'])} |"
+            f"{_format_speedup(row['median_vs_baseline'])} |"
         )
 
 
@@ -283,14 +305,18 @@ def main() -> None:
     """Run the benchmark and print a Markdown results table."""
     parser = argparse.ArgumentParser(
         description=(
-            "Benchmark Binance server-time calls across main Python, "
+            "Benchmark Binance server-time calls across PyPI Python, "
             "the current PyO3-backed Python wrapper, and native Rust."
         ),
     )
     parser.add_argument("--iterations", type=int, default=20)
     parser.add_argument("--warmup", type=int, default=3)
     parser.add_argument("--timeout", type=int, default=10)
-    parser.add_argument("--main-ref", default="main", help="Local git ref for the Python baseline.")
+    parser.add_argument(
+        "--baseline-version",
+        default=DEFAULT_BASELINE_VERSION,
+        help="PyPI dcex version for the native Python baseline.",
+    )
     parser.add_argument("--csv", type=Path, default=None, help="Optional local CSV output path.")
     args = parser.parse_args()
 
@@ -302,13 +328,13 @@ def main() -> None:
         raise SystemExit("--timeout must be positive")
 
     rows = [
-        _benchmark_main_python(args),
+        _benchmark_pypi_python(args),
         _benchmark_pyo3_python(args),
         _benchmark_rust_native(args),
     ]
     _add_speedups(rows)
 
-    _print_markdown(rows)
+    _print_markdown(rows, args.baseline_version)
     if args.csv is not None:
         _write_csv(args.csv, rows)
 
