@@ -8,14 +8,12 @@ response handling.
 
 import hashlib
 import hmac
+import json
 import logging
 import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Literal, Self, cast
-
-import httpx
-import msgspec
 
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
@@ -62,7 +60,7 @@ class HTTPManager(BaseHTTPManager):
     base_url: str = field(default="https://api.gateio.ws")
     logger: logging.Logger | None = field(default=None)
     timeout: int = field(default=10)
-    session: httpx.AsyncClient | None = field(default=None, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -92,16 +90,14 @@ class HTTPManager(BaseHTTPManager):
             and hasattr(self._native_client, "set_product_table")
         ):
             self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def _native_private(
         self,
@@ -144,7 +140,7 @@ class HTTPManager(BaseHTTPManager):
             if isinstance(value, bool):
                 value = str(value).lower()
             elif isinstance(value, (list, dict, tuple)):
-                value = msgspec.json.encode(value).decode("utf-8")
+                value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))
         return params
 
@@ -195,7 +191,7 @@ class HTTPManager(BaseHTTPManager):
         Raises:
             ValueError: If API secret is not set
         """
-        payload_string = msgspec.json.encode(body or {}).decode("utf-8") if body else ""
+        payload_string = json.dumps(body or {}, separators=(",", ":")) if body else ""
         hashed_payload = hashlib.sha512(payload_string.encode("utf-8")).hexdigest()
 
         query_string = _format_query_string(query)
@@ -235,11 +231,8 @@ class HTTPManager(BaseHTTPManager):
             ValueError: If signed request lacks credentials
             FailedRequestError: If request fails or API returns error
         """
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
-
-        if self.session is None:
-            raise RuntimeError("Failed to initialize HTTP session")
 
         query = query or {}
         body = body or {}
@@ -275,7 +268,7 @@ class HTTPManager(BaseHTTPManager):
             body_string = None
             query_params: Any = _format_query_string(query) or None
             if method_upper in ("POST", "PUT", "PATCH") and body:
-                body_string = msgspec.json.encode(body).decode("utf-8")
+                body_string = json.dumps(body, separators=(",", ":"))
 
             if uses_native:
                 status, response_headers, response_body = await cast(

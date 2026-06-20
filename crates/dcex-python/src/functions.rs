@@ -64,6 +64,20 @@ fn lighter_auth_token(
 }
 
 #[pyfunction]
+fn aster_sign_message(message: &str, private_key: &str) -> PyResult<String> {
+    let normalized = private_key.strip_prefix("0x").unwrap_or(private_key);
+    let bytes = hex::decode(normalized)
+        .map_err(|error| PyValueError::new_err(format!("invalid Aster private key: {error}")))?;
+    let key: [u8; 32] = bytes.try_into().map_err(|bytes: Vec<u8>| {
+        PyValueError::new_err(format!(
+            "Aster private key must contain 32 bytes, got {}",
+            bytes.len()
+        ))
+    })?;
+    dcex::exchanges::aster::sign_message(message, &key).map_err(to_py_value_error)
+}
+
+#[pyfunction]
 fn exchange_names() -> Vec<String> {
     common::exchange_names()
         .into_iter()
@@ -164,6 +178,7 @@ pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(lighter_schnorr_sign, m)?)?;
     m.add_function(wrap_pyfunction!(lighter_sign_transaction, m)?)?;
     m.add_function(wrap_pyfunction!(lighter_auth_token, m)?)?;
+    m.add_function(wrap_pyfunction!(aster_sign_message, m)?)?;
     m.add_function(wrap_pyfunction!(exchange_names, m)?)?;
     m.add_function(wrap_pyfunction!(order_side_parse, m)?)?;
     m.add_function(wrap_pyfunction!(order_side_to_exchange, m)?)?;

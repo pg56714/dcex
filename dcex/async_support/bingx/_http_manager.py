@@ -9,8 +9,6 @@ from dataclasses import dataclass, field
 from typing import Any, Self, cast
 from urllib.parse import urlencode
 
-import httpx
-
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
@@ -84,7 +82,7 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(init=False, default=None)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     base_url: str = field(default="https://open-api.bingx.com")
@@ -114,16 +112,14 @@ class HTTPManager(BaseHTTPManager):
             and hasattr(self._native_client, "set_product_table")
         ):
             self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def _native_private(
         self,
@@ -193,7 +189,7 @@ class HTTPManager(BaseHTTPManager):
             FailedRequestError: When API request fails
         """
 
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
 
         if signed and not (self.api_key and self.api_secret):
@@ -202,9 +198,6 @@ class HTTPManager(BaseHTTPManager):
         uses_native = self._uses_native_transport()
         url = self.base_url + path
         try:
-            if self.session is None:
-                raise ValueError("Session is not initialized. Call async_init() first.")
-
             if uses_native:
                 json_body = None
                 if not signed and method.upper() in {"POST", "PUT"}:
@@ -263,7 +256,7 @@ class HTTPManager(BaseHTTPManager):
                 else:
                     raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except (httpx.HTTPError, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

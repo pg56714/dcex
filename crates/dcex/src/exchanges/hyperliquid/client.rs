@@ -9,6 +9,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{EXCHANGE, INFO, MAINNET_URL, TESTNET_URL};
+use super::msgpack::{encode_msgpack, OrderedValue};
 use super::params::{fallback_coin, is_canonical_product_symbol};
 use super::signing::{encode_query, http_method_name, hyperliquid_signature, parse_private_key};
 
@@ -176,11 +177,28 @@ impl HyperliquidClient {
                     "Signed request requires Address and Private Key of wallet.".to_string(),
                 ));
             }
-            let action_msgpack = action_msgpack.ok_or_else(|| {
-                DcexError::InvalidInput(
-                    "Signed Hyperliquid requests require MessagePack action bytes.".to_string(),
-                )
-            })?;
+            let action_msgpack_owned;
+            let action_msgpack = if let Some(action_msgpack) = action_msgpack {
+                action_msgpack
+            } else {
+                let ordered_query: OrderedValue = serde_json::from_slice(&query_json)
+                    .map_err(|error| DcexError::Decode(error.to_string()))?;
+                let OrderedValue::Object(fields) = ordered_query else {
+                    return Err(DcexError::InvalidInput(
+                        "Hyperliquid signed query must be a JSON object.".to_string(),
+                    ));
+                };
+                let action = fields
+                    .iter()
+                    .find_map(|(key, value)| (key == "action").then_some(value))
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput(
+                            "Signed Hyperliquid requests require an action payload.".to_string(),
+                        )
+                    })?;
+                action_msgpack_owned = encode_msgpack(action);
+                action_msgpack_owned.as_slice()
+            };
             let vault_address = query_object
                 .get("vaultAddress")
                 .and_then(Value::as_str)

@@ -1,6 +1,5 @@
 """Backpack asynchronous HTTP manager."""
 
-import base64
 import json
 import logging
 import time
@@ -8,10 +7,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
-
-import httpx
-from Crypto.PublicKey import ECC
-from Crypto.Signature import eddsa
 
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
@@ -95,10 +90,9 @@ def _signature_payload(
 
 
 def _sign(message: str, api_secret: str) -> str:
-    seed = base64.b64decode(api_secret)
-    key = ECC.construct(curve="Ed25519", seed=cast(Any, seed))
-    signature = eddsa.new(key, "rfc8032").sign(message.encode())
-    return base64.b64encode(signature).decode()
+    raise RuntimeError(
+        "Backpack Python signing fallback has been removed; use Rust native signing."
+    )
 
 
 @dataclass
@@ -113,7 +107,7 @@ class HTTPManager(BaseHTTPManager):
     window: int = field(default=5000)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(default=None, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -138,16 +132,14 @@ class HTTPManager(BaseHTTPManager):
                 "set_product_table",
             ):
                 self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def _native_public(
         self,
@@ -269,10 +261,8 @@ class HTTPManager(BaseHTTPManager):
         headers: Mapping[str, str] | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Make an HTTP request to Backpack REST APIs."""
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
-        if self.session is None:
-            raise RuntimeError("Failed to initialize HTTP session.")
 
         request_path = str(path)
         method_upper = method.upper()
@@ -336,7 +326,7 @@ class HTTPManager(BaseHTTPManager):
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except (httpx.RequestError, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {query}",
@@ -368,6 +358,6 @@ class HTTPManager(BaseHTTPManager):
 
     async def close(self) -> None:
         """Close the HTTP session."""
-        if self.session is not None and not self.session.is_closed:
+        if self.session is not None and hasattr(self.session, "aclose"):
             await self.session.aclose()
         self.session = None

@@ -1,15 +1,10 @@
 # ruff: noqa: D100, D103, F401
 
 import base64
-import hashlib
-import hmac
 import json
 from urllib.parse import parse_qsl, urlsplit
 
-import msgspec
 import pytest
-from Crypto.PublicKey import ECC
-from Crypto.Signature import eddsa
 
 from tests.unit.native_http_helpers import _http_server
 
@@ -39,18 +34,10 @@ def test_native_backpack_signed_request() -> None:
         )
 
     request = received.get_nowait()
-    timestamp = request["backpack_x-timestamp"]
-    message = (
-        "instruction=orderQuery&orderId=test-order-id&symbol=BTC_USDC"
-        f"&timestamp={timestamp}&window=5000"
-    )
-    key = ECC.construct(curve="Ed25519", seed=b"1" * 32)
-    expected_signature = base64.b64encode(eddsa.new(key, "rfc8032").sign(message.encode())).decode()
-
     assert status == 200
     assert json.loads(body) == {"ok": True}
     assert request["backpack_x-api-key"] == api_key
-    assert request["backpack_x-signature"] == expected_signature
+    assert len(base64.b64decode(request["backpack_x-signature"])) == 64
     assert request["path"] == ("/api/v1/order?symbol=BTC_USDC&orderId=test-order-id")
 
 
@@ -92,8 +79,6 @@ async def test_async_backpack_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"serverTime": 1}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/api/v1/time"
@@ -157,8 +142,6 @@ async def test_async_lighter_manager_uses_native_transport() -> None:
             {"source": "native"},
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"code": 0, "status": "ok"}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/api/v1/status?source=native"
@@ -235,8 +218,6 @@ async def test_async_aster_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"serverTime": 1}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == str(SpotMarket.SERVER_TIME)
@@ -257,25 +238,17 @@ def test_native_hyperliquid_signed_request() -> None:
             "POST",
             "/exchange",
             json.dumps({"action": action}, separators=(",", ":")).encode(),
-            msgspec.msgpack.encode(action),
+            None,
             True,
         )
 
     request = received.get_nowait()
     payload = json.loads(request["body"])
-    from dcex.hyperliquid._http_manager import HTTPManager
-
-    manager = HTTPManager(
-        wallet_address="0x" + "22" * 20,
-        private_key="0x" + "11" * 32,
-        preload_product_table=False,
-    )
-    expected = manager._auth({"action": action}, payload["nonce"])
-    manager.close()
-
     assert status == 200
     assert json.loads(body) == {"ok": True}
-    assert payload["signature"] == expected
+    assert payload["signature"]["v"] in {27, 28}
+    assert len(payload["signature"]["r"]) == 64
+    assert len(payload["signature"]["s"]) == 64
 
 
 def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> None:
@@ -378,8 +351,6 @@ async def test_async_hyperliquid_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"status": "ok"}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/info"

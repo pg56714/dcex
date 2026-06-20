@@ -7,10 +7,7 @@ import json
 from typing import Any
 from urllib.parse import parse_qsl, urlsplit
 
-import msgspec
 import pytest
-from Crypto.PublicKey import ECC
-from Crypto.Signature import eddsa
 
 from tests.unit.native_http_helpers import _http_server
 
@@ -174,8 +171,6 @@ async def test_async_binance_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == (f"{SpotMarket.EXCHANGE_INFO}?symbol=ETHUSDT")

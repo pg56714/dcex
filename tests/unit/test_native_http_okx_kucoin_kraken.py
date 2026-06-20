@@ -6,10 +6,7 @@ import hmac
 import json
 from urllib.parse import parse_qsl, urlsplit
 
-import msgspec
 import pytest
-from Crypto.PublicKey import ECC
-from Crypto.Signature import eddsa
 
 from tests.unit.native_http_helpers import _http_server
 
@@ -87,8 +84,6 @@ async def test_async_okx_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"code": "0", "data": []}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/api/v5/public/time?source=native"
@@ -173,8 +168,6 @@ async def test_async_kucoin_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"code": "200000", "data": 1}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/api/v1/timestamp?source=native"
@@ -295,8 +288,6 @@ async def test_async_kraken_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"error": [], "result": {"unixtime": 1}}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/0/public/Time"

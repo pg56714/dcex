@@ -10,8 +10,6 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, cast
 from urllib.parse import parse_qsl, urlencode
 
-import requests
-
 from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
@@ -73,7 +71,7 @@ class HTTPManager(BaseHTTPManager):
     passphrase: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: requests.Session = field(default_factory=requests.Session, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -97,11 +95,11 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is requests.Session
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     def _native_private(
         self,
@@ -239,7 +237,7 @@ class HTTPManager(BaseHTTPManager):
                     response = self.session.delete(url, headers=headers, timeout=self.timeout)
                 else:
                     raise ValueError(f"Unsupported HTTP method: {method}")
-        except (requests.RequestException, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
@@ -285,4 +283,6 @@ class HTTPManager(BaseHTTPManager):
 
     def close(self) -> None:
         """Close the HTTP session."""
-        self.session.close()
+        if self.session is not None and hasattr(self.session, "close"):
+            self.session.close()
+        self.session = None

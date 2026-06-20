@@ -3,9 +3,9 @@
 import os
 import time
 import uuid
+import json
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
-import msgspec
 import pytest
 from dotenv import load_dotenv
 
@@ -76,7 +76,7 @@ def _cloid() -> str:
 
 
 def _asset_id(client: Client) -> int:
-    return msgspec.json.decode(client.ptm.get_exchange_symbol(Common.HYPERLIQUID, SYMBOL))[1]
+    return json.loads(client.ptm.get_exchange_symbol(Common.HYPERLIQUID, SYMBOL))[1]
 
 
 def _mid_price(client: Client) -> Decimal:

@@ -3,14 +3,12 @@
 import base64
 import hashlib
 import hmac
+import json
 import logging
 import time
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
-
-import httpx
-import msgspec
 
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
@@ -104,7 +102,7 @@ class HTTPManager(BaseHTTPManager):
     futures_api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(default=None, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -129,17 +127,14 @@ class HTTPManager(BaseHTTPManager):
             self.ptm = await ProductTableManager.get_instance(Common.KRAKEN)
             if self._native_client is not None:
                 self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _uses_native_transport(self, request_base_url: str) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-            and request_base_url in {self.base_url, self.futures_base_url}
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     @property
     def _spot_api_key(self) -> str | None:
@@ -249,10 +244,8 @@ class HTTPManager(BaseHTTPManager):
         auth_type: AuthType | None = None,
     ) -> dict[str, Any]:
         """Make an HTTP request to Kraken REST APIs."""
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
-        if self.session is None:
-            raise RuntimeError("Failed to initialize HTTP session")
 
         request_path = str(path)
         filtered_query = _filtered_query(query)
@@ -289,7 +282,7 @@ class HTTPManager(BaseHTTPManager):
 
             if self._uses_native_transport(request_base_url):
                 json_body = (
-                    msgspec.json.encode(filtered_query)
+                    json.dumps(filtered_query, separators=(",", ":")).encode()
                     if method_upper in {"POST", "PUT"} and filtered_query and not signed
                     else None
                 )
@@ -348,7 +341,7 @@ class HTTPManager(BaseHTTPManager):
                     response = await self.session.delete(url, headers=headers)
                 else:
                     raise ValueError(f"Unsupported method: {method}")
-        except (httpx.RequestError, RuntimeError) as e:
+        except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
@@ -394,5 +387,6 @@ class HTTPManager(BaseHTTPManager):
 
     async def close(self) -> None:
         """Close the HTTP session."""
-        if self.session is not None and not self.session.is_closed:
+        if self.session is not None and hasattr(self.session, "aclose"):
             await self.session.aclose()
+        self.session = None

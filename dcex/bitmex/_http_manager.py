@@ -8,15 +8,13 @@ and error handling.
 
 import hashlib
 import hmac
+import json
 import logging
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, cast
 from urllib.parse import parse_qsl, urlencode
-
-import msgspec
-import requests
 
 from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
@@ -55,7 +53,7 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: requests.Session = field(default_factory=requests.Session, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -87,11 +85,11 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is requests.Session
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     def _native_private(
         self,
@@ -127,7 +125,7 @@ class HTTPManager(BaseHTTPManager):
             if enum_value is not None:
                 value = enum_value
             if isinstance(value, (list, dict)):
-                value = msgspec.json.encode(value).decode("utf-8")
+                value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))
         return params
 
@@ -214,8 +212,6 @@ class HTTPManager(BaseHTTPManager):
             FailedRequestError: If the API request fails or returns an error
             ValueError: If an unsupported HTTP method is used
         """
-        if self.session is None:
-            raise RuntimeError("HTTP session is not initialized")
 
         response = None
         try:
@@ -231,7 +227,9 @@ class HTTPManager(BaseHTTPManager):
                     else []
                 )
                 body_bytes = (
-                    msgspec.json.encode(query) if query and method.upper() != "GET" else None
+                    json.dumps(query, separators=(",", ":")).encode()
+                    if query and method.upper() != "GET"
+                    else None
                 )
                 status, response_headers, response_body = cast(
                     Any,
@@ -260,7 +258,7 @@ class HTTPManager(BaseHTTPManager):
                         timeout=self.timeout,
                     )
                 elif method.upper() == "POST":
-                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    body = json.dumps(query, separators=(",", ":")) if query else ""
                     response = self.session.post(
                         url,
                         headers=self._headers(method, full_path, body, signed=signed),
@@ -268,7 +266,7 @@ class HTTPManager(BaseHTTPManager):
                         timeout=self.timeout,
                     )
                 elif method.upper() == "PUT":
-                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    body = json.dumps(query, separators=(",", ":")) if query else ""
                     response = self.session.put(
                         url,
                         headers=self._headers(method, full_path, body, signed=signed),
@@ -276,7 +274,7 @@ class HTTPManager(BaseHTTPManager):
                         timeout=self.timeout,
                     )
                 elif method.upper() == "DELETE":
-                    body = msgspec.json.encode(query).decode("utf-8") if query else ""
+                    body = json.dumps(query, separators=(",", ":")) if query else ""
                     response = self.session.request(
                         method="DELETE",
                         url=url,
@@ -318,7 +316,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 return data
 
-        except (requests.exceptions.RequestException, RuntimeError) as e:
+        except RuntimeError as e:
             timestamp = str(generate_timestamp(iso_format=True))
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
@@ -331,4 +329,6 @@ class HTTPManager(BaseHTTPManager):
 
     def close(self) -> None:
         """Close the HTTP session."""
-        self.session.close()
+        if self.session is not None and hasattr(self.session, "close"):
+            self.session.close()
+        self.session = None

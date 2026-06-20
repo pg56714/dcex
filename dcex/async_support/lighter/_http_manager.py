@@ -5,8 +5,6 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
-import httpx
-
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...lighter._http_manager import _coerced_lighter_sign_kwargs
@@ -45,7 +43,7 @@ class HTTPManager(BaseHTTPManager):
     api_private_key: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(default=None, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager | None = field(init=False, default=None, repr=False)
     _signer: SignerClient | None = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
@@ -71,19 +69,17 @@ class HTTPManager(BaseHTTPManager):
                 "set_product_table",
             ):
                 self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def __aenter__(self) -> Self:
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
         return self
 
@@ -177,10 +173,8 @@ class HTTPManager(BaseHTTPManager):
         """Make a raw HTTP request to Lighter REST APIs."""
         if signed:
             raise ValueError("Signed raw Lighter requests are not implemented; use native methods.")
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
-        if self.session is None:
-            raise RuntimeError("Failed to initialize HTTP session.")
 
         request_path = str(path)
         filtered_query = _filtered_query(query)
@@ -231,7 +225,7 @@ class HTTPManager(BaseHTTPManager):
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except (httpx.RequestError, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
@@ -371,5 +365,6 @@ class HTTPManager(BaseHTTPManager):
     async def close(self) -> None:
         """Close the HTTP session."""
         await self.close_signer()
-        if self.session is not None and not self.session.is_closed:
+        if self.session is not None and hasattr(self.session, "aclose"):
             await self.session.aclose()
+        self.session = None

@@ -1,6 +1,5 @@
+import json
 from typing import Any
-
-import msgspec
 
 from .._native_http import NativeResponse
 from ..utils.common import Common
@@ -55,7 +54,7 @@ class MarketHTTP(HTTPManager):
                 product_symbol=(
                     self._exchange_symbol(product_symbol) if product_symbol is not None else None
                 ),
-                filter=msgspec.json.encode(filter).decode("utf-8") if filter is not None else None,
+                filter=json.dumps(filter, separators=(",", ":")) if filter is not None else None,
                 count=count,
             ),
         )
@@ -205,7 +204,7 @@ class MarketHTTP(HTTPManager):
                 product_symbol=(
                     self._exchange_symbol(product_symbol) if product_symbol is not None else None
                 ),
-                filter=msgspec.json.encode(filter).decode("utf-8") if filter is not None else None,
+                filter=json.dumps(filter, separators=(",", ":")) if filter is not None else None,
                 columns=columns,
                 count=count,
                 start=start,

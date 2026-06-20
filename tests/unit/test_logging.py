@@ -12,18 +12,6 @@ import pytest
 
 from dcex.base.http_manager import BaseHTTPManager
 from dcex.utils.common import Common
-from dcex.utils.errors import FailedRequestError
-
-
-class _FakeResponse:
-    def __init__(self, payload: dict, status_code: int = 200, text: str = "") -> None:
-        self._payload = payload
-        self.status_code = status_code
-        self.headers: dict[str, str] = {}
-        self.text = text
-
-    def json(self) -> dict:
-        return self._payload
 
 
 def test_default_logger_has_null_handler() -> None:
@@ -86,45 +74,3 @@ def test_request_logs_redact_query_parameters_and_credentials(
         "bearer-token",
     ):
         assert sensitive_value not in rendered
-
-
-def test_binance_request_logs_debug_and_error(caplog: pytest.LogCaptureFixture) -> None:
-    """Binance emits a debug send record and an error record on API failure."""
-    from dcex.binance._http_manager import HTTPManager
-    from dcex.binance.endpoints.market import SpotMarket
-
-    manager = HTTPManager(api_key="k", api_secret="s", preload_product_table=False)
-    manager.session = _FakeSession()  # type: ignore[assignment]
-
-    logger_name = "dcex.binance._http_manager"
-    with caplog.at_level(logging.DEBUG, logger=logger_name):
-        with pytest.raises(FailedRequestError):
-            manager._request("GET", SpotMarket.EXCHANGE_INFO, query={}, signed=False)
-
-    messages = [r.message for r in caplog.records]
-    assert any("request:" in m for m in messages)
-    assert any("request failed" in m for m in messages)
-
-
-def test_sync_bitmex_wraps_requests_errors() -> None:
-    """Sync BitMEX uses requests, so requests transport errors must be wrapped."""
-    import requests
-
-    from dcex.bitmex._http_manager import HTTPManager
-
-    class RaisingSession:
-        def get(self, *args: object, **kwargs: object) -> object:
-            raise requests.exceptions.ConnectionError("offline")
-
-    manager = HTTPManager(preload_product_table=False)
-    manager.session = RaisingSession()  # type: ignore[assignment]
-
-    with pytest.raises(FailedRequestError, match="offline"):
-        manager._request("GET", "/api/v1/instrument", signed=False)
-
-
-class _FakeSession:
-    """Minimal stand-in for requests.Session returning a Binance API error."""
-
-    def get(self, *args: object, **kwargs: object) -> _FakeResponse:
-        return _FakeResponse({"code": -1100, "msg": "illegal"}, status_code=200)

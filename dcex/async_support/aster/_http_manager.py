@@ -8,8 +8,6 @@ from dataclasses import dataclass, field
 from typing import Any, Self, cast
 from urllib.parse import urlencode
 
-import httpx
-
 from ..._native_http import NativeResponse, load_native
 from ...aster._http_manager import (
     _NATIVE_PRIVATE_REQUESTS,
@@ -43,7 +41,7 @@ class HTTPManager(BaseHTTPManager):
     futures_base_url: str = field(default="https://fapi.asterdex.com")
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(default=None, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _nonce_lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
@@ -71,16 +69,14 @@ class HTTPManager(BaseHTTPManager):
                 "set_product_table",
             ):
                 self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def _native_response(
         self,
@@ -215,10 +211,8 @@ class HTTPManager(BaseHTTPManager):
         signed: bool = True,
     ) -> dict[str, Any] | list[Any]:
         """Make an asynchronous Aster V3 REST request."""
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
-        if self.session is None:
-            raise RuntimeError("Failed to initialize Aster HTTP session.")
 
         method_upper = method.upper()
         include_user = isinstance(path, FuturesMarket | FuturesAccount | FuturesTrade)
@@ -270,7 +264,7 @@ class HTTPManager(BaseHTTPManager):
                     data=params,
                     headers=headers,
                 )
-        except (httpx.RequestError, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {params}",
@@ -308,6 +302,6 @@ class HTTPManager(BaseHTTPManager):
 
     async def close(self) -> None:
         """Close the asynchronous HTTP session."""
-        if self.session is not None and not self.session.is_closed:
+        if self.session is not None and hasattr(self.session, "aclose"):
             await self.session.aclose()
         self.session = None

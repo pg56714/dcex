@@ -9,10 +9,6 @@ from dataclasses import dataclass, field
 from typing import Any, cast
 from urllib.parse import urlencode
 
-import requests
-from coincurve import PrivateKey
-from Crypto.Hash import keccak
-
 from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
@@ -89,52 +85,17 @@ _NATIVE_PRIVATE_REQUESTS: dict[str, tuple[str, AsterPath]] = {
     "get_futures_strategy_history_order": ("GET", FuturesTrade.STRATEGY_HISTORY_ORDER),
 }
 
-_DOMAIN_NAME = "AsterSignTransaction"
-_DOMAIN_VERSION = "1"
-_DOMAIN_CHAIN_ID = 1666
-_ZERO_ADDRESS = bytes(20)
-_DOMAIN_TYPE = "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-_MESSAGE_TYPE = "Message(string msg)"
-
-
-def _keccak(data: bytes) -> bytes:
-    digest = keccak.new(digest_bits=256)
-    digest.update(data)
-    return digest.digest()
-
-
-def _uint256(value: int) -> bytes:
-    return value.to_bytes(32, "big")
-
-
-def _address(value: bytes) -> bytes:
-    return value.rjust(32, b"\0")
-
-
-def _domain_separator() -> bytes:
-    return _keccak(
-        _keccak(_DOMAIN_TYPE.encode())
-        + _keccak(_DOMAIN_NAME.encode())
-        + _keccak(_DOMAIN_VERSION.encode())
-        + _uint256(_DOMAIN_CHAIN_ID)
-        + _address(_ZERO_ADDRESS)
-    )
-
 
 def _eip712_digest(message: str) -> bytes:
-    struct_hash = _keccak(_keccak(_MESSAGE_TYPE.encode()) + _keccak(message.encode()))
-    return _keccak(b"\x19\x01" + _domain_separator() + struct_hash)
+    """Reject the removed Python Aster signing fallback."""
+    raise RuntimeError("Aster Python signing fallback has been removed; use Rust native signing.")
 
 
 def sign_message(message: str, private_key: str) -> str:
-    """Sign an Aster V3 EIP-712 message and return an Ethereum signature."""
-    key_hex = private_key.removeprefix("0x")
-    recoverable = PrivateKey(bytes.fromhex(key_hex)).sign_recoverable(
-        _eip712_digest(message),
-        hasher=None,
-    )
-    signature = recoverable[:64] + bytes([recoverable[64] + 27])
-    return f"0x{signature.hex()}"
+    """Sign an Aster V3 EIP-712 message using the Rust native extension."""
+    if _native is None or not hasattr(_native, "aster_sign_message"):
+        raise RuntimeError("Aster native signing is required.")
+    return str(_native.aster_sign_message(message, private_key))
 
 
 def _format_value(value: object) -> str:
@@ -162,7 +123,7 @@ class HTTPManager(BaseHTTPManager):
     futures_base_url: str = field(default="https://fapi.asterdex.com")
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: requests.Session = field(default_factory=requests.Session, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _nonce_lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
@@ -192,11 +153,11 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is requests.Session
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     def _native_response(
         self,
@@ -397,7 +358,7 @@ class HTTPManager(BaseHTTPManager):
                 )
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
-        except (requests.RequestException, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {params}",
@@ -435,4 +396,6 @@ class HTTPManager(BaseHTTPManager):
 
     def close(self) -> None:
         """Close the HTTP session."""
-        self.session.close()
+        if self.session is not None and hasattr(self.session, "close"):
+            self.session.close()
+        self.session = None

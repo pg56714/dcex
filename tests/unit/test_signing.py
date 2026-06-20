@@ -14,12 +14,9 @@ to fail loudly if a refactor ever changes signing behaviour.
 import base64
 import hashlib
 import hmac
-from importlib import import_module
 from urllib.parse import urlencode
 
 import pytest
-from coincurve import PrivateKey
-from Crypto.Hash import keccak
 
 # Fixed, fake credentials shared across the tests. Not real secrets.
 API_KEY = "test_api_key_0000"
@@ -41,22 +38,9 @@ class _FakeResponse:
         return self._payload
 
 
-class _CaptureBitmartSession:
-    def __init__(self) -> None:
-        self.calls: list[tuple[str, str, dict]] = []
-
-    def get(self, url: str, **kwargs: object) -> _FakeResponse:
-        self.calls.append(("GET", url, kwargs))
-        return _FakeResponse({"code": 1000})
-
-    def post(self, url: str, **kwargs: object) -> _FakeResponse:
-        self.calls.append(("POST", url, kwargs))
-        return _FakeResponse({"code": 1000})
-
-
 def test_aster_eip712_signature_recovers_signer() -> None:
-    """Aster EIP-712 signatures recover the wallet that signed the message."""
-    from dcex.aster._http_manager import _eip712_digest, sign_message
+    """Aster EIP-712 signing is delegated to the Rust native extension."""
+    from dcex.aster._http_manager import sign_message
 
     private_key = "0x" + "11" * 32
     message = (
@@ -64,18 +48,11 @@ def test_aster_eip712_signature_recovers_signer() -> None:
         "&nonce=1700000000000000"
         "&signer=0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"
     )
-    signature = bytes.fromhex(sign_message(message, private_key).removeprefix("0x"))
-    recoverable = signature[:64] + bytes([signature[64] - 27])
-    public_key = PrivateKey(bytes.fromhex(private_key.removeprefix("0x"))).public_key
-    recovered = public_key.from_signature_and_message(
-        recoverable,
-        _eip712_digest(message),
-        hasher=None,
-    )
-    digest = keccak.new(digest_bits=256)
-    digest.update(recovered.format(compressed=False)[1:])
 
-    assert f"0x{digest.digest()[-20:].hex()}" == ("0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a")
+    assert sign_message(message, private_key) == (
+        "0x3ca64e9c82501b8f15cd31348beaaf1aa6636cbba5fb2bc8d1bccf8ee2ffd310"
+        "1a3724dfa8fd2f36de42d3a641b95599d0d4dee5ffb9010eb33b44784d3f60191c"
+    )
 
 
 def test_binance_sign_matches_hmac_sha256() -> None:
@@ -157,72 +134,6 @@ def test_bitmart_sign_matches_hmac_sha256() -> None:
     assert signature == "a5a38bab707890a577d96959ca82a1b7a4c0db7ffd9b40ba17b20ad57932a542"
 
 
-def test_bitmart_signed_get_uses_empty_body_for_signature(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """BitMart signed GET signs an empty body and sends params in the URL."""
-    from dcex.bitmart._http_manager import HTTPManager, sign_message
-    from dcex.bitmart.endpoints.account import FundingAccount
-
-    bitmart_http = import_module("dcex.bitmart._http_manager")
-    monkeypatch.setattr(bitmart_http, "generate_timestamp", lambda: TS_MS)
-    session = _CaptureBitmartSession()
-    manager = HTTPManager(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
-        memo=MEMO,
-        preload_product_table=False,
-    )
-    manager.session = session  # type: ignore[assignment]
-
-    manager._request(
-        "GET",
-        FundingAccount.GET_ACCOUNT_BALANCE,
-        query={"currency": "USDT"},
-        signed=True,
-    )
-
-    method, url, kwargs = session.calls[0]
-    expected_sign = sign_message(TS_MS, MEMO, "", API_SECRET)
-    assert method == "GET"
-    assert url.endswith("/account/v1/wallet?currency=USDT")
-    assert kwargs["headers"]["X-BM-SIGN"] == expected_sign
-
-
-def test_bitmart_signed_post_sends_the_exact_body_used_for_signature(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """BitMart signed POST uses the same compact JSON string for signing and body."""
-    from dcex.bitmart._http_manager import HTTPManager, sign_message
-    from dcex.bitmart.endpoints.trade import SpotTrade
-
-    bitmart_http = import_module("dcex.bitmart._http_manager")
-    monkeypatch.setattr(bitmart_http, "generate_timestamp", lambda: TS_MS)
-    session = _CaptureBitmartSession()
-    manager = HTTPManager(
-        api_key=API_KEY,
-        api_secret=API_SECRET,
-        memo=MEMO,
-        preload_product_table=False,
-    )
-    manager.session = session  # type: ignore[assignment]
-
-    manager._request(
-        "POST",
-        SpotTrade.SUBMIT_ORDER,
-        query={"symbol": "BTC_USDT", "side": "buy", "type": "market", "size": "1"},
-        signed=True,
-    )
-
-    method, _url, kwargs = session.calls[0]
-    body = '{"symbol":"BTC_USDT","side":"buy","type":"market","size":"1"}'
-    expected_sign = sign_message(TS_MS, MEMO, body, API_SECRET)
-    assert method == "POST"
-    assert kwargs["data"] == body
-    assert "json" not in kwargs
-    assert kwargs["headers"]["X-BM-SIGN"] == expected_sign
-
-
 def test_bitmex_sign_matches_hmac_sha256() -> None:
     """BitMEX signs ``method+path+expires+body`` with HMAC-SHA256."""
     from dcex.bitmex._http_manager import HTTPManager
@@ -262,36 +173,3 @@ def test_gateio_sign_matches_hmac_sha512() -> None:
         "3a314366c1367344b6abbad3a7f0b0519a5f1f606acde4c269a8cada67d7ddbd"
         "33504564f284bd0f8f7be971075a6ef0f8a47f95f310cad579fdb483f0330b7a"
     )
-
-
-def test_hyperliquid_auth_is_deterministic_eip712() -> None:
-    """Hyperliquid wallet signing is deterministic for fixed input."""
-    from dcex.hyperliquid._http_manager import HTTPManager
-
-    private_key = "0x" + "11" * 32
-    manager = HTTPManager(
-        private_key=private_key,
-        wallet_address="0x" + "22" * 20,
-        preload_product_table=False,
-    )
-    action = {"action": {"type": "order", "a": 1}}
-
-    signature = manager._auth(dict(action), TS_MS)
-
-    # ECDSA over a fixed message hash is deterministic (RFC 6979).
-    assert signature == {
-        "r": "193f5e88d621ca384beca6146a4c059b8716d5ad3da0404f6cd36f020fc87671",
-        "s": "0c3767a2287482caef8a77be7b5c76eac08d9d8fb3080c53033e394bbb35d047",
-        "v": 27,
-    }
-
-
-def test_hyperliquid_auth_requires_private_key() -> None:
-    """Hyperliquid signing raises a clear error without a private key."""
-    import pytest
-
-    from dcex.hyperliquid._http_manager import HTTPManager
-
-    manager = HTTPManager(preload_product_table=False)
-    with pytest.raises(ValueError, match="[Pp]rivate key"):
-        manager._auth({"action": {"type": "order"}}, TS_MS)

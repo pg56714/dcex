@@ -1,14 +1,12 @@
 import base64
 import hashlib
 import hmac
+import json
 import logging
 import time
 from dataclasses import dataclass, field
 from typing import Any, Literal, cast
 from urllib.parse import urlencode
-
-import msgspec
-import requests
 
 from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
@@ -37,7 +35,7 @@ class HTTPManager(BaseHTTPManager):
     passphrase: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: requests.Session = field(default_factory=requests.Session, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _encrypted_passphrase: str | None = field(default=None, init=False, repr=False)
@@ -72,12 +70,11 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self, request_base_url: str) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is requests.Session
-            and request_base_url in {self.base_url, self.futures_base_url}
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     def _native_private(
         self,
@@ -119,7 +116,7 @@ class HTTPManager(BaseHTTPManager):
             if isinstance(value, bool):
                 value = str(value).lower()
             elif isinstance(value, (list, dict)):
-                value = msgspec.json.encode(value).decode("utf-8")
+                value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))
         return params
 
@@ -166,7 +163,7 @@ class HTTPManager(BaseHTTPManager):
                 request_path = f"{path}?{urlencode(query)}"
                 signature_path = request_path
         elif method_upper in {"POST", "PUT"}:
-            body = msgspec.json.encode(query).decode("utf-8") if query else ""
+            body = json.dumps(query, separators=(",", ":")) if query else ""
         elif method_upper == "DELETE":
             if query:
                 query_string = urlencode(query)
@@ -220,7 +217,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported method: {method}")
 
-        except (requests.RequestException, RuntimeError) as e:
+        except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
@@ -268,4 +265,6 @@ class HTTPManager(BaseHTTPManager):
 
     def close(self) -> None:
         """Close the HTTP session."""
-        self.session.close()
+        if self.session is not None and hasattr(self.session, "close"):
+            self.session.close()
+        self.session = None

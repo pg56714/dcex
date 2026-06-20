@@ -1,4 +1,4 @@
-"""Lighter private-request signer backed by Rust with a Python fallback."""
+"""Lighter private-request signer backed by Rust native helpers."""
 
 from __future__ import annotations
 
@@ -9,8 +9,6 @@ import secrets
 import time
 from types import ModuleType
 from typing import Any
-
-import requests
 
 from ._crypto import (
     poseidon_hash_bytes,
@@ -184,15 +182,16 @@ class SignerClient:
 
     def check_client(self) -> str | None:
         """Check configured private keys against Lighter public keys."""
+        if _NATIVE is None or not hasattr(_NATIVE, "LighterHttpClient"):
+            return "failed to get API keys: dcex._native is required"
         try:
-            response = requests.get(
-                f"{self.url}/api/v1/apikeys",
-                params={"account_index": self.account_index},
-                timeout=10,
+            client = _NATIVE.LighterHttpClient(timeout=10, base_url=self.url)
+            _status, _headers, body = client.public_request(
+                "get_api_keys",
+                [("account_index", str(self.account_index))],
             )
-            response.raise_for_status()
-            data = response.json()
-        except (requests.RequestException, ValueError) as exc:
+            data = json.loads(bytes(body))
+        except (RuntimeError, TypeError, ValueError, json.JSONDecodeError) as exc:
             return f"failed to get API keys: {exc}"
         return self.check_client_data(data)
 

@@ -1,11 +1,11 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
 import asyncio
+import json
 import os
 import uuid
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
-import msgspec
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
@@ -79,7 +79,7 @@ def _cloid() -> str:
 
 
 def _asset_id(client: Client) -> int:
-    return msgspec.json.decode(client.ptm.get_exchange_symbol(Common.HYPERLIQUID, SYMBOL))[1]
+    return json.loads(client.ptm.get_exchange_symbol(Common.HYPERLIQUID, SYMBOL))[1]
 
 
 async def _mid_price(client: Client) -> Decimal:

@@ -1,11 +1,9 @@
 import hashlib
 import hmac
+import json
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
-
-import httpx
-import msgspec
 
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
@@ -50,7 +48,7 @@ class HTTPManager(BaseHTTPManager):
     memo: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(init=False, default=None)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -96,8 +94,6 @@ class HTTPManager(BaseHTTPManager):
             )
         ):
             self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     @staticmethod
@@ -114,11 +110,11 @@ class HTTPManager(BaseHTTPManager):
         return "spot"
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def _native_private(
         self,
@@ -159,7 +155,7 @@ class HTTPManager(BaseHTTPManager):
             if isinstance(value, bool):
                 value = str(value).lower()
             elif isinstance(value, (list, dict)):
-                value = msgspec.json.encode(value).decode("utf-8")
+                value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))
         return params
 
@@ -217,11 +213,8 @@ class HTTPManager(BaseHTTPManager):
             ValueError: When API credentials are missing for signed requests
             FailedRequestError: When API request fails
         """
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
-
-        if self.session is None:
-            raise RuntimeError("Failed to initialize HTTP session")
 
         if query is None:
             query = {}
@@ -239,7 +232,7 @@ class HTTPManager(BaseHTTPManager):
 
         timestamp = generate_timestamp()
         body = (
-            msgspec.json.encode(query if query else {}).decode("utf-8")
+            json.dumps(query if query else {}, separators=(",", ":"))
             if method.upper() == "POST"
             else ""
         )
@@ -296,7 +289,7 @@ class HTTPManager(BaseHTTPManager):
                 else:
                     raise ValueError(f"Unsupported HTTP method: {method}")
 
-        except (httpx.HTTPError, RuntimeError) as e:
+        except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

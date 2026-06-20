@@ -242,6 +242,7 @@ name = "dcex-python"
 version = "0.0.0"
 dependencies = [
  "dcex",
+ "hex",
  "pyo3",
  "pyo3-async-runtimes",
  "serde_json",

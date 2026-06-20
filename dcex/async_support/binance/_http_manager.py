@@ -8,8 +8,6 @@ from importlib import import_module
 from typing import Any, Self, cast
 from urllib.parse import urlencode
 
-import httpx
-
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -33,7 +31,7 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(default=None, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -65,8 +63,6 @@ class HTTPManager(BaseHTTPManager):
             )
         if self.preload_product_table and self._native_client is not None:
             self._native_client.set_product_table(self.ptm._native_table)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         return self
 
     def _get_base_url(
@@ -112,11 +108,11 @@ class HTTPManager(BaseHTTPManager):
         return "spot"
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def _request(
         self,
@@ -133,15 +129,12 @@ class HTTPManager(BaseHTTPManager):
         query: dict | None = None,
         signed: bool = True,
     ) -> dict:
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
 
         query = dict(query or {})
         if signed and not (self.api_key and self.api_secret):
             raise ValueError("Signed request requires API Key and Secret.")
-
-        if self.session is None:
-            raise ValueError("Session is not initialized")
 
         base_url = self._get_base_url(path)
         url = f"{base_url}{path}"
@@ -194,7 +187,7 @@ class HTTPManager(BaseHTTPManager):
                 response_headers = self._store_response_headers(response)
                 status_code = response.status_code
                 response_text = response.text
-        except (httpx.RequestError, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Params: {query}",

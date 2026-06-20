@@ -6,10 +6,7 @@ import hmac
 import json
 from urllib.parse import parse_qsl, urlsplit
 
-import msgspec
 import pytest
-from Crypto.PublicKey import ECC
-from Crypto.Signature import eddsa
 
 from tests.unit.native_http_helpers import _http_server
 
@@ -90,8 +87,6 @@ async def test_async_bingx_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/test?symbol=ETHUSDT"
@@ -320,8 +315,6 @@ async def test_async_mexc_manager_uses_native_contract_transport() -> None:
             api="contract",
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     request = received.get_nowait()
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
@@ -504,8 +497,6 @@ async def test_async_bitmex_manager_uses_native_signed_body() -> None:
             signed=True,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     request = received.get_nowait()
     payload = f"POST/test{request['api-expires']}{request['body']}"
     expected_signature = hmac.new(
@@ -675,8 +666,6 @@ async def test_async_bitmart_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     request = received.get_nowait()
     assert result == {"code": 1000}
     assert manager.last_response_headers["x-response"] == "native"
@@ -758,8 +747,6 @@ async def test_async_bitget_manager_uses_native_transport() -> None:
             signed=True,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     request = received.get_nowait()
     assert result == {"code": "00000"}
     assert manager.last_response_headers["x-response"] == "native"
@@ -855,8 +842,6 @@ async def test_async_bybit_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"retCode": 0}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/test?symbol=ETHUSDT"
@@ -937,8 +922,6 @@ async def test_async_gateio_manager_uses_native_transport() -> None:
             signed=False,
         )
 
-    assert manager.session is not None
-    await manager.session.aclose()
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/api/v4/test?settle=usdt"

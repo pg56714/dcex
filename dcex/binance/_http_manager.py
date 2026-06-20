@@ -8,8 +8,6 @@ from importlib import import_module
 from typing import Any, cast
 from urllib.parse import urlencode
 
-import requests
-
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -40,7 +38,7 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: requests.Session = field(default_factory=requests.Session, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     use_native: bool = field(default=True)
@@ -137,11 +135,11 @@ class HTTPManager(BaseHTTPManager):
         return "spot"
 
     def _uses_native_transport(self) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is requests.Session
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     def _request(
         self,
@@ -236,7 +234,7 @@ class HTTPManager(BaseHTTPManager):
                 response_headers = self._store_response_headers(response)
                 status_code = response.status_code
                 response_text = response.text
-        except (requests.exceptions.RequestException, RuntimeError) as exc:
+        except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Params: {query}",
@@ -289,4 +287,6 @@ class HTTPManager(BaseHTTPManager):
 
     def close(self) -> None:
         """Close the HTTP session."""
-        self.session.close()
+        if self.session is not None and hasattr(self.session, "close"):
+            self.session.close()
+        self.session = None

@@ -1,14 +1,12 @@
 import base64
 import hashlib
 import hmac
+import json
 import logging
 import time
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
-
-import httpx
-import msgspec
 
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
@@ -37,7 +35,7 @@ class HTTPManager(BaseHTTPManager):
     passphrase: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: httpx.AsyncClient | None = field(default=None, init=False)
+    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _encrypted_passphrase: str | None = field(default=None, init=False, repr=False)
@@ -66,8 +64,6 @@ class HTTPManager(BaseHTTPManager):
 
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.KUCOIN)
-        if self.session is None or self.session.is_closed:
-            self.session = httpx.AsyncClient(timeout=self.timeout)
         if (
             self.preload_product_table
             and self._native_client is not None
@@ -77,12 +73,11 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self, request_base_url: str) -> bool:
-        return (
-            self.use_native
-            and self._native_client is not None
-            and type(self.session) is httpx.AsyncClient
-            and request_base_url in {self.base_url, self.futures_base_url}
-        )
+        if not self.use_native or self._native_client is None:
+            raise RuntimeError(
+                "The dcex native extension is required; Python HTTP fallback has been removed."
+            )
+        return True
 
     async def _native_private(
         self,
@@ -127,7 +122,7 @@ class HTTPManager(BaseHTTPManager):
             if isinstance(value, bool):
                 value = str(value).lower()
             elif isinstance(value, (list, dict)):
-                value = msgspec.json.encode(value).decode("utf-8")
+                value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))
         return params
 
@@ -164,12 +159,10 @@ class HTTPManager(BaseHTTPManager):
         base_url: str | None = None,
     ) -> dict[str, Any]:
         """Make HTTP request to KuCoin API."""
-        if self.session is None or self.session.is_closed:
+        if self._native_client is None:
             await self.async_init()
 
         # 再次檢查確保 session 不為 None
-        if self.session is None:
-            raise RuntimeError("Failed to initialize HTTP session")
 
         # Prepare request data
         timestamp = str(int(time.time() * 1000))
@@ -186,7 +179,7 @@ class HTTPManager(BaseHTTPManager):
                     f"{path}?{urlencode(query)}"  # GET: include query params in signature
                 )
         elif method_upper in ["POST", "PUT"]:
-            body = msgspec.json.encode(query).decode("utf-8") if query else ""
+            body = json.dumps(query, separators=(",", ":")) if query else ""
             # POST/PUT/DELETE: don't include query params in signature path
             signature_path = path
         elif method_upper == "DELETE":
@@ -249,7 +242,7 @@ class HTTPManager(BaseHTTPManager):
             else:
                 raise ValueError(f"Unsupported method: {method}")
 
-        except (httpx.RequestError, RuntimeError) as e:
+        except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
@@ -299,5 +292,6 @@ class HTTPManager(BaseHTTPManager):
 
     async def close(self) -> None:
         """Close the HTTP session."""
-        if self.session:
+        if self.session is not None and hasattr(self.session, "aclose"):
             await self.session.aclose()
+        self.session = None
