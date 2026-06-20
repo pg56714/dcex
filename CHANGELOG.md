@@ -1,3 +1,46 @@
+## 0.22.0 (2026-06-20)
+
+### Feat
+
+- migrate aster to rust core
+- migrate backpack to rust core
+- migrate lighter to rust core
+- migrate hyperliquid to rust core
+- migrate kucoin to rust core
+- migrate bingx to rust core
+- migrate gateio to rust core
+- migrate BitMEX to Rust core
+- migrate BitMart to Rust core
+- move MEXC HTTP APIs to Rust
+- move Kraken HTTP APIs to Rust
+- move Bitget HTTP APIs to Rust
+- move OKX HTTP APIs to Rust
+- move Bybit APIs to Rust
+- move Binance private APIs to Rust
+- move shared product table core to Rust
+- migrate exchange HTTP APIs to Rust
+- add Rust core for Lighter signing
+
+### Fix
+
+- harden live exchange tests
+- add dev tools for clean ci sync
+- complete native client cleanup
+- handle partial hyperliquid spot closes
+- split rust release and stabilize native tests
+- align migrated exchange parity paths
+- preserve Binance native private errors
+
+### Refactor
+
+- move endpoint routing into rust
+- require rust native transport
+- move product table rows to rust
+- remove python http fallback dependencies
+- align rust crate layout and tests
+- split large shared modules
+- split Python native bindings
+
 ## 0.21.2 (2026-06-13)
 
 ### Fix
