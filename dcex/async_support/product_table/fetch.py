@@ -1,85 +1,84 @@
 """Asynchronous Python compatibility functions for the Rust product table."""
 
-import polars as pl
-
 from ... import _native
 from ...product_table.fetch import MarketInfo as MarketInfo
+from ...product_table.fetch import ProductTable as ProductTable
 
 
-async def _fetch(exchange: str) -> pl.DataFrame:
-    return pl.DataFrame(await _native.fetch_product_table_async(exchange))
+async def _fetch(exchange: str) -> ProductTable:
+    return await _native.fetch_product_table_async(exchange)
 
 
-async def aster() -> pl.DataFrame:
+async def aster() -> ProductTable:
     """Fetch Aster product metadata."""
     return await _fetch("aster")
 
 
-async def backpack() -> pl.DataFrame:
+async def backpack() -> ProductTable:
     """Fetch Backpack product metadata."""
     return await _fetch("backpack")
 
 
-async def binance() -> pl.DataFrame:
+async def binance() -> ProductTable:
     """Fetch Binance product metadata."""
     return await _fetch("binance")
 
 
-async def bingx() -> pl.DataFrame:
+async def bingx() -> ProductTable:
     """Fetch BingX product metadata."""
     return await _fetch("bingx")
 
 
-async def bitget() -> pl.DataFrame:
+async def bitget() -> ProductTable:
     """Fetch Bitget product metadata."""
     return await _fetch("bitget")
 
 
-async def bitmart() -> pl.DataFrame:
+async def bitmart() -> ProductTable:
     """Fetch BitMart product metadata."""
     return await _fetch("bitmart")
 
 
-async def bitmex() -> pl.DataFrame:
+async def bitmex() -> ProductTable:
     """Fetch BitMEX product metadata."""
     return await _fetch("bitmex")
 
 
-async def bybit() -> pl.DataFrame:
+async def bybit() -> ProductTable:
     """Fetch Bybit product metadata."""
     return await _fetch("bybit")
 
 
-async def gateio() -> pl.DataFrame:
+async def gateio() -> ProductTable:
     """Fetch Gate.io product metadata."""
     return await _fetch("gateio")
 
 
-async def hyperliquid() -> pl.DataFrame:
+async def hyperliquid() -> ProductTable:
     """Fetch Hyperliquid product metadata."""
     return await _fetch("hyperliquid")
 
 
-async def kucoin() -> pl.DataFrame:
+async def kucoin() -> ProductTable:
     """Fetch KuCoin product metadata."""
     return await _fetch("kucoin")
 
 
-async def kraken() -> pl.DataFrame:
+async def kraken() -> ProductTable:
     """Fetch Kraken product metadata."""
     return await _fetch("kraken")
 
 
-async def lighter() -> pl.DataFrame:
+async def lighter() -> ProductTable:
     """Fetch Lighter product metadata."""
     return await _fetch("lighter")
 
 
-async def mexc() -> pl.DataFrame:
+async def mexc() -> ProductTable:
     """Fetch MEXC product metadata."""
     return await _fetch("mexc")
 
 
-async def okx() -> pl.DataFrame:
+async def okx() -> ProductTable:
     """Fetch OKX product metadata."""
     return await _fetch("okx")

@@ -328,7 +328,7 @@ def test_hyperliquid_spot_round_trip_restores_test_delta_after_sell_failure(
     }
     place_order = Mock(side_effect=[filled(120), rejected, filled(120)])
     client = SimpleNamespace(place_order=place_order)
-    balances = iter((Decimal("10"), Decimal("10.5")))
+    balances = iter((Decimal("10"), Decimal("130"), Decimal("130"), Decimal("10")))
     monkeypatch.setattr(module, "_open_orders", lambda *_: [])
     monkeypatch.setattr(module, "_spot_available_usdc", lambda *_: Decimal("20"))
     monkeypatch.setattr(module, "_spot_available", lambda *_: next(balances))
@@ -402,7 +402,7 @@ async def test_async_hyperliquid_spot_round_trip_restores_test_delta_after_sell_
     }
     place_order = AsyncMock(side_effect=[filled(120), rejected, filled(120)])
     client = SimpleNamespace(place_order=place_order)
-    balances = iter((Decimal("10"), Decimal("10.5")))
+    balances = iter((Decimal("10"), Decimal("130"), Decimal("130"), Decimal("10")))
 
     async def spot_available(*_args: object) -> Decimal:
         return next(balances)

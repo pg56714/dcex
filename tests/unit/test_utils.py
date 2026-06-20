@@ -3,10 +3,8 @@
 
 from collections.abc import Callable
 
-import polars as pl
 import pytest
 
-from dcex.utils.common_dataframe import to_dataframe
 from dcex.utils.decimal_utils import get_decimal_places, reverse_decimal_places
 from dcex.utils.timeframe_utils import (
     bitmart_convert_timeframe,
@@ -95,21 +93,3 @@ def test_get_decimal_places_rejects_non_finite_values(value: float) -> None:
 
 def test_reverse_decimal_places() -> None:
     assert reverse_decimal_places(3) == 0.001
-
-
-def test_to_dataframe_handles_empty_input() -> None:
-    assert to_dataframe(None).is_empty()
-    assert to_dataframe([]).is_empty()
-    assert to_dataframe({}).is_empty()
-
-
-def test_to_dataframe_handles_dicts_and_rows() -> None:
-    dict_frame = to_dataframe({"symbol": "BTC", "price": 1})
-    assert dict_frame.to_dicts() == [{"symbol": "BTC", "price": 1}]
-
-    list_frame = to_dataframe([{"symbol": "BTC"}, {"symbol": "ETH"}])
-    assert list_frame["symbol"].to_list() == ["BTC", "ETH"]
-
-    row_frame = to_dataframe([["BTC", 1], ["ETH", 2]], schema=["symbol", "price"])
-    assert isinstance(row_frame, pl.DataFrame)
-    assert row_frame.to_dicts() == [{"symbol": "BTC", "price": 1}, {"symbol": "ETH", "price": 2}]

@@ -12,7 +12,7 @@ async def main() -> None:
     for exchange in Common:
         manager = await ProductTableManager.get_instance(exchange)
         output_path = output_dir / f"{exchange.value}_product_table.csv"
-        manager.df.write_csv(output_path)
+        manager.write_csv(output_path)
         print(output_path)
 
 

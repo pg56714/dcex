@@ -172,6 +172,9 @@ product_symbol = ptm.get_product_symbol(
 )
 
 print(product_symbol)
+
+rows = ptm.rows()
+ptm.write_csv("binance_product_table.csv")
 ```
 
 ## Contributing
@@ -242,9 +245,10 @@ when needed.
 
 ## Release Publishing
 
-The Python release workflow publishes only when Commitizen creates a version
-bump on `main`. A bumped Python release builds wheels and publishes the Python
-package to PyPI. If no version bump is detected, PyPI is not updated.
+The release workflow detects Conventional Commit changes on `main` and plans
+Python and Rust releases independently. A bumped Python release builds wheels
+and publishes the Python package to PyPI. If no Python version bump is
+detected, PyPI is not updated.
 
 The Rust crate has an independent version in `crates/dcex/Cargo.toml` and is
 published from `rust-v*` tags. For example, `rust-v0.1.0` publishes crate

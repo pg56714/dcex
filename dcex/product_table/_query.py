@@ -1,8 +1,7 @@
 """Python compatibility layer for the Rust product table."""
 
-from typing import Any
-
-import polars as pl
+from pathlib import Path
+from typing import Any, cast
 
 from .. import _native
 
@@ -14,16 +13,30 @@ class ProductTableError(Exception):
 class ProductTableQueryMixin:
     """Expose the existing Python query API through the Rust product table."""
 
-    product_table: pl.DataFrame
+    product_table: _native.ProductTable
     _native_table: _native.ProductTable
 
     def _build_indexes(self) -> None:
-        """Build the Rust indexes from the current Polars table."""
-        rows = [
-            {key: str(value) for key, value in row.items() if value is not None}
-            for row in self.product_table.to_dicts()
-        ]
-        self._native_table = _native.ProductTable(rows)
+        """Build the Rust indexes from the current table rows."""
+        self.product_table = _coerce_product_table(self.product_table)
+        self._native_table = self.product_table
+
+    @property
+    def df(self) -> _native.ProductTable:
+        """Return the native product table kept for source compatibility."""
+        return self.product_table
+
+    def rows(self) -> list[dict[str, str]]:
+        """Return product table rows."""
+        return self.product_table.to_dicts()
+
+    def to_dicts(self) -> list[dict[str, str]]:
+        """Return product table rows."""
+        return self.rows()
+
+    def write_csv(self, path: str | Path) -> None:
+        """Write product table rows to CSV."""
+        self.product_table.write_csv(path)
 
     def _call(self, method: str, *args: object, **kwargs: object) -> Any:  # noqa: ANN401
         try:
@@ -138,3 +151,9 @@ class ProductTableQueryMixin:
             product_type,
             exchange_type,
         )
+
+
+def _coerce_product_table(value: object) -> _native.ProductTable:
+    if isinstance(value, _native.ProductTable):
+        return value
+    return _native.ProductTable(cast("list[dict[str, str]]", value))

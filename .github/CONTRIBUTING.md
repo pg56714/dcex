@@ -23,17 +23,7 @@ Current scope notes:
    uv sync
    ```
 
-3. Install pre-commit hooks:
-
-   ```sh
-   uv run pre-commit install --hook-type pre-commit --hook-type commit-msg --hook-type pre-push
-   ```
-
-4. Run all pre-commit checks when you need a full local verification:
-
-   ```sh
-   uv run pre-commit run --all-files
-   ```
+3. Run the relevant quality checks before opening a pull request.
 
 ## Testing
 
@@ -122,19 +112,14 @@ fix(binance): normalize futures order payload
 feat(ptm): add exchange metadata lookup
 ```
 
-This project uses Commitizen. You can create a guided commit message with:
-
-```sh
-uv run cz commit
-```
-
 Versioning and changelog updates are handled by the release workflow after changes are merged.
 
 ## Release Publishing
 
-The Python release workflow publishes only when Commitizen creates a new
-version on `main`. For a bumped Python release, GitHub Actions builds Python
-artifacts and publishes the package to PyPI using Trusted Publishing.
+The release workflow detects Conventional Commit changes on `main` and plans
+Python and Rust releases independently. For a bumped Python release, GitHub
+Actions builds Python artifacts and publishes the package to PyPI using
+Trusted Publishing.
 
 The Rust crate `dcex` is versioned independently in `crates/dcex/Cargo.toml`
 and published from matching `rust-v*` tags. For example, tag `rust-v0.1.0`

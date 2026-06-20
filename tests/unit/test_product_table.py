@@ -1,15 +1,15 @@
 """
 Offline unit tests for ProductTableManager query logic.
 
-These build a manager from a hand-made DataFrame (no network, no fetch) and
+These build a manager from hand-made rows (no network, no fetch) and
 exercise the pure query/index methods. They pin the lookup behaviour so the
 query logic can be refactored (e.g. shared between sync and async) safely.
 """
 # ruff: noqa: D103
 
 import asyncio
+import csv
 
-import polars as pl
 import pytest
 
 from dcex.async_support.product_table import fetch as async_fetch
@@ -17,6 +17,7 @@ from dcex.async_support.product_table import manager as async_manager
 from dcex.async_support.product_table.manager import (
     ProductTableManager as AsyncProductTableManager,
 )
+from dcex import _native
 from dcex.product_table import fetch as sync_fetch
 from dcex.product_table import manager as sync_manager
 from dcex.product_table.manager import ProductTableError, ProductTableManager
@@ -71,7 +72,7 @@ _ROWS = [
 def _make_manager() -> ProductTableManager:
     """Build a manager from the fixture table without any network fetch."""
     manager = ProductTableManager()
-    manager.product_table = pl.DataFrame(_ROWS)
+    manager.product_table = _native.ProductTable(_ROWS)
     manager._build_indexes()
     return manager
 
@@ -181,7 +182,7 @@ def test_product_symbol_lookup_honors_product_and_exchange_types() -> None:
 
 def test_indexed_lookup_preserves_ambiguous_results() -> None:
     manager = ProductTableManager()
-    manager.product_table = pl.DataFrame(
+    manager.product_table = _native.ProductTable(
         [
             {
                 "exchange": "example",
@@ -219,6 +220,20 @@ def test_indexed_lookup_preserves_ambiguous_results() -> None:
     )
 
 
+def test_native_product_table_supports_dataframe_free_helpers(tmp_path) -> None:
+    rows = _native.ProductTable(_ROWS[:2])
+
+    assert rows.height == 2
+    assert rows["product_symbol"].to_list() == ["BTC-USDT-SPOT", "BTC-USDT-SWAP"]
+    assert rows.to_dicts() == _ROWS[:2]
+
+    output_path = tmp_path / "product_table.csv"
+    rows.write_csv(output_path)
+
+    with output_path.open(newline="", encoding="utf-8") as file:
+        assert list(csv.DictReader(file)) == _ROWS[:2]
+
+
 def test_all_product_fetches_match_the_registry() -> None:
     assert [function.__name__ for function in sync_manager.VALID_EXCHANGES] == [
         function.__name__ for function in async_manager.VALID_EXCHANGES
@@ -245,9 +260,9 @@ def test_all_product_fetches_match_the_registry() -> None:
 def test_sync_fetch_delegates_to_rust(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[str | None] = []
 
-    def fetch_product_table(exchange_name: str | None = None) -> list[dict[str, str]]:
+    def fetch_product_table(exchange_name: str | None = None) -> _native.ProductTable:
         calls.append(exchange_name)
-        return [_ROWS[0]]
+        return _native.ProductTable([_ROWS[0]])
 
     monkeypatch.setattr(sync_fetch._native, "fetch_product_table", fetch_product_table)
 
@@ -261,9 +276,9 @@ async def test_async_fetch_delegates_to_rust(monkeypatch: pytest.MonkeyPatch) ->
 
     async def fetch_product_table_async(
         exchange_name: str | None = None,
-    ) -> list[dict[str, str]]:
+    ) -> _native.ProductTable:
         calls.append(exchange_name)
-        return [_ROWS[0]]
+        return _native.ProductTable([_ROWS[0]])
 
     monkeypatch.setattr(
         async_fetch._native,
@@ -345,9 +360,9 @@ def test_sync_manager_fetch_uses_rust_and_wraps_errors(
 ) -> None:
     calls: list[str | None] = []
 
-    def fetch_product_table(exchange_name: str | None = None) -> list[dict[str, str]]:
+    def fetch_product_table(exchange_name: str | None = None) -> _native.ProductTable:
         calls.append(exchange_name)
-        return [_ROWS[0]]
+        return _native.ProductTable([_ROWS[0]])
 
     monkeypatch.setattr(sync_manager._native, "fetch_product_table", fetch_product_table)
     result = ProductTableManager()._fetch_product_tables("binance")
@@ -371,9 +386,9 @@ async def test_async_manager_fetch_uses_rust_and_wraps_errors(
 
     async def fetch_product_table_async(
         exchange_name: str | None = None,
-    ) -> list[dict[str, str]]:
+    ) -> _native.ProductTable:
         calls.append(exchange_name)
-        return [_ROWS[0]]
+        return _native.ProductTable([_ROWS[0]])
 
     monkeypatch.setattr(
         async_manager._native,

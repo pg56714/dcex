@@ -2,9 +2,9 @@
 
 from dataclasses import asdict, dataclass
 
-import polars as pl
-
 from .. import _native
+
+ProductTable = _native.ProductTable
 
 
 @dataclass
@@ -29,80 +29,80 @@ class MarketInfo:
         return asdict(self)
 
 
-def _fetch(exchange: str) -> pl.DataFrame:
-    return pl.DataFrame(_native.fetch_product_table(exchange))
+def _fetch(exchange: str) -> ProductTable:
+    return _native.fetch_product_table(exchange)
 
 
-def aster() -> pl.DataFrame:
+def aster() -> ProductTable:
     """Fetch Aster product metadata."""
     return _fetch("aster")
 
 
-def backpack() -> pl.DataFrame:
+def backpack() -> ProductTable:
     """Fetch Backpack product metadata."""
     return _fetch("backpack")
 
 
-def binance() -> pl.DataFrame:
+def binance() -> ProductTable:
     """Fetch Binance product metadata."""
     return _fetch("binance")
 
 
-def bingx() -> pl.DataFrame:
+def bingx() -> ProductTable:
     """Fetch BingX product metadata."""
     return _fetch("bingx")
 
 
-def bitget() -> pl.DataFrame:
+def bitget() -> ProductTable:
     """Fetch Bitget product metadata."""
     return _fetch("bitget")
 
 
-def bitmart() -> pl.DataFrame:
+def bitmart() -> ProductTable:
     """Fetch BitMart product metadata."""
     return _fetch("bitmart")
 
 
-def bitmex() -> pl.DataFrame:
+def bitmex() -> ProductTable:
     """Fetch BitMEX product metadata."""
     return _fetch("bitmex")
 
 
-def bybit() -> pl.DataFrame:
+def bybit() -> ProductTable:
     """Fetch Bybit product metadata."""
     return _fetch("bybit")
 
 
-def gateio() -> pl.DataFrame:
+def gateio() -> ProductTable:
     """Fetch Gate.io product metadata."""
     return _fetch("gateio")
 
 
-def hyperliquid() -> pl.DataFrame:
+def hyperliquid() -> ProductTable:
     """Fetch Hyperliquid product metadata."""
     return _fetch("hyperliquid")
 
 
-def kucoin() -> pl.DataFrame:
+def kucoin() -> ProductTable:
     """Fetch KuCoin product metadata."""
     return _fetch("kucoin")
 
 
-def kraken() -> pl.DataFrame:
+def kraken() -> ProductTable:
     """Fetch Kraken product metadata."""
     return _fetch("kraken")
 
 
-def lighter() -> pl.DataFrame:
+def lighter() -> ProductTable:
     """Fetch Lighter product metadata."""
     return _fetch("lighter")
 
 
-def mexc() -> pl.DataFrame:
+def mexc() -> ProductTable:
     """Fetch MEXC product metadata."""
     return _fetch("mexc")
 
 
-def okx() -> pl.DataFrame:
+def okx() -> ProductTable:
     """Fetch OKX product metadata."""
     return _fetch("okx")

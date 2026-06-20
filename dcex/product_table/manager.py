@@ -1,11 +1,4 @@
-"""
-Product table management module.
-
-This module provides the ProductTableManager class for managing exchange product
-mapping tables and standardized product information across different exchanges.
-"""
-
-import polars as pl
+"""Product table management module."""
 
 from .. import _native
 from ..registry import SYNC_EXCHANGES
@@ -28,19 +21,9 @@ class ProductTableManager(ProductTableQueryMixin):
     corresponding exchange-specific symbols, along with key trading attributes.
     It helps standardize the representation of products across different exchanges.
 
-    Columns:
-        - product_symbol: Standardized product identifier used internally.
-        - exchange_symbol: The product symbol as recognized on the exchange.
-        - exchange: The name of the exchange where the product is traded.
-        - product_type: The category of the product (e.g., SPOT, SWAP, FUTURES).
-        - price_precision: The decimal precision allowed for price values (if applicable).
-        - size_precision: The decimal precision allowed for order sizes (if applicable).
-        - contract_value: The notional value of one contract (for derivatives).
-        - min_size: The minimum order size allowed on the exchange.
-        - min_notional: The minimum notional value required for an order.
-
     Fetching, normalization, indexing, and querying are implemented by the Rust
-    core. This class preserves the synchronous Python API and Polars output.
+    core. This class preserves the synchronous Python query API without a
+    heavy table runtime dependency.
     """
 
     _instance = {}
@@ -74,17 +57,17 @@ class ProductTableManager(ProductTableQueryMixin):
         self.product_table = self._fetch_product_tables(exchange_name)
         self._build_indexes()
 
-    def _fetch_product_tables(self, exchange_name: str | None = None) -> pl.DataFrame:
+    def _fetch_product_tables(self, exchange_name: str | None = None) -> _native.ProductTable:
         """
         Fetch product tables through the Rust core.
         """
         try:
-            rows = _native.fetch_product_table(exchange_name)
+            table = _native.fetch_product_table(exchange_name)
         except (RuntimeError, ValueError) as exc:
             raise ProductTableError(str(exc)) from exc
-        if not rows:
+        if table.height == 0:
             raise ProductTableError("Failed to fetch product tables from any exchange")
-        return pl.DataFrame(rows)
+        return table
 
     def refresh(self, exchange_name: str | None = None) -> None:
         """

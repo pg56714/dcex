@@ -1,4 +1,23 @@
 use super::*;
+use std::io::{BufWriter, Write};
+
+use pyo3::exceptions::{PyIndexError, PyTypeError};
+use pyo3::types::{PyAny, PyDict};
+
+const PRODUCT_TABLE_COLUMNS: [&str; 12] = [
+    "exchange",
+    "exchange_symbol",
+    "product_symbol",
+    "product_type",
+    "exchange_type",
+    "price_precision",
+    "size_precision",
+    "min_size",
+    "base_currency",
+    "quote_currency",
+    "min_notional",
+    "size_per_contract",
+];
 
 fn exchange_from_name(name: &str) -> PyResult<dcex::exchange::Exchange> {
     dcex::exchange::Exchange::ALL
@@ -32,25 +51,88 @@ fn market_info_from_map(mut row: BTreeMap<String, String>) -> PyResult<MarketInf
     })
 }
 
-fn market_info_to_map(row: MarketInfo) -> BTreeMap<String, String> {
+fn market_info_to_map(row: &MarketInfo) -> BTreeMap<String, String> {
     BTreeMap::from([
-        ("exchange".to_string(), row.exchange),
-        ("exchange_symbol".to_string(), row.exchange_symbol),
-        ("product_symbol".to_string(), row.product_symbol),
-        ("product_type".to_string(), row.product_type),
-        ("exchange_type".to_string(), row.exchange_type),
-        ("price_precision".to_string(), row.price_precision),
-        ("size_precision".to_string(), row.size_precision),
-        ("min_size".to_string(), row.min_size),
-        ("base_currency".to_string(), row.base_currency),
-        ("quote_currency".to_string(), row.quote_currency),
-        ("min_notional".to_string(), row.min_notional),
-        ("size_per_contract".to_string(), row.size_per_contract),
+        ("exchange".to_string(), row.exchange.clone()),
+        ("exchange_symbol".to_string(), row.exchange_symbol.clone()),
+        ("product_symbol".to_string(), row.product_symbol.clone()),
+        ("product_type".to_string(), row.product_type.clone()),
+        ("exchange_type".to_string(), row.exchange_type.clone()),
+        ("price_precision".to_string(), row.price_precision.clone()),
+        ("size_precision".to_string(), row.size_precision.clone()),
+        ("min_size".to_string(), row.min_size.clone()),
+        ("base_currency".to_string(), row.base_currency.clone()),
+        ("quote_currency".to_string(), row.quote_currency.clone()),
+        ("min_notional".to_string(), row.min_notional.clone()),
+        (
+            "size_per_contract".to_string(),
+            row.size_per_contract.clone(),
+        ),
     ])
 }
 
-fn market_rows_to_maps(rows: Vec<MarketInfo>) -> Vec<BTreeMap<String, String>> {
-    rows.into_iter().map(market_info_to_map).collect()
+fn market_rows_to_maps(rows: &[MarketInfo]) -> Vec<BTreeMap<String, String>> {
+    rows.iter().map(market_info_to_map).collect()
+}
+
+fn market_info_field<'a>(row: &'a MarketInfo, key: &str) -> Option<&'a str> {
+    match key {
+        "exchange" => Some(&row.exchange),
+        "exchange_symbol" => Some(&row.exchange_symbol),
+        "product_symbol" => Some(&row.product_symbol),
+        "product_type" => Some(&row.product_type),
+        "exchange_type" => Some(&row.exchange_type),
+        "price_precision" => Some(&row.price_precision),
+        "size_precision" => Some(&row.size_precision),
+        "min_size" => Some(&row.min_size),
+        "base_currency" => Some(&row.base_currency),
+        "quote_currency" => Some(&row.quote_currency),
+        "min_notional" => Some(&row.min_notional),
+        "size_per_contract" => Some(&row.size_per_contract),
+        _ => None,
+    }
+}
+
+fn write_csv_field(writer: &mut impl Write, value: &str) -> std::io::Result<()> {
+    let needs_quotes = value.contains([',', '"', '\n', '\r']);
+    if needs_quotes {
+        writer.write_all(b"\"")?;
+        for character in value.chars() {
+            if character == '"' {
+                writer.write_all(b"\"\"")?;
+            } else {
+                let mut buffer = [0; 4];
+                writer.write_all(character.encode_utf8(&mut buffer).as_bytes())?;
+            }
+        }
+        writer.write_all(b"\"")?;
+    } else {
+        writer.write_all(value.as_bytes())?;
+    }
+    Ok(())
+}
+
+fn write_csv_record(writer: &mut impl Write, values: &[&str]) -> std::io::Result<()> {
+    for (index, value) in values.iter().enumerate() {
+        if index > 0 {
+            writer.write_all(b",")?;
+        }
+        write_csv_field(writer, value)?;
+    }
+    writer.write_all(b"\n")?;
+    Ok(())
+}
+
+#[pyclass(name = "ProductColumn")]
+pub(crate) struct PythonProductColumn {
+    values: Vec<String>,
+}
+
+#[pymethods]
+impl PythonProductColumn {
+    fn to_list(&self) -> Vec<String> {
+        self.values.clone()
+    }
 }
 
 #[pyclass(name = "ProductTable")]
@@ -72,7 +154,64 @@ impl PythonProductTable {
     }
 
     fn rows(&self) -> Vec<BTreeMap<String, String>> {
-        market_rows_to_maps(self.table.rows().to_vec())
+        market_rows_to_maps(self.table.rows())
+    }
+
+    fn to_dicts(&self) -> Vec<BTreeMap<String, String>> {
+        self.rows()
+    }
+
+    #[getter]
+    fn height(&self) -> usize {
+        self.table.rows().len()
+    }
+
+    fn __len__(&self) -> usize {
+        self.table.rows().len()
+    }
+
+    fn __getitem__<'py>(&self, py: Python<'py>, item: &Bound<'py, PyAny>) -> PyResult<Py<PyAny>> {
+        if let Ok(key) = item.extract::<String>() {
+            let values = column_values(&self.table, &key)?;
+            return Ok(Py::new(py, PythonProductColumn { values })?.into_any());
+        }
+
+        if let Ok(index) = item.extract::<isize>() {
+            let index = normalize_index(index, self.table.rows().len())?;
+            let dict = PyDict::new(py);
+            for (key, value) in market_info_to_map(&self.table.rows()[index]) {
+                dict.set_item(key, value)?;
+            }
+            return Ok(dict.into_any().unbind());
+        }
+
+        Err(PyTypeError::new_err(
+            "ProductTable indices must be integers or strings.",
+        ))
+    }
+
+    fn write_csv(&self, path: &Bound<'_, PyAny>) -> PyResult<()> {
+        let path = path.str()?.to_string();
+        let file = std::fs::File::create(path).map_err(|error| {
+            PyRuntimeError::new_err(format!("failed to create product table CSV: {error}"))
+        })?;
+        let mut writer = BufWriter::new(file);
+        write_csv_record(&mut writer, &PRODUCT_TABLE_COLUMNS).map_err(|error| {
+            PyRuntimeError::new_err(format!("failed to write product table CSV: {error}"))
+        })?;
+        for row in self.table.rows() {
+            let values = PRODUCT_TABLE_COLUMNS
+                .iter()
+                .map(|key| market_info_field(row, key).unwrap_or_default())
+                .collect::<Vec<_>>();
+            write_csv_record(&mut writer, &values).map_err(|error| {
+                PyRuntimeError::new_err(format!("failed to write product table CSV: {error}"))
+            })?;
+        }
+        writer.flush().map_err(|error| {
+            PyRuntimeError::new_err(format!("failed to flush product table CSV: {error}"))
+        })?;
+        Ok(())
     }
 
     #[pyo3(signature = (
@@ -202,13 +341,37 @@ impl PythonProductTable {
     }
 }
 
+fn column_values(table: &ProductTable, key: &str) -> PyResult<Vec<String>> {
+    table
+        .rows()
+        .iter()
+        .map(|row| {
+            market_info_field(row, key)
+                .map(str::to_string)
+                .ok_or_else(|| PyValueError::new_err(format!("Key not found: {key}")))
+        })
+        .collect()
+}
+
+fn normalize_index(index: isize, len: usize) -> PyResult<usize> {
+    let normalized = if index < 0 {
+        len as isize + index
+    } else {
+        index
+    };
+    if normalized < 0 || normalized >= len as isize {
+        return Err(PyIndexError::new_err("ProductTable index out of range."));
+    }
+    Ok(normalized as usize)
+}
+
 #[pyfunction]
 #[pyo3(signature = (exchange_name=None, timeout=10.0))]
 fn fetch_product_table(
     py: Python<'_>,
     exchange_name: Option<&str>,
     timeout: f64,
-) -> PyResult<Vec<BTreeMap<String, String>>> {
+) -> PyResult<PythonProductTable> {
     if !timeout.is_finite() || timeout <= 0.0 {
         return Err(PyValueError::new_err(
             "HTTP timeout must be a positive finite number.",
@@ -216,13 +379,11 @@ fn fetch_product_table(
     }
     let exchange = exchange_name.map(exchange_from_name).transpose()?;
     py.allow_threads(|| {
-        block_on(async move {
-            ProductTable::fetch(exchange, Duration::from_secs_f64(timeout))
-                .await
-                .map(ProductTable::into_rows)
-        })
+        block_on(
+            async move { ProductTable::fetch(exchange, Duration::from_secs_f64(timeout)).await },
+        )
     })
-    .map(market_rows_to_maps)
+    .map(|table| PythonProductTable { table })
     .map_err(to_py_runtime_error)
 }
 
@@ -245,12 +406,12 @@ fn fetch_product_table_async<'py>(
     pyo3_async_runtimes::tokio::future_into_py(py, async move {
         ProductTable::fetch(exchange, Duration::from_secs_f64(timeout))
             .await
-            .map(ProductTable::into_rows)
-            .map(market_rows_to_maps)
+            .map(|table| PythonProductTable { table })
             .map_err(to_py_runtime_error)
     })
 }
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<PythonProductColumn>()?;
     m.add_class::<PythonProductTable>()?;
     m.add_function(wrap_pyfunction!(fetch_product_table, m)?)?;
     m.add_function(wrap_pyfunction!(fetch_product_table_async, m)?)?;
