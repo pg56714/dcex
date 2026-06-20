@@ -45,6 +45,10 @@ dev = [
   "ruff>=0.14.2",
   "pytest>=8.4.2",
   "maturin>=1.9.0",
+  "ipython>=9.14.1",
+  "nest-asyncio>=1.6.0",
+  "pre-commit>=4.6.0",
+  "commitizen>=4.16.3",
 ]
 
 [tool.ruff] # https://docs.astral.sh/ruff/settings/#top-level
