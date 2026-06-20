@@ -175,8 +175,7 @@ def write_version(config: ComponentConfig, version: str) -> None:
     path.write_text(updated, encoding="utf-8")
 
 
-def update_cargo_lock(package_name: str, version: str) -> None:
-    path = ROOT / "Cargo.lock"
+def update_lock_package_version(path: Path, package_name: str, version: str) -> None:
     if not path.exists():
         return
 
@@ -206,6 +205,14 @@ def update_cargo_lock(package_name: str, version: str) -> None:
 
     if changed:
         path.write_text("".join(lines), encoding="utf-8")
+
+
+def update_cargo_lock(package_name: str, version: str) -> None:
+    update_lock_package_version(ROOT / "Cargo.lock", package_name, version)
+
+
+def update_uv_lock(package_name: str, version: str) -> None:
+    update_lock_package_version(ROOT / "uv.lock", package_name, version)
 
 
 def tag_for(config: ComponentConfig, version: str) -> str:
@@ -356,7 +363,6 @@ def prepend_changelog(path: Path, section: str) -> None:
 def plan_component(name: str, body_dir: Path) -> dict[str, Any]:
     config = COMPONENTS[name]
     current_version = read_version(config)
-    expected_current_tag = tag_for(config, current_version)
     tags = matching_tags(config)
     previous_tag = tags.get(current_version) or latest_matching_tag(config)
     commits = commits_since(previous_tag)
@@ -369,7 +375,7 @@ def plan_component(name: str, body_dir: Path) -> dict[str, Any]:
         if (parsed := parse_conventional_commit(commit)) is not None
     ]
     bump = strongest_bump(parsed_commits)
-    is_initial_release = expected_current_tag not in tags
+    is_initial_release = current_version not in tags
 
     if is_initial_release and name == "rust":
         next_version = current_version
@@ -441,7 +447,9 @@ def apply_plan(plan: dict[str, Any], body_dir: Path) -> None:
         changelog_section = build_changelog(next_version, parsed_commits)
 
         write_version(config, next_version)
-        if name == "rust":
+        if name == "python":
+            update_uv_lock("dcex", next_version)
+        elif name == "rust":
             update_cargo_lock("dcex", next_version)
         prepend_changelog(config.changelog_file, changelog_section)
         (body_dir / config.body_file).write_text(changelog_section, encoding="utf-8")
