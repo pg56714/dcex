@@ -14,6 +14,7 @@ Scope note: dcex focuses on market data, account queries, and trading/order APIs
 [![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/dcex)](https://badge.fury.io/py/dcex)
+[![Crates.io](https://img.shields.io/crates/v/dcex)](https://crates.io/crates/dcex)
 
 ## Installation
 
