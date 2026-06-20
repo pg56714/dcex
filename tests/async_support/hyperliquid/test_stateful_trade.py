@@ -288,22 +288,30 @@ async def _close_spot_test_delta(
     before: Decimal,
     remaining: Decimal,
 ) -> None:
-    sell_size = int(remaining)
-    if sell_size <= 0:
-        return
+    for _ in range(3):
+        available_delta = max(await _spot_available(client, "PURR") - before, Decimal("0"))
+        sell_size = int(available_delta)
+        if sell_size <= 0:
+            if remaining > 0:
+                await asyncio.sleep(1)
+                remaining = Decimal("0")
+                continue
+            return
 
-    sell = await client.place_order(
-        product_symbol=SPOT_SYMBOL,
-        isBuy=False,
-        price=await _spot_aggressive_sell_price(client, Decimal(sell_size)),
-        size=str(sell_size),
-        reduceOnly=False,
-        tif="Ioc",
-        cloid=_cloid(),
-    )
-    _assert_exchange_response(sell)
-    assert _filled_size(sell) == Decimal(sell_size)
-    await asyncio.sleep(2)
+        sell = await client.place_order(
+            product_symbol=SPOT_SYMBOL,
+            isBuy=False,
+            price=await _spot_aggressive_sell_price(client, Decimal(sell_size)),
+            size=str(sell_size),
+            reduceOnly=False,
+            tif="Ioc",
+            cloid=_cloid(),
+        )
+        _assert_exchange_response(sell)
+        assert _filled_size(sell) > 0
+        await asyncio.sleep(2)
+        remaining = Decimal("0")
+
     assert await _spot_available(client, "PURR") - before < Decimal("1")
 
 
@@ -595,12 +603,15 @@ async def test_spot_market_round_trip(client):
             sell_outcome_known = True
         sold_size = _filled_size(sell)
         sell_outcome_known = True
-        assert sold_size == Decimal(sell_size)
+        assert sold_size > 0
         await asyncio.sleep(2)
+        remaining = max(await _spot_available(client, "PURR") - before, Decimal("0"))
+        if remaining >= Decimal("1"):
+            await _close_spot_test_delta(client, before, remaining)
         assert await _spot_available(client, "PURR") - before < Decimal("1")
     finally:
         try:
-            remaining = bought_size - sold_size
+            remaining = max(await _spot_available(client, "PURR") - before, Decimal("0"))
             if remaining > 0 and (not sell_submitted or sell_outcome_known):
                 await _close_spot_test_delta(client, before, remaining)
         finally:

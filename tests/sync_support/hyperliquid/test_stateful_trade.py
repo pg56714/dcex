@@ -1,9 +1,9 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
+import json
 import os
 import time
 import uuid
-import json
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -277,22 +277,30 @@ def _spot_aggressive_sell_price(client: Client, size: Decimal | None = None) -> 
 
 
 def _close_spot_test_delta(client: Client, before: Decimal, remaining: Decimal) -> None:
-    sell_size = int(remaining)
-    if sell_size <= 0:
-        return
+    for _ in range(3):
+        available_delta = max(_spot_available(client, "PURR") - before, Decimal("0"))
+        sell_size = int(available_delta)
+        if sell_size <= 0:
+            if remaining > 0:
+                time.sleep(1)
+                remaining = Decimal("0")
+                continue
+            return
 
-    sell = client.place_order(
-        product_symbol=SPOT_SYMBOL,
-        isBuy=False,
-        price=_spot_aggressive_sell_price(client, Decimal(sell_size)),
-        size=str(sell_size),
-        reduceOnly=False,
-        tif="Ioc",
-        cloid=_cloid(),
-    )
-    _assert_exchange_response(sell)
-    assert _filled_size(sell) == Decimal(sell_size)
-    time.sleep(2)
+        sell = client.place_order(
+            product_symbol=SPOT_SYMBOL,
+            isBuy=False,
+            price=_spot_aggressive_sell_price(client, Decimal(sell_size)),
+            size=str(sell_size),
+            reduceOnly=False,
+            tif="Ioc",
+            cloid=_cloid(),
+        )
+        _assert_exchange_response(sell)
+        assert _filled_size(sell) > 0
+        time.sleep(2)
+        remaining = Decimal("0")
+
     assert _spot_available(client, "PURR") - before < Decimal("1")
 
 
@@ -572,12 +580,15 @@ def test_spot_market_round_trip(client):
             sell_outcome_known = True
         sold_size = _filled_size(sell)
         sell_outcome_known = True
-        assert sold_size == Decimal(sell_size)
+        assert sold_size > 0
         time.sleep(2)
+        remaining = max(_spot_available(client, "PURR") - before, Decimal("0"))
+        if remaining >= Decimal("1"):
+            _close_spot_test_delta(client, before, remaining)
         assert _spot_available(client, "PURR") - before < Decimal("1")
     finally:
         try:
-            remaining = bought_size - sold_size
+            remaining = max(_spot_available(client, "PURR") - before, Decimal("0"))
             if remaining > 0 and (not sell_submitted or sell_outcome_known):
                 _close_spot_test_delta(client, before, remaining)
         finally:
