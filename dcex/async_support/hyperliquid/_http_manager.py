@@ -39,7 +39,6 @@ class HTTPManager(BaseHTTPManager):
     private_key: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -260,7 +259,5 @@ class HTTPManager(BaseHTTPManager):
             return data
 
     async def close(self) -> None:
-        """Close the underlying HTTP session if it exists."""
-        if self.session is not None and hasattr(self.session, "aclose"):
-            await self.session.aclose()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

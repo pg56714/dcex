@@ -34,9 +34,8 @@ class HTTPManager(BaseHTTPManager):
     Base HTTP manager for BitMEX API interactions.
 
     This class provides the foundation for all BitMEX API HTTP clients,
-    handling authentication, request signing, session management, and
-    error handling. It includes optimized TCP settings and response
-    header tracking.
+    handling authentication, request signing, error handling, and response
+    header tracking through the Rust native transport.
 
     Attributes:
         base_url: Base URL for BitMEX API
@@ -44,7 +43,6 @@ class HTTPManager(BaseHTTPManager):
         api_secret: API secret for request signing
         timeout: Request timeout in seconds
         logger: Logger instance for debugging
-        session: HTTP client session
         ptm: Product table manager instance
         preload_product_table: Whether to preload product table
     """
@@ -56,7 +54,6 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -65,14 +62,13 @@ class HTTPManager(BaseHTTPManager):
         """
         Initialize the HTTP manager asynchronously.
 
-        Sets up the HTTP client session with optimized TCP settings,
-        and optionally loads the product table manager.
+        Initializes native transport state and optionally loads the product table manager.
 
         Returns:
             HTTPManager: Self instance for method chaining
 
         Raises:
-            RuntimeError: If session initialization fails
+            RuntimeError: If native initialization fails
         """
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
@@ -151,7 +147,7 @@ class HTTPManager(BaseHTTPManager):
         Make an HTTP request to the BitMEX API.
 
         Handles request preparation, execution, response parsing, and error handling.
-        Automatically initializes session if needed and stores response headers.
+        Automatically initializes native transport if needed and stores response headers.
 
         Args:
             method: HTTP method to use
@@ -163,7 +159,7 @@ class HTTPManager(BaseHTTPManager):
             dict[str, Any]: Parsed JSON response data
 
         Raises:
-            RuntimeError: If session initialization fails
+            RuntimeError: If native initialization fails
             ValueError: If unsupported HTTP method is used
             FailedRequestError: If API request fails or returns error
         """

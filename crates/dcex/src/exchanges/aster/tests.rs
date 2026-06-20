@@ -23,6 +23,10 @@ fn recording_server() -> (String, JoinHandle<Option<String>>) {
         loop {
             match listener.accept() {
                 Ok((mut stream, _)) => {
+                    stream.set_nonblocking(false).expect("blocking stream");
+                    stream
+                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .expect("read timeout");
                     let mut buffer = [0u8; 4096];
                     let size = stream.read(&mut buffer).expect("read");
                     let request = String::from_utf8_lossy(&buffer[..size]).into_owned();

@@ -37,7 +37,5 @@ class Client(
         await self.close()
 
     async def close(self) -> None:
-        """Close the client and clean up resources."""
-        if self.session is not None and hasattr(self.session, "aclose"):
-            await self.session.aclose()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

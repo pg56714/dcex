@@ -43,7 +43,6 @@ class HTTPManager(BaseHTTPManager):
         timeout: Request timeout in seconds
         recv_window: Receive window for requests
         logger: Logger instance
-        session: HTTP session for connection pooling
         ptm: Product table manager instance
         preload_product_table: Whether to preload product table
     """
@@ -58,7 +57,6 @@ class HTTPManager(BaseHTTPManager):
     timeout: int = field(default=10)
     recv_window: int = field(default=5000)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     sync_server_time: bool = field(default=True)
@@ -251,7 +249,5 @@ class HTTPManager(BaseHTTPManager):
             ) from e
 
     def close(self) -> None:
-        """Close the HTTP session."""
-        if self.session is not None and hasattr(self.session, "close"):
-            self.session.close()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

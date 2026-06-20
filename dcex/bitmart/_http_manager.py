@@ -31,7 +31,6 @@ class HTTPManager(BaseHTTPManager):
     memo: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -227,7 +226,5 @@ class HTTPManager(BaseHTTPManager):
             ) from e
 
     def close(self) -> None:
-        """Close the HTTP session."""
-        if self.session is not None and hasattr(self.session, "close"):
-            self.session.close()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

@@ -51,7 +51,6 @@ class HTTPManager(BaseHTTPManager):
         api_secret: API secret for request signing
         timeout: Request timeout in seconds
         logger: Logger instance for debugging
-        session: HTTP session for connection pooling
         ptm: Product table manager for symbol conversion
         preload_product_table: Whether to preload product table on initialization
     """
@@ -63,7 +62,6 @@ class HTTPManager(BaseHTTPManager):
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -238,7 +236,5 @@ class HTTPManager(BaseHTTPManager):
             ) from e
 
     def close(self) -> None:
-        """Close the HTTP session."""
-        if self.session is not None and hasattr(self.session, "close"):
-            self.session.close()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

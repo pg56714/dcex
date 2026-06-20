@@ -56,7 +56,6 @@ class HTTPManager(BaseHTTPManager):
         base_api: Base URL for OKX API
         timeout: Request timeout in seconds
         logger: Logger instance for debugging
-        session: HTTP session for connection pooling
         ptm: Product table manager instance
         preload_product_table: Whether to preload product table
     """
@@ -70,7 +69,6 @@ class HTTPManager(BaseHTTPManager):
     base_api: str = field(default="https://openapi.okx.com")
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -268,7 +266,5 @@ class HTTPManager(BaseHTTPManager):
             return data
 
     def close(self) -> None:
-        """Close the HTTP session."""
-        if self.session is not None and hasattr(self.session, "close"):
-            self.session.close()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

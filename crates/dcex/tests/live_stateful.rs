@@ -1,6 +1,8 @@
 mod live_stateful {
     mod common;
 
+    mod aster;
+    mod backpack;
     mod binance;
     mod bingx;
     mod bitget;
@@ -8,7 +10,10 @@ mod live_stateful {
     mod bitmex;
     mod bybit;
     mod gateio;
+    mod hyperliquid;
     mod kraken;
+    mod kucoin;
+    mod lighter;
     mod mexc;
     mod okx;
 }

@@ -40,7 +40,6 @@ class HTTPManager(BaseHTTPManager):
     private_key: str | None = field(default=None, repr=False)
     timeout: float = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -85,7 +84,7 @@ class HTTPManager(BaseHTTPManager):
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        """Exit context manager and close the underlying session."""
+        """Exit context manager and release native resources."""
         self.close()
 
     def _get_ptm(self) -> ProductTableManager:
@@ -252,8 +251,5 @@ class HTTPManager(BaseHTTPManager):
             return data
 
     def close(self) -> None:
-        """Close the underlying HTTP session if it exists."""
-        if self.session is not None:
-            if self.session is not None and hasattr(self.session, "close"):
-                self.session.close()
-            self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

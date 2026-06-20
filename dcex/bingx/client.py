@@ -41,6 +41,5 @@ class Client(
         self.close()
 
     def close(self) -> None:
-        """Close the client and clean up resources."""
-        if hasattr(self, "session") and self.session is not None:
-            self.session.close()
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

@@ -100,21 +100,6 @@ class FakeSyncResponse:
         return {"listenKey": "test-listen-key"}
 
 
-class FakeSyncSession:
-    def post(self, *args: object, **kwargs: object) -> FakeSyncResponse:
-        return FakeSyncResponse()
-
-    def close(self) -> None:
-        return None
-
-
-class FakeAsyncSession:
-    is_closed = False
-
-    async def post(self, *args: object, **kwargs: object) -> FakeAsyncResponse:
-        return FakeAsyncResponse()
-
-
 class FakeSyncNativePublicClient:
     def __init__(self, calls: list[dict[str, Any]]) -> None:
         self.calls = calls
@@ -383,7 +368,6 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
 def _wire_sync(client: Any) -> list[dict[str, Any]]:
     calls: list[dict[str, Any]] = []
     client.ptm = FakePTM()
-    client.session = FakeSyncSession()
 
     def fake_request(
         method: str,
@@ -412,7 +396,6 @@ def _wire_sync(client: Any) -> list[dict[str, Any]]:
 def _wire_async(client: Any) -> list[dict[str, Any]]:
     calls: list[dict[str, Any]] = []
     client.ptm = FakePTM()
-    client.session = FakeAsyncSession()
 
     async def fake_request(
         method: str,

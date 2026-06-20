@@ -32,7 +32,6 @@ class HTTPManager(BaseHTTPManager):
     futures_base_url: str = field(default="https://fapi.asterdex.com")
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -217,7 +216,5 @@ class HTTPManager(BaseHTTPManager):
         return data
 
     async def close(self) -> None:
-        """Close the asynchronous HTTP session."""
-        if self.session is not None and hasattr(self.session, "aclose"):
-            await self.session.aclose()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

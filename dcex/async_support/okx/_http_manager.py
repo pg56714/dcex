@@ -54,7 +54,6 @@ class HTTPManager(BaseHTTPManager):
     base_api: str = field(default="https://openapi.okx.com")
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)

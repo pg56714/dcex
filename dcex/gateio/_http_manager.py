@@ -38,7 +38,6 @@ class HTTPManager(BaseHTTPManager):
         base_url: Base URL for the Gate.io API
         logger: Logger instance for debugging
         timeout: Request timeout in seconds
-        session: HTTP session for connection pooling
         preload_product_table: Whether to preload product table on initialization
     """
 
@@ -49,7 +48,6 @@ class HTTPManager(BaseHTTPManager):
     base_url: str = field(default="https://api.gateio.ws")
     logger: logging.Logger | None = field(default=None)
     timeout: int = field(default=10)
-    session: Any = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
@@ -252,7 +250,5 @@ class HTTPManager(BaseHTTPManager):
             ) from e
 
     def close(self) -> None:
-        """Close the HTTP session."""
-        if self.session is not None and hasattr(self.session, "close"):
-            self.session.close()
-        self.session = None
+        """Release native HTTP resources held by the Rust extension."""
+        self._native_client = None

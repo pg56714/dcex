@@ -46,7 +46,6 @@ class HTTPManager(BaseHTTPManager):
         timeout: Request timeout in seconds
         recv_window: Receive window for requests
         logger: Logger instance
-        session: HTTP client session
         ptm: Product table manager
         preload_product_table: Whether to preload product table
     """
@@ -61,7 +60,6 @@ class HTTPManager(BaseHTTPManager):
     timeout: int = field(default=10)
     recv_window: int = field(default=5000)
     logger: logging.Logger | None = field(default=None)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     sync_server_time: bool = field(default=True)
@@ -163,7 +161,7 @@ class HTTPManager(BaseHTTPManager):
             Dict containing API response data
 
         Raises:
-            RuntimeError: If session initialization fails
+            RuntimeError: If native initialization fails
             ValueError: If signed request lacks credentials
             FailedRequestError: If request fails or API returns error
         """

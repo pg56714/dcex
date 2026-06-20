@@ -39,7 +39,6 @@ class HTTPManager(BaseHTTPManager):
         base_url: Base URL for API requests
         logger: Logger instance
         timeout: Request timeout in seconds
-        session: HTTP client session
         ptm: Product table manager
         preload_product_table: Whether to preload product table
     """
@@ -51,7 +50,6 @@ class HTTPManager(BaseHTTPManager):
     base_url: str = field(default="https://api.gateio.ws")
     logger: logging.Logger | None = field(default=None)
     timeout: int = field(default=10)
-    session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
@@ -183,7 +181,7 @@ class HTTPManager(BaseHTTPManager):
             Dict containing API response data
 
         Raises:
-            RuntimeError: If session initialization fails
+            RuntimeError: If native initialization fails
             ValueError: If signed request lacks credentials
             FailedRequestError: If request fails or API returns error
         """
