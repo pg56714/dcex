@@ -1,10 +1,49 @@
-use std::time::Duration;
+use std::{
+    io::{ErrorKind, Read, Write},
+    net::TcpListener,
+    thread::{self, JoinHandle},
+    time::{Duration, Instant},
+};
 
 use serde_json::{json, Value};
 
 use crate::http::{HttpMethod, RequestBody};
+use crate::DcexError;
 
 use super::*;
+
+fn recording_server() -> (String, JoinHandle<Option<String>>) {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    listener.set_nonblocking(true).expect("nonblocking");
+    let address = listener.local_addr().expect("address");
+    let handle = thread::spawn(move || {
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match listener.accept() {
+                Ok((mut stream, _)) => {
+                    let mut buffer = [0u8; 4096];
+                    let size = stream.read(&mut buffer).expect("read");
+                    let request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+                    stream
+                        .write_all(
+                            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
+Content-Length: 13\r\nConnection: close\r\n\r\n{\"code\":1000}",
+                        )
+                        .expect("write");
+                    return request.lines().next().map(str::to_string);
+                }
+                Err(error) if error.kind() == ErrorKind::WouldBlock => {
+                    if Instant::now() >= deadline {
+                        return None;
+                    }
+                    thread::sleep(Duration::from_millis(10));
+                }
+                Err(error) => panic!("accept failed: {error}"),
+            }
+        }
+    });
+    (format!("http://{address}"), handle)
+}
 
 #[test]
 fn signed_post_uses_exact_body() {
@@ -33,6 +72,106 @@ fn signed_post_uses_exact_body() {
         Some("a5a38bab707890a577d96959ca82a1b7a4c0db7ffd9b40ba17b20ad57932a542")
     );
     assert_eq!(request.body, RequestBody::Raw(body));
+}
+
+#[test]
+fn raw_auto_routes_spot_paths_to_spot_base_url() {
+    let (spot_base_url, handle) = recording_server();
+    let client = BitmartClient::with_base_urls(
+        None,
+        None,
+        None,
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(
+            HttpMethod::Get,
+            "/spot/quotation/v3/ticker",
+            vec![("symbol".to_string(), "BTC_USDT".to_string())],
+            None,
+            false,
+        )
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /spot/quotation/v3/ticker?symbol=BTC_USDT HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn raw_auto_routes_contract_paths_to_futures_base_url() {
+    let (futures_base_url, handle) = recording_server();
+    let client = BitmartClient::with_base_urls(
+        None,
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(
+            HttpMethod::Get,
+            "/contract/public/details",
+            vec![("symbol".to_string(), "BTCUSDT".to_string())],
+            None,
+            false,
+        )
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /contract/public/details?symbol=BTCUSDT HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn raw_auto_routes_transfer_contract_paths_to_futures_base_url() {
+    let (futures_base_url, handle) = recording_server();
+    let client = BitmartClient::with_base_urls(
+        None,
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(
+            HttpMethod::Get,
+            "/account/v1/transfer-contract",
+            Vec::new(),
+            None,
+            false,
+        )
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /account/v1/transfer-contract HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn raw_auto_rejects_unsupported_path_prefixes() {
+    assert_eq!(
+        BitmartMarket::from_path("/unknown"),
+        Err(DcexError::InvalidInput(
+            "unsupported BitMart API path: /unknown".to_string()
+        ))
+    );
 }
 
 #[test]

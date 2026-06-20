@@ -178,51 +178,42 @@ def test_native_aster_signed_request() -> None:
     assert signature == sign_message(message, "0x" + "11" * 32)
 
 
-def test_sync_aster_manager_uses_native_transport() -> None:
-    from dcex.aster._http_manager import HTTPManager
-
-    path = "/api/v3/time"
+def test_sync_aster_public_wrapper_uses_native_dispatcher() -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.aster.client import Client
 
     with _http_server({"serverTime": 1}) as (base_url, received):
-        manager = HTTPManager(
+        client = Client(
             spot_base_url=base_url,
             futures_base_url=base_url,
             preload_product_table=False,
         )
-        result = manager._request(
-            "GET",
-            path,
-            signed=False,
-        )
+        result = client.get_spot_server_time()
 
-    manager.close()
+    client.close()
     assert result == {"serverTime": 1}
-    assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == path
+    assert client.last_response_headers["x-response"] == "native"
+    assert received.get_nowait()["path"] == "/api/v3/time"
 
 
 @pytest.mark.asyncio
-async def test_async_aster_manager_uses_native_transport() -> None:
-    from dcex.async_support.aster._http_manager import HTTPManager
-
-    path = "/api/v3/time"
+async def test_async_aster_public_wrapper_uses_native_dispatcher() -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.async_support.aster.client import Client
 
     with _http_server({"serverTime": 1}) as (base_url, received):
-        manager = HTTPManager(
+        client = Client(
             spot_base_url=base_url,
             futures_base_url=base_url,
             preload_product_table=False,
         )
-        await manager.async_init()
-        result = await manager._request(
-            "GET",
-            path,
-            signed=False,
-        )
+        await client.async_init()
+        result = await client.get_futures_server_time()
 
+    await client.close()
     assert result == {"serverTime": 1}
-    assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == path
+    assert client.last_response_headers["x-response"] == "native"
+    assert received.get_nowait()["path"] == "/fapi/v3/time"
 
 
 def test_native_hyperliquid_signed_request() -> None:

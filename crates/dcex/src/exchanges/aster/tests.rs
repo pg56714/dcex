@@ -1,4 +1,9 @@
-use std::time::Duration;
+use std::{
+    io::{ErrorKind, Read, Write},
+    net::TcpListener,
+    thread::{self, JoinHandle},
+    time::{Duration, Instant},
+};
 
 use serde_json::{json, Value};
 
@@ -7,6 +12,40 @@ use crate::product_table::{MarketInfo, ProductTable};
 
 use super::{sign_message, AsterClient, AsterMarket};
 use crate::exchanges::aster::params::AsterParams;
+use crate::DcexError;
+
+fn recording_server() -> (String, JoinHandle<Option<String>>) {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    listener.set_nonblocking(true).expect("nonblocking");
+    let address = listener.local_addr().expect("address");
+    let handle = thread::spawn(move || {
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match listener.accept() {
+                Ok((mut stream, _)) => {
+                    let mut buffer = [0u8; 4096];
+                    let size = stream.read(&mut buffer).expect("read");
+                    let request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+                    stream
+                        .write_all(
+                            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
+Content-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
+                        )
+                        .expect("write");
+                    return request.lines().next().map(str::to_string);
+                }
+                Err(error) if error.kind() == ErrorKind::WouldBlock => {
+                    if Instant::now() >= deadline {
+                        return None;
+                    }
+                    thread::sleep(Duration::from_millis(10));
+                }
+                Err(error) => panic!("accept failed: {error}"),
+            }
+        }
+    });
+    (format!("http://{address}"), handle)
+}
 
 #[test]
 fn eip712_signature_matches_python_vector() {
@@ -51,6 +90,64 @@ fn signed_futures_request_includes_user_before_signer() {
         .path
         .contains("signer=0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"));
     assert!(request.path.contains("signature=0x"));
+}
+
+#[test]
+fn raw_auto_routes_spot_paths_to_spot_base_url() {
+    let (spot_base_url, handle) = recording_server();
+    let client = AsterClient::with_base_urls(
+        None,
+        None,
+        None,
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(HttpMethod::Get, "/api/v3/time", Vec::new(), false)
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /api/v3/time HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn raw_auto_routes_futures_paths_to_futures_base_url() {
+    let (futures_base_url, handle) = recording_server();
+    let client = AsterClient::with_base_urls(
+        None,
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(HttpMethod::Get, "/fapi/v3/time", Vec::new(), false)
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /fapi/v3/time HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn raw_auto_rejects_unsupported_path_prefixes() {
+    assert_eq!(
+        AsterMarket::from_path("/unknown"),
+        Err(DcexError::InvalidInput(
+            "unsupported Aster API path: /unknown".to_string()
+        ))
+    );
 }
 
 #[test]

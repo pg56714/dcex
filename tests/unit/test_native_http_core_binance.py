@@ -125,59 +125,6 @@ async def test_native_binance_async_public_request() -> None:
     assert received.get_nowait()["path"] == "/test?symbol=ETHUSDT"
 
 
-def test_sync_binance_manager_uses_native_transport() -> None:
-    native = pytest.importorskip("dcex._native")
-    from dcex.binance._http_manager import HTTPManager
-
-    path = "/api/v3/exchangeInfo"
-
-    with _http_server() as (base_url, received):
-        manager = HTTPManager(preload_product_table=False)
-        manager._native_client = native.BinanceHttpClient(
-            timeout=2,
-            spot_base_url=base_url,
-            futures_base_url=base_url,
-        )
-        result = manager._request(
-            "GET",
-            path,
-            {"symbol": "BTCUSDT"},
-            signed=False,
-        )
-
-    manager.close()
-    assert result == {"ok": True}
-    assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == f"{path}?symbol=BTCUSDT"
-
-
-@pytest.mark.asyncio
-async def test_async_binance_manager_uses_native_transport() -> None:
-    native = pytest.importorskip("dcex._native")
-    from dcex.async_support.binance._http_manager import HTTPManager
-
-    path = "/api/v3/exchangeInfo"
-
-    with _http_server() as (base_url, received):
-        manager = HTTPManager(preload_product_table=False)
-        await manager.async_init()
-        manager._native_client = native.BinanceHttpClient(
-            timeout=2,
-            spot_base_url=base_url,
-            futures_base_url=base_url,
-        )
-        result = await manager._request(
-            "GET",
-            path,
-            {"symbol": "ETHUSDT"},
-            signed=False,
-        )
-
-    assert result == {"ok": True}
-    assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == f"{path}?symbol=ETHUSDT"
-
-
 def test_sync_binance_public_wrapper_uses_native_dispatcher() -> None:
     native = pytest.importorskip("dcex._native")
     from dcex.binance.client import Client

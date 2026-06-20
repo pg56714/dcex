@@ -1,5 +1,11 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use std::{
+    io::{ErrorKind, Read, Write},
+    net::TcpListener,
+    thread::{self, JoinHandle},
+    time::Instant,
+};
 
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::SPOT_BASE_URL;
@@ -9,6 +15,39 @@ use crate::exchange::RequestSigner;
 use crate::http::{block_on, HttpMethod, HttpRequest};
 use crate::product_table::ProductTable;
 use crate::DcexError;
+
+fn recording_server() -> (String, JoinHandle<Option<String>>) {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    listener.set_nonblocking(true).expect("nonblocking");
+    let address = listener.local_addr().expect("address");
+    let handle = thread::spawn(move || {
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match listener.accept() {
+                Ok((mut stream, _)) => {
+                    let mut buffer = [0u8; 4096];
+                    let size = stream.read(&mut buffer).expect("read");
+                    let request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+                    stream
+                        .write_all(
+                            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
+Content-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
+                        )
+                        .expect("write");
+                    return request.lines().next().map(str::to_string);
+                }
+                Err(error) if error.kind() == ErrorKind::WouldBlock => {
+                    if Instant::now() >= deadline {
+                        return None;
+                    }
+                    thread::sleep(Duration::from_millis(10));
+                }
+                Err(error) => panic!("accept failed: {error}"),
+            }
+        }
+    });
+    (format!("http://{address}"), handle)
+}
 
 #[test]
 fn signer_matches_python_implementation() {
@@ -78,6 +117,67 @@ fn product_symbol_selects_expected_market() {
     assert_eq!(
         market_for_product_symbol_fallback("BTC-USDT-SWAP"),
         BinanceMarket::Futures
+    );
+}
+
+#[test]
+fn raw_auto_routes_spot_paths_to_spot_base_url() {
+    let (spot_base_url, handle) = recording_server();
+    let client = BinanceClient::with_base_urls(
+        None,
+        None,
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(
+            HttpMethod::Get,
+            "/api/v3/exchangeInfo",
+            vec![("symbol".to_string(), "BTCUSDT".to_string())],
+            false,
+        )
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /api/v3/exchangeInfo?symbol=BTCUSDT HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn raw_auto_routes_futures_paths_to_futures_base_url() {
+    let (futures_base_url, handle) = recording_server();
+    let client = BinanceClient::with_base_urls(
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(HttpMethod::Get, "/fapi/v1/exchangeInfo", Vec::new(), false)
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /fapi/v1/exchangeInfo HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn raw_auto_rejects_unsupported_path_prefixes() {
+    assert_eq!(
+        BinanceMarket::from_path("/unknown"),
+        Err(DcexError::InvalidInput(
+            "unsupported Binance API path: /unknown".to_string()
+        ))
     );
 }
 

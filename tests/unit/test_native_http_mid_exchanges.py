@@ -620,58 +620,45 @@ def test_native_bitmart_signed_body() -> None:
     assert request["body"] == request_body.decode()
 
 
-def test_sync_bitmart_manager_uses_native_transport() -> None:
+def test_sync_bitmart_public_wrapper_uses_native_dispatcher() -> None:
     native = pytest.importorskip("dcex._native")
-    from dcex.bitmart._http_manager import HTTPManager
-
-    path = "/spot/quotation/v3/ticker"
+    from dcex.bitmart.client import Client
 
     with _http_server({"code": 1000}) as (base_url, received):
-        manager = HTTPManager(preload_product_table=False)
-        manager._native_client = native.BitmartHttpClient(
+        client = Client(preload_product_table=False)
+        client._native_client = native.BitmartHttpClient(
             timeout=2,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        result = manager._request(
-            "GET",
-            path,
-            {"symbol": "BTC_USDT"},
-            signed=False,
-        )
+        result = client.get_ticker_of_a_pair("BTC-USDT-SPOT")
 
-    manager.close()
+    client.close()
     assert result == {"code": 1000}
-    assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == f"{path}?symbol=BTC_USDT"
+    assert client.last_response_headers["x-response"] == "native"
+    assert received.get_nowait()["path"] == "/spot/quotation/v3/ticker?symbol=BTC_USDT"
 
 
 @pytest.mark.asyncio
-async def test_async_bitmart_manager_uses_native_transport() -> None:
+async def test_async_bitmart_public_wrapper_uses_native_dispatcher() -> None:
     native = pytest.importorskip("dcex._native")
-    from dcex.async_support.bitmart._http_manager import HTTPManager
-
-    path = "/spot/v2/submit_order"
+    from dcex.async_support.bitmart.client import Client
 
     with _http_server({"code": 1000}) as (base_url, received):
-        manager = HTTPManager(preload_product_table=False)
-        await manager.async_init()
-        manager._native_client = native.BitmartHttpClient(
+        client = Client(preload_product_table=False)
+        await client.async_init()
+        client._native_client = native.BitmartHttpClient(
             timeout=2,
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        result = await manager._request(
-            "POST",
-            path,
-            {"symbol": "BTC_USDT", "side": "buy"},
-            signed=False,
-        )
+        result = await client.get_contracts_details("BTC-USDT-SWAP")
 
+    await client.close()
     request = received.get_nowait()
     assert result == {"code": 1000}
-    assert manager.last_response_headers["x-response"] == "native"
-    assert request["body"] == '{"symbol":"BTC_USDT","side":"buy"}'
+    assert client.last_response_headers["x-response"] == "native"
+    assert request["path"] == "/contract/public/details?symbol=BTCUSDT"
 
 
 def test_native_bitget_signed_body() -> None:
