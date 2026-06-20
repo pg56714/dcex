@@ -1,11 +1,7 @@
 """Kraken asynchronous HTTP manager."""
 
-import base64
-import hashlib
-import hmac
 import json
 import logging
-import time
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
@@ -66,26 +62,6 @@ def _native_params(query: dict[str, Any]) -> list[tuple[str, str]]:
     return params
 
 
-def _spot_signature(path: str, payload: dict[str, Any], api_secret: str) -> str:
-    encoded = _encoded_query(payload)
-    message = path.encode() + hashlib.sha256((str(payload["nonce"]) + encoded).encode()).digest()
-    mac = hmac.new(base64.b64decode(api_secret), message, hashlib.sha512)
-    return base64.b64encode(mac.digest()).decode()
-
-
-def _futures_auth_path(path: str) -> str:
-    if path.startswith("/derivatives"):
-        return path.removeprefix("/derivatives")
-    return path
-
-
-def _futures_signature(path: str, post_data: str, nonce: str, api_secret: str) -> str:
-    auth_path = _futures_auth_path(path)
-    hashed = hashlib.sha256((post_data + nonce + auth_path).encode()).digest()
-    mac = hmac.new(base64.b64decode(api_secret), hashed, hashlib.sha512)
-    return base64.b64encode(mac.digest()).decode()
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for Kraken public REST APIs."""
@@ -105,14 +81,15 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self._setup_logger(self.logger)
         native_client_type = getattr(_native, "KrakenHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 spot_api_key=self._spot_api_key,
                 spot_api_secret=self._spot_api_secret,
@@ -129,8 +106,8 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
         return self
 
-    def _uses_native_transport(self, request_base_url: str) -> bool:
-        if not self.use_native or self._native_client is None:
+    def _uses_native_transport(self) -> bool:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -205,35 +182,6 @@ class HTTPManager(BaseHTTPManager):
             return "futures"
         return "spot"
 
-    def _spot_headers(self, path: str, payload: dict[str, Any]) -> dict[str, str]:
-        api_key = self._spot_api_key
-        api_secret = self._spot_api_secret
-        if not api_key or not api_secret:
-            raise ValueError(
-                "Signed Kraken spot requests require spot_api_key and spot_api_secret."
-            )
-        return {
-            "Accept": "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "API-Key": api_key,
-            "API-Sign": _spot_signature(path, payload, api_secret),
-        }
-
-    def _futures_headers(self, path: str, post_data: str, nonce: str) -> dict[str, str]:
-        api_key = self._futures_api_key
-        api_secret = self._futures_api_secret
-        if not api_key or not api_secret:
-            raise ValueError(
-                "Signed Kraken futures requests require futures_api_key and futures_api_secret."
-            )
-        return {
-            "Accept": "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "APIKey": api_key,
-            "Authent": _futures_signature(path, post_data, nonce, api_secret),
-            "Nonce": nonce,
-        }
-
     async def _request(
         self,
         method: Literal["GET", "POST", "PUT", "DELETE"],
@@ -257,7 +205,6 @@ class HTTPManager(BaseHTTPManager):
             request_path = f"{request_path}?{encoded_query}"
 
         url = f"{request_base_url}{request_path}"
-        response = None
         try:
             self._log_request(method, url)
             method_upper = method.upper()
@@ -280,67 +227,28 @@ class HTTPManager(BaseHTTPManager):
                     "Signed Kraken futures requests require futures_api_key and futures_api_secret."
                 )
 
-            if self._uses_native_transport(request_base_url):
-                json_body = (
-                    json.dumps(filtered_query, separators=(",", ":")).encode()
-                    if method_upper in {"POST", "PUT"} and filtered_query and not signed
-                    else None
-                )
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    selected_auth_type,
-                    str(path),
-                    _native_params(filtered_query),
-                    json_body,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            else:
-                body: str | None = None
-                headers = {"Accept": "application/json"}
-                if signed and selected_auth_type == "spot":
-                    nonce = str(time.time_ns())
-                    spot_payload: dict[str, Any] = {"nonce": nonce}
-                    spot_payload.update(filtered_query)
-                    body = _encoded_query(spot_payload)
-                    headers = self._spot_headers(str(path), spot_payload)
-                    url = f"{request_base_url}{path}"
-                elif signed and selected_auth_type == "futures":
-                    nonce = str(time.time_ns())
-                    body = encoded_query
-                    headers = self._futures_headers(str(path), encoded_query, nonce)
-                    if method_upper in {"GET", "DELETE"} and encoded_query:
-                        url = f"{request_base_url}{path}?{encoded_query}"
-                    else:
-                        url = f"{request_base_url}{path}"
-
-                if method_upper == "GET":
-                    response = await self.session.get(url, headers=headers)
-                elif method_upper == "POST":
-                    response = await self.session.post(
-                        url,
-                        headers=headers,
-                        content=body if signed else None,
-                        json=None if signed else (filtered_query or None),
-                    )
-                elif method_upper == "PUT":
-                    response = await self.session.put(
-                        url,
-                        headers=headers,
-                        content=body if signed else None,
-                        json=None if signed else (filtered_query or None),
-                    )
-                elif method_upper == "DELETE":
-                    response = await self.session.delete(url, headers=headers)
-                else:
-                    raise ValueError(f"Unsupported method: {method}")
+            self._uses_native_transport()
+            json_body = (
+                json.dumps(filtered_query, separators=(",", ":")).encode()
+                if method_upper in {"POST", "PUT"} and filtered_query and not signed
+                else None
+            )
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                selected_auth_type,
+                str(path),
+                _native_params(filtered_query),
+                json_body,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(

@@ -1,10 +1,7 @@
 """MEXC synchronous HTTP manager."""
 
-import hashlib
-import hmac
 import json
 import logging
-import time
 from dataclasses import dataclass, field
 from typing import Any, Literal, cast
 from urllib.parse import parse_qsl, urlencode
@@ -50,10 +47,6 @@ def _query_pairs(query: dict[str, Any]) -> list[tuple[str, str]]:
     return parse_qsl(_encoded_query(query), keep_blank_values=True)
 
 
-def _sign(payload: str, api_secret: str) -> str:
-    return hmac.new(api_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for MEXC Spot V3 and Contract V1 REST APIs."""
@@ -69,21 +62,21 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
         self._logger = self._setup_logger(self.logger)
         native_client_type = getattr(_native, "MexcHttpClient", None)
-        if self.use_native and native_client_type is not None:
-            self._native_client = native_client_type(
-                api_key=self.api_key,
-                api_secret=self.api_secret,
-                timeout=self.timeout,
-                base_url=self.base_url,
-                contract_base_url=self.contract_base_url,
-            )
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        self._native_client = native_client_type(
+            api_key=self.api_key,
+            api_secret=self.api_secret,
+            timeout=self.timeout,
+            base_url=self.base_url,
+            contract_base_url=self.contract_base_url,
+        )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.MEXC)
             if self._native_client is not None and hasattr(
@@ -92,7 +85,7 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -140,78 +133,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _headers(
-        self,
-        *,
-        signed: bool,
-        api: Literal["spot", "contract"],
-        request_time: str | None = None,
-        signature: str | None = None,
-    ) -> dict[str, str]:
-        headers = {"Content-Type": "application/json"}
-        if not signed:
-            return headers
-        if not (self.api_key and self.api_secret):
-            raise ValueError("Signed MEXC requests require api_key and api_secret.")
-        if api == "spot":
-            headers["X-MEXC-APIKEY"] = self.api_key
-        else:
-            if request_time is None or signature is None:
-                raise ValueError("Contract signed requests require request_time and signature.")
-            headers.update(
-                {
-                    "ApiKey": self.api_key,
-                    "Request-Time": request_time,
-                    "Signature": signature,
-                }
-            )
-        return headers
-
-    def _prepare_spot_request(
-        self,
-        query: dict[str, Any],
-        signed: bool,
-    ) -> tuple[str, str | None, dict[str, str]]:
-        if not signed:
-            return _encoded_query(query), None, self._headers(signed=False, api="spot")
-        query = dict(query)
-        query.setdefault("timestamp", int(time.time() * 1000))
-        query_string = _encoded_query(query)
-        query["signature"] = _sign(query_string, self.api_secret or "")
-        signed_query_string = _encoded_query(query)
-        return signed_query_string, None, self._headers(signed=True, api="spot")
-
-    def _prepare_contract_request(
-        self,
-        method: str,
-        query: RequestPayload,
-        signed: bool,
-    ) -> tuple[str, str | None, dict[str, str]]:
-        if not signed:
-            query_string = _encoded_query(query) if isinstance(query, dict) else ""
-            body = _json_body(query) if method.upper() not in {"GET", "DELETE"} else None
-            return query_string, body, self._headers(signed=False, api="contract")
-
-        request_time = str(int(time.time() * 1000))
-        if method.upper() in {"GET", "DELETE"}:
-            if not isinstance(query, dict):
-                raise TypeError("MEXC Contract GET and DELETE requests require a mapping query.")
-            query_string = _encoded_query(query, sort=True)
-            body = None
-            request_param = query_string
-        else:
-            query_string = ""
-            body = _json_body(query)
-            request_param = body or ""
-        signature = _sign(f"{self.api_key}{request_time}{request_param}", self.api_secret or "")
-        headers = self._headers(
-            signed=True,
-            api="contract",
-            request_time=request_time,
-            signature=signature,
-        )
-        return query_string, body, headers
-
     def _request(
         self,
         method: Literal["GET", "POST", "PUT", "DELETE"],
@@ -226,71 +147,33 @@ class HTTPManager(BaseHTTPManager):
         base_url = (self.contract_base_url or self.base_url) if api == "contract" else self.base_url
         url = f"{base_url}{request_path}"
 
-        response = None
         try:
             self._log_request(method, url)
-            if self._uses_native_transport():
-                if api == "spot" and not isinstance(filtered_query, dict):
-                    raise TypeError("MEXC Spot requests require a mapping query.")
-                params = _query_pairs(filtered_query) if isinstance(filtered_query, dict) else []
-                body = None
-                if api == "contract" and method.upper() not in {"GET", "DELETE"}:
-                    body = _json_body(filtered_query).encode()
-                status, response_headers, response_body = cast(
-                    Any,
-                    self._native_client,
-                ).request_raw(
-                    method,
-                    api,
-                    request_path,
-                    params,
-                    body,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            else:
-                if api == "contract":
-                    query_string, body, headers = self._prepare_contract_request(
-                        method,
-                        filtered_query,
-                        signed,
-                    )
-                else:
-                    if not isinstance(filtered_query, dict):
-                        raise TypeError("MEXC Spot requests require a mapping query.")
-                    query_string, body, headers = self._prepare_spot_request(
-                        filtered_query,
-                        signed,
-                    )
-
-                if query_string:
-                    url = f"{url}?{query_string}"
-
-                method_upper = method.upper()
-                if method_upper == "GET":
-                    response = self.session.get(url, headers=headers, timeout=self.timeout)
-                elif method_upper == "POST":
-                    response = self.session.post(
-                        url,
-                        headers=headers,
-                        data=body,
-                        timeout=self.timeout,
-                    )
-                elif method_upper == "PUT":
-                    response = self.session.put(
-                        url,
-                        headers=headers,
-                        data=body,
-                        timeout=self.timeout,
-                    )
-                elif method_upper == "DELETE":
-                    response = self.session.delete(url, headers=headers, timeout=self.timeout)
-                else:
-                    raise ValueError(f"Unsupported HTTP method: {method}")
+            self._uses_native_transport()
+            if signed and not (self.api_key and self.api_secret):
+                raise ValueError("Signed MEXC requests require api_key and api_secret.")
+            if api == "spot" and not isinstance(filtered_query, dict):
+                raise TypeError("MEXC Spot requests require a mapping query.")
+            params = _query_pairs(filtered_query) if isinstance(filtered_query, dict) else []
+            body = None
+            if api == "contract" and method.upper() not in {"GET", "DELETE"}:
+                body = _json_body(filtered_query).encode()
+            status, response_headers, response_body = cast(
+                Any,
+                self._native_client,
+            ).request_raw(
+                method,
+                api,
+                request_path,
+                params,
+                body,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(

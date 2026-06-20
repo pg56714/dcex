@@ -6,11 +6,8 @@ to the Gate.io API, including authentication, request signing, and
 response handling.
 """
 
-import hashlib
-import hmac
 import json
 import logging
-import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Literal, Self, cast
@@ -23,12 +20,6 @@ from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
 _native = load_native()
-
-
-def _format_query_string(query: dict[str, Any] | None) -> str:
-    if not query:
-        return ""
-    return "&".join(f"{key}={value}" for key, value in query.items())
 
 
 @dataclass
@@ -63,7 +54,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -77,7 +67,9 @@ class HTTPManager(BaseHTTPManager):
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.GATEIO)
         native_client_type = getattr(_native, "GateioHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -93,7 +85,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -167,42 +159,6 @@ class HTTPManager(BaseHTTPManager):
         except KeyError as e:
             raise ValueError(f"Missing path parameter: {e}") from e
 
-    def _sign(
-        self,
-        method: str,
-        url_path: str,
-        query: dict[str, Any] | None,
-        body: dict[str, Any] | list | None,
-        timestamp: str,
-    ) -> str:
-        """
-        Generate authentication signature.
-
-        Args:
-            method: HTTP method
-            url_path: URL path
-            query: Query parameters
-            body: Request body
-            timestamp: Request timestamp
-
-        Returns:
-            HMAC-SHA512 signature
-
-        Raises:
-            ValueError: If API secret is not set
-        """
-        payload_string = json.dumps(body or {}, separators=(",", ":")) if body else ""
-        hashed_payload = hashlib.sha512(payload_string.encode("utf-8")).hexdigest()
-
-        query_string = _format_query_string(query)
-
-        s = f"{method.upper()}\n{url_path}\n{query_string}\n{hashed_payload}\n{timestamp}"
-        if self.api_secret is None:
-            raise ValueError("API secret is required for signing")
-        return hmac.new(
-            self.api_secret.encode("utf-8"), s.encode("utf-8"), hashlib.sha512
-        ).hexdigest()
-
     async def _request(
         self,
         method: Literal["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -241,70 +197,36 @@ class HTTPManager(BaseHTTPManager):
         full_path = "/api/v4" + resolved_path
         url = self.base_url + full_path
 
-        timestamp = str(int(time.time()))
-        uses_native = self._uses_native_transport()
-        headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
+        timestamp = str(generate_timestamp(iso_format=True))
+        self._uses_native_transport()
 
         if signed:
             if not (self.api_key and self.api_secret):
                 raise ValueError("Signed request requires API Key and Secret.")
-            if not uses_native:
-                sign = self._sign(method, full_path, query, body, timestamp)
-                headers.update(
-                    {
-                        "KEY": self.api_key,
-                        "Timestamp": timestamp,
-                        "SIGN": sign,
-                    }
-                )
 
         self._log_request(method, url)
 
         try:
             method_upper = method.upper()
             body_string = None
-            query_params: Any = _format_query_string(query) or None
             if method_upper in ("POST", "PUT", "PATCH") and body:
                 body_string = json.dumps(body, separators=(",", ":"))
 
-            if uses_native:
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    full_path,
-                    [(key, str(value)) for key, value in query.items()],
-                    body_string.encode() if body_string and body else None,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            else:
-                if method_upper == "GET":
-                    response = await self.session.get(url, headers=headers, params=query_params)
-                elif method_upper == "POST":
-                    response = await self.session.post(
-                        url, headers=headers, params=query_params, content=body_string
-                    )
-                elif method_upper == "PUT":
-                    response = await self.session.put(
-                        url, headers=headers, params=query_params, content=body_string
-                    )
-                elif method_upper == "DELETE":
-                    response = await self.session.delete(url, headers=headers, params=query_params)
-                elif method_upper == "PATCH":
-                    response = await self.session.patch(
-                        url, headers=headers, params=query_params, content=body_string
-                    )
-                else:
-                    raise ValueError(f"Unsupported HTTP method: {method}")
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                full_path,
+                [(key, str(value)) for key, value in query.items()],
+                body_string.encode() if body_string and body else None,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except FailedRequestError:
             raise

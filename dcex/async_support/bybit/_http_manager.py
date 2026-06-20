@@ -6,8 +6,6 @@ to the Bybit API, including authentication, request signing, and
 response handling.
 """
 
-import hashlib
-import hmac
 import json
 import logging
 from dataclasses import dataclass, field
@@ -25,59 +23,7 @@ SUBDOMAIN_TESTNET = "api-testnet"
 SUBDOMAIN_MAINNET = "api"
 DOMAIN_MAIN = "bybit"
 TLD_MAIN = "com"
-TIME_ENDPOINT = "/v5/market/time"
 _native = load_native()
-
-
-def _extract_server_time_ms(data: dict[str, Any]) -> int | None:
-    value = data.get("time")
-    if value is not None:
-        return int(value)
-
-    result = data.get("result")
-    if isinstance(result, dict):
-        time_nano = result.get("timeNano")
-        if time_nano is not None:
-            return int(time_nano) // 1_000_000
-
-        time_second = result.get("timeSecond")
-        if time_second is not None:
-            return int(time_second) * 1_000
-
-    return None
-
-
-def get_header(api_key: str, signature: str, timestamp: int, recv_window: int) -> dict[str, str]:
-    """
-    Generate authentication headers for signed requests.
-
-    Args:
-        api_key: API key
-        signature: Request signature
-        timestamp: Request timestamp
-        recv_window: Receive window
-
-    Returns:
-        Dict containing authentication headers
-    """
-    return {
-        "Content-Type": "application/json",
-        "X-BAPI-API-KEY": api_key,
-        "X-BAPI-SIGN": signature,
-        "X-BAPI-SIGN-TYPE": "2",
-        "X-BAPI-TIMESTAMP": str(timestamp),
-        "X-BAPI-RECV-WINDOW": str(recv_window),
-    }
-
-
-def get_header_no_sign() -> dict[str, str]:
-    """
-    Generate headers for unsigned requests.
-
-    Returns:
-        Dict containing basic headers
-    """
-    return {"Content-Type": "application/json"}
 
 
 @dataclass
@@ -119,9 +65,6 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     sync_server_time: bool = field(default=True)
-    timestamp_offset_ms: int = field(default=0, repr=False)
-    _time_offset_synced: bool = field(default=False, init=False, repr=False)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -137,7 +80,9 @@ class HTTPManager(BaseHTTPManager):
         subdomain = SUBDOMAIN_TESTNET if self.testnet else SUBDOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=subdomain, DOMAIN=self.domain, TLD=self.tld)
         native_client_type = getattr(_native, "BybitHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -151,7 +96,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -198,55 +143,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    async def _sync_time_offset(self) -> None:
-        if self._time_offset_synced or not self.sync_server_time:
-            self._time_offset_synced = True
-            return
-
-        self._time_offset_synced = True
-        if self.session is None:
-            return
-
-        try:
-            local_start = int(generate_timestamp())
-            response = await self.session.get(
-                self.endpoint + TIME_ENDPOINT,
-                headers=get_header_no_sign(),
-                timeout=self.timeout,
-            )
-            local_end = int(generate_timestamp())
-            data = response.json()
-            server_time_ms = _extract_server_time_ms(data)
-            if response.status_code // 100 == 2 and server_time_ms is not None:
-                self.timestamp_offset_ms = server_time_ms - ((local_start + local_end) // 2)
-        except Exception:
-            return
-
-    async def _timestamp(self, signed: bool) -> int:
-        # Bybit rejects signed requests more than 1000ms ahead of server time.
-        if signed:
-            await self._sync_time_offset()
-        return int(generate_timestamp()) + self.timestamp_offset_ms
-
-    def _auth(self, payload: str, timestamp: int) -> str:
-        """
-        Generate authentication signature.
-
-        Args:
-            payload: Request payload string
-            timestamp: Request timestamp
-
-        Returns:
-            HMAC-SHA256 signature
-
-        Raises:
-            ValueError: If api_secret is not set
-        """
-        if self.api_secret is None:
-            raise ValueError("api_secret is required for signing requests")
-        param_str = f"{timestamp}{self.api_key}{self.recv_window}{payload}"
-        return hmac.new(self.api_secret.encode(), param_str.encode(), hashlib.sha256).hexdigest()
-
     async def _request(
         self,
         method: Literal["GET", "POST"],
@@ -278,8 +174,8 @@ class HTTPManager(BaseHTTPManager):
             query = {}
 
         request_path = path
-        uses_native = self._uses_native_transport()
-        timestamp = int(generate_timestamp()) if uses_native else await self._timestamp(signed)
+        self._uses_native_transport()
+        timestamp = int(generate_timestamp())
 
         if method.upper() == "GET":
             if query:
@@ -296,43 +192,29 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret):
                 raise ValueError("Signed request requires API Key and Secret.")
-            if not uses_native:
-                signature = self._auth(payload, timestamp)
-                headers = get_header(self.api_key, signature, timestamp, self.recv_window)
-        else:
-            headers = get_header_no_sign()
 
         url = self.endpoint + path
         self._log_request(method, url)
-        response = None
 
         try:
-            if uses_native:
-                params = [
-                    (key, str(value)) for key, value in sorted(query.items()) if value is not None
-                ]
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    request_path,
-                    params,
-                    payload.encode() if method.upper() != "GET" else None,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            else:
-                if method.upper() == "GET":
-                    response = await self.session.get(url, headers=headers)
-                elif method.upper() == "POST":
-                    response = await self.session.post(url, headers=headers, content=payload)
-                else:
-                    raise ValueError(f"Unsupported HTTP method: {method}")
+            params = [
+                (key, str(value)) for key, value in sorted(query.items()) if value is not None
+            ]
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                request_path,
+                params,
+                payload.encode() if method.upper() != "GET" else None,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)

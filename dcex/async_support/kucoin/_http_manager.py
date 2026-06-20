@@ -1,9 +1,5 @@
-import base64
-import hashlib
-import hmac
 import json
 import logging
-import time
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
@@ -16,12 +12,6 @@ from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
 _native = load_native()
-
-
-def _sign(plain: bytes, key: bytes) -> str:
-    """KuCoin signature generation using HMAC-SHA256."""
-    hm = hmac.new(key, plain, hashlib.sha256)
-    return base64.b64encode(hm.digest()).decode()
 
 
 @dataclass
@@ -38,21 +28,16 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    _encrypted_passphrase: str | None = field(default=None, init=False, repr=False)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self.logger or logging.getLogger(__name__)
 
-        # Encrypt passphrase if credentials are provided
-        if self.passphrase and self.api_secret:
-            self._encrypted_passphrase = _sign(
-                self.passphrase.encode("utf-8"), self.api_secret.encode("utf-8")
-            )
         native_client_type = getattr(_native, "KucoinHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -72,8 +57,8 @@ class HTTPManager(BaseHTTPManager):
             self._native_client.set_product_table(self.ptm._native_table)
         return self
 
-    def _uses_native_transport(self, request_base_url: str) -> bool:
-        if not self.use_native or self._native_client is None:
+    def _uses_native_transport(self) -> bool:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -126,30 +111,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _generate_headers(self, timestamp: str, signature: str) -> dict[str, str]:
-        """Generate headers for KuCoin API requests."""
-        headers = {
-            "Content-Type": "application/json",
-        }
-
-        if self.api_key and signature and self._encrypted_passphrase:
-            headers.update(
-                {
-                    "KC-API-KEY": self.api_key,
-                    "KC-API-SIGN": signature,
-                    "KC-API-TIMESTAMP": timestamp,
-                    "KC-API-PASSPHRASE": self._encrypted_passphrase,
-                    "KC-API-KEY-VERSION": "2",
-                }
-            )
-
-        return headers
-
-    def _create_signature_payload(self, timestamp: str, method: str, path: str, body: str) -> str:
-        """Create the payload for signature generation according to KuCoin API v2."""
-        # For KuCoin API v2, the signature payload is: timestamp + method + path + body
-        return f"{timestamp}{method.upper()}{path}{body}"
-
     async def _request(
         self,
         method: Literal["GET", "POST", "PUT", "DELETE"],
@@ -165,82 +126,50 @@ class HTTPManager(BaseHTTPManager):
         # 再次檢查確保 session 不為 None
 
         # Prepare request data
-        timestamp = str(int(time.time() * 1000))
+        timestamp = str(generate_timestamp(iso_format=True))
         method_upper = method.upper()
         body = ""
         request_path = path
-        signature_path = path
 
         # Handle different HTTP methods
         if method_upper == "GET":
             if query:
                 request_path = f"{path}?{urlencode(query)}"
-                signature_path = (
-                    f"{path}?{urlencode(query)}"  # GET: include query params in signature
-                )
         elif method_upper in ["POST", "PUT"]:
             body = json.dumps(query, separators=(",", ":")) if query else ""
-            # POST/PUT/DELETE: don't include query params in signature path
-            signature_path = path
         elif method_upper == "DELETE":
             if query:
                 query_string = urlencode(query)
                 request_path = f"{path}?{query_string}"
-                signature_path = f"{path}?{query_string}"
-            else:
-                request_path = path
-                signature_path = path
+        else:
+            raise ValueError(f"Unsupported method: {method}")
 
         # Generate signature if needed
         request_base_url = base_url or self.base_url
-        uses_native = self._uses_native_transport(request_base_url)
-        signature = ""
+        self._uses_native_transport()
         if signed:
             if not (self.api_key and self.api_secret and self.passphrase):
                 raise ValueError("Signed request requires API Key, Secret, and Passphrase.")
 
-            # Create signature payload
-            if not uses_native:
-                payload = self._create_signature_payload(timestamp, method, signature_path, body)
-                if self.api_secret is None:
-                    raise ValueError("API secret is required for signing")
-                signature = _sign(payload.encode("utf-8"), self.api_secret.encode("utf-8"))
-
-        response = None
         url = f"{request_base_url}{request_path}"
         try:
-            if uses_native:
-                market = "futures" if request_base_url == self.futures_base_url else "spot"
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    market,
-                    path,
-                    [(key, str(value)) for key, value in (query or {}).items()],
-                    body.encode() if body else None,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method_upper == "GET":
-                headers = self._generate_headers(timestamp, signature)
-                response = await self.session.get(url, headers=headers)
-            elif method_upper == "POST":
-                headers = self._generate_headers(timestamp, signature)
-                response = await self.session.post(url, headers=headers, content=body)
-            elif method_upper == "PUT":
-                headers = self._generate_headers(timestamp, signature)
-                response = await self.session.put(url, headers=headers, content=body)
-            elif method_upper == "DELETE":
-                headers = self._generate_headers(timestamp, signature)
-                response = await self.session.delete(url, headers=headers)
-            else:
-                raise ValueError(f"Unsupported method: {method}")
+            market = "futures" if request_base_url == self.futures_base_url else "spot"
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                market,
+                path,
+                [(key, str(value)) for key, value in (query or {}).items()],
+                body.encode() if body else None,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)

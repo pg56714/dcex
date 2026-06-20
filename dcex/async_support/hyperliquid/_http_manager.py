@@ -21,16 +21,6 @@ DOMAIN_TESTNET = "hyperliquid-testnet"
 TLD_MAIN = "xyz"
 
 
-def get_header() -> dict[str, str]:
-    """
-    Get default HTTP headers for API requests.
-
-    Returns:
-        Dict containing Content-Type header
-    """
-    return {"Content-Type": "application/json"}
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """
@@ -52,7 +42,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -70,7 +59,9 @@ class HTTPManager(BaseHTTPManager):
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)
         native_client_type = getattr(_native, "HyperliquidHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 testnet=self.testnet,
                 wallet_address=self.wallet_address,
@@ -88,7 +79,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -176,12 +167,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _auth(self, query: dict[str, Any], timestamp: int) -> dict[str, str | int]:
-        """Reject legacy Python signing fallback."""
-        raise RuntimeError(
-            "Hyperliquid Python signing fallback has been removed; use the Rust native client."
-        )
-
     async def _request(
         self,
         method: str,
@@ -211,56 +196,32 @@ class HTTPManager(BaseHTTPManager):
         query = dict(query or {})
 
         timestamp = int(generate_timestamp())
-        uses_native = self._uses_native_transport()
+        self._uses_native_transport()
 
-        # Add signing fields before building URL/body so GET also carries signature
         if signed:
             if not (self.wallet_address and self.private_key):
                 raise ValueError("Signed request requires Address and Private Key of wallet.")
-            if not uses_native:
-                query["nonce"] = timestamp
-                query["signature"] = self._auth(query, timestamp)
-
-        if method.upper() == "GET" and not uses_native:
-            if query:
-                from urllib.parse import urlencode
-
-                # URL-encode and sort by key for stability
-                sorted_items = sorted((k, v) for k, v in query.items() if v is not None)
-                encoded = urlencode(sorted_items, doseq=True, safe="")
-                path += ("?" + encoded) if encoded else ""
-
-        headers = get_header()
 
         url = self.endpoint + path
         self._log_request(method, url)
 
         try:
-            if uses_native:
-                action_msgpack = None
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    path,
-                    json.dumps(query, separators=(",", ":")).encode(),
-                    action_msgpack,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method.upper() == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method.upper() == "POST":
-                response = await self.session.post(
-                    url, headers=headers, json=query if query else {}
-                )
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+            action_msgpack = None
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                path,
+                json.dumps(query, separators=(",", ":")).encode(),
+                action_msgpack,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)

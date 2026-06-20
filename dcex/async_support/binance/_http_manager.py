@@ -1,12 +1,8 @@
-import hashlib
-import hmac
 import json
 import logging
-import time
 from dataclasses import dataclass, field
 from importlib import import_module
 from typing import Any, Self, cast
-from urllib.parse import urlencode
 
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
@@ -34,7 +30,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     api_map = {
@@ -55,7 +50,9 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINANCE)
-        if self.use_native and _native is not None and self._native_client is None:
+        if _native is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = _native.BinanceHttpClient(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -82,15 +79,6 @@ class HTTPManager(BaseHTTPManager):
                 return base_url
         raise ValueError(f"Unknown API path: {path} (type={type(path)})")
 
-    def _sign(self, params: dict) -> str:
-        if self.api_secret is None:
-            raise ValueError("API secret is required for signing")
-        query_string = urlencode(params)
-        return hmac.new(self.api_secret.encode(), query_string.encode(), hashlib.sha256).hexdigest()
-
-    def _headers(self) -> dict[str, str]:
-        return {"X-MBX-APIKEY": self.api_key} if self.api_key else {}
-
     @staticmethod
     def _native_market(
         path: (
@@ -108,7 +96,7 @@ class HTTPManager(BaseHTTPManager):
         return "spot"
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -139,54 +127,19 @@ class HTTPManager(BaseHTTPManager):
         base_url = self._get_base_url(path)
         url = f"{base_url}{path}"
         self._log_request(method, url)
-        uses_native = self._uses_native_transport()
-        native_client = self._native_client
-        response = None
+        self._uses_native_transport()
+        native_client = cast(Any, self._native_client)
         try:
-            if uses_native:
-                status_code, response_headers, body = await cast(
-                    Any,
-                    native_client,
-                ).request_raw_async(
-                    method,
-                    self._native_market(path),
-                    str(path),
-                    [(str(key), str(value)) for key, value in query.items()],
-                    signed,
-                )
-                response_headers = dict(response_headers)
-                response_text = bytes(body).decode(errors="replace")
-                self.last_response_headers = response_headers
-            else:
-                if signed:
-                    query["timestamp"] = int(time.time() * 1000)
-                    query["recvWindow"] = 5000
-                    query["signature"] = self._sign(query)
-
-                if method.upper() == "GET":
-                    url += f"?{urlencode(query)}" if query else ""
-                    response = await self.session.get(url, headers=self._headers())
-                elif method.upper() == "POST":
-                    response = await self.session.post(
-                        url,
-                        headers=self._headers(),
-                        data=query,
-                    )
-                elif method.upper() == "PUT":
-                    response = await self.session.put(
-                        url,
-                        headers=self._headers(),
-                        data=query,
-                    )
-                elif method.upper() == "DELETE":
-                    url += f"?{urlencode(query)}" if query else ""
-                    response = await self.session.delete(url, headers=self._headers())
-                else:
-                    raise ValueError(f"Unsupported method: {method}")
-
-                response_headers = self._store_response_headers(response)
-                status_code = response.status_code
-                response_text = response.text
+            status_code, response_headers, body = await native_client.request_raw_async(
+                method,
+                self._native_market(path),
+                str(path),
+                [(str(key), str(value)) for key, value in query.items()],
+                signed,
+            )
+            response_headers = dict(response_headers)
+            response_text = bytes(body).decode(errors="replace")
+            self.last_response_headers = response_headers
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
@@ -198,10 +151,7 @@ class HTTPManager(BaseHTTPManager):
             ) from exc
 
         try:
-            if uses_native:
-                data = json.loads(body)
-            else:
-                data = cast(Any, response).json()
+            data = json.loads(body)
         except Exception as exc:
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",

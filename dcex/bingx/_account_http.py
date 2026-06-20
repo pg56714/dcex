@@ -3,7 +3,6 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
-from .endpoints.account import SwapAccount
 
 
 class AccountHTTP(HTTPManager):
@@ -154,15 +153,8 @@ class AccountHTTP(HTTPManager):
     def get_listen_key(self) -> str:
         if not self.api_key:
             raise ValueError("API key is required")
-        if self._uses_native_transport():
-            return self._native_private("get_listen_key", [])["listenKey"]
-        res = self._request(
-            method="POST",
-            path=SwapAccount.LISTEN_KEY,
-            signed=False,
-            request_headers={"X-BX-APIKEY": self.api_key},
-        )
-        return res["listenKey"]
+        self._uses_native_transport()
+        return self._native_private("get_listen_key", [])["listenKey"]
 
     def keep_alive_listen_key(self, listen_key: str) -> dict[str, Any]:
         return self._native_private(

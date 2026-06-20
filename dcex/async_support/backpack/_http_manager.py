@@ -2,7 +2,6 @@
 
 import json
 import logging
-import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
@@ -64,37 +63,6 @@ def _native_signature_payload(
     return [_native_items(item) for item in payload]
 
 
-def _signature_chunks(instruction: str, payload: RequestPayload | None) -> list[str]:
-    if payload is None:
-        return [f"instruction={instruction}"]
-    if isinstance(payload, Mapping):
-        query_string = _encoded_query(_filtered_query(payload), sort=True)
-        chunk = f"instruction={instruction}"
-        if query_string:
-            chunk = f"{chunk}&{query_string}"
-        return [chunk]
-    return [
-        f"instruction={instruction}&{_encoded_query(_filtered_query(item), sort=True)}"
-        for item in payload
-    ]
-
-
-def _signature_payload(
-    instruction: str,
-    payload: RequestPayload | None,
-    timestamp: str,
-    window: str,
-) -> str:
-    chunks = _signature_chunks(instruction, payload)
-    return f"{'&'.join(chunks)}&timestamp={timestamp}&window={window}"
-
-
-def _sign(message: str, api_secret: str) -> str:
-    raise RuntimeError(
-        "Backpack Python signing fallback has been removed; use Rust native signing."
-    )
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for Backpack REST APIs."""
@@ -110,14 +78,15 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
         """Initialize async HTTP manager."""
         self._logger = self._setup_logger(self.logger)
         native_client_type = getattr(_native, "BackpackHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -135,7 +104,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -222,35 +191,6 @@ class HTTPManager(BaseHTTPManager):
                 params.append((key, _format_value(value)))
         return params
 
-    def _headers(
-        self,
-        signed: bool,
-        instruction: str | None,
-        payload: RequestPayload | None,
-        extra_headers: Mapping[str, str] | None = None,
-    ) -> dict[str, str]:
-        headers = {"Accept": "application/json", "Content-Type": "application/json"}
-        headers.update({key: value for key, value in (extra_headers or {}).items() if value})
-        if not signed:
-            return headers
-        if not self.api_key or not self.api_secret:
-            raise ValueError("Signed Backpack requests require api_key and api_secret.")
-        if not instruction:
-            raise ValueError("Signed Backpack requests require an instruction.")
-
-        timestamp = str(int(time.time() * 1000))
-        window = str(self.window)
-        message = _signature_payload(instruction, payload, timestamp, window)
-        headers.update(
-            {
-                "X-API-Key": self.api_key,
-                "X-Signature": _sign(message, self.api_secret),
-                "X-Timestamp": timestamp,
-                "X-Window": window,
-            }
-        )
-        return headers
-
     async def _request(
         self,
         method: Literal["GET", "POST", "PATCH", "DELETE"],
@@ -278,54 +218,33 @@ class HTTPManager(BaseHTTPManager):
             url = f"{url}?{query_string}"
         body = _json_body(body_payload) if body_payload is not None else None
         signed_payload = body_payload if body_payload is not None else query_payload
-        request_headers = (
-            {"Accept": "application/json", "Content-Type": "application/json"}
-            if self._uses_native_transport()
-            else self._headers(signed, instruction, signed_payload, headers)
-        )
-        if self._uses_native_transport() and signed:
+        self._uses_native_transport()
+        if signed:
             if not self.api_key or not self.api_secret:
                 raise ValueError("Signed Backpack requests require api_key and api_secret.")
             if not instruction:
                 raise ValueError("Signed Backpack requests require an instruction.")
 
-        response = None
         try:
             self._log_request(method, url)
-            if self._uses_native_transport():
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    request_path,
-                    _native_items(query_payload) if query_payload is not None else [],
-                    body.encode() if body is not None else None,
-                    signed,
-                    instruction,
-                    _native_signature_payload(signed_payload),
-                    {key: value for key, value in (headers or {}).items() if value},
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method_upper == "GET":
-                response = await self.session.get(url, headers=request_headers)
-            elif method_upper == "POST":
-                response = await self.session.post(url, headers=request_headers, content=body)
-            elif method_upper == "PATCH":
-                response = await self.session.patch(url, headers=request_headers, content=body)
-            elif method_upper == "DELETE":
-                response = await self.session.request(
-                    method_upper,
-                    url,
-                    headers=request_headers,
-                    content=body,
-                )
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                request_path,
+                _native_items(query_payload) if query_payload is not None else [],
+                body.encode() if body is not None else None,
+                signed,
+                instruction,
+                _native_signature_payload(signed_payload),
+                {key: value for key, value in (headers or {}).items() if value},
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(

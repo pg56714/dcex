@@ -17,7 +17,6 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
 CSV_FIELDS = [
     "target",
@@ -141,13 +140,12 @@ def _run_json_command(
     env: dict[str, str] | None,
     context: str,
 ) -> dict[str, Any]:
-    completed = subprocess.run(
+    completed = subprocess.run(  # noqa: S603
         command,
         cwd=cwd,
         env=env,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         check=False,
     )
     if completed.returncode != 0:
@@ -166,10 +164,9 @@ def _run_json_command(
 
 
 def _extract_git_ref(ref: str, destination: Path) -> None:
-    completed = subprocess.run(
-        ["git", "-C", str(ROOT), "archive", "--format=tar", ref],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+    completed = subprocess.run(  # noqa: S603
+        ["git", "-C", str(ROOT), "archive", "--format=tar", ref],  # noqa: S607
+        capture_output=True,
         check=False,
     )
     if completed.returncode != 0:
@@ -214,12 +211,13 @@ def _benchmark_pyo3_python(args: argparse.Namespace) -> dict[str, str | int | fl
         import dcex
         from dcex import _native as _unused_native  # noqa: F401
     except ImportError as exc:  # pragma: no cover - example guard
-        raise SystemExit("Build the native extension first: uv run maturin develop --release") from exc
+        raise SystemExit(
+            "Build the native extension first: uv run maturin develop --release"
+        ) from exc
 
     client = dcex.binance(
         preload_product_table=False,
         timeout=args.timeout,
-        use_native=True,
     )
     try:
         return _measure(

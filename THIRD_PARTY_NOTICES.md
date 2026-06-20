@@ -2,8 +2,8 @@
 
 ## Lighter cryptography
 
-`dcex/lighter/_crypto.py` and `crates/dcex/src/lighter.rs` contain modified
-ports of cryptographic algorithms and constants from:
+`crates/dcex/src/lighter.rs` contains modified ports of cryptographic
+algorithms and constants from:
 
 - [elliottech/lighter-go](https://github.com/elliottech/lighter-go)
 - [elliottech/poseidon_crypto](https://github.com/elliottech/poseidon_crypto)

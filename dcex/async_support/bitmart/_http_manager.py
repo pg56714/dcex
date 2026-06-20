@@ -1,5 +1,3 @@
-import hashlib
-import hmac
 import json
 import logging
 from dataclasses import dataclass, field
@@ -18,25 +16,6 @@ from .endpoints.trade import FuturesTrade, SpotTrade
 _native = load_native()
 
 
-def sign_message(timestamp: int, memo: str, body: str, secret_key: str) -> str:
-    message = f"{timestamp}#{memo}#{body}"
-    return hmac.new(secret_key.encode(), message.encode(), hashlib.sha256).hexdigest()
-
-
-def get_header(api_key: str, sign: str, timestamp: int, memo: str) -> dict[str, str]:
-    return {
-        "Content-Type": "application/json",
-        "X-BM-KEY": api_key,
-        "X-BM-SIGN": sign,
-        "X-BM-TIMESTAMP": str(timestamp),
-        "X-BM-MEMO": memo,
-    }
-
-
-def get_header_no_sign() -> dict[str, str]:
-    return {"Content-Type": "application/json"}
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for BitMart API requests with authentication and error handling."""
@@ -51,7 +30,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     api_map = {
@@ -78,7 +56,9 @@ class HTTPManager(BaseHTTPManager):
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMART)
         native_client_type = getattr(_native, "BitmartHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -110,7 +90,7 @@ class HTTPManager(BaseHTTPManager):
         return "spot"
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -240,54 +220,34 @@ class HTTPManager(BaseHTTPManager):
         if signed and not (self.api_key and self.api_secret and self.memo):
             raise ValueError("Signed request requires API Key and Secret and Memo.")
 
-        if signed:
-            memo = cast(str, self.memo)
-            sign = sign_message(int(timestamp), memo, body, cast(str, self.api_secret))
-            headers = get_header(cast(str, self.api_key), sign, int(timestamp), memo)
-        else:
-            headers = get_header_no_sign()
-
         self._log_request(method, url)
 
-        response = None
         try:
-            if self._uses_native_transport():
-                params = [
-                    (
-                        key,
-                        str(value).lower() if isinstance(value, bool) else str(value),
-                    )
-                    for key, value in sorted(query.items())
-                    if value is not None
-                ]
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    self._native_market(path),
-                    str(path),
-                    params,
-                    body.encode() if method.upper() == "POST" else None,
-                    signed,
+            self._uses_native_transport()
+            params = [
+                (
+                    key,
+                    str(value).lower() if isinstance(value, bool) else str(value),
                 )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            else:
-                if method.upper() == "GET":
-                    response = await self.session.get(url, headers=headers)
-                elif method.upper() == "POST":
-                    # Use data instead of json to ensure exact body matches signature
-                    response = await self.session.post(
-                        url,
-                        content=body,
-                        headers=headers,
-                    )
-                else:
-                    raise ValueError(f"Unsupported HTTP method: {method}")
+                for key, value in sorted(query.items())
+                if value is not None
+            ]
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                self._native_market(path),
+                str(path),
+                params,
+                body.encode() if method.upper() == "POST" else None,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)

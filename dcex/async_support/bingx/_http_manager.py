@@ -1,38 +1,18 @@
 """BingX HTTP manager for API requests."""
 
-import hashlib
-import hmac
 import json
 import logging
-import time
 from dataclasses import dataclass, field
 from typing import Any, Self, cast
-from urllib.parse import urlencode
 
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
+from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
 _native = load_native()
-
-
-def get_header(api_key: str) -> dict[str, str]:
-    return {
-        "X-BX-APIKEY": api_key,
-    }
-
-
-def get_header_no_sign() -> dict[str, str]:
-    return {"Content-Type": "application/json"}
-
-
-def get_sign(api_secret: str, payload: str) -> str:
-    signature = hmac.new(
-        api_secret.encode("utf-8"), payload.encode("utf-8"), digestmod=hashlib.sha256
-    ).hexdigest()
-    return signature
 
 
 def _format_param_value(value: object) -> str:
@@ -51,27 +31,6 @@ def _prepare_query(params_map: dict[str, Any]) -> dict[str, str]:
     }
 
 
-def _build_param_string(params_map: dict[str, str], *, encode: bool) -> str:
-    if encode:
-        return urlencode(params_map)
-    return "&".join(f"{key}={value}" for key, value in params_map.items())
-
-
-def signed_param_strings(params_map: dict[str, Any]) -> tuple[str, str]:
-    params = _prepare_query(params_map)
-    params["timestamp"] = str(int(time.time() * 1000))
-    return (
-        _build_param_string(params, encode=False),
-        _build_param_string(params, encode=True),
-    )
-
-
-def parse_param(params_map: dict[str, Any]) -> str:
-    params = _prepare_query(params_map)
-    params["timestamp"] = str(int(time.time() * 1000))
-    return _build_param_string(params, encode=False)
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for BingX API requests with authentication and error handling."""
@@ -86,7 +45,6 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     base_url: str = field(default="https://open-api.bingx.com")
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -99,8 +57,11 @@ class HTTPManager(BaseHTTPManager):
         self._logger = self.logger or logging.getLogger(__name__)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINGX)
-        if self.use_native and _native is not None and self._native_client is None:
-            self._native_client = _native.BingxHttpClient(
+        native_client_type = getattr(_native, "BingxHttpClient", None)
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
+            self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
                 timeout=self.timeout,
@@ -115,7 +76,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -141,7 +102,7 @@ class HTTPManager(BaseHTTPManager):
                 request=f"BingX {method_name} | Params: {params}",
                 message=str(exc),
                 status_code="Unknown",
-                time=str(int(time.time() * 1000)),
+                time=str(generate_timestamp(iso_format=True)),
             ) from exc
         response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
@@ -195,66 +156,25 @@ class HTTPManager(BaseHTTPManager):
         if signed and not (self.api_key and self.api_secret):
             raise ValueError("Signed request requires API Key and Secret.")
 
-        uses_native = self._uses_native_transport()
+        self._uses_native_transport()
         url = self.base_url + path
         try:
-            if uses_native:
-                json_body = None
-                if not signed and method.upper() in {"POST", "PUT"}:
-                    json_body = json.dumps(
-                        query or {},
-                        separators=(",", ":"),
-                        ensure_ascii=False,
-                    ).encode()
-                status, response_headers, body = await cast(
-                    Any, self._native_client
-                ).request_raw_async(
-                    method,
-                    path,
-                    list(_prepare_query(query or {}).items()),
-                    signed,
-                    None if signed else request_headers or get_header_no_sign(),
-                    json_body,
-                )
-                response = NativeResponse(status, dict(response_headers), bytes(body))
-            else:
-                if signed:
-                    sign_payload, urlpa = signed_param_strings(query or {})
-                    url = (
-                        f"{url}?{urlpa}&signature="
-                        f"{get_sign(cast(str, self.api_secret), sign_payload)}"
-                    )
-                    headers = get_header(cast(str, self.api_key))
-                else:
-                    headers = request_headers or get_header_no_sign()
-                    if query:
-                        sorted_query = urlencode(_prepare_query(query))
-                        url += "?" + sorted_query if sorted_query else ""
-
-                if method.upper() == "GET":
-                    response = await self.session.get(url, headers=headers)
-                elif method.upper() == "POST":
-                    if signed:
-                        response = await self.session.post(url, headers=headers)
-                    else:
-                        response = await self.session.post(
-                            url,
-                            headers=headers,
-                            json=query if query else {},
-                        )
-                elif method.upper() == "PUT":
-                    if signed:
-                        response = await self.session.put(url, headers=headers)
-                    else:
-                        response = await self.session.put(
-                            url,
-                            headers=headers,
-                            json=query if query else {},
-                        )
-                elif method.upper() == "DELETE":
-                    response = await self.session.delete(url, headers=headers)
-                else:
-                    raise ValueError(f"Unsupported HTTP method: {method}")
+            json_body = None
+            if not signed and method.upper() in {"POST", "PUT"}:
+                json_body = json.dumps(
+                    query or {},
+                    separators=(",", ":"),
+                    ensure_ascii=False,
+                ).encode()
+            status, response_headers, body = await cast(Any, self._native_client).request_raw_async(
+                method,
+                path,
+                list(_prepare_query(query or {}).items()),
+                signed,
+                None if signed else request_headers,
+                json_body,
+            )
+            response = NativeResponse(status, dict(response_headers), bytes(body))
 
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
@@ -262,7 +182,7 @@ class HTTPManager(BaseHTTPManager):
                 request=f"{method.upper()} {url} | Body: {query}",
                 message=f"Request failed: {str(exc)}",
                 status_code=status_code,
-                time=str(int(time.time() * 1000)),
+                time=str(generate_timestamp(iso_format=True)),
                 resp_headers=resp_headers,
             ) from exc
         else:
@@ -274,7 +194,7 @@ class HTTPManager(BaseHTTPManager):
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"Failed to decode JSON response: {exc}",
                     status_code=response.status_code,
-                    time=str(int(time.time() * 1000)),
+                    time=str(generate_timestamp(iso_format=True)),
                     resp_headers=dict(response.headers),
                 ) from exc
 
@@ -285,7 +205,7 @@ class HTTPManager(BaseHTTPManager):
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"BingX API Error: [{code}] {error_message}",
                     status_code=response.status_code,
-                    time=str(int(time.time() * 1000)),
+                    time=str(generate_timestamp(iso_format=True)),
                     resp_headers=dict(response.headers),
                 )
 
@@ -294,7 +214,7 @@ class HTTPManager(BaseHTTPManager):
                     request=f"{method.upper()} {url} | Body: {query}",
                     message=f"HTTP Error {response.status_code}: {response.text}",
                     status_code=response.status_code,
-                    time=str(int(time.time() * 1000)),
+                    time=str(generate_timestamp(iso_format=True)),
                     resp_headers=dict(response.headers),
                 )
 

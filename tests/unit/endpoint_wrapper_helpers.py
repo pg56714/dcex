@@ -141,6 +141,32 @@ class FakeSyncNativePublicClient:
         self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
 
+    def create_auth_token(
+        self,
+        deadline: int | None = None,
+        api_key_index: int | None = None,
+    ) -> str:
+        self.calls.append(
+            {
+                "method": "NATIVE_AUTH_TOKEN",
+                "deadline": deadline,
+                "api_key_index": api_key_index,
+            }
+        )
+        return "test-auth-token"
+
+    def check_client(self) -> None:
+        self.calls.append({"method": "NATIVE_CHECK_CLIENT"})
+        return None
+
+    def sign_request(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, str, str, None]:
+        self.calls.append({"method": "NATIVE_SIGN", "path": method_name, "query": params})
+        return 1, "{}", "test-tx-hash", None
+
 
 class FakeAsyncNativePublicClient:
     def __init__(self, calls: list[dict[str, Any]]) -> None:
@@ -168,6 +194,32 @@ class FakeAsyncNativePublicClient:
         self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
 
+    def create_auth_token(
+        self,
+        deadline: int | None = None,
+        api_key_index: int | None = None,
+    ) -> str:
+        self.calls.append(
+            {
+                "method": "NATIVE_AUTH_TOKEN",
+                "deadline": deadline,
+                "api_key_index": api_key_index,
+            }
+        )
+        return "test-auth-token"
+
+    async def check_client_async(self) -> None:
+        self.calls.append({"method": "NATIVE_CHECK_CLIENT"})
+        return None
+
+    async def sign_request_async(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, str, str, None]:
+        self.calls.append({"method": "NATIVE_SIGN", "path": method_name, "query": params})
+        return 1, "{}", "test-tx-hash", None
+
 
 class FakeSyncHyperliquidMarket:
     def __init__(self, *args: object, **kwargs: object) -> None:
@@ -192,37 +244,6 @@ class FakeAsyncHyperliquidMarket:
 
     async def close(self) -> None:
         return None
-
-
-class FakeLighterSigner:
-    """Signer stand-in for Lighter endpoint wrapper tests."""
-
-    def create_auth_token_with_expiry(self, **kwargs: object) -> tuple[str, None]:
-        return "test-auth-token", None
-
-    def check_client(self) -> None:
-        return None
-
-    def check_client_data(self, data: object) -> None:
-        return None
-
-    def sign_create_order(self, **kwargs: object) -> tuple[int, str, str, None]:
-        return 1, "{}", "test-tx-hash", None
-
-    def sign_cancel_order(self, **kwargs: object) -> tuple[int, str, str, None]:
-        return 2, "{}", "test-tx-hash", None
-
-    def sign_modify_order(self, **kwargs: object) -> tuple[int, str, str, None]:
-        return 3, "{}", "test-tx-hash", None
-
-    def sign_cancel_all_orders(self, **kwargs: object) -> tuple[int, str, str, None]:
-        return 4, "{}", "test-tx-hash", None
-
-    def sign_update_leverage(self, **kwargs: object) -> tuple[int, str, str, None]:
-        return 5, "{}", "test-tx-hash", None
-
-    def sign_update_margin(self, **kwargs: object) -> tuple[int, str, str, None]:
-        return 6, "{}", "test-tx-hash", None
 
 
 def _endpoint_method_names(mode: str, exchange: str) -> list[str]:
@@ -842,9 +863,9 @@ def _patch_hyperliquid_market(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(async_trade, "MarketHTTP", FakeAsyncHyperliquidMarket)
 
 
-def _patch_lighter_signer(client: Any) -> None:
-    if client.__class__.__module__.endswith(".lighter.client"):
-        client._signer = FakeLighterSigner()
+def _patch_lighter_native_client(client: Any) -> None:
+    if client.__class__.__module__.endswith(".lighter.client") and client._native_client is None:
+        client._native_client = FakeSyncNativePublicClient([])
 
 
 __all__ = [name for name in globals() if not name.startswith("__")]

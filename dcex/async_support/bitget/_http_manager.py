@@ -1,11 +1,7 @@
 """Bitget asynchronous HTTP manager."""
 
-import base64
-import hashlib
-import hmac
 import json
 import logging
-import time
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import parse_qsl, urlencode
@@ -45,20 +41,6 @@ def _json_body(query: dict[str, Any] | list) -> str:
     return json.dumps(query, separators=(",", ":"), ensure_ascii=False) if query else ""
 
 
-def _sign(
-    timestamp: str,
-    method: str,
-    path: str,
-    query_string: str,
-    body: str,
-    api_secret: str,
-) -> str:
-    request_path = f"{path}?{query_string}" if query_string else path
-    payload = f"{timestamp}{method.upper()}{request_path}{body}"
-    digest = hmac.new(api_secret.encode(), payload.encode(), hashlib.sha256).digest()
-    return base64.b64encode(digest).decode()
-
-
 @dataclass
 class HTTPManager(BaseHTTPManager):
     """HTTP manager for Bitget REST APIs."""
@@ -74,7 +56,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -83,7 +64,9 @@ class HTTPManager(BaseHTTPManager):
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITGET)
         native_client_type = getattr(_native, "BitgetHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -96,7 +79,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -143,37 +126,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _headers(
-        self,
-        method: str,
-        path: str,
-        query_string: str,
-        body: str,
-        signed: bool,
-    ) -> dict[str, str]:
-        headers = {"Content-Type": "application/json", "locale": "en-US"}
-        if not signed:
-            return headers
-        if not (self.api_key and self.api_secret and self.passphrase):
-            raise ValueError("Signed Bitget requests require api_key, api_secret, and passphrase.")
-        timestamp = str(int(time.time() * 1000))
-        headers.update(
-            {
-                "ACCESS-KEY": self.api_key,
-                "ACCESS-SIGN": _sign(
-                    timestamp,
-                    method,
-                    path,
-                    query_string,
-                    body,
-                    self.api_secret,
-                ),
-                "ACCESS-TIMESTAMP": timestamp,
-                "ACCESS-PASSPHRASE": self.passphrase,
-            }
-        )
-        return headers
-
     async def _request(
         self,
         method: Literal["GET", "POST", "PUT", "DELETE"],
@@ -197,43 +149,29 @@ class HTTPManager(BaseHTTPManager):
         if query_string:
             url = f"{url}?{query_string}"
 
-        response = None
         try:
             self._log_request(method, url)
-            if self._uses_native_transport():
-                if signed and not (self.api_key and self.api_secret and self.passphrase):
-                    raise ValueError(
-                        "Signed Bitget requests require api_key, api_secret, and passphrase."
-                    )
-                params = parse_qsl(query_string, keep_blank_values=True) if query_string else []
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    request_path,
-                    params,
-                    body.encode() if body else None,
-                    signed,
+            self._uses_native_transport()
+            if signed and not (self.api_key and self.api_secret and self.passphrase):
+                raise ValueError(
+                    "Signed Bitget requests require api_key, api_secret, and passphrase."
                 )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            else:
-                headers = self._headers(method, request_path, query_string, body, signed)
-                method_upper = method.upper()
-                if method_upper == "GET":
-                    response = await self.session.get(url, headers=headers)
-                elif method_upper == "POST":
-                    response = await self.session.post(url, headers=headers, content=body)
-                elif method_upper == "PUT":
-                    response = await self.session.put(url, headers=headers, content=body)
-                elif method_upper == "DELETE":
-                    response = await self.session.delete(url, headers=headers)
-                else:
-                    raise ValueError(f"Unsupported HTTP method: {method}")
+            params = parse_qsl(query_string, keep_blank_values=True) if query_string else []
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                request_path,
+                params,
+                body.encode() if body else None,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(

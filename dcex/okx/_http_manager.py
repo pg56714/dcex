@@ -1,5 +1,3 @@
-import base64
-import hmac
 import json
 import logging
 from dataclasses import dataclass, field
@@ -13,69 +11,6 @@ from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
 
 _native = load_native()
-
-
-def _sign(message: str, secretKey: str) -> str:
-    """
-    Generate HMAC-SHA256 signature for OKX API authentication.
-
-    Args:
-        message: The message to sign (pre-hash string)
-        secretKey: The API secret key
-
-    Returns:
-        Base64 encoded HMAC-SHA256 signature
-    """
-    mac = hmac.new(
-        bytes(secretKey, encoding="utf8"),
-        bytes(message, encoding="utf-8"),
-        digestmod="sha256",
-    )
-    d = mac.digest()
-    return base64.b64encode(d).decode()
-
-
-def pre_hash(timestamp: str | int, method: str, path: str, body: str) -> str:
-    """
-    Create pre-hash string for OKX API signature generation.
-
-    Args:
-        timestamp: Request timestamp
-        method: HTTP method (GET, POST, etc.)
-        path: API endpoint path
-        body: Request body (empty string for GET requests)
-
-    Returns:
-        Concatenated string for signature generation
-    """
-    return str(timestamp) + str.upper(method) + path + body
-
-
-def get_header(
-    api_key: str, sign: str, timestamp: str | int, passphrase: str, flag: str
-) -> dict[str, str]:
-    """
-    Generate HTTP headers for signed OKX API requests.
-
-    Args:
-        api_key: OKX API key
-        sign: Generated signature
-        timestamp: Request timestamp
-        passphrase: OKX API passphrase
-        flag: Simulated trading flag ("0" for live, "1" for simulated)
-
-    Returns:
-        Dictionary containing HTTP headers for authentication
-    """
-    header = {
-        "Content-Type": "application/json",
-        "OK-ACCESS-KEY": api_key,
-        "OK-ACCESS-SIGN": sign,
-        "OK-ACCESS-TIMESTAMP": str(timestamp),
-        "OK-ACCESS-PASSPHRASE": passphrase,
-        "x-simulated-trading": flag,
-    }
-    return header
 
 
 def parse_params_to_str(query: dict[str, Any]) -> str:
@@ -93,23 +28,6 @@ def parse_params_to_str(query: dict[str, Any]) -> str:
     if not parts:
         return ""
     return "?" + "&".join(parts)
-
-
-def get_header_no_sign(flag: str) -> dict[str, str]:
-    """
-    Generate HTTP headers for unsigned OKX API requests.
-
-    Args:
-        flag: Simulated trading flag ("0" for live, "1" for simulated)
-
-    Returns:
-        Dictionary containing basic HTTP headers
-    """
-    header = {
-        "Content-Type": "application/json",
-        "x-simulated-trading": flag,
-    }
-    return header
 
 
 def _okx_error_details(data: dict[str, Any]) -> tuple[str, str]:
@@ -155,7 +73,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -166,15 +83,16 @@ class HTTPManager(BaseHTTPManager):
         """
         self._logger = self._setup_logger(self.logger)
         native_client_type = getattr(_native, "OkxHttpClient", None)
-        if self.use_native and native_client_type is not None:
-            self._native_client = native_client_type(
-                api_key=self.api_key,
-                api_secret=self.api_secret,
-                passphrase=self.passphrase,
-                flag=self.flag,
-                timeout=self.timeout,
-                base_url=self.base_api,
-            )
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        self._native_client = native_client_type(
+            api_key=self.api_key,
+            api_secret=self.api_secret,
+            passphrase=self.passphrase,
+            flag=self.flag,
+            timeout=self.timeout,
+            base_url=self.base_api,
+        )
 
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.OKX)
@@ -182,7 +100,7 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -253,6 +171,9 @@ class HTTPManager(BaseHTTPManager):
             query = {}
 
         method_upper = method.upper()
+        if method_upper not in {"GET", "POST"}:
+            raise ValueError(f"Unsupported HTTP method: {method}")
+        self._uses_native_transport()
         request_path = path
         if method_upper == "GET":
             if isinstance(query, dict):
@@ -270,59 +191,31 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret and self.passphrase):
                 raise ValueError("Signed request requires API Key and Secret and Passphrase.")
-            if not self._uses_native_transport():
-                sign = _sign(
-                    pre_hash(timestamp, method_upper, request_path, body_str),
-                    self.api_secret,
-                )
-                headers = get_header(
-                    self.api_key,
-                    sign,
-                    timestamp,
-                    self.passphrase,
-                    self.flag,
-                )
-            else:
-                headers = get_header_no_sign(self.flag)
-        else:
-            headers = get_header_no_sign(self.flag)
 
         url = self.base_api + request_path
         self._log_request(method, url)
 
         try:
-            if self._uses_native_transport():
-                params = (
-                    [(key, str(value)) for key, value in query.items()]
-                    if method_upper == "GET" and isinstance(query, dict)
-                    else []
-                )
-                status, response_headers, response_body = cast(
-                    Any,
-                    self._native_client,
-                ).request_raw(
-                    method,
-                    path,
-                    params,
-                    body_str.encode() if method_upper == "POST" else None,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method_upper == "GET":
-                response = self.session.get(url, headers=headers, timeout=self.timeout)
-            elif method_upper == "POST":
-                response = self.session.post(
-                    url,
-                    data=body_str,
-                    headers=headers,
-                    timeout=self.timeout,
-                )
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+            params = (
+                [(key, str(value)) for key, value in query.items()]
+                if method_upper == "GET" and isinstance(query, dict)
+                else []
+            )
+            status, response_headers, response_body = cast(
+                Any,
+                self._native_client,
+            ).request_raw(
+                method,
+                path,
+                params,
+                body_str.encode() if method_upper == "POST" else None,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(

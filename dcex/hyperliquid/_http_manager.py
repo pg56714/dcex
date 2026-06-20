@@ -4,7 +4,7 @@ import json
 import logging
 from dataclasses import dataclass, field
 from types import TracebackType
-from typing import Any, NoReturn, cast
+from typing import Any, cast
 
 from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
@@ -20,16 +20,6 @@ SUBDOMAIN_MAIN = "api"
 DOMAIN_MAINNET = "hyperliquid"
 DOMAIN_TESTNET = "hyperliquid-testnet"
 TLD_MAIN = "xyz"
-
-
-def get_header() -> dict[str, str]:
-    """
-    Get default HTTP headers for API requests.
-
-    Returns:
-        Dict containing Content-Type header
-    """
-    return {"Content-Type": "application/json"}
 
 
 @dataclass
@@ -53,7 +43,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager | None = field(init=False, default=None)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -62,14 +51,15 @@ class HTTPManager(BaseHTTPManager):
         domain = DOMAIN_TESTNET if self.testnet else DOMAIN_MAINNET
         self.endpoint = HTTP_URL.format(SUBDOMAIN=self.subdomain, DOMAIN=domain, TLD=self.tld)
         native_client_type = getattr(_native, "HyperliquidHttpClient", None)
-        if self.use_native and native_client_type is not None:
-            self._native_client = native_client_type(
-                testnet=self.testnet,
-                wallet_address=self.wallet_address,
-                private_key=self.private_key,
-                timeout=self.timeout,
-                endpoint=self.endpoint,
-            )
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        self._native_client = native_client_type(
+            testnet=self.testnet,
+            wallet_address=self.wallet_address,
+            private_key=self.private_key,
+            timeout=self.timeout,
+            endpoint=self.endpoint,
+        )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.HYPERLIQUID)
             if self._native_client is not None and hasattr(
@@ -79,7 +69,7 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -97,12 +87,6 @@ class HTTPManager(BaseHTTPManager):
     ) -> None:
         """Exit context manager and close the underlying session."""
         self.close()
-
-    def _ensure_session(self) -> NoReturn:
-        """Ensure the HTTP session is available, creating it if needed."""
-        raise RuntimeError(
-            "The dcex native extension is required; Python HTTP fallback has been removed."
-        )
 
     def _get_ptm(self) -> ProductTableManager:
         """Lazily obtain the product table manager instance."""
@@ -178,12 +162,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _auth(self, query: dict[str, Any], timestamp: int) -> dict[str, str | int]:
-        """Reject legacy Python signing fallback."""
-        raise RuntimeError(
-            "Hyperliquid Python signing fallback has been removed; use the Rust native client."
-        )
-
     def _request(
         self,
         method: str,
@@ -210,55 +188,32 @@ class HTTPManager(BaseHTTPManager):
         query = dict(query or {})
 
         timestamp = int(generate_timestamp())
-        uses_native = self._uses_native_transport()
+        self._uses_native_transport()
 
-        # Add signing fields before building URL/body so GET also carries signature
         if signed:
             if not (self.wallet_address and self.private_key):
                 raise ValueError("Signed request requires Address and Private Key of wallet.")
-            if not uses_native:
-                query["nonce"] = timestamp
-                query["signature"] = self._auth(query, timestamp)
-
-        headers = get_header()
 
         url = self.endpoint + path
         self._log_request(method, url)
 
-        session: Any = None
-
         try:
-            if uses_native:
-                action_msgpack = None
-                status, response_headers, response_body = cast(
-                    Any,
-                    self._native_client,
-                ).request_raw(
-                    method,
-                    path,
-                    json.dumps(query, separators=(",", ":")).encode(),
-                    action_msgpack,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method.upper() == "GET":
-                if query:
-                    from urllib.parse import urlencode
-
-                    sorted_items = sorted((k, v) for k, v in query.items() if v is not None)
-                    encoded = urlencode(sorted_items, doseq=True, safe="")
-                    url = f"{url}?{encoded}" if encoded else url
-                response = session.get(url, headers=headers, timeout=self.timeout)
-            elif method.upper() == "POST":
-                response = session.post(
-                    url, headers=headers, json=query if query else {}, timeout=self.timeout
-                )
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+            action_msgpack = None
+            status, response_headers, response_body = cast(
+                Any,
+                self._native_client,
+            ).request_raw(
+                method,
+                path,
+                json.dumps(query, separators=(",", ":")).encode(),
+                action_msgpack,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)

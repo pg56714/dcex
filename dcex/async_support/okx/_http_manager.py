@@ -1,7 +1,5 @@
 """OKX HTTP manager for handling API requests."""
 
-import base64
-import hmac
 import json
 import logging
 from dataclasses import dataclass, field
@@ -15,84 +13,6 @@ from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
 _native = load_native()
-
-
-def _sign(message: str, secretKey: str) -> str:
-    """
-    Generate HMAC-SHA256 signature.
-
-    Args:
-        message: Message to sign
-        secretKey: Secret key for signing
-
-    Returns:
-        Base64 encoded signature
-    """
-    mac = hmac.new(
-        bytes(secretKey, encoding="utf8"),
-        bytes(message, encoding="utf-8"),
-        digestmod="sha256",
-    )
-    d = mac.digest()
-    return base64.b64encode(d).decode()
-
-
-def pre_hash(timestamp: str, method: str, path: str, body: str) -> str:
-    """
-    Create pre-hash string for signature.
-
-    Args:
-        timestamp: Request timestamp
-        method: HTTP method
-        path: Request path
-        body: Request body
-
-    Returns:
-        Pre-hash string
-    """
-    return str(timestamp) + str.upper(method) + path + body
-
-
-def get_header(
-    api_key: str, sign: str, timestamp: str, passphrase: str, flag: str
-) -> dict[str, str]:
-    """
-    Generate signed request headers.
-
-    Args:
-        api_key: API key
-        sign: Request signature
-        timestamp: Request timestamp
-        passphrase: API passphrase
-        flag: Simulated trading flag
-
-    Returns:
-        Dict containing request headers
-    """
-    return {
-        "Content-Type": "application/json",
-        "OK-ACCESS-KEY": api_key,
-        "OK-ACCESS-SIGN": sign,
-        "OK-ACCESS-TIMESTAMP": str(timestamp),
-        "OK-ACCESS-PASSPHRASE": passphrase,
-        "x-simulated-trading": flag,
-    }
-
-
-def get_header_no_sign(flag: str) -> dict[str, str]:
-    """
-    Generate unsigned request headers.
-
-    Args:
-        flag: Simulated trading flag
-
-    Returns:
-        Dict containing request headers
-    """
-    return {
-        "Content-Type": "application/json",
-        "x-simulated-trading": flag,
-    }
 
 
 def parse_params_to_str(query: dict[str, Any]) -> str:
@@ -137,7 +57,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -151,7 +70,9 @@ class HTTPManager(BaseHTTPManager):
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.OKX)
         native_client_type = getattr(_native, "OkxHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             self._native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -165,7 +86,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -241,6 +162,9 @@ class HTTPManager(BaseHTTPManager):
             query = {}
 
         method_upper = method.upper()
+        if method_upper not in {"GET", "POST"}:
+            raise ValueError(f"Unsupported HTTP method: {method}")
+        self._uses_native_transport()
         request_path = path
         if method_upper == "GET" and query and isinstance(query, dict):
             request_path += parse_params_to_str(query)
@@ -254,55 +178,31 @@ class HTTPManager(BaseHTTPManager):
         if signed:
             if not (self.api_key and self.api_secret and self.passphrase):
                 raise ValueError("Signed request requires API Key and Secret and Passphrase.")
-            if not self._uses_native_transport():
-                sign = _sign(
-                    pre_hash(str(timestamp), method_upper, request_path, body_str),
-                    self.api_secret,
-                )
-                headers = get_header(
-                    self.api_key,
-                    sign,
-                    str(timestamp),
-                    self.passphrase,
-                    self.flag,
-                )
-            else:
-                headers = get_header_no_sign(self.flag)
-        else:
-            headers = get_header_no_sign(self.flag)
 
         url = self.base_api + request_path
         self._log_request(method, url)
 
         try:
-            if self._uses_native_transport():
-                params = (
-                    [(key, str(value)) for key, value in query.items()]
-                    if method_upper == "GET" and isinstance(query, dict)
-                    else []
-                )
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    path,
-                    params,
-                    body_str.encode() if method_upper == "POST" else None,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method_upper == "GET":
-                response = await self.session.get(url, headers=headers)
-            elif method_upper == "POST":
-                # Send exactly the same JSON string used for signing to avoid signature mismatch
-                response = await self.session.post(url, headers=headers, content=body_str)
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+            params = (
+                [(key, str(value)) for key, value in query.items()]
+                if method_upper == "GET" and isinstance(query, dict)
+                else []
+            )
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                path,
+                params,
+                body_str.encode() if method_upper == "POST" else None,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)

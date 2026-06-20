@@ -11,7 +11,6 @@ from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
-from .signer_client import SignerClient
 
 _native = load_native()
 
@@ -44,23 +43,22 @@ class HTTPManager(BaseHTTPManager):
     logger: logging.Logger | None = field(default=None)
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager | None = field(init=False, default=None, repr=False)
-    _signer: SignerClient | None = field(default=None, init=False, repr=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
         self._logger = self._setup_logger(self.logger)
         native_client_type = getattr(_native, "LighterHttpClient", None)
-        if self.use_native and native_client_type is not None:
-            self._native_client = native_client_type(
-                timeout=self.timeout,
-                base_url=self.base_url,
-                account_index=self.account_index,
-                api_key_index=self.api_key_index,
-                api_private_key=self.api_private_key,
-            )
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        self._native_client = native_client_type(
+            timeout=self.timeout,
+            base_url=self.base_url,
+            account_index=self.account_index,
+            api_key_index=self.api_key_index,
+            api_private_key=self.api_private_key,
+        )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.LIGHTER)
             if self._native_client is not None and hasattr(
@@ -70,7 +68,7 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -134,14 +132,11 @@ class HTTPManager(BaseHTTPManager):
         method_name: str,
         params: list[tuple[str, str]],
     ) -> tuple[Any, Any, Any, Any]:
-        """Sign a Lighter transaction via Rust, falling back to the legacy signer in tests."""
+        """Sign a Lighter transaction via Rust."""
         native_client = self._native_client
         if native_client is not None and hasattr(native_client, "sign_request"):
             return cast(tuple[Any, Any, Any, Any], native_client.sign_request(method_name, params))
-        signer = self._private_signer()
-        kwargs = dict(params)
-        method = getattr(signer, method_name)
-        return cast(tuple[Any, Any, Any, Any], method(**_coerced_lighter_sign_kwargs(kwargs)))
+        raise RuntimeError("Lighter native client sign_request is unavailable.")
 
     def _request(
         self,
@@ -164,49 +159,26 @@ class HTTPManager(BaseHTTPManager):
         if query_string:
             url = f"{url}?{query_string}"
 
-        request_headers = {
-            "Content-Type": (
-                "application/x-www-form-urlencoded"
-                if content_type == "form"
-                else "application/json"
-            )
-        }
-        request_headers.update({key: value for key, value in (headers or {}).items() if value})
-        request_body = _encoded_query(_filtered_query(body)) if body else None
-
-        response = None
         try:
             self._log_request(method, url)
-            method_upper = method.upper()
-            if self._uses_native_transport():
-                status, response_headers, response_body = cast(
-                    Any,
-                    self._native_client,
-                ).request_raw(
-                    method,
-                    request_path,
-                    [(key, _format_value(value)) for key, value in filtered_query.items()],
-                    [(key, _format_value(value)) for key, value in _filtered_query(body).items()],
-                    signed,
-                    {key: value for key, value in (headers or {}).items() if value},
-                    content_type,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method_upper == "GET":
-                response = self.session.get(url, headers=request_headers, timeout=self.timeout)
-            elif method_upper == "POST":
-                response = self.session.post(
-                    url,
-                    headers=request_headers,
-                    data=request_body,
-                    timeout=self.timeout,
-                )
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+            self._uses_native_transport()
+            status, response_headers, response_body = cast(
+                Any,
+                self._native_client,
+            ).request_raw(
+                method,
+                request_path,
+                [(key, _format_value(value)) for key, value in filtered_query.items()],
+                [(key, _format_value(value)) for key, value in _filtered_query(body).items()],
+                signed,
+                {key: value for key, value in (headers or {}).items() if value},
+                content_type,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
@@ -264,20 +236,6 @@ class HTTPManager(BaseHTTPManager):
             raise ValueError("Lighter private requests require api_key_index.")
         return int(resolved)
 
-    def _private_signer(self) -> SignerClient:
-        account_index = self._private_account_index()
-        api_key_index = self._private_api_key_index()
-        api_private_key = self.api_private_key
-        if not api_private_key:
-            raise ValueError("Lighter private requests require api_private_key.")
-        if self._signer is None:
-            self._signer = SignerClient(
-                url=self.base_url,
-                account_index=account_index,
-                api_private_keys={api_key_index: api_private_key},
-            )
-        return self._signer
-
     def _auth_token(
         self,
         authorization: str | None = None,
@@ -290,28 +248,13 @@ class HTTPManager(BaseHTTPManager):
         native_client = self._native_client
         if native_client is not None and hasattr(native_client, "create_auth_token"):
             return str(native_client.create_auth_token(deadline, api_key_index))
-        signer = self._private_signer()
-        kwargs: dict[str, int] = {"api_key_index": self._private_api_key_index(api_key_index)}
-        if deadline is not None:
-            kwargs["deadline"] = deadline
-        token, error = signer.create_auth_token_with_expiry(**kwargs)
-        if error is not None:
-            raise ValueError(f"Lighter auth token creation failed: {error}")
-        if token is None:
-            raise ValueError("Lighter auth token creation returned no token.")
-        return token
+        raise RuntimeError("Lighter native client create_auth_token is unavailable.")
 
     def _native_check_client(self) -> str | None:
         native_client = self._native_client
         if native_client is not None and hasattr(native_client, "check_client"):
             return cast(str | None, native_client.check_client())
-        signer = self._private_signer()
-        response = self._request(
-            "GET",
-            "/api/v1/apikeys",
-            {"account_index": self._private_account_index()},
-        )
-        return signer.check_client_data(response)
+        raise RuntimeError("Lighter native client check_client is unavailable.")
 
     def _signed_tx(
         self,
@@ -335,51 +278,8 @@ class HTTPManager(BaseHTTPManager):
             content_type="form",
         )
 
-    def close_signer(self) -> None:
-        """Close the Lighter signer client if it was initialized."""
-        signer = self._signer
-        self._signer = None
-        if signer is not None:
-            signer.close()
-
     def close(self) -> None:
         """Close the HTTP session."""
-        self.close_signer()
         if self.session is not None and hasattr(self.session, "close"):
             self.session.close()
         self.session = None
-
-
-def _coerced_lighter_sign_kwargs(values: dict[str, str]) -> dict[str, Any]:
-    int_keys = {
-        "api_key_index",
-        "base_amount",
-        "client_order_index",
-        "direction",
-        "fraction",
-        "integrator_account_index",
-        "integrator_maker_fee",
-        "integrator_taker_fee",
-        "margin_mode",
-        "market_index",
-        "nonce",
-        "order_expiry",
-        "order_index",
-        "order_type",
-        "price",
-        "skip_nonce",
-        "time_in_force",
-        "timestamp_ms",
-        "trigger_price",
-        "usdc_amount",
-    }
-    bool_keys = {"is_ask", "reduce_only"}
-    result: dict[str, Any] = {}
-    for key, value in values.items():
-        if key in int_keys:
-            result[key] = int(value)
-        elif key in bool_keys:
-            result[key] = value in {"true", "True", "1"}
-        else:
-            result[key] = value
-    return result

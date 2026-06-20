@@ -201,20 +201,17 @@ Examples are under `examples/sync` and `examples/async`. See
 
 ## Benchmarking
 
-Local CPU-bound benchmarks isolate code paths where the Rust core can avoid
-Python interpreter overhead. Benchmark scripts are kept in the repo, but
-benchmark output files are not committed.
+Local CPU-bound benchmarks compare Python PyO3 wrapper calls with Rust native
+calls for the same Rust core operation. Benchmark scripts are kept in the repo,
+but benchmark output files are not committed.
 
-Recorded local CPU-bound sample (`.\.venv\Scripts\python.exe examples\benchmark_core_local.py --iterations 20`, 2026-06-19):
+Local CPU-bound benchmark output:
 
-Speedups are measured against the pure Python fallback implementation for the
-same local CPU-bound operation.
-
-| Operation | PyO3 bridge speedup | Rust native speedup |
-| --------- | ------------------- | ------------------- |
-| Cryptographic hash | 89.06x | 85.50x |
-| Schnorr signature | 496.43x | 448.37x |
-| Transaction payload signing | 309.08x | 368.78x |
+| Operation | PyO3 wrapper median ms | Rust native median ms | Rust vs PyO3 |
+| --------- | ---------------------- | --------------------- | ------------ |
+| Cryptographic hash | measured locally | measured locally | measured locally |
+| Schnorr signature | measured locally | measured locally | measured locally |
+| Transaction payload signing | measured locally | measured locally | measured locally |
 
 Public HTTP benchmarks are live network measurements, so results depend on
 exchange latency and local network conditions.
@@ -229,7 +226,7 @@ Recorded sample (`uv run python examples/benchmark_public_http.py --iterations 2
 
 | Layer | Command | Output |
 | ----- | ------- | ------ |
-| Local CPU-bound Python vs PyO3 vs Rust native | `uv run python examples/benchmark_core_local.py --iterations 20` | Speedup table |
+| Local CPU-bound PyO3 wrapper vs Rust native | `uv run python examples/benchmark_core_local.py --iterations 20` | Timing and speedup table |
 | Rust native local CPU-bound only | `cargo run -p dcex --example core_local_benchmark --release` | Timing table |
 | main native Python vs PyO3 vs Rust native | `uv run python examples/benchmark_public_http.py --iterations 20` | Markdown table |
 | Rust native only | `cargo run -p dcex --example public_http_benchmark --release` | Markdown table |

@@ -1,12 +1,8 @@
-import hashlib
-import hmac
 import json
 import logging
-import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
-from urllib.parse import parse_qsl, urlencode
 
 from ..._native_http import NativeResponse, load_native
 from ...base.http_manager import BaseHTTPManager
@@ -16,6 +12,20 @@ from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
 
 _native = load_native()
+
+
+def _query_pairs(
+    query: Mapping[str, str | int | Sequence[str | int] | float | bool] | None,
+) -> list[tuple[str, str]]:
+    if not query:
+        return []
+    params: list[tuple[str, str]] = []
+    for key, value in query.items():
+        if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+            params.extend((key, str(item)) for item in value)
+        else:
+            params.append((key, str(value)))
+    return params
 
 
 @dataclass
@@ -49,7 +59,6 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
@@ -69,7 +78,9 @@ class HTTPManager(BaseHTTPManager):
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BITMEX)
         native_client_type = getattr(_native, "BitmexHttpClient", None)
-        if self.use_native and native_client_type is not None and self._native_client is None:
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        if self._native_client is None:
             native_client = native_client_type(
                 api_key=self.api_key,
                 api_secret=self.api_secret,
@@ -82,7 +93,7 @@ class HTTPManager(BaseHTTPManager):
         return self
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -129,61 +140,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _sign(self, method: str, path: str, expires: int, body: str = "") -> str:
-        """
-        Generate BitMEX API signature for request authentication.
-
-        Creates HMAC-SHA256 signature according to BitMEX documentation.
-
-        Args:
-            method: HTTP method (GET, POST, PUT, DELETE)
-            path: API endpoint path
-            expires: Expiration timestamp
-            body: Request body content
-
-        Returns:
-            str: Base64-encoded signature
-
-        Raises:
-            ValueError: If api_secret is not provided
-        """
-        if self.api_secret is None:
-            raise ValueError("api_secret is required for signing requests")
-        message = method + path + str(expires) + body
-        signature = hmac.new(
-            self.api_secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256
-        ).hexdigest()
-        return signature
-
-    def _headers(
-        self, method: str, path: str, body: str = "", signed: bool = True
-    ) -> dict[str, str]:
-        """
-        Generate HTTP headers for BitMEX API requests.
-
-        Creates standard headers and optionally adds authentication headers
-        with API key, signature, and expiration timestamp.
-
-        Args:
-            method: HTTP method
-            path: API endpoint path
-            body: Request body content
-            signed: Whether to include authentication headers
-
-        Returns:
-            dict[str, str]: HTTP headers dictionary
-        """
-        headers = {"Content-Type": "application/json", "Accept": "application/json"}
-
-        if self.api_key and self.api_secret and signed:
-            expires = int(time.time()) + 5  # 5 seconds from now
-            signature = self._sign(method, path, expires, body)
-            headers.update(
-                {"api-key": self.api_key, "api-signature": signature, "api-expires": str(expires)}
-            )
-
-        return headers
-
     async def _request(
         self,
         method: Literal["GET", "POST", "PUT", "DELETE"],
@@ -213,74 +169,35 @@ class HTTPManager(BaseHTTPManager):
         """
         if self._native_client is None:
             await self.async_init()
-
-        response = None
         try:
             url = f"{self.base_url}{path}"
-            body = ""
-            full_path = path
+            method_upper = method.upper()
+            if method_upper not in {"GET", "POST", "PUT", "DELETE"}:
+                raise ValueError(f"Unsupported method: {method}")
             self._log_request(method, url)
 
-            if self._uses_native_transport():
-                params = (
-                    parse_qsl(urlencode(query), keep_blank_values=True)
-                    if query and method.upper() == "GET"
-                    else []
-                )
-                body_bytes = (
-                    json.dumps(query, separators=(",", ":")).encode()
-                    if query and method.upper() != "GET"
-                    else None
-                )
-                status, response_headers, response_body = await cast(
-                    Any,
-                    self._native_client,
-                ).request_raw_async(
-                    method,
-                    path,
-                    params,
-                    body_bytes,
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            else:
-                if method.upper() == "GET":
-                    if query:
-                        query_string = urlencode(query)
-                        url += f"?{query_string}"
-                        full_path += f"?{query_string}"
-                    response = await self.session.get(
-                        url,
-                        headers=self._headers(method, full_path, signed=signed),
-                    )
-                elif method.upper() == "POST":
-                    body = json.dumps(query, separators=(",", ":")) if query else ""
-                    response = await self.session.post(
-                        url,
-                        headers=self._headers(method, full_path, body, signed=signed),
-                        content=body,
-                    )
-                elif method.upper() == "PUT":
-                    body = json.dumps(query, separators=(",", ":")) if query else ""
-                    response = await self.session.put(
-                        url,
-                        headers=self._headers(method, full_path, body, signed=signed),
-                        content=body,
-                    )
-                elif method.upper() == "DELETE":
-                    body = json.dumps(query, separators=(",", ":")) if query else ""
-                    response = await self.session.request(
-                        method="DELETE",
-                        url=url,
-                        headers=self._headers(method, full_path, body, signed=signed),
-                        content=body,
-                    )
-                else:
-                    raise ValueError(f"Unsupported method: {method}")
+            self._uses_native_transport()
+            params = _query_pairs(query) if method_upper == "GET" else []
+            body_bytes = (
+                json.dumps(query, separators=(",", ":")).encode()
+                if query and method_upper != "GET"
+                else None
+            )
+            status, response_headers, response_body = await cast(
+                Any,
+                self._native_client,
+            ).request_raw_async(
+                method,
+                path,
+                params,
+                body_bytes,
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
 
         except RuntimeError as e:
             timestamp = generate_timestamp(iso_format=True)

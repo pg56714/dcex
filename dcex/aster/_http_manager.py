@@ -2,12 +2,9 @@
 
 import json
 import logging
-import threading
-import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, cast
-from urllib.parse import urlencode
 
 from .._native_http import NativeResponse, load_native
 from ..base.http_manager import BaseHTTPManager
@@ -86,11 +83,6 @@ _NATIVE_PRIVATE_REQUESTS: dict[str, tuple[str, AsterPath]] = {
 }
 
 
-def _eip712_digest(message: str) -> bytes:
-    """Reject the removed Python Aster signing fallback."""
-    raise RuntimeError("Aster Python signing fallback has been removed; use Rust native signing.")
-
-
 def sign_message(message: str, private_key: str) -> str:
     """Sign an Aster V3 EIP-712 message using the Rust native extension."""
     if _native is None or not hasattr(_native, "aster_sign_message"):
@@ -126,24 +118,22 @@ class HTTPManager(BaseHTTPManager):
     session: Any = field(default=None, init=False, repr=False)
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
-    _nonce_lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
-    _last_nonce: int = field(default=0, init=False, repr=False)
-    use_native: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         """Initialize the Aster HTTP manager."""
         self._logger = self._setup_logger(self.logger)
         native_client_type = getattr(_native, "AsterHttpClient", None)
-        if self.use_native and native_client_type is not None:
-            self._native_client = native_client_type(
-                user_address=self.user_address,
-                signer_address=self.signer_address,
-                private_key=self.private_key,
-                timeout=self.timeout,
-                spot_base_url=self.spot_base_url,
-                futures_base_url=self.futures_base_url,
-            )
+        if native_client_type is None:
+            raise RuntimeError("The dcex native extension is required.")
+        self._native_client = native_client_type(
+            user_address=self.user_address,
+            signer_address=self.signer_address,
+            private_key=self.private_key,
+            timeout=self.timeout,
+            spot_base_url=self.spot_base_url,
+            futures_base_url=self.futures_base_url,
+        )
         if self.preload_product_table:
             self.ptm = ProductTableManager.get_instance(Common.ASTER)
             if self._native_client is not None and hasattr(
@@ -153,7 +143,7 @@ class HTTPManager(BaseHTTPManager):
                 self._native_client.set_product_table(self.ptm._native_table)
 
     def _uses_native_transport(self) -> bool:
-        if not self.use_native or self._native_client is None:
+        if self._native_client is None:
             raise RuntimeError(
                 "The dcex native extension is required; Python HTTP fallback has been removed."
             )
@@ -252,33 +242,6 @@ class HTTPManager(BaseHTTPManager):
             return self.futures_base_url
         raise ValueError(f"Unknown Aster API path: {path} (type={type(path)})")
 
-    def _next_nonce(self) -> int:
-        with self._nonce_lock:
-            nonce = int(time.time_ns() // 1_000)
-            if nonce <= self._last_nonce:
-                nonce = self._last_nonce + 1
-            self._last_nonce = nonce
-            return nonce
-
-    def _signed_query(
-        self,
-        query: Mapping[str, Any] | None,
-        *,
-        include_user: bool,
-    ) -> dict[str, str]:
-        if not self.signer_address or not self.private_key:
-            raise ValueError("Signed Aster requests require signer_address and private_key.")
-        if include_user and not self.user_address:
-            raise ValueError("Signed Aster futures requests require user_address.")
-        params = _filtered_query(query)
-        params["nonce"] = str(self._next_nonce())
-        if include_user:
-            params["user"] = str(self.user_address)
-        params["signer"] = self.signer_address
-        message = urlencode(params)
-        params["signature"] = sign_message(message, self.private_key)
-        return params
-
     def _request(
         self,
         method: str,
@@ -289,75 +252,32 @@ class HTTPManager(BaseHTTPManager):
         """Make an Aster V3 REST request."""
         method_upper = method.upper()
         include_user = isinstance(path, FuturesMarket | FuturesAccount | FuturesTrade)
-        uses_native = self._uses_native_transport()
-        if signed and uses_native:
+        self._uses_native_transport()
+        if signed:
             if not self.signer_address or not self.private_key:
                 raise ValueError("Signed Aster requests require signer_address and private_key.")
             if include_user and not self.user_address:
                 raise ValueError("Signed Aster futures requests require user_address.")
-        params = (
-            _filtered_query(query)
-            if uses_native
-            else (
-                self._signed_query(query, include_user=include_user)
-                if signed
-                else _filtered_query(query)
-            )
-        )
+        params = _filtered_query(query)
         url = f"{self._get_base_url(path)}{path}"
-        headers = {"Accept": "application/json"}
-        if method_upper != "GET":
-            headers["Content-Type"] = "application/x-www-form-urlencoded"
-        response = None
         try:
             self._log_request(method_upper, url)
-            if uses_native:
-                market = "futures" if include_user else "spot"
-                status, response_headers, response_body = cast(
-                    Any,
-                    self._native_client,
-                ).request_raw(
-                    method,
-                    market,
-                    str(path),
-                    list(params.items()),
-                    signed,
-                )
-                response = NativeResponse(
-                    status,
-                    dict(response_headers),
-                    bytes(response_body),
-                )
-            elif method_upper == "GET":
-                response = self.session.get(
-                    url,
-                    params=params,
-                    headers=headers,
-                    timeout=self.timeout,
-                )
-            elif method_upper == "POST":
-                response = self.session.post(
-                    url,
-                    data=params,
-                    headers=headers,
-                    timeout=self.timeout,
-                )
-            elif method_upper == "PUT":
-                response = self.session.put(
-                    url,
-                    data=params,
-                    headers=headers,
-                    timeout=self.timeout,
-                )
-            elif method_upper == "DELETE":
-                response = self.session.delete(
-                    url,
-                    data=params,
-                    headers=headers,
-                    timeout=self.timeout,
-                )
-            else:
-                raise ValueError(f"Unsupported HTTP method: {method}")
+            market = "futures" if include_user else "spot"
+            status, response_headers, response_body = cast(
+                Any,
+                self._native_client,
+            ).request_raw(
+                method,
+                market,
+                str(path),
+                list(params.items()),
+                signed,
+            )
+            response = NativeResponse(
+                status,
+                dict(response_headers),
+                bytes(response_body),
+            )
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
