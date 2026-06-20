@@ -11,6 +11,7 @@ A high-performance and lightweight Python and Rust library for interacting with 
 Scope note: dcex focuses on market data, account queries, and trading/order APIs. External withdrawal creation endpoints are not currently wrapped, and options support is limited to exchange-specific APIs rather than the unified Product Table Manager.
 
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
+[![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/dcex)](https://badge.fury.io/py/dcex)
 
@@ -29,6 +30,12 @@ uv add dcex
 ```
 
 Rust:
+
+```bash
+cargo add dcex
+```
+
+or add it manually:
 
 ```toml
 [dependencies]
@@ -196,8 +203,9 @@ network access, exchange credentials, or account state.
 
 ## Examples
 
-Examples are under `examples/sync` and `examples/async`. See
-[examples/README.md](examples/README.md) for the example conventions.
+Python examples are under `examples/sync` and `examples/async`. Rust examples
+are under `crates/dcex/examples`. See [examples/README.md](examples/README.md)
+for the example conventions.
 
 ## Benchmarking
 

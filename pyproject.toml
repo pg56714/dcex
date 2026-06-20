@@ -14,10 +14,11 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Rust",
   "Operating System :: OS Independent",
 ]
 dependencies = []
-description = "A Lightweight Python Package for Low-Latency and Cross-Exchange Trading."
+description = "Rust-backed Python bindings for low-latency cross-exchange crypto trading."
 license = "MIT"
 license-files = ["LICENSE", "LICENSES/Apache-2.0.txt", "THIRD_PARTY_NOTICES.md"]
 name = "dcex"

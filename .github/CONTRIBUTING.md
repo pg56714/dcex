@@ -16,14 +16,22 @@ Current scope notes:
 
 ## Development Environment
 
-1. Install `uv`: [official installation guide](https://docs.astral.sh/uv/getting-started/installation/).
-2. Create and sync the local environment:
+1. Install Rust stable and Cargo.
+2. Install `uv`: [official installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+3. Create and sync the local Python environment:
 
    ```sh
    uv sync
    ```
 
-3. Run the relevant quality checks before opening a pull request.
+4. Build the PyO3 extension when running Python code against the current Rust
+   sources:
+
+   ```sh
+   uv run maturin develop --release
+   ```
+
+5. Run the relevant quality checks before opening a pull request.
 
 ## Testing
 
@@ -136,7 +144,8 @@ Use GitHub Issues for bug reports and scoped feature requests. For broad product
 Good bug reports are:
 
 - Reproducible: include steps or a minimal code sample.
-- Specific: include the dcex version, Python version, operating system, exchange, and endpoint.
+- Specific: include the dcex Python package version or Rust crate version,
+  Python/Rust version, operating system, exchange, and endpoint.
 - Unique: check existing issues before opening a new one.
 - Scoped: keep one bug per issue.
 

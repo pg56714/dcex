@@ -1,5 +1,5 @@
 name: "Bug report"
-description: "Create a report to help us improve the dcex trading package."
+description: "Create a report to help us improve the dcex Python package or Rust crate."
 title: "bug: "
 labels: ["bug", "triage"]
 
@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to fill out this bug report! This will help us improve the dcex trading package.
+        Thank you for taking the time to fill out this bug report. This helps us improve the dcex Python package and Rust crate.
   - type: textarea
     id: describe
     attributes:
@@ -21,7 +21,7 @@ body:
       label: "Steps to Reproduce"
       description: "Please list the steps to reproduce the issue:"
       value: |
-        1. Install/Import dcex package ...
+        1. Install/import the Python package or add the Rust crate ...
         2. Set up exchange connection ...
         3. Try to execute ...
         4. See the error
@@ -31,13 +31,17 @@ body:
     id: code
     attributes:
       label: "Code Example"
-      description: "Please provide a minimal code example that reproduces the error"
+      description: "Please provide a minimal Python or Rust code example that reproduces the error"
       value: |
         ```python
-        # Your code example
+        # Python example, if applicable
         import dcex
 
         # Steps that show the error
+        ```
+
+        ```rust
+        // Rust example, if applicable
         ```
     validations:
       required: false
@@ -45,8 +49,8 @@ body:
     id: environment
     attributes:
       label: "Environment Information"
-      description: "Please provide your Python version, operating system, and dcex version"
-      placeholder: "e.g., Python 3.12, Windows 11, dcex v0.1.0"
+      description: "Please provide your Python/Rust version, operating system, and dcex package/crate version"
+      placeholder: "e.g., Python 3.12, Rust stable, Windows 11, PyPI dcex 0.22.x or crate dcex 0.1.x"
     validations:
       required: true
   - type: dropdown

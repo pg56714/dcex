@@ -1,6 +1,6 @@
 [package]
 name = "dcex"
-description = "Rust trading library for dcex exchange integrations."
+description = "Rust core library for low-latency cross-exchange crypto trading."
 authors.workspace = true
 edition.workspace = true
 license.workspace = true

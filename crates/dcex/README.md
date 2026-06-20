@@ -1,9 +1,10 @@
 # dcex
 
-Rust trading library for dcex exchange integrations.
+Rust core library for low-latency cross-exchange crypto trading.
 
-The crate contains the Rust implementation used by the Python `dcex` package
-and can also be used directly from Rust applications.
+This crate contains the exchange HTTP, signing, serialization, product-table,
+and response-validation implementation used by the Python `dcex` package. It
+can also be used directly from Rust applications without the Python layer.
 
 ## Example
 
@@ -82,3 +83,9 @@ Set `DCEX_BENCH_ITERATIONS`, `DCEX_BENCH_WARMUP`, and
 `DCEX_BENCH_INNER_LOOPS` to change the run length.
 Set `DCEX_BENCH_OUTPUT=json` when another script needs machine-readable
 results.
+
+## Python Package Relationship
+
+The PyPI package `dcex` exposes the existing Python sync and async APIs through
+PyO3 bindings to this Rust crate. The internal `dcex-python` crate only builds
+the Python extension module and is not published to crates.io.

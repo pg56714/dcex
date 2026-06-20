@@ -1,5 +1,5 @@
 name: "Feature Request"
-description: "Submit a suggestion to help us improve the dcex trading package."
+description: "Submit a suggestion to help us improve the dcex Python package or Rust crate."
 title: "feat: "
 labels: ["feat", "enhancement"]
 
