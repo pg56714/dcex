@@ -154,7 +154,7 @@ jobs:
         run: uv sync --locked
 
       - name: Build wheel
-        run: uv build --wheel --out-dir dist
+        run: uv run maturin build --release --out dist --compatibility pypi
 
       - name: Build source distribution
         if: ${{ runner.os == 'Linux' }}
@@ -238,7 +238,7 @@ jobs:
         run: uv sync --locked
 
       - name: Build wheel
-        run: uv build --wheel --out-dir dist
+        run: uv run maturin build --release --out dist --compatibility pypi
 
       - name: Build source distribution
         if: ${{ runner.os == 'Linux' }}
