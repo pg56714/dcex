@@ -1,4 +1,4 @@
-name: Release Python Package
+name: Release Packages
 
 on:
   push:
@@ -8,64 +8,109 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-packages
+  cancel-in-progress: false
+
 jobs:
-  bump_version:
+  plan:
     runs-on: ubuntu-latest
     outputs:
-      cz_version: ${{ steps.cz.outputs.version }}
-      has_bump: ${{ steps.check_bump.outputs.has_bump }}
+      any_release: ${{ steps.plan.outputs.any_release }}
+      python_release: ${{ steps.plan.outputs.python_release }}
+      python_version: ${{ steps.plan.outputs.python_version }}
+      python_tag: ${{ steps.plan.outputs.python_tag }}
+      python_body_path: ${{ steps.plan.outputs.python_body_path }}
+      rust_release: ${{ steps.plan.outputs.rust_release }}
+      rust_version: ${{ steps.plan.outputs.rust_version }}
+      rust_tag: ${{ steps.plan.outputs.rust_tag }}
+      rust_body_path: ${{ steps.plan.outputs.rust_body_path }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Create bump and changelog
-        id: cz
-        uses: commitizen-tools/commitizen-action@0.27.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          changelog_increment_filename: body.md
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
-      - name: Check if bump occurred
-        id: check_bump
-        env:
-          PREV_VERSION: ${{ steps.cz.outputs.previous_version }}
-          CURR_VERSION: ${{ steps.cz.outputs.version }}
+      - name: Plan releases
+        id: plan
         run: |
-          echo "Previous version: ${PREV_VERSION:-unknown}"
-          echo "Current version: ${CURR_VERSION:-unknown}"
+          uv run --no-project scripts/release_plan.py --format text --github-output "$GITHUB_OUTPUT"
 
-          if [ -n "${CURR_VERSION}" ] && [ "${PREV_VERSION}" != "${CURR_VERSION}" ]; then
-            echo "Version bump detected (versions differ)."
-            echo "has_bump=true" >> "$GITHUB_OUTPUT"
+  apply:
+    needs: plan
+    if: ${{ needs.plan.outputs.any_release == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      python_release: ${{ needs.plan.outputs.python_release }}
+      python_version: ${{ needs.plan.outputs.python_version }}
+      python_tag: ${{ needs.plan.outputs.python_tag }}
+      python_body_path: ${{ needs.plan.outputs.python_body_path }}
+      rust_release: ${{ needs.plan.outputs.rust_release }}
+      rust_version: ${{ needs.plan.outputs.rust_version }}
+      rust_tag: ${{ needs.plan.outputs.rust_tag }}
+      rust_body_path: ${{ needs.plan.outputs.rust_body_path }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Apply release plan
+        run: |
+          uv run --no-project scripts/release_plan.py --apply --format text --body-dir .release
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit release files
+        run: |
+          git add CHANGELOG.md pyproject.toml Cargo.lock crates/dcex/Cargo.toml
+          if [ -f crates/dcex/CHANGELOG.md ]; then
+            git add crates/dcex/CHANGELOG.md
+          fi
+          if git diff --cached --quiet; then
+            echo "No release file changes to commit."
           else
-            echo "No version bump detected."
-            echo "has_bump=false" >> "$GITHUB_OUTPUT"
+            git commit -m "chore: release packages"
           fi
 
-          if [ -f body.md ]; then
-            echo "Preview of body.md:"
-            head -n 20 body.md
-          fi
-
-      - name: Debug output
+      - name: Create release tags
         run: |
-          echo "Bumped version: ${{ steps.cz.outputs.version }}"
-          echo "Has bump: ${{ steps.check_bump.outputs.has_bump }}"
+          if [ "${{ needs.plan.outputs.python_release }}" = "true" ]; then
+            git tag "${{ needs.plan.outputs.python_tag }}"
+          fi
+          if [ "${{ needs.plan.outputs.rust_release }}" = "true" ]; then
+            git tag "${{ needs.plan.outputs.rust_tag }}"
+          fi
 
-      - name: Create Python GitHub Release
-        if: ${{ steps.check_bump.outputs.has_bump == 'true' }}
-        uses: softprops/action-gh-release@v3
+      - name: Push release commit and tags
+        run: |
+          refs=(HEAD:main)
+          if [ "${{ needs.plan.outputs.python_release }}" = "true" ]; then
+            refs+=("${{ needs.plan.outputs.python_tag }}")
+          fi
+          if [ "${{ needs.plan.outputs.rust_release }}" = "true" ]; then
+            refs+=("${{ needs.plan.outputs.rust_tag }}")
+          fi
+          git push --atomic origin "${refs[@]}"
+
+      - name: Upload release metadata
+        uses: actions/upload-artifact@v5
         with:
-          body_path: "body.md"
-          tag_name: ${{ steps.cz.outputs.version }}
-          name: Python ${{ steps.cz.outputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: release-metadata
+          path: .release/*
+          include-hidden-files: true
+          if-no-files-found: error
 
   build_python_artifacts:
-    needs: bump_version
-    if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
+    needs: apply
+    if: ${{ success() && needs.apply.outputs.python_release == 'true' }}
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -78,7 +123,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ needs.bump_version.outputs.cz_version }}
+          ref: ${{ needs.apply.outputs.python_tag }}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -95,10 +140,7 @@ jobs:
         run: uv sync --locked
 
       - name: Build wheel
-        run: |
-          VERSION=${{ needs.bump_version.outputs.cz_version }}
-          echo "Building wheel for version $VERSION..."
-          uv build --wheel --out-dir dist
+        run: uv build --wheel --out-dir dist
 
       - name: Build source distribution
         if: ${{ runner.os == 'Linux' }}
@@ -111,13 +153,13 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  publish_if_bumped:
-    needs: [bump_version, build_python_artifacts]
-    if: ${{ success() && needs.bump_version.outputs.has_bump == 'true' }}
+  publish_python:
+    needs: [apply, build_python_artifacts]
+    if: ${{ success() && needs.apply.outputs.python_release == 'true' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read # checkout (job-level permissions replace the top-level block)
-      id-token: write # required for PyPI Trusted Publishing (OIDC)
+      contents: write
+      id-token: write
 
     steps:
       - name: Install uv
@@ -130,8 +172,66 @@ jobs:
           path: dist
           merge-multiple: true
 
+      - name: Download release metadata
+        uses: actions/download-artifact@v5
+        with:
+          name: release-metadata
+          path: .release
+
       - name: Publish to PyPI
+        run: uv publish dist/*
+
+      - name: Create Python GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          body_path: ${{ needs.apply.outputs.python_body_path }}
+          tag_name: ${{ needs.apply.outputs.python_tag }}
+          name: Python ${{ needs.apply.outputs.python_version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish_rust:
+    needs: apply
+    if: ${{ success() && needs.apply.outputs.rust_release == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.apply.outputs.rust_tag }}
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Download release metadata
+        uses: actions/download-artifact@v5
+        with:
+          name: release-metadata
+          path: .release
+
+      - name: Check tag matches crate version
         run: |
-          VERSION=${{ needs.bump_version.outputs.cz_version }}
-          echo "Publishing version $VERSION to PyPI..."
-          uv publish dist/*
+          VERSION="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "dcex") | .version')"
+          EXPECTED_TAG="rust-v${VERSION}"
+          echo "Crate version: ${VERSION}"
+          echo "Expected tag: ${EXPECTED_TAG}"
+          echo "Actual tag: ${{ needs.apply.outputs.rust_tag }}"
+          if [ "${{ needs.apply.outputs.rust_tag }}" != "${EXPECTED_TAG}" ]; then
+            echo "Tag must match crates/dcex/Cargo.toml version."
+            exit 1
+          fi
+
+      - name: Publish dcex to crates.io
+        run: cargo publish -p dcex --locked --token "${{ secrets.CARGO_REGISTRY_TOKEN }}"
+
+      - name: Create Rust GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          body_path: ${{ needs.apply.outputs.rust_body_path }}
+          tag_name: ${{ needs.apply.outputs.rust_tag }}
+          name: Rust ${{ needs.apply.outputs.rust_tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

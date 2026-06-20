@@ -76,6 +76,7 @@ docs/_build/
 .pybuilder/
 target/
 /.maturin-dist/
+.release/
 
 # Jupyter Notebook
 .ipynb_checkpoints
