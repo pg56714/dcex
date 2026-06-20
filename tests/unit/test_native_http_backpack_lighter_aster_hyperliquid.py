@@ -240,8 +240,10 @@ def test_native_hyperliquid_signed_request() -> None:
     assert status == 200
     assert json.loads(body) == {"ok": True}
     assert payload["signature"]["v"] in {27, 28}
-    assert len(payload["signature"]["r"]) == 64
-    assert len(payload["signature"]["s"]) == 64
+    assert payload["signature"]["r"].startswith("0x")
+    assert payload["signature"]["s"].startswith("0x")
+    assert len(payload["signature"]["r"]) == 66
+    assert len(payload["signature"]["s"]) == 66
 
 
 def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> None:
