@@ -12,80 +12,13 @@ from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
-from .endpoints.account import FuturesAccount, SpotAccount
-from .endpoints.market import FuturesMarket, SpotMarket
-from .endpoints.trade import FuturesTrade, SpotTrade
 
 _native = load_native()
-
-AsterPath = SpotMarket | FuturesMarket | SpotAccount | FuturesAccount | SpotTrade | FuturesTrade
-
-_NATIVE_PRIVATE_REQUESTS: dict[str, tuple[str, AsterPath]] = {
-    "get_spot_account": ("GET", SpotAccount.ACCOUNT),
-    "get_spot_transaction_history": ("GET", SpotAccount.TRANSACTION_HISTORY),
-    "get_futures_position_mode": ("GET", FuturesAccount.POSITION_MODE),
-    "set_futures_position_mode": ("POST", FuturesAccount.POSITION_MODE),
-    "get_futures_stp_mode": ("GET", FuturesAccount.STP_MODE),
-    "set_futures_stp_mode": ("POST", FuturesAccount.STP_MODE),
-    "get_futures_multi_assets_mode": ("GET", FuturesAccount.MULTI_ASSETS_MODE),
-    "set_futures_multi_assets_mode": ("POST", FuturesAccount.MULTI_ASSETS_MODE),
-    "get_futures_balance": ("GET", FuturesAccount.BALANCE),
-    "get_futures_account": ("GET", FuturesAccount.ACCOUNT),
-    "modify_futures_position_margin": ("POST", FuturesAccount.POSITION_MARGIN),
-    "get_futures_position_margin_history": (
-        "GET",
-        FuturesAccount.POSITION_MARGIN_HISTORY,
-    ),
-    "get_futures_position_risk": ("GET", FuturesAccount.POSITION_RISK),
-    "get_futures_user_trades": ("GET", FuturesAccount.USER_TRADES),
-    "get_futures_income": ("GET", FuturesAccount.INCOME),
-    "get_futures_leverage_bracket": ("GET", FuturesAccount.LEVERAGE_BRACKET),
-    "get_futures_adl_quantile": ("GET", FuturesAccount.ADL_QUANTILE),
-    "get_futures_force_orders": ("GET", FuturesAccount.FORCE_ORDERS),
-    "get_spot_commission_rate": ("GET", SpotMarket.COMMISSION_RATE),
-    "get_futures_commission_rate": ("GET", FuturesAccount.COMMISSION_RATE),
-    "update_futures_mmp": ("POST", FuturesAccount.MMP),
-    "get_futures_mmp": ("GET", FuturesAccount.MMP),
-    "delete_futures_mmp": ("DELETE", FuturesAccount.MMP),
-    "reset_futures_mmp": ("POST", FuturesAccount.MMP_RESET),
-    "create_spot_listen_key": ("POST", SpotAccount.LISTEN_KEY),
-    "keep_alive_spot_listen_key": ("PUT", SpotAccount.LISTEN_KEY),
-    "close_spot_listen_key": ("DELETE", SpotAccount.LISTEN_KEY),
-    "create_futures_listen_key": ("POST", FuturesAccount.LISTEN_KEY),
-    "keep_alive_futures_listen_key": ("PUT", FuturesAccount.LISTEN_KEY),
-    "close_futures_listen_key": ("DELETE", FuturesAccount.LISTEN_KEY),
-    "place_spot_order": ("POST", SpotTrade.ORDER),
-    "cancel_spot_order": ("DELETE", SpotTrade.ORDER),
-    "get_spot_order": ("GET", SpotTrade.ORDER),
-    "get_spot_open_order": ("GET", SpotTrade.OPEN_ORDER),
-    "get_spot_open_orders": ("GET", SpotTrade.OPEN_ORDERS),
-    "cancel_all_spot_open_orders": ("DELETE", SpotTrade.ALL_OPEN_ORDERS),
-    "get_spot_all_orders": ("GET", SpotTrade.ALL_ORDERS),
-    "get_spot_user_trades": ("GET", SpotTrade.USER_TRADES),
-    "place_futures_order": ("POST", FuturesTrade.ORDER),
-    "modify_futures_order": ("PUT", FuturesTrade.ORDER),
-    "place_futures_chase_order": ("POST", FuturesTrade.CHASE),
-    "place_futures_batch_orders": ("POST", FuturesTrade.BATCH_ORDERS),
-    "get_futures_order": ("GET", FuturesTrade.ORDER),
-    "cancel_futures_order": ("DELETE", FuturesTrade.ORDER),
-    "cancel_all_futures_open_orders": ("DELETE", FuturesTrade.ALL_OPEN_ORDERS),
-    "cancel_futures_batch_orders": ("DELETE", FuturesTrade.BATCH_ORDERS),
-    "set_futures_countdown_cancel_all": ("POST", FuturesTrade.COUNTDOWN_CANCEL_ALL),
-    "get_futures_open_order": ("GET", FuturesTrade.OPEN_ORDER),
-    "get_futures_open_orders": ("GET", FuturesTrade.OPEN_ORDERS),
-    "get_futures_all_orders": ("GET", FuturesTrade.ALL_ORDERS),
-    "set_futures_leverage": ("POST", FuturesTrade.LEVERAGE),
-    "set_futures_margin_type": ("POST", FuturesTrade.MARGIN_TYPE),
-    "place_futures_strategy_order": ("POST", FuturesTrade.PLACE_STRATEGY_ORDER),
-    "update_futures_strategy_order": ("POST", FuturesTrade.UPDATE_STRATEGY_ORDER),
-    "get_futures_strategy_open_order": ("GET", FuturesTrade.STRATEGY_OPEN_ORDER),
-    "get_futures_strategy_history_order": ("GET", FuturesTrade.STRATEGY_HISTORY_ORDER),
-}
 
 
 def sign_message(message: str, private_key: str) -> str:
     """Sign an Aster V3 EIP-712 message using the Rust native extension."""
-    if _native is None or not hasattr(_native, "aster_sign_message"):
+    if not hasattr(_native, "aster_sign_message"):
         raise RuntimeError("Aster native signing is required.")
     return str(_native.aster_sign_message(message, private_key))
 
@@ -196,18 +129,7 @@ class HTTPManager(BaseHTTPManager):
         method_name: str,
         params: list[tuple[str, str]],
     ) -> str:
-        if method_name == "transfer_spot_futures":
-            market = dict(params).get("market", "spot").lower()
-            spec = (
-                "POST",
-                SpotAccount.TRANSFER if market == "spot" else FuturesAccount.TRANSFER,
-            )
-        else:
-            spec = _NATIVE_PRIVATE_REQUESTS.get(method_name)
-        if spec is None:
-            return f"GET {self.spot_base_url}/{method_name} | Body: {params}"
-        method, path = spec
-        return f"{method} {self._get_base_url(path)}{path} | Body: {params}"
+        return f"ASTER {method_name} | Params: {params}"
 
     @staticmethod
     def _native_params(**kwargs: object) -> list[tuple[str, str]]:
@@ -235,41 +157,27 @@ class HTTPManager(BaseHTTPManager):
                 params.append((key, _format_value(value)))
         return params
 
-    def _get_base_url(self, path: AsterPath) -> str:
-        if isinstance(path, SpotMarket | SpotAccount | SpotTrade):
-            return self.spot_base_url
-        if isinstance(path, FuturesMarket | FuturesAccount | FuturesTrade):
-            return self.futures_base_url
-        raise ValueError(f"Unknown Aster API path: {path} (type={type(path)})")
-
     def _request(
         self,
         method: str,
-        path: AsterPath,
+        path: str,
         query: Mapping[str, Any] | None = None,
         signed: bool = True,
     ) -> dict[str, Any] | list[Any]:
         """Make an Aster V3 REST request."""
         method_upper = method.upper()
-        include_user = isinstance(path, FuturesMarket | FuturesAccount | FuturesTrade)
         self._uses_native_transport()
-        if signed:
-            if not self.signer_address or not self.private_key:
-                raise ValueError("Signed Aster requests require signer_address and private_key.")
-            if include_user and not self.user_address:
-                raise ValueError("Signed Aster futures requests require user_address.")
         params = _filtered_query(query)
-        url = f"{self._get_base_url(path)}{path}"
+        request_path = str(path)
+        url = request_path
         try:
             self._log_request(method_upper, url)
-            market = "futures" if include_user else "spot"
             status, response_headers, response_body = cast(
                 Any,
                 self._native_client,
-            ).request_raw(
+            ).request_raw_auto(
                 method,
-                market,
-                str(path),
+                request_path,
                 list(params.items()),
                 signed,
             )

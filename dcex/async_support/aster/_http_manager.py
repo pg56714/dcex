@@ -7,14 +7,9 @@ from typing import Any, Self, cast
 
 from ..._native_http import NativeResponse, load_native
 from ...aster._http_manager import (
-    _NATIVE_PRIVATE_REQUESTS,
-    AsterPath,
     _filtered_query,
     _format_value,
 )
-from ...aster.endpoints.account import FuturesAccount, SpotAccount
-from ...aster.endpoints.market import FuturesMarket, SpotMarket
-from ...aster.endpoints.trade import FuturesTrade, SpotTrade
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -125,18 +120,7 @@ class HTTPManager(BaseHTTPManager):
         method_name: str,
         params: list[tuple[str, str]],
     ) -> str:
-        if method_name == "transfer_spot_futures":
-            market = dict(params).get("market", "spot").lower()
-            spec = (
-                "POST",
-                SpotAccount.TRANSFER if market == "spot" else FuturesAccount.TRANSFER,
-            )
-        else:
-            spec = _NATIVE_PRIVATE_REQUESTS.get(method_name)
-        if spec is None:
-            return f"GET {self.spot_base_url}/{method_name} | Body: {params}"
-        method, path = spec
-        return f"{method} {self._get_base_url(path)}{path} | Body: {params}"
+        return f"ASTER {method_name} | Params: {params}"
 
     @staticmethod
     def _native_params(**kwargs: object) -> list[tuple[str, str]]:
@@ -164,17 +148,10 @@ class HTTPManager(BaseHTTPManager):
                 params.append((key, _format_value(value)))
         return params
 
-    def _get_base_url(self, path: AsterPath) -> str:
-        if isinstance(path, SpotMarket | SpotAccount | SpotTrade):
-            return self.spot_base_url
-        if isinstance(path, FuturesMarket | FuturesAccount | FuturesTrade):
-            return self.futures_base_url
-        raise ValueError(f"Unknown Aster API path: {path} (type={type(path)})")
-
     async def _request(
         self,
         method: str,
-        path: AsterPath,
+        path: str,
         query: Mapping[str, Any] | None = None,
         signed: bool = True,
     ) -> dict[str, Any] | list[Any]:
@@ -183,25 +160,18 @@ class HTTPManager(BaseHTTPManager):
             await self.async_init()
 
         method_upper = method.upper()
-        include_user = isinstance(path, FuturesMarket | FuturesAccount | FuturesTrade)
         self._uses_native_transport()
-        if signed:
-            if not self.signer_address or not self.private_key:
-                raise ValueError("Signed Aster requests require signer_address and private_key.")
-            if include_user and not self.user_address:
-                raise ValueError("Signed Aster futures requests require user_address.")
         params = _filtered_query(query)
-        url = f"{self._get_base_url(path)}{path}"
+        request_path = str(path)
+        url = request_path
         try:
             self._log_request(method_upper, url)
-            market = "futures" if include_user else "spot"
             status, response_headers, response_body = await cast(
                 Any,
                 self._native_client,
-            ).request_raw_async(
+            ).request_raw_auto_async(
                 method,
-                market,
-                str(path),
+                request_path,
                 list(params.items()),
                 signed,
             )

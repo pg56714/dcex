@@ -1,1 +1,0 @@
-"""Kraken async endpoint definitions."""

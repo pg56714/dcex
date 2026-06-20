@@ -89,6 +89,8 @@ TX_PAYLOAD_JSON = (
     b'"ReduceOnly":0,"TriggerPrice":0,"OrderExpiry":8,"ExpiredAt":1590000,"Nonce":11}'
 )
 
+# This embedded script intentionally imports the historical PyPI baseline.
+# It is not a runtime dependency of the current package.
 PYPI_PYTHON_CORE_BENCHMARK = r"""
 from __future__ import annotations
 

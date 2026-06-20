@@ -11,9 +11,6 @@ from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
-from .endpoints.account import FundingAccount, FuturesAccount
-from .endpoints.market import FuturesMarket, SpotMarket
-from .endpoints.trade import FuturesTrade, SpotTrade
 
 _native = load_native()
 
@@ -39,19 +36,6 @@ class HTTPManager(BaseHTTPManager):
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
-    api_map = {
-        "https://api-cloud.bitmart.com": {
-            SpotTrade,
-            SpotMarket,
-            FundingAccount,
-        },  # v1 API
-        "https://api-cloud-v2.bitmart.com": {
-            FuturesTrade,
-            FuturesMarket,
-            FuturesAccount,
-        },  # v2 API
-    }
-
     def __post_init__(self) -> None:
         """Initialize logger and product table manager."""
         self._logger = self._setup_logger(self.logger)
@@ -72,12 +56,6 @@ class HTTPManager(BaseHTTPManager):
                 "set_product_table",
             ):
                 self._native_client.set_product_table(self.ptm._native_table)
-
-    @staticmethod
-    def _native_market(path: str) -> str:
-        if type(path) in {FuturesTrade, FuturesMarket, FuturesAccount}:
-            return "futures"
-        return "spot"
 
     def _uses_native_transport(self) -> bool:
         if self._native_client is None:
@@ -126,24 +104,6 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _get_base_url(self, path: str) -> str:
-        """
-        Get the base URL for the given API path.
-
-        Args:
-            path: API endpoint path
-
-        Returns:
-            Base URL string
-
-        Raises:
-            ValueError: If the path type is not recognized
-        """
-        for base_url, enums in self.api_map.items():
-            if type(path) in enums:
-                return base_url
-        raise ValueError(f"Unknown API path: {path} (type={type(path)})")
-
     def _request(
         self,
         method: str,
@@ -170,8 +130,8 @@ class HTTPManager(BaseHTTPManager):
         if query is None:
             query = {}
 
-        base_url = self._get_base_url(path)
-        url = base_url + str(path)
+        request_path = str(path)
+        url = request_path
 
         method_upper = method.upper()
         if method_upper == "GET" and query:
@@ -207,10 +167,9 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = cast(
                 Any,
                 self._native_client,
-            ).request_raw(
+            ).request_raw_auto(
                 method,
-                self._native_market(path),
-                str(path),
+                request_path,
                 params,
                 body.encode() if method_upper == "POST" else None,
                 signed,

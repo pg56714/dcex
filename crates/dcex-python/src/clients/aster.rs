@@ -71,6 +71,24 @@ impl PythonAsterHttpClient {
         .map_err(to_py_runtime_error)
     }
 
+    #[pyo3(signature = (method, path, params=None, signed=true))]
+    fn request_raw_auto(
+        &self,
+        py: Python<'_>,
+        method: &str,
+        path: String,
+        params: Option<Vec<(String, String)>>,
+        signed: bool,
+    ) -> PyResult<PythonHttpResponse> {
+        let method = http_method(method)?;
+        py.allow_threads(|| {
+            self.client
+                .request_raw_auto_blocking(method, path, params.unwrap_or_default(), signed)
+        })
+        .map(python_http_response)
+        .map_err(to_py_runtime_error)
+    }
+
     #[pyo3(signature = (method, market, path, params=None, signed=true))]
     fn request_raw_async<'py>(
         &self,
@@ -88,6 +106,27 @@ impl PythonAsterHttpClient {
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .request_raw(method, market, path, params, signed)
+                .await
+                .map(python_http_response)
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    #[pyo3(signature = (method, path, params=None, signed=true))]
+    fn request_raw_auto_async<'py>(
+        &self,
+        py: Python<'py>,
+        method: &str,
+        path: String,
+        params: Option<Vec<(String, String)>>,
+        signed: bool,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        let method = http_method(method)?;
+        let params = params.unwrap_or_default();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .request_raw_auto(method, path, params, signed)
                 .await
                 .map(python_http_response)
                 .map_err(to_py_runtime_error)

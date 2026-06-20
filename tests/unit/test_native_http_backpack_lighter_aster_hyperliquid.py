@@ -180,7 +180,8 @@ def test_native_aster_signed_request() -> None:
 
 def test_sync_aster_manager_uses_native_transport() -> None:
     from dcex.aster._http_manager import HTTPManager
-    from dcex.aster.endpoints.market import SpotMarket
+
+    path = "/api/v3/time"
 
     with _http_server({"serverTime": 1}) as (base_url, received):
         manager = HTTPManager(
@@ -190,20 +191,21 @@ def test_sync_aster_manager_uses_native_transport() -> None:
         )
         result = manager._request(
             "GET",
-            SpotMarket.SERVER_TIME,
+            path,
             signed=False,
         )
 
     manager.close()
     assert result == {"serverTime": 1}
     assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == str(SpotMarket.SERVER_TIME)
+    assert received.get_nowait()["path"] == path
 
 
 @pytest.mark.asyncio
 async def test_async_aster_manager_uses_native_transport() -> None:
-    from dcex.aster.endpoints.market import SpotMarket
     from dcex.async_support.aster._http_manager import HTTPManager
+
+    path = "/api/v3/time"
 
     with _http_server({"serverTime": 1}) as (base_url, received):
         manager = HTTPManager(
@@ -214,13 +216,13 @@ async def test_async_aster_manager_uses_native_transport() -> None:
         await manager.async_init()
         result = await manager._request(
             "GET",
-            SpotMarket.SERVER_TIME,
+            path,
             signed=False,
         )
 
     assert result == {"serverTime": 1}
     assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == str(SpotMarket.SERVER_TIME)
+    assert received.get_nowait()["path"] == path
 
 
 def test_native_hyperliquid_signed_request() -> None:

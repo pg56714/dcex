@@ -1,1 +1,0 @@
-"""Bitget async endpoint definitions."""

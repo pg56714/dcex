@@ -19,6 +19,23 @@ pub enum BitmartMarket {
     Spot,
 }
 
+impl BitmartMarket {
+    pub fn from_path(path: &str) -> Result<Self> {
+        if path.starts_with("/contract/")
+            || path == super::endpoints::FUTURES_TRANSFER
+            || path == super::endpoints::FUTURES_TRANSFER_LIST
+        {
+            return Ok(Self::Futures);
+        }
+        if path.starts_with("/spot/") || path.starts_with("/account/") {
+            return Ok(Self::Spot);
+        }
+        Err(DcexError::InvalidInput(format!(
+            "unsupported BitMart API path: {path}"
+        )))
+    }
+}
+
 #[derive(Clone)]
 pub struct BitmartClient {
     transport: AsyncHttpClient,
@@ -109,6 +126,20 @@ impl BitmartClient {
         self.transport.execute(request).await
     }
 
+    pub async fn request_raw_auto(
+        &self,
+        method: HttpMethod,
+        path: impl Into<String>,
+        params: Vec<(String, String)>,
+        body: Option<Vec<u8>>,
+        signed: bool,
+    ) -> Result<HttpResponse> {
+        let path = path.into();
+        let market = BitmartMarket::from_path(&path)?;
+        self.request_raw(method, market, path, params, body, signed)
+            .await
+    }
+
     pub fn request_raw_blocking(
         &self,
         method: HttpMethod,
@@ -123,6 +154,23 @@ impl BitmartClient {
         block_on(async move {
             client
                 .request_raw(method, market, path, params, body, signed)
+                .await
+        })
+    }
+
+    pub fn request_raw_auto_blocking(
+        &self,
+        method: HttpMethod,
+        path: impl Into<String>,
+        params: Vec<(String, String)>,
+        body: Option<Vec<u8>>,
+        signed: bool,
+    ) -> Result<HttpResponse> {
+        let client = self.clone();
+        let path = path.into();
+        block_on(async move {
+            client
+                .request_raw_auto(method, path, params, body, signed)
                 .await
         })
     }

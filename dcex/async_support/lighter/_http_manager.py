@@ -277,28 +277,6 @@ class HTTPManager(BaseHTTPManager):
             return cast(str | None, await native_client.check_client_async())
         raise RuntimeError("Lighter native client check_client_async is unavailable.")
 
-    async def _signed_tx(
-        self,
-        result: tuple[Any, Any, Any, Any],
-        *,
-        price_protection: bool | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        tx_type, tx_info, _tx_hash, error = result
-        if error is not None:
-            raise ValueError(f"Lighter signing failed: {error}")
-        from .endpoints.market import Public
-
-        return await self._request(
-            "POST",
-            Public.SEND_TX,
-            body={
-                "tx_type": int(tx_type),
-                "tx_info": str(tx_info),
-                "price_protection": price_protection,
-            },
-            content_type="form",
-        )
-
     async def close(self) -> None:
         """Close the HTTP session."""
         if self.session is not None and hasattr(self.session, "aclose"):

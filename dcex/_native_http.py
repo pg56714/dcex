@@ -7,12 +7,12 @@ from types import ModuleType
 from typing import Any
 
 
-def load_native() -> ModuleType | None:
-    """Load the optional PyO3 module when it is available."""
+def load_native() -> ModuleType:
+    """Load the required PyO3 module."""
     try:
         return import_module("dcex._native")
-    except ImportError:
-        return None
+    except ImportError as exc:
+        raise RuntimeError("The dcex native extension is required.") from exc
 
 
 @dataclass(frozen=True)

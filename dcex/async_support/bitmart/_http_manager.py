@@ -9,9 +9,6 @@ from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
-from .endpoints.account import FundingAccount, FuturesAccount
-from .endpoints.market import FuturesMarket, SpotMarket
-from .endpoints.trade import FuturesTrade, SpotTrade
 
 _native = load_native()
 
@@ -31,19 +28,6 @@ class HTTPManager(BaseHTTPManager):
     ptm: ProductTableManager = field(init=False)
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
-
-    api_map = {
-        "https://api-cloud.bitmart.com": {
-            SpotTrade,
-            SpotMarket,
-            FundingAccount,
-        },  # v1 API
-        "https://api-cloud-v2.bitmart.com": {
-            FuturesTrade,
-            FuturesMarket,
-            FuturesAccount,
-        },  # v2 API
-    }
 
     async def async_init(self) -> Self:
         """
@@ -75,19 +59,6 @@ class HTTPManager(BaseHTTPManager):
         ):
             self._native_client.set_product_table(self.ptm._native_table)
         return self
-
-    @staticmethod
-    def _native_market(
-        path: FundingAccount
-        | FuturesAccount
-        | SpotMarket
-        | FuturesMarket
-        | SpotTrade
-        | FuturesTrade,
-    ) -> str:
-        if type(path) in {FuturesTrade, FuturesMarket, FuturesAccount}:
-            return "futures"
-        return "spot"
 
     def _uses_native_transport(self) -> bool:
         if self._native_client is None:
@@ -139,41 +110,10 @@ class HTTPManager(BaseHTTPManager):
             params.append((key, str(value)))
         return params
 
-    def _get_base_url(
-        self,
-        path: FundingAccount
-        | FuturesAccount
-        | SpotMarket
-        | FuturesMarket
-        | SpotTrade
-        | FuturesTrade,
-    ) -> str:
-        """
-        Get base URL for API endpoint.
-
-        Args:
-            path: API endpoint path
-
-        Returns:
-            str: Base URL for the endpoint
-
-        Raises:
-            ValueError: When unknown API path is provided
-        """
-        for base_url, enums in self.api_map.items():
-            if type(path) in enums:
-                return base_url
-        raise ValueError(f"Unknown API path: {path} (type={type(path)})")
-
     async def _request(
         self,
         method: Literal["GET", "POST"],
-        path: FundingAccount
-        | FuturesAccount
-        | SpotMarket
-        | FuturesMarket
-        | SpotTrade
-        | FuturesTrade,
+        path: str,
         query: dict[str, Any] | None = None,
         signed: bool = True,
     ) -> dict[str, Any]:
@@ -199,8 +139,8 @@ class HTTPManager(BaseHTTPManager):
         if query is None:
             query = {}
 
-        base_url = self._get_base_url(path)
-        url = base_url + path.value
+        request_path = str(path)
+        url = request_path
 
         if method.upper() == "GET" and query:
             params_str = "&".join(
@@ -235,10 +175,9 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = await cast(
                 Any,
                 self._native_client,
-            ).request_raw_async(
+            ).request_raw_auto_async(
                 method,
-                self._native_market(path),
-                str(path),
+                request_path,
                 params,
                 body.encode() if method.upper() == "POST" else None,
                 signed,

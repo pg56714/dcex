@@ -19,6 +19,20 @@ pub enum AsterMarket {
     Spot,
 }
 
+impl AsterMarket {
+    pub fn from_path(path: &str) -> Result<Self> {
+        if path.starts_with("/fapi/") {
+            return Ok(Self::Futures);
+        }
+        if path.starts_with("/api/") {
+            return Ok(Self::Spot);
+        }
+        Err(DcexError::InvalidInput(format!(
+            "unsupported Aster API path: {path}"
+        )))
+    }
+}
+
 #[derive(Clone)]
 pub struct AsterClient {
     transport: AsyncHttpClient,
@@ -108,6 +122,18 @@ impl AsterClient {
         self.transport.execute(request).await
     }
 
+    pub async fn request_raw_auto(
+        &self,
+        method: HttpMethod,
+        path: impl Into<String>,
+        params: Vec<(String, String)>,
+        signed: bool,
+    ) -> Result<HttpResponse> {
+        let path = path.into();
+        let market = AsterMarket::from_path(&path)?;
+        self.request_raw(method, market, path, params, signed).await
+    }
+
     pub fn request_raw_blocking(
         &self,
         method: HttpMethod,
@@ -123,6 +149,18 @@ impl AsterClient {
                 .request_raw(method, market, path, params, signed)
                 .await
         })
+    }
+
+    pub fn request_raw_auto_blocking(
+        &self,
+        method: HttpMethod,
+        path: impl Into<String>,
+        params: Vec<(String, String)>,
+        signed: bool,
+    ) -> Result<HttpResponse> {
+        let client = self.clone();
+        let path = path.into();
+        block_on(async move { client.request_raw_auto(method, path, params, signed).await })
     }
 
     pub(super) fn build_request(

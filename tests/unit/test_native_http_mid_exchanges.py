@@ -623,7 +623,8 @@ def test_native_bitmart_signed_body() -> None:
 def test_sync_bitmart_manager_uses_native_transport() -> None:
     native = pytest.importorskip("dcex._native")
     from dcex.bitmart._http_manager import HTTPManager
-    from dcex.bitmart.endpoints.market import SpotMarket
+
+    path = "/spot/quotation/v3/ticker"
 
     with _http_server({"code": 1000}) as (base_url, received):
         manager = HTTPManager(preload_product_table=False)
@@ -634,7 +635,7 @@ def test_sync_bitmart_manager_uses_native_transport() -> None:
         )
         result = manager._request(
             "GET",
-            SpotMarket.GET_TICKER_OF_A_PAIR,
+            path,
             {"symbol": "BTC_USDT"},
             signed=False,
         )
@@ -642,14 +643,15 @@ def test_sync_bitmart_manager_uses_native_transport() -> None:
     manager.close()
     assert result == {"code": 1000}
     assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == (f"{SpotMarket.GET_TICKER_OF_A_PAIR}?symbol=BTC_USDT")
+    assert received.get_nowait()["path"] == f"{path}?symbol=BTC_USDT"
 
 
 @pytest.mark.asyncio
 async def test_async_bitmart_manager_uses_native_transport() -> None:
     native = pytest.importorskip("dcex._native")
     from dcex.async_support.bitmart._http_manager import HTTPManager
-    from dcex.async_support.bitmart.endpoints.trade import SpotTrade
+
+    path = "/spot/v2/submit_order"
 
     with _http_server({"code": 1000}) as (base_url, received):
         manager = HTTPManager(preload_product_table=False)
@@ -661,7 +663,7 @@ async def test_async_bitmart_manager_uses_native_transport() -> None:
         )
         result = await manager._request(
             "POST",
-            SpotTrade.SUBMIT_ORDER,
+            path,
             {"symbol": "BTC_USDT", "side": "buy"},
             signed=False,
         )

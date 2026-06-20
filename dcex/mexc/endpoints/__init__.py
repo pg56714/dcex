@@ -1,1 +1,0 @@
-"""MEXC REST endpoint enumerations."""

@@ -1,1 +1,0 @@
-"""Backpack REST endpoint enumerations."""

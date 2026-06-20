@@ -1,1 +1,0 @@
-"""Lighter async endpoint definitions."""

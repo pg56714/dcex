@@ -128,7 +128,8 @@ async def test_native_binance_async_public_request() -> None:
 def test_sync_binance_manager_uses_native_transport() -> None:
     native = pytest.importorskip("dcex._native")
     from dcex.binance._http_manager import HTTPManager
-    from dcex.binance.endpoints.market import SpotMarket
+
+    path = "/api/v3/exchangeInfo"
 
     with _http_server() as (base_url, received):
         manager = HTTPManager(preload_product_table=False)
@@ -139,7 +140,7 @@ def test_sync_binance_manager_uses_native_transport() -> None:
         )
         result = manager._request(
             "GET",
-            SpotMarket.EXCHANGE_INFO,
+            path,
             {"symbol": "BTCUSDT"},
             signed=False,
         )
@@ -147,14 +148,15 @@ def test_sync_binance_manager_uses_native_transport() -> None:
     manager.close()
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == (f"{SpotMarket.EXCHANGE_INFO}?symbol=BTCUSDT")
+    assert received.get_nowait()["path"] == f"{path}?symbol=BTCUSDT"
 
 
 @pytest.mark.asyncio
 async def test_async_binance_manager_uses_native_transport() -> None:
     native = pytest.importorskip("dcex._native")
     from dcex.async_support.binance._http_manager import HTTPManager
-    from dcex.async_support.binance.endpoints.market import SpotMarket
+
+    path = "/api/v3/exchangeInfo"
 
     with _http_server() as (base_url, received):
         manager = HTTPManager(preload_product_table=False)
@@ -166,14 +168,14 @@ async def test_async_binance_manager_uses_native_transport() -> None:
         )
         result = await manager._request(
             "GET",
-            SpotMarket.EXCHANGE_INFO,
+            path,
             {"symbol": "ETHUSDT"},
             signed=False,
         )
 
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == (f"{SpotMarket.EXCHANGE_INFO}?symbol=ETHUSDT")
+    assert received.get_nowait()["path"] == f"{path}?symbol=ETHUSDT"
 
 
 def test_sync_binance_public_wrapper_uses_native_dispatcher() -> None:

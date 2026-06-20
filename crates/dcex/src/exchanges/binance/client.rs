@@ -25,6 +25,18 @@ impl BinanceMarket {
             Self::Spot => SPOT_BASE_URL,
         }
     }
+
+    pub fn from_path(path: &str) -> Result<Self> {
+        if path.starts_with("/fapi/") || path.starts_with("/futures/") {
+            return Ok(Self::Futures);
+        }
+        if path.starts_with("/api/") || path.starts_with("/sapi/") {
+            return Ok(Self::Spot);
+        }
+        Err(DcexError::InvalidInput(format!(
+            "unsupported Binance API path: {path}"
+        )))
+    }
 }
 
 #[derive(Clone)]
@@ -117,6 +129,18 @@ impl BinanceClient {
         }
         let request = self.build_request(method, market, path, params);
         self.inner.execute_raw(request, signed).await
+    }
+
+    pub async fn request_raw_auto(
+        &self,
+        method: HttpMethod,
+        path: impl Into<String>,
+        params: Vec<(String, String)>,
+        signed: bool,
+    ) -> Result<HttpResponse> {
+        let path = path.into();
+        let market = BinanceMarket::from_path(&path)?;
+        self.request_raw(method, market, path, params, signed).await
     }
 
     async fn sync_server_time(&self, market: BinanceMarket) -> Result<()> {
@@ -227,6 +251,18 @@ impl BinanceClient {
                 .request_raw(method, market, path, params, signed)
                 .await
         })
+    }
+
+    pub fn request_raw_auto_blocking(
+        &self,
+        method: HttpMethod,
+        path: impl Into<String>,
+        params: Vec<(String, String)>,
+        signed: bool,
+    ) -> Result<HttpResponse> {
+        let client = self.clone();
+        let path = path.into();
+        block_on(async move { client.request_raw_auto(method, path, params, signed).await })
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {

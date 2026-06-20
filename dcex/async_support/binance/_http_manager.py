@@ -1,22 +1,16 @@
 import json
 import logging
 from dataclasses import dataclass, field
-from importlib import import_module
 from typing import Any, Self, cast
 
+from ..._native_http import load_native
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
 from ..product_table.manager import ProductTableManager
-from .endpoints.account import FuturesAccount, SpotAccount, WalletAsset
-from .endpoints.market import FuturesMarket, SpotMarket
-from .endpoints.trade import FuturesTrade, SpotTrade
 
-try:
-    _native = import_module("dcex._native")
-except ImportError:
-    _native = None
+_native = load_native()
 
 
 @dataclass
@@ -32,26 +26,10 @@ class HTTPManager(BaseHTTPManager):
     preload_product_table: bool = field(default=True)
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
-    api_map = {
-        "https://fapi.binance.com": {
-            FuturesTrade,
-            FuturesMarket,
-            FuturesAccount,
-        },
-        "https://api.binance.com": {
-            SpotMarket,
-            SpotTrade,
-            SpotAccount,
-            WalletAsset,
-        },
-    }
-
     async def async_init(self) -> Self:
         self._logger = self._setup_logger(self.logger)
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.BINANCE)
-        if _native is None:
-            raise RuntimeError("The dcex native extension is required.")
         if self._native_client is None:
             self._native_client = _native.BinanceHttpClient(
                 api_key=self.api_key,
@@ -61,39 +39,6 @@ class HTTPManager(BaseHTTPManager):
         if self.preload_product_table and self._native_client is not None:
             self._native_client.set_product_table(self.ptm._native_table)
         return self
-
-    def _get_base_url(
-        self,
-        path: (
-            SpotAccount
-            | FuturesAccount
-            | WalletAsset
-            | SpotMarket
-            | FuturesMarket
-            | SpotTrade
-            | FuturesTrade
-        ),
-    ) -> str:
-        for base_url, enums in self.api_map.items():
-            if type(path) in enums:
-                return base_url
-        raise ValueError(f"Unknown API path: {path} (type={type(path)})")
-
-    @staticmethod
-    def _native_market(
-        path: (
-            SpotAccount
-            | FuturesAccount
-            | WalletAsset
-            | SpotMarket
-            | FuturesMarket
-            | SpotTrade
-            | FuturesTrade
-        ),
-    ) -> str:
-        if type(path) in {FuturesTrade, FuturesMarket, FuturesAccount}:
-            return "futures"
-        return "spot"
 
     def _uses_native_transport(self) -> bool:
         if self._native_client is None:
@@ -105,15 +50,7 @@ class HTTPManager(BaseHTTPManager):
     async def _request(
         self,
         method: str,
-        path: (
-            SpotAccount
-            | FuturesAccount
-            | WalletAsset
-            | SpotMarket
-            | FuturesMarket
-            | SpotTrade
-            | FuturesTrade
-        ),
+        path: str,
         query: dict | None = None,
         signed: bool = True,
     ) -> dict:
@@ -124,16 +61,15 @@ class HTTPManager(BaseHTTPManager):
         if signed and not (self.api_key and self.api_secret):
             raise ValueError("Signed request requires API Key and Secret.")
 
-        base_url = self._get_base_url(path)
-        url = f"{base_url}{path}"
+        request_path = str(path)
+        url = request_path
         self._log_request(method, url)
         self._uses_native_transport()
         native_client = cast(Any, self._native_client)
         try:
-            status_code, response_headers, body = await native_client.request_raw_async(
+            status_code, response_headers, body = await native_client.request_raw_auto_async(
                 method,
-                self._native_market(path),
-                str(path),
+                request_path,
                 [(str(key), str(value)) for key, value in query.items()],
                 signed,
             )
