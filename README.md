@@ -212,43 +212,40 @@ for the example conventions.
 
 Local CPU-bound benchmarks isolate Lighter signing and hashing hot paths. The
 baseline is the PyPI `dcex==0.21.2` native Python implementation, fixed at
-`1.00x`; this keeps the comparison reproducible after this branch is merged
-into `main`. Rust-backed Python is the current Python API calling the Rust core
-through PyO3. The baseline is identified by package source and version because
-the current working tree may still report the same Python package version until
-the next release bump.
+`1.00x`. Rust-backed Python is PyPI `dcex==0.22.0`, and Rust native is the
+crates.io `dcex==0.1.0` crate. The benchmark records package source and version
+so the comparison stays reproducible after this branch is merged into `main`.
 
-Recorded sample (`uv run python examples/benchmark_core_local.py --iterations 50 --warmup 5 --baseline-version 0.21.2`, 2026-06-20):
+Recorded sample (`uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.22.0 --rust-crate-version 0.1.0`, 2026-06-20):
 
 Baseline: PyPI `dcex==0.21.2` native Python implementation = 1.00x.
+Rust-backed Python: PyPI `dcex==0.22.0`; Rust native: crates.io `dcex==0.1.0`.
 
 | Operation | Rust-backed Python | Rust native |
 | --------- | ------------------ | ----------- |
-| Cryptographic hash | 135.87x | 142.05x |
-| Schnorr signature | 648.68x | 672.18x |
-| Transaction payload signing | 395.80x | 595.90x |
+| Cryptographic hash | 77.68x | 103.58x |
+| Schnorr signature | 532.71x | 695.91x |
+| Transaction payload signing | 319.56x | 556.76x |
 
-Public HTTP benchmarks install the same PyPI baseline and compare live Binance
-server-time calls against the current PyO3-backed Python wrapper and Rust
-native example. Treat those results as an end-to-end latency check, not as the
-primary evidence for CPU-bound signing speed, because exchange latency and
-local network conditions dominate the measurement.
+Public HTTP benchmarks install the same PyPI packages and compile a temporary
+Cargo benchmark against crates.io `dcex==0.1.0`. Treat those results as an
+end-to-end latency check, not as the primary evidence for CPU-bound signing
+speed, because exchange latency and local network conditions dominate the
+measurement.
 
 | Layer | Command | Output |
 | ----- | ------- | ------ |
-| Local CPU-bound PyPI baseline vs current core | `uv run python examples/benchmark_core_local.py --iterations 50 --warmup 5 --baseline-version 0.21.2` | Speedup table |
-| Rust native local CPU-bound only | `cargo run -p dcex --example core_local_benchmark --release` | Timing table |
-| Public HTTP PyPI baseline vs current core | `uv run python examples/benchmark_public_http.py --iterations 20 --baseline-version 0.21.2` | Markdown table |
-| Rust native only | `cargo run -p dcex --example public_http_benchmark --release` | Markdown table |
-| Optional local CPU-bound CSV output | `uv run python examples/benchmark_core_local.py --csv benchmark_core.csv` | Ignored local CSV file |
-| Optional public HTTP CSV output | `uv run python examples/benchmark_public_http.py --csv benchmark_public.csv` | Ignored local CSV file |
+| Local CPU-bound release artifacts | `uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.22.0 --rust-crate-version 0.1.0` | Speedup table |
+| Public HTTP release artifacts | `uv run python scripts/benchmark_public_http.py --iterations 20 --python-baseline-version 0.21.2 --pyo3-version 0.22.0 --rust-crate-version 0.1.0` | Markdown table |
+| Optional local CPU-bound CSV output | `uv run python scripts/benchmark_core_local.py --csv benchmark_core.csv` | Ignored local CSV file |
+| Optional public HTTP CSV output | `uv run python scripts/benchmark_public_http.py --csv benchmark_public.csv` | Ignored local CSV file |
 
-The Python benchmark scripts install the PyPI baseline into a temporary target
-directory with `uv pip install --target`; they do not mutate the current
-environment. Use `--baseline-version` when you need to compare against another
-published Python package version. Use `DCEX_BENCH_ITERATIONS`,
-`DCEX_BENCH_WARMUP`, `DCEX_BENCH_INNER_LOOPS`, and `DCEX_BENCH_OUTPUT=json` for
-Rust-only examples when needed.
+The Python benchmark scripts install PyPI packages into temporary target
+directories with `uv pip install --target`, then compile the Rust benchmark
+harness against the requested crates.io package version. They do not mutate the
+current environment. Use `--python-baseline-version`, `--pyo3-version`, and
+`--rust-crate-version` when you need to compare against other published
+artifacts.
 
 ## Release Publishing
 

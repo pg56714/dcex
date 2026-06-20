@@ -58,6 +58,10 @@ fn env_nonnegative_usize(name: &str, default: usize) -> usize {
         .unwrap_or(default)
 }
 
+fn env_string(name: &str, default: &str) -> String {
+    env::var(name).unwrap_or_else(|_| default.to_string())
+}
+
 fn median(values: &mut [f64]) -> f64 {
     values.sort_by(|left, right| left.total_cmp(right));
     let midpoint = values.len() / 2;
@@ -118,6 +122,8 @@ fn main() {
     let iterations = env_positive_usize("DCEX_BENCH_ITERATIONS", 20);
     let warmup = env_nonnegative_usize("DCEX_BENCH_WARMUP", 3);
     let inner_loops = env_positive_usize("DCEX_BENCH_INNER_LOOPS", 1);
+    let target = env_string("DCEX_BENCH_TARGET", "Rust native");
+    let crate_version = env_string("DCEX_BENCH_CRATE_VERSION", env!("CARGO_PKG_VERSION"));
 
     let rows = vec![
         json!({
@@ -138,8 +144,17 @@ fn main() {
         .map(|value| value.eq_ignore_ascii_case("json"))
         .unwrap_or(false)
     {
-        println!("{}", json!({ "rows": rows }));
+        println!(
+            "{}",
+            json!({
+                "target": target,
+                "crate_version": crate_version,
+                "rows": rows,
+            })
+        );
     } else {
+        println!("Target: {target} (`dcex` crate {crate_version}).");
+        println!();
         println!("| Operation | Rust median ms |");
         println!("| --------- | -------------- |");
         for row in rows {

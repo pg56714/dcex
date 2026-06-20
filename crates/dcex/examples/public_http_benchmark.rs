@@ -18,6 +18,10 @@ fn env_nonnegative_usize(name: &str, default: usize) -> usize {
         .unwrap_or(default)
 }
 
+fn env_string(name: &str, default: &str) -> String {
+    env::var(name).unwrap_or_else(|_| default.to_string())
+}
+
 fn mean_duration_ms(values: &[f64]) -> f64 {
     values.iter().sum::<f64>() / values.len() as f64
 }
@@ -36,6 +40,8 @@ fn median_duration_ms(values: &mut [f64]) -> f64 {
 async fn main() -> dcex::Result<()> {
     let iterations = env_positive_usize("DCEX_BENCH_ITERATIONS", 20);
     let warmup = env_nonnegative_usize("DCEX_BENCH_WARMUP", 3);
+    let target = env_string("DCEX_BENCH_TARGET", "Rust native");
+    let crate_version = env_string("DCEX_BENCH_CRATE_VERSION", env!("CARGO_PKG_VERSION"));
     let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
 
     for _ in 0..warmup {
@@ -61,7 +67,8 @@ async fn main() -> dcex::Result<()> {
         println!(
             "{}",
             serde_json::json!({
-                "target": "Rust native",
+                "target": target,
+                "crate_version": crate_version,
                 "iterations": iterations,
                 "median_ms": median,
                 "mean_ms": mean,
@@ -70,9 +77,11 @@ async fn main() -> dcex::Result<()> {
             })
         );
     } else {
+        println!("Target: {target} (`dcex` crate {crate_version}).");
+        println!();
         println!("| Target | Iterations | Median ms | Mean ms | Min ms | Max ms |");
         println!("| ------ | ---------- | --------- | ------- | ------ | ------ |");
-        println!("| Rust native | {iterations} | {median:.3} | {mean:.3} | {min:.3} | {max:.3} |");
+        println!("| {target} | {iterations} | {median:.3} | {mean:.3} | {min:.3} | {max:.3} |");
     }
 
     Ok(())
