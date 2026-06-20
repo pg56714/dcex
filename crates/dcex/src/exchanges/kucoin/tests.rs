@@ -1,4 +1,9 @@
 use std::time::Duration;
+use std::{
+    io::{Read, Write},
+    net::TcpListener,
+    thread,
+};
 
 use crate::http::HttpMethod;
 
@@ -54,4 +59,54 @@ fn futures_symbol_fallback_matches_kucoin_contract_format() {
             .expect("symbol"),
         "ETHUSDTM"
     );
+}
+
+#[tokio::test]
+async fn public_spot_orderbook_is_signed() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    let response = client
+        .public_request(
+            "get_spot_orderbook",
+            vec![("product_symbol".to_string(), "BTC-USDT-SPOT".to_string())],
+        )
+        .await
+        .expect("response");
+
+    assert_eq!(response.data["code"], "200000");
+    let request = handle.join().expect("server");
+    assert!(request.starts_with("GET /api/v3/market/orderbook/level2?symbol=BTC-USDT HTTP/1.1"));
+    let request = request.to_ascii_lowercase();
+    assert!(request.contains("kc-api-key: api-key"));
+    assert!(request.contains("kc-api-sign: "));
+    assert!(request.contains("kc-api-timestamp: "));
+    assert!(request.contains("kc-api-passphrase: "));
+}
+
+fn server() -> (String, thread::JoinHandle<String>) {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let address = listener.local_addr().expect("address");
+    let handle = thread::spawn(move || {
+        let (mut stream, _) = listener.accept().expect("accept");
+        let mut buffer = [0u8; 4096];
+        let size = stream.read(&mut buffer).expect("read");
+        let request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+        stream
+            .write_all(
+                b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
+Content-Length: 46\r\nConnection: close\r\n\r\n{\"code\":\"200000\",\"data\":{\"bids\":[],\"asks\":[]}}",
+            )
+            .expect("write");
+        request
+    });
+    (format!("http://{address}"), handle)
 }

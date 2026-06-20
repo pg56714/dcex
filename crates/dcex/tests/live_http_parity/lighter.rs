@@ -1,8 +1,9 @@
 use std::time::Duration;
 
 use dcex::exchanges::lighter::LighterClient;
+use serde_json::Value;
 
-use super::common::{require_env, run_cases, run_private_cases, Case, BTC_USDT_SWAP};
+use super::common::{live_http_enabled, require_env, run_cases, run_private_cases, Case};
 
 const LIGHTER_BASE_URL: &str = "https://mainnet.zklighter.elliot.ai";
 
@@ -10,15 +11,21 @@ const LIGHTER_BASE_URL: &str = "https://mainnet.zklighter.elliot.ai";
 #[ignore = "requires live exchange API access"]
 async fn lighter_public_live_parity() -> dcex::Result<()> {
     let client = LighterClient::new(Duration::from_secs(20))?;
+    if !live_http_enabled() {
+        eprintln!("skipping live HTTP parity test; set RUN_LIVE_HTTP_TESTS=1");
+        return Ok(());
+    }
+    let details = client.get_order_book_details(Vec::new()).await?;
+    let market_id = active_market_id(&details.data)?;
     run_cases(
         vec![
             Case::new("get_status", &[]),
             Case::new("get_info", &[]),
             Case::new("get_order_book_details", &[]),
-            Case::new("get_order_books", &[("product_symbol", BTC_USDT_SWAP)]),
+            Case::new("get_order_books", &[("market_id", market_id.as_str())]),
             Case::new(
                 "get_order_book_orders",
-                &[("product_symbol", BTC_USDT_SWAP), ("limit", "5")],
+                &[("market_id", market_id.as_str()), ("limit", "5")],
             ),
         ],
         |case| {
@@ -39,6 +46,28 @@ async fn lighter_public_live_parity() -> dcex::Result<()> {
         },
     )
     .await
+}
+
+fn active_market_id(data: &Value) -> dcex::Result<String> {
+    let markets = data
+        .get("order_book_details")
+        .and_then(Value::as_array)
+        .ok_or_else(|| {
+            dcex::DcexError::Decode(format!("missing Lighter order_book_details: {data:?}"))
+        })?;
+    let market = markets
+        .iter()
+        .find(|market| market.get("status").and_then(Value::as_str) == Some("active"))
+        .or_else(|| markets.first())
+        .ok_or_else(|| dcex::DcexError::Decode("no Lighter market found".to_string()))?;
+    market
+        .get("market_id")
+        .and_then(|value| match value {
+            Value::String(value) => Some(value.clone()),
+            Value::Number(value) => Some(value.to_string()),
+            _ => None,
+        })
+        .ok_or_else(|| dcex::DcexError::Decode(format!("missing Lighter market_id: {market:?}")))
 }
 
 #[tokio::test]

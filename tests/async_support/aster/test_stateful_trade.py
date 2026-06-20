@@ -629,7 +629,7 @@ async def test_futures_strategy_documented_payloads(client):
             subOrderList=[first_order, second_order],
         )
     assert place_error.value.status_code == 400
-    assert "/fapi/v3/placeStrategyOrder" in place_error.value.request
+    assert place_error.value.request == "<redacted>"
 
     update_order = dict(first_order)
     update_order.update(firstDrivenId=0, secondDrivenId=0)

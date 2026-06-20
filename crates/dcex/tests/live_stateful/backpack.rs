@@ -55,7 +55,7 @@ async fn backpack_direct_live_stateful_order() -> dcex::Result<()> {
         ]))
         .await?;
     assert_success(&order);
-    let order_id = require_order_id(&order.data, &["orderId"])?;
+    let order_id = require_order_id(&order.data, &["orderId", "id"])?;
     let cancel = client
         .cancel_order(params(&[
             ("product_symbol", BTC_USDC_SPOT),

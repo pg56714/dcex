@@ -10,6 +10,7 @@ import pytest
 from dotenv import load_dotenv
 
 from dcex.bingx.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -56,6 +57,12 @@ def _fmt(value: Decimal) -> str:
     return format(value.normalize(), "f")
 
 
+def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+    message = str(exc)
+    if "100410" in message or "endpoint trigger frequency limit" in message:
+        pytest.skip("BingX temporarily rate-limited this endpoint.")
+
+
 def _swap_available_usdt(client: Client) -> Decimal:
     data = client.get_swap_account_balance().get("data", [])
     if isinstance(data, list):
@@ -68,7 +75,11 @@ def _swap_available_usdt(client: Client) -> Decimal:
 
 
 def _spot_available(client: Client, asset: str) -> Decimal:
-    balances = client.get_spot_account_balance().get("data", {}).get("balances", [])
+    try:
+        balances = client.get_spot_account_balance().get("data", {}).get("balances", [])
+    except FailedRequestError as exc:
+        _skip_if_rate_limited(exc)
+        raise
     for item in balances:
         if item.get("asset") == asset:
             return _dec(item.get("free"))

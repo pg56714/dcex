@@ -17,4 +17,4 @@ dcex = { path = "../dcex" }
 hex = "0.4"
 pyo3 = { version = "0.23.5", features = ["extension-module"] }
 pyo3-async-runtimes = { version = "0.23.0", features = ["tokio-runtime"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["preserve_order"] }

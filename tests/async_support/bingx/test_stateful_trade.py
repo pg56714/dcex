@@ -12,6 +12,7 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.bingx.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -65,6 +66,12 @@ def _client_order_id() -> str:
     return f"dcex{uuid.uuid4().hex[:16]}"
 
 
+def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+    message = str(exc)
+    if "100410" in message or "endpoint trigger frequency limit" in message:
+        pytest.skip("BingX temporarily rate-limited this endpoint.")
+
+
 async def _swap_available_usdt(client: Client) -> Decimal:
     data = (await client.get_swap_account_balance()).get("data", [])
     if isinstance(data, list):
@@ -77,7 +84,11 @@ async def _swap_available_usdt(client: Client) -> Decimal:
 
 
 async def _spot_available(client: Client, asset: str) -> Decimal:
-    balances = (await client.get_spot_account_balance()).get("data", {}).get("balances", [])
+    try:
+        balances = (await client.get_spot_account_balance()).get("data", {}).get("balances", [])
+    except FailedRequestError as exc:
+        _skip_if_rate_limited(exc)
+        raise
     for item in balances:
         if item.get("asset") == asset:
             return _dec(item.get("free"))

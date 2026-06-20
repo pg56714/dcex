@@ -160,7 +160,7 @@ pub(crate) fn format_transfer_amount_ceil(value: f64, decimals: usize) -> String
 }
 
 pub(crate) fn first_bid_price(data: &Value) -> Result<f64> {
-    first_book_price(data, &["bids", "b"], Some("Buy"))
+    first_book_price(data, &["bids", "b", "levels"], Some("Buy"))
 }
 
 pub(crate) async fn fetch_trading_details(
@@ -479,10 +479,14 @@ fn first_price_in_array(data: &Value) -> Option<f64> {
     let rows = data.as_array()?;
     let first = rows.first()?;
     match first {
-        Value::Array(values) => values.first().and_then(value_as_f64),
+        Value::Array(values) => values.first().and_then(|value| match value {
+            Value::Array(_) | Value::Object(_) => first_price_in_array(value),
+            _ => value_as_f64(value),
+        }),
         Value::Object(object) => object
             .get("price")
             .or_else(|| object.get("p"))
+            .or_else(|| object.get("px"))
             .or_else(|| object.get("Price"))
             .and_then(value_as_f64),
         _ => value_as_f64(first),
@@ -565,4 +569,21 @@ fn now_ms() -> u128 {
         .duration_since(UNIX_EPOCH)
         .expect("system clock should be after unix epoch")
         .as_millis()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn first_bid_price_reads_hyperliquid_levels() {
+        let data = serde_json::json!({
+            "levels": [
+                [{"px": "63567.0", "sz": "1"}],
+                [{"px": "63568.0", "sz": "1"}]
+            ]
+        });
+
+        assert_eq!(first_bid_price(&data).expect("bid"), 63567.0);
+    }
 }

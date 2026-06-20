@@ -14,8 +14,11 @@ async fn kucoin_spot_direct_live_stateful_order() -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());
     }
-    let Some(keys) = require_env(&["KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_PASSPHRASE"])
-    else {
+    let Some(keys) = require_env(&[
+        "KUCOIN_API_KEY",
+        "KUCOIN_API_SECRET",
+        "KUCOIN_API_PASSPHRASE",
+    ]) else {
         return Ok(());
     };
     let client = KucoinClient::new(

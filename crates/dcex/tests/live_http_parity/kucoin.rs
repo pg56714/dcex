@@ -14,7 +14,6 @@ async fn kucoin_public_live_parity() -> dcex::Result<()> {
         vec![
             Case::new("get_spot_instrument_info", &[]),
             Case::new("get_spot_ticker", &[("product_symbol", BTC_USDT_SPOT)]),
-            Case::new("get_spot_orderbook", &[("product_symbol", BTC_USDT_SPOT)]),
             Case::new(
                 "get_spot_public_trades",
                 &[("product_symbol", BTC_USDT_SPOT)],
@@ -44,7 +43,6 @@ async fn kucoin_public_live_parity() -> dcex::Result<()> {
                         get_futures_ticker,
                         get_spot_instrument_info,
                         get_spot_kline,
-                        get_spot_orderbook,
                         get_spot_public_trades,
                         get_spot_ticker,
                     ]
@@ -58,8 +56,11 @@ async fn kucoin_public_live_parity() -> dcex::Result<()> {
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn kucoin_private_read_live_parity() -> dcex::Result<()> {
-    let Some(keys) = require_env(&["KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_PASSPHRASE"])
-    else {
+    let Some(keys) = require_env(&[
+        "KUCOIN_API_KEY",
+        "KUCOIN_API_SECRET",
+        "KUCOIN_API_PASSPHRASE",
+    ]) else {
         return Ok(());
     };
     let client = KucoinClient::new(
@@ -69,8 +70,13 @@ async fn kucoin_private_read_live_parity() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
     run_private_cases(
-        &["KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_PASSPHRASE"],
+        &[
+            "KUCOIN_API_KEY",
+            "KUCOIN_API_SECRET",
+            "KUCOIN_API_PASSPHRASE",
+        ],
         vec![
+            Case::new("get_spot_orderbook", &[("product_symbol", BTC_USDT_SPOT)]),
             Case::new("get_account_balance", &[]),
             Case::new("get_futures_account", &[]),
             Case::new("get_futures_positions", &[]),
@@ -87,6 +93,7 @@ async fn kucoin_private_read_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
+                        get_spot_orderbook,
                         get_account_balance,
                         get_futures_account,
                         get_futures_order_list,

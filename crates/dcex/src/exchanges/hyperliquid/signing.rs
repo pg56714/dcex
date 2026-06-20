@@ -40,8 +40,8 @@ pub fn hyperliquid_signature(
     let digest = agent_eip712_digest(if testnet { "b" } else { "a" }, &connection_id);
     let signature = recoverable_sign(&digest, private_key)?;
     Ok(HyperliquidSignature {
-        r: hex::encode(&signature[..32]),
-        s: hex::encode(&signature[32..64]),
+        r: format!("0x{}", hex::encode(&signature[..32])),
+        s: format!("0x{}", hex::encode(&signature[32..64])),
         v: signature[64] + 27,
     })
 }

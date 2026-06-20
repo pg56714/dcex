@@ -6,12 +6,21 @@ import pytest
 from dotenv import load_dotenv
 
 from dcex.okx.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
 OKX_API_KEY = os.getenv("OKX_API_KEY")
 OKX_API_SECRET = os.getenv("OKX_API_SECRET")
 OKX_PASSPHRASE = os.getenv("OKX_PASSPHRASE")
+
+
+def _skip_if_deposit_withdraw_status_unavailable(exc) -> None:
+    message = str(exc)
+    if "58214" in message:
+        pytest.skip("OKX deposit/withdraw status is unavailable during chain maintenance.")
+    if "50011" in message or "Too many requests" in message:
+        pytest.skip("OKX rate-limited the deposit/withdraw status endpoint.")
 
 
 @pytest.fixture
@@ -76,12 +85,16 @@ def test_get_deposit_withdraw_status(client):
     )
     if deposit is None:
         pytest.skip("OKX account has no complete USDT deposit record to query.")
-    res = client.get_deposit_withdraw_status(
-        txId=deposit["txId"],
-        ccy=deposit["ccy"],
-        to=deposit["to"],
-        chain=deposit["chain"],
-    )
+    try:
+        res = client.get_deposit_withdraw_status(
+            txId=deposit["txId"],
+            ccy=deposit["ccy"],
+            to=deposit["to"],
+            chain=deposit["chain"],
+        )
+    except FailedRequestError as exc:
+        _skip_if_deposit_withdraw_status_unavailable(exc)
+        raise
     assert res is not None
 
 
