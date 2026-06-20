@@ -136,6 +136,9 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+
       - name: Install dependencies
         run: uv sync --locked
 
@@ -205,6 +208,9 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
 
       - name: Download release metadata
         uses: actions/download-artifact@v5
