@@ -11,8 +11,7 @@ async fn main() -> dcex::Result<()> {
         .map_err(|error| dcex::DcexError::InvalidInput(error.to_string()))?;
 
     let mut ws = KrakenPrivateWebSocket::new(api_key, api_secret, Duration::from_secs(10))?;
-    let token = ws.connect().await?;
-    println!("token={token}");
+    ws.connect().await?;
     ws.subscribe_balances().await?;
     println!("{}", ws.recv().await?);
     ws.close().await?;

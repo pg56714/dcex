@@ -54,6 +54,7 @@ impl BybitPrivateWebSocket {
     }
 
     pub async fn auth(&mut self) -> Result<()> {
+        self.authenticated = false;
         let expires = auth_expires_ms(unix_timestamp_ms()?);
         let signature = auth_signature(&self.api_secret, expires)?;
         let request_id = self.next_request_id();
@@ -63,6 +64,8 @@ impl BybitPrivateWebSocket {
             "args": [self.api_key, expires, signature],
         });
         self.connection.send_json(&payload).await?;
+        let event = self.connection.recv_json().await?;
+        validate_auth_ack(&event)?;
         self.authenticated = true;
         Ok(())
     }
@@ -181,8 +184,36 @@ fn validate_credential(label: &str, value: &str) -> Result<()> {
     Ok(())
 }
 
+fn validate_auth_ack(event: &Value) -> Result<()> {
+    let op = event.get("op").and_then(Value::as_str);
+    let success = event.get("success").and_then(Value::as_bool);
+    let code = event
+        .get("retCode")
+        .or_else(|| event.get("ret_code"))
+        .or_else(|| event.get("code"))
+        .and_then(value_as_string);
+    let code_success = code.as_deref().is_some_and(|code| code == "0");
+    if op == Some("auth") && (success == Some(true) || (success.is_none() && code_success)) {
+        Ok(())
+    } else {
+        Err(DcexError::Runtime(format!(
+            "Bybit WebSocket auth rejected: {event}"
+        )))
+    }
+}
+
+fn value_as_string(value: &Value) -> Option<String> {
+    match value {
+        Value::String(value) => Some(value.clone()),
+        Value::Number(value) => Some(value.to_string()),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
@@ -202,5 +233,13 @@ mod tests {
     fn rejects_invalid_topic() {
         assert!(normalize_topic("order").is_ok());
         assert!(normalize_topic("bad/topic").is_err());
+    }
+
+    #[test]
+    fn validates_auth_ack() {
+        assert!(validate_auth_ack(&json!({"op": "auth", "success": true})).is_ok());
+        assert!(validate_auth_ack(&json!({"op": "auth", "retCode": 0})).is_ok());
+        assert!(validate_auth_ack(&json!({"op": "auth", "success": false})).is_err());
+        assert!(validate_auth_ack(&json!({"op": "subscribe", "success": true})).is_err());
     }
 }

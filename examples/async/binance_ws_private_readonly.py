@@ -13,7 +13,6 @@ async def main() -> None:
 
     async with binance.private(api_key=api_key, api_secret=api_secret) as ws:
         await ws.keep_alive()
-        print({"listen_key": ws.listen_key()})
         print(await ws.recv())
 
 

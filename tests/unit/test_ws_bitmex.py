@@ -103,14 +103,17 @@ class _FakeNativeBitmexPrivateWebSocketClient:
     async def unsubscribe(self, args: list[str]) -> None:
         self.unsubscriptions.extend(args)
 
-    async def subscribe_orders(self, product_symbol: str) -> None:
-        await self.subscribe([f"order:{product_symbol}"])
+    async def subscribe_orders(self, product_symbol: str | None = None) -> None:
+        topic = "order" if product_symbol is None else f"order:{product_symbol}"
+        await self.subscribe([topic])
 
-    async def subscribe_executions(self, product_symbol: str) -> None:
-        await self.subscribe([f"execution:{product_symbol}"])
+    async def subscribe_executions(self, product_symbol: str | None = None) -> None:
+        topic = "execution" if product_symbol is None else f"execution:{product_symbol}"
+        await self.subscribe([topic])
 
-    async def subscribe_positions(self, product_symbol: str) -> None:
-        await self.subscribe([f"position:{product_symbol}"])
+    async def subscribe_positions(self, product_symbol: str | None = None) -> None:
+        topic = "position" if product_symbol is None else f"position:{product_symbol}"
+        await self.subscribe([topic])
 
     async def subscribe_margin(self) -> None:
         await self.subscribe(["margin"])
@@ -208,6 +211,9 @@ async def test_bitmex_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         await ws.subscribe_orders("XBTUSD")
         await ws.subscribe_executions("XBTUSD")
         await ws.subscribe_positions("XBTUSD")
+        await ws.subscribe_orders()
+        await ws.subscribe_executions()
+        await ws.subscribe_positions()
         await ws.subscribe_margin()
         await ws.subscribe_wallet()
         await ws.ping()
@@ -217,6 +223,9 @@ async def test_bitmex_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         "order:XBTUSD",
         "execution:XBTUSD",
         "position:XBTUSD",
+        "order",
+        "execution",
+        "position",
         "margin",
         "wallet",
     ]

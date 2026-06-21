@@ -141,7 +141,7 @@ class PrivateClient(AsyncWebSocketMixin):
         await self._native_client.subscribe_positions(inst_type)
 
     def is_logged_in(self) -> bool:
-        """Return whether login has been sent."""
+        """Return whether login has been acknowledged."""
         return bool(self._native_client.is_logged_in())
 
     async def recv(self) -> dict[str, Any] | list[Any]:

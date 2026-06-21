@@ -334,49 +334,52 @@ impl PythonBitmexPrivateWebSocketClient {
         })
     }
 
+    #[pyo3(signature = (product_symbol=None))]
     fn subscribe_orders<'py>(
         &self,
         py: Python<'py>,
-        product_symbol: String,
+        product_symbol: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_orders(Some(&product_symbol))
+                .subscribe_orders(product_symbol.as_deref())
                 .await
                 .map_err(to_py_runtime_error)
         })
     }
 
+    #[pyo3(signature = (product_symbol=None))]
     fn subscribe_executions<'py>(
         &self,
         py: Python<'py>,
-        product_symbol: String,
+        product_symbol: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_executions(Some(&product_symbol))
+                .subscribe_executions(product_symbol.as_deref())
                 .await
                 .map_err(to_py_runtime_error)
         })
     }
 
+    #[pyo3(signature = (product_symbol=None))]
     fn subscribe_positions<'py>(
         &self,
         py: Python<'py>,
-        product_symbol: String,
+        product_symbol: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_positions(Some(&product_symbol))
+                .subscribe_positions(product_symbol.as_deref())
                 .await
                 .map_err(to_py_runtime_error)
         })

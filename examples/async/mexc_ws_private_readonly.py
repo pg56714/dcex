@@ -12,7 +12,6 @@ async def main() -> None:
 
     async with mexc.private(api_key=api_key) as ws:
         await ws.keep_alive()
-        print({"listen_key": ws.listen_key()})
         await ws.subscribe_account()
         print(await ws.recv())
 

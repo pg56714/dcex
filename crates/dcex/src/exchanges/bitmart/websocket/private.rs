@@ -69,6 +69,7 @@ impl BitmartPrivateWebSocket {
     }
 
     pub async fn login(&mut self) -> Result<()> {
+        self.logged_in = false;
         let timestamp = unix_timestamp_ms()?.to_string();
         let sign = login_signature(&self.api_secret, &self.memo, &timestamp)?;
         let payload = json!({
@@ -76,6 +77,9 @@ impl BitmartPrivateWebSocket {
             "args": [self.api_key, timestamp, sign],
         });
         self.connection.send_json(&payload).await?;
+        let payload = self.connection.recv_bytes().await?;
+        let event = decode_event(payload)?;
+        validate_login_ack(&event)?;
         self.logged_in = true;
         Ok(())
     }
@@ -149,8 +153,40 @@ fn login_signature(api_secret: &str, memo: &str, timestamp: &str) -> Result<Stri
     hmac_sha256_hex(api_secret.as_bytes(), payload.as_bytes())
 }
 
+fn validate_login_ack(event: &Value) -> Result<()> {
+    let event_name = event
+        .get("event")
+        .or_else(|| event.get("op"))
+        .and_then(Value::as_str);
+    let success = event.get("success").and_then(Value::as_bool);
+    let status_codes = ["code", "errorCode", "error_code"]
+        .into_iter()
+        .filter_map(|field| event.get(field).and_then(value_as_string))
+        .collect::<Vec<_>>();
+    let codes_are_successful = status_codes
+        .iter()
+        .all(|code| matches!(code.as_str(), "0" | "1000" | "200"));
+    if event_name == Some("login") && success != Some(false) && codes_are_successful {
+        Ok(())
+    } else {
+        Err(DcexError::Runtime(format!(
+            "BitMart WebSocket login rejected: {event}"
+        )))
+    }
+}
+
+fn value_as_string(value: &Value) -> Option<String> {
+    match value {
+        Value::String(value) => Some(value.clone()),
+        Value::Number(value) => Some(value.to_string()),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
@@ -175,5 +211,14 @@ mod tests {
             Duration::from_secs(1),
         )
         .is_err());
+    }
+
+    #[test]
+    fn validates_login_ack() {
+        assert!(validate_login_ack(&json!({"event": "login"})).is_ok());
+        assert!(validate_login_ack(&json!({"event": "login", "code": 1000})).is_ok());
+        assert!(validate_login_ack(&json!({"event": "login", "errorCode": "0"})).is_ok());
+        assert!(validate_login_ack(&json!({"event": "login", "errorCode": "30001"})).is_err());
+        assert!(validate_login_ack(&json!({"event": "error", "code": 1000})).is_err());
     }
 }

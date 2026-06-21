@@ -11,9 +11,8 @@ async fn main() -> dcex::Result<()> {
         .map_err(|error| dcex::DcexError::InvalidInput(error.to_string()))?;
 
     let mut ws = BinancePrivateWebSocket::new(api_key, api_secret, Duration::from_secs(10))?;
-    let listen_key = ws.connect().await?;
+    ws.connect().await?;
     ws.keep_alive().await?;
-    println!("listen_key={listen_key}");
     println!("{}", ws.recv().await?);
     ws.close().await?;
     Ok(())

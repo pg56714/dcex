@@ -129,7 +129,7 @@ class PrivateClient(AsyncWebSocketMixin):
         return str(await self._native_client.subscribe_wallet())
 
     def is_authenticated(self) -> bool:
-        """Return whether auth has been sent."""
+        """Return whether auth has been acknowledged."""
         return bool(self._native_client.is_authenticated())
 
     async def recv(self) -> dict[str, Any] | list[Any]:

@@ -111,6 +111,7 @@ impl OkxPrivateWebSocket {
     }
 
     pub async fn login(&mut self) -> Result<()> {
+        self.logged_in = false;
         let timestamp = websocket_timestamp(unix_timestamp_ms()?);
         let sign = login_signature(&self.api_secret, &timestamp)?;
         let payload = json!({
@@ -123,6 +124,8 @@ impl OkxPrivateWebSocket {
             }],
         });
         self.connection.send_json(&payload).await?;
+        let event = self.connection.recv_json().await?;
+        validate_login_ack(&event)?;
         self.logged_in = true;
         Ok(())
     }
@@ -276,8 +279,30 @@ fn validate_credential(label: &str, value: &str) -> Result<()> {
     Ok(())
 }
 
+fn validate_login_ack(event: &Value) -> Result<()> {
+    let event_name = event.get("event").and_then(Value::as_str);
+    let code = event.get("code").and_then(value_as_string);
+    if event_name == Some("login") && code.as_deref() == Some("0") {
+        Ok(())
+    } else {
+        Err(DcexError::Runtime(format!(
+            "OKX WebSocket login rejected: {event}"
+        )))
+    }
+}
+
+fn value_as_string(value: &Value) -> Option<String> {
+    match value {
+        Value::String(value) => Some(value.clone()),
+        Value::Number(value) => Some(value.to_string()),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
@@ -317,5 +342,12 @@ mod tests {
             OkxPrivateWebSocketArg::new("orders", None, Some("BTC/USDT".to_string()), None)
                 .is_err()
         );
+    }
+
+    #[test]
+    fn validates_login_ack() {
+        assert!(validate_login_ack(&json!({"event": "login", "code": "0"})).is_ok());
+        assert!(validate_login_ack(&json!({"event": "login", "code": "60012"})).is_err());
+        assert!(validate_login_ack(&json!({"event": "subscribe", "code": "0"})).is_err());
     }
 }

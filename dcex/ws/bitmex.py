@@ -129,15 +129,15 @@ class PrivateClient(AsyncWebSocketMixin):
         """Unsubscribe from raw BitMEX private table arguments."""
         await self._native_client.unsubscribe(args)
 
-    async def subscribe_orders(self, product_symbol: str) -> None:
+    async def subscribe_orders(self, product_symbol: str | None = None) -> None:
         """Subscribe to order updates."""
         await self._native_client.subscribe_orders(product_symbol)
 
-    async def subscribe_executions(self, product_symbol: str) -> None:
+    async def subscribe_executions(self, product_symbol: str | None = None) -> None:
         """Subscribe to execution updates."""
         await self._native_client.subscribe_executions(product_symbol)
 
-    async def subscribe_positions(self, product_symbol: str) -> None:
+    async def subscribe_positions(self, product_symbol: str | None = None) -> None:
         """Subscribe to position updates."""
         await self._native_client.subscribe_positions(product_symbol)
 
