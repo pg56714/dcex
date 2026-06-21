@@ -1,1 +1,3 @@
-pub use crate::exchanges::okx::websocket::{OkxPublicWebSocket, OkxWebSocketArg};
+pub use crate::exchanges::okx::websocket::{
+    OkxPrivateWebSocket, OkxPrivateWebSocketArg, OkxPublicWebSocket, OkxWebSocketArg,
+};

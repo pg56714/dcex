@@ -1,0 +1,26 @@
+"""Open an OKX private WebSocket user-data stream."""
+
+import asyncio
+import os
+
+from dcex.ws import okx
+
+
+async def main() -> None:
+    """Open the private stream, subscribe to account updates, and print one message."""
+    api_key = os.environ["OKX_API_KEY"]
+    api_secret = os.environ["OKX_API_SECRET"]
+    passphrase = os.environ["OKX_PASSPHRASE"]
+
+    async with okx.private(
+        api_key=api_key,
+        api_secret=api_secret,
+        passphrase=passphrase,
+    ) as ws:
+        print(await ws.recv())
+        await ws.subscribe_account()
+        print(await ws.recv())
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

@@ -72,9 +72,107 @@ class PublicClient(AsyncWebSocketMixin):
         raise RuntimeError(f"Unexpected OKX WebSocket event payload: {event!r}")
 
 
+class PrivateClient(AsyncWebSocketMixin):
+    """Async OKX private WebSocket client."""
+
+    def __init__(
+        self,
+        api_key: str,
+        api_secret: str,
+        passphrase: str,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+    ) -> None:
+        """Create an OKX private WebSocket client."""
+        self._native_client = _native.OkxPrivateWebSocketClient(
+            api_key=api_key,
+            api_secret=api_secret,
+            passphrase=passphrase,
+            timeout=timeout,
+            base_url=base_url,
+        )
+
+    async def connect(self) -> None:
+        """Open the WebSocket connection and login."""
+        await self._native_client.connect()
+
+    async def login(self) -> None:
+        """Send the OKX login operation."""
+        await self._native_client.login()
+
+    async def close(self) -> None:
+        """Close the WebSocket connection."""
+        await self._native_client.close()
+
+    async def subscribe_channel(
+        self,
+        channel: str,
+        inst_type: str | None = None,
+        inst_id: str | None = None,
+        ccy: str | None = None,
+    ) -> None:
+        """Subscribe to an OKX private channel."""
+        await self._native_client.subscribe_channel(channel, inst_type, inst_id, ccy)
+
+    async def unsubscribe_channel(
+        self,
+        channel: str,
+        inst_type: str | None = None,
+        inst_id: str | None = None,
+        ccy: str | None = None,
+    ) -> None:
+        """Unsubscribe from an OKX private channel."""
+        await self._native_client.unsubscribe_channel(channel, inst_type, inst_id, ccy)
+
+    async def subscribe_orders(
+        self,
+        inst_type: str | None = None,
+        inst_id: str | None = None,
+    ) -> None:
+        """Subscribe to order update events."""
+        await self._native_client.subscribe_orders(inst_type, inst_id)
+
+    async def subscribe_account(self, ccy: str | None = None) -> None:
+        """Subscribe to account balance events."""
+        await self._native_client.subscribe_account(ccy)
+
+    async def subscribe_positions(self, inst_type: str | None = None) -> None:
+        """Subscribe to position update events."""
+        await self._native_client.subscribe_positions(inst_type)
+
+    def is_logged_in(self) -> bool:
+        """Return whether login has been sent."""
+        return bool(self._native_client.is_logged_in())
+
+    async def recv(self) -> dict[str, Any] | list[Any]:
+        """Receive and decode one WebSocket event."""
+        body = await self._native_client.recv()
+        event = json.loads(bytes(body))
+        if isinstance(event, dict | list):
+            return event
+        raise RuntimeError(f"Unexpected OKX WebSocket event payload: {event!r}")
+
+
 def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
     """Create an async OKX public market WebSocket client."""
     return PublicClient(timeout=timeout, base_url=base_url)
 
 
-__all__ = ["PublicClient", "public"]
+def private(
+    api_key: str,
+    api_secret: str,
+    passphrase: str,
+    timeout: float = 10.0,
+    base_url: str | None = None,
+) -> PrivateClient:
+    """Create an async OKX private WebSocket client."""
+    return PrivateClient(
+        api_key=api_key,
+        api_secret=api_secret,
+        passphrase=passphrase,
+        timeout=timeout,
+        base_url=base_url,
+    )
+
+
+__all__ = ["PrivateClient", "PublicClient", "private", "public"]
