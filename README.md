@@ -128,7 +128,7 @@ async fn main() -> dcex::Result<()> {
 | **BingX**       | Yes       | Yes        | Yes       | Yes        |
 | **KuCoin**      | Yes       | Yes        | Yes       | Yes        |
 | **Hyperliquid** | Yes       | Yes        | Yes       | Yes        |
-| **Lighter**     | Yes       | Yes        | No        | No         |
+| **Lighter**     | Yes       | Yes        | Yes       | Yes        |
 | **Backpack**    | Yes       | Yes        | No        | No         |
 | **Aster**       | Yes       | Yes        | No        | No         |
 
@@ -140,7 +140,7 @@ streams. Order placement and cancellation remain on HTTP clients.
 - Product Table Manager for unifying trading instruments across exchanges
 - HTTP clients with consistent sync and async interfaces where available
 - Native Rust core for exchange HTTP, WebSocket, signing, serialization, and response validation
-- WebSocket public streams for Binance, BingX, Bybit, OKX, Bitget, Kraken, KuCoin, MEXC, BitMart, BitMEX, Gate.io, and Hyperliquid, with user-data streams for Binance, BingX, Bybit, OKX, Bitget, Kraken, KuCoin, MEXC, BitMart, BitMEX, Gate.io, and Hyperliquid
+- WebSocket public streams for Binance, BingX, Bybit, OKX, Bitget, Kraken, KuCoin, MEXC, BitMart, BitMEX, Gate.io, Hyperliquid, and Lighter, with user-data streams for Binance, BingX, Bybit, OKX, Bitget, Kraken, KuCoin, MEXC, BitMart, BitMEX, Gate.io, Hyperliquid, and Lighter
 - Direct Rust crate (`dcex`) for applications that do not need the Python layer
 - Opt-in live test suites for public, private, stateful, and generated-report endpoints
 

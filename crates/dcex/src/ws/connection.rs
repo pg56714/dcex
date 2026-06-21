@@ -108,6 +108,18 @@ impl WebSocketConnection {
         .map_err(|error| DcexError::Transport(format!("WebSocket send failed: {error}")))
     }
 
+    pub async fn send_ping(&mut self, payload: impl Into<Vec<u8>>) -> Result<()> {
+        let timeout_duration = self.config.timeout;
+        let stream = self.stream_mut()?;
+        timeout(
+            timeout_duration,
+            stream.send(Message::Ping(payload.into().into())),
+        )
+        .await
+        .map_err(|_| DcexError::Transport("WebSocket ping send timed out.".to_string()))?
+        .map_err(|error| DcexError::Transport(format!("WebSocket ping send failed: {error}")))
+    }
+
     pub async fn recv_json(&mut self) -> Result<Value> {
         let payload = self.recv_text().await?;
         serde_json::from_str(&payload)

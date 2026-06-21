@@ -11,6 +11,7 @@ from . import (
     hyperliquid,
     kraken,
     kucoin,
+    lighter,
     mexc,
     okx,
 )
@@ -26,6 +27,7 @@ __all__ = [
     "hyperliquid",
     "kraken",
     "kucoin",
+    "lighter",
     "mexc",
     "okx",
 ]

@@ -212,6 +212,8 @@ mod kucoin_client;
 mod kucoin_ws;
 #[path = "clients/lighter.rs"]
 mod lighter_client;
+#[path = "ws/lighter.rs"]
+mod lighter_ws;
 #[path = "clients/mexc.rs"]
 mod mexc_client;
 #[path = "ws/mexc.rs"]
@@ -246,6 +248,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     kucoin_client::register(m)?;
     kucoin_ws::register(m)?;
     lighter_client::register(m)?;
+    lighter_ws::register(m)?;
     mexc_client::register(m)?;
     mexc_ws::register(m)?;
     okx_client::register(m)?;
