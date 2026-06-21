@@ -20,6 +20,7 @@ futures-util = { version = "0.3", default-features = false, features = [
   "sink",
   "std",
 ] }
+flate2 = "1"
 hex = "0.4"
 getrandom = "0.2"
 hmac = "0.12"

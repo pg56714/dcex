@@ -180,6 +180,8 @@ mod bitget_client;
 mod bitget_ws;
 #[path = "clients/bitmart.rs"]
 mod bitmart_client;
+#[path = "ws/bitmart.rs"]
+mod bitmart_ws;
 #[path = "clients/bitmex.rs"]
 mod bitmex_client;
 #[path = "clients/bybit.rs"]
@@ -218,6 +220,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     bitget_client::register(m)?;
     bitget_ws::register(m)?;
     bitmart_client::register(m)?;
+    bitmart_ws::register(m)?;
     bitmex_client::register(m)?;
     bybit_client::register(m)?;
     bybit_ws::register(m)?;
