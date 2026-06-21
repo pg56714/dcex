@@ -114,30 +114,30 @@ async fn main() -> dcex::Result<()> {
 
 ## Supported Exchanges
 
-| Exchange        | HTTP Clients | WS Public | WS Private |
-| --------------- | ------------ | --------- | ---------- |
-| **Binance**     | Yes          | Yes       | Yes        |
-| **Bybit**       | Yes          | Yes       | Yes        |
-| **OKX**         | Yes          | Yes       | Yes        |
-| **Bitget**      | Yes          | Yes       | No         |
-| **Kraken**      | Yes          | No        | No         |
-| **MEXC**        | Yes          | No        | No         |
-| **BitMart**     | Yes          | No        | No         |
-| **BitMEX**      | Yes          | No        | No         |
-| **Gate.io**     | Yes          | No        | No         |
-| **BingX**       | Yes          | No        | No         |
-| **KuCoin**      | Yes          | No        | No         |
-| **Hyperliquid** | Yes          | No        | No         |
-| **Lighter**     | Yes          | No        | No         |
-| **Backpack**    | Yes          | No        | No         |
-| **Aster**       | Yes          | No        | No         |
+| Exchange        | HTTP Sync | HTTP Async | WS Public | WS Private |
+| --------------- | --------- | ---------- | --------- | ---------- |
+| **Binance**     | Yes       | Yes        | Yes       | Yes        |
+| **Bybit**       | Yes       | Yes        | Yes       | Yes        |
+| **OKX**         | Yes       | Yes        | Yes       | Yes        |
+| **Bitget**      | Yes       | Yes        | Yes       | No         |
+| **Kraken**      | Yes       | Yes        | No        | No         |
+| **MEXC**        | Yes       | Yes        | No        | No         |
+| **BitMart**     | Yes       | Yes        | No        | No         |
+| **BitMEX**      | Yes       | Yes        | No        | No         |
+| **Gate.io**     | Yes       | Yes        | No        | No         |
+| **BingX**       | Yes       | Yes        | No        | No         |
+| **KuCoin**      | Yes       | Yes        | No        | No         |
+| **Hyperliquid** | Yes       | Yes        | No        | No         |
+| **Lighter**     | Yes       | Yes        | No        | No         |
+| **Backpack**    | Yes       | Yes        | No        | No         |
+| **Aster**       | Yes       | Yes        | No        | No         |
 
 WS private support currently covers authenticated user-data streams. Order placement and cancellation remain on HTTP clients.
 
 ## Key Features
 
 - Product Table Manager for unifying trading instruments across exchanges
-- Python API clients with consistent interfaces where available
+- HTTP clients with consistent sync and async interfaces where available
 - Native Rust core for exchange HTTP, WebSocket, signing, serialization, and response validation
 - WebSocket public streams for Binance, Bybit, OKX, and Bitget, with authenticated user-data streams for Binance, Bybit, and OKX
 - Direct Rust crate (`dcex`) for applications that do not need the Python layer
