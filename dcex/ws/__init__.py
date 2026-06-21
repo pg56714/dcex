@@ -1,6 +1,19 @@
 """Async WebSocket clients backed by the Rust core."""
 
-from . import binance, bingx, bitget, bitmart, bitmex, bybit, gateio, kraken, kucoin, mexc, okx
+from . import (
+    binance,
+    bingx,
+    bitget,
+    bitmart,
+    bitmex,
+    bybit,
+    gateio,
+    hyperliquid,
+    kraken,
+    kucoin,
+    mexc,
+    okx,
+)
 
 __all__ = [
     "binance",
@@ -10,6 +23,7 @@ __all__ = [
     "bitmex",
     "bybit",
     "gateio",
+    "hyperliquid",
     "kraken",
     "kucoin",
     "mexc",

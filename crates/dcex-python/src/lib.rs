@@ -200,6 +200,8 @@ mod gateio_ws;
 mod http_client;
 #[path = "clients/hyperliquid.rs"]
 mod hyperliquid_client;
+#[path = "ws/hyperliquid.rs"]
+mod hyperliquid_ws;
 #[path = "clients/kraken.rs"]
 mod kraken_client;
 #[path = "ws/kraken.rs"]
@@ -237,6 +239,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     gateio_client::register(m)?;
     gateio_ws::register(m)?;
     hyperliquid_client::register(m)?;
+    hyperliquid_ws::register(m)?;
     http_client::register(m)?;
     kraken_client::register(m)?;
     kraken_ws::register(m)?;

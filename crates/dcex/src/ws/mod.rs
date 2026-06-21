@@ -6,6 +6,7 @@ pub mod bitmex;
 pub mod bybit;
 pub mod connection;
 pub mod gateio;
+pub mod hyperliquid;
 pub mod kraken;
 pub mod kucoin;
 pub mod mexc;

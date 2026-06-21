@@ -7,6 +7,7 @@ mod msgpack;
 mod params;
 mod signing;
 mod trade;
+pub mod websocket;
 mod wrappers;
 
 pub use client::HyperliquidClient;
