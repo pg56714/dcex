@@ -6,9 +6,9 @@
 
 > Originally created and maintained by the same contributor, this fork continues active development, building upon the original foundation with enhanced design, unified DEX + CEX support, and fixes for previously unresolved issues.
 
-A high-performance and lightweight Python and Rust library for interacting with cryptocurrency exchanges. dcex offers synchronous and asynchronous Python clients backed by a Rust core, plus direct Rust APIs for low-level HTTP, signing, and exchange integrations.
+A high-performance and lightweight Python and Rust library for interacting with cryptocurrency exchanges. dcex offers Python clients backed by a Rust core, plus direct Rust APIs for low-level HTTP, WebSocket, signing, and exchange integrations.
 
-Scope note: dcex focuses on market data, account queries, and trading/order APIs. External withdrawal creation endpoints are not currently wrapped, and options support is limited to exchange-specific APIs rather than the unified Product Table Manager.
+Scope note: dcex focuses on market data, account queries, trading/order APIs, and market/user-data streams. External withdrawal creation endpoints are not currently wrapped, and options support is limited to exchange-specific APIs rather than the unified Product Table Manager.
 
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
 [![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org/)
@@ -114,29 +114,32 @@ async fn main() -> dcex::Result<()> {
 
 ## Supported Exchanges
 
-| Exchange        | Sync Support | Async Support |
-| --------------- | ------------ | ------------- |
-| **Binance**     | Yes          | Yes           |
-| **Bybit**       | Yes          | Yes           |
-| **OKX**         | Yes          | Yes           |
-| **Bitget**      | Yes          | Yes           |
-| **Kraken**      | Yes          | Yes           |
-| **MEXC**        | Yes          | Yes           |
-| **BitMart**     | Yes          | Yes           |
-| **BitMEX**      | Yes          | Yes           |
-| **Gate.io**     | Yes          | Yes           |
-| **BingX**       | Yes          | Yes           |
-| **KuCoin**      | Yes          | Yes           |
-| **Hyperliquid** | Yes          | Yes           |
-| **Lighter**     | Yes          | Yes           |
-| **Backpack**    | Yes          | Yes           |
-| **Aster**       | Yes          | Yes           |
+| Exchange        | HTTP Clients | WS Public | WS Private |
+| --------------- | ------------ | --------- | ---------- |
+| **Binance**     | Yes          | Yes       | Yes        |
+| **Bybit**       | Yes          | Yes       | Yes        |
+| **OKX**         | Yes          | Yes       | Yes        |
+| **Bitget**      | Yes          | Yes       | No         |
+| **Kraken**      | Yes          | No        | No         |
+| **MEXC**        | Yes          | No        | No         |
+| **BitMart**     | Yes          | No        | No         |
+| **BitMEX**      | Yes          | No        | No         |
+| **Gate.io**     | Yes          | No        | No         |
+| **BingX**       | Yes          | No        | No         |
+| **KuCoin**      | Yes          | No        | No         |
+| **Hyperliquid** | Yes          | No        | No         |
+| **Lighter**     | Yes          | No        | No         |
+| **Backpack**    | Yes          | No        | No         |
+| **Aster**       | Yes          | No        | No         |
+
+WS private support currently covers authenticated user-data streams. Order placement and cancellation remain on HTTP clients.
 
 ## Key Features
 
 - Product Table Manager for unifying trading instruments across exchanges
-- Sync and async Python API clients with consistent interfaces where available
-- Native Rust core for exchange HTTP, signing, serialization, and response validation
+- Python API clients with consistent interfaces where available
+- Native Rust core for exchange HTTP, WebSocket, signing, serialization, and response validation
+- WebSocket public streams for Binance, Bybit, OKX, and Bitget, with authenticated user-data streams for Binance, Bybit, and OKX
 - Direct Rust crate (`dcex`) for applications that do not need the Python layer
 - Opt-in live test suites for public, private, stateful, and generated-report endpoints
 

@@ -2,9 +2,10 @@
 
 Rust core library for low-latency cross-exchange crypto trading.
 
-This crate contains the exchange HTTP, signing, serialization, product-table,
-and response-validation implementation used by the Python `dcex` package. It
-can also be used directly from Rust applications without the Python layer.
+This crate contains the exchange HTTP, WebSocket, signing, serialization,
+product-table, and response-validation implementation used by the Python
+`dcex` package. It can also be used directly from Rust applications without the
+Python layer.
 
 ## Example
 
@@ -64,6 +65,22 @@ cargo run -p dcex --example lighter_public
 cargo run -p dcex --example mexc_public
 cargo run -p dcex --example okx_public
 ```
+
+WebSocket examples are available for exchanges that have stream support in the
+Rust core:
+
+```sh
+cargo run -p dcex --example binance_ws_public
+cargo run -p dcex --example bybit_ws_public
+cargo run -p dcex --example okx_ws_public
+cargo run -p dcex --example bitget_ws_public
+cargo run -p dcex --example binance_ws_private_readonly
+cargo run -p dcex --example bybit_ws_private_readonly
+cargo run -p dcex --example okx_ws_private_readonly
+```
+
+Private read-only WebSocket examples require exchange credentials in environment
+variables and only open user-data streams.
 
 ## Python Package Relationship
 
