@@ -1,3 +1,27 @@
+## 0.2.0 (2026-06-21)
+
+### Feat
+
+- add kucoin websocket clients
+- add bingx websocket clients
+- add gateio websocket clients
+- add bitmex websocket clients
+- add bitmart websocket clients
+- add mexc websocket clients
+- add kraken websocket clients
+- add bitget private websocket client
+- add bybit private websocket client
+- add okx private websocket client
+- add bitget public websocket client
+- add bybit public websocket client
+- add binance private websocket client
+- add okx public websocket client
+- add binance public websocket client
+
+### Fix
+
+- harden websocket private auth state
+
 ## 0.1.0 (2026-06-20)
 
 ### Feat
