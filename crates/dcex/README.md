@@ -58,7 +58,7 @@ async fn main() -> dcex::Result<()> {
 | **BitMEX**      | Yes  | Yes       | Yes        |
 | **Gate.io**     | Yes  | Yes       | Yes        |
 | **BingX**       | Yes  | Yes       | Yes        |
-| **KuCoin**      | Yes  | No        | No         |
+| **KuCoin**      | Yes  | Yes       | Yes        |
 | **Hyperliquid** | Yes  | No        | No         |
 | **Lighter**     | Yes  | No        | No         |
 | **Backpack**    | Yes  | No        | No         |
@@ -102,6 +102,7 @@ cargo run -p dcex --example bitmart_ws_public
 cargo run -p dcex --example bitmex_ws_public
 cargo run -p dcex --example gateio_ws_public
 cargo run -p dcex --example kraken_ws_public
+cargo run -p dcex --example kucoin_ws_public
 cargo run -p dcex --example mexc_ws_public
 cargo run -p dcex --example binance_ws_private_readonly
 cargo run -p dcex --example bingx_ws_private_readonly
@@ -111,6 +112,7 @@ cargo run -p dcex --example bitmex_ws_private_readonly
 cargo run -p dcex --example bybit_ws_private_readonly
 cargo run -p dcex --example gateio_ws_private_readonly
 cargo run -p dcex --example kraken_ws_private_readonly
+cargo run -p dcex --example kucoin_ws_private_readonly
 cargo run -p dcex --example mexc_ws_private_readonly
 cargo run -p dcex --example okx_ws_private_readonly
 ```

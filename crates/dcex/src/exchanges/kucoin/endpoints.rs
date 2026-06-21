@@ -1,6 +1,9 @@
 pub(super) const SPOT_BASE_URL: &str = "https://api.kucoin.com";
 pub(super) const FUTURES_BASE_URL: &str = "https://api-futures.kucoin.com";
 
+pub(super) const SPOT_WS_PUBLIC_TOKEN: &str = "/api/v1/bullet-public";
+pub(super) const SPOT_WS_PRIVATE_TOKEN: &str = "/api/v1/bullet-private";
+
 pub(super) const SPOT_INSTRUMENT_INFO: &str = "/api/v2/symbols";
 pub(super) const SPOT_TICKER: &str = "/api/v1/market/orderbook/level1";
 pub(super) const SPOT_ALL_TICKERS: &str = "/api/v1/market/allTickers";
