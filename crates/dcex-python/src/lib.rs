@@ -198,6 +198,8 @@ mod lighter_client;
 mod mexc_client;
 #[path = "clients/okx.rs"]
 mod okx_client;
+#[path = "ws/okx.rs"]
+mod okx_ws;
 
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -218,6 +220,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     mexc_client::register(m)?;
     okx_client::register(m)?;
     binance_ws::register(m)?;
+    okx_ws::register(m)?;
     product_table::register(m)?;
     functions::register(m)?;
     Ok(())

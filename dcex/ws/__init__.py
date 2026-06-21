@@ -1,5 +1,5 @@
 """Async WebSocket clients backed by the Rust core."""
 
-from . import binance
+from . import binance, okx
 
-__all__ = ["binance"]
+__all__ = ["binance", "okx"]
