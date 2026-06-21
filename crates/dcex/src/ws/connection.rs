@@ -94,6 +94,43 @@ impl WebSocketConnection {
             .map_err(|error| DcexError::Decode(format!("failed to decode WebSocket JSON: {error}")))
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        loop {
+            let timeout_duration = self.config.timeout;
+            let stream = self.stream_mut()?;
+            let message = timeout(timeout_duration, stream.next())
+                .await
+                .map_err(|_| DcexError::Transport("WebSocket receive timed out.".to_string()))?
+                .ok_or_else(|| DcexError::Transport("WebSocket connection closed.".to_string()))?
+                .map_err(|error| {
+                    DcexError::Transport(format!("WebSocket receive failed: {error}"))
+                })?;
+
+            match message {
+                Message::Text(payload) => return Ok(payload.to_string().into_bytes()),
+                Message::Binary(payload) => return Ok(payload.to_vec()),
+                Message::Ping(payload) => {
+                    let stream = self.stream_mut()?;
+                    timeout(timeout_duration, stream.send(Message::Pong(payload)))
+                        .await
+                        .map_err(|_| {
+                            DcexError::Transport("WebSocket pong send timed out.".to_string())
+                        })?
+                        .map_err(|error| {
+                            DcexError::Transport(format!("WebSocket pong send failed: {error}"))
+                        })?;
+                }
+                Message::Pong(_) | Message::Frame(_) => {}
+                Message::Close(_) => {
+                    self.stream = None;
+                    return Err(DcexError::Transport(
+                        "WebSocket connection closed.".to_string(),
+                    ));
+                }
+            }
+        }
+    }
+
     pub async fn recv_text(&mut self) -> Result<String> {
         loop {
             let timeout_duration = self.config.timeout;
