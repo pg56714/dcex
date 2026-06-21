@@ -1,6 +1,7 @@
 pub mod binance;
 pub mod bitget;
 pub mod bitmart;
+pub mod bitmex;
 pub mod bybit;
 pub mod connection;
 pub mod kraken;

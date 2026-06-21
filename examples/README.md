@@ -10,7 +10,7 @@ basic client usage, not for exhaustively validating exchange endpoints.
 - `*_ws_public.py` files do not require API keys and read a small number of public stream events.
 - `*_private_readonly.py` files require credentials but avoid order placement, cancellations, external withdrawals, transfers, leverage changes, and account-mode changes.
 - `*_ws_private_readonly.py` files require credentials and only open user-data streams; they do not place or cancel orders.
-- WebSocket examples currently cover public streams for Binance, Bybit, OKX, Bitget, BitMart, Kraken, and MEXC, plus private user-data streams for Binance, Bybit, OKX, Bitget, BitMart, Kraken, and MEXC.
+- WebSocket examples currently cover public streams for Binance, Bybit, OKX, Bitget, BitMart, BitMEX, Kraken, and MEXC, plus private user-data streams for Binance, Bybit, OKX, Bitget, BitMart, BitMEX, Kraken, and MEXC.
 - Generated-report endpoint checks belong in `tests` and should be run with the `generated` marker.
 
 Use the pytest live suites for endpoint validation.

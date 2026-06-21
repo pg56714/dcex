@@ -184,6 +184,8 @@ mod bitmart_client;
 mod bitmart_ws;
 #[path = "clients/bitmex.rs"]
 mod bitmex_client;
+#[path = "ws/bitmex.rs"]
+mod bitmex_ws;
 #[path = "clients/bybit.rs"]
 mod bybit_client;
 #[path = "ws/bybit.rs"]
@@ -222,6 +224,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     bitmart_client::register(m)?;
     bitmart_ws::register(m)?;
     bitmex_client::register(m)?;
+    bitmex_ws::register(m)?;
     bybit_client::register(m)?;
     bybit_ws::register(m)?;
     gateio_client::register(m)?;

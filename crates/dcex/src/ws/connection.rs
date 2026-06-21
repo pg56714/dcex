@@ -4,6 +4,8 @@ use futures_util::{SinkExt, StreamExt};
 use serde_json::Value;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
+use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+use tokio_tungstenite::tungstenite::http::header::{HeaderName, HeaderValue};
 use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
 
@@ -56,11 +58,29 @@ impl WebSocketConnection {
     }
 
     pub async fn connect(&mut self) -> Result<()> {
+        self.connect_with_headers(Vec::new()).await
+    }
+
+    pub async fn connect_with_headers(&mut self, headers: Vec<(String, String)>) -> Result<()> {
         if self.stream.is_some() {
             return Ok(());
         }
         let url = self.config.url.clone();
-        let connect_result = timeout(self.config.timeout, connect_async(&url))
+        let mut request = url.as_str().into_client_request().map_err(|error| {
+            DcexError::InvalidInput(format!("invalid WebSocket request: {error}"))
+        })?;
+        for (name, value) in headers {
+            let header_name = HeaderName::from_bytes(name.as_bytes()).map_err(|error| {
+                DcexError::InvalidInput(format!("invalid WebSocket header name {name}: {error}"))
+            })?;
+            let header_value = HeaderValue::from_str(&value).map_err(|error| {
+                DcexError::InvalidInput(format!(
+                    "invalid WebSocket header value for {name}: {error}"
+                ))
+            })?;
+            request.headers_mut().insert(header_name, header_value);
+        }
+        let connect_result = timeout(self.config.timeout, connect_async(request))
             .await
             .map_err(|_| DcexError::Transport(format!("WebSocket connect timed out: {url}")))?;
         let (stream, _) = connect_result

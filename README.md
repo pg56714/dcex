@@ -123,7 +123,7 @@ async fn main() -> dcex::Result<()> {
 | **Kraken**      | Yes       | Yes        | Yes       | Yes        |
 | **MEXC**        | Yes       | Yes        | Yes       | Yes        |
 | **BitMart**     | Yes       | Yes        | Yes       | Yes        |
-| **BitMEX**      | Yes       | Yes        | No        | No         |
+| **BitMEX**      | Yes       | Yes        | Yes       | Yes        |
 | **Gate.io**     | Yes       | Yes        | No        | No         |
 | **BingX**       | Yes       | Yes        | No        | No         |
 | **KuCoin**      | Yes       | Yes        | No        | No         |
@@ -139,7 +139,7 @@ WS private support currently covers authenticated user-data streams. Order place
 - Product Table Manager for unifying trading instruments across exchanges
 - HTTP clients with consistent sync and async interfaces where available
 - Native Rust core for exchange HTTP, WebSocket, signing, serialization, and response validation
-- WebSocket public streams for Binance, Bybit, OKX, Bitget, Kraken, MEXC, and BitMart, with authenticated user-data streams for Binance, Bybit, OKX, Bitget, Kraken, MEXC, and BitMart
+- WebSocket public streams for Binance, Bybit, OKX, Bitget, Kraken, MEXC, BitMart, and BitMEX, with authenticated user-data streams for Binance, Bybit, OKX, Bitget, Kraken, MEXC, BitMart, and BitMEX
 - Direct Rust crate (`dcex`) for applications that do not need the Python layer
 - Opt-in live test suites for public, private, stateful, and generated-report endpoints
 
