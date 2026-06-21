@@ -1,1 +1,3 @@
-pub use crate::exchanges::bitget::websocket::{BitgetPublicWebSocket, BitgetWebSocketArg};
+pub use crate::exchanges::bitget::websocket::{
+    BitgetPrivateWebSocket, BitgetPrivateWebSocketArg, BitgetPublicWebSocket, BitgetWebSocketArg,
+};

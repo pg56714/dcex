@@ -52,8 +52,102 @@ class _FakeNativeBitgetPublicWebSocketClient:
         )
 
 
+class _FakeNativeBitgetPrivateWebSocketClient:
+    def __init__(
+        self,
+        api_key: str,
+        api_secret: str,
+        passphrase: str,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+    ) -> None:
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.passphrase = passphrase
+        self.timeout = timeout
+        self.base_url = base_url
+        self.connected = False
+        self.closed = False
+        self.logged_in = False
+        self.ping_count = 0
+        self.subscriptions: list[tuple[str, str, str | None, str | None]] = []
+
+    async def connect(self) -> None:
+        self.connected = True
+        self.logged_in = True
+
+    async def login(self) -> None:
+        self.logged_in = True
+
+    async def close(self) -> None:
+        self.closed = True
+        self.logged_in = False
+
+    async def ping(self) -> None:
+        self.ping_count += 1
+
+    async def subscribe_channel(
+        self,
+        inst_type: str,
+        channel: str,
+        inst_id: str | None = None,
+        coin: str | None = None,
+    ) -> None:
+        self.subscriptions.append((inst_type, channel, inst_id, coin))
+
+    async def unsubscribe_channel(
+        self,
+        inst_type: str,
+        channel: str,
+        inst_id: str | None = None,
+        coin: str | None = None,
+    ) -> None:
+        self.subscriptions.remove((inst_type, channel, inst_id, coin))
+
+    async def subscribe_orders(
+        self,
+        inst_type: str = "USDT-FUTURES",
+        inst_id: str | None = None,
+    ) -> None:
+        await self.subscribe_channel(inst_type, "orders", inst_id)
+
+    async def subscribe_fills(
+        self,
+        inst_type: str = "USDT-FUTURES",
+        inst_id: str | None = None,
+    ) -> None:
+        await self.subscribe_channel(inst_type, "fill", inst_id)
+
+    async def subscribe_positions(
+        self,
+        inst_type: str = "USDT-FUTURES",
+        inst_id: str | None = None,
+    ) -> None:
+        await self.subscribe_channel(inst_type, "positions", inst_id)
+
+    async def subscribe_account(
+        self,
+        inst_type: str = "USDT-FUTURES",
+        coin: str | None = None,
+    ) -> None:
+        await self.subscribe_channel(inst_type, "account", coin=coin)
+
+    async def subscribe_equity(self, inst_type: str = "USDT-FUTURES") -> None:
+        await self.subscribe_channel(inst_type, "equity")
+
+    def is_logged_in(self) -> bool:
+        return self.logged_in
+
+    async def recv(self) -> bytes:
+        return (
+            b'{"event":"subscribe",'
+            b'"arg":{"instType":"USDT-FUTURES","channel":"account","coin":"default"}}'
+        )
+
+
 class _FakeNative:
     BitgetPublicWebSocketClient = _FakeNativeBitgetPublicWebSocketClient
+    BitgetPrivateWebSocketClient = _FakeNativeBitgetPrivateWebSocketClient
 
 
 @pytest.mark.asyncio
@@ -110,3 +204,50 @@ async def test_bitget_public_ws_rejects_unexpected_payload(
     ws = bitget.public()
     with pytest.raises(RuntimeError, match="Unexpected Bitget WebSocket event payload"):
         await ws.recv()
+
+
+@pytest.mark.asyncio
+async def test_bitget_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import bitget
+
+    monkeypatch.setattr(bitget, "_native", _FakeNative)
+
+    async with bitget.private(
+        api_key="api-key",
+        api_secret="api-secret",
+        passphrase="passphrase",
+        timeout=2,
+        base_url="wss://example.test/private",
+    ) as ws:
+        native_client = ws._native_client
+        assert native_client.connected is True
+        assert native_client.api_key == "api-key"
+        assert native_client.api_secret == "api-secret"
+        assert native_client.passphrase == "passphrase"
+        assert native_client.timeout == 2
+        assert native_client.base_url == "wss://example.test/private"
+        assert ws.is_logged_in() is True
+
+        await ws.subscribe_orders()
+        await ws.subscribe_fills(inst_id="BTCUSDT")
+        await ws.subscribe_positions(inst_type="COIN-FUTURES")
+        await ws.subscribe_account(coin="default")
+        await ws.subscribe_equity()
+        await ws.ping()
+        event = await ws.recv()
+
+    assert native_client.subscriptions == [
+        ("USDT-FUTURES", "orders", None, None),
+        ("USDT-FUTURES", "fill", "BTCUSDT", None),
+        ("COIN-FUTURES", "positions", None, None),
+        ("USDT-FUTURES", "account", None, "default"),
+        ("USDT-FUTURES", "equity", None, None),
+    ]
+    assert native_client.ping_count == 1
+    assert event == {
+        "event": "subscribe",
+        "arg": {"instType": "USDT-FUTURES", "channel": "account", "coin": "default"},
+    }
+    assert native_client.closed is True
+    assert ws.is_logged_in() is False

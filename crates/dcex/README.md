@@ -75,6 +75,7 @@ cargo run -p dcex --example bybit_ws_public
 cargo run -p dcex --example okx_ws_public
 cargo run -p dcex --example bitget_ws_public
 cargo run -p dcex --example binance_ws_private_readonly
+cargo run -p dcex --example bitget_ws_private_readonly
 cargo run -p dcex --example bybit_ws_private_readonly
 cargo run -p dcex --example okx_ws_private_readonly
 ```
