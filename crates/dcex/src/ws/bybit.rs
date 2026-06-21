@@ -1,1 +1,1 @@
-pub use crate::exchanges::bybit::websocket::BybitPublicWebSocket;
+pub use crate::exchanges::bybit::websocket::{BybitPrivateWebSocket, BybitPublicWebSocket};
