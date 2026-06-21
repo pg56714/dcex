@@ -1,3 +1,4 @@
+pub mod aster;
 pub mod backpack;
 pub mod binance;
 pub mod bingx;

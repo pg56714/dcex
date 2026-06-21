@@ -166,6 +166,8 @@ mod product_table;
 
 #[path = "clients/aster.rs"]
 mod aster_client;
+#[path = "ws/aster.rs"]
+mod aster_ws;
 #[path = "clients/backpack.rs"]
 mod backpack_client;
 #[path = "ws/backpack.rs"]
@@ -228,6 +230,7 @@ mod okx_ws;
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     aster_client::register(m)?;
+    aster_ws::register(m)?;
     backpack_client::register(m)?;
     backpack_ws::register(m)?;
     binance_client::register(m)?;

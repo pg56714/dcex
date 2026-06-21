@@ -7,6 +7,7 @@ mod signing;
 #[cfg(test)]
 mod tests;
 mod trade;
+pub mod websocket;
 mod wrappers;
 
 pub use client::{AsterClient, AsterMarket};

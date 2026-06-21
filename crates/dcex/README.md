@@ -62,7 +62,7 @@ async fn main() -> dcex::Result<()> {
 | **Hyperliquid** | Yes  | Yes       | Yes        |
 | **Lighter**     | Yes  | Yes       | Yes        |
 | **Backpack**    | Yes  | Yes       | Yes        |
-| **Aster**       | Yes  | No        | No         |
+| **Aster**       | Yes  | Yes       | Yes        |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.
@@ -93,6 +93,7 @@ WebSocket examples are available for exchanges that have stream support in the
 Rust core:
 
 ```sh
+cargo run -p dcex --example aster_ws_public
 cargo run -p dcex --example binance_ws_public
 cargo run -p dcex --example backpack_ws_public
 cargo run -p dcex --example bingx_ws_public
@@ -107,6 +108,7 @@ cargo run -p dcex --example kraken_ws_public
 cargo run -p dcex --example kucoin_ws_public
 cargo run -p dcex --example lighter_ws_public
 cargo run -p dcex --example mexc_ws_public
+cargo run -p dcex --example aster_ws_private_readonly
 cargo run -p dcex --example binance_ws_private_readonly
 cargo run -p dcex --example backpack_ws_private_readonly
 cargo run -p dcex --example bingx_ws_private_readonly
