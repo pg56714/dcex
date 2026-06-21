@@ -194,6 +194,8 @@ mod http_client;
 mod hyperliquid_client;
 #[path = "clients/kraken.rs"]
 mod kraken_client;
+#[path = "ws/kraken.rs"]
+mod kraken_ws;
 #[path = "clients/kucoin.rs"]
 mod kucoin_client;
 #[path = "clients/lighter.rs"]
@@ -221,6 +223,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     hyperliquid_client::register(m)?;
     http_client::register(m)?;
     kraken_client::register(m)?;
+    kraken_ws::register(m)?;
     kucoin_client::register(m)?;
     lighter_client::register(m)?;
     mexc_client::register(m)?;
