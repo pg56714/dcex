@@ -6,6 +6,7 @@ pub mod exchanges;
 pub mod http;
 pub mod lighter;
 pub mod product_table;
+pub mod ws;
 
 use std::fmt::{Display, Formatter};
 

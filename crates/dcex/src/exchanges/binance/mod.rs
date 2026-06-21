@@ -7,6 +7,7 @@ mod private;
 mod signing;
 mod stream;
 mod trade;
+pub mod websocket;
 
 #[cfg(test)]
 mod tests;

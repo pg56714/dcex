@@ -170,6 +170,8 @@ mod aster_client;
 mod backpack_client;
 #[path = "clients/binance.rs"]
 mod binance_client;
+#[path = "ws/binance.rs"]
+mod binance_ws;
 #[path = "clients/bingx.rs"]
 mod bingx_client;
 #[path = "clients/bitget.rs"]
@@ -215,6 +217,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     lighter_client::register(m)?;
     mexc_client::register(m)?;
     okx_client::register(m)?;
+    binance_ws::register(m)?;
     product_table::register(m)?;
     functions::register(m)?;
     Ok(())
