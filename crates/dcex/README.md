@@ -61,7 +61,7 @@ async fn main() -> dcex::Result<()> {
 | **KuCoin**      | Yes  | Yes       | Yes        |
 | **Hyperliquid** | Yes  | Yes       | Yes        |
 | **Lighter**     | Yes  | Yes       | Yes        |
-| **Backpack**    | Yes  | No        | No         |
+| **Backpack**    | Yes  | Yes       | Yes        |
 | **Aster**       | Yes  | No        | No         |
 
 WS private support currently covers authenticated or address-scoped user-data
@@ -94,6 +94,7 @@ Rust core:
 
 ```sh
 cargo run -p dcex --example binance_ws_public
+cargo run -p dcex --example backpack_ws_public
 cargo run -p dcex --example bingx_ws_public
 cargo run -p dcex --example bybit_ws_public
 cargo run -p dcex --example okx_ws_public
@@ -107,6 +108,7 @@ cargo run -p dcex --example kucoin_ws_public
 cargo run -p dcex --example lighter_ws_public
 cargo run -p dcex --example mexc_ws_public
 cargo run -p dcex --example binance_ws_private_readonly
+cargo run -p dcex --example backpack_ws_private_readonly
 cargo run -p dcex --example bingx_ws_private_readonly
 cargo run -p dcex --example bitget_ws_private_readonly
 cargo run -p dcex --example bitmart_ws_private_readonly

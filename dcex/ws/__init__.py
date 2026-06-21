@@ -1,6 +1,7 @@
 """Async WebSocket clients backed by the Rust core."""
 
 from . import (
+    backpack,
     binance,
     bingx,
     bitget,
@@ -17,6 +18,7 @@ from . import (
 )
 
 __all__ = [
+    "backpack",
     "binance",
     "bingx",
     "bitget",

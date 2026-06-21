@@ -8,5 +8,6 @@ mod params;
 mod signing;
 mod tests;
 mod trade;
+pub mod websocket;
 
 pub use client::{BackpackClient, SignaturePayload};

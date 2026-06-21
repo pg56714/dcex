@@ -1,3 +1,4 @@
+pub mod backpack;
 pub mod binance;
 pub mod bingx;
 pub mod bitget;

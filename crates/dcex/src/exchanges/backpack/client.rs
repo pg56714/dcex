@@ -351,6 +351,33 @@ impl BackpackClient {
         }
         Ok(product_symbol.to_string())
     }
+
+    pub(super) fn websocket_signature(&self, timestamp: &str) -> Result<[String; 4]> {
+        let api_key = self.api_key.as_deref().ok_or_else(|| {
+            DcexError::InvalidInput(
+                "Backpack private WebSocket subscriptions require api_key and api_secret."
+                    .to_string(),
+            )
+        })?;
+        let signing_key = self.signing_key.as_ref().ok_or_else(|| {
+            DcexError::InvalidInput(
+                "Backpack private WebSocket subscriptions require api_key and api_secret."
+                    .to_string(),
+            )
+        })?;
+        Ok([
+            api_key.to_string(),
+            signature_header(
+                signing_key,
+                "subscribe",
+                &Vec::new(),
+                timestamp,
+                self.window,
+            ),
+            timestamp.to_string(),
+            self.window.to_string(),
+        ])
+    }
 }
 
 fn exchange_symbol_fallback(product_symbol: &str) -> String {
