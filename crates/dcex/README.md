@@ -44,6 +44,29 @@ async fn main() -> dcex::Result<()> {
 }
 ```
 
+## Supported Exchanges
+
+| Exchange        | HTTP | WS Public | WS Private |
+| --------------- | ---- | --------- | ---------- |
+| **Binance**     | Yes  | Yes       | Yes        |
+| **Bybit**       | Yes  | Yes       | Yes        |
+| **OKX**         | Yes  | Yes       | Yes        |
+| **Bitget**      | Yes  | Yes       | Yes        |
+| **Kraken**      | Yes  | Yes       | Yes        |
+| **MEXC**        | Yes  | No        | No         |
+| **BitMart**     | Yes  | No        | No         |
+| **BitMEX**      | Yes  | No        | No         |
+| **Gate.io**     | Yes  | No        | No         |
+| **BingX**       | Yes  | No        | No         |
+| **KuCoin**      | Yes  | No        | No         |
+| **Hyperliquid** | Yes  | No        | No         |
+| **Lighter**     | Yes  | No        | No         |
+| **Backpack**    | Yes  | No        | No         |
+| **Aster**       | Yes  | No        | No         |
+
+WS private support currently covers authenticated user-data streams. Order
+placement and cancellation remain on HTTP clients.
+
 ## Exchange Examples
 
 Read-only public examples are available for the migrated exchange clients:
