@@ -49,8 +49,54 @@ class _FakeNativeBinancePublicWebSocketClient:
         return b'{"e":"trade","s":"BTCUSDT"}'
 
 
+class _FakeNativeBinancePrivateWebSocketClient:
+    def __init__(
+        self,
+        api_key: str,
+        api_secret: str,
+        timeout: float = 10.0,
+        spot_http_base_url: str | None = None,
+        futures_http_base_url: str | None = None,
+        ws_base_url: str | None = None,
+    ) -> None:
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.timeout = timeout
+        self.spot_http_base_url = spot_http_base_url
+        self.futures_http_base_url = futures_http_base_url
+        self.ws_base_url = ws_base_url
+        self.connected = False
+        self.closed = False
+        self.keep_alive_count = 0
+        self.closed_listen_key = False
+        self._listen_key: str | None = None
+
+    async def connect(self) -> str:
+        self.connected = True
+        self._listen_key = "listen-key"
+        return self._listen_key
+
+    async def close(self) -> None:
+        self.closed = True
+        self._listen_key = None
+
+    async def keep_alive(self) -> None:
+        self.keep_alive_count += 1
+
+    async def close_listen_key(self) -> None:
+        self.closed_listen_key = True
+        self._listen_key = None
+
+    def listen_key(self) -> str | None:
+        return self._listen_key
+
+    async def recv(self) -> bytes:
+        return b'{"e":"ACCOUNT_UPDATE","E":123}'
+
+
 class _FakeNative:
     BinancePublicWebSocketClient = _FakeNativeBinancePublicWebSocketClient
+    BinancePrivateWebSocketClient = _FakeNativeBinancePrivateWebSocketClient
 
 
 @pytest.mark.asyncio
@@ -93,3 +139,35 @@ async def test_binance_public_ws_rejects_unexpected_payload(
     ws = binance.public()
     with pytest.raises(RuntimeError, match="Unexpected Binance WebSocket event payload"):
         await ws.recv()
+
+
+@pytest.mark.asyncio
+async def test_binance_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import binance
+
+    monkeypatch.setattr(binance, "_native", _FakeNative)
+
+    async with binance.private(
+        api_key="api-key",
+        api_secret="api-secret",
+        timeout=2,
+        futures_http_base_url="https://example.test/fapi",
+        ws_base_url="wss://example.test/private",
+    ) as ws:
+        native_client = ws._native_client
+        assert native_client.connected is True
+        assert native_client.api_key == "api-key"
+        assert native_client.api_secret == "api-secret"
+        assert native_client.timeout == 2
+        assert native_client.futures_http_base_url == "https://example.test/fapi"
+        assert native_client.ws_base_url == "wss://example.test/private"
+        assert ws.listen_key() == "listen-key"
+
+        await ws.keep_alive()
+        event = await ws.recv()
+
+    assert event == {"e": "ACCOUNT_UPDATE", "E": 123}
+    assert native_client.keep_alive_count == 1
+    assert native_client.closed is True
+    assert ws.listen_key() is None
