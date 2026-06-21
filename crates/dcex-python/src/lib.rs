@@ -176,6 +176,8 @@ mod binance_ws;
 mod bingx_client;
 #[path = "clients/bitget.rs"]
 mod bitget_client;
+#[path = "ws/bitget.rs"]
+mod bitget_ws;
 #[path = "clients/bitmart.rs"]
 mod bitmart_client;
 #[path = "clients/bitmex.rs"]
@@ -210,6 +212,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     binance_client::register(m)?;
     bingx_client::register(m)?;
     bitget_client::register(m)?;
+    bitget_ws::register(m)?;
     bitmart_client::register(m)?;
     bitmex_client::register(m)?;
     bybit_client::register(m)?;
