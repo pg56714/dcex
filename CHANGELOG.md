@@ -1,3 +1,9 @@
+## 0.24.2 (2026-06-22)
+
+### Fix
+
+- repair live websocket connectivity
+
 ## 0.24.1 (2026-06-22)
 
 ### Perf
