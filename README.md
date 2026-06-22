@@ -32,17 +32,7 @@ uv add dcex
 
 Rust:
 
-```bash
-cargo add dcex
-```
-
-or add it manually:
-
-```toml
-[dependencies]
-dcex = "0.1.0"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-```
+Direct Rust usage is documented in [crates/dcex/README.md](crates/dcex/README.md).
 
 ## Quick Start
 
@@ -259,8 +249,8 @@ and publishes the Python package to PyPI. If no Python version bump is
 detected, PyPI is not updated.
 
 The Rust crate has an independent version in `crates/dcex/Cargo.toml` and is
-published from `rust-v*` tags. For example, `rust-v0.1.0` publishes crate
-version `0.1.0` to crates.io and creates a separate GitHub Release.
+published from `rust-v*` tags. For example, `rust-vX.Y.Z` publishes crate
+version `X.Y.Z` to crates.io and creates a separate GitHub Release.
 The `crates/dcex-python` package is an internal PyO3 build crate and is not
 published to crates.io; the Python package version is managed only in
 `pyproject.toml`.

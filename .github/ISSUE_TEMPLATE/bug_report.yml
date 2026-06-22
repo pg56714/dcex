@@ -50,7 +50,7 @@ body:
     attributes:
       label: "Environment Information"
       description: "Please provide your Python/Rust version, operating system, and dcex package/crate version"
-      placeholder: "e.g., Python 3.12, Rust stable, Windows 11, PyPI dcex 0.22.x or crate dcex 0.1.x"
+      placeholder: "e.g., Python 3.12, Rust stable, Windows 11, PyPI dcex X.Y.Z or crate dcex X.Y.Z"
     validations:
       required: true
   - type: dropdown

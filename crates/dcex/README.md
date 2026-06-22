@@ -7,7 +7,15 @@ product-table, and response-validation implementation used by the Python
 `dcex` package. It can also be used directly from Rust applications without the
 Python layer.
 
+## Installation
+
+```sh
+cargo add dcex
+```
+
 ## Example
+
+The examples use Tokio for async execution.
 
 ```rust
 use std::time::Duration;
@@ -133,3 +141,9 @@ address in environment variables and only open user-data streams.
 The PyPI package `dcex` exposes the existing Python sync and async APIs through
 PyO3 bindings to this Rust crate. The internal `dcex-python` crate only builds
 the Python extension module and is not published to crates.io.
+
+## Disclaimer
+
+Cryptocurrency trading involves significant risk. This library is provided
+as-is without any warranty. Users are responsible for their own trading
+decisions and risk management.
