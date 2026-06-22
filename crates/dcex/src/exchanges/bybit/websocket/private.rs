@@ -113,6 +113,10 @@ impl BybitPrivateWebSocket {
         self.connection.recv_json().await
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        self.connection.recv_bytes().await
+    }
+
     async fn send_topics(&mut self, op: &str, topics: Vec<String>) -> Result<String> {
         if topics.is_empty() {
             return Err(DcexError::InvalidInput(

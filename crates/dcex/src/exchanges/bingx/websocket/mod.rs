@@ -12,16 +12,18 @@ pub use private::BingxPrivateWebSocket;
 pub use public::BingxPublicWebSocket;
 
 pub(super) fn decode_event(payload: Vec<u8>) -> Result<Value> {
-    let text_error = match std::str::from_utf8(&payload) {
-        Ok(text) => match parse_event_text(text) {
-            Ok(value) => return Ok(value),
-            Err(error) => Some(error),
-        },
-        Err(_) => None,
-    };
-    match gunzip(&payload) {
-        Ok(text) => parse_event_text(&text),
-        Err(error) => Err(text_error.unwrap_or(error)),
+    let text = decode_event_text(&payload)?;
+    parse_event_text(&text)
+}
+
+pub(super) fn decode_event_bytes(payload: Vec<u8>) -> Result<Vec<u8>> {
+    let text = decode_event_text(&payload)?;
+    let trimmed = text.trim();
+    if matches!(trimmed, "Pong" | "pong") {
+        serde_json::to_vec(trimmed)
+            .map_err(|error| DcexError::Decode(format!("failed to encode BingX pong: {error}")))
+    } else {
+        Ok(text.into_bytes())
     }
 }
 
@@ -30,6 +32,20 @@ pub(super) fn is_application_ping(value: &Value) -> bool {
         .as_str()
         .map(|text| text.eq_ignore_ascii_case("ping"))
         .unwrap_or(false)
+}
+
+pub(super) fn is_application_ping_text(text: &str) -> bool {
+    text.trim().eq_ignore_ascii_case("ping")
+}
+
+fn decode_event_text(payload: &[u8]) -> Result<String> {
+    let text_error = match std::str::from_utf8(payload) {
+        Ok(text) => return Ok(text.to_string()),
+        Err(error) => Some(DcexError::Decode(format!(
+            "failed to decode BingX WebSocket text payload: {error}"
+        ))),
+    };
+    gunzip(payload).map_err(|error| text_error.unwrap_or(error))
 }
 
 fn parse_event_text(text: &str) -> Result<Value> {

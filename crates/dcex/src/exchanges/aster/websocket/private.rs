@@ -178,6 +178,10 @@ impl AsterPrivateWebSocket {
         self.connection_mut()?.recv_json().await
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        self.connection_mut()?.recv_bytes().await
+    }
+
     fn connection_mut(&mut self) -> Result<&mut WebSocketConnection> {
         self.connection.as_mut().ok_or_else(|| {
             DcexError::InvalidInput("WebSocket is not connected; call connect first.".to_string())

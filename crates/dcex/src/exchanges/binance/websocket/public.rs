@@ -89,6 +89,10 @@ impl BinancePublicWebSocket {
         self.connection.recv_json().await
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        self.connection.recv_bytes().await
+    }
+
     fn stream_symbol(&self, product_symbol: &str) -> Result<String> {
         let symbol = if let Some(table) = &self.product_table {
             if is_canonical_product_symbol(product_symbol) {

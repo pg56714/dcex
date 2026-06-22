@@ -8,7 +8,10 @@ use crate::{DcexError, Result};
 
 use super::super::client::BingxClient;
 use super::super::endpoints::BASE_URL;
-use super::{decode_event, is_application_ping, normalize_data_type, validate_credential};
+use super::{
+    decode_event, decode_event_bytes, is_application_ping, is_application_ping_text,
+    normalize_data_type, validate_credential,
+};
 
 const WS_URL: &str = "wss://open-api-ws.bingx.com/market";
 
@@ -144,6 +147,20 @@ impl BingxPrivateWebSocket {
                 continue;
             }
             return Ok(event);
+        }
+    }
+
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        loop {
+            let payload = self.connection_mut()?.recv_bytes().await?;
+            let body = decode_event_bytes(payload)?;
+            if let Ok(text) = std::str::from_utf8(&body) {
+                if is_application_ping_text(text) {
+                    self.connection_mut()?.send_text("Pong").await?;
+                    continue;
+                }
+            }
+            return Ok(body);
         }
     }
 

@@ -189,14 +189,12 @@ impl PythonOkxPublicWebSocketClient {
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let event = client
+            let body = client
                 .lock()
                 .await
-                .recv()
+                .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            let body = serde_json::to_vec(&event)
-                .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
             Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }
@@ -385,14 +383,12 @@ impl PythonOkxPrivateWebSocketClient {
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let event = client
+            let body = client
                 .lock()
                 .await
-                .recv()
+                .recv_bytes()
                 .await
                 .map_err(to_py_runtime_error)?;
-            let body = serde_json::to_vec(&event)
-                .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
             Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
         })
     }

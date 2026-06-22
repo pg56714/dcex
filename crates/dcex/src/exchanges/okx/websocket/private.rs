@@ -181,6 +181,10 @@ impl OkxPrivateWebSocket {
         self.connection.recv_json().await
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        self.connection.recv_bytes().await
+    }
+
     async fn send_subscription(
         &mut self,
         op: &str,

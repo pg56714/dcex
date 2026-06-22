@@ -121,6 +121,10 @@ impl AsterPublicWebSocket {
         self.connection.recv_json().await
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        self.connection.recv_bytes().await
+    }
+
     fn stream_symbol(&self, product_symbol: &str) -> Result<String> {
         let symbol = self.client.exchange_symbol(product_symbol)?;
         normalize_stream_symbol(&symbol)

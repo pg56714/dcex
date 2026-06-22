@@ -12,16 +12,18 @@ pub use private::BitmartPrivateWebSocket;
 pub use public::BitmartPublicWebSocket;
 
 pub(super) fn decode_event(payload: Vec<u8>) -> Result<Value> {
-    let text_error = match std::str::from_utf8(&payload) {
-        Ok(text) => match parse_event_text(text) {
-            Ok(value) => return Ok(value),
-            Err(error) => Some(error),
-        },
-        Err(_) => None,
-    };
-    match inflate_raw(&payload) {
-        Ok(text) => parse_event_text(&text),
-        Err(error) => Err(text_error.unwrap_or(error)),
+    let text = decode_event_text(&payload)?;
+    parse_event_text(&text)
+}
+
+pub(super) fn decode_event_bytes(payload: Vec<u8>) -> Result<Vec<u8>> {
+    let text = decode_event_text(&payload)?;
+    let text = text.trim();
+    if matches!(text, "ping" | "pong") {
+        serde_json::to_vec(text)
+            .map_err(|error| DcexError::Decode(format!("failed to encode BitMart ping: {error}")))
+    } else {
+        Ok(text.as_bytes().to_vec())
     }
 }
 
@@ -33,6 +35,16 @@ fn parse_event_text(text: &str) -> Result<Value> {
     serde_json::from_str(text).map_err(|error| {
         DcexError::Decode(format!("failed to decode BitMart WebSocket JSON: {error}"))
     })
+}
+
+fn decode_event_text(payload: &[u8]) -> Result<String> {
+    let text_error = match std::str::from_utf8(payload) {
+        Ok(text) => return Ok(text.to_string()),
+        Err(error) => Some(DcexError::Decode(format!(
+            "failed to decode BitMart WebSocket text payload: {error}"
+        ))),
+    };
+    inflate_raw(payload).map_err(|error| text_error.unwrap_or(error))
 }
 
 fn inflate_raw(payload: &[u8]) -> Result<String> {

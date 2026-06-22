@@ -134,6 +134,10 @@ impl BitgetPublicWebSocket {
         self.connection.recv_json().await
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        self.connection.recv_bytes().await
+    }
+
     fn instrument(&self, product_symbol: &str) -> Result<(String, String)> {
         let inst_id = if let Some(table) = &self.product_table {
             if is_canonical_product_symbol(product_symbol) {

@@ -115,6 +115,10 @@ impl BackpackPublicWebSocket {
         self.connection.recv_json().await
     }
 
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        self.connection.recv_bytes().await
+    }
+
     fn stream_symbol(&self, product_symbol: &str) -> Result<String> {
         stream_symbol(self.client.exchange_symbol(product_symbol)?)
     }

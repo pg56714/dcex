@@ -5,7 +5,7 @@ use serde_json::{json, Value};
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::{decode_event, normalize_symbol, normalize_topic};
+use super::{decode_event, decode_event_bytes, normalize_symbol, normalize_topic};
 
 const PUBLIC_WS_URL: &str = "wss://ws-manager-compress.bitmart.com/api?protocol=1.1";
 
@@ -92,6 +92,11 @@ impl BitmartPublicWebSocket {
     pub async fn recv(&mut self) -> Result<Value> {
         let payload = self.connection.recv_bytes().await?;
         decode_event(payload)
+    }
+
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        let payload = self.connection.recv_bytes().await?;
+        decode_event_bytes(payload)
     }
 
     async fn send_operation(&mut self, op: &str, topics: Vec<String>) -> Result<()> {

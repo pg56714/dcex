@@ -7,7 +7,9 @@ use crate::exchange::unix_timestamp_ms;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::{decode_event, normalize_symbol, normalize_topic, validate_credential};
+use super::{
+    decode_event, decode_event_bytes, normalize_symbol, normalize_topic, validate_credential,
+};
 
 const PRIVATE_WS_URL: &str = "wss://ws-manager-compress.bitmart.com/user?protocol=1.1";
 const LOGIN_DOMAIN: &str = "bitmart.WebSocket";
@@ -120,6 +122,11 @@ impl BitmartPrivateWebSocket {
     pub async fn recv(&mut self) -> Result<Value> {
         let payload = self.connection.recv_bytes().await?;
         decode_event(payload)
+    }
+
+    pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
+        let payload = self.connection.recv_bytes().await?;
+        decode_event_bytes(payload)
     }
 
     async fn send_operation(&mut self, op: &str, topics: Vec<String>) -> Result<()> {
