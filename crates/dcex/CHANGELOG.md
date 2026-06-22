@@ -1,3 +1,16 @@
+## 0.3.0 (2026-06-22)
+
+### Feat
+
+- add aster websocket support
+- add backpack websocket support
+- add lighter websocket support
+- add hyperliquid websocket support
+
+### Fix
+
+- preserve hyperliquid websocket coin symbols
+
 ## 0.2.0 (2026-06-21)
 
 ### Feat

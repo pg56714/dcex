@@ -1,3 +1,12 @@
+## 0.24.0 (2026-06-22)
+
+### Feat
+
+- add aster websocket support
+- add backpack websocket support
+- add lighter websocket support
+- add hyperliquid websocket support
+
 ## 0.23.0 (2026-06-21)
 
 ### Feat
