@@ -1,4 +1,5 @@
 use serde_json::Value;
+use url::Url;
 
 use crate::{DcexError, Result};
 
@@ -35,11 +36,18 @@ pub(super) fn extract_bullet_token(data: &Value) -> Result<KucoinBulletToken> {
 }
 
 pub(super) fn websocket_url(endpoint: &str, token: &str, connect_id: &str) -> Result<String> {
-    let endpoint = endpoint.trim().trim_end_matches('/');
+    let endpoint = endpoint.trim();
     validate_token("KuCoin WebSocket endpoint", endpoint)?;
     validate_token("KuCoin bullet token", token)?;
     validate_token("KuCoin connect id", connect_id)?;
-    Ok(format!("{endpoint}?token={token}&connectId={connect_id}"))
+
+    let mut url = Url::parse(endpoint)
+        .map_err(|error| DcexError::InvalidInput(format!("invalid KuCoin endpoint: {error}")))?;
+    url.query_pairs_mut()
+        .clear()
+        .append_pair("token", token)
+        .append_pair("connectId", connect_id);
+    Ok(url.into())
 }
 
 pub(super) fn normalize_symbol(product_symbol: &str, futures: bool) -> Result<String> {
@@ -151,8 +159,8 @@ mod tests {
         assert!(normalize_topic("/market/ticker:BTC-USDT").is_ok());
         assert!(normalize_topic("/market ticker:BTC-USDT").is_err());
         assert_eq!(
-            websocket_url("wss://example.test/", "token", "dcex-1").expect("url"),
-            "wss://example.test?token=token&connectId=dcex-1"
+            websocket_url("wss://example.test/", "token=value", "dcex-1").expect("url"),
+            "wss://example.test/?token=token%3Dvalue&connectId=dcex-1"
         );
     }
 }

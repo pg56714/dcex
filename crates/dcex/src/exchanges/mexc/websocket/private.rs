@@ -2,9 +2,13 @@ use std::time::Duration;
 
 use serde_json::{json, Value};
 
+use crate::crypto::hmac_sha256_hex;
+use crate::exchange::unix_timestamp_ms;
 use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest};
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
+
+use super::super::signing::encode_params;
 
 const SPOT_HTTP_BASE_URL: &str = "https://api.mexc.com";
 const WS_BASE_URL: &str = "wss://wbs-api.mexc.com/ws";
@@ -14,6 +18,7 @@ pub struct MexcPrivateWebSocket {
     connection: WebSocketConnection,
     transport: AsyncHttpClient,
     api_key: String,
+    api_secret: Option<String>,
     spot_http_base_url: String,
     ws_base_url: String,
     timeout: Duration,
@@ -22,8 +27,19 @@ pub struct MexcPrivateWebSocket {
 
 impl MexcPrivateWebSocket {
     pub fn new(api_key: String, timeout: Duration) -> Result<Self> {
-        Self::with_urls(
+        Self::with_urls_and_secret(
             api_key,
+            None,
+            timeout,
+            SPOT_HTTP_BASE_URL.to_string(),
+            WS_BASE_URL.to_string(),
+        )
+    }
+
+    pub fn with_secret(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
+        Self::with_urls_and_secret(
+            api_key,
+            Some(api_secret),
             timeout,
             SPOT_HTTP_BASE_URL.to_string(),
             WS_BASE_URL.to_string(),
@@ -36,7 +52,20 @@ impl MexcPrivateWebSocket {
         spot_http_base_url: impl Into<String>,
         ws_base_url: impl Into<String>,
     ) -> Result<Self> {
+        Self::with_urls_and_secret(api_key, None, timeout, spot_http_base_url, ws_base_url)
+    }
+
+    pub fn with_urls_and_secret(
+        api_key: String,
+        api_secret: Option<String>,
+        timeout: Duration,
+        spot_http_base_url: impl Into<String>,
+        ws_base_url: impl Into<String>,
+    ) -> Result<Self> {
         validate_credential("MEXC API key", &api_key)?;
+        if let Some(api_secret) = api_secret.as_deref() {
+            validate_credential("MEXC API secret", api_secret)?;
+        }
         let spot_http_base_url = spot_http_base_url.into();
         let ws_base_url = ws_base_url.into();
         Ok(Self {
@@ -46,6 +75,7 @@ impl MexcPrivateWebSocket {
             )?),
             transport: AsyncHttpClient::new(timeout)?,
             api_key,
+            api_secret,
             spot_http_base_url,
             ws_base_url,
             timeout,
@@ -178,11 +208,17 @@ impl MexcPrivateWebSocket {
     ) -> Result<HttpRequest> {
         let mut request = HttpRequest::new(method, &self.spot_http_base_url, LISTEN_KEY_PATH)
             .header("X-MEXC-APIKEY", self.api_key.clone());
+        let mut query = Vec::new();
         if let Some(listen_key) = listen_key {
-            request
-                .query
-                .push(("listenKey".to_string(), listen_key.to_string()));
+            query.push(("listenKey".to_string(), listen_key.to_string()));
         }
+        if let Some(api_secret) = self.api_secret.as_deref() {
+            query.push(("timestamp".to_string(), unix_timestamp_ms()?.to_string()));
+            let signature =
+                hmac_sha256_hex(api_secret.as_bytes(), encode_params(&query).as_bytes())?;
+            query.push(("signature".to_string(), signature));
+        }
+        request.query = query;
         Ok(request)
     }
 }
@@ -253,5 +289,33 @@ mod tests {
             private_ws_url("wss://wbs-api.mexc.com/ws/", "abc").expect("url"),
             "wss://wbs-api.mexc.com/ws?listenKey=abc"
         );
+    }
+
+    #[test]
+    fn signs_listen_key_request_when_secret_is_available() {
+        let ws = MexcPrivateWebSocket::with_urls_and_secret(
+            "key".to_string(),
+            Some("secret".to_string()),
+            Duration::from_secs(10),
+            "https://api.mexc.com",
+            "wss://wbs-api.mexc.com/ws",
+        )
+        .expect("ws");
+        let request = ws
+            .listen_key_request(HttpMethod::Put, Some("listen-key"))
+            .expect("request");
+
+        assert!(request
+            .query
+            .iter()
+            .any(|(key, value)| { key == "listenKey" && value == "listen-key" }));
+        assert!(request
+            .query
+            .iter()
+            .any(|(key, value)| { key == "timestamp" && !value.is_empty() }));
+        assert!(request
+            .query
+            .iter()
+            .any(|(key, value)| { key == "signature" && !value.is_empty() }));
     }
 }

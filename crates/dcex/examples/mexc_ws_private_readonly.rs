@@ -7,8 +7,10 @@ use dcex::ws::mexc::MexcPrivateWebSocket;
 async fn main() -> dcex::Result<()> {
     let api_key = env::var("MEXC_API_KEY")
         .map_err(|error| dcex::DcexError::InvalidInput(error.to_string()))?;
+    let api_secret = env::var("MEXC_API_SECRET")
+        .map_err(|error| dcex::DcexError::InvalidInput(error.to_string()))?;
 
-    let mut ws = MexcPrivateWebSocket::new(api_key, Duration::from_secs(10))?;
+    let mut ws = MexcPrivateWebSocket::with_secret(api_key, api_secret, Duration::from_secs(10))?;
     ws.connect().await?;
     ws.keep_alive().await?;
     ws.subscribe_account().await?;

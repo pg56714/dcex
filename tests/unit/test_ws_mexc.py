@@ -25,9 +25,7 @@ class _FakeNativeMexcPublicWebSocketClient:
         self.subscriptions.extend(channels)
 
     async def unsubscribe(self, channels: list[str]) -> None:
-        self.subscriptions = [
-            channel for channel in self.subscriptions if channel not in channels
-        ]
+        self.subscriptions = [channel for channel in self.subscriptions if channel not in channels]
 
     async def subscribe_trades(self, product_symbol: str) -> None:
         self.subscriptions.append(f"trades:{product_symbol}")
@@ -56,11 +54,13 @@ class _FakeNativeMexcPrivateWebSocketClient:
     def __init__(
         self,
         api_key: str,
+        api_secret: str | None = None,
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         ws_base_url: str | None = None,
     ) -> None:
         self.api_key = api_key
+        self.api_secret = api_secret
         self.timeout = timeout
         self.spot_http_base_url = spot_http_base_url
         self.ws_base_url = ws_base_url
@@ -91,9 +91,7 @@ class _FakeNativeMexcPrivateWebSocketClient:
         self.subscriptions.extend(channels)
 
     async def unsubscribe(self, channels: list[str]) -> None:
-        self.subscriptions = [
-            channel for channel in self.subscriptions if channel not in channels
-        ]
+        self.subscriptions = [channel for channel in self.subscriptions if channel not in channels]
 
     async def subscribe_account(self) -> None:
         self.subscriptions.append("spot@private.account.v3.api.pb")
@@ -158,6 +156,7 @@ async def test_mexc_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
 
     async with mexc.private(
         api_key="api-key",
+        api_secret="api-secret",
         timeout=2,
         spot_http_base_url="https://example.test",
         ws_base_url="wss://example.test/ws",
@@ -165,6 +164,7 @@ async def test_mexc_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
         native_client = ws._native_client
         assert native_client.connected is True
         assert native_client.api_key == "api-key"
+        assert native_client.api_secret == "api-secret"
         assert native_client.timeout == 2
         assert native_client.spot_http_base_url == "https://example.test"
         assert native_client.ws_base_url == "wss://example.test/ws"

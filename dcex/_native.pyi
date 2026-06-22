@@ -726,6 +726,7 @@ class MexcPrivateWebSocketClient:
     def __init__(
         self,
         api_key: str,
+        api_secret: str | None = None,
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         ws_base_url: str | None = None,

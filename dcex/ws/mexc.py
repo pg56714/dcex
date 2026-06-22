@@ -81,6 +81,7 @@ class PrivateClient(AsyncWebSocketMixin):
     def __init__(
         self,
         api_key: str,
+        api_secret: str | None = None,
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         ws_base_url: str | None = None,
@@ -88,6 +89,7 @@ class PrivateClient(AsyncWebSocketMixin):
         """Create a MEXC private WebSocket client."""
         self._native_client = _native.MexcPrivateWebSocketClient(
             api_key=api_key,
+            api_secret=api_secret,
             timeout=timeout,
             spot_http_base_url=spot_http_base_url,
             ws_base_url=ws_base_url,
@@ -150,6 +152,7 @@ def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
 
 def private(
     api_key: str,
+    api_secret: str | None = None,
     timeout: float = 10.0,
     spot_http_base_url: str | None = None,
     ws_base_url: str | None = None,
@@ -157,6 +160,7 @@ def private(
     """Create an async MEXC private WebSocket client."""
     return PrivateClient(
         api_key=api_key,
+        api_secret=api_secret,
         timeout=timeout,
         spot_http_base_url=spot_http_base_url,
         ws_base_url=ws_base_url,

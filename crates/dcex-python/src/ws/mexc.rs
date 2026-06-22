@@ -207,9 +207,10 @@ impl PythonMexcPublicWebSocketClient {
 #[pymethods]
 impl PythonMexcPrivateWebSocketClient {
     #[new]
-    #[pyo3(signature = (api_key, timeout=10.0, spot_http_base_url=None, ws_base_url=None))]
+    #[pyo3(signature = (api_key, api_secret=None, timeout=10.0, spot_http_base_url=None, ws_base_url=None))]
     fn new(
         api_key: String,
+        api_secret: Option<String>,
         timeout: f64,
         spot_http_base_url: Option<String>,
         ws_base_url: Option<String>,
@@ -220,14 +221,20 @@ impl PythonMexcPrivateWebSocketClient {
             ));
         }
         let timeout = Duration::from_secs_f64(timeout);
-        let client = match (spot_http_base_url, ws_base_url) {
-            (None, None) => MexcPrivateWebSocket::new(api_key, timeout),
-            (spot_http_base_url, ws_base_url) => MexcPrivateWebSocket::with_urls(
-                api_key,
-                timeout,
-                spot_http_base_url.unwrap_or_else(|| "https://api.mexc.com".to_string()),
-                ws_base_url.unwrap_or_else(|| "wss://wbs-api.mexc.com/ws".to_string()),
-            ),
+        let client = match (api_secret, spot_http_base_url, ws_base_url) {
+            (None, None, None) => MexcPrivateWebSocket::new(api_key, timeout),
+            (Some(api_secret), None, None) => {
+                MexcPrivateWebSocket::with_secret(api_key, api_secret, timeout)
+            }
+            (api_secret, spot_http_base_url, ws_base_url) => {
+                MexcPrivateWebSocket::with_urls_and_secret(
+                    api_key,
+                    api_secret,
+                    timeout,
+                    spot_http_base_url.unwrap_or_else(|| "https://api.mexc.com".to_string()),
+                    ws_base_url.unwrap_or_else(|| "wss://wbs-api.mexc.com/ws".to_string()),
+                )
+            }
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
