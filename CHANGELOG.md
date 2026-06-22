@@ -1,3 +1,9 @@
+## 0.24.1 (2026-06-22)
+
+### Perf
+
+- avoid redundant websocket json conversion
+
 ## 0.24.0 (2026-06-22)
 
 ### Feat
