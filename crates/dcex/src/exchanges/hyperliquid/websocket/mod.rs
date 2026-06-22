@@ -8,7 +8,7 @@ use serde_json::{Map, Value};
 
 use crate::{DcexError, Result};
 
-use super::params::fallback_coin;
+use super::params::{fallback_coin, is_canonical_product_symbol};
 
 pub(crate) const MAINNET_WS_URL: &str = "wss://api.hyperliquid.xyz/ws";
 pub(crate) const TESTNET_WS_URL: &str = "wss://api.hyperliquid-testnet.xyz/ws";
@@ -129,6 +129,7 @@ pub(crate) fn l2_book_subscription(
 }
 
 pub(crate) fn normalize_coin(product_symbol: &str) -> Result<String> {
+    let is_canonical_product_symbol = is_canonical_product_symbol(product_symbol);
     let coin = fallback_coin(product_symbol);
     let coin = coin.trim();
     if coin.is_empty() {
@@ -136,15 +137,18 @@ pub(crate) fn normalize_coin(product_symbol: &str) -> Result<String> {
             "Hyperliquid coin must not be empty.".to_string(),
         ));
     }
-    if !coin
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '_' | '/'))
-    {
+    if !coin.chars().all(|character| {
+        character.is_ascii_alphanumeric() || matches!(character, '-' | '_' | '/' | ':' | '#')
+    }) {
         return Err(DcexError::InvalidInput(format!(
             "unsupported Hyperliquid coin: {coin}"
         )));
     }
-    Ok(coin.to_ascii_uppercase())
+    if is_canonical_product_symbol {
+        Ok(coin.to_ascii_uppercase())
+    } else {
+        Ok(coin.to_string())
+    }
 }
 
 pub(crate) fn normalize_user(user: &str) -> Result<String> {
@@ -246,6 +250,13 @@ mod tests {
     fn normalizes_coin_from_canonical_symbol() {
         assert_eq!(normalize_coin("btc-usdc-swap").expect("coin"), "BTC");
         assert_eq!(normalize_coin("ETH").expect("coin"), "ETH");
+    }
+
+    #[test]
+    fn preserves_raw_hyperliquid_coin_symbols() {
+        assert_eq!(normalize_coin("kPEPE").expect("coin"), "kPEPE");
+        assert_eq!(normalize_coin("test:ABC").expect("coin"), "test:ABC");
+        assert_eq!(normalize_coin("#10").expect("coin"), "#10");
     }
 
     #[test]
