@@ -32,7 +32,11 @@ uv add dcex
 
 Rust:
 
-Direct Rust usage is documented in [crates/dcex/README.md](crates/dcex/README.md).
+```bash
+cargo add dcex
+```
+
+Direct Rust usage is also documented in [crates/dcex/README.md](crates/dcex/README.md).
 
 ## Quick Start
 
@@ -82,22 +86,13 @@ if __name__ == "__main__":
 ```rust
 use std::time::Duration;
 
-use dcex::exchanges::binance::{BinanceClient, BinanceMarket};
-use dcex::http::HttpMethod;
+use dcex::exchanges::binance::BinanceClient;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
     let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
-    let response = client
-        .request_raw(
-            HttpMethod::Get,
-            BinanceMarket::Spot,
-            "/api/v3/time",
-            Vec::new(),
-            false,
-        )
-        .await?;
-    println!("{}", response.text()?);
+    let response = client.get_server_time("spot").await?;
+    println!("{}", response.data);
     Ok(())
 }
 ```
@@ -130,7 +125,7 @@ streams. Order placement and cancellation remain on HTTP clients.
 - Product Table Manager for unifying trading instruments across exchanges
 - HTTP clients with consistent sync and async interfaces where available
 - Native Rust core for exchange HTTP, WebSocket, signing, serialization, and response validation
-- WebSocket public streams for Aster, Backpack, Binance, BingX, Bybit, OKX, Bitget, Kraken, KuCoin, MEXC, BitMart, BitMEX, Gate.io, Hyperliquid, and Lighter, with user-data streams for Aster, Backpack, Binance, BingX, Bybit, OKX, Bitget, Kraken, KuCoin, MEXC, BitMart, BitMEX, Gate.io, Hyperliquid, and Lighter
+- Public and private WebSocket stream clients across the supported exchanges
 - Direct Rust crate (`dcex`) for applications that do not need the Python layer
 - Opt-in live test suites for public, private, stateful, and generated-report endpoints
 
@@ -196,19 +191,11 @@ Live, private, stateful, and generated-report tests use the pytest markers
 configured in `pyproject.toml`. These tests are opt-in because they can require
 network access, exchange credentials, or account state.
 
-## Examples
-
-Python examples are under `examples/sync` and `examples/async`. Rust examples
-are under `crates/dcex/examples`. See [examples/README.md](examples/README.md)
-for the example conventions.
-
 ## Benchmarking
 
 Local CPU-bound benchmarks isolate Lighter signing and hashing hot paths. The
-baseline is the PyPI `dcex==0.21.2` native Python implementation, fixed at
-`1.00x`. Rust-backed Python is PyPI `dcex==0.22.0`, and Rust native is the
-crates.io `dcex==0.1.0` crate. The benchmark records package source and version
-so the comparison stays reproducible after this branch is merged into `main`.
+recorded sample below compares older published artifacts and keeps the package
+source and version fixed so the result remains reproducible.
 
 Recorded sample (`uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.22.0 --rust-crate-version 0.1.0`, 2026-06-20):
 
