@@ -1,10 +1,10 @@
 mod live_http_parity {
     macro_rules! request_case {
-        ($client:expr, $case:expr, [$($method:ident),+ $(,)?]) => {{
+        ($client:expr, $case:expr, [$($method:ident => $method_with:ident),+ $(,)?]) => {{
             let case = $case;
             match case.method {
                 $(
-                    stringify!($method) => $client.$method(case.params).await,
+                    stringify!($method) => $client.$method_with(case.params).await,
                 )+
                 method => Err(dcex::DcexError::InvalidInput(format!(
                     "unsupported live parity method: {method}",

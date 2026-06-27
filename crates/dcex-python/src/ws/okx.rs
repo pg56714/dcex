@@ -78,12 +78,15 @@ impl PythonOkxPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_channel(&channel, product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client
+                    .subscribe_channel_for_symbol(&channel, &product_symbol)
+                    .await
+            } else {
+                client.subscribe_channel(&channel).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -96,12 +99,15 @@ impl PythonOkxPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .unsubscribe_channel(&channel, product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client
+                    .unsubscribe_channel_for_symbol(&channel, &product_symbol)
+                    .await
+            } else {
+                client.unsubscribe_channel(&channel).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -285,13 +291,11 @@ impl PythonOkxPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let arg = okx_private_arg(channel, inst_type, inst_id, ccy)?;
             client
                 .lock()
                 .await
-                .subscribe(vec![dcex::ws::okx::OkxPrivateWebSocketArg::new(
-                    channel, inst_type, inst_id, ccy,
-                )
-                .map_err(to_py_runtime_error)?])
+                .subscribe(vec![arg])
                 .await
                 .map_err(to_py_runtime_error)
         })
@@ -308,13 +312,11 @@ impl PythonOkxPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let arg = okx_private_arg(channel, inst_type, inst_id, ccy)?;
             client
                 .lock()
                 .await
-                .unsubscribe(vec![dcex::ws::okx::OkxPrivateWebSocketArg::new(
-                    channel, inst_type, inst_id, ccy,
-                )
-                .map_err(to_py_runtime_error)?])
+                .unsubscribe(vec![arg])
                 .await
                 .map_err(to_py_runtime_error)
         })
@@ -329,12 +331,25 @@ impl PythonOkxPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_orders(inst_type.as_deref(), inst_id.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            match (inst_type, inst_id) {
+                (None, None) => client.subscribe_orders().await,
+                (Some(inst_type), None) => client.subscribe_orders_for_type(&inst_type).await,
+                (Some(inst_type), Some(inst_id)) => {
+                    client
+                        .subscribe_orders_for_instrument(&inst_type, &inst_id)
+                        .await
+                }
+                (None, Some(inst_id)) => {
+                    client
+                        .subscribe(vec![dcex::ws::okx::OkxPrivateWebSocketArg::with_inst_id(
+                            "orders", inst_id,
+                        )
+                        .map_err(to_py_runtime_error)?])
+                        .await
+                }
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -346,12 +361,13 @@ impl PythonOkxPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_account(ccy.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(ccy) = ccy {
+                client.subscribe_account_for_ccy(&ccy).await
+            } else {
+                client.subscribe_account().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -363,12 +379,13 @@ impl PythonOkxPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_positions(inst_type.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(inst_type) = inst_type {
+                client.subscribe_positions_for_type(&inst_type).await
+            } else {
+                client.subscribe_positions().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -397,4 +414,33 @@ impl PythonOkxPrivateWebSocketClient {
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PythonOkxPublicWebSocketClient>()?;
     m.add_class::<PythonOkxPrivateWebSocketClient>()
+}
+
+fn okx_private_arg(
+    channel: String,
+    inst_type: Option<String>,
+    inst_id: Option<String>,
+    ccy: Option<String>,
+) -> PyResult<dcex::ws::okx::OkxPrivateWebSocketArg> {
+    use dcex::ws::okx::OkxPrivateWebSocketArg;
+
+    match (inst_type, inst_id, ccy) {
+        (None, None, None) => OkxPrivateWebSocketArg::new(channel),
+        (Some(inst_type), None, None) => OkxPrivateWebSocketArg::with_inst_type(channel, inst_type),
+        (None, Some(inst_id), None) => OkxPrivateWebSocketArg::with_inst_id(channel, inst_id),
+        (Some(inst_type), Some(inst_id), None) => {
+            OkxPrivateWebSocketArg::with_inst_type_and_id(channel, inst_type, inst_id)
+        }
+        (None, None, Some(ccy)) => OkxPrivateWebSocketArg::with_ccy(channel, ccy),
+        (Some(inst_type), None, Some(ccy)) => {
+            OkxPrivateWebSocketArg::with_inst_type_and_ccy(channel, inst_type, ccy)
+        }
+        (None, Some(inst_id), Some(ccy)) => {
+            OkxPrivateWebSocketArg::with_inst_id_and_ccy(channel, inst_id, ccy)
+        }
+        (Some(inst_type), Some(inst_id), Some(ccy)) => {
+            OkxPrivateWebSocketArg::with_inst_type_and_id_and_ccy(channel, inst_type, inst_id, ccy)
+        }
+    }
+    .map_err(to_py_runtime_error)
 }

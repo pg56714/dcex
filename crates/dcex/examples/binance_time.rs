@@ -5,7 +5,7 @@ use dcex::http::HttpMethod;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
+    let client = BinanceClient::public(Duration::from_secs(10))?;
     let response = client
         .request_raw(
             HttpMethod::Get,

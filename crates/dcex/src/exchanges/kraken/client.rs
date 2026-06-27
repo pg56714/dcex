@@ -50,6 +50,10 @@ impl KrakenClient {
         )
     }
 
+    pub fn public(timeout: Duration) -> Result<Self> {
+        Self::new(None, None, None, None, timeout)
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub fn with_base_urls(
         spot_api_key: Option<String>,

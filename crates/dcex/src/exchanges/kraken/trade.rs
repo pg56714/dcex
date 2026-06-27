@@ -12,41 +12,44 @@ impl KrakenClient {
         params: &KrakenParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "place_spot_order" => self.place_spot_order_with(params, None, None, None).await,
+            "place_spot_order" => {
+                self.place_spot_order_request(params, None, None, None)
+                    .await
+            }
             "place_spot_market_order" => {
-                self.place_spot_order_with(params, None, Some("market"), None)
+                self.place_spot_order_request(params, None, Some("market"), None)
                     .await
             }
             "place_spot_market_buy_order" => {
-                self.place_spot_order_with(params, Some("buy"), Some("market"), None)
+                self.place_spot_order_request(params, Some("buy"), Some("market"), None)
                     .await
             }
             "place_spot_market_sell_order" => {
-                self.place_spot_order_with(params, Some("sell"), Some("market"), None)
+                self.place_spot_order_request(params, Some("sell"), Some("market"), None)
                     .await
             }
             "place_spot_limit_order" => {
-                self.place_spot_order_with(params, None, Some("limit"), None)
+                self.place_spot_order_request(params, None, Some("limit"), None)
                     .await
             }
             "place_spot_limit_buy_order" => {
-                self.place_spot_order_with(params, Some("buy"), Some("limit"), None)
+                self.place_spot_order_request(params, Some("buy"), Some("limit"), None)
                     .await
             }
             "place_spot_limit_sell_order" => {
-                self.place_spot_order_with(params, Some("sell"), Some("limit"), None)
+                self.place_spot_order_request(params, Some("sell"), Some("limit"), None)
                     .await
             }
             "place_spot_post_only_limit_order" => {
-                self.place_spot_order_with(params, None, Some("limit"), Some("post"))
+                self.place_spot_order_request(params, None, Some("limit"), Some("post"))
                     .await
             }
             "place_spot_post_only_limit_buy_order" => {
-                self.place_spot_order_with(params, Some("buy"), Some("limit"), Some("post"))
+                self.place_spot_order_request(params, Some("buy"), Some("limit"), Some("post"))
                     .await
             }
             "place_spot_post_only_limit_sell_order" => {
-                self.place_spot_order_with(params, Some("sell"), Some("limit"), Some("post"))
+                self.place_spot_order_request(params, Some("sell"), Some("limit"), Some("post"))
                     .await
             }
             "get_spot_open_orders" => {
@@ -104,43 +107,43 @@ impl KrakenClient {
                     .await
             }
             "place_futures_order" => {
-                self.place_futures_order_with(params, None, None, None)
+                self.place_futures_order_request(params, None, None, None)
                     .await
             }
             "place_futures_market_order" => {
-                self.place_futures_order_with(params, None, Some("mkt"), None)
+                self.place_futures_order_request(params, None, Some("mkt"), None)
                     .await
             }
             "place_futures_market_buy_order" => {
-                self.place_futures_order_with(params, Some("buy"), Some("mkt"), None)
+                self.place_futures_order_request(params, Some("buy"), Some("mkt"), None)
                     .await
             }
             "place_futures_market_sell_order" => {
-                self.place_futures_order_with(params, Some("sell"), Some("mkt"), None)
+                self.place_futures_order_request(params, Some("sell"), Some("mkt"), None)
                     .await
             }
             "place_futures_limit_order" => {
-                self.place_futures_order_with(params, None, Some("lmt"), Some("price"))
+                self.place_futures_order_request(params, None, Some("lmt"), Some("price"))
                     .await
             }
             "place_futures_limit_buy_order" => {
-                self.place_futures_order_with(params, Some("buy"), Some("lmt"), Some("price"))
+                self.place_futures_order_request(params, Some("buy"), Some("lmt"), Some("price"))
                     .await
             }
             "place_futures_limit_sell_order" => {
-                self.place_futures_order_with(params, Some("sell"), Some("lmt"), Some("price"))
+                self.place_futures_order_request(params, Some("sell"), Some("lmt"), Some("price"))
                     .await
             }
             "place_futures_post_only_limit_order" => {
-                self.place_futures_order_with(params, None, Some("post"), Some("price"))
+                self.place_futures_order_request(params, None, Some("post"), Some("price"))
                     .await
             }
             "place_futures_post_only_limit_buy_order" => {
-                self.place_futures_order_with(params, Some("buy"), Some("post"), Some("price"))
+                self.place_futures_order_request(params, Some("buy"), Some("post"), Some("price"))
                     .await
             }
             "place_futures_post_only_limit_sell_order" => {
-                self.place_futures_order_with(params, Some("sell"), Some("post"), Some("price"))
+                self.place_futures_order_request(params, Some("sell"), Some("post"), Some("price"))
                     .await
             }
             "get_futures_open_orders" => {
@@ -176,7 +179,7 @@ impl KrakenClient {
         Ok(Some(result?))
     }
 
-    async fn place_spot_order_with(
+    async fn place_spot_order_request(
         &self,
         params: &KrakenParams,
         side: Option<&str>,
@@ -204,7 +207,7 @@ impl KrakenClient {
             .await
     }
 
-    async fn place_futures_order_with(
+    async fn place_futures_order_request(
         &self,
         params: &KrakenParams,
         side: Option<&str>,

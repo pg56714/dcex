@@ -133,12 +133,15 @@ impl PythonBackpackPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_depth(&product_symbol, speed.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(speed) = speed {
+                client
+                    .subscribe_depth_with_speed(&product_symbol, &speed)
+                    .await
+            } else {
+                client.subscribe_depth(&product_symbol).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -151,12 +154,15 @@ impl PythonBackpackPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_orderbook(&product_symbol, speed.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(speed) = speed {
+                client
+                    .subscribe_orderbook_with_speed(&product_symbol, &speed)
+                    .await
+            } else {
+                client.subscribe_orderbook(&product_symbol).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -385,12 +391,13 @@ impl PythonBackpackPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_orders(product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client.subscribe_orders_for_symbol(&product_symbol).await
+            } else {
+                client.subscribe_orders().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -402,12 +409,13 @@ impl PythonBackpackPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_positions(product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client.subscribe_positions_for_symbol(&product_symbol).await
+            } else {
+                client.subscribe_positions().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -419,12 +427,13 @@ impl PythonBackpackPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_rfq(product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client.subscribe_rfq_for_symbol(&product_symbol).await
+            } else {
+                client.subscribe_rfq().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 

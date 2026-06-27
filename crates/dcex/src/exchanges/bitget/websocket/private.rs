@@ -20,7 +20,36 @@ pub struct BitgetPrivateWebSocketArg {
 }
 
 impl BitgetPrivateWebSocketArg {
-    pub fn new(
+    pub fn new(inst_type: impl Into<String>, channel: impl Into<String>) -> Result<Self> {
+        Self::with_filters(inst_type, channel, None, None)
+    }
+
+    pub fn with_inst_id(
+        inst_type: impl Into<String>,
+        channel: impl Into<String>,
+        inst_id: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(inst_type, channel, Some(inst_id.into()), None)
+    }
+
+    pub fn with_coin(
+        inst_type: impl Into<String>,
+        channel: impl Into<String>,
+        coin: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(inst_type, channel, None, Some(coin.into()))
+    }
+
+    pub fn with_inst_id_and_coin(
+        inst_type: impl Into<String>,
+        channel: impl Into<String>,
+        inst_id: impl Into<String>,
+        coin: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(inst_type, channel, Some(inst_id.into()), Some(coin.into()))
+    }
+
+    fn with_filters(
         inst_type: impl Into<String>,
         channel: impl Into<String>,
         inst_id: Option<String>,
@@ -144,75 +173,144 @@ impl BitgetPrivateWebSocket {
         self.send_subscription("unsubscribe", args).await
     }
 
-    pub async fn subscribe_channel(
-        &mut self,
-        inst_type: &str,
-        channel: &str,
-        inst_id: Option<&str>,
-        coin: Option<&str>,
-    ) -> Result<()> {
-        self.subscribe(vec![BitgetPrivateWebSocketArg::new(
-            inst_type,
-            channel,
-            inst_id.map(ToString::to_string),
-            coin.map(ToString::to_string),
-        )?])
-        .await
-    }
-
-    pub async fn unsubscribe_channel(
-        &mut self,
-        inst_type: &str,
-        channel: &str,
-        inst_id: Option<&str>,
-        coin: Option<&str>,
-    ) -> Result<()> {
-        self.unsubscribe(vec![BitgetPrivateWebSocketArg::new(
-            inst_type,
-            channel,
-            inst_id.map(ToString::to_string),
-            coin.map(ToString::to_string),
-        )?])
-        .await
-    }
-
-    pub async fn subscribe_orders(&mut self, inst_type: &str, inst_id: Option<&str>) -> Result<()> {
-        self.subscribe_channel(
-            inst_type,
-            "orders",
-            Some(inst_id.unwrap_or("default")),
-            None,
-        )
-        .await
-    }
-
-    pub async fn subscribe_fills(&mut self, inst_type: &str, inst_id: Option<&str>) -> Result<()> {
-        self.subscribe_channel(inst_type, "fill", Some(inst_id.unwrap_or("default")), None)
+    pub async fn subscribe_channel(&mut self, inst_type: &str, channel: &str) -> Result<()> {
+        self.subscribe(vec![BitgetPrivateWebSocketArg::new(inst_type, channel)?])
             .await
     }
 
-    pub async fn subscribe_positions(
+    pub async fn subscribe_channel_with_inst_id(
         &mut self,
         inst_type: &str,
-        inst_id: Option<&str>,
+        channel: &str,
+        inst_id: &str,
     ) -> Result<()> {
-        self.subscribe_channel(
-            inst_type,
-            "positions",
-            Some(inst_id.unwrap_or("default")),
-            None,
-        )
+        self.subscribe(vec![BitgetPrivateWebSocketArg::with_inst_id(
+            inst_type, channel, inst_id,
+        )?])
         .await
     }
 
-    pub async fn subscribe_account(&mut self, inst_type: &str, coin: Option<&str>) -> Result<()> {
-        self.subscribe_channel(inst_type, "account", None, Some(coin.unwrap_or("default")))
+    pub async fn subscribe_channel_with_coin(
+        &mut self,
+        inst_type: &str,
+        channel: &str,
+        coin: &str,
+    ) -> Result<()> {
+        self.subscribe(vec![BitgetPrivateWebSocketArg::with_coin(
+            inst_type, channel, coin,
+        )?])
+        .await
+    }
+
+    pub async fn subscribe_channel_with_inst_id_and_coin(
+        &mut self,
+        inst_type: &str,
+        channel: &str,
+        inst_id: &str,
+        coin: &str,
+    ) -> Result<()> {
+        self.subscribe(vec![BitgetPrivateWebSocketArg::with_inst_id_and_coin(
+            inst_type, channel, inst_id, coin,
+        )?])
+        .await
+    }
+
+    pub async fn unsubscribe_channel(&mut self, inst_type: &str, channel: &str) -> Result<()> {
+        self.unsubscribe(vec![BitgetPrivateWebSocketArg::new(inst_type, channel)?])
+            .await
+    }
+
+    pub async fn unsubscribe_channel_with_inst_id(
+        &mut self,
+        inst_type: &str,
+        channel: &str,
+        inst_id: &str,
+    ) -> Result<()> {
+        self.unsubscribe(vec![BitgetPrivateWebSocketArg::with_inst_id(
+            inst_type, channel, inst_id,
+        )?])
+        .await
+    }
+
+    pub async fn unsubscribe_channel_with_coin(
+        &mut self,
+        inst_type: &str,
+        channel: &str,
+        coin: &str,
+    ) -> Result<()> {
+        self.unsubscribe(vec![BitgetPrivateWebSocketArg::with_coin(
+            inst_type, channel, coin,
+        )?])
+        .await
+    }
+
+    pub async fn unsubscribe_channel_with_inst_id_and_coin(
+        &mut self,
+        inst_type: &str,
+        channel: &str,
+        inst_id: &str,
+        coin: &str,
+    ) -> Result<()> {
+        self.unsubscribe(vec![BitgetPrivateWebSocketArg::with_inst_id_and_coin(
+            inst_type, channel, inst_id, coin,
+        )?])
+        .await
+    }
+
+    pub async fn subscribe_orders(&mut self, inst_type: &str) -> Result<()> {
+        self.subscribe_channel_with_inst_id(inst_type, "orders", "default")
+            .await
+    }
+
+    pub async fn subscribe_orders_for_inst_id(
+        &mut self,
+        inst_type: &str,
+        inst_id: &str,
+    ) -> Result<()> {
+        self.subscribe_channel_with_inst_id(inst_type, "orders", inst_id)
+            .await
+    }
+
+    pub async fn subscribe_fills(&mut self, inst_type: &str) -> Result<()> {
+        self.subscribe_channel_with_inst_id(inst_type, "fill", "default")
+            .await
+    }
+
+    pub async fn subscribe_fills_for_inst_id(
+        &mut self,
+        inst_type: &str,
+        inst_id: &str,
+    ) -> Result<()> {
+        self.subscribe_channel_with_inst_id(inst_type, "fill", inst_id)
+            .await
+    }
+
+    pub async fn subscribe_positions(&mut self, inst_type: &str) -> Result<()> {
+        self.subscribe_channel_with_inst_id(inst_type, "positions", "default")
+            .await
+    }
+
+    pub async fn subscribe_positions_for_inst_id(
+        &mut self,
+        inst_type: &str,
+        inst_id: &str,
+    ) -> Result<()> {
+        self.subscribe_channel_with_inst_id(inst_type, "positions", inst_id)
+            .await
+    }
+
+    pub async fn subscribe_account(&mut self, inst_type: &str) -> Result<()> {
+        self.subscribe_channel_with_coin(inst_type, "account", "default")
+            .await
+    }
+
+    pub async fn subscribe_account_for_coin(&mut self, inst_type: &str, coin: &str) -> Result<()> {
+        self.subscribe_channel_with_coin(inst_type, "account", coin)
             .await
     }
 
     pub async fn subscribe_equity(&mut self, inst_type: &str) -> Result<()> {
-        self.subscribe_channel(inst_type, "equity", None, None)
-            .await
+        self.subscribe_channel(inst_type, "equity").await
     }
 
     pub async fn recv(&mut self) -> Result<Value> {
@@ -380,8 +478,7 @@ mod tests {
     #[test]
     fn builds_private_channel_arg() {
         let arg =
-            BitgetPrivateWebSocketArg::new("swap", "orders", Some("default".to_string()), None)
-                .expect("arg");
+            BitgetPrivateWebSocketArg::with_inst_id("swap", "orders", "default").expect("arg");
         assert_eq!(arg.inst_type, "USDT-FUTURES");
         assert_eq!(arg.channel, "orders");
         assert_eq!(arg.inst_id.as_deref(), Some("default"));
@@ -391,9 +488,9 @@ mod tests {
 
     #[test]
     fn rejects_invalid_private_arg() {
-        assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "account", None, None).is_ok());
-        assert!(BitgetPrivateWebSocketArg::new("bad", "orders", None, None).is_err());
-        assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "orders/", None, None).is_err());
+        assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "account").is_ok());
+        assert!(BitgetPrivateWebSocketArg::new("bad", "orders").is_err());
+        assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "orders/").is_err());
     }
 
     #[test]

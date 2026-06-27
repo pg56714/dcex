@@ -201,7 +201,7 @@ fn product_table_overrides_symbol_fallback() {
         min_notional: "0".to_string(),
         size_per_contract: "1".to_string(),
     }]);
-    let client = BinanceClient::new(None, None, Duration::from_secs(1))
+    let client = BinanceClient::public(Duration::from_secs(1))
         .expect("client")
         .with_product_table(table);
 

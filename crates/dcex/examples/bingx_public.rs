@@ -4,9 +4,9 @@ use dcex::exchanges::bingx::BingxClient;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let client = BingxClient::new(None, None, Duration::from_secs(10))?;
+    let client = BingxClient::public(Duration::from_secs(10))?;
     let response = client
-        .get_orderbook(vec![
+        .get_orderbook_with(vec![
             ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
             ("limit".to_string(), "5".to_string()),
         ])

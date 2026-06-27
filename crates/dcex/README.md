@@ -26,12 +26,18 @@ use dcex::exchanges::binance::BinanceClient;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
-    let response = client.get_server_time("spot").await?;
+    let api_key = std::env::var("BINANCE_API_KEY").expect("Set BINANCE_API_KEY");
+    let api_secret = std::env::var("BINANCE_API_SECRET").expect("Set BINANCE_API_SECRET");
+    let client = BinanceClient::new(Some(api_key), Some(api_secret), Duration::from_secs(10))?;
+    let response = client.get_income_history().await?;
     println!("{}", response.data);
     Ok(())
 }
 ```
+
+HTTP methods that do not require endpoint parameters can be called without an
+empty parameter list. Use the `_with(...)` variant when passing optional query
+or body parameters.
 
 WebSocket:
 

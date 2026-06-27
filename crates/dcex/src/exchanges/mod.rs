@@ -1,12 +1,20 @@
 macro_rules! impl_exchange_method_wrappers {
     (
         $client:ty;
-        public [$($public_method:ident),* $(,)?];
-        private [$($private_method:ident),* $(,)?] $(;)?
+        public [$($public_method:ident($($public_param:ident => $public_key:literal),*) => $public_method_with:ident),* $(,)?];
+        private [$($private_method:ident($($private_param:ident => $private_key:literal),*) => $private_method_with:ident),* $(,)?] $(;)?
     ) => {
         impl $client {
             $(
                 pub async fn $public_method(
+                    &self,
+                    $($public_param: impl ToString),*
+                ) -> crate::Result<crate::exchange::ValidatedResponse> {
+                    let params = vec![$(($public_key.to_string(), $public_param.to_string())),*];
+                    self.$public_method_with(params).await
+                }
+
+                pub async fn $public_method_with(
                     &self,
                     params: Vec<(String, String)>,
                 ) -> crate::Result<crate::exchange::ValidatedResponse> {
@@ -16,6 +24,14 @@ macro_rules! impl_exchange_method_wrappers {
 
             $(
                 pub async fn $private_method(
+                    &self,
+                    $($private_param: impl ToString),*
+                ) -> crate::Result<crate::exchange::ValidatedResponse> {
+                    let params = vec![$(($private_key.to_string(), $private_param.to_string())),*];
+                    self.$private_method_with(params).await
+                }
+
+                pub async fn $private_method_with(
                     &self,
                     params: Vec<(String, String)>,
                 ) -> crate::Result<crate::exchange::ValidatedResponse> {

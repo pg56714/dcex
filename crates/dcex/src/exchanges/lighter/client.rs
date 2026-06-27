@@ -200,7 +200,27 @@ impl LighterClient {
         private_key_for(&self.api_private_keys, api_key_index)
     }
 
-    pub fn create_auth_token(
+    pub fn create_auth_token(&self) -> Result<String> {
+        self.create_auth_token_with_options(None, None)
+    }
+
+    pub fn create_auth_token_with_deadline(&self, deadline: u64) -> Result<String> {
+        self.create_auth_token_with_options(Some(deadline), None)
+    }
+
+    pub fn create_auth_token_with_api_key_index(&self, api_key_index: u64) -> Result<String> {
+        self.create_auth_token_with_options(None, Some(api_key_index))
+    }
+
+    pub fn create_auth_token_with_deadline_and_api_key_index(
+        &self,
+        deadline: u64,
+        api_key_index: u64,
+    ) -> Result<String> {
+        self.create_auth_token_with_options(Some(deadline), Some(api_key_index))
+    }
+
+    fn create_auth_token_with_options(
         &self,
         deadline: Option<u64>,
         api_key_index: Option<u64>,

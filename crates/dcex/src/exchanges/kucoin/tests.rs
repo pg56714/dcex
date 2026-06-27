@@ -45,7 +45,7 @@ fn signature_and_passphrase_match_python_vectors() {
 
 #[test]
 fn futures_symbol_fallback_matches_kucoin_contract_format() {
-    let client = KucoinClient::new(None, None, None, Duration::from_secs(1)).expect("client");
+    let client = KucoinClient::public(Duration::from_secs(1)).expect("client");
 
     assert_eq!(
         client

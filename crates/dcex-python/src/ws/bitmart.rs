@@ -351,12 +351,13 @@ impl PythonBitmartPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_orders(product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client.subscribe_orders_for_symbol(&product_symbol).await
+            } else {
+                client.subscribe_orders().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 

@@ -70,18 +70,30 @@ impl BackpackPrivateWebSocket {
         self.connection.send_json(&payload).await
     }
 
-    pub async fn subscribe_orders(&mut self, product_symbol: Option<&str>) -> Result<()> {
-        self.subscribe_account_stream("orderUpdate", product_symbol)
+    pub async fn subscribe_orders(&mut self) -> Result<()> {
+        self.subscribe_account_stream("orderUpdate", None).await
+    }
+
+    pub async fn subscribe_orders_for_symbol(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe_account_stream("orderUpdate", Some(product_symbol))
             .await
     }
 
-    pub async fn subscribe_positions(&mut self, product_symbol: Option<&str>) -> Result<()> {
-        self.subscribe_account_stream("positionUpdate", product_symbol)
+    pub async fn subscribe_positions(&mut self) -> Result<()> {
+        self.subscribe_account_stream("positionUpdate", None).await
+    }
+
+    pub async fn subscribe_positions_for_symbol(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe_account_stream("positionUpdate", Some(product_symbol))
             .await
     }
 
-    pub async fn subscribe_rfq(&mut self, product_symbol: Option<&str>) -> Result<()> {
-        self.subscribe_account_stream("rfqUpdate", product_symbol)
+    pub async fn subscribe_rfq(&mut self) -> Result<()> {
+        self.subscribe_account_stream("rfqUpdate", None).await
+    }
+
+    pub async fn subscribe_rfq_for_symbol(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe_account_stream("rfqUpdate", Some(product_symbol))
             .await
     }
 

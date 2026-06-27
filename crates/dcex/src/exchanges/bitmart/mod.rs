@@ -10,6 +10,9 @@ pub mod websocket;
 mod wrappers;
 
 pub use client::{BitmartClient, BitmartMarket};
+pub use params::{
+    BitmartContractsDetailsParams, BitmartFundingRateHistoryParams, BitmartSpotKlineParams,
+};
 pub use websocket::{BitmartPrivateWebSocket, BitmartPublicWebSocket};
 
 #[cfg(test)]

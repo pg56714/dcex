@@ -32,14 +32,14 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
 
     let orderbook = client
-        .get_spot_orderbook(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
+        .get_spot_orderbook_with(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
         .await?;
     let details = fetch_trading_details(Exchange::Mexc, "mexc", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
 
     let order = client
-        .place_spot_post_only_limit_buy_order(params(&[
+        .place_spot_post_only_limit_buy_order_with(params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("quantity", quantity.as_str()),
             ("price", price.as_str()),
@@ -49,7 +49,7 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
     let cancel = client
-        .cancel_spot_order(params(&[
+        .cancel_spot_order_with(params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("orderId", order_id.as_str()),
         ]))
@@ -83,7 +83,7 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let ticker = client
-        .get_contract_ticker(params(&[("product_symbol", BTC_USDT_SWAP)]))
+        .get_contract_ticker_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
         .await?;
     let bid = find_f64(&ticker.data, &["bid1", "bid", "bidPrice"]).ok_or_else(|| {
         dcex::DcexError::Decode(format!("MEXC contract ticker has no bid: {ticker:?}"))
@@ -99,7 +99,7 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     };
 
     let order = client
-        .place_contract_post_only_buy_order(params(&[
+        .place_contract_post_only_buy_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("price", price.as_str()),
             ("vol", quantity.as_str()),
@@ -112,12 +112,12 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["orderId", "order_id"])?;
 
     let cancel = client
-        .cancel_contract_order(params(&[("orderId", order_id.as_str())]))
+        .cancel_contract_order_with(params(&[("orderId", order_id.as_str())]))
         .await?;
     assert_success(&cancel);
 
     let opened = client
-        .place_contract_market_buy_order(params(&[
+        .place_contract_market_buy_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("vol", quantity.as_str()),
             ("leverage", MEXC_CONTRACT_LEVERAGE),
@@ -129,7 +129,7 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     assert!(wait_for_positive_position(|| mexc_contract_position_abs(&client)).await? > 0.0);
 
     let closed = client
-        .place_contract_market_order(params(&[
+        .place_contract_market_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("side", "4"),
             ("vol", quantity.as_str()),
@@ -149,7 +149,7 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
 
 async fn mexc_contract_open_orders(client: &MexcClient) -> dcex::Result<bool> {
     let response = client
-        .get_contract_open_orders(params(&[
+        .get_contract_open_orders_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("page_num", "1"),
             ("page_size", "20"),
@@ -160,7 +160,7 @@ async fn mexc_contract_open_orders(client: &MexcClient) -> dcex::Result<bool> {
 
 async fn mexc_contract_position_abs(client: &MexcClient) -> dcex::Result<f64> {
     let response = client
-        .get_contract_open_positions(params(&[("product_symbol", BTC_USDT_SWAP)]))
+        .get_contract_open_positions_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
         .await?;
     Ok(sum_abs_values_for_symbols(
         &response.data,
@@ -216,7 +216,7 @@ async fn mexc_transfer(
 ) -> dcex::Result<()> {
     let amount = format_transfer_amount(amount);
     let response = client
-        .user_universal_transfer(params(&[
+        .user_universal_transfer_with(params(&[
             ("fromAccountType", from_account),
             ("toAccountType", to_account),
             ("asset", "USDT"),
@@ -228,13 +228,13 @@ async fn mexc_transfer(
 }
 
 async fn mexc_spot_usdt(client: &MexcClient) -> dcex::Result<f64> {
-    let response = client.get_spot_account(Vec::new()).await?;
+    let response = client.get_spot_account().await?;
     Ok(asset_amount(&response.data, "USDT", &["free", "available"]))
 }
 
 async fn mexc_contract_usdt(client: &MexcClient) -> dcex::Result<f64> {
     let response = client
-        .get_contract_asset(params(&[("currency", "USDT")]))
+        .get_contract_asset_with(params(&[("currency", "USDT")]))
         .await?;
     Ok(asset_amount(
         &response.data,

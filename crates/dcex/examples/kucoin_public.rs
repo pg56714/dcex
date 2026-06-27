@@ -4,13 +4,13 @@ use dcex::exchanges::kucoin::KucoinClient;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let client = KucoinClient::new(None, None, None, Duration::from_secs(10))?;
+    let client = KucoinClient::public(Duration::from_secs(10))?;
 
-    let instruments = client.get_spot_instrument_info(Vec::new()).await?;
+    let instruments = client.get_spot_instrument_info().await?;
     println!("{}", instruments.data);
 
     let ticker = client
-        .get_spot_ticker(vec![(
+        .get_spot_ticker_with(vec![(
             "product_symbol".to_string(),
             "BTC-USDT-SPOT".to_string(),
         )])

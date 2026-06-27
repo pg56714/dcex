@@ -111,12 +111,8 @@ impl AsterPrivateWebSocket {
 
     pub async fn create_listen_key(&self) -> Result<String> {
         let response = match self.market {
-            AsterMarket::Futures => {
-                self.http_client
-                    .create_futures_listen_key(Vec::new())
-                    .await?
-            }
-            AsterMarket::Spot => self.http_client.create_spot_listen_key(Vec::new()).await?,
+            AsterMarket::Futures => self.http_client.create_futures_listen_key().await?,
+            AsterMarket::Spot => self.http_client.create_spot_listen_key().await?,
         };
         extract_listen_key(&response)
     }
@@ -129,13 +125,11 @@ impl AsterPrivateWebSocket {
         })?;
         match self.market {
             AsterMarket::Futures => {
-                self.http_client
-                    .keep_alive_futures_listen_key(Vec::new())
-                    .await?;
+                self.http_client.keep_alive_futures_listen_key().await?;
             }
             AsterMarket::Spot => {
                 self.http_client
-                    .keep_alive_spot_listen_key(vec![(
+                    .keep_alive_spot_listen_key_with(vec![(
                         "listenKey".to_string(),
                         listen_key.to_string(),
                     )])
@@ -149,13 +143,11 @@ impl AsterPrivateWebSocket {
         if let Some(listen_key) = self.listen_key.take() {
             match self.market {
                 AsterMarket::Futures => {
-                    self.http_client
-                        .close_futures_listen_key(Vec::new())
-                        .await?;
+                    self.http_client.close_futures_listen_key().await?;
                 }
                 AsterMarket::Spot => {
                     self.http_client
-                        .close_spot_listen_key(vec![("listenKey".to_string(), listen_key)])
+                        .close_spot_listen_key_with(vec![("listenKey".to_string(), listen_key)])
                         .await?;
                 }
             }

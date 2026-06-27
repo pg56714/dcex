@@ -1,7 +1,10 @@
 use std::time::Duration;
 
 use dcex::exchange::ValidatedResponse;
-use dcex::exchanges::bitmart::BitmartClient;
+use dcex::exchanges::bitmart::{
+    BitmartClient, BitmartContractsDetailsParams, BitmartFundingRateHistoryParams,
+    BitmartSpotKlineParams,
+};
 
 use super::common::{
     live_http_enabled, now_ms, require_env, run_cases, Case, BTC_USDT_SPOT, BTC_USDT_SWAP,
@@ -10,7 +13,7 @@ use super::common::{
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn bitmart_public_live_parity() -> dcex::Result<()> {
-    let client = BitmartClient::new(None, None, None, Duration::from_secs(20))?;
+    let client = BitmartClient::public(Duration::from_secs(20))?;
     let end_time = (now_ms() / 1000).to_string();
     let start_time = ((now_ms() / 1000) - 24 * 60 * 60).to_string();
     run_cases(
@@ -128,20 +131,20 @@ async fn bitmart_private_read_live_parity() -> dcex::Result<()> {
             client,
             case,
             [
-                get_account_balance,
-                get_account_currencies,
-                get_contract_assets,
-                get_contract_open_order,
-                get_contract_order_history,
-                get_contract_position,
-                get_contract_trade,
-                get_contract_transaction_history,
-                get_contract_transfer_list,
-                get_deposit_address,
-                get_spot_account_orders,
-                get_spot_account_trade_list,
-                get_spot_open_orders,
-                get_spot_wallet,
+                get_account_balance => get_account_balance_with,
+                get_account_currencies => get_account_currencies_with,
+                get_contract_assets => get_contract_assets_with,
+                get_contract_open_order => get_contract_open_order_with,
+                get_contract_order_history => get_contract_order_history_with,
+                get_contract_position => get_contract_position_with,
+                get_contract_trade => get_contract_trade_with,
+                get_contract_transaction_history => get_contract_transaction_history_with,
+                get_contract_transfer_list => get_contract_transfer_list_with,
+                get_deposit_address => get_deposit_address_with,
+                get_spot_account_orders => get_spot_account_orders_with,
+                get_spot_account_trade_list => get_spot_account_trade_list_with,
+                get_spot_open_orders => get_spot_open_orders_with,
+                get_spot_wallet => get_spot_wallet_with,
             ]
         ) {
             Ok(response) => {
@@ -183,18 +186,22 @@ async fn bitmart_public_case(
         }
         "get_spot_kline" => {
             client
-                .get_spot_kline(
+                .get_spot_kline_with(
                     params.required("product_symbol")?,
                     params.required("interval")?,
-                    params.get("before"),
-                    params.get("after"),
-                    params.get("limit"),
+                    BitmartSpotKlineParams {
+                        before: params.get("before"),
+                        after: params.get("after"),
+                        limit: params.get("limit"),
+                    },
                 )
                 .await
         }
         "get_contracts_details" => {
             client
-                .get_contracts_details(params.get("product_symbol"))
+                .get_contracts_details_with(BitmartContractsDetailsParams {
+                    product_symbol: params.get("product_symbol"),
+                })
                 .await
         }
         "get_depth" => client.get_depth(params.required("product_symbol")?).await,
@@ -235,7 +242,12 @@ async fn bitmart_public_case(
         }
         "get_funding_rate_history" => {
             client
-                .get_funding_rate_history(params.required("product_symbol")?, params.get("limit"))
+                .get_funding_rate_history_with(
+                    params.required("product_symbol")?,
+                    BitmartFundingRateHistoryParams {
+                        limit: params.get("limit"),
+                    },
+                )
                 .await
         }
         method => Err(dcex::DcexError::InvalidInput(format!(

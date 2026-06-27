@@ -2,6 +2,23 @@ use serde_json::{Map, Number, Value};
 
 use crate::{DcexError, Result};
 
+#[derive(Clone, Debug, Default)]
+pub struct BitmartContractsDetailsParams<'a> {
+    pub product_symbol: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BitmartFundingRateHistoryParams<'a> {
+    pub limit: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BitmartSpotKlineParams<'a> {
+    pub before: Option<&'a str>,
+    pub after: Option<&'a str>,
+    pub limit: Option<&'a str>,
+}
+
 pub(super) struct BitmartParams(Vec<(String, String)>);
 
 impl BitmartParams {

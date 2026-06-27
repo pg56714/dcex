@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use dcex::exchange::ValidatedResponse;
-use dcex::exchanges::aster::AsterClient;
+use dcex::exchanges::aster::{AsterClient, AsterLimitParams, AsterOptionalSymbolParams};
 
 use super::common::{
     require_env, run_cases, run_private_cases, Case, BTC_USDT_SPOT, BTC_USDT_SWAP,
@@ -10,7 +10,7 @@ use super::common::{
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn aster_public_live_parity() -> dcex::Result<()> {
-    let client = AsterClient::new(None, None, None, Duration::from_secs(20))?;
+    let client = AsterClient::public(Duration::from_secs(20))?;
     run_cases(
         vec![
             Case::new("ping_spot", &[]),
@@ -86,17 +86,29 @@ async fn aster_public_case(client: &AsterClient, case: Case) -> dcex::Result<Val
         "get_futures_server_time" => client.get_futures_server_time().await,
         "get_spot_orderbook" => {
             client
-                .get_spot_orderbook(params.required("product_symbol")?, params.u64("limit")?)
+                .get_spot_orderbook_with(
+                    params.required("product_symbol")?,
+                    AsterLimitParams {
+                        limit: params.u64("limit")?,
+                    },
+                )
                 .await
         }
         "get_futures_orderbook" => {
             client
-                .get_futures_orderbook(params.required("product_symbol")?, params.u64("limit")?)
+                .get_futures_orderbook_with(
+                    params.required("product_symbol")?,
+                    AsterLimitParams {
+                        limit: params.u64("limit")?,
+                    },
+                )
                 .await
         }
         "get_futures_ticker_24hr" => {
             client
-                .get_futures_ticker_24hr(params.get("product_symbol"))
+                .get_futures_ticker_24hr_with(AsterOptionalSymbolParams {
+                    product_symbol: params.get("product_symbol"),
+                })
                 .await
         }
         method => Err(dcex::DcexError::InvalidInput(format!(

@@ -45,6 +45,10 @@ impl BybitClient {
         )
     }
 
+    pub fn public(recv_window: u64, sync_server_time: bool, timeout: Duration) -> Result<Self> {
+        Self::new(None, None, recv_window, sync_server_time, timeout)
+    }
+
     pub fn with_base_url(
         api_key: Option<String>,
         api_secret: Option<String>,

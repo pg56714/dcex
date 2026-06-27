@@ -33,7 +33,7 @@ fn signature_includes_encoded_query_path() {
 
 #[test]
 fn limit_buy_shortcut_builds_order_body_without_side_param() {
-    let client = BitmexClient::new(None, None, Duration::from_secs(1)).expect("client");
+    let client = BitmexClient::public(Duration::from_secs(1)).expect("client");
     let params = params::BitmexParams::from_pairs(vec![
         ("product_symbol".to_string(), "XBT-USD-SWAP".to_string()),
         ("orderQty".to_string(), "100".to_string()),
@@ -63,7 +63,7 @@ fn limit_buy_shortcut_builds_order_body_without_side_param() {
 
 #[test]
 fn amend_order_requires_order_identifier() {
-    let client = BitmexClient::new(None, None, Duration::from_secs(1)).expect("client");
+    let client = BitmexClient::public(Duration::from_secs(1)).expect("client");
     let params = params::BitmexParams::from_pairs(vec![
         ("product_symbol".to_string(), "XBT-USD-SWAP".to_string()),
         ("price".to_string(), "1.5".to_string()),
@@ -74,7 +74,7 @@ fn amend_order_requires_order_identifier() {
 
 #[test]
 fn cancel_order_accepts_array_identifiers() {
-    let client = BitmexClient::new(None, None, Duration::from_secs(1)).expect("client");
+    let client = BitmexClient::public(Duration::from_secs(1)).expect("client");
     let params = params::BitmexParams::from_pairs(vec![
         (
             "orderID".to_string(),

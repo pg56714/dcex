@@ -22,7 +22,7 @@ impl BackpackPublicWebSocket {
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
-            client: BackpackClient::new(None, None, 5000, timeout)?,
+            client: BackpackClient::public(5000, timeout)?,
         })
     }
 
@@ -61,26 +61,31 @@ impl BackpackPublicWebSocket {
             .await
     }
 
-    pub async fn subscribe_depth(
+    pub async fn subscribe_depth(&mut self, product_symbol: &str) -> Result<()> {
+        let symbol = self.stream_symbol(product_symbol)?;
+        self.subscribe(vec![format!("depth.{symbol}")]).await
+    }
+
+    pub async fn subscribe_depth_with_speed(
         &mut self,
         product_symbol: &str,
-        speed: Option<&str>,
+        speed: &str,
     ) -> Result<()> {
         let symbol = self.stream_symbol(product_symbol)?;
-        let stream = if let Some(speed) = speed {
-            format!("depth.{}.{}", validate_depth_speed(speed)?, symbol)
-        } else {
-            format!("depth.{symbol}")
-        };
+        let stream = format!("depth.{}.{}", validate_depth_speed(speed)?, symbol);
         self.subscribe(vec![stream]).await
     }
 
-    pub async fn subscribe_orderbook(
+    pub async fn subscribe_orderbook(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe_depth(product_symbol).await
+    }
+
+    pub async fn subscribe_orderbook_with_speed(
         &mut self,
         product_symbol: &str,
-        speed: Option<&str>,
+        speed: &str,
     ) -> Result<()> {
-        self.subscribe_depth(product_symbol, speed).await
+        self.subscribe_depth_with_speed(product_symbol, speed).await
     }
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, interval: &str) -> Result<()> {

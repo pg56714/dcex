@@ -3,7 +3,10 @@ use crate::{DcexError, Result};
 
 use super::client::{BitmartClient, BitmartMarket};
 use super::endpoints::*;
-use super::params::{bitmart_timeframe, push_optional, BitmartParams};
+use super::params::{
+    bitmart_timeframe, push_optional, BitmartContractsDetailsParams,
+    BitmartFundingRateHistoryParams, BitmartParams, BitmartSpotKlineParams,
+};
 
 impl BitmartClient {
     pub async fn get_spot_currencies(&self) -> Result<ValidatedResponse> {
@@ -42,9 +45,16 @@ impl BitmartClient {
         &self,
         product_symbol: &str,
         interval: &str,
-        before: Option<&str>,
-        after: Option<&str>,
-        limit: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.get_spot_kline_with(product_symbol, interval, BitmartSpotKlineParams::default())
+            .await
+    }
+
+    pub async fn get_spot_kline_with(
+        &self,
+        product_symbol: &str,
+        interval: &str,
+        request: BitmartSpotKlineParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![
             (
@@ -53,21 +63,26 @@ impl BitmartClient {
             ),
             ("step".to_string(), bitmart_timeframe(interval)?.to_string()),
         ];
-        push_optional(&mut params, "before", before);
-        push_optional(&mut params, "after", after);
-        push_optional(&mut params, "limit", limit);
+        push_optional(&mut params, "before", request.before);
+        push_optional(&mut params, "after", request.after);
+        push_optional(&mut params, "limit", request.limit);
         self.public_get(BitmartMarket::Spot, SPOT_KLINE, params)
             .await
     }
 
-    pub async fn get_contracts_details(
+    pub async fn get_contracts_details(&self) -> Result<ValidatedResponse> {
+        self.get_contracts_details_with(BitmartContractsDetailsParams::default())
+            .await
+    }
+
+    pub async fn get_contracts_details_with(
         &self,
-        product_symbol: Option<&str>,
+        request: BitmartContractsDetailsParams<'_>,
     ) -> Result<ValidatedResponse> {
         self.public_get(
             BitmartMarket::Futures,
             FUTURES_CONTRACT_DETAILS,
-            self.optional_symbol_params(product_symbol, false)?,
+            self.optional_symbol_params(request.product_symbol, false)?,
         )
         .await
     }
@@ -131,13 +146,24 @@ impl BitmartClient {
     pub async fn get_funding_rate_history(
         &self,
         product_symbol: &str,
-        limit: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.get_funding_rate_history_with(
+            product_symbol,
+            BitmartFundingRateHistoryParams::default(),
+        )
+        .await
+    }
+
+    pub async fn get_funding_rate_history_with(
+        &self,
+        product_symbol: &str,
+        request: BitmartFundingRateHistoryParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![(
             "symbol".to_string(),
             self.exchange_symbol(product_symbol, false)?,
         )];
-        push_optional(&mut params, "limit", limit);
+        push_optional(&mut params, "limit", request.limit);
         self.public_get(BitmartMarket::Futures, FUTURES_FUNDING_RATE_HISTORY, params)
             .await
     }
@@ -158,18 +184,22 @@ impl BitmartClient {
                     .await
             }
             "get_spot_kline" => {
-                self.get_spot_kline(
+                self.get_spot_kline_with(
                     params.required("product_symbol")?,
                     params.required("interval")?,
-                    params.get("before"),
-                    params.get("after"),
-                    params.get("limit"),
+                    BitmartSpotKlineParams {
+                        before: params.get("before"),
+                        after: params.get("after"),
+                        limit: params.get("limit"),
+                    },
                 )
                 .await
             }
             "get_contracts_details" => {
-                self.get_contracts_details(params.get("product_symbol"))
-                    .await
+                self.get_contracts_details_with(BitmartContractsDetailsParams {
+                    product_symbol: params.get("product_symbol"),
+                })
+                .await
             }
             "get_depth" => self.get_depth(params.required("product_symbol")?).await,
             "get_contract_kline" => {
@@ -203,9 +233,11 @@ impl BitmartClient {
                     .await
             }
             "get_funding_rate_history" => {
-                self.get_funding_rate_history(
+                self.get_funding_rate_history_with(
                     params.required("product_symbol")?,
-                    params.get("limit"),
+                    BitmartFundingRateHistoryParams {
+                        limit: params.get("limit"),
+                    },
                 )
                 .await
             }

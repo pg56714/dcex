@@ -169,7 +169,7 @@ impl LighterClient {
         if self.api_private_keys.is_empty() {
             return Ok(None);
         }
-        self.create_auth_token(None, None).map(Some)
+        self.create_auth_token().map(Some)
     }
 
     pub(super) fn market_query(
@@ -216,7 +216,7 @@ pub(super) fn auth_header_required(
         .get("authorization")
         .map(str::to_string)
         .map(Ok)
-        .unwrap_or_else(|| client.create_auth_token(None, None))?;
+        .unwrap_or_else(|| client.create_auth_token())?;
     let mut headers = BTreeMap::new();
     headers.insert("Authorization".to_string(), authorization);
     Ok(headers)

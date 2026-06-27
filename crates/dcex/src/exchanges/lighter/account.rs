@@ -120,7 +120,7 @@ impl LighterClient {
                     if self.api_private_keys.is_empty() {
                         None
                     } else {
-                        Some(self.create_auth_token(None, None)?)
+                        Some(self.create_auth_token()?)
                     },
                 )?,
             ),

@@ -39,6 +39,18 @@ impl HyperliquidClient {
         )
     }
 
+    pub fn public(testnet: bool, timeout: Duration) -> Result<Self> {
+        Self::new(testnet, None, None, timeout)
+    }
+
+    pub fn for_wallet_address(
+        testnet: bool,
+        wallet_address: String,
+        timeout: Duration,
+    ) -> Result<Self> {
+        Self::new(testnet, Some(wallet_address), None, timeout)
+    }
+
     pub fn with_endpoint(
         testnet: bool,
         wallet_address: Option<String>,

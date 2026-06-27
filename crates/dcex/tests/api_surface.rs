@@ -4,10 +4,67 @@ use dcex::exchanges::{
     lighter::LighterClient, mexc::MexcClient, okx::OkxClient,
 };
 
+trait WrapperSource {
+    const SOURCE: &'static str;
+}
+
+impl WrapperSource for BingxClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/bingx/wrappers.rs");
+}
+
+impl WrapperSource for BybitClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/bybit/wrappers.rs");
+}
+
+impl WrapperSource for OkxClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/okx/wrappers.rs");
+}
+
+impl WrapperSource for BitgetClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/bitget/wrappers.rs");
+}
+
+impl WrapperSource for KrakenClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/kraken/wrappers.rs");
+}
+
+impl WrapperSource for MexcClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/mexc/wrappers.rs");
+}
+
+impl WrapperSource for BitmartClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/bitmart/wrappers.rs");
+}
+
+impl WrapperSource for GateioClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/gateio/wrappers.rs");
+}
+
+impl WrapperSource for BitmexClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/bitmex/wrappers.rs");
+}
+
+impl WrapperSource for HyperliquidClient {
+    const SOURCE: &'static str = include_str!("../src/exchanges/hyperliquid/wrappers.rs");
+}
+
+impl WrapperSource for LighterClient {
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/lighter/client.rs"),
+        include_str!("../src/exchanges/lighter/wrappers.rs")
+    );
+}
+
 macro_rules! assert_methods {
     ($client:ty: $($method:ident),* $(,)?) => {
+        let source = <$client as WrapperSource>::SOURCE;
         $(
-            let _ = <$client>::$method;
+            assert!(
+                source.contains(concat!(stringify!($method), "(")),
+                "{} does not list {}",
+                stringify!($client),
+                stringify!($method),
+            );
         )*
     };
 }

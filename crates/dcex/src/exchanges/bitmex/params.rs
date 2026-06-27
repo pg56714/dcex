@@ -2,6 +2,45 @@ use serde_json::{Map, Number, Value};
 
 use crate::{DcexError, Result};
 
+#[derive(Clone, Debug, Default)]
+pub struct BitmexInstrumentInfoParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub filter: Option<&'a str>,
+    pub count: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BitmexOrderbookParams<'a> {
+    pub depth: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BitmexTableParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub symbol: Option<&'a str>,
+    pub filter: Option<&'a str>,
+    pub columns: Option<&'a str>,
+    pub count: Option<&'a str>,
+    pub start: Option<&'a str>,
+    pub reverse: Option<&'a str>,
+    pub start_time: Option<&'a str>,
+    pub end_time: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BitmexBucketParams<'a> {
+    pub bin_size: Option<&'a str>,
+    pub partial: Option<&'a str>,
+    pub symbol: Option<&'a str>,
+    pub filter: Option<&'a str>,
+    pub columns: Option<&'a str>,
+    pub count: Option<&'a str>,
+    pub start: Option<&'a str>,
+    pub reverse: Option<&'a str>,
+    pub start_time: Option<&'a str>,
+    pub end_time: Option<&'a str>,
+}
+
 pub(super) struct BitmexParams(Vec<(String, String)>);
 
 impl BitmexParams {

@@ -2,6 +2,58 @@ use serde_json::Value;
 
 use crate::{DcexError, Result};
 
+#[derive(Clone, Debug, Default)]
+pub struct AsterAggTradesParams {
+    pub from_id: Option<u64>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AsterExchangeInfoParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub symbols: Option<Vec<String>>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AsterFundingRateParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AsterHistoricalTradesParams {
+    pub limit: Option<u64>,
+    pub from_id: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AsterIndexPriceKlinesParams {
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AsterKlinesParams {
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AsterLimitParams {
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AsterOptionalSymbolParams<'a> {
+    pub product_symbol: Option<&'a str>,
+}
+
 pub(super) struct AsterParams(Vec<(String, String)>);
 
 impl AsterParams {

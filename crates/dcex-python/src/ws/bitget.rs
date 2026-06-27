@@ -292,12 +292,28 @@ impl PythonBitgetPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_channel(&inst_type, &channel, inst_id.as_deref(), coin.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            match (inst_id, coin) {
+                (None, None) => client.subscribe_channel(&inst_type, &channel).await,
+                (Some(inst_id), None) => {
+                    client
+                        .subscribe_channel_with_inst_id(&inst_type, &channel, &inst_id)
+                        .await
+                }
+                (None, Some(coin)) => {
+                    client
+                        .subscribe_channel_with_coin(&inst_type, &channel, &coin)
+                        .await
+                }
+                (Some(inst_id), Some(coin)) => {
+                    client
+                        .subscribe_channel_with_inst_id_and_coin(
+                            &inst_type, &channel, &inst_id, &coin,
+                        )
+                        .await
+                }
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -312,12 +328,28 @@ impl PythonBitgetPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .unsubscribe_channel(&inst_type, &channel, inst_id.as_deref(), coin.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            match (inst_id, coin) {
+                (None, None) => client.unsubscribe_channel(&inst_type, &channel).await,
+                (Some(inst_id), None) => {
+                    client
+                        .unsubscribe_channel_with_inst_id(&inst_type, &channel, &inst_id)
+                        .await
+                }
+                (None, Some(coin)) => {
+                    client
+                        .unsubscribe_channel_with_coin(&inst_type, &channel, &coin)
+                        .await
+                }
+                (Some(inst_id), Some(coin)) => {
+                    client
+                        .unsubscribe_channel_with_inst_id_and_coin(
+                            &inst_type, &channel, &inst_id, &coin,
+                        )
+                        .await
+                }
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -331,12 +363,15 @@ impl PythonBitgetPrivateWebSocketClient {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let inst_type = default_private_inst_type(inst_type);
-            client
-                .lock()
-                .await
-                .subscribe_orders(&inst_type, inst_id.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(inst_id) = inst_id {
+                client
+                    .subscribe_orders_for_inst_id(&inst_type, &inst_id)
+                    .await
+            } else {
+                client.subscribe_orders(&inst_type).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -350,12 +385,15 @@ impl PythonBitgetPrivateWebSocketClient {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let inst_type = default_private_inst_type(inst_type);
-            client
-                .lock()
-                .await
-                .subscribe_fills(&inst_type, inst_id.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(inst_id) = inst_id {
+                client
+                    .subscribe_fills_for_inst_id(&inst_type, &inst_id)
+                    .await
+            } else {
+                client.subscribe_fills(&inst_type).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -369,12 +407,15 @@ impl PythonBitgetPrivateWebSocketClient {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let inst_type = default_private_inst_type(inst_type);
-            client
-                .lock()
-                .await
-                .subscribe_positions(&inst_type, inst_id.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(inst_id) = inst_id {
+                client
+                    .subscribe_positions_for_inst_id(&inst_type, &inst_id)
+                    .await
+            } else {
+                client.subscribe_positions(&inst_type).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -388,12 +429,13 @@ impl PythonBitgetPrivateWebSocketClient {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let inst_type = default_private_inst_type(inst_type);
-            client
-                .lock()
-                .await
-                .subscribe_account(&inst_type, coin.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(coin) = coin {
+                client.subscribe_account_for_coin(&inst_type, &coin).await
+            } else {
+                client.subscribe_account(&inst_type).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 

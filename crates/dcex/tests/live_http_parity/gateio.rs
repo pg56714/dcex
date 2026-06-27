@@ -9,7 +9,7 @@ use super::common::{
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn gateio_public_live_parity() -> dcex::Result<()> {
-    let client = GateioClient::new(None, None, Duration::from_secs(20))?;
+    let client = GateioClient::public(Duration::from_secs(20))?;
     run_cases(
         vec![
             Case::new("get_all_futures_contracts", &[]),
@@ -67,18 +67,18 @@ async fn gateio_public_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_all_delivery_contracts,
-                        get_all_futures_contracts,
-                        get_a_single_futures_contract,
-                        get_contract_kline,
-                        get_contract_list_tickers,
-                        get_contract_order_book,
-                        get_futures_contract_stats,
-                        get_futures_funding_rate_history,
-                        get_spot_all_currency_pairs,
-                        get_spot_kline,
-                        get_spot_list_tickers,
-                        get_spot_order_book,
+                        get_all_delivery_contracts => get_all_delivery_contracts_with,
+                        get_all_futures_contracts => get_all_futures_contracts_with,
+                        get_a_single_futures_contract => get_a_single_futures_contract_with,
+                        get_contract_kline => get_contract_kline_with,
+                        get_contract_list_tickers => get_contract_list_tickers_with,
+                        get_contract_order_book => get_contract_order_book_with,
+                        get_futures_contract_stats => get_futures_contract_stats_with,
+                        get_futures_funding_rate_history => get_futures_funding_rate_history_with,
+                        get_spot_all_currency_pairs => get_spot_all_currency_pairs_with,
+                        get_spot_kline => get_spot_kline_with,
+                        get_spot_list_tickers => get_spot_list_tickers_with,
+                        get_spot_order_book => get_spot_order_book_with,
                     ]
                 )
             }
@@ -164,26 +164,26 @@ async fn gateio_private_read_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_contract_order_list,
-                        get_contract_single_positions,
-                        get_delivery_account,
-                        get_delivery_account_book,
-                        get_delivery_all_positions,
-                        get_futures_account,
-                        get_futures_account_book,
-                        get_futures_all_positions,
-                        get_futures_auto_deleveraging_history,
-                        get_futures_position_close_history,
-                        get_spot_account,
-                        get_spot_account_book,
-                        get_spot_batch_fee,
-                        get_spot_fee,
-                        get_spot_open_orders,
-                        get_spot_order_list,
-                        get_spot_trading_history,
-                        get_total_balance,
-                        get_trading_history,
-                        get_unified_accounts,
+                        get_contract_order_list => get_contract_order_list_with,
+                        get_contract_single_positions => get_contract_single_positions_with,
+                        get_delivery_account => get_delivery_account_with,
+                        get_delivery_account_book => get_delivery_account_book_with,
+                        get_delivery_all_positions => get_delivery_all_positions_with,
+                        get_futures_account => get_futures_account_with,
+                        get_futures_account_book => get_futures_account_book_with,
+                        get_futures_all_positions => get_futures_all_positions_with,
+                        get_futures_auto_deleveraging_history => get_futures_auto_deleveraging_history_with,
+                        get_futures_position_close_history => get_futures_position_close_history_with,
+                        get_spot_account => get_spot_account_with,
+                        get_spot_account_book => get_spot_account_book_with,
+                        get_spot_batch_fee => get_spot_batch_fee_with,
+                        get_spot_fee => get_spot_fee_with,
+                        get_spot_open_orders => get_spot_open_orders_with,
+                        get_spot_order_list => get_spot_order_list_with,
+                        get_spot_trading_history => get_spot_trading_history_with,
+                        get_total_balance => get_total_balance_with,
+                        get_trading_history => get_trading_history_with,
+                        get_unified_accounts => get_unified_accounts_with,
                     ]
                 )
             }

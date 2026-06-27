@@ -10,7 +10,7 @@ const BTC_USDC_SWAP: &str = "BTC-USDC-SWAP";
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn backpack_public_live_parity() -> dcex::Result<()> {
-    let client = BackpackClient::new(None, None, 5_000, Duration::from_secs(20))?;
+    let client = BackpackClient::public(5_000, Duration::from_secs(20))?;
     run_cases(
         vec![
             Case::new("ping", &[]),
@@ -35,14 +35,14 @@ async fn backpack_public_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_funding_rates,
-                        get_market,
-                        get_markets,
-                        get_open_interest,
-                        get_order_book_depth,
-                        get_ticker,
-                        get_time,
-                        ping,
+                        get_funding_rates => get_funding_rates_with,
+                        get_market => get_market_with,
+                        get_markets => get_markets_with,
+                        get_open_interest => get_open_interest_with,
+                        get_order_book_depth => get_order_book_depth_with,
+                        get_ticker => get_ticker_with,
+                        get_time => get_time_with,
+                        ping => ping_with,
                     ]
                 )
             }
@@ -80,7 +80,7 @@ async fn backpack_private_read_live_parity() -> dcex::Result<()> {
                 request_case!(
                     client,
                     case,
-                    [get_account, get_balances, get_fill_history, get_open_orders]
+                    [get_account => get_account_with, get_balances => get_balances_with, get_fill_history => get_fill_history_with, get_open_orders => get_open_orders_with]
                 )
             }
         },

@@ -1,6 +1,11 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
-use super::params::{market_from_type, normalize_order_side, push_optional};
+use super::params::{
+    market_from_type, normalize_order_side, push_optional, BinanceAccountTradesParams,
+    BinanceAlgoOrderLookupParams, BinanceAllFuturesAlgoOrdersParams, BinanceAllOpenOrdersParams,
+    BinanceAllOrdersParams, BinanceLimitOrderParams, BinanceMarketOrderParams,
+    BinanceOpenFuturesAlgoOrdersParams, BinanceOrderLookupParams, BinancePostOnlyOrderParams,
+};
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};
@@ -29,6 +34,16 @@ impl BinanceClient {
         product_symbol: &str,
         side: &str,
         order_type: &str,
+    ) -> Result<ValidatedResponse> {
+        self.place_order_with(product_symbol, side, order_type, Vec::new())
+            .await
+    }
+
+    pub async fn place_order_with(
+        &self,
+        product_symbol: &str,
+        side: &str,
+        order_type: &str,
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         self.order_request(
@@ -47,6 +62,16 @@ impl BinanceClient {
         product_symbol: &str,
         side: &str,
         order_type: &str,
+    ) -> Result<ValidatedResponse> {
+        self.test_order_with(product_symbol, side, order_type, Vec::new())
+            .await
+    }
+
+    pub async fn test_order_with(
+        &self,
+        product_symbol: &str,
+        side: &str,
+        order_type: &str,
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         self.order_request(
@@ -61,6 +86,17 @@ impl BinanceClient {
     }
 
     pub async fn place_futures_algo_order(
+        &self,
+        product_symbol: &str,
+        side: &str,
+        order_type: &str,
+        algo_type: &str,
+    ) -> Result<ValidatedResponse> {
+        self.place_futures_algo_order_with(product_symbol, side, order_type, algo_type, Vec::new())
+            .await
+    }
+
+    pub async fn place_futures_algo_order_with(
         &self,
         product_symbol: &str,
         side: &str,
@@ -87,34 +123,35 @@ impl BinanceClient {
 
     pub async fn cancel_futures_algo_order(
         &self,
-        algo_id: Option<&str>,
-        client_algo_id: Option<&str>,
+        request: BinanceAlgoOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.futures_algo_order_request(HttpMethod::Delete, algo_id, client_algo_id)
+        self.futures_algo_order_request(HttpMethod::Delete, request)
             .await
     }
 
     pub async fn get_futures_algo_order(
         &self,
-        algo_id: Option<&str>,
-        client_algo_id: Option<&str>,
+        request: BinanceAlgoOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.futures_algo_order_request(HttpMethod::Get, algo_id, client_algo_id)
+        self.futures_algo_order_request(HttpMethod::Get, request)
             .await
     }
 
-    pub async fn get_all_open_futures_algo_orders(
+    pub async fn get_all_open_futures_algo_orders(&self) -> Result<ValidatedResponse> {
+        self.get_all_open_futures_algo_orders_with(BinanceOpenFuturesAlgoOrdersParams::default())
+            .await
+    }
+
+    pub async fn get_all_open_futures_algo_orders_with(
         &self,
-        product_symbol: Option<&str>,
-        algo_type: Option<&str>,
-        algo_id: Option<&str>,
+        request: BinanceOpenFuturesAlgoOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
-        if let Some(product_symbol) = product_symbol {
+        if let Some(product_symbol) = request.product_symbol {
             params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
         }
-        push_optional(&mut params, "algoType", algo_type);
-        push_optional(&mut params, "algoId", algo_id);
+        push_optional(&mut params, "algoType", request.algo_type);
+        push_optional(&mut params, "algoId", request.algo_id);
         self.request(
             HttpMethod::Get,
             BinanceMarket::Futures,
@@ -128,16 +165,24 @@ impl BinanceClient {
     pub async fn get_all_futures_algo_orders(
         &self,
         product_symbol: &str,
-        algo_id: Option<&str>,
-        start_time: Option<&str>,
-        end_time: Option<&str>,
-        limit: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.get_all_futures_algo_orders_with(
+            product_symbol,
+            BinanceAllFuturesAlgoOrdersParams::default(),
+        )
+        .await
+    }
+
+    pub async fn get_all_futures_algo_orders_with(
+        &self,
+        product_symbol: &str,
+        request: BinanceAllFuturesAlgoOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
-        push_optional(&mut params, "algoId", algo_id);
-        push_optional(&mut params, "startTime", start_time);
-        push_optional(&mut params, "endTime", end_time);
-        push_optional(&mut params, "limit", limit);
+        push_optional(&mut params, "algoId", request.algo_id);
+        push_optional(&mut params, "startTime", request.start_time);
+        push_optional(&mut params, "endTime", request.end_time);
+        push_optional(&mut params, "limit", request.limit);
         self.request(
             HttpMethod::Get,
             BinanceMarket::Futures,
@@ -167,15 +212,28 @@ impl BinanceClient {
         product_symbol: &str,
         side: &str,
         quantity: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
-        new_order_resp_type: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.place_market_order_with(
+            product_symbol,
+            side,
+            quantity,
+            BinanceMarketOrderParams::default(),
+        )
+        .await
+    }
+
+    pub async fn place_market_order_with(
+        &self,
+        product_symbol: &str,
+        side: &str,
+        quantity: &str,
+        request: BinanceMarketOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![("quantity".to_string(), quantity.to_string())];
-        push_optional(&mut params, "positionSide", position_side);
-        push_optional(&mut params, "reduceOnly", reduce_only);
-        push_optional(&mut params, "newOrderRespType", new_order_resp_type);
-        self.place_order(product_symbol, side, "MARKET", params)
+        push_optional(&mut params, "positionSide", request.position_side);
+        push_optional(&mut params, "reduceOnly", request.reduce_only);
+        push_optional(&mut params, "newOrderRespType", request.new_order_resp_type);
+        self.place_order_with(product_symbol, side, "MARKET", params)
             .await
     }
 
@@ -183,38 +241,46 @@ impl BinanceClient {
         &self,
         product_symbol: &str,
         quantity: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
-        new_order_resp_type: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        self.place_market_order(
+        self.place_market_buy_order_with(
             product_symbol,
-            "BUY",
             quantity,
-            position_side,
-            reduce_only,
-            new_order_resp_type,
+            BinanceMarketOrderParams::default(),
         )
         .await
+    }
+
+    pub async fn place_market_buy_order_with(
+        &self,
+        product_symbol: &str,
+        quantity: &str,
+        request: BinanceMarketOrderParams<'_>,
+    ) -> Result<ValidatedResponse> {
+        self.place_market_order_with(product_symbol, "BUY", quantity, request)
+            .await
     }
 
     pub async fn place_market_sell_order(
         &self,
         product_symbol: &str,
         quantity: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
-        new_order_resp_type: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        self.place_market_order(
+        self.place_market_sell_order_with(
             product_symbol,
-            "SELL",
             quantity,
-            position_side,
-            reduce_only,
-            new_order_resp_type,
+            BinanceMarketOrderParams::default(),
         )
         .await
+    }
+
+    pub async fn place_market_sell_order_with(
+        &self,
+        product_symbol: &str,
+        quantity: &str,
+        request: BinanceMarketOrderParams<'_>,
+    ) -> Result<ValidatedResponse> {
+        self.place_market_order_with(product_symbol, "SELL", quantity, request)
+            .await
     }
 
     pub async fn place_limit_order(
@@ -224,17 +290,35 @@ impl BinanceClient {
         quantity: &str,
         price: &str,
         time_in_force: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.place_limit_order_with(
+            product_symbol,
+            side,
+            quantity,
+            price,
+            time_in_force,
+            BinanceLimitOrderParams::default(),
+        )
+        .await
+    }
+
+    pub async fn place_limit_order_with(
+        &self,
+        product_symbol: &str,
+        side: &str,
+        quantity: &str,
+        price: &str,
+        time_in_force: &str,
+        request: BinanceLimitOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![
             ("quantity".to_string(), quantity.to_string()),
             ("price".to_string(), price.to_string()),
             ("timeInForce".to_string(), time_in_force.to_string()),
         ];
-        push_optional(&mut params, "positionSide", position_side);
-        push_optional(&mut params, "reduceOnly", reduce_only);
-        self.place_order(product_symbol, side, "LIMIT", params)
+        push_optional(&mut params, "positionSide", request.position_side);
+        push_optional(&mut params, "reduceOnly", request.reduce_only);
+        self.place_order_with(product_symbol, side, "LIMIT", params)
             .await
     }
 
@@ -244,17 +328,32 @@ impl BinanceClient {
         quantity: &str,
         price: &str,
         time_in_force: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        self.place_limit_order(
+        self.place_limit_buy_order_with(
+            product_symbol,
+            quantity,
+            price,
+            time_in_force,
+            BinanceLimitOrderParams::default(),
+        )
+        .await
+    }
+
+    pub async fn place_limit_buy_order_with(
+        &self,
+        product_symbol: &str,
+        quantity: &str,
+        price: &str,
+        time_in_force: &str,
+        request: BinanceLimitOrderParams<'_>,
+    ) -> Result<ValidatedResponse> {
+        self.place_limit_order_with(
             product_symbol,
             "BUY",
             quantity,
             price,
             time_in_force,
-            position_side,
-            reduce_only,
+            request,
         )
         .await
     }
@@ -265,17 +364,32 @@ impl BinanceClient {
         quantity: &str,
         price: &str,
         time_in_force: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        self.place_limit_order(
+        self.place_limit_sell_order_with(
+            product_symbol,
+            quantity,
+            price,
+            time_in_force,
+            BinanceLimitOrderParams::default(),
+        )
+        .await
+    }
+
+    pub async fn place_limit_sell_order_with(
+        &self,
+        product_symbol: &str,
+        quantity: &str,
+        price: &str,
+        time_in_force: &str,
+        request: BinanceLimitOrderParams<'_>,
+    ) -> Result<ValidatedResponse> {
+        self.place_limit_order_with(
             product_symbol,
             "SELL",
             quantity,
             price,
             time_in_force,
-            position_side,
-            reduce_only,
+            request,
         )
         .await
     }
@@ -286,11 +400,27 @@ impl BinanceClient {
         side: &str,
         quantity: &str,
         price: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.place_post_only_limit_order_with(
+            product_symbol,
+            side,
+            quantity,
+            price,
+            BinancePostOnlyOrderParams::default(),
+        )
+        .await
+    }
+
+    pub async fn place_post_only_limit_order_with(
+        &self,
+        product_symbol: &str,
+        side: &str,
+        quantity: &str,
+        price: &str,
+        request: BinancePostOnlyOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
         if self.market_for_product_symbol(product_symbol)? == BinanceMarket::Spot {
-            self.place_order(
+            self.place_order_with(
                 product_symbol,
                 side,
                 "LIMIT_MAKER",
@@ -301,14 +431,16 @@ impl BinanceClient {
             )
             .await
         } else {
-            self.place_limit_order(
+            self.place_limit_order_with(
                 product_symbol,
                 side,
                 quantity,
                 price,
                 "GTX",
-                position_side,
-                reduce_only,
+                BinanceLimitOrderParams {
+                    position_side: request.position_side,
+                    reduce_only: request.reduce_only,
+                },
             )
             .await
         }
@@ -319,18 +451,25 @@ impl BinanceClient {
         product_symbol: &str,
         quantity: &str,
         price: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        self.place_post_only_limit_order(
+        self.place_post_only_limit_buy_order_with(
             product_symbol,
-            "BUY",
             quantity,
             price,
-            position_side,
-            reduce_only,
+            BinancePostOnlyOrderParams::default(),
         )
         .await
+    }
+
+    pub async fn place_post_only_limit_buy_order_with(
+        &self,
+        product_symbol: &str,
+        quantity: &str,
+        price: &str,
+        request: BinancePostOnlyOrderParams<'_>,
+    ) -> Result<ValidatedResponse> {
+        self.place_post_only_limit_order_with(product_symbol, "BUY", quantity, price, request)
+            .await
     }
 
     pub async fn place_post_only_limit_sell_order(
@@ -338,63 +477,66 @@ impl BinanceClient {
         product_symbol: &str,
         quantity: &str,
         price: &str,
-        position_side: Option<&str>,
-        reduce_only: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        self.place_post_only_limit_order(
+        self.place_post_only_limit_sell_order_with(
             product_symbol,
-            "SELL",
             quantity,
             price,
-            position_side,
-            reduce_only,
+            BinancePostOnlyOrderParams::default(),
         )
         .await
+    }
+
+    pub async fn place_post_only_limit_sell_order_with(
+        &self,
+        product_symbol: &str,
+        quantity: &str,
+        price: &str,
+        request: BinancePostOnlyOrderParams<'_>,
+    ) -> Result<ValidatedResponse> {
+        self.place_post_only_limit_order_with(product_symbol, "SELL", quantity, price, request)
+            .await
     }
 
     pub async fn cancel_order(
         &self,
         product_symbol: &str,
-        order_id: Option<&str>,
-        orig_client_order_id: Option<&str>,
+        request: BinanceOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.order_lookup_request(
-            HttpMethod::Delete,
-            product_symbol,
-            order_id,
-            orig_client_order_id,
-        )
-        .await
+        self.order_lookup_request(HttpMethod::Delete, product_symbol, request)
+            .await
     }
 
     pub async fn get_order(
         &self,
         product_symbol: &str,
-        order_id: Option<&str>,
-        orig_client_order_id: Option<&str>,
+        request: BinanceOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.order_lookup_request(
-            HttpMethod::Get,
-            product_symbol,
-            order_id,
-            orig_client_order_id,
-        )
-        .await
+        self.order_lookup_request(HttpMethod::Get, product_symbol, request)
+            .await
     }
 
-    pub async fn get_open_orders(
+    pub async fn get_open_orders(&self, product_symbol: &str) -> Result<ValidatedResponse> {
+        self.get_open_orders_with(product_symbol, BinanceOrderLookupParams::default())
+            .await
+    }
+
+    pub async fn get_open_orders_with(
         &self,
         product_symbol: &str,
-        order_id: Option<&str>,
-        orig_client_order_id: Option<&str>,
+        request: BinanceOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
         let path = if market == BinanceMarket::Spot {
             SPOT_OPEN_ORDERS
-        } else if order_id.is_some() || orig_client_order_id.is_some() {
-            push_optional(&mut params, "orderId", order_id);
-            push_optional(&mut params, "origClientOrderId", orig_client_order_id);
+        } else if request.order_id.is_some() || request.orig_client_order_id.is_some() {
+            push_optional(&mut params, "orderId", request.order_id);
+            push_optional(
+                &mut params,
+                "origClientOrderId",
+                request.orig_client_order_id,
+            );
             FUTURES_OPEN_ORDER
         } else {
             FUTURES_OPEN_ORDERS
@@ -403,22 +545,26 @@ impl BinanceClient {
             .await
     }
 
-    pub async fn get_all_open_orders(
+    pub async fn get_all_open_orders(&self) -> Result<ValidatedResponse> {
+        self.get_all_open_orders_with(BinanceAllOpenOrdersParams::default())
+            .await
+    }
+
+    pub async fn get_all_open_orders_with(
         &self,
-        product_symbol: Option<&str>,
-        market_type: &str,
+        request: BinanceAllOpenOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
-        let market = if let Some(product_symbol) = product_symbol {
+        let market = if let Some(product_symbol) = request.product_symbol {
             self.market_for_product_symbol(product_symbol)?
         } else {
-            market_from_type(market_type)
+            market_from_type(request.market_type.unwrap_or("spot"))
         };
         let path = if market == BinanceMarket::Spot {
             SPOT_OPEN_ORDERS
         } else {
             FUTURES_OPEN_ORDERS
         };
-        let params = if let Some(product_symbol) = product_symbol {
+        let params = if let Some(product_symbol) = request.product_symbol {
             vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)]
         } else {
             Vec::new()
@@ -444,25 +590,28 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_future_all_order(
-        &self,
-        product_symbol: &str,
-        order_id: Option<&str>,
-        start_time: Option<&str>,
-        end_time: Option<&str>,
-        limit: Option<&str>,
-    ) -> Result<ValidatedResponse> {
-        self.get_all_orders(product_symbol, order_id, start_time, end_time, limit)
+    pub async fn get_future_all_order(&self, product_symbol: &str) -> Result<ValidatedResponse> {
+        self.get_future_all_order_with(product_symbol, BinanceAllOrdersParams::default())
             .await
     }
 
-    pub async fn get_all_orders(
+    pub async fn get_future_all_order_with(
         &self,
         product_symbol: &str,
-        order_id: Option<&str>,
-        start_time: Option<&str>,
-        end_time: Option<&str>,
-        limit: Option<&str>,
+        request: BinanceAllOrdersParams<'_>,
+    ) -> Result<ValidatedResponse> {
+        self.get_all_orders_with(product_symbol, request).await
+    }
+
+    pub async fn get_all_orders(&self, product_symbol: &str) -> Result<ValidatedResponse> {
+        self.get_all_orders_with(product_symbol, BinanceAllOrdersParams::default())
+            .await
+    }
+
+    pub async fn get_all_orders_with(
+        &self,
+        product_symbol: &str,
+        request: BinanceAllOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
         let path = if market == BinanceMarket::Spot {
@@ -471,22 +620,23 @@ impl BinanceClient {
             FUTURES_ALL_ORDERS
         };
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
-        push_optional(&mut params, "orderId", order_id);
-        push_optional(&mut params, "startTime", start_time);
-        push_optional(&mut params, "endTime", end_time);
-        push_optional(&mut params, "limit", limit);
+        push_optional(&mut params, "orderId", request.order_id);
+        push_optional(&mut params, "startTime", request.start_time);
+        push_optional(&mut params, "endTime", request.end_time);
+        push_optional(&mut params, "limit", request.limit);
         self.request(HttpMethod::Get, market, path, params, true)
             .await
     }
 
-    pub async fn get_account_trades(
+    pub async fn get_account_trades(&self, product_symbol: &str) -> Result<ValidatedResponse> {
+        self.get_account_trades_with(product_symbol, BinanceAccountTradesParams::default())
+            .await
+    }
+
+    pub async fn get_account_trades_with(
         &self,
         product_symbol: &str,
-        order_id: Option<&str>,
-        start_time: Option<&str>,
-        end_time: Option<&str>,
-        from_id: Option<&str>,
-        limit: Option<&str>,
+        request: BinanceAccountTradesParams<'_>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
         let path = if market == BinanceMarket::Spot {
@@ -496,12 +646,12 @@ impl BinanceClient {
         };
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
         if market == BinanceMarket::Spot {
-            push_optional(&mut params, "orderId", order_id);
+            push_optional(&mut params, "orderId", request.order_id);
         }
-        push_optional(&mut params, "startTime", start_time);
-        push_optional(&mut params, "endTime", end_time);
-        push_optional(&mut params, "fromId", from_id);
-        push_optional(&mut params, "limit", limit);
+        push_optional(&mut params, "startTime", request.start_time);
+        push_optional(&mut params, "endTime", request.end_time);
+        push_optional(&mut params, "fromId", request.from_id);
+        push_optional(&mut params, "limit", request.limit);
         self.request(HttpMethod::Get, market, path, params, true)
             .await
     }
@@ -545,17 +695,16 @@ impl BinanceClient {
     pub(super) async fn futures_algo_order_request(
         &self,
         method: HttpMethod,
-        algo_id: Option<&str>,
-        client_algo_id: Option<&str>,
+        request: BinanceAlgoOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
-        if algo_id.is_none() && client_algo_id.is_none() {
+        if request.algo_id.is_none() && request.client_algo_id.is_none() {
             return Err(DcexError::InvalidInput(
                 "Either algoId or clientAlgoId is required.".to_string(),
             ));
         }
         let mut params = Vec::new();
-        push_optional(&mut params, "algoId", algo_id);
-        push_optional(&mut params, "clientAlgoId", client_algo_id);
+        push_optional(&mut params, "algoId", request.algo_id);
+        push_optional(&mut params, "clientAlgoId", request.client_algo_id);
         self.request(
             method,
             BinanceMarket::Futures,
@@ -570,8 +719,7 @@ impl BinanceClient {
         &self,
         method: HttpMethod,
         product_symbol: &str,
-        order_id: Option<&str>,
-        orig_client_order_id: Option<&str>,
+        request: BinanceOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
         let path = if market == BinanceMarket::Spot {
@@ -580,8 +728,12 @@ impl BinanceClient {
             FUTURES_ORDER
         };
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
-        push_optional(&mut params, "orderId", order_id);
-        push_optional(&mut params, "origClientOrderId", orig_client_order_id);
+        push_optional(&mut params, "orderId", request.order_id);
+        push_optional(
+            &mut params,
+            "origClientOrderId",
+            request.orig_client_order_id,
+        );
         self.request(method, market, path, params, true).await
     }
 }

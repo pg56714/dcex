@@ -12,6 +12,9 @@ pub mod websocket;
 mod wrappers;
 
 pub use client::BitmexClient;
+pub use params::{
+    BitmexBucketParams, BitmexInstrumentInfoParams, BitmexOrderbookParams, BitmexTableParams,
+};
 pub use websocket::{BitmexPrivateWebSocket, BitmexPublicWebSocket};
 
 #[cfg(test)]

@@ -18,7 +18,15 @@ pub struct OkxWebSocketArg {
 }
 
 impl OkxWebSocketArg {
-    pub fn new(channel: impl Into<String>, inst_id: Option<String>) -> Result<Self> {
+    pub fn new(channel: impl Into<String>) -> Result<Self> {
+        Self::with_inst_id_optional(channel, None)
+    }
+
+    pub fn with_inst_id(channel: impl Into<String>, inst_id: impl Into<String>) -> Result<Self> {
+        Self::with_inst_id_optional(channel, Some(inst_id.into()))
+    }
+
+    fn with_inst_id_optional(channel: impl Into<String>, inst_id: Option<String>) -> Result<Self> {
         let channel = normalize_channel(&channel.into())?;
         let inst_id = inst_id.map(|value| normalize_inst_id(&value)).transpose()?;
         Ok(Self { channel, inst_id })
@@ -80,50 +88,58 @@ impl OkxPublicWebSocket {
         self.send_subscription("unsubscribe", args).await
     }
 
-    pub async fn subscribe_channel(
+    pub async fn subscribe_channel(&mut self, channel: &str) -> Result<()> {
+        self.subscribe(vec![OkxWebSocketArg::new(channel)?]).await
+    }
+
+    pub async fn subscribe_channel_for_symbol(
         &mut self,
         channel: &str,
-        product_symbol: Option<&str>,
+        product_symbol: &str,
     ) -> Result<()> {
-        let inst_id = product_symbol
-            .map(|symbol| self.exchange_symbol(symbol))
-            .transpose()?;
-        self.subscribe(vec![OkxWebSocketArg::new(channel, inst_id)?])
+        let inst_id = self.exchange_symbol(product_symbol)?;
+        self.subscribe(vec![OkxWebSocketArg::with_inst_id(channel, inst_id)?])
             .await
     }
 
-    pub async fn unsubscribe_channel(
+    pub async fn unsubscribe_channel(&mut self, channel: &str) -> Result<()> {
+        self.unsubscribe(vec![OkxWebSocketArg::new(channel)?]).await
+    }
+
+    pub async fn unsubscribe_channel_for_symbol(
         &mut self,
         channel: &str,
-        product_symbol: Option<&str>,
+        product_symbol: &str,
     ) -> Result<()> {
-        let inst_id = product_symbol
-            .map(|symbol| self.exchange_symbol(symbol))
-            .transpose()?;
-        self.unsubscribe(vec![OkxWebSocketArg::new(channel, inst_id)?])
+        let inst_id = self.exchange_symbol(product_symbol)?;
+        self.unsubscribe(vec![OkxWebSocketArg::with_inst_id(channel, inst_id)?])
             .await
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_channel("trades", Some(product_symbol)).await
+        self.subscribe_channel_for_symbol("trades", product_symbol)
+            .await
     }
 
     pub async fn subscribe_ticker(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_channel("tickers", Some(product_symbol))
+        self.subscribe_channel_for_symbol("tickers", product_symbol)
             .await
     }
 
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_channel("books", Some(product_symbol)).await
+        self.subscribe_channel_for_symbol("books", product_symbol)
+            .await
     }
 
     pub async fn subscribe_orderbook5(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_channel("books5", Some(product_symbol)).await
+        self.subscribe_channel_for_symbol("books5", product_symbol)
+            .await
     }
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, interval: &str) -> Result<()> {
         let channel = format!("candle{}", normalize_interval(interval)?);
-        self.subscribe_channel(&channel, Some(product_symbol)).await
+        self.subscribe_channel_for_symbol(&channel, product_symbol)
+            .await
     }
 
     pub async fn recv(&mut self) -> Result<Value> {
@@ -238,7 +254,7 @@ mod tests {
 
     #[test]
     fn builds_channel_arg() {
-        let arg = OkxWebSocketArg::new("trades", Some("btc-usdt".to_string())).expect("arg");
+        let arg = OkxWebSocketArg::with_inst_id("trades", "btc-usdt").expect("arg");
         assert_eq!(arg.channel, "trades");
         assert_eq!(arg.inst_id.as_deref(), Some("BTC-USDT"));
         assert_eq!(arg.to_json()["channel"], "trades");
@@ -247,7 +263,7 @@ mod tests {
 
     #[test]
     fn rejects_invalid_channel_and_inst_id() {
-        assert!(OkxWebSocketArg::new("bad channel", Some("BTC-USDT".to_string())).is_err());
-        assert!(OkxWebSocketArg::new("trades", Some("BTC/USDT".to_string())).is_err());
+        assert!(OkxWebSocketArg::with_inst_id("bad channel", "BTC-USDT").is_err());
+        assert!(OkxWebSocketArg::with_inst_id("trades", "BTC/USDT").is_err());
     }
 }

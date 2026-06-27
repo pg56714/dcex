@@ -81,6 +81,24 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+### Python WebSocket Usage
+
+```python
+import asyncio
+
+from dcex.ws import binance
+
+
+async def main():
+    async with binance.public() as ws:
+        await ws.subscribe_agg_trades("BTC-USDT-SPOT")
+        print(await ws.recv())
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
 ### Rust Usage
 
 ```rust
@@ -90,12 +108,18 @@ use dcex::exchanges::binance::BinanceClient;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
-    let response = client.get_server_time("spot").await?;
+    let api_key = std::env::var("BINANCE_API_KEY").expect("Set BINANCE_API_KEY");
+    let api_secret = std::env::var("BINANCE_API_SECRET").expect("Set BINANCE_API_SECRET");
+    let client = BinanceClient::new(Some(api_key), Some(api_secret), Duration::from_secs(10))?;
+    let response = client.get_income_history().await?;
     println!("{}", response.data);
     Ok(())
 }
 ```
+
+Rust HTTP methods that do not require endpoint parameters can be called without
+passing `None` or an empty parameter list. Use the `_with(...)` variant only
+when you need to pass optional query/body parameters.
 
 ## Supported Exchanges
 

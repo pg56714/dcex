@@ -9,7 +9,7 @@ use super::common::{
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn bybit_public_live_parity() -> dcex::Result<()> {
-    let client = BybitClient::new(None, None, 5_000, true, Duration::from_secs(20))?;
+    let client = BybitClient::public(5_000, true, Duration::from_secs(20))?;
     run_cases(
         vec![
             Case::new("get_instruments_info", &[("category", "spot")]),
@@ -69,20 +69,20 @@ async fn bybit_public_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_adl_alert,
-                        get_delivery_price,
-                        get_funding_rate_history,
-                        get_historical_volatility,
-                        get_instruments_info,
-                        get_insurance_pool,
-                        get_kline,
-                        get_long_short_ratio,
-                        get_open_interest,
-                        get_order_price_limit,
-                        get_orderbook,
-                        get_public_trade_history,
-                        get_risk_limit,
-                        get_tickers,
+                        get_adl_alert => get_adl_alert_with,
+                        get_delivery_price => get_delivery_price_with,
+                        get_funding_rate_history => get_funding_rate_history_with,
+                        get_historical_volatility => get_historical_volatility_with,
+                        get_instruments_info => get_instruments_info_with,
+                        get_insurance_pool => get_insurance_pool_with,
+                        get_kline => get_kline_with,
+                        get_long_short_ratio => get_long_short_ratio_with,
+                        get_open_interest => get_open_interest_with,
+                        get_order_price_limit => get_order_price_limit_with,
+                        get_orderbook => get_orderbook_with,
+                        get_public_trade_history => get_public_trade_history_with,
+                        get_risk_limit => get_risk_limit_with,
+                        get_tickers => get_tickers_with,
                     ]
                 )
             }
@@ -142,27 +142,27 @@ async fn bybit_private_read_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_account_info,
-                        get_borrow_history,
-                        get_coin_balance,
-                        get_coin_info,
-                        get_coins_balance,
-                        get_closed_pnl,
-                        get_collateral_info,
-                        get_deposit_records,
-                        get_fee_rates,
-                        get_internal_deposit_records,
-                        get_internal_transfer_records,
-                        get_master_deposit_address,
-                        get_positions,
-                        get_spot_asset_info,
-                        get_sub_uid,
-                        get_transaction_log,
-                        get_transferable_amount,
-                        get_transferable_coin,
-                        get_universal_transfer_records,
-                        get_wallet_balance,
-                        get_withdrawable_amount,
+                        get_account_info => get_account_info_with,
+                        get_borrow_history => get_borrow_history_with,
+                        get_coin_balance => get_coin_balance_with,
+                        get_coin_info => get_coin_info_with,
+                        get_coins_balance => get_coins_balance_with,
+                        get_closed_pnl => get_closed_pnl_with,
+                        get_collateral_info => get_collateral_info_with,
+                        get_deposit_records => get_deposit_records_with,
+                        get_fee_rates => get_fee_rates_with,
+                        get_internal_deposit_records => get_internal_deposit_records_with,
+                        get_internal_transfer_records => get_internal_transfer_records_with,
+                        get_master_deposit_address => get_master_deposit_address_with,
+                        get_positions => get_positions_with,
+                        get_spot_asset_info => get_spot_asset_info_with,
+                        get_sub_uid => get_sub_uid_with,
+                        get_transaction_log => get_transaction_log_with,
+                        get_transferable_amount => get_transferable_amount_with,
+                        get_transferable_coin => get_transferable_coin_with,
+                        get_universal_transfer_records => get_universal_transfer_records_with,
+                        get_wallet_balance => get_wallet_balance_with,
+                        get_withdrawable_amount => get_withdrawable_amount_with,
                     ]
                 )
             }

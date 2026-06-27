@@ -34,7 +34,7 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let orderbook = client
-        .get_spot_order_book(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
+        .get_spot_order_book_with(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
         .await?;
     let details = fetch_trading_details(Exchange::GateIo, "gateio", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
@@ -49,7 +49,7 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let order = client
-        .place_spot_post_only_limit_buy_order(params(&[
+        .place_spot_post_only_limit_buy_order_with(params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("amount", amount.as_str()),
             ("price", price.as_str()),
@@ -59,7 +59,7 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["id", "order_id", "orderId"])?;
 
     let cancel = client
-        .cancel_spot_single_order(params(&[
+        .cancel_spot_single_order_with(params(&[
             ("order_id", order_id.as_str()),
             ("product_symbol", BTC_USDT_SPOT),
         ]))
@@ -93,7 +93,7 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let orderbook = client
-        .get_contract_order_book(params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "5")]))
+        .get_contract_order_book_with(params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "5")]))
         .await?;
     let details = fetch_trading_details(Exchange::GateIo, "gateio", BTC_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
@@ -113,7 +113,7 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let order = client
-        .place_contract_post_only_limit_buy_order(params(&[
+        .place_contract_post_only_limit_buy_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("size", size.as_str()),
             ("price", price.as_str()),
@@ -123,12 +123,12 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["id", "order_id", "orderId"])?;
 
     let cancel = client
-        .cancel_contract_single_order(params(&[("order_id", order_id.as_str())]))
+        .cancel_contract_single_order_with(params(&[("order_id", order_id.as_str())]))
         .await?;
     assert_success(&cancel);
 
     let opened = client
-        .place_contract_market_buy_order(params(&[
+        .place_contract_market_buy_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("size", size.as_str()),
         ]))
@@ -140,7 +140,7 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
 
     let close_size = format!("-{}", size.trim_start_matches('-'));
     let closed = client
-        .place_contract_order(params(&[
+        .place_contract_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("size", close_size.as_str()),
             ("price", "0"),
@@ -161,14 +161,14 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
 
 async fn gateio_spot_open_orders(client: &GateioClient) -> dcex::Result<bool> {
     let response = client
-        .get_spot_open_orders(params(&[("limit", "20")]))
+        .get_spot_open_orders_with(params(&[("limit", "20")]))
         .await?;
     Ok(contains_non_empty_array(&response.data, &[]))
 }
 
 async fn gateio_contract_open_orders(client: &GateioClient) -> dcex::Result<bool> {
     let response = client
-        .get_contract_order_list(params(&[
+        .get_contract_order_list_with(params(&[
             ("status", "open"),
             ("product_symbol", BTC_USDT_SWAP),
             ("limit", "20"),
@@ -179,7 +179,7 @@ async fn gateio_contract_open_orders(client: &GateioClient) -> dcex::Result<bool
 
 async fn gateio_contract_position_abs(client: &GateioClient) -> dcex::Result<f64> {
     let response = client
-        .get_contract_single_positions(params(&[("product_symbol", BTC_USDT_SWAP)]))
+        .get_contract_single_positions_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
         .await?;
     Ok(find_f64(&response.data, &["size", "value"])
         .unwrap_or_default()
@@ -187,12 +187,14 @@ async fn gateio_contract_position_abs(client: &GateioClient) -> dcex::Result<f64
 }
 
 async fn gateio_spot_usdt(client: &GateioClient) -> dcex::Result<f64> {
-    let response = client.get_spot_account(params(&[("ccy", "USDT")])).await?;
+    let response = client
+        .get_spot_account_with(params(&[("ccy", "USDT")]))
+        .await?;
     Ok(asset_amount(&response.data, "USDT", &["available"]))
 }
 
 async fn gateio_futures_usdt(client: &GateioClient) -> dcex::Result<f64> {
-    let response = client.get_futures_account(Vec::new()).await?;
+    let response = client.get_futures_account().await?;
     Ok(asset_amount(
         &response.data,
         "USDT",
@@ -207,7 +209,7 @@ async fn gateio_futures_usdt(client: &GateioClient) -> dcex::Result<f64> {
 
 async fn gateio_contract_market_price(client: &GateioClient) -> dcex::Result<f64> {
     let response = client
-        .get_contract_list_tickers(params(&[("product_symbol", BTC_USDT_SWAP)]))
+        .get_contract_list_tickers_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
         .await?;
     find_f64(&response.data, &["last", "last_price", "mark_price"]).ok_or_else(|| {
         dcex::DcexError::Decode(format!(
@@ -219,7 +221,7 @@ async fn gateio_contract_market_price(client: &GateioClient) -> dcex::Result<f64
 async fn assert_gateio_contract_records(client: &GateioClient) -> dcex::Result<()> {
     sleep(Duration::from_secs(2)).await;
     let orders = client
-        .get_contract_order_list(params(&[
+        .get_contract_order_list_with(params(&[
             ("status", "finished"),
             ("product_symbol", BTC_USDT_SWAP),
             ("limit", "20"),
@@ -227,7 +229,7 @@ async fn assert_gateio_contract_records(client: &GateioClient) -> dcex::Result<(
         .await?;
     assert_success(&orders);
     let trades = client
-        .get_trading_history(params(&[
+        .get_trading_history_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("limit", "20"),
         ]))

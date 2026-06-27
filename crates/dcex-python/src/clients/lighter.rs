@@ -222,9 +222,17 @@ impl PythonLighterHttpClient {
         deadline: Option<u64>,
         api_key_index: Option<u64>,
     ) -> PyResult<String> {
-        self.client
-            .create_auth_token(deadline, api_key_index)
-            .map_err(to_py_runtime_error)
+        match (deadline, api_key_index) {
+            (None, None) => self.client.create_auth_token(),
+            (Some(deadline), None) => self.client.create_auth_token_with_deadline(deadline),
+            (None, Some(api_key_index)) => self
+                .client
+                .create_auth_token_with_api_key_index(api_key_index),
+            (Some(deadline), Some(api_key_index)) => self
+                .client
+                .create_auth_token_with_deadline_and_api_key_index(deadline, api_key_index),
+        }
+        .map_err(to_py_runtime_error)
     }
 
     #[pyo3(signature = (deadline=None, api_key_index=None))]
@@ -236,9 +244,16 @@ impl PythonLighterHttpClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .create_auth_token(deadline, api_key_index)
-                .map_err(to_py_runtime_error)
+            match (deadline, api_key_index) {
+                (None, None) => client.create_auth_token(),
+                (Some(deadline), None) => client.create_auth_token_with_deadline(deadline),
+                (None, Some(api_key_index)) => {
+                    client.create_auth_token_with_api_key_index(api_key_index)
+                }
+                (Some(deadline), Some(api_key_index)) => client
+                    .create_auth_token_with_deadline_and_api_key_index(deadline, api_key_index),
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 

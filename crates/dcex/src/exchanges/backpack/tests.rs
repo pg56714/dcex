@@ -68,7 +68,7 @@ mod tests {
             min_notional: "0".to_string(),
             size_per_contract: "1".to_string(),
         }]);
-        let client = BackpackClient::new(None, None, 5_000, Duration::from_secs(1))
+        let client = BackpackClient::public(5_000, Duration::from_secs(1))
             .expect("client")
             .with_product_table(table);
 

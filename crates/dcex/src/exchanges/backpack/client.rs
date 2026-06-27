@@ -36,6 +36,10 @@ impl BackpackClient {
         Self::with_base_url(api_key, api_secret, window, timeout, BASE_URL.to_string())
     }
 
+    pub fn public(window: u64, timeout: Duration) -> Result<Self> {
+        Self::new(None, None, window, timeout)
+    }
+
     pub fn with_base_url(
         api_key: Option<String>,
         api_secret: Option<String>,

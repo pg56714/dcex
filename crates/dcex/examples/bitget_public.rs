@@ -4,9 +4,9 @@ use dcex::exchanges::bitget::BitgetClient;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let client = BitgetClient::new(None, None, None, Duration::from_secs(10))?;
+    let client = BitgetClient::public(Duration::from_secs(10))?;
     let response = client
-        .get_spot_orderbook(vec![
+        .get_spot_orderbook_with(vec![
             ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
             ("limit".to_string(), "5".to_string()),
         ])

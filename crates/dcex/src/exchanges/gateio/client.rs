@@ -30,6 +30,10 @@ impl GateioClient {
         Self::with_base_url(api_key, api_secret, timeout, BASE_URL.to_string())
     }
 
+    pub fn public(timeout: Duration) -> Result<Self> {
+        Self::new(None, None, timeout)
+    }
+
     pub fn with_base_url(
         api_key: Option<String>,
         api_secret: Option<String>,

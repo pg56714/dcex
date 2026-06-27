@@ -1,6 +1,10 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
-use super::params::{push_optional, push_optional_display};
+use super::params::{
+    push_optional, push_optional_display, BinanceFundingWalletParams, BinanceIncomeHistoryParams,
+    BinanceUniversalTransferHistoryParams, BinanceUniversalTransferParams,
+    BinanceWalletBalanceParams,
+};
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
 use crate::Result;
@@ -16,24 +20,24 @@ impl BinanceClient {
             .await
     }
 
-    pub async fn get_income_history(
+    pub async fn get_income_history(&self) -> Result<ValidatedResponse> {
+        self.get_income_history_with(BinanceIncomeHistoryParams::default())
+            .await
+    }
+
+    pub async fn get_income_history_with(
         &self,
-        product_symbol: Option<&str>,
-        income_type: Option<&str>,
-        start_time: Option<u64>,
-        end_time: Option<u64>,
-        page: Option<u64>,
-        limit: Option<u64>,
+        request: BinanceIncomeHistoryParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
-        if let Some(product_symbol) = product_symbol {
+        if let Some(product_symbol) = request.product_symbol {
             params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
         }
-        push_optional(&mut params, "incomeType", income_type);
-        push_optional_display(&mut params, "startTime", start_time);
-        push_optional_display(&mut params, "endTime", end_time);
-        push_optional_display(&mut params, "page", page);
-        push_optional_display(&mut params, "limit", limit);
+        push_optional(&mut params, "incomeType", request.income_type);
+        push_optional_display(&mut params, "startTime", request.start_time);
+        push_optional_display(&mut params, "endTime", request.end_time);
+        push_optional_display(&mut params, "page", request.page);
+        push_optional_display(&mut params, "limit", request.limit);
         self.request(
             HttpMethod::Get,
             BinanceMarket::Futures,
@@ -55,9 +59,17 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_wallet_balance(&self, quote_asset: Option<&str>) -> Result<ValidatedResponse> {
+    pub async fn get_wallet_balance(&self) -> Result<ValidatedResponse> {
+        self.get_wallet_balance_with(BinanceWalletBalanceParams::default())
+            .await
+    }
+
+    pub async fn get_wallet_balance_with(
+        &self,
+        request: BinanceWalletBalanceParams<'_>,
+    ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
-        push_optional(&mut params, "quoteAsset", quote_asset);
+        push_optional(&mut params, "quoteAsset", request.quote_asset);
         self.request(
             HttpMethod::Get,
             BinanceMarket::Spot,
@@ -68,14 +80,18 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_funding_wallet(
+    pub async fn get_funding_wallet(&self) -> Result<ValidatedResponse> {
+        self.get_funding_wallet_with(BinanceFundingWalletParams::default())
+            .await
+    }
+
+    pub async fn get_funding_wallet_with(
         &self,
-        asset: Option<&str>,
-        need_btc_valuation: Option<&str>,
+        request: BinanceFundingWalletParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = Vec::new();
-        push_optional(&mut params, "asset", asset);
-        push_optional(&mut params, "needBtcValuation", need_btc_valuation);
+        push_optional(&mut params, "asset", request.asset);
+        push_optional(&mut params, "needBtcValuation", request.need_btc_valuation);
         self.request(
             HttpMethod::Post,
             BinanceMarket::Spot,
@@ -91,16 +107,30 @@ impl BinanceClient {
         transfer_type: &str,
         asset: &str,
         amount: &str,
-        from_symbol: Option<&str>,
-        to_symbol: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.create_universal_transfer_with(
+            transfer_type,
+            asset,
+            amount,
+            BinanceUniversalTransferParams::default(),
+        )
+        .await
+    }
+
+    pub async fn create_universal_transfer_with(
+        &self,
+        transfer_type: &str,
+        asset: &str,
+        amount: &str,
+        request: BinanceUniversalTransferParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![
             ("type".to_string(), transfer_type.to_string()),
             ("asset".to_string(), asset.to_string()),
             ("amount".to_string(), amount.to_string()),
         ];
-        push_optional(&mut params, "fromSymbol", from_symbol);
-        push_optional(&mut params, "toSymbol", to_symbol);
+        push_optional(&mut params, "fromSymbol", request.from_symbol);
+        push_optional(&mut params, "toSymbol", request.to_symbol);
         self.request(
             HttpMethod::Post,
             BinanceMarket::Spot,
@@ -114,20 +144,26 @@ impl BinanceClient {
     pub async fn get_universal_transfer_history(
         &self,
         transfer_type: &str,
-        start_time: Option<u64>,
-        end_time: Option<u64>,
-        current: Option<u64>,
-        size: Option<u64>,
-        from_symbol: Option<&str>,
-        to_symbol: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        self.get_universal_transfer_history_with(
+            transfer_type,
+            BinanceUniversalTransferHistoryParams::default(),
+        )
+        .await
+    }
+
+    pub async fn get_universal_transfer_history_with(
+        &self,
+        transfer_type: &str,
+        request: BinanceUniversalTransferHistoryParams<'_>,
     ) -> Result<ValidatedResponse> {
         let mut params = vec![("type".to_string(), transfer_type.to_string())];
-        push_optional_display(&mut params, "startTime", start_time);
-        push_optional_display(&mut params, "endTime", end_time);
-        push_optional_display(&mut params, "current", current);
-        push_optional_display(&mut params, "size", size);
-        push_optional(&mut params, "fromSymbol", from_symbol);
-        push_optional(&mut params, "toSymbol", to_symbol);
+        push_optional_display(&mut params, "startTime", request.start_time);
+        push_optional_display(&mut params, "endTime", request.end_time);
+        push_optional_display(&mut params, "current", request.current);
+        push_optional_display(&mut params, "size", request.size);
+        push_optional(&mut params, "fromSymbol", request.from_symbol);
+        push_optional(&mut params, "toSymbol", request.to_symbol);
         self.request(
             HttpMethod::Get,
             BinanceMarket::Spot,

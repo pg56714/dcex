@@ -12,7 +12,7 @@ async fn main() -> dcex::Result<()> {
 
     let mut ws = BackpackPrivateWebSocket::new(api_key, api_secret, 5000, Duration::from_secs(10))?;
     ws.connect().await?;
-    ws.subscribe_orders(None).await?;
+    ws.subscribe_orders().await?;
     println!("{}", ws.recv().await?);
     ws.close().await?;
     Ok(())

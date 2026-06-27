@@ -103,15 +103,15 @@ impl BitmartPrivateWebSocket {
         self.send_operation("unsubscribe", topics).await
     }
 
-    pub async fn subscribe_orders(&mut self, product_symbol: Option<&str>) -> Result<()> {
-        let topic = match product_symbol {
-            Some(product_symbol) => {
-                let symbol = normalize_symbol(product_symbol)?;
-                format!("spot/user/order:{symbol}")
-            }
-            None => "spot/user/orders:ALL_SYMBOLS".to_string(),
-        };
-        self.subscribe(vec![topic]).await
+    pub async fn subscribe_orders(&mut self) -> Result<()> {
+        self.subscribe(vec!["spot/user/orders:ALL_SYMBOLS".to_string()])
+            .await
+    }
+
+    pub async fn subscribe_orders_for_symbol(&mut self, product_symbol: &str) -> Result<()> {
+        let symbol = normalize_symbol(product_symbol)?;
+        self.subscribe(vec![format!("spot/user/order:{symbol}")])
+            .await
     }
 
     pub async fn subscribe_balance(&mut self) -> Result<()> {

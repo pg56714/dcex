@@ -16,40 +16,45 @@ impl BitgetClient {
         let result = match method_name {
             "place_spot_order" => self.place_spot_order_from_params(params).await,
             "place_spot_market_order" => {
-                self.place_spot_order_with(params, None, Some("market"), None)
+                self.place_spot_order_request(params, None, Some("market"), None)
                     .await
             }
             "place_spot_market_buy_order" => {
-                self.place_spot_order_with(params, Some("buy"), Some("market"), None)
+                self.place_spot_order_request(params, Some("buy"), Some("market"), None)
                     .await
             }
             "place_spot_market_sell_order" => {
-                self.place_spot_order_with(params, Some("sell"), Some("market"), None)
+                self.place_spot_order_request(params, Some("sell"), Some("market"), None)
                     .await
             }
             "place_spot_limit_order" => {
-                self.place_spot_order_with(params, None, Some("limit"), Some("gtc"))
+                self.place_spot_order_request(params, None, Some("limit"), Some("gtc"))
                     .await
             }
             "place_spot_limit_buy_order" => {
-                self.place_spot_order_with(params, Some("buy"), Some("limit"), Some("gtc"))
+                self.place_spot_order_request(params, Some("buy"), Some("limit"), Some("gtc"))
                     .await
             }
             "place_spot_limit_sell_order" => {
-                self.place_spot_order_with(params, Some("sell"), Some("limit"), Some("gtc"))
+                self.place_spot_order_request(params, Some("sell"), Some("limit"), Some("gtc"))
                     .await
             }
             "place_spot_post_only_limit_order" => {
-                self.place_spot_order_with(params, None, Some("limit"), Some("post_only"))
+                self.place_spot_order_request(params, None, Some("limit"), Some("post_only"))
                     .await
             }
             "place_spot_post_only_limit_buy_order" => {
-                self.place_spot_order_with(params, Some("buy"), Some("limit"), Some("post_only"))
+                self.place_spot_order_request(params, Some("buy"), Some("limit"), Some("post_only"))
                     .await
             }
             "place_spot_post_only_limit_sell_order" => {
-                self.place_spot_order_with(params, Some("sell"), Some("limit"), Some("post_only"))
-                    .await
+                self.place_spot_order_request(
+                    params,
+                    Some("sell"),
+                    Some("limit"),
+                    Some("post_only"),
+                )
+                .await
             }
             "place_spot_batch_orders" => self.place_spot_batch_orders_from_params(params).await,
             "cancel_spot_order" => self.cancel_spot_order_from_params(params).await,
@@ -123,39 +128,44 @@ impl BitgetClient {
             }
             "place_futures_order" => self.place_futures_order_from_params(params).await,
             "place_futures_market_order" => {
-                self.place_futures_order_with(params, None, Some("market"), None)
+                self.place_futures_order_request(params, None, Some("market"), None)
                     .await
             }
             "place_futures_market_buy_order" => {
-                self.place_futures_order_with(params, Some("buy"), Some("market"), None)
+                self.place_futures_order_request(params, Some("buy"), Some("market"), None)
                     .await
             }
             "place_futures_market_sell_order" => {
-                self.place_futures_order_with(params, Some("sell"), Some("market"), None)
+                self.place_futures_order_request(params, Some("sell"), Some("market"), None)
                     .await
             }
             "place_futures_limit_order" => {
-                self.place_futures_order_with(params, None, Some("limit"), Some("gtc"))
+                self.place_futures_order_request(params, None, Some("limit"), Some("gtc"))
                     .await
             }
             "place_futures_limit_buy_order" => {
-                self.place_futures_order_with(params, Some("buy"), Some("limit"), Some("gtc"))
+                self.place_futures_order_request(params, Some("buy"), Some("limit"), Some("gtc"))
                     .await
             }
             "place_futures_limit_sell_order" => {
-                self.place_futures_order_with(params, Some("sell"), Some("limit"), Some("gtc"))
+                self.place_futures_order_request(params, Some("sell"), Some("limit"), Some("gtc"))
                     .await
             }
             "place_futures_post_only_limit_order" => {
-                self.place_futures_order_with(params, None, Some("limit"), Some("post_only"))
+                self.place_futures_order_request(params, None, Some("limit"), Some("post_only"))
                     .await
             }
             "place_futures_post_only_limit_buy_order" => {
-                self.place_futures_order_with(params, Some("buy"), Some("limit"), Some("post_only"))
-                    .await
+                self.place_futures_order_request(
+                    params,
+                    Some("buy"),
+                    Some("limit"),
+                    Some("post_only"),
+                )
+                .await
             }
             "place_futures_post_only_limit_sell_order" => {
-                self.place_futures_order_with(
+                self.place_futures_order_request(
                     params,
                     Some("sell"),
                     Some("limit"),
@@ -209,10 +219,11 @@ impl BitgetClient {
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
-        self.place_spot_order_with(params, None, None, None).await
+        self.place_spot_order_request(params, None, None, None)
+            .await
     }
 
-    async fn place_spot_order_with(
+    async fn place_spot_order_request(
         &self,
         params: &BitgetParams,
         side: Option<&str>,
@@ -318,11 +329,11 @@ impl BitgetClient {
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
-        self.place_futures_order_with(params, None, None, None)
+        self.place_futures_order_request(params, None, None, None)
             .await
     }
 
-    async fn place_futures_order_with(
+    async fn place_futures_order_request(
         &self,
         params: &BitgetParams,
         side: Option<&str>,

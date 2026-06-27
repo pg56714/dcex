@@ -6,10 +6,10 @@ use dcex::exchanges::lighter::LighterClient;
 async fn main() -> dcex::Result<()> {
     let client = LighterClient::new(Duration::from_secs(10))?;
 
-    let details = client.get_order_book_details(Vec::new()).await?;
+    let details = client.get_order_book_details().await?;
     println!("{}", details.data);
 
-    let status = client.get_status(Vec::new()).await?;
+    let status = client.get_status().await?;
     println!("{}", status.data);
 
     Ok(())

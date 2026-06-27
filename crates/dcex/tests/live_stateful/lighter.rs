@@ -44,7 +44,7 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
     })?;
     let (base_amount, price) = post_only_buy_order_amounts(&market)?;
     let order = client
-        .create_order(vec![
+        .create_order_with(vec![
             ("market_index".to_string(), market_id.clone()),
             (
                 "client_order_index".to_string(),
@@ -63,7 +63,7 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
     let order_index =
         active_order_index(&client, account_index, &market_id, client_order_index).await?;
     let cancel = client
-        .cancel_order(vec![
+        .cancel_order_with(vec![
             ("market_index".to_string(), market_id),
             ("order_index".to_string(), order_index),
         ])
@@ -73,7 +73,7 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 async fn active_lighter_market(client: &LighterClient) -> dcex::Result<Value> {
-    let response = client.get_order_book_details(Vec::new()).await?;
+    let response = client.get_order_book_details().await?;
     let markets = response
         .data
         .get("order_book_details")
@@ -116,7 +116,7 @@ async fn active_order_index(
 ) -> dcex::Result<String> {
     for _ in 0..10 {
         let active = client
-            .get_account_active_orders(vec![
+            .get_account_active_orders_with(vec![
                 ("account_index".to_string(), account_index.to_string()),
                 ("market_id".to_string(), market_id.to_string()),
             ])

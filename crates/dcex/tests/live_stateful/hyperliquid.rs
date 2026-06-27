@@ -25,7 +25,7 @@ async fn hyperliquid_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
 
     let existing = client
-        .open_orders(vec![("user".to_string(), keys[0].clone())])
+        .open_orders_with(vec![("user".to_string(), keys[0].clone())])
         .await?;
     if existing
         .data
@@ -37,7 +37,7 @@ async fn hyperliquid_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let orderbook = client
-        .get_l2book(vec![(
+        .get_l2book_with(vec![(
             "product_symbol".to_string(),
             BTC_USD_SWAP.to_string(),
         )])
@@ -47,7 +47,7 @@ async fn hyperliquid_direct_live_stateful_order() -> dcex::Result<()> {
     let price = hyperliquid_post_only_buy_price(bid)?;
     let size = hyperliquid_order_size(&price, &minimum_order_quantity(&price, &details)?)?;
     let order = client
-        .place_future_limit_buy_order(vec![
+        .place_future_limit_buy_order_with(vec![
             ("product_symbol".to_string(), BTC_USD_SWAP.to_string()),
             ("price".to_string(), price),
             ("size".to_string(), size),
@@ -58,7 +58,7 @@ async fn hyperliquid_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["oid"])?;
     let cancel = client
-        .cancel_order(vec![
+        .cancel_order_with(vec![
             ("product_symbol".to_string(), BTC_USD_SWAP.to_string()),
             ("oid".to_string(), order_id),
         ])

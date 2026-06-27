@@ -88,18 +88,32 @@ impl BitmexPrivateWebSocket {
         self.send_operation("unsubscribe", args).await
     }
 
-    pub async fn subscribe_orders(&mut self, product_symbol: Option<&str>) -> Result<()> {
-        self.subscribe(vec![subscription_arg("order", product_symbol)?])
+    pub async fn subscribe_orders(&mut self) -> Result<()> {
+        self.subscribe(vec![subscription_arg("order", None)?]).await
+    }
+
+    pub async fn subscribe_orders_for_symbol(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe(vec![subscription_arg("order", Some(product_symbol))?])
             .await
     }
 
-    pub async fn subscribe_executions(&mut self, product_symbol: Option<&str>) -> Result<()> {
-        self.subscribe(vec![subscription_arg("execution", product_symbol)?])
+    pub async fn subscribe_executions(&mut self) -> Result<()> {
+        self.subscribe(vec![subscription_arg("execution", None)?])
             .await
     }
 
-    pub async fn subscribe_positions(&mut self, product_symbol: Option<&str>) -> Result<()> {
-        self.subscribe(vec![subscription_arg("position", product_symbol)?])
+    pub async fn subscribe_executions_for_symbol(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe(vec![subscription_arg("execution", Some(product_symbol))?])
+            .await
+    }
+
+    pub async fn subscribe_positions(&mut self) -> Result<()> {
+        self.subscribe(vec![subscription_arg("position", None)?])
+            .await
+    }
+
+    pub async fn subscribe_positions_for_symbol(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe(vec![subscription_arg("position", Some(product_symbol))?])
             .await
     }
 

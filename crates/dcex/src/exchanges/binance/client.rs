@@ -64,6 +64,10 @@ impl BinanceClient {
         )
     }
 
+    pub fn public(timeout: Duration) -> Result<Self> {
+        Self::new(None, None, timeout)
+    }
+
     pub fn with_base_urls(
         api_key: Option<String>,
         api_secret: Option<String>,

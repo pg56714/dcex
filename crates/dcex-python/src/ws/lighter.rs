@@ -338,9 +338,17 @@ impl PythonLighterPrivateWebSocketClient {
         let client = self.client.try_lock().map_err(|_| {
             PyRuntimeError::new_err("Lighter WebSocket client is busy; try again later.")
         })?;
-        client
-            .create_auth_token(deadline, api_key_index)
-            .map_err(to_py_runtime_error)
+        match (deadline, api_key_index) {
+            (None, None) => client.create_auth_token(),
+            (Some(deadline), None) => client.create_auth_token_with_deadline(deadline),
+            (None, Some(api_key_index)) => {
+                client.create_auth_token_with_api_key_index(api_key_index)
+            }
+            (Some(deadline), Some(api_key_index)) => {
+                client.create_auth_token_with_deadline_and_api_key_index(deadline, api_key_index)
+            }
+        }
+        .map_err(to_py_runtime_error)
     }
 
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -388,12 +396,13 @@ impl PythonLighterPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe(&channel, auth)
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(auth) = auth {
+                client.subscribe_with_auth(&channel, auth).await
+            } else {
+                client.subscribe(&channel).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 

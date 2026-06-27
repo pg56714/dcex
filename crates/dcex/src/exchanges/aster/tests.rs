@@ -170,7 +170,7 @@ fn product_table_resolves_canonical_symbol() {
         min_notional: "5".to_string(),
         size_per_contract: "1".to_string(),
     }]);
-    let client = AsterClient::new(None, None, None, Duration::from_secs(1))
+    let client = AsterClient::public(Duration::from_secs(1))
         .expect("client")
         .with_product_table(table);
 
@@ -182,7 +182,7 @@ fn product_table_resolves_canonical_symbol() {
 
 #[test]
 fn batch_orders_resolve_product_symbol_and_side() {
-    let client = AsterClient::new(None, None, None, Duration::from_secs(1)).expect("client");
+    let client = AsterClient::public(Duration::from_secs(1)).expect("client");
     let params = AsterParams::from_pairs(vec![(
         "batchOrders".to_string(),
         json!([

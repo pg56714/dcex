@@ -74,16 +74,35 @@ impl LighterPrivateWebSocket {
         self.connection.send_ping(Vec::new()).await
     }
 
-    pub fn create_auth_token(
-        &self,
-        deadline: Option<u64>,
-        api_key_index: Option<u64>,
-    ) -> Result<String> {
-        self.client.create_auth_token(deadline, api_key_index)
+    pub fn create_auth_token(&self) -> Result<String> {
+        self.client.create_auth_token()
     }
 
-    pub async fn subscribe(&mut self, channel: &str, auth: Option<String>) -> Result<()> {
-        let payload = subscription_payload("subscribe", channel, auth)?;
+    pub fn create_auth_token_with_deadline(&self, deadline: u64) -> Result<String> {
+        self.client.create_auth_token_with_deadline(deadline)
+    }
+
+    pub fn create_auth_token_with_api_key_index(&self, api_key_index: u64) -> Result<String> {
+        self.client
+            .create_auth_token_with_api_key_index(api_key_index)
+    }
+
+    pub fn create_auth_token_with_deadline_and_api_key_index(
+        &self,
+        deadline: u64,
+        api_key_index: u64,
+    ) -> Result<String> {
+        self.client
+            .create_auth_token_with_deadline_and_api_key_index(deadline, api_key_index)
+    }
+
+    pub async fn subscribe(&mut self, channel: &str) -> Result<()> {
+        let payload = subscription_payload("subscribe", channel, None)?;
+        self.connection.send_json(&payload).await
+    }
+
+    pub async fn subscribe_with_auth(&mut self, channel: &str, auth: String) -> Result<()> {
+        let payload = subscription_payload("subscribe", channel, Some(auth))?;
         self.connection.send_json(&payload).await
     }
 
@@ -93,12 +112,12 @@ impl LighterPrivateWebSocket {
     }
 
     pub async fn subscribe_authenticated(&mut self, channel: &str) -> Result<()> {
-        let auth = self.create_auth_token(None, None)?;
-        self.subscribe(channel, Some(auth)).await
+        let auth = self.create_auth_token()?;
+        self.subscribe_with_auth(channel, auth).await
     }
 
     pub async fn subscribe_account_all(&mut self) -> Result<()> {
-        self.subscribe(&account_channel("account_all", self.account_index)?, None)
+        self.subscribe(&account_channel("account_all", self.account_index)?)
             .await
     }
 
@@ -111,7 +130,7 @@ impl LighterPrivateWebSocket {
     }
 
     pub async fn subscribe_user_stats(&mut self) -> Result<()> {
-        self.subscribe(&account_channel("user_stats", self.account_index)?, None)
+        self.subscribe(&account_channel("user_stats", self.account_index)?)
             .await
     }
 
@@ -149,18 +168,15 @@ impl LighterPrivateWebSocket {
     }
 
     pub async fn subscribe_account_all_trades(&mut self) -> Result<()> {
-        self.subscribe(
-            &account_channel("account_all_trades", self.account_index)?,
-            None,
-        )
-        .await
+        self.subscribe(&account_channel("account_all_trades", self.account_index)?)
+            .await
     }
 
     pub async fn subscribe_account_all_positions(&mut self) -> Result<()> {
-        self.subscribe(
-            &account_channel("account_all_positions", self.account_index)?,
-            None,
-        )
+        self.subscribe(&account_channel(
+            "account_all_positions",
+            self.account_index,
+        )?)
         .await
     }
 

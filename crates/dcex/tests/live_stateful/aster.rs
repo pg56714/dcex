@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use dcex::exchange::Exchange;
-use dcex::exchanges::aster::AsterClient;
+use dcex::exchanges::aster::{AsterClient, AsterLimitParams};
 
 use super::common::{
     assert_success, fetch_trading_details, minimum_order_quantity, params, post_only_buy_price,
@@ -29,7 +29,7 @@ async fn aster_futures_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
 
     let open_orders = client
-        .get_futures_open_orders(params(&[("product_symbol", BTC_USDT_SWAP)]))
+        .get_futures_open_orders_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
         .await?;
     if open_orders
         .data
@@ -40,12 +40,14 @@ async fn aster_futures_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client.get_futures_orderbook(BTC_USDT_SWAP, Some(5)).await?;
+    let orderbook = client
+        .get_futures_orderbook_with(BTC_USDT_SWAP, AsterLimitParams { limit: Some(5) })
+        .await?;
     let details = fetch_trading_details(Exchange::Aster, "aster", BTC_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     let order = client
-        .place_futures_order(params(&[
+        .place_futures_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("side", "BUY"),
             ("type", "LIMIT"),
@@ -57,7 +59,7 @@ async fn aster_futures_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
     let cancel = client
-        .cancel_futures_order(params(&[
+        .cancel_futures_order_with(params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("orderId", order_id.as_str()),
         ]))

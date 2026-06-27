@@ -27,7 +27,7 @@ async fn backpack_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
 
     let open_orders = client
-        .get_open_orders(params(&[("product_symbol", BTC_USDC_SPOT)]))
+        .get_open_orders_with(params(&[("product_symbol", BTC_USDC_SPOT)]))
         .await?;
     if open_orders
         .data
@@ -39,13 +39,13 @@ async fn backpack_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let orderbook = client
-        .get_order_book_depth(params(&[("product_symbol", BTC_USDC_SPOT), ("limit", "5")]))
+        .get_order_book_depth_with(params(&[("product_symbol", BTC_USDC_SPOT), ("limit", "5")]))
         .await?;
     let details = fetch_trading_details(Exchange::Backpack, "backpack", BTC_USDC_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     let order = client
-        .place_limit_order(params(&[
+        .place_limit_order_with(params(&[
             ("product_symbol", BTC_USDC_SPOT),
             ("side", "Bid"),
             ("quantity", quantity.as_str()),
@@ -57,7 +57,7 @@ async fn backpack_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId", "id"])?;
     let cancel = client
-        .cancel_order(params(&[
+        .cancel_order_with(params(&[
             ("product_symbol", BTC_USDC_SPOT),
             ("orderId", order_id.as_str()),
         ]))

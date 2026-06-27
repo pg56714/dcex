@@ -1,7 +1,12 @@
 use std::time::Duration;
 
 use dcex::exchange::ValidatedResponse;
-use dcex::exchanges::binance::BinanceClient;
+use dcex::exchanges::binance::{
+    BinanceClient, BinanceFundingRateParams, BinanceFundingWalletParams, BinanceFuturesBasisParams,
+    BinanceFuturesPeriodParams, BinanceIncomeHistoryParams, BinanceKlinesParams,
+    BinanceLimitParams, BinanceOptionalSymbolParams, BinanceSymbolListParams,
+    BinanceUniversalTransferHistoryParams, BinanceWalletBalanceParams,
+};
 
 use super::common::{
     require_env, run_cases, run_private_cases, Case, BTC_USDT_SPOT, BTC_USDT_SWAP,
@@ -10,7 +15,7 @@ use super::common::{
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn binance_public_live_parity() -> dcex::Result<()> {
-    let client = BinanceClient::new(None, None, Duration::from_secs(20))?;
+    let client = BinanceClient::public(Duration::from_secs(20))?;
     run_cases(
         vec![
             Case::new(
@@ -147,17 +152,30 @@ async fn binance_public_case(
     match case.method {
         "get_spot_exchange_info" => {
             client
-                .get_spot_exchange_info(params.get("product_symbol"), None, None)
+                .get_spot_exchange_info_with(BinanceSymbolListParams {
+                    product_symbol: params.get("product_symbol"),
+                    ..Default::default()
+                })
                 .await
         }
         "get_spot_orderbook" => {
             client
-                .get_spot_orderbook(params.required("product_symbol")?, params.u64("limit")?)
+                .get_spot_orderbook_with(
+                    params.required("product_symbol")?,
+                    BinanceLimitParams {
+                        limit: params.u64("limit")?,
+                    },
+                )
                 .await
         }
         "get_spot_trades" => {
             client
-                .get_spot_trades(params.required("product_symbol")?, params.u64("limit")?)
+                .get_spot_trades_with(
+                    params.required("product_symbol")?,
+                    BinanceLimitParams {
+                        limit: params.u64("limit")?,
+                    },
+                )
                 .await
         }
         "get_server_time" => {
@@ -168,32 +186,38 @@ async fn binance_public_case(
         "get_futures_exchange_info" => client.get_futures_exchange_info().await,
         "get_futures_ticker" => {
             client
-                .get_futures_ticker(params.get("product_symbol"))
+                .get_futures_ticker_with(BinanceOptionalSymbolParams {
+                    product_symbol: params.get("product_symbol"),
+                })
                 .await
         }
         "get_klines" => {
             client
-                .get_klines(
+                .get_klines_with(
                     params.required("product_symbol")?,
                     params.required("interval")?,
-                    params.u64("start_time")?,
-                    params.u64("limit")?,
+                    BinanceKlinesParams {
+                        start_time: params.u64("start_time")?,
+                        limit: params.u64("limit")?,
+                    },
                 )
                 .await
         }
         "get_futures_premium_index" => {
             client
-                .get_futures_premium_index(params.get("product_symbol"))
+                .get_futures_premium_index_with(BinanceOptionalSymbolParams {
+                    product_symbol: params.get("product_symbol"),
+                })
                 .await
         }
         "get_futures_funding_rate" => {
             client
-                .get_futures_funding_rate(
-                    params.get("product_symbol"),
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
-                    params.u64("limit")?,
-                )
+                .get_futures_funding_rate_with(BinanceFundingRateParams {
+                    product_symbol: params.get("product_symbol"),
+                    start_time: params.u64("startTime")?,
+                    end_time: params.u64("endTime")?,
+                    limit: params.u64("limit")?,
+                })
                 .await
         }
         "get_futures_open_interest" => {
@@ -203,68 +227,80 @@ async fn binance_public_case(
         }
         "get_futures_open_interest_history" => {
             client
-                .get_futures_open_interest_history(
+                .get_futures_open_interest_history_with(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
-                    params.u64("limit")?,
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
+                    BinanceFuturesPeriodParams {
+                        limit: params.u64("limit")?,
+                        start_time: params.u64("startTime")?,
+                        end_time: params.u64("endTime")?,
+                    },
                 )
                 .await
         }
         "get_futures_global_long_short_account_ratio" => {
             client
-                .get_futures_global_long_short_account_ratio(
+                .get_futures_global_long_short_account_ratio_with(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
-                    params.u64("limit")?,
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
+                    BinanceFuturesPeriodParams {
+                        limit: params.u64("limit")?,
+                        start_time: params.u64("startTime")?,
+                        end_time: params.u64("endTime")?,
+                    },
                 )
                 .await
         }
         "get_futures_top_long_short_account_ratio" => {
             client
-                .get_futures_top_long_short_account_ratio(
+                .get_futures_top_long_short_account_ratio_with(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
-                    params.u64("limit")?,
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
+                    BinanceFuturesPeriodParams {
+                        limit: params.u64("limit")?,
+                        start_time: params.u64("startTime")?,
+                        end_time: params.u64("endTime")?,
+                    },
                 )
                 .await
         }
         "get_futures_top_long_short_position_ratio" => {
             client
-                .get_futures_top_long_short_position_ratio(
+                .get_futures_top_long_short_position_ratio_with(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
-                    params.u64("limit")?,
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
+                    BinanceFuturesPeriodParams {
+                        limit: params.u64("limit")?,
+                        start_time: params.u64("startTime")?,
+                        end_time: params.u64("endTime")?,
+                    },
                 )
                 .await
         }
         "get_futures_taker_buy_sell_volume" => {
             client
-                .get_futures_taker_buy_sell_volume(
+                .get_futures_taker_buy_sell_volume_with(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
-                    params.u64("limit")?,
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
+                    BinanceFuturesPeriodParams {
+                        limit: params.u64("limit")?,
+                        start_time: params.u64("startTime")?,
+                        end_time: params.u64("endTime")?,
+                    },
                 )
                 .await
         }
         "get_futures_basis" => {
             client
-                .get_futures_basis(
+                .get_futures_basis_with(
                     params.required("product_symbol")?,
                     params.get("contractType").unwrap_or("PERPETUAL"),
                     params.get("period").unwrap_or("5m"),
-                    params.u64("limit")?,
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
+                    BinanceFuturesBasisParams {
+                        limit: params.u64("limit")?,
+                        start_time: params.u64("startTime")?,
+                        end_time: params.u64("endTime")?,
+                    },
                 )
                 .await
         }
@@ -286,35 +322,46 @@ async fn binance_private_case(
                 .await
         }
         "get_futures_account_info" => client.get_futures_account_info().await,
-        "get_wallet_balance" => client.get_wallet_balance(params.get("quoteAsset")).await,
+        "get_wallet_balance" => {
+            client
+                .get_wallet_balance_with(BinanceWalletBalanceParams {
+                    quote_asset: params.get("quoteAsset"),
+                })
+                .await
+        }
         "get_funding_wallet" => {
             client
-                .get_funding_wallet(params.get("asset"), params.get("needBtcValuation"))
+                .get_funding_wallet_with(BinanceFundingWalletParams {
+                    asset: params.get("asset"),
+                    need_btc_valuation: params.get("needBtcValuation"),
+                })
                 .await
         }
         "get_universal_transfer_history" => {
             client
-                .get_universal_transfer_history(
+                .get_universal_transfer_history_with(
                     params.required("type")?,
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
-                    params.u64("current")?,
-                    params.u64("size")?,
-                    params.get("fromSymbol"),
-                    params.get("toSymbol"),
+                    BinanceUniversalTransferHistoryParams {
+                        start_time: params.u64("startTime")?,
+                        end_time: params.u64("endTime")?,
+                        current: params.u64("current")?,
+                        size: params.u64("size")?,
+                        from_symbol: params.get("fromSymbol"),
+                        to_symbol: params.get("toSymbol"),
+                    },
                 )
                 .await
         }
         "get_income_history" => {
             client
-                .get_income_history(
-                    params.get("product_symbol"),
-                    params.get("incomeType"),
-                    params.u64("startTime")?,
-                    params.u64("endTime")?,
-                    params.u64("page")?,
-                    params.u64("limit")?,
-                )
+                .get_income_history_with(BinanceIncomeHistoryParams {
+                    product_symbol: params.get("product_symbol"),
+                    income_type: params.get("incomeType"),
+                    start_time: params.u64("startTime")?,
+                    end_time: params.u64("endTime")?,
+                    page: params.u64("page")?,
+                    limit: params.u64("limit")?,
+                })
                 .await
         }
         method => Err(dcex::DcexError::InvalidInput(format!(

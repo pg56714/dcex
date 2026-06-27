@@ -48,45 +48,55 @@ impl BitmexPublicWebSocket {
         self.send_operation("unsubscribe", args).await
     }
 
-    pub async fn subscribe_table(
+    pub async fn subscribe_table(&mut self, table: &str) -> Result<()> {
+        self.subscribe(vec![subscription_arg(table, None)?]).await
+    }
+
+    pub async fn subscribe_table_for_symbol(
         &mut self,
         table: &str,
-        product_symbol: Option<&str>,
+        product_symbol: &str,
     ) -> Result<()> {
-        self.subscribe(vec![subscription_arg(table, product_symbol)?])
+        self.subscribe(vec![subscription_arg(table, Some(product_symbol))?])
             .await
     }
 
-    pub async fn unsubscribe_table(
+    pub async fn unsubscribe_table(&mut self, table: &str) -> Result<()> {
+        self.unsubscribe(vec![subscription_arg(table, None)?]).await
+    }
+
+    pub async fn unsubscribe_table_for_symbol(
         &mut self,
         table: &str,
-        product_symbol: Option<&str>,
+        product_symbol: &str,
     ) -> Result<()> {
-        self.unsubscribe(vec![subscription_arg(table, product_symbol)?])
+        self.unsubscribe(vec![subscription_arg(table, Some(product_symbol))?])
             .await
     }
 
     pub async fn subscribe_instrument(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_table("instrument", Some(product_symbol))
+        self.subscribe_table_for_symbol("instrument", product_symbol)
             .await
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_table("trade", Some(product_symbol)).await
+        self.subscribe_table_for_symbol("trade", product_symbol)
+            .await
     }
 
     pub async fn subscribe_quotes(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_table("quote", Some(product_symbol)).await
+        self.subscribe_table_for_symbol("quote", product_symbol)
+            .await
     }
 
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str, depth: u32) -> Result<()> {
         let table = orderbook_table(depth)?;
-        self.subscribe_table(table, Some(product_symbol)).await
+        self.subscribe_table_for_symbol(table, product_symbol).await
     }
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, bin_size: &str) -> Result<()> {
         let table = trade_bin_table(bin_size)?;
-        self.subscribe_table(table, Some(product_symbol)).await
+        self.subscribe_table_for_symbol(table, product_symbol).await
     }
 
     pub async fn recv(&mut self) -> Result<Value> {

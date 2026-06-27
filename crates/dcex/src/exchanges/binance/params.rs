@@ -1,6 +1,157 @@
 use super::client::BinanceMarket;
 use crate::{DcexError, Result};
 
+#[derive(Clone, Debug, Default)]
+pub struct BinanceAccountTradesParams<'a> {
+    pub order_id: Option<&'a str>,
+    pub start_time: Option<&'a str>,
+    pub end_time: Option<&'a str>,
+    pub from_id: Option<&'a str>,
+    pub limit: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceAlgoOrderLookupParams<'a> {
+    pub algo_id: Option<&'a str>,
+    pub client_algo_id: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceAllFuturesAlgoOrdersParams<'a> {
+    pub algo_id: Option<&'a str>,
+    pub start_time: Option<&'a str>,
+    pub end_time: Option<&'a str>,
+    pub limit: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceAllOpenOrdersParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub market_type: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceAllOrdersParams<'a> {
+    pub order_id: Option<&'a str>,
+    pub start_time: Option<&'a str>,
+    pub end_time: Option<&'a str>,
+    pub limit: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceFundingRateParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceFundingWalletParams<'a> {
+    pub asset: Option<&'a str>,
+    pub need_btc_valuation: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceFuturesBasisParams {
+    pub limit: Option<u64>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceFuturesPeriodParams {
+    pub limit: Option<u64>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceIncomeHistoryParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub income_type: Option<&'a str>,
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub page: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceKlinesParams {
+    pub start_time: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceLimitParams {
+    pub limit: Option<u64>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceLimitOrderParams<'a> {
+    pub position_side: Option<&'a str>,
+    pub reduce_only: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceMarketOrderParams<'a> {
+    pub position_side: Option<&'a str>,
+    pub reduce_only: Option<&'a str>,
+    pub new_order_resp_type: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceOpenFuturesAlgoOrdersParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub algo_type: Option<&'a str>,
+    pub algo_id: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceOptionalSymbolParams<'a> {
+    pub product_symbol: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceOrderLookupParams<'a> {
+    pub order_id: Option<&'a str>,
+    pub orig_client_order_id: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinancePostOnlyOrderParams<'a> {
+    pub position_side: Option<&'a str>,
+    pub reduce_only: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceSymbolListParams<'a> {
+    pub product_symbol: Option<&'a str>,
+    pub product_symbols: Option<Vec<String>>,
+    pub symbol_status: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceUniversalTransferHistoryParams<'a> {
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub current: Option<u64>,
+    pub size: Option<u64>,
+    pub from_symbol: Option<&'a str>,
+    pub to_symbol: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceUniversalTransferParams<'a> {
+    pub from_symbol: Option<&'a str>,
+    pub to_symbol: Option<&'a str>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct BinanceWalletBalanceParams<'a> {
+    pub quote_asset: Option<&'a str>,
+}
+
 pub(super) struct PublicParams(pub(super) Vec<(String, String)>);
 
 impl PublicParams {

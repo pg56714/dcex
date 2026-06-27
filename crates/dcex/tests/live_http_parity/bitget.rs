@@ -10,7 +10,7 @@ use super::common::{
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn bitget_public_live_parity() -> dcex::Result<()> {
-    let client = BitgetClient::new(None, None, None, Duration::from_secs(20))?;
+    let client = BitgetClient::public(Duration::from_secs(20))?;
     let end_time = now_ms().to_string();
     let start_time = (now_ms() - 10 * 60 * 1000).to_string();
     run_cases(
@@ -127,24 +127,24 @@ async fn bitget_public_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_futures_contracts,
-                        get_futures_current_funding_rate,
-                        get_futures_history_funding_rate,
-                        get_futures_history_kline,
-                        get_futures_kline,
-                        get_futures_open_interest,
-                        get_futures_orderbook,
-                        get_futures_recent_trades,
-                        get_futures_ticker,
-                        get_futures_tickers,
-                        get_spot_coins,
-                        get_spot_history_kline,
-                        get_spot_kline,
-                        get_spot_market_trades,
-                        get_spot_orderbook,
-                        get_spot_recent_trades,
-                        get_spot_symbols,
-                        get_spot_tickers,
+                        get_futures_contracts => get_futures_contracts_with,
+                        get_futures_current_funding_rate => get_futures_current_funding_rate_with,
+                        get_futures_history_funding_rate => get_futures_history_funding_rate_with,
+                        get_futures_history_kline => get_futures_history_kline_with,
+                        get_futures_kline => get_futures_kline_with,
+                        get_futures_open_interest => get_futures_open_interest_with,
+                        get_futures_orderbook => get_futures_orderbook_with,
+                        get_futures_recent_trades => get_futures_recent_trades_with,
+                        get_futures_ticker => get_futures_ticker_with,
+                        get_futures_tickers => get_futures_tickers_with,
+                        get_spot_coins => get_spot_coins_with,
+                        get_spot_history_kline => get_spot_history_kline_with,
+                        get_spot_kline => get_spot_kline_with,
+                        get_spot_market_trades => get_spot_market_trades_with,
+                        get_spot_orderbook => get_spot_orderbook_with,
+                        get_spot_recent_trades => get_spot_recent_trades_with,
+                        get_spot_symbols => get_spot_symbols_with,
+                        get_spot_tickers => get_spot_tickers_with,
                     ]
                 )
             }
@@ -221,25 +221,25 @@ async fn bitget_private_read_live_parity() -> dcex::Result<()> {
             client,
             case,
             [
-                get_all_account_balance,
-                get_deposit_records,
-                get_funding_assets,
-                get_futures_account,
-                get_futures_account_bills,
-                get_futures_accounts,
-                get_futures_fills,
-                get_futures_history_orders,
-                get_futures_open_orders,
-                get_futures_position,
-                get_futures_positions,
-                get_spot_account_assets,
-                get_spot_account_bills,
-                get_spot_account_info,
-                get_spot_fills,
-                get_spot_history_orders,
-                get_spot_open_orders,
-                get_transfer_records,
-                get_transferable_coins,
+                get_all_account_balance => get_all_account_balance_with,
+                get_deposit_records => get_deposit_records_with,
+                get_funding_assets => get_funding_assets_with,
+                get_futures_account => get_futures_account_with,
+                get_futures_account_bills => get_futures_account_bills_with,
+                get_futures_accounts => get_futures_accounts_with,
+                get_futures_fills => get_futures_fills_with,
+                get_futures_history_orders => get_futures_history_orders_with,
+                get_futures_open_orders => get_futures_open_orders_with,
+                get_futures_position => get_futures_position_with,
+                get_futures_positions => get_futures_positions_with,
+                get_spot_account_assets => get_spot_account_assets_with,
+                get_spot_account_bills => get_spot_account_bills_with,
+                get_spot_account_info => get_spot_account_info_with,
+                get_spot_fills => get_spot_fills_with,
+                get_spot_history_orders => get_spot_history_orders_with,
+                get_spot_open_orders => get_spot_open_orders_with,
+                get_transfer_records => get_transfer_records_with,
+                get_transferable_coins => get_transferable_coins_with,
             ]
         ) {
             Ok(response) => {

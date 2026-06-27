@@ -16,7 +16,7 @@ async fn main() -> dcex::Result<()> {
         BitgetPrivateWebSocket::new(api_key, api_secret, passphrase, Duration::from_secs(10))?;
     ws.connect().await?;
     println!("{}", ws.recv().await?);
-    ws.subscribe_account("USDT-FUTURES", None).await?;
+    ws.subscribe_account("USDT-FUTURES").await?;
     println!("{}", ws.recv().await?);
     ws.close().await?;
     Ok(())

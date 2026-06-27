@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use dcex::exchange::Exchange;
-use dcex::exchanges::bitmex::BitmexClient;
+use dcex::exchanges::bitmex::{BitmexClient, BitmexOrderbookParams};
 use tokio::time::sleep;
 
 use super::common::{
@@ -38,13 +38,15 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client.get_orderbook(XBT_USDT_SWAP, Some("10")).await?;
+    let orderbook = client
+        .get_orderbook_with(XBT_USDT_SWAP, BitmexOrderbookParams { depth: Some("10") })
+        .await?;
     let details = fetch_trading_details(Exchange::BitMEX, "bitmex", XBT_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
 
     let order = client
-        .place_post_only_buy_order(params(&[
+        .place_post_only_buy_order_with(params(&[
             ("product_symbol", XBT_USDT_SWAP),
             ("orderQty", quantity.as_str()),
             ("price", price.as_str()),
@@ -55,12 +57,12 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["orderID"])?;
 
     let cancel = client
-        .cancel_order(params(&[("orderID", order_id.as_str())]))
+        .cancel_order_with(params(&[("orderID", order_id.as_str())]))
         .await?;
     assert_success(&cancel);
 
     let opened = client
-        .place_market_buy_order(params(&[
+        .place_market_buy_order_with(params(&[
             ("product_symbol", XBT_USDT_SWAP),
             ("orderQty", quantity.as_str()),
             ("clOrdID", unique_client_id("dcexrs").as_str()),
@@ -70,7 +72,7 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
     assert!(wait_for_positive_position(|| bitmex_position_abs(&client)).await? > 0.0);
 
     let closed = client
-        .place_market_sell_order(params(&[
+        .place_market_sell_order_with(params(&[
             ("product_symbol", XBT_USDT_SWAP),
             ("orderQty", quantity.as_str()),
             ("clOrdID", unique_client_id("dcexrs").as_str()),
@@ -87,7 +89,7 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
 
 async fn bitmex_open_orders(client: &BitmexClient) -> dcex::Result<bool> {
     let response = client
-        .get_order(params(&[
+        .get_order_with(params(&[
             ("product_symbol", XBT_USDT_SWAP),
             ("filter", "{\"open\":true}"),
             ("count", "100"),
@@ -99,7 +101,7 @@ async fn bitmex_open_orders(client: &BitmexClient) -> dcex::Result<bool> {
 
 async fn bitmex_position_abs(client: &BitmexClient) -> dcex::Result<f64> {
     let response = client
-        .get_positions(params(&[("filter", "{\"symbol\":\"XBTUSDT\"}")]))
+        .get_positions_with(params(&[("filter", "{\"symbol\":\"XBTUSDT\"}")]))
         .await?;
     Ok(sum_abs_values_for_symbols(
         &response.data,
@@ -110,6 +112,8 @@ async fn bitmex_position_abs(client: &BitmexClient) -> dcex::Result<f64> {
 }
 
 async fn bitmex_available_margin(client: &BitmexClient) -> dcex::Result<f64> {
-    let response = client.get_margin(params(&[("currency", "USDt")])).await?;
+    let response = client
+        .get_margin_with(params(&[("currency", "USDt")]))
+        .await?;
     Ok(super::common::find_f64(&response.data, &["availableMargin"]).unwrap_or(0.0))
 }

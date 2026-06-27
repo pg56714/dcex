@@ -47,8 +47,12 @@ impl HyperliquidPublicWebSocket {
         self.connection.send_json(&payload).await
     }
 
-    pub async fn subscribe_all_mids(&mut self, dex: Option<&str>) -> Result<()> {
-        self.subscribe(all_mids_subscription(dex)?).await
+    pub async fn subscribe_all_mids(&mut self) -> Result<()> {
+        self.subscribe(all_mids_subscription(None)?).await
+    }
+
+    pub async fn subscribe_all_mids_for_dex(&mut self, dex: &str) -> Result<()> {
+        self.subscribe(all_mids_subscription(Some(dex))?).await
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<()> {
@@ -57,10 +61,47 @@ impl HyperliquidPublicWebSocket {
     }
 
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe_l2_book(product_symbol, None, None).await
+        self.subscribe_l2_book(product_symbol).await
     }
 
-    pub async fn subscribe_l2_book(
+    pub async fn subscribe_l2_book(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe_l2_book_with_optional_precision(product_symbol, None, None)
+            .await
+    }
+
+    pub async fn subscribe_l2_book_with_n_sig_figs(
+        &mut self,
+        product_symbol: &str,
+        n_sig_figs: u64,
+    ) -> Result<()> {
+        self.subscribe_l2_book_with_optional_precision(product_symbol, Some(n_sig_figs), None)
+            .await
+    }
+
+    pub async fn subscribe_l2_book_with_mantissa(
+        &mut self,
+        product_symbol: &str,
+        mantissa: u64,
+    ) -> Result<()> {
+        self.subscribe_l2_book_with_optional_precision(product_symbol, None, Some(mantissa))
+            .await
+    }
+
+    pub async fn subscribe_l2_book_with_precision(
+        &mut self,
+        product_symbol: &str,
+        n_sig_figs: u64,
+        mantissa: u64,
+    ) -> Result<()> {
+        self.subscribe_l2_book_with_optional_precision(
+            product_symbol,
+            Some(n_sig_figs),
+            Some(mantissa),
+        )
+        .await
+    }
+
+    async fn subscribe_l2_book_with_optional_precision(
         &mut self,
         product_symbol: &str,
         n_sig_figs: Option<u64>,

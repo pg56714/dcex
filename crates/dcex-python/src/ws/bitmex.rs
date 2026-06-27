@@ -105,12 +105,15 @@ impl PythonBitmexPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_table(&table, product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client
+                    .subscribe_table_for_symbol(&table, &product_symbol)
+                    .await
+            } else {
+                client.subscribe_table(&table).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -123,12 +126,15 @@ impl PythonBitmexPublicWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .unsubscribe_table(&table, product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client
+                    .unsubscribe_table_for_symbol(&table, &product_symbol)
+                    .await
+            } else {
+                client.unsubscribe_table(&table).await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -340,12 +346,13 @@ impl PythonBitmexPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_orders(product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client.subscribe_orders_for_symbol(&product_symbol).await
+            } else {
+                client.subscribe_orders().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -357,12 +364,15 @@ impl PythonBitmexPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_executions(product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client
+                    .subscribe_executions_for_symbol(&product_symbol)
+                    .await
+            } else {
+                client.subscribe_executions().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 
@@ -374,12 +384,13 @@ impl PythonBitmexPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .lock()
-                .await
-                .subscribe_positions(product_symbol.as_deref())
-                .await
-                .map_err(to_py_runtime_error)
+            let mut client = client.lock().await;
+            if let Some(product_symbol) = product_symbol {
+                client.subscribe_positions_for_symbol(&product_symbol).await
+            } else {
+                client.subscribe_positions().await
+            }
+            .map_err(to_py_runtime_error)
         })
     }
 

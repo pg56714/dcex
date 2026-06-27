@@ -20,7 +20,64 @@ pub struct OkxPrivateWebSocketArg {
 }
 
 impl OkxPrivateWebSocketArg {
-    pub fn new(
+    pub fn new(channel: impl Into<String>) -> Result<Self> {
+        Self::with_filters(channel, None, None, None)
+    }
+
+    pub fn with_inst_type(
+        channel: impl Into<String>,
+        inst_type: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(channel, Some(inst_type.into()), None, None)
+    }
+
+    pub fn with_inst_id(channel: impl Into<String>, inst_id: impl Into<String>) -> Result<Self> {
+        Self::with_filters(channel, None, Some(inst_id.into()), None)
+    }
+
+    pub fn with_inst_type_and_id(
+        channel: impl Into<String>,
+        inst_type: impl Into<String>,
+        inst_id: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(channel, Some(inst_type.into()), Some(inst_id.into()), None)
+    }
+
+    pub fn with_ccy(channel: impl Into<String>, ccy: impl Into<String>) -> Result<Self> {
+        Self::with_filters(channel, None, None, Some(ccy.into()))
+    }
+
+    pub fn with_inst_type_and_ccy(
+        channel: impl Into<String>,
+        inst_type: impl Into<String>,
+        ccy: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(channel, Some(inst_type.into()), None, Some(ccy.into()))
+    }
+
+    pub fn with_inst_id_and_ccy(
+        channel: impl Into<String>,
+        inst_id: impl Into<String>,
+        ccy: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(channel, None, Some(inst_id.into()), Some(ccy.into()))
+    }
+
+    pub fn with_inst_type_and_id_and_ccy(
+        channel: impl Into<String>,
+        inst_type: impl Into<String>,
+        inst_id: impl Into<String>,
+        ccy: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(
+            channel,
+            Some(inst_type.into()),
+            Some(inst_id.into()),
+            Some(ccy.into()),
+        )
+    }
+
+    fn with_filters(
         channel: impl Into<String>,
         inst_type: Option<String>,
         inst_id: Option<String>,
@@ -143,36 +200,48 @@ impl OkxPrivateWebSocket {
         self.send_subscription("unsubscribe", args).await
     }
 
-    pub async fn subscribe_orders(
+    pub async fn subscribe_orders(&mut self) -> Result<()> {
+        self.subscribe(vec![OkxPrivateWebSocketArg::new("orders")?])
+            .await
+    }
+
+    pub async fn subscribe_orders_for_type(&mut self, inst_type: &str) -> Result<()> {
+        self.subscribe(vec![OkxPrivateWebSocketArg::with_inst_type(
+            "orders", inst_type,
+        )?])
+        .await
+    }
+
+    pub async fn subscribe_orders_for_instrument(
         &mut self,
-        inst_type: Option<&str>,
-        inst_id: Option<&str>,
+        inst_type: &str,
+        inst_id: &str,
     ) -> Result<()> {
-        self.subscribe(vec![OkxPrivateWebSocketArg::new(
-            "orders",
-            inst_type.map(ToString::to_string),
-            inst_id.map(ToString::to_string),
-            None,
+        self.subscribe(vec![OkxPrivateWebSocketArg::with_inst_type_and_id(
+            "orders", inst_type, inst_id,
         )?])
         .await
     }
 
-    pub async fn subscribe_account(&mut self, ccy: Option<&str>) -> Result<()> {
-        self.subscribe(vec![OkxPrivateWebSocketArg::new(
-            "account",
-            None,
-            None,
-            ccy.map(ToString::to_string),
-        )?])
-        .await
+    pub async fn subscribe_account(&mut self) -> Result<()> {
+        self.subscribe(vec![OkxPrivateWebSocketArg::new("account")?])
+            .await
     }
 
-    pub async fn subscribe_positions(&mut self, inst_type: Option<&str>) -> Result<()> {
-        self.subscribe(vec![OkxPrivateWebSocketArg::new(
+    pub async fn subscribe_account_for_ccy(&mut self, ccy: &str) -> Result<()> {
+        self.subscribe(vec![OkxPrivateWebSocketArg::with_ccy("account", ccy)?])
+            .await
+    }
+
+    pub async fn subscribe_positions(&mut self) -> Result<()> {
+        self.subscribe(vec![OkxPrivateWebSocketArg::new("positions")?])
+            .await
+    }
+
+    pub async fn subscribe_positions_for_type(&mut self, inst_type: &str) -> Result<()> {
+        self.subscribe(vec![OkxPrivateWebSocketArg::with_inst_type(
             "positions",
-            inst_type.map(ToString::to_string),
-            None,
-            None,
+            inst_type,
         )?])
         .await
     }
@@ -324,13 +393,8 @@ mod tests {
 
     #[test]
     fn builds_private_channel_arg() {
-        let arg = OkxPrivateWebSocketArg::new(
-            "orders",
-            Some("swap".to_string()),
-            Some("btc-usdt-swap".to_string()),
-            None,
-        )
-        .expect("arg");
+        let arg = OkxPrivateWebSocketArg::with_inst_type_and_id("orders", "swap", "btc-usdt-swap")
+            .expect("arg");
         assert_eq!(arg.channel, "orders");
         assert_eq!(arg.inst_type.as_deref(), Some("SWAP"));
         assert_eq!(arg.inst_id.as_deref(), Some("BTC-USDT-SWAP"));
@@ -341,10 +405,9 @@ mod tests {
 
     #[test]
     fn rejects_invalid_channel_arg() {
-        assert!(OkxPrivateWebSocketArg::new("bad channel", None, None, None).is_err());
+        assert!(OkxPrivateWebSocketArg::new("bad channel").is_err());
         assert!(
-            OkxPrivateWebSocketArg::new("orders", None, Some("BTC/USDT".to_string()), None)
-                .is_err()
+            OkxPrivateWebSocketArg::with_inst_type_and_id("orders", "SWAP", "BTC/USDT").is_err()
         );
     }
 

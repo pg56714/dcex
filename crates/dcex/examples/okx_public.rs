@@ -4,9 +4,9 @@ use dcex::exchanges::okx::OkxClient;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let client = OkxClient::new(None, None, None, "0".to_string(), Duration::from_secs(10))?;
+    let client = OkxClient::public(Duration::from_secs(10))?;
     let response = client
-        .get_orderbook(vec![
+        .get_orderbook_with(vec![
             ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
             ("sz".to_string(), "5".to_string()),
         ])

@@ -42,7 +42,7 @@ async fn main() -> dcex::Result<()> {
     let warmup = env_nonnegative_usize("DCEX_BENCH_WARMUP", 3);
     let target = env_string("DCEX_BENCH_TARGET", "Rust native");
     let crate_version = env_string("DCEX_BENCH_CRATE_VERSION", env!("CARGO_PKG_VERSION"));
-    let client = BinanceClient::new(None, None, Duration::from_secs(10))?;
+    let client = BinanceClient::public(Duration::from_secs(10))?;
 
     for _ in 0..warmup {
         client.get_server_time("spot").await?;

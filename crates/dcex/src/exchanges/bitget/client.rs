@@ -40,6 +40,10 @@ impl BitgetClient {
         )
     }
 
+    pub fn public(timeout: Duration) -> Result<Self> {
+        Self::new(None, None, None, timeout)
+    }
+
     pub fn with_base_url(
         api_key: Option<String>,
         api_secret: Option<String>,

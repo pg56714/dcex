@@ -31,7 +31,7 @@ impl AsterPublicWebSocket {
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             market,
-            client: AsterClient::new(None, None, None, timeout)?,
+            client: AsterClient::public(timeout)?,
             next_request_id: 1,
         })
     }

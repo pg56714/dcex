@@ -13,3 +13,13 @@ pub mod websocket;
 mod tests;
 
 pub use client::{BinanceClient, BinanceMarket};
+pub use params::{
+    BinanceAccountTradesParams, BinanceAlgoOrderLookupParams, BinanceAllFuturesAlgoOrdersParams,
+    BinanceAllOpenOrdersParams, BinanceAllOrdersParams, BinanceFundingRateParams,
+    BinanceFundingWalletParams, BinanceFuturesBasisParams, BinanceFuturesPeriodParams,
+    BinanceIncomeHistoryParams, BinanceKlinesParams, BinanceLimitOrderParams, BinanceLimitParams,
+    BinanceMarketOrderParams, BinanceOpenFuturesAlgoOrdersParams, BinanceOptionalSymbolParams,
+    BinanceOrderLookupParams, BinancePostOnlyOrderParams, BinanceSymbolListParams,
+    BinanceUniversalTransferHistoryParams, BinanceUniversalTransferParams,
+    BinanceWalletBalanceParams,
+};

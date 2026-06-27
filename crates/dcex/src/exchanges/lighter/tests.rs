@@ -66,7 +66,7 @@ fn auth_token_uses_configured_private_key() {
     .expect("client");
 
     let token = client
-        .create_auth_token(Some(600), Some(3))
+        .create_auth_token_with_deadline_and_api_key_index(600, 3)
         .expect("auth token");
     let parts = token.split(':').collect::<Vec<_>>();
 

@@ -214,7 +214,7 @@ fn contract_modify_limit_order_keeps_numeric_payload_types() {
 
 #[test]
 fn spot_limit_buy_shortcut_does_not_require_side_param() {
-    let client = BitmartClient::new(None, None, None, Duration::from_secs(1)).expect("client");
+    let client = BitmartClient::public(Duration::from_secs(1)).expect("client");
     let params = params::BitmartParams::from_pairs(vec![
         ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
         ("size".to_string(), "1".to_string()),
@@ -238,7 +238,7 @@ fn spot_limit_buy_shortcut_does_not_require_side_param() {
 
 #[test]
 fn contract_cancel_order_keeps_order_id_as_string() {
-    let client = BitmartClient::new(None, None, None, Duration::from_secs(1)).expect("client");
+    let client = BitmartClient::public(Duration::from_secs(1)).expect("client");
     let params = params::BitmartParams::from_pairs(vec![
         ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
         ("order_id".to_string(), "3000378272670421".to_string()),

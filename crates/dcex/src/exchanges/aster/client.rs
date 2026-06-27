@@ -62,6 +62,10 @@ impl AsterClient {
         )
     }
 
+    pub fn public(timeout: Duration) -> Result<Self> {
+        Self::new(None, None, None, timeout)
+    }
+
     pub fn with_base_urls(
         user_address: Option<String>,
         signer_address: Option<String>,

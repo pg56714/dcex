@@ -33,6 +33,10 @@ impl BitmexClient {
         Self::with_base_url(api_key, api_secret, timeout, BASE_URL.to_string())
     }
 
+    pub fn public(timeout: Duration) -> Result<Self> {
+        Self::new(None, None, timeout)
+    }
+
     pub fn with_base_url(
         api_key: Option<String>,
         api_secret: Option<String>,
@@ -178,18 +182,6 @@ impl BitmexClient {
             }
         }
         Ok(exchange_symbol_fallback(product_symbol))
-    }
-
-    pub(super) fn normalize_symbol_params(&self, params: &mut [(String, String)]) -> Result<()> {
-        for (key, value) in params.iter_mut() {
-            if key == "product_symbol" {
-                *key = "symbol".to_string();
-                *value = self.exchange_symbol(value)?;
-            } else if key == "symbol" {
-                *value = self.exchange_symbol(value)?;
-            }
-        }
-        Ok(())
     }
 
     pub(super) fn push_product_symbol(

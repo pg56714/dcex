@@ -23,7 +23,7 @@ use crate::Result;
 
 use super::*;
 pub(super) async fn fetch_aster(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = AsterClient::new(None, None, None, timeout)?;
+    let client = AsterClient::public(timeout)?;
     let spot = client
         .public_request("get_spot_exchange_info", vec![])
         .await?;
@@ -86,7 +86,7 @@ fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
 }
 
 pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BackpackClient::new(None, None, 5_000, timeout)?;
+    let client = BackpackClient::public(5_000, timeout)?;
     let response = client.public_request("get_markets", vec![]).await?;
     let mut rows = Vec::new();
     for market in value_array(Some(&response.data)) {
@@ -139,7 +139,7 @@ pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>>
 }
 
 pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BinanceClient::new(None, None, timeout)?;
+    let client = BinanceClient::public(timeout)?;
     let spot = client
         .public_request("get_spot_exchange_info", vec![])
         .await?;
@@ -197,7 +197,7 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
 }
 
 pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BingxClient::new(None, None, timeout)?;
+    let client = BingxClient::public(timeout)?;
     let swap = client
         .public_request("get_swap_instrument_info", vec![])
         .await?;
@@ -249,7 +249,7 @@ pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
 }
 
 pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BitgetClient::new(None, None, None, timeout)?;
+    let client = BitgetClient::public(timeout)?;
     let spot = client.public_request("get_spot_symbols", vec![]).await?;
     let futures = client
         .public_request(
@@ -310,7 +310,7 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
 }
 
 pub(super) async fn fetch_bitmart(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BitmartClient::new(None, None, None, timeout)?;
+    let client = BitmartClient::public(timeout)?;
     let swap = client
         .public_request("get_contracts_details", vec![])
         .await?;
@@ -358,7 +358,7 @@ pub(super) async fn fetch_bitmart(timeout: Duration) -> Result<Vec<MarketInfo>> 
 }
 
 pub(super) async fn fetch_bitmex(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BitmexClient::new(None, None, timeout)?;
+    let client = BitmexClient::public(timeout)?;
     let response = client
         .public_request(
             "get_instrument_info",
@@ -403,7 +403,7 @@ pub(super) async fn fetch_bitmex(timeout: Duration) -> Result<Vec<MarketInfo>> {
 }
 
 pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BybitClient::new(None, None, 5_000, false, timeout)?;
+    let client = BybitClient::public(5_000, false, timeout)?;
     let mut rows = Vec::new();
     for category in ["linear", "inverse", "spot"] {
         let markets = bybit_instruments(&client, category).await?;
@@ -478,7 +478,7 @@ async fn bybit_instruments(client: &BybitClient, category: &str) -> Result<Vec<V
 }
 
 pub(super) async fn fetch_gateio(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = GateioClient::new(None, None, timeout)?;
+    let client = GateioClient::public(timeout)?;
     let futures = client
         .public_request("get_all_futures_contracts", vec![])
         .await?;
@@ -554,7 +554,7 @@ fn parse_gateio_contracts(
 }
 
 pub(super) async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = HyperliquidClient::new(false, None, None, timeout)?;
+    let client = HyperliquidClient::public(false, timeout)?;
     let perpetual = client.public_request("get_meta", Vec::new()).await?;
     let spot = client.public_request("get_spot_meta", Vec::new()).await?;
     let mut rows = Vec::new();
@@ -629,7 +629,7 @@ pub(super) async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInf
 }
 
 pub(super) async fn fetch_kucoin(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = KucoinClient::new(None, None, None, timeout)?;
+    let client = KucoinClient::public(timeout)?;
     let spot = client
         .public_request("get_spot_instrument_info", vec![])
         .await?;
@@ -677,7 +677,7 @@ pub(super) async fn fetch_kucoin(timeout: Duration) -> Result<Vec<MarketInfo>> {
 }
 
 pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = KrakenClient::new(None, None, None, None, timeout)?;
+    let client = KrakenClient::public(timeout)?;
     let spot = client
         .public_request("get_spot_asset_pairs", vec![])
         .await?;
@@ -816,7 +816,7 @@ fn lighter_market_info(market: &Value, product_type: &str) -> Result<MarketInfo>
 }
 
 pub(super) async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = MexcClient::new(None, None, timeout)?;
+    let client = MexcClient::public(timeout)?;
     let spot = client
         .public_request("get_spot_exchange_info", vec![])
         .await?;
@@ -883,7 +883,7 @@ pub(super) async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
 }
 
 pub(super) async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = OkxClient::new(None, None, None, "0".to_string(), timeout)?;
+    let client = OkxClient::public(timeout)?;
     let mut rows = Vec::new();
     for (instrument_type, product_type) in
         [("SWAP", "swap"), ("SPOT", "spot"), ("FUTURES", "futures")]

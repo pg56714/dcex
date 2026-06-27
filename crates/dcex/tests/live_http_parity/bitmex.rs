@@ -1,7 +1,10 @@
 use std::time::Duration;
 
 use dcex::exchange::ValidatedResponse;
-use dcex::exchanges::bitmex::BitmexClient;
+use dcex::exchanges::bitmex::{
+    BitmexBucketParams, BitmexClient, BitmexInstrumentInfoParams, BitmexOrderbookParams,
+    BitmexTableParams,
+};
 
 use super::common::{require_env, run_cases, run_private_cases, Case};
 
@@ -10,7 +13,7 @@ const XBT_USDT_SWAP: &str = "XBT-USDT-SWAP";
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn bitmex_public_live_parity() -> dcex::Result<()> {
-    let client = BitmexClient::new(None, None, Duration::from_secs(20))?;
+    let client = BitmexClient::public(Duration::from_secs(20))?;
     run_cases(
         vec![
             Case::new("get_instrument_info", &[]),
@@ -92,14 +95,14 @@ async fn bitmex_private_read_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_executions,
-                        get_margin,
-                        get_margining_mode,
-                        get_order,
-                        get_positions,
-                        get_trade_history,
-                        get_trading_volume,
-                        get_wallet_summary,
+                        get_executions => get_executions_with,
+                        get_margin => get_margin_with,
+                        get_margining_mode => get_margining_mode_with,
+                        get_order => get_order_with,
+                        get_positions => get_positions_with,
+                        get_trade_history => get_trade_history_with,
+                        get_trading_volume => get_trading_volume_with,
+                        get_wallet_summary => get_wallet_summary_with,
                     ]
                 )
             }
@@ -113,23 +116,100 @@ async fn bitmex_public_case(client: &BitmexClient, case: Case) -> dcex::Result<V
     match case.method {
         "get_instrument_info" => {
             client
-                .get_instrument_info(
-                    params.get("product_symbol"),
-                    params.get("filter"),
-                    params.get("count"),
-                )
+                .get_instrument_info_with(BitmexInstrumentInfoParams {
+                    product_symbol: params.get("product_symbol"),
+                    filter: params.get("filter"),
+                    count: params.get("count"),
+                })
                 .await
         }
         "get_orderbook" => {
             client
-                .get_orderbook(params.required("product_symbol")?, params.get("depth"))
+                .get_orderbook_with(
+                    params.required("product_symbol")?,
+                    BitmexOrderbookParams {
+                        depth: params.get("depth"),
+                    },
+                )
                 .await
         }
-        "get_trades" => client.get_trades(params.into_inner()).await,
-        "get_ticker" => client.get_ticker(params.into_inner()).await,
-        "get_kline" => client.get_kline(params.into_inner()).await,
-        "get_funding" => client.get_funding(params.into_inner()).await,
-        "get_liquidations" => client.get_liquidations(params.into_inner()).await,
+        "get_trades" => {
+            client
+                .get_trades_with(BitmexTableParams {
+                    product_symbol: params.get("product_symbol"),
+                    symbol: params.get("symbol"),
+                    filter: params.get("filter"),
+                    columns: params.get("columns"),
+                    count: params.get("count"),
+                    start: params.get("start"),
+                    reverse: params.get("reverse"),
+                    start_time: params.get("startTime"),
+                    end_time: params.get("endTime"),
+                })
+                .await
+        }
+        "get_ticker" => {
+            client
+                .get_ticker_with(BitmexBucketParams {
+                    bin_size: params.get("binSize"),
+                    partial: params.get("partial"),
+                    symbol: params.get("symbol"),
+                    filter: params.get("filter"),
+                    columns: params.get("columns"),
+                    count: params.get("count"),
+                    start: params.get("start"),
+                    reverse: params.get("reverse"),
+                    start_time: params.get("startTime"),
+                    end_time: params.get("endTime"),
+                })
+                .await
+        }
+        "get_kline" => {
+            client
+                .get_kline_with(BitmexBucketParams {
+                    bin_size: params.get("binSize"),
+                    partial: params.get("partial"),
+                    symbol: params.get("symbol"),
+                    filter: params.get("filter"),
+                    columns: params.get("columns"),
+                    count: params.get("count"),
+                    start: params.get("start"),
+                    reverse: params.get("reverse"),
+                    start_time: params.get("startTime"),
+                    end_time: params.get("endTime"),
+                })
+                .await
+        }
+        "get_funding" => {
+            client
+                .get_funding_with(BitmexTableParams {
+                    product_symbol: params.get("product_symbol"),
+                    symbol: params.get("symbol"),
+                    filter: params.get("filter"),
+                    columns: params.get("columns"),
+                    count: params.get("count"),
+                    start: params.get("start"),
+                    reverse: params.get("reverse"),
+                    start_time: params.get("startTime"),
+                    end_time: params.get("endTime"),
+                })
+                .await
+        }
+        "get_liquidations" => {
+            client
+                .get_liquidations_with(BitmexTableParams {
+                    product_symbol: params.get("product_symbol"),
+                    symbol: params.get("symbol"),
+                    filter: params.get("filter"),
+                    columns: params.get("columns"),
+                    count: params.get("count"),
+                    start: params.get("start"),
+                    reverse: params.get("reverse"),
+                    start_time: params.get("startTime"),
+                    end_time: params.get("endTime"),
+                })
+                .await
+        }
         method => Err(dcex::DcexError::InvalidInput(format!(
             "unsupported BitMEX public test method: {method}",
         ))),
@@ -149,9 +229,5 @@ impl Params {
     fn required(&self, key: &str) -> dcex::Result<&str> {
         self.get(key)
             .ok_or_else(|| dcex::DcexError::InvalidInput(format!("missing {key}")))
-    }
-
-    fn into_inner(self) -> Vec<(String, String)> {
-        self.0
     }
 }
