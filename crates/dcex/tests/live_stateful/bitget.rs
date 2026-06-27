@@ -34,9 +34,12 @@ async fn bitget_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    let orderbook = client
-        .get_spot_orderbook_with(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
-        .await?;
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::Bitget, "bitget", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
@@ -55,11 +58,14 @@ async fn bitget_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let order_result = if uta {
-        client.place_uta_order_with(order_params).await
+        super::common::exchange_method_request(&client, "place_uta_order", order_params).await
     } else {
-        client
-            .place_spot_post_only_limit_buy_order_with(order_params)
-            .await
+        super::common::exchange_method_request(
+            &client,
+            "place_spot_post_only_limit_buy_order",
+            order_params,
+        )
+        .await
     };
     let order = match order_result {
         Ok(response) => response,
@@ -79,9 +85,9 @@ async fn bitget_direct_live_stateful_order() -> dcex::Result<()> {
         push(&mut cancel_params, "product_symbol", BTC_USDT_SPOT);
     }
     let cancel = if uta {
-        client.cancel_uta_order_with(cancel_params).await?
+        super::common::exchange_method_request(&client, "cancel_uta_order", cancel_params).await?
     } else {
-        client.cancel_spot_order_with(cancel_params).await?
+        super::common::exchange_method_request(&client, "cancel_spot_order", cancel_params).await?
     };
     assert_success(&cancel);
     Ok(())
@@ -114,13 +120,16 @@ async fn bitget_swap_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client
-        .get_futures_orderbook_with(params(&[
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_futures_orderbook",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("productType", BITGET_FUTURES_PRODUCT_TYPE),
             ("limit", "5"),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::Bitget, "bitget", BTC_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
@@ -175,21 +184,27 @@ async fn is_uta(client: &BitgetClient) -> bool {
 
 async fn bitget_open_swap_orders(client: &BitgetClient, uta: bool) -> dcex::Result<bool> {
     let response = if uta {
-        client
-            .get_uta_open_orders_with(params(&[
+        super::common::exchange_method_request(
+            &client,
+            "get_uta_open_orders",
+            params(&[
                 ("category", BITGET_FUTURES_PRODUCT_TYPE),
                 ("product_symbol", BTC_USDT_SWAP),
                 ("limit", "20"),
-            ]))
-            .await?
+            ]),
+        )
+        .await?
     } else {
-        client
-            .get_futures_open_orders_with(params(&[
+        super::common::exchange_method_request(
+            &client,
+            "get_futures_open_orders",
+            params(&[
                 ("product_symbol", BTC_USDT_SWAP),
                 ("productType", BITGET_FUTURES_PRODUCT_TYPE),
                 ("limit", "20"),
-            ]))
-            .await?
+            ]),
+        )
+        .await?
     };
     Ok(contains_non_empty_array(
         &response.data,
@@ -199,19 +214,25 @@ async fn bitget_open_swap_orders(client: &BitgetClient, uta: bool) -> dcex::Resu
 
 async fn bitget_swap_position_abs(client: &BitgetClient, uta: bool) -> dcex::Result<f64> {
     let response = if uta {
-        client
-            .get_uta_positions_with(params(&[
+        super::common::exchange_method_request(
+            &client,
+            "get_uta_positions",
+            params(&[
                 ("category", BITGET_FUTURES_PRODUCT_TYPE),
                 ("product_symbol", BTC_USDT_SWAP),
-            ]))
-            .await?
+            ]),
+        )
+        .await?
     } else {
-        client
-            .get_futures_positions_with(params(&[
+        super::common::exchange_method_request(
+            &client,
+            "get_futures_positions",
+            params(&[
                 ("productType", BITGET_FUTURES_PRODUCT_TYPE),
                 ("marginCoin", "USDT"),
-            ]))
-            .await?
+            ]),
+        )
+        .await?
     };
     Ok(sum_abs_values_for_symbols(
         &response.data,
@@ -245,15 +266,18 @@ async fn ensure_bitget_futures_margin(
         return Ok(None);
     }
     let amount = format_transfer_amount(needed);
-    let response = client
-        .transfer_with(params(&[
+    let response = super::common::exchange_method_request(
+        &client,
+        "transfer",
+        params(&[
             ("coin", "USDT"),
             ("amount", amount.as_str()),
             ("fromType", "spot"),
             ("toType", "usdt_futures"),
             ("clientOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&response);
     sleep(Duration::from_secs(2)).await;
     Ok(Some(needed))
@@ -273,23 +297,29 @@ async fn return_bitget_futures_margin(
         return Ok(());
     }
     let amount = format_transfer_amount(amount);
-    let response = client
-        .transfer_with(params(&[
+    let response = super::common::exchange_method_request(
+        &client,
+        "transfer",
+        params(&[
             ("coin", "USDT"),
             ("amount", amount.as_str()),
             ("fromType", "usdt_futures"),
             ("toType", "spot"),
             ("clientOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&response);
     Ok(())
 }
 
 async fn bitget_spot_usdt(client: &BitgetClient) -> dcex::Result<f64> {
-    let response = client
-        .get_spot_account_assets_with(params(&[("coin", "USDT")]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_spot_account_assets",
+        params(&[("coin", "USDT")]),
+    )
+    .await?;
     Ok(asset_amount(
         &response.data,
         "USDT",
@@ -301,9 +331,12 @@ async fn bitget_futures_usdt(client: &BitgetClient, uta: bool) -> dcex::Result<f
     let response = if uta {
         client.get_uta_account_assets().await?
     } else {
-        client
-            .get_futures_accounts_with(params(&[("productType", BITGET_FUTURES_PRODUCT_TYPE)]))
-            .await?
+        super::common::exchange_method_request(
+            &client,
+            "get_futures_accounts",
+            params(&[("productType", BITGET_FUTURES_PRODUCT_TYPE)]),
+        )
+        .await?
     };
     Ok(asset_amount(
         &response.data,
@@ -319,8 +352,10 @@ async fn bitget_place_swap_post_only_buy(
     price: &str,
 ) -> dcex::Result<dcex::exchange::ValidatedResponse> {
     if uta {
-        return client
-            .place_uta_order_with(params(&[
+        return super::common::exchange_method_request(
+            &client,
+            "place_uta_order",
+            params(&[
                 ("category", BITGET_FUTURES_PRODUCT_TYPE),
                 ("product_symbol", BTC_USDT_SWAP),
                 ("side", "buy"),
@@ -330,11 +365,14 @@ async fn bitget_place_swap_post_only_buy(
                 ("timeInForce", "post_only"),
                 ("marginMode", "crossed"),
                 ("clientOid", unique_client_id("dcexrs").as_str()),
-            ]))
-            .await;
+            ]),
+        )
+        .await;
     }
-    client
-        .place_futures_post_only_limit_buy_order_with(params(&[
+    super::common::exchange_method_request(
+        &client,
+        "place_futures_post_only_limit_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("productType", BITGET_FUTURES_PRODUCT_TYPE),
             ("marginMode", "crossed"),
@@ -342,29 +380,36 @@ async fn bitget_place_swap_post_only_buy(
             ("size", quantity),
             ("price", price),
             ("clientOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await
+        ]),
+    )
+    .await
 }
 
 async fn set_bitget_swap_leverage(client: &BitgetClient, uta: bool) -> dcex::Result<()> {
     let result = if uta {
-        client
-            .set_uta_leverage_with(params(&[
+        super::common::exchange_method_request(
+            &client,
+            "set_uta_leverage",
+            params(&[
                 ("category", BITGET_FUTURES_PRODUCT_TYPE),
                 ("product_symbol", BTC_USDT_SWAP),
                 ("leverage", BITGET_SWAP_LEVERAGE),
                 ("marginMode", "crossed"),
-            ]))
-            .await
+            ]),
+        )
+        .await
     } else {
-        client
-            .set_futures_leverage_with(params(&[
+        super::common::exchange_method_request(
+            &client,
+            "set_futures_leverage",
+            params(&[
                 ("product_symbol", BTC_USDT_SWAP),
                 ("productType", BITGET_FUTURES_PRODUCT_TYPE),
                 ("marginCoin", "USDT"),
                 ("leverage", BITGET_SWAP_LEVERAGE),
-            ]))
-            .await
+            ]),
+        )
+        .await
     };
     match result {
         Ok(response) => {
@@ -382,21 +427,27 @@ async fn bitget_cancel_swap_order(
     order_id: &str,
 ) -> dcex::Result<dcex::exchange::ValidatedResponse> {
     if uta {
-        return client
-            .cancel_uta_order_with(params(&[
+        return super::common::exchange_method_request(
+            &client,
+            "cancel_uta_order",
+            params(&[
                 ("category", BITGET_FUTURES_PRODUCT_TYPE),
                 ("orderId", order_id),
-            ]))
-            .await;
+            ]),
+        )
+        .await;
     }
-    client
-        .cancel_futures_order_with(params(&[
+    super::common::exchange_method_request(
+        &client,
+        "cancel_futures_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("productType", BITGET_FUTURES_PRODUCT_TYPE),
             ("marginCoin", "USDT"),
             ("orderId", order_id),
-        ]))
-        .await
+        ]),
+    )
+    .await
 }
 
 async fn bitget_place_swap_market_buy(
@@ -405,8 +456,10 @@ async fn bitget_place_swap_market_buy(
     quantity: &str,
 ) -> dcex::Result<dcex::exchange::ValidatedResponse> {
     if uta {
-        return client
-            .place_uta_order_with(params(&[
+        return super::common::exchange_method_request(
+            &client,
+            "place_uta_order",
+            params(&[
                 ("category", BITGET_FUTURES_PRODUCT_TYPE),
                 ("product_symbol", BTC_USDT_SWAP),
                 ("side", "buy"),
@@ -414,19 +467,23 @@ async fn bitget_place_swap_market_buy(
                 ("qty", quantity),
                 ("marginMode", "crossed"),
                 ("clientOid", unique_client_id("dcexrs").as_str()),
-            ]))
-            .await;
+            ]),
+        )
+        .await;
     }
-    client
-        .place_futures_market_buy_order_with(params(&[
+    super::common::exchange_method_request(
+        &client,
+        "place_futures_market_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("productType", BITGET_FUTURES_PRODUCT_TYPE),
             ("marginMode", "crossed"),
             ("marginCoin", "USDT"),
             ("size", quantity),
             ("clientOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await
+        ]),
+    )
+    .await
 }
 
 async fn bitget_place_swap_market_sell_reduce_only(
@@ -435,8 +492,10 @@ async fn bitget_place_swap_market_sell_reduce_only(
     quantity: &str,
 ) -> dcex::Result<dcex::exchange::ValidatedResponse> {
     if uta {
-        return client
-            .place_uta_order_with(params(&[
+        return super::common::exchange_method_request(
+            &client,
+            "place_uta_order",
+            params(&[
                 ("category", BITGET_FUTURES_PRODUCT_TYPE),
                 ("product_symbol", BTC_USDT_SWAP),
                 ("side", "sell"),
@@ -445,11 +504,14 @@ async fn bitget_place_swap_market_sell_reduce_only(
                 ("marginMode", "crossed"),
                 ("reduceOnly", "yes"),
                 ("clientOid", unique_client_id("dcexrs").as_str()),
-            ]))
-            .await;
+            ]),
+        )
+        .await;
     }
-    client
-        .place_futures_market_sell_order_with(params(&[
+    super::common::exchange_method_request(
+        &client,
+        "place_futures_market_sell_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("productType", BITGET_FUTURES_PRODUCT_TYPE),
             ("marginMode", "crossed"),
@@ -457,6 +519,7 @@ async fn bitget_place_swap_market_sell_reduce_only(
             ("size", quantity),
             ("reduceOnly", "YES"),
             ("clientOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await
+        ]),
+    )
+    .await
 }

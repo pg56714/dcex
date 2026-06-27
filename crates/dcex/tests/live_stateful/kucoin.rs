@@ -28,9 +28,12 @@ async fn kucoin_spot_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    let open_orders = client
-        .get_spot_open_orders_with(params(&[("product_symbol", BTC_USDT_SPOT)]))
-        .await?;
+    let open_orders = super::common::exchange_method_request(
+        &client,
+        "get_spot_open_orders",
+        params(&[("product_symbol", BTC_USDT_SPOT)]),
+    )
+    .await?;
     if open_orders
         .data
         .get("items")
@@ -41,28 +44,37 @@ async fn kucoin_spot_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client
-        .get_spot_orderbook_with(params(&[("product_symbol", BTC_USDT_SPOT)]))
-        .await?;
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT)]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::KuCoin, "kucoin", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let size = minimum_order_quantity(&price, &details)?;
-    let order = client
-        .place_spot_post_only_limit_buy_order_with(params(&[
+    let order = super::common::exchange_method_request(
+        &client,
+        "place_spot_post_only_limit_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("size", size.as_str()),
             ("price", price.as_str()),
             ("clientOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
-    let cancel = client
-        .cancel_spot_order_with(params(&[
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_spot_order",
+        params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("orderId", order_id.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&cancel);
     Ok(())
 }

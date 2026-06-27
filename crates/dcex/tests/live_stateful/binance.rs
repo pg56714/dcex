@@ -1,10 +1,7 @@
 use std::time::Duration;
 
 use dcex::exchange::Exchange;
-use dcex::exchanges::binance::{
-    BinanceClient, BinanceFundingWalletParams, BinanceLimitParams, BinanceMarketOrderParams,
-    BinanceOptionalSymbolParams, BinanceOrderLookupParams,
-};
+use dcex::exchanges::binance::BinanceClient;
 use tokio::time::sleep;
 
 use super::common::{
@@ -38,9 +35,7 @@ async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    let orderbook = client
-        .get_spot_orderbook_with(BTC_USDT_SPOT, BinanceLimitParams { limit: Some(5) })
-        .await?;
+    let orderbook = client.get_spot_orderbook(BTC_USDT_SPOT).limit(5).await?;
     let details = fetch_trading_details(Exchange::Binance, "binance", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
@@ -68,13 +63,8 @@ async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
     let cancel_result = client
-        .cancel_order(
-            BTC_USDT_SPOT,
-            BinanceOrderLookupParams {
-                order_id: Some(order_id.as_str()),
-                ..Default::default()
-            },
-        )
+        .cancel_order(BTC_USDT_SPOT)
+        .param("orderId", order_id.as_str())
         .await;
     return_binance_transfer(&client, &transfer).await?;
     let cancel = cancel_result?;
@@ -106,9 +96,8 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     }
 
     let ticker = client
-        .get_futures_ticker_with(BinanceOptionalSymbolParams {
-            product_symbol: Some(BTC_USDT_SWAP),
-        })
+        .get_futures_ticker()
+        .param("product_symbol", BTC_USDT_SWAP)
         .await?;
     let details = fetch_trading_details(Exchange::Binance, "binance", BTC_USDT_SWAP).await?;
     let bid = find_f64(&ticker.data, &["bidPrice", "bid"]).ok_or_else(|| {
@@ -133,13 +122,8 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
     let cancel = client
-        .cancel_order(
-            BTC_USDT_SWAP,
-            BinanceOrderLookupParams {
-                order_id: Some(order_id.as_str()),
-                ..Default::default()
-            },
-        )
+        .cancel_order(BTC_USDT_SWAP)
+        .param("orderId", order_id.as_str())
         .await?;
     assert_success(&cancel);
 
@@ -150,14 +134,8 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     assert!(wait_for_positive_position(|| futures_position_abs(&client)).await? > 0.0);
 
     let closed = client
-        .place_market_sell_order_with(
-            BTC_USDT_SWAP,
-            quantity.as_str(),
-            BinanceMarketOrderParams {
-                reduce_only: Some("true"),
-                ..Default::default()
-            },
-        )
+        .place_market_sell_order(BTC_USDT_SWAP, quantity.as_str())
+        .param("reduceOnly", "true")
         .await?;
     assert_success(&closed);
     assert_eq!(
@@ -281,10 +259,9 @@ async fn spot_usdt(client: &BinanceClient) -> dcex::Result<f64> {
 
 async fn funding_usdt(client: &BinanceClient) -> dcex::Result<f64> {
     let response = client
-        .get_funding_wallet_with(BinanceFundingWalletParams {
-            asset: Some("USDT"),
-            need_btc_valuation: Some("false"),
-        })
+        .get_funding_wallet()
+        .asset("USDT")
+        .need_btc_valuation("false")
         .await?;
     Ok(asset_amount(&response.data, "USDT", &["free", "available"]))
 }

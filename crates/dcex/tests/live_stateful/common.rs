@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::future::Future;
+use std::future::{Future, IntoFuture};
 use std::sync::OnceLock;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -27,6 +27,26 @@ pub(crate) fn params(values: &[(&str, &str)]) -> Params {
 
 pub(crate) fn push(params: &mut Params, key: &str, value: impl Into<String>) {
     params.push((key.to_string(), value.into()));
+}
+
+pub(crate) async fn exchange_method_request<C>(
+    client: &C,
+    method_name: &'static str,
+    params: Params,
+) -> Result<ValidatedResponse>
+where
+    C: dcex::exchanges::ExchangeMethodRequestClient + Sync,
+{
+    match client
+        .public_request_boxed(method_name, params.clone())
+        .await
+    {
+        Ok(response) => Ok(response),
+        Err(DcexError::InvalidInput(message)) if message.contains("unsupported") => {
+            client.private_request_boxed(method_name, params).await
+        }
+        Err(error) => Err(error),
+    }
 }
 
 pub(crate) fn live_trading_enabled() -> bool {
@@ -363,15 +383,15 @@ where
 pub(crate) async fn wait_for_non_empty_records<F, Fut>(mut read: F, keys: &[&str]) -> Result<bool>
 where
     F: FnMut() -> Fut,
-    Fut: Future<Output = Result<ValidatedResponse>>,
+    Fut: IntoFuture<Output = Result<ValidatedResponse>>,
 {
-    let mut response = read().await?;
+    let mut response = read().into_future().await?;
     for _ in 0..10 {
         if contains_non_empty_array(&response.data, keys) {
             return Ok(true);
         }
         sleep(Duration::from_secs(1)).await;
-        response = read().await?;
+        response = read().into_future().await?;
     }
     Ok(false)
 }

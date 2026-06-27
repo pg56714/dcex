@@ -20,12 +20,11 @@ impl BinanceClient {
             .await
     }
 
-    pub async fn get_income_history(&self) -> Result<ValidatedResponse> {
-        self.get_income_history_with(BinanceIncomeHistoryParams::default())
-            .await
+    pub fn get_income_history(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_income_history", Vec::new())
     }
 
-    pub async fn get_income_history_with(
+    pub(super) async fn send_get_income_history(
         &self,
         request: BinanceIncomeHistoryParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -59,12 +58,11 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_wallet_balance(&self) -> Result<ValidatedResponse> {
-        self.get_wallet_balance_with(BinanceWalletBalanceParams::default())
-            .await
+    pub fn get_wallet_balance(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_wallet_balance", Vec::new())
     }
 
-    pub async fn get_wallet_balance_with(
+    pub(super) async fn send_get_wallet_balance(
         &self,
         request: BinanceWalletBalanceParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -80,12 +78,11 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_funding_wallet(&self) -> Result<ValidatedResponse> {
-        self.get_funding_wallet_with(BinanceFundingWalletParams::default())
-            .await
+    pub fn get_funding_wallet(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_funding_wallet", Vec::new())
     }
 
-    pub async fn get_funding_wallet_with(
+    pub(super) async fn send_get_funding_wallet(
         &self,
         request: BinanceFundingWalletParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -102,22 +99,24 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn create_universal_transfer(
+    pub fn create_universal_transfer(
         &self,
         transfer_type: &str,
         asset: &str,
         amount: &str,
-    ) -> Result<ValidatedResponse> {
-        self.create_universal_transfer_with(
-            transfer_type,
-            asset,
-            amount,
-            BinanceUniversalTransferParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "create_universal_transfer",
+            vec![
+                ("type".to_string(), transfer_type.to_string()),
+                ("asset".to_string(), asset.to_string()),
+                ("amount".to_string(), amount.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn create_universal_transfer_with(
+    pub(super) async fn send_create_universal_transfer(
         &self,
         transfer_type: &str,
         asset: &str,
@@ -141,18 +140,18 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_universal_transfer_history(
+    pub fn get_universal_transfer_history(
         &self,
         transfer_type: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_universal_transfer_history_with(
-            transfer_type,
-            BinanceUniversalTransferHistoryParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_universal_transfer_history",
+            vec![("type".to_string(), transfer_type.to_string())],
         )
-        .await
     }
 
-    pub async fn get_universal_transfer_history_with(
+    pub(super) async fn send_get_universal_transfer_history(
         &self,
         transfer_type: &str,
         request: BinanceUniversalTransferHistoryParams<'_>,

@@ -36,8 +36,8 @@ async fn main() -> dcex::Result<()> {
 ```
 
 HTTP methods that do not require endpoint parameters can be called without an
-empty parameter list. Use the `_with(...)` variant when passing optional query
-or body parameters.
+empty parameter list. Optional query/body parameters are added with builder
+setters such as `.limit(100)` or `.param("key", value)`.
 
 WebSocket:
 

@@ -23,3 +23,21 @@ pub use params::{
     BinanceUniversalTransferHistoryParams, BinanceUniversalTransferParams,
     BinanceWalletBalanceParams,
 };
+
+impl crate::exchanges::ExchangeMethodRequestClient for BinanceClient {
+    fn public_request_boxed<'a>(
+        &'a self,
+        method_name: &'static str,
+        params: Vec<(String, String)>,
+    ) -> crate::exchanges::ExchangeMethodFuture<'a> {
+        Box::pin(async move { self.public_request(method_name, params).await })
+    }
+
+    fn private_request_boxed<'a>(
+        &'a self,
+        method_name: &'static str,
+        params: Vec<(String, String)>,
+    ) -> crate::exchanges::ExchangeMethodFuture<'a> {
+        Box::pin(async move { self.private_request(method_name, params).await })
+    }
+}

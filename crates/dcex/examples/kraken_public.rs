@@ -6,10 +6,8 @@ use dcex::exchanges::kraken::KrakenClient;
 async fn main() -> dcex::Result<()> {
     let client = KrakenClient::public(Duration::from_secs(10))?;
     let response = client
-        .get_spot_ticker_with(vec![(
-            "product_symbol".to_string(),
-            "BTC-USDT-SPOT".to_string(),
-        )])
+        .get_spot_ticker()
+        .param("product_symbol", "BTC-USDT-SPOT")
         .await?;
     println!("{}", response.data);
     Ok(())

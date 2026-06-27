@@ -26,11 +26,11 @@ async fn hyperliquid_public_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_funding_rate_history => get_funding_rate_history_with,
-                        get_l2book => get_l2book_with,
-                        get_meta => get_meta_with,
-                        get_meta_and_asset_ctxs => get_meta_and_asset_ctxs_with,
-                        get_spot_meta => get_spot_meta_with,
+                        get_funding_rate_history,
+                        get_l2book,
+                        get_meta,
+                        get_meta_and_asset_ctxs,
+                        get_spot_meta,
                     ]
                 )
             }

@@ -32,26 +32,35 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    let orderbook = client
-        .get_spot_orderbook_with(params(&[("product_symbol", BTC_USDT_SPOT), ("count", "5")]))
-        .await?;
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("count", "5")]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
 
-    let order = client
-        .place_spot_post_only_limit_buy_order_with(params(&[
+    let order = super::common::exchange_method_request(
+        &client,
+        "place_spot_post_only_limit_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("volume", quantity.as_str()),
             ("price", price.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["txid"])?;
 
-    let cancel = client
-        .cancel_spot_order_with(params(&[("txid", order_id.as_str())]))
-        .await?;
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_spot_order",
+        params(&[("txid", order_id.as_str())]),
+    )
+    .await?;
     assert_success(&cancel);
     Ok(())
 }
@@ -82,9 +91,12 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client
-        .get_futures_orderbook_with(params(&[("product_symbol", BTC_USD_SWAP)]))
-        .await?;
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_futures_orderbook",
+        params(&[("product_symbol", BTC_USD_SWAP)]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USD_SWAP).await?;
     let bid = first_bid_price(&orderbook.data)?;
     let price = kraken_futures_post_only_buy_price(&orderbook.data)?;
@@ -100,39 +112,51 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
         None => return Ok(()),
     };
 
-    let order = client
-        .place_futures_post_only_limit_buy_order_with(params(&[
+    let order = super::common::exchange_method_request(
+        &client,
+        "place_futures_post_only_limit_buy_order",
+        params(&[
             ("product_symbol", BTC_USD_SWAP),
             ("size", quantity.as_str()),
             ("price", price.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["order_id"])?;
 
-    let cancel = client
-        .cancel_futures_order_with(params(&[("order_id", order_id.as_str())]))
-        .await?;
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_futures_order",
+        params(&[("order_id", order_id.as_str())]),
+    )
+    .await?;
     assert_success(&cancel);
 
-    let opened = client
-        .place_futures_market_buy_order_with(params(&[
+    let opened = super::common::exchange_method_request(
+        &client,
+        "place_futures_market_buy_order",
+        params(&[
             ("product_symbol", BTC_USD_SWAP),
             ("size", quantity.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&opened);
     let opened_id = require_order_id(&opened.data, &["order_id"])?;
     eprintln!("Kraken futures market open order_id={opened_id}");
     assert!(wait_for_positive_position(|| kraken_futures_position_abs(&client)).await? > 0.0);
 
-    let closed = client
-        .place_futures_market_sell_order_with(params(&[
+    let closed = super::common::exchange_method_request(
+        &client,
+        "place_futures_market_sell_order",
+        params(&[
             ("product_symbol", BTC_USD_SWAP),
             ("size", quantity.as_str()),
             ("reduceOnly", "true"),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&closed);
     let closed_id = require_order_id(&closed.data, &["order_id"])?;
     eprintln!("Kraken futures market close order_id={closed_id}");
@@ -178,14 +202,17 @@ async fn ensure_kraken_futures_margin(
         return Ok(None);
     }
     let amount = format_transfer_amount_ceil(needed, 8);
-    let response = client
-        .futures_wallet_transfer_with(params(&[
+    let response = super::common::exchange_method_request(
+        &client,
+        "futures_wallet_transfer",
+        params(&[
             ("amount", amount.as_str()),
             ("fromAccount", "cash"),
             ("toAccount", "flex"),
             ("unit", "USDT"),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&response);
     sleep(Duration::from_secs(2)).await;
     Ok(Some(needed))
@@ -201,14 +228,17 @@ async fn return_kraken_futures_margin(client: &KrakenClient, amount: f64) -> dce
         return Ok(());
     }
     let amount = format_transfer_amount_ceil(amount, 8);
-    let response = client
-        .futures_wallet_transfer_with(params(&[
+    let response = super::common::exchange_method_request(
+        &client,
+        "futures_wallet_transfer",
+        params(&[
             ("amount", amount.as_str()),
             ("fromAccount", "flex"),
             ("toAccount", "cash"),
             ("unit", "USDT"),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&response);
     Ok(())
 }
@@ -218,13 +248,19 @@ async fn assert_kraken_futures_records(
     opened_id: &str,
     closed_id: &str,
 ) -> dcex::Result<()> {
-    let opened_status = client
-        .get_futures_order_status_with(params(&[("orderIds", opened_id)]))
-        .await?;
+    let opened_status = super::common::exchange_method_request(
+        &client,
+        "get_futures_order_status",
+        params(&[("orderIds", opened_id)]),
+    )
+    .await?;
     assert_success(&opened_status);
-    let closed_status = client
-        .get_futures_order_status_with(params(&[("orderIds", closed_id)]))
-        .await?;
+    let closed_status = super::common::exchange_method_request(
+        &client,
+        "get_futures_order_status",
+        params(&[("orderIds", closed_id)]),
+    )
+    .await?;
     assert_success(&closed_status);
 
     let has_fills = wait_for_non_empty_records(|| client.get_futures_fills(), &["fills"]).await?;

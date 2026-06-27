@@ -43,8 +43,10 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
         dcex::DcexError::InvalidInput(format!("invalid generated Lighter client id: {error}"))
     })?;
     let (base_amount, price) = post_only_buy_order_amounts(&market)?;
-    let order = client
-        .create_order_with(vec![
+    let order = super::common::exchange_method_request(
+        &client,
+        "create_order",
+        vec![
             ("market_index".to_string(), market_id.clone()),
             (
                 "client_order_index".to_string(),
@@ -56,18 +58,22 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
             ("order_type".to_string(), "0".to_string()),
             ("time_in_force".to_string(), "2".to_string()),
             ("order_expiry".to_string(), "-1".to_string()),
-        ])
-        .await?;
+        ],
+    )
+    .await?;
     assert_success(&order);
     sleep(Duration::from_secs(1)).await;
     let order_index =
         active_order_index(&client, account_index, &market_id, client_order_index).await?;
-    let cancel = client
-        .cancel_order_with(vec![
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_order",
+        vec![
             ("market_index".to_string(), market_id),
             ("order_index".to_string(), order_index),
-        ])
-        .await?;
+        ],
+    )
+    .await?;
     assert_success(&cancel);
     Ok(())
 }
@@ -115,12 +121,15 @@ async fn active_order_index(
     client_order_index: i64,
 ) -> dcex::Result<String> {
     for _ in 0..10 {
-        let active = client
-            .get_account_active_orders_with(vec![
+        let active = super::common::exchange_method_request(
+            &client,
+            "get_account_active_orders",
+            vec![
                 ("account_index".to_string(), account_index.to_string()),
                 ("market_id".to_string(), market_id.to_string()),
-            ])
-            .await?;
+            ],
+        )
+        .await?;
         if let Some(order_index) = find_string(&active.data, &["order_index", "orderIndex"]) {
             if find_string(&active.data, &["client_order_index", "clientOrderIndex"]).as_deref()
                 == Some(&client_order_index.to_string())

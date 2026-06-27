@@ -118,8 +118,8 @@ async fn main() -> dcex::Result<()> {
 ```
 
 Rust HTTP methods that do not require endpoint parameters can be called without
-passing `None` or an empty parameter list. Use the `_with(...)` variant only
-when you need to pass optional query/body parameters.
+passing `None` or an empty parameter list. Optional query/body parameters are
+added with builder setters such as `.limit(100)` or `.param("key", value)`.
 
 ## Supported Exchanges
 

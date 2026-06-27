@@ -9,12 +9,7 @@ async fn main() -> dcex::Result<()> {
     let meta = client.get_meta().await?;
     println!("{}", meta.data);
 
-    let orderbook = client
-        .get_l2book_with(vec![(
-            "product_symbol".to_string(),
-            "BTC-USD-SWAP".to_string(),
-        )])
-        .await?;
+    let orderbook = client.get_l2book("BTC-USD-SWAP").await?;
     println!("{}", orderbook.data);
 
     Ok(())

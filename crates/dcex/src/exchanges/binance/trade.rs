@@ -29,17 +29,24 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn place_order(
+    pub fn place_order(
         &self,
         product_symbol: &str,
         side: &str,
         order_type: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_order_with(product_symbol, side, order_type, Vec::new())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("side".to_string(), side.to_string()),
+                ("type_".to_string(), order_type.to_string()),
+            ],
+        )
     }
 
-    pub async fn place_order_with(
+    pub(super) async fn send_place_order(
         &self,
         product_symbol: &str,
         side: &str,
@@ -57,17 +64,24 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn test_order(
+    pub fn test_order(
         &self,
         product_symbol: &str,
         side: &str,
         order_type: &str,
-    ) -> Result<ValidatedResponse> {
-        self.test_order_with(product_symbol, side, order_type, Vec::new())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "test_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("side".to_string(), side.to_string()),
+                ("type_".to_string(), order_type.to_string()),
+            ],
+        )
     }
 
-    pub async fn test_order_with(
+    pub(super) async fn send_test_order(
         &self,
         product_symbol: &str,
         side: &str,
@@ -85,18 +99,26 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn place_futures_algo_order(
+    pub fn place_futures_algo_order(
         &self,
         product_symbol: &str,
         side: &str,
         order_type: &str,
         algo_type: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_futures_algo_order_with(product_symbol, side, order_type, algo_type, Vec::new())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_futures_algo_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("side".to_string(), side.to_string()),
+                ("type_".to_string(), order_type.to_string()),
+                ("algoType".to_string(), algo_type.to_string()),
+            ],
+        )
     }
 
-    pub async fn place_futures_algo_order_with(
+    pub(super) async fn send_place_futures_algo_order(
         &self,
         product_symbol: &str,
         side: &str,
@@ -121,28 +143,29 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn cancel_futures_algo_order(
+    pub fn cancel_futures_algo_order(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "cancel_futures_algo_order",
+            Vec::new(),
+        )
+    }
+
+    pub fn get_futures_algo_order(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_futures_algo_order", Vec::new())
+    }
+
+    pub fn get_all_open_futures_algo_orders(
         &self,
-        request: BinanceAlgoOrderLookupParams<'_>,
-    ) -> Result<ValidatedResponse> {
-        self.futures_algo_order_request(HttpMethod::Delete, request)
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_all_open_futures_algo_orders",
+            Vec::new(),
+        )
     }
 
-    pub async fn get_futures_algo_order(
-        &self,
-        request: BinanceAlgoOrderLookupParams<'_>,
-    ) -> Result<ValidatedResponse> {
-        self.futures_algo_order_request(HttpMethod::Get, request)
-            .await
-    }
-
-    pub async fn get_all_open_futures_algo_orders(&self) -> Result<ValidatedResponse> {
-        self.get_all_open_futures_algo_orders_with(BinanceOpenFuturesAlgoOrdersParams::default())
-            .await
-    }
-
-    pub async fn get_all_open_futures_algo_orders_with(
+    pub(super) async fn send_get_all_open_futures_algo_orders(
         &self,
         request: BinanceOpenFuturesAlgoOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -162,18 +185,18 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_all_futures_algo_orders(
+    pub fn get_all_futures_algo_orders(
         &self,
         product_symbol: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_all_futures_algo_orders_with(
-            product_symbol,
-            BinanceAllFuturesAlgoOrdersParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_all_futures_algo_orders",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
         )
-        .await
     }
 
-    pub async fn get_all_futures_algo_orders_with(
+    pub(super) async fn send_get_all_futures_algo_orders(
         &self,
         product_symbol: &str,
         request: BinanceAllFuturesAlgoOrdersParams<'_>,
@@ -207,22 +230,24 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn place_market_order(
+    pub fn place_market_order(
         &self,
         product_symbol: &str,
         side: &str,
         quantity: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_market_order_with(
-            product_symbol,
-            side,
-            quantity,
-            BinanceMarketOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_market_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("side".to_string(), side.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_market_order_with(
+    pub(super) async fn send_place_market_order(
         &self,
         product_symbol: &str,
         side: &str,
@@ -233,76 +258,82 @@ impl BinanceClient {
         push_optional(&mut params, "positionSide", request.position_side);
         push_optional(&mut params, "reduceOnly", request.reduce_only);
         push_optional(&mut params, "newOrderRespType", request.new_order_resp_type);
-        self.place_order_with(product_symbol, side, "MARKET", params)
+        self.send_place_order(product_symbol, side, "MARKET", params)
             .await
     }
 
-    pub async fn place_market_buy_order(
+    pub fn place_market_buy_order(
         &self,
         product_symbol: &str,
         quantity: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_market_buy_order_with(
-            product_symbol,
-            quantity,
-            BinanceMarketOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_market_buy_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_market_buy_order_with(
+    pub(super) async fn send_place_market_buy_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         request: BinanceMarketOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.place_market_order_with(product_symbol, "BUY", quantity, request)
+        self.send_place_market_order(product_symbol, "BUY", quantity, request)
             .await
     }
 
-    pub async fn place_market_sell_order(
+    pub fn place_market_sell_order(
         &self,
         product_symbol: &str,
         quantity: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_market_sell_order_with(
-            product_symbol,
-            quantity,
-            BinanceMarketOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_market_sell_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_market_sell_order_with(
+    pub(super) async fn send_place_market_sell_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         request: BinanceMarketOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.place_market_order_with(product_symbol, "SELL", quantity, request)
+        self.send_place_market_order(product_symbol, "SELL", quantity, request)
             .await
     }
 
-    pub async fn place_limit_order(
+    pub fn place_limit_order(
         &self,
         product_symbol: &str,
         side: &str,
         quantity: &str,
         price: &str,
         time_in_force: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_limit_order_with(
-            product_symbol,
-            side,
-            quantity,
-            price,
-            time_in_force,
-            BinanceLimitOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_limit_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("side".to_string(), side.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+                ("price".to_string(), price.to_string()),
+                ("timeInForce".to_string(), time_in_force.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_limit_order_with(
+    pub(super) async fn send_place_limit_order(
         &self,
         product_symbol: &str,
         side: &str,
@@ -318,28 +349,30 @@ impl BinanceClient {
         ];
         push_optional(&mut params, "positionSide", request.position_side);
         push_optional(&mut params, "reduceOnly", request.reduce_only);
-        self.place_order_with(product_symbol, side, "LIMIT", params)
+        self.send_place_order(product_symbol, side, "LIMIT", params)
             .await
     }
 
-    pub async fn place_limit_buy_order(
+    pub fn place_limit_buy_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         price: &str,
         time_in_force: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_limit_buy_order_with(
-            product_symbol,
-            quantity,
-            price,
-            time_in_force,
-            BinanceLimitOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_limit_buy_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+                ("price".to_string(), price.to_string()),
+                ("timeInForce".to_string(), time_in_force.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_limit_buy_order_with(
+    pub(super) async fn send_place_limit_buy_order(
         &self,
         product_symbol: &str,
         quantity: &str,
@@ -347,7 +380,7 @@ impl BinanceClient {
         time_in_force: &str,
         request: BinanceLimitOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.place_limit_order_with(
+        self.send_place_limit_order(
             product_symbol,
             "BUY",
             quantity,
@@ -358,24 +391,26 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn place_limit_sell_order(
+    pub fn place_limit_sell_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         price: &str,
         time_in_force: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_limit_sell_order_with(
-            product_symbol,
-            quantity,
-            price,
-            time_in_force,
-            BinanceLimitOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_limit_sell_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+                ("price".to_string(), price.to_string()),
+                ("timeInForce".to_string(), time_in_force.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_limit_sell_order_with(
+    pub(super) async fn send_place_limit_sell_order(
         &self,
         product_symbol: &str,
         quantity: &str,
@@ -383,7 +418,7 @@ impl BinanceClient {
         time_in_force: &str,
         request: BinanceLimitOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.place_limit_order_with(
+        self.send_place_limit_order(
             product_symbol,
             "SELL",
             quantity,
@@ -394,24 +429,26 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn place_post_only_limit_order(
+    pub fn place_post_only_limit_order(
         &self,
         product_symbol: &str,
         side: &str,
         quantity: &str,
         price: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_post_only_limit_order_with(
-            product_symbol,
-            side,
-            quantity,
-            price,
-            BinancePostOnlyOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_post_only_limit_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("side".to_string(), side.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+                ("price".to_string(), price.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_post_only_limit_order_with(
+    pub(super) async fn send_place_post_only_limit_order(
         &self,
         product_symbol: &str,
         side: &str,
@@ -420,7 +457,7 @@ impl BinanceClient {
         request: BinancePostOnlyOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
         if self.market_for_product_symbol(product_symbol)? == BinanceMarket::Spot {
-            self.place_order_with(
+            self.send_place_order(
                 product_symbol,
                 side,
                 "LIMIT_MAKER",
@@ -431,7 +468,7 @@ impl BinanceClient {
             )
             .await
         } else {
-            self.place_limit_order_with(
+            self.send_place_limit_order(
                 product_symbol,
                 side,
                 quantity,
@@ -446,82 +483,96 @@ impl BinanceClient {
         }
     }
 
-    pub async fn place_post_only_limit_buy_order(
+    pub fn place_post_only_limit_buy_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         price: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_post_only_limit_buy_order_with(
-            product_symbol,
-            quantity,
-            price,
-            BinancePostOnlyOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_post_only_limit_buy_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+                ("price".to_string(), price.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_post_only_limit_buy_order_with(
+    pub(super) async fn send_place_post_only_limit_buy_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         price: &str,
         request: BinancePostOnlyOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.place_post_only_limit_order_with(product_symbol, "BUY", quantity, price, request)
+        self.send_place_post_only_limit_order(product_symbol, "BUY", quantity, price, request)
             .await
     }
 
-    pub async fn place_post_only_limit_sell_order(
+    pub fn place_post_only_limit_sell_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         price: &str,
-    ) -> Result<ValidatedResponse> {
-        self.place_post_only_limit_sell_order_with(
-            product_symbol,
-            quantity,
-            price,
-            BinancePostOnlyOrderParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "place_post_only_limit_sell_order",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("quantity".to_string(), quantity.to_string()),
+                ("price".to_string(), price.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn place_post_only_limit_sell_order_with(
+    pub(super) async fn send_place_post_only_limit_sell_order(
         &self,
         product_symbol: &str,
         quantity: &str,
         price: &str,
         request: BinancePostOnlyOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.place_post_only_limit_order_with(product_symbol, "SELL", quantity, price, request)
+        self.send_place_post_only_limit_order(product_symbol, "SELL", quantity, price, request)
             .await
     }
 
-    pub async fn cancel_order(
+    pub fn cancel_order(
         &self,
         product_symbol: &str,
-        request: BinanceOrderLookupParams<'_>,
-    ) -> Result<ValidatedResponse> {
-        self.order_lookup_request(HttpMethod::Delete, product_symbol, request)
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "cancel_order",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_order(
+    pub fn get_order(
         &self,
         product_symbol: &str,
-        request: BinanceOrderLookupParams<'_>,
-    ) -> Result<ValidatedResponse> {
-        self.order_lookup_request(HttpMethod::Get, product_symbol, request)
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_order",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_open_orders(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_open_orders_with(product_symbol, BinanceOrderLookupParams::default())
-            .await
+    pub fn get_open_orders(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_open_orders",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_open_orders_with(
+    pub(super) async fn send_get_open_orders(
         &self,
         product_symbol: &str,
         request: BinanceOrderLookupParams<'_>,
@@ -545,12 +596,11 @@ impl BinanceClient {
             .await
     }
 
-    pub async fn get_all_open_orders(&self) -> Result<ValidatedResponse> {
-        self.get_all_open_orders_with(BinanceAllOpenOrdersParams::default())
-            .await
+    pub fn get_all_open_orders(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_all_open_orders", Vec::new())
     }
 
-    pub async fn get_all_open_orders_with(
+    pub(super) async fn send_get_all_open_orders(
         &self,
         request: BinanceAllOpenOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -590,25 +640,37 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_future_all_order(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_future_all_order_with(product_symbol, BinanceAllOrdersParams::default())
-            .await
+    pub fn get_future_all_order(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_future_all_order",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_future_all_order_with(
+    pub(super) async fn send_get_future_all_order(
         &self,
         product_symbol: &str,
         request: BinanceAllOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
-        self.get_all_orders_with(product_symbol, request).await
+        self.send_get_all_orders(product_symbol, request).await
     }
 
-    pub async fn get_all_orders(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_all_orders_with(product_symbol, BinanceAllOrdersParams::default())
-            .await
+    pub fn get_all_orders(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_all_orders",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_all_orders_with(
+    pub(super) async fn send_get_all_orders(
         &self,
         product_symbol: &str,
         request: BinanceAllOrdersParams<'_>,
@@ -628,12 +690,18 @@ impl BinanceClient {
             .await
     }
 
-    pub async fn get_account_trades(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_account_trades_with(product_symbol, BinanceAccountTradesParams::default())
-            .await
+    pub fn get_account_trades(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_account_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_account_trades_with(
+    pub(super) async fn send_get_account_trades(
         &self,
         product_symbol: &str,
         request: BinanceAccountTradesParams<'_>,

@@ -55,12 +55,11 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_spot_exchange_info(&self) -> Result<ValidatedResponse> {
-        self.get_spot_exchange_info_with(AsterExchangeInfoParams::default())
-            .await
+    pub fn get_spot_exchange_info(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_spot_exchange_info", Vec::new())
     }
 
-    pub async fn get_spot_exchange_info_with(
+    pub(super) async fn send_get_spot_exchange_info(
         &self,
         request: AsterExchangeInfoParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -96,12 +95,18 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_spot_orderbook(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_spot_orderbook_with(product_symbol, AsterLimitParams::default())
-            .await
+    pub fn get_spot_orderbook(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_spot_orderbook",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_spot_orderbook_with(
+    pub(super) async fn send_get_spot_orderbook(
         &self,
         product_symbol: &str,
         request: AsterLimitParams,
@@ -110,12 +115,18 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_futures_orderbook(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_futures_orderbook_with(product_symbol, AsterLimitParams::default())
-            .await
+    pub fn get_futures_orderbook(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_orderbook",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_futures_orderbook_with(
+    pub(super) async fn send_get_futures_orderbook(
         &self,
         product_symbol: &str,
         request: AsterLimitParams,
@@ -124,12 +135,18 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_spot_recent_trades(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_spot_recent_trades_with(product_symbol, AsterLimitParams::default())
-            .await
+    pub fn get_spot_recent_trades(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_spot_recent_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_spot_recent_trades_with(
+    pub(super) async fn send_get_spot_recent_trades(
         &self,
         product_symbol: &str,
         request: AsterLimitParams,
@@ -138,15 +155,18 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_futures_recent_trades(
+    pub fn get_futures_recent_trades(
         &self,
         product_symbol: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_recent_trades_with(product_symbol, AsterLimitParams::default())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_recent_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_futures_recent_trades_with(
+    pub(super) async fn send_get_futures_recent_trades(
         &self,
         product_symbol: &str,
         request: AsterLimitParams,
@@ -160,15 +180,18 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_spot_historical_trades(
+    pub fn get_spot_historical_trades(
         &self,
         product_symbol: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_spot_historical_trades_with(product_symbol, AsterHistoricalTradesParams::default())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_spot_historical_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_spot_historical_trades_with(
+    pub(super) async fn send_get_spot_historical_trades(
         &self,
         product_symbol: &str,
         request: AsterHistoricalTradesParams,
@@ -182,18 +205,18 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_futures_historical_trades(
+    pub fn get_futures_historical_trades(
         &self,
         product_symbol: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_historical_trades_with(
-            product_symbol,
-            AsterHistoricalTradesParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_historical_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
         )
-        .await
     }
 
-    pub async fn get_futures_historical_trades_with(
+    pub(super) async fn send_get_futures_historical_trades(
         &self,
         product_symbol: &str,
         request: AsterHistoricalTradesParams,
@@ -207,12 +230,18 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_spot_agg_trades(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_spot_agg_trades_with(product_symbol, AsterAggTradesParams::default())
-            .await
+    pub fn get_spot_agg_trades(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_spot_agg_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_spot_agg_trades_with(
+    pub(super) async fn send_get_spot_agg_trades(
         &self,
         product_symbol: &str,
         request: AsterAggTradesParams,
@@ -221,12 +250,18 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_futures_agg_trades(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_futures_agg_trades_with(product_symbol, AsterAggTradesParams::default())
-            .await
+    pub fn get_futures_agg_trades(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_agg_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_futures_agg_trades_with(
+    pub(super) async fn send_get_futures_agg_trades(
         &self,
         product_symbol: &str,
         request: AsterAggTradesParams,
@@ -240,16 +275,22 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_spot_klines(
+    pub fn get_spot_klines(
         &self,
         product_symbol: &str,
         interval: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_spot_klines_with(product_symbol, interval, AsterKlinesParams::default())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_spot_klines",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("interval".to_string(), interval.to_string()),
+            ],
+        )
     }
 
-    pub async fn get_spot_klines_with(
+    pub(super) async fn send_get_spot_klines(
         &self,
         product_symbol: &str,
         interval: &str,
@@ -265,16 +306,22 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_futures_klines(
+    pub fn get_futures_klines(
         &self,
         product_symbol: &str,
         interval: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_klines_with(product_symbol, interval, AsterKlinesParams::default())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_klines",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("interval".to_string(), interval.to_string()),
+            ],
+        )
     }
 
-    pub async fn get_futures_klines_with(
+    pub(super) async fn send_get_futures_klines(
         &self,
         product_symbol: &str,
         interval: &str,
@@ -290,20 +337,22 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_futures_index_price_klines(
+    pub fn get_futures_index_price_klines(
         &self,
         pair: &str,
         interval: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_index_price_klines_with(
-            pair,
-            interval,
-            AsterIndexPriceKlinesParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_index_price_klines",
+            vec![
+                ("pair".to_string(), pair.to_string()),
+                ("interval".to_string(), interval.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_index_price_klines_with(
+    pub(super) async fn send_get_futures_index_price_klines(
         &self,
         pair: &str,
         interval: &str,
@@ -326,20 +375,22 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_futures_mark_price_klines(
+    pub fn get_futures_mark_price_klines(
         &self,
         product_symbol: &str,
         interval: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_mark_price_klines_with(
-            product_symbol,
-            interval,
-            AsterKlinesParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_mark_price_klines",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("interval".to_string(), interval.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_mark_price_klines_with(
+    pub(super) async fn send_get_futures_mark_price_klines(
         &self,
         product_symbol: &str,
         interval: &str,
@@ -355,12 +406,11 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_spot_ticker_24hr(&self) -> Result<ValidatedResponse> {
-        self.get_spot_ticker_24hr_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_spot_ticker_24hr(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_spot_ticker_24hr", Vec::new())
     }
 
-    pub async fn get_spot_ticker_24hr_with(
+    pub(super) async fn send_get_spot_ticker_24hr(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -368,12 +418,11 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_futures_ticker_24hr(&self) -> Result<ValidatedResponse> {
-        self.get_futures_ticker_24hr_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_futures_ticker_24hr(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_futures_ticker_24hr", Vec::new())
     }
 
-    pub async fn get_futures_ticker_24hr_with(
+    pub(super) async fn send_get_futures_ticker_24hr(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -381,12 +430,11 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_spot_ticker_price(&self) -> Result<ValidatedResponse> {
-        self.get_spot_ticker_price_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_spot_ticker_price(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_spot_ticker_price", Vec::new())
     }
 
-    pub async fn get_spot_ticker_price_with(
+    pub(super) async fn send_get_spot_ticker_price(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -394,12 +442,15 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_futures_ticker_price(&self) -> Result<ValidatedResponse> {
-        self.get_futures_ticker_price_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_futures_ticker_price(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_ticker_price",
+            Vec::new(),
+        )
     }
 
-    pub async fn get_futures_ticker_price_with(
+    pub(super) async fn send_get_futures_ticker_price(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -407,12 +458,11 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_spot_book_ticker(&self) -> Result<ValidatedResponse> {
-        self.get_spot_book_ticker_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_spot_book_ticker(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_spot_book_ticker", Vec::new())
     }
 
-    pub async fn get_spot_book_ticker_with(
+    pub(super) async fn send_get_spot_book_ticker(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -420,12 +470,11 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_futures_book_ticker(&self) -> Result<ValidatedResponse> {
-        self.get_futures_book_ticker_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_futures_book_ticker(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_futures_book_ticker", Vec::new())
     }
 
-    pub async fn get_futures_book_ticker_with(
+    pub(super) async fn send_get_futures_book_ticker(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -451,12 +500,15 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_futures_premium_index(&self) -> Result<ValidatedResponse> {
-        self.get_futures_premium_index_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_futures_premium_index(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_premium_index",
+            Vec::new(),
+        )
     }
 
-    pub async fn get_futures_premium_index_with(
+    pub(super) async fn send_get_futures_premium_index(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -464,12 +516,15 @@ impl AsterClient {
             .await
     }
 
-    pub async fn get_futures_funding_rate(&self) -> Result<ValidatedResponse> {
-        self.get_futures_funding_rate_with(AsterFundingRateParams::default())
-            .await
+    pub fn get_futures_funding_rate(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_funding_rate",
+            Vec::new(),
+        )
     }
 
-    pub async fn get_futures_funding_rate_with(
+    pub(super) async fn send_get_futures_funding_rate(
         &self,
         request: AsterFundingRateParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -490,12 +545,15 @@ impl AsterClient {
         .await
     }
 
-    pub async fn get_futures_funding_info(&self) -> Result<ValidatedResponse> {
-        self.get_futures_funding_info_with(AsterOptionalSymbolParams::default())
-            .await
+    pub fn get_futures_funding_info(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_funding_info",
+            Vec::new(),
+        )
     }
 
-    pub async fn get_futures_funding_info_with(
+    pub(super) async fn send_get_futures_funding_info(
         &self,
         request: AsterOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -529,7 +587,7 @@ impl AsterClient {
             "get_spot_server_time" => self.get_spot_server_time().await,
             "get_futures_server_time" => self.get_futures_server_time().await,
             "get_spot_exchange_info" => {
-                self.get_spot_exchange_info_with(AsterExchangeInfoParams {
+                self.send_get_spot_exchange_info(AsterExchangeInfoParams {
                     product_symbol: params.get("product_symbol"),
                     symbols: params.values("symbols"),
                 })
@@ -537,7 +595,7 @@ impl AsterClient {
             }
             "get_futures_exchange_info" => self.get_futures_exchange_info().await,
             "get_spot_orderbook" => {
-                self.get_spot_orderbook_with(
+                self.send_get_spot_orderbook(
                     params.required("product_symbol")?,
                     AsterLimitParams {
                         limit: params.u64("limit")?,
@@ -546,7 +604,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_orderbook" => {
-                self.get_futures_orderbook_with(
+                self.send_get_futures_orderbook(
                     params.required("product_symbol")?,
                     AsterLimitParams {
                         limit: params.u64("limit")?,
@@ -555,7 +613,7 @@ impl AsterClient {
                 .await
             }
             "get_spot_recent_trades" => {
-                self.get_spot_recent_trades_with(
+                self.send_get_spot_recent_trades(
                     params.required("product_symbol")?,
                     AsterLimitParams {
                         limit: params.u64("limit")?,
@@ -564,7 +622,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_recent_trades" => {
-                self.get_futures_recent_trades_with(
+                self.send_get_futures_recent_trades(
                     params.required("product_symbol")?,
                     AsterLimitParams {
                         limit: params.u64("limit")?,
@@ -573,7 +631,7 @@ impl AsterClient {
                 .await
             }
             "get_spot_historical_trades" => {
-                self.get_spot_historical_trades_with(
+                self.send_get_spot_historical_trades(
                     params.required("product_symbol")?,
                     AsterHistoricalTradesParams {
                         limit: params.u64("limit")?,
@@ -583,7 +641,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_historical_trades" => {
-                self.get_futures_historical_trades_with(
+                self.send_get_futures_historical_trades(
                     params.required("product_symbol")?,
                     AsterHistoricalTradesParams {
                         limit: params.u64("limit")?,
@@ -593,7 +651,7 @@ impl AsterClient {
                 .await
             }
             "get_spot_agg_trades" => {
-                self.get_spot_agg_trades_with(
+                self.send_get_spot_agg_trades(
                     params.required("product_symbol")?,
                     AsterAggTradesParams {
                         from_id: params.u64("fromId")?,
@@ -605,7 +663,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_agg_trades" => {
-                self.get_futures_agg_trades_with(
+                self.send_get_futures_agg_trades(
                     params.required("product_symbol")?,
                     AsterAggTradesParams {
                         from_id: params.u64("fromId")?,
@@ -617,7 +675,7 @@ impl AsterClient {
                 .await
             }
             "get_spot_klines" => {
-                self.get_spot_klines_with(
+                self.send_get_spot_klines(
                     params.required("product_symbol")?,
                     params.required("interval")?,
                     AsterKlinesParams {
@@ -629,7 +687,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_klines" => {
-                self.get_futures_klines_with(
+                self.send_get_futures_klines(
                     params.required("product_symbol")?,
                     params.required("interval")?,
                     AsterKlinesParams {
@@ -641,7 +699,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_index_price_klines" => {
-                self.get_futures_index_price_klines_with(
+                self.send_get_futures_index_price_klines(
                     params.required("pair")?,
                     params.required("interval")?,
                     AsterIndexPriceKlinesParams {
@@ -653,7 +711,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_mark_price_klines" => {
-                self.get_futures_mark_price_klines_with(
+                self.send_get_futures_mark_price_klines(
                     params.required("product_symbol")?,
                     params.required("interval")?,
                     AsterKlinesParams {
@@ -665,37 +723,37 @@ impl AsterClient {
                 .await
             }
             "get_spot_ticker_24hr" => {
-                self.get_spot_ticker_24hr_with(AsterOptionalSymbolParams {
+                self.send_get_spot_ticker_24hr(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_ticker_24hr" => {
-                self.get_futures_ticker_24hr_with(AsterOptionalSymbolParams {
+                self.send_get_futures_ticker_24hr(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_spot_ticker_price" => {
-                self.get_spot_ticker_price_with(AsterOptionalSymbolParams {
+                self.send_get_spot_ticker_price(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_ticker_price" => {
-                self.get_futures_ticker_price_with(AsterOptionalSymbolParams {
+                self.send_get_futures_ticker_price(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_spot_book_ticker" => {
-                self.get_spot_book_ticker_with(AsterOptionalSymbolParams {
+                self.send_get_spot_book_ticker(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_book_ticker" => {
-                self.get_futures_book_ticker_with(AsterOptionalSymbolParams {
+                self.send_get_futures_book_ticker(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
@@ -705,13 +763,13 @@ impl AsterClient {
                     .await
             }
             "get_futures_premium_index" => {
-                self.get_futures_premium_index_with(AsterOptionalSymbolParams {
+                self.send_get_futures_premium_index(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_funding_rate" => {
-                self.get_futures_funding_rate_with(AsterFundingRateParams {
+                self.send_get_futures_funding_rate(AsterFundingRateParams {
                     product_symbol: params.get("product_symbol"),
                     start_time: params.u64("startTime")?,
                     end_time: params.u64("endTime")?,
@@ -720,7 +778,7 @@ impl AsterClient {
                 .await
             }
             "get_futures_funding_info" => {
-                self.get_futures_funding_info_with(AsterOptionalSymbolParams {
+                self.send_get_futures_funding_info(AsterOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await

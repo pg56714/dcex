@@ -38,9 +38,12 @@ async fn bingx_spot_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client
-        .get_spot_orderbook_with(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
-        .await?;
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::BingX, "bingx", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
@@ -56,23 +59,29 @@ async fn bingx_spot_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let order = client
-        .place_spot_post_only_buy_order_with(params(&[
+    let order = super::common::exchange_method_request(
+        &client,
+        "place_spot_post_only_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("quantity", quantity.as_str()),
             ("price", price.as_str()),
             ("clientOrderId", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
-    let cancel = client
-        .cancel_spot_order_with(params(&[
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_spot_order",
+        params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("orderId", order_id.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&cancel);
     Ok(())
 }
@@ -101,9 +110,12 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let orderbook = client
-        .get_orderbook_with(params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "5")]))
-        .await?;
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_orderbook",
+        params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "5")]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::BingX, "bingx", BTC_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
@@ -117,40 +129,52 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let order = client
-        .place_swap_post_only_buy_order_with(params(&[
+    let order = super::common::exchange_method_request(
+        &client,
+        "place_swap_post_only_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("quantity", quantity.as_str()),
             ("price", price.as_str()),
             ("positionSide", "LONG"),
             ("clientOrderId", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
-    let cancel = client
-        .cancel_swap_order_with(params(&[
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_swap_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("orderId", order_id.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&cancel);
 
-    let market_order = client
-        .place_swap_market_buy_order_with(params(&[
+    let market_order = super::common::exchange_method_request(
+        &client,
+        "place_swap_market_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("quantity", quantity.as_str()),
             ("positionSide", "LONG"),
             ("clientOrderId", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&market_order);
     assert!(wait_for_positive_position(|| bingx_swap_position_abs(&client)).await? > 0.0);
 
-    let close = client
-        .close_swap_all_positions_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
-        .await?;
+    let close = super::common::exchange_method_request(
+        &client,
+        "close_swap_all_positions",
+        params(&[("product_symbol", BTC_USDT_SWAP)]),
+    )
+    .await?;
     assert_success(&close);
     assert_eq!(
         wait_for_flat_position(|| bingx_swap_position_abs(&client)).await?,
@@ -160,23 +184,32 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 async fn bingx_spot_open_orders(client: &BingxClient) -> dcex::Result<bool> {
-    let response = client
-        .get_spot_open_orders_with(params(&[("product_symbol", BTC_USDT_SPOT)]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_spot_open_orders",
+        params(&[("product_symbol", BTC_USDT_SPOT)]),
+    )
+    .await?;
     Ok(contains_non_empty_array(&response.data, &["orders"]))
 }
 
 async fn bingx_swap_open_orders(client: &BingxClient) -> dcex::Result<bool> {
-    let response = client
-        .get_open_orders_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_open_orders",
+        params(&[("product_symbol", BTC_USDT_SWAP)]),
+    )
+    .await?;
     Ok(contains_non_empty_array(&response.data, &["orders"]))
 }
 
 async fn bingx_swap_position_abs(client: &BingxClient) -> dcex::Result<f64> {
-    let response = client
-        .get_open_positions_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_open_positions",
+        params(&[("product_symbol", BTC_USDT_SWAP)]),
+    )
+    .await?;
     Ok(sum_abs_values_for_symbols(
         &response.data,
         &["symbol"],
@@ -191,9 +224,12 @@ async fn bingx_spot_usdt(client: &BingxClient) -> dcex::Result<f64> {
 }
 
 async fn bingx_fund_usdt(client: &BingxClient) -> dcex::Result<f64> {
-    let response = client
-        .get_fund_account_balance_with(params(&[("asset", "USDT")]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_fund_account_balance",
+        params(&[("asset", "USDT")]),
+    )
+    .await?;
     Ok(asset_amount(
         &response.data,
         "USDT",
@@ -255,14 +291,17 @@ async fn ensure_bingx_usdt(
             continue;
         }
         let amount = format_transfer_amount(amount);
-        let transfer = client
-            .asset_transfer_with(params(&[
+        let transfer = super::common::exchange_method_request(
+            &client,
+            "asset_transfer",
+            params(&[
                 ("fromAccount", source_account),
                 ("toAccount", target_account),
                 ("asset", "USDT"),
                 ("amount", amount.as_str()),
-            ]))
-            .await;
+            ]),
+        )
+        .await;
         let transfer = match transfer {
             Ok(response) => response,
             Err(error) => {
@@ -301,12 +340,12 @@ async fn bingx_transferable_usdt(
     from_account: &str,
     to_account: &str,
 ) -> dcex::Result<f64> {
-    let response = client
-        .get_transferable_coins_with(params(&[
-            ("fromAccount", from_account),
-            ("toAccount", to_account),
-        ]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_transferable_coins",
+        params(&[("fromAccount", from_account), ("toAccount", to_account)]),
+    )
+    .await?;
     Ok(asset_amount(
         &response.data,
         "USDT",
@@ -315,9 +354,12 @@ async fn bingx_transferable_usdt(
 }
 
 async fn bingx_swap_market_price(client: &BingxClient) -> dcex::Result<f64> {
-    let response = client
-        .get_ticker_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_ticker",
+        params(&[("product_symbol", BTC_USDT_SWAP)]),
+    )
+    .await?;
     find_f64(&response.data, &["lastPrice", "last", "price"]).ok_or_else(|| {
         dcex::DcexError::Decode(format!(
             "BingX swap ticker has no usable market price: {response:?}"

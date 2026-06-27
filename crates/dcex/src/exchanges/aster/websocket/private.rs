@@ -129,10 +129,7 @@ impl AsterPrivateWebSocket {
             }
             AsterMarket::Spot => {
                 self.http_client
-                    .keep_alive_spot_listen_key_with(vec![(
-                        "listenKey".to_string(),
-                        listen_key.to_string(),
-                    )])
+                    .keep_alive_spot_listen_key(listen_key)
                     .await?;
             }
         }
@@ -146,9 +143,7 @@ impl AsterPrivateWebSocket {
                     self.http_client.close_futures_listen_key().await?;
                 }
                 AsterMarket::Spot => {
-                    self.http_client
-                        .close_spot_listen_key_with(vec![("listenKey".to_string(), listen_key)])
-                        .await?;
+                    self.http_client.close_spot_listen_key(&listen_key).await?;
                 }
             }
         }

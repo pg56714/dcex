@@ -35,11 +35,11 @@ async fn lighter_public_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_info => get_info_with,
-                        get_order_book_details => get_order_book_details_with,
-                        get_order_book_orders => get_order_book_orders_with,
-                        get_order_books => get_order_books_with,
-                        get_status => get_status_with,
+                        get_info,
+                        get_order_book_details,
+                        get_order_book_orders,
+                        get_order_books,
+                        get_status,
                     ]
                 )
             }
@@ -114,9 +114,9 @@ async fn lighter_private_read_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_account_active_orders => get_account_active_orders_with,
-                        get_account_limits => get_account_limits_with,
-                        get_next_nonce => get_next_nonce_with,
+                        get_account_active_orders,
+                        get_account_limits,
+                        get_next_nonce,
                     ]
                 )
             }

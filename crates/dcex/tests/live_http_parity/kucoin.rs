@@ -37,14 +37,14 @@ async fn kucoin_public_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_futures_contract => get_futures_contract_with,
-                        get_futures_contracts => get_futures_contracts_with,
-                        get_futures_orderbook => get_futures_orderbook_with,
-                        get_futures_ticker => get_futures_ticker_with,
-                        get_spot_instrument_info => get_spot_instrument_info_with,
-                        get_spot_kline => get_spot_kline_with,
-                        get_spot_public_trades => get_spot_public_trades_with,
-                        get_spot_ticker => get_spot_ticker_with,
+                        get_futures_contract,
+                        get_futures_contracts,
+                        get_futures_orderbook,
+                        get_futures_ticker,
+                        get_spot_instrument_info,
+                        get_spot_kline,
+                        get_spot_public_trades,
+                        get_spot_ticker,
                     ]
                 )
             }
@@ -93,12 +93,12 @@ async fn kucoin_private_read_live_parity() -> dcex::Result<()> {
                     client,
                     case,
                     [
-                        get_spot_orderbook => get_spot_orderbook_with,
-                        get_account_balance => get_account_balance_with,
-                        get_futures_account => get_futures_account_with,
-                        get_futures_order_list => get_futures_order_list_with,
-                        get_futures_positions => get_futures_positions_with,
-                        get_spot_open_orders => get_spot_open_orders_with,
+                        get_spot_orderbook,
+                        get_account_balance,
+                        get_futures_account,
+                        get_futures_order_list,
+                        get_futures_positions,
+                        get_spot_open_orders,
                     ]
                 )
             }

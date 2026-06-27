@@ -9,12 +9,11 @@ use super::params::{
 };
 
 impl BitmexClient {
-    pub async fn get_instrument_info(&self) -> Result<ValidatedResponse> {
-        self.get_instrument_info_with(BitmexInstrumentInfoParams::default())
-            .await
+    pub fn get_instrument_info(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_instrument_info", Vec::new())
     }
 
-    pub async fn get_instrument_info_with(
+    pub(super) async fn send_get_instrument_info(
         &self,
         request: BitmexInstrumentInfoParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -32,12 +31,18 @@ impl BitmexClient {
         self.public_get(path, params).await
     }
 
-    pub async fn get_orderbook(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_orderbook_with(product_symbol, BitmexOrderbookParams::default())
-            .await
+    pub fn get_orderbook(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_orderbook",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_orderbook_with(
+    pub(super) async fn send_get_orderbook(
         &self,
         product_symbol: &str,
         request: BitmexOrderbookParams<'_>,
@@ -47,11 +52,11 @@ impl BitmexClient {
         self.public_get(ORDERBOOK, params).await
     }
 
-    pub async fn get_trades(&self) -> Result<ValidatedResponse> {
-        self.get_trades_with(BitmexTableParams::default()).await
+    pub fn get_trades(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_trades", Vec::new())
     }
 
-    pub async fn get_trades_with(
+    pub(super) async fn send_get_trades(
         &self,
         request: BitmexTableParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -59,11 +64,11 @@ impl BitmexClient {
         self.public_get(TRADE, params).await
     }
 
-    pub async fn get_ticker(&self) -> Result<ValidatedResponse> {
-        self.get_ticker_with(BitmexBucketParams::default()).await
+    pub fn get_ticker(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_ticker", Vec::new())
     }
 
-    pub async fn get_ticker_with(
+    pub(super) async fn send_get_ticker(
         &self,
         request: BitmexBucketParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -71,11 +76,11 @@ impl BitmexClient {
         self.public_get(TICKER, params).await
     }
 
-    pub async fn get_kline(&self) -> Result<ValidatedResponse> {
-        self.get_kline_with(BitmexBucketParams::default()).await
+    pub fn get_kline(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_kline", Vec::new())
     }
 
-    pub async fn get_kline_with(
+    pub(super) async fn send_get_kline(
         &self,
         request: BitmexBucketParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -83,11 +88,11 @@ impl BitmexClient {
         self.public_get(KLINE, params).await
     }
 
-    pub async fn get_funding(&self) -> Result<ValidatedResponse> {
-        self.get_funding_with(BitmexTableParams::default()).await
+    pub fn get_funding(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_funding", Vec::new())
     }
 
-    pub async fn get_funding_with(
+    pub(super) async fn send_get_funding(
         &self,
         request: BitmexTableParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -95,12 +100,11 @@ impl BitmexClient {
         self.public_get(FUNDING, params).await
     }
 
-    pub async fn get_liquidations(&self) -> Result<ValidatedResponse> {
-        self.get_liquidations_with(BitmexTableParams::default())
-            .await
+    pub fn get_liquidations(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_liquidations", Vec::new())
     }
 
-    pub async fn get_liquidations_with(
+    pub(super) async fn send_get_liquidations(
         &self,
         request: BitmexTableParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -116,7 +120,7 @@ impl BitmexClient {
         let public_params = BitmexParams::from_pairs(params);
         match method_name {
             "get_instrument_info" => {
-                self.get_instrument_info_with(BitmexInstrumentInfoParams {
+                self.send_get_instrument_info(BitmexInstrumentInfoParams {
                     product_symbol: public_params.get("product_symbol"),
                     filter: public_params.get("filter"),
                     count: public_params.get("count"),
@@ -124,7 +128,7 @@ impl BitmexClient {
                 .await
             }
             "get_orderbook" => {
-                self.get_orderbook_with(
+                self.send_get_orderbook(
                     public_params.required("product_symbol")?,
                     BitmexOrderbookParams {
                         depth: public_params.get("depth"),
@@ -133,7 +137,7 @@ impl BitmexClient {
                 .await
             }
             "get_trades" => {
-                self.get_trades_with(BitmexTableParams {
+                self.send_get_trades(BitmexTableParams {
                     product_symbol: public_params.get("product_symbol"),
                     symbol: public_params.get("symbol"),
                     filter: public_params.get("filter"),
@@ -147,7 +151,7 @@ impl BitmexClient {
                 .await
             }
             "get_ticker" => {
-                self.get_ticker_with(BitmexBucketParams {
+                self.send_get_ticker(BitmexBucketParams {
                     bin_size: public_params.get("binSize"),
                     partial: public_params.get("partial"),
                     symbol: public_params.get("symbol"),
@@ -162,7 +166,7 @@ impl BitmexClient {
                 .await
             }
             "get_kline" => {
-                self.get_kline_with(BitmexBucketParams {
+                self.send_get_kline(BitmexBucketParams {
                     bin_size: public_params.get("binSize"),
                     partial: public_params.get("partial"),
                     symbol: public_params.get("symbol"),
@@ -177,7 +181,7 @@ impl BitmexClient {
                 .await
             }
             "get_funding" => {
-                self.get_funding_with(BitmexTableParams {
+                self.send_get_funding(BitmexTableParams {
                     product_symbol: public_params.get("product_symbol"),
                     symbol: public_params.get("symbol"),
                     filter: public_params.get("filter"),
@@ -191,7 +195,7 @@ impl BitmexClient {
                 .await
             }
             "get_liquidations" => {
-                self.get_liquidations_with(BitmexTableParams {
+                self.send_get_liquidations(BitmexTableParams {
                     product_symbol: public_params.get("product_symbol"),
                     symbol: public_params.get("symbol"),
                     filter: public_params.get("filter"),

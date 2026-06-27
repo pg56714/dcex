@@ -20,12 +20,11 @@ impl BinanceClient {
             .await
     }
 
-    pub async fn get_spot_exchange_info(&self) -> Result<ValidatedResponse> {
-        self.get_spot_exchange_info_with(BinanceSymbolListParams::default())
-            .await
+    pub fn get_spot_exchange_info(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_spot_exchange_info", Vec::new())
     }
 
-    pub async fn get_spot_exchange_info_with(
+    pub(super) async fn send_get_spot_exchange_info(
         &self,
         request: BinanceSymbolListParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -55,12 +54,18 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_spot_orderbook(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_spot_orderbook_with(product_symbol, BinanceLimitParams::default())
-            .await
+    pub fn get_spot_orderbook(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_spot_orderbook",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_spot_orderbook_with(
+    pub(super) async fn send_get_spot_orderbook(
         &self,
         product_symbol: &str,
         request: BinanceLimitParams,
@@ -77,12 +82,18 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_spot_trades(&self, product_symbol: &str) -> Result<ValidatedResponse> {
-        self.get_spot_trades_with(product_symbol, BinanceLimitParams::default())
-            .await
+    pub fn get_spot_trades(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_spot_trades",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub async fn get_spot_trades_with(
+    pub(super) async fn send_get_spot_trades(
         &self,
         product_symbol: &str,
         request: BinanceLimitParams,
@@ -99,12 +110,11 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_spot_price(&self) -> Result<ValidatedResponse> {
-        self.get_spot_price_with(BinanceSymbolListParams::default())
-            .await
+    pub fn get_spot_price(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_spot_price", Vec::new())
     }
 
-    pub async fn get_spot_price_with(
+    pub(super) async fn send_get_spot_price(
         &self,
         request: BinanceSymbolListParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -134,16 +144,22 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_klines(
+    pub fn get_klines(
         &self,
         product_symbol: &str,
         interval: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_klines_with(product_symbol, interval, BinanceKlinesParams::default())
-            .await
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_klines",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("interval".to_string(), interval.to_string()),
+            ],
+        )
     }
 
-    pub async fn get_klines_with(
+    pub(super) async fn send_get_klines(
         &self,
         product_symbol: &str,
         interval: &str,
@@ -176,12 +192,11 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_ticker(&self) -> Result<ValidatedResponse> {
-        self.get_futures_ticker_with(BinanceOptionalSymbolParams::default())
-            .await
+    pub fn get_futures_ticker(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(self, "get_futures_ticker", Vec::new())
     }
 
-    pub async fn get_futures_ticker_with(
+    pub(super) async fn send_get_futures_ticker(
         &self,
         request: BinanceOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -199,12 +214,15 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_premium_index(&self) -> Result<ValidatedResponse> {
-        self.get_futures_premium_index_with(BinanceOptionalSymbolParams::default())
-            .await
+    pub fn get_futures_premium_index(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_premium_index",
+            Vec::new(),
+        )
     }
 
-    pub async fn get_futures_premium_index_with(
+    pub(super) async fn send_get_futures_premium_index(
         &self,
         request: BinanceOptionalSymbolParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -222,12 +240,15 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_funding_rate(&self) -> Result<ValidatedResponse> {
-        self.get_futures_funding_rate_with(BinanceFundingRateParams::default())
-            .await
+    pub fn get_futures_funding_rate(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_funding_rate",
+            Vec::new(),
+        )
     }
 
-    pub async fn get_futures_funding_rate_with(
+    pub(super) async fn send_get_futures_funding_rate(
         &self,
         request: BinanceFundingRateParams<'_>,
     ) -> Result<ValidatedResponse> {
@@ -256,20 +277,22 @@ impl BinanceClient {
             .await
     }
 
-    pub async fn get_futures_open_interest_history(
+    pub fn get_futures_open_interest_history(
         &self,
         product_symbol: &str,
         period: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_open_interest_history_with(
-            product_symbol,
-            period,
-            BinanceFuturesPeriodParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_open_interest_history",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("period".to_string(), period.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_open_interest_history_with(
+    pub(super) async fn send_get_futures_open_interest_history(
         &self,
         product_symbol: &str,
         period: &str,
@@ -284,20 +307,22 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_global_long_short_account_ratio(
+    pub fn get_futures_global_long_short_account_ratio(
         &self,
         product_symbol: &str,
         period: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_global_long_short_account_ratio_with(
-            product_symbol,
-            period,
-            BinanceFuturesPeriodParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_global_long_short_account_ratio",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("period".to_string(), period.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_global_long_short_account_ratio_with(
+    pub(super) async fn send_get_futures_global_long_short_account_ratio(
         &self,
         product_symbol: &str,
         period: &str,
@@ -312,20 +337,22 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_top_long_short_account_ratio(
+    pub fn get_futures_top_long_short_account_ratio(
         &self,
         product_symbol: &str,
         period: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_top_long_short_account_ratio_with(
-            product_symbol,
-            period,
-            BinanceFuturesPeriodParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_top_long_short_account_ratio",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("period".to_string(), period.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_top_long_short_account_ratio_with(
+    pub(super) async fn send_get_futures_top_long_short_account_ratio(
         &self,
         product_symbol: &str,
         period: &str,
@@ -340,20 +367,22 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_top_long_short_position_ratio(
+    pub fn get_futures_top_long_short_position_ratio(
         &self,
         product_symbol: &str,
         period: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_top_long_short_position_ratio_with(
-            product_symbol,
-            period,
-            BinanceFuturesPeriodParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_top_long_short_position_ratio",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("period".to_string(), period.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_top_long_short_position_ratio_with(
+    pub(super) async fn send_get_futures_top_long_short_position_ratio(
         &self,
         product_symbol: &str,
         period: &str,
@@ -368,20 +397,22 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_taker_buy_sell_volume(
+    pub fn get_futures_taker_buy_sell_volume(
         &self,
         product_symbol: &str,
         period: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_taker_buy_sell_volume_with(
-            product_symbol,
-            period,
-            BinanceFuturesPeriodParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_taker_buy_sell_volume",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("period".to_string(), period.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_taker_buy_sell_volume_with(
+    pub(super) async fn send_get_futures_taker_buy_sell_volume(
         &self,
         product_symbol: &str,
         period: &str,
@@ -396,22 +427,24 @@ impl BinanceClient {
         .await
     }
 
-    pub async fn get_futures_basis(
+    pub fn get_futures_basis(
         &self,
         product_symbol: &str,
         contract_type: &str,
         period: &str,
-    ) -> Result<ValidatedResponse> {
-        self.get_futures_basis_with(
-            product_symbol,
-            contract_type,
-            period,
-            BinanceFuturesBasisParams::default(),
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_basis",
+            vec![
+                ("product_symbol".to_string(), product_symbol.to_string()),
+                ("contractType".to_string(), contract_type.to_string()),
+                ("period".to_string(), period.to_string()),
+            ],
         )
-        .await
     }
 
-    pub async fn get_futures_basis_with(
+    pub(super) async fn send_get_futures_basis(
         &self,
         product_symbol: &str,
         contract_type: &str,
@@ -477,7 +510,7 @@ impl BinanceClient {
                     .await
             }
             "get_spot_exchange_info" => {
-                self.get_spot_exchange_info_with(BinanceSymbolListParams {
+                self.send_get_spot_exchange_info(BinanceSymbolListParams {
                     product_symbol: params.get("product_symbol"),
                     product_symbols: params.values("product_symbols"),
                     symbol_status: params.get("symbolStatus"),
@@ -485,7 +518,7 @@ impl BinanceClient {
                 .await
             }
             "get_spot_orderbook" => {
-                self.get_spot_orderbook_with(
+                self.send_get_spot_orderbook(
                     params.required("product_symbol")?,
                     BinanceLimitParams {
                         limit: params.u64("limit")?,
@@ -494,7 +527,7 @@ impl BinanceClient {
                 .await
             }
             "get_spot_trades" => {
-                self.get_spot_trades_with(
+                self.send_get_spot_trades(
                     params.required("product_symbol")?,
                     BinanceLimitParams {
                         limit: params.u64("limit")?,
@@ -503,7 +536,7 @@ impl BinanceClient {
                 .await
             }
             "get_spot_price" => {
-                self.get_spot_price_with(BinanceSymbolListParams {
+                self.send_get_spot_price(BinanceSymbolListParams {
                     product_symbol: params.get("product_symbol"),
                     product_symbols: params.values("product_symbols"),
                     symbol_status: params.get("symbolStatus"),
@@ -511,7 +544,7 @@ impl BinanceClient {
                 .await
             }
             "get_klines" => {
-                self.get_klines_with(
+                self.send_get_klines(
                     params.required("product_symbol")?,
                     params.required("interval")?,
                     BinanceKlinesParams {
@@ -523,19 +556,19 @@ impl BinanceClient {
             }
             "get_futures_exchange_info" => self.get_futures_exchange_info().await,
             "get_futures_ticker" => {
-                self.get_futures_ticker_with(BinanceOptionalSymbolParams {
+                self.send_get_futures_ticker(BinanceOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_premium_index" => {
-                self.get_futures_premium_index_with(BinanceOptionalSymbolParams {
+                self.send_get_futures_premium_index(BinanceOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),
                 })
                 .await
             }
             "get_futures_funding_rate" => {
-                self.get_futures_funding_rate_with(BinanceFundingRateParams {
+                self.send_get_futures_funding_rate(BinanceFundingRateParams {
                     product_symbol: params.get("product_symbol"),
                     start_time: params.u64("startTime")?,
                     end_time: params.u64("endTime")?,
@@ -548,7 +581,7 @@ impl BinanceClient {
                     .await
             }
             "get_futures_open_interest_history" => {
-                self.get_futures_open_interest_history_with(
+                self.send_get_futures_open_interest_history(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
                     BinanceFuturesPeriodParams {
@@ -560,7 +593,7 @@ impl BinanceClient {
                 .await
             }
             "get_futures_global_long_short_account_ratio" => {
-                self.get_futures_global_long_short_account_ratio_with(
+                self.send_get_futures_global_long_short_account_ratio(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
                     BinanceFuturesPeriodParams {
@@ -572,7 +605,7 @@ impl BinanceClient {
                 .await
             }
             "get_futures_top_long_short_account_ratio" => {
-                self.get_futures_top_long_short_account_ratio_with(
+                self.send_get_futures_top_long_short_account_ratio(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
                     BinanceFuturesPeriodParams {
@@ -584,7 +617,7 @@ impl BinanceClient {
                 .await
             }
             "get_futures_top_long_short_position_ratio" => {
-                self.get_futures_top_long_short_position_ratio_with(
+                self.send_get_futures_top_long_short_position_ratio(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
                     BinanceFuturesPeriodParams {
@@ -596,7 +629,7 @@ impl BinanceClient {
                 .await
             }
             "get_futures_taker_buy_sell_volume" => {
-                self.get_futures_taker_buy_sell_volume_with(
+                self.send_get_futures_taker_buy_sell_volume(
                     params.required("product_symbol")?,
                     params.get("period").unwrap_or("5m"),
                     BinanceFuturesPeriodParams {
@@ -608,7 +641,7 @@ impl BinanceClient {
                 .await
             }
             "get_futures_basis" => {
-                self.get_futures_basis_with(
+                self.send_get_futures_basis(
                     params.required("product_symbol")?,
                     params.get("contractType").unwrap_or("PERPETUAL"),
                     params.get("period").unwrap_or("5m"),

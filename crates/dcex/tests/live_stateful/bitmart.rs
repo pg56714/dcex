@@ -46,13 +46,16 @@ async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
     let price = price_below_market(bid, &details, 0.95)?;
     let size = minimum_order_quantity_with_step(&price, &details, Some(&details.min_size))?;
 
-    let order = match client
-        .place_spot_post_only_limit_buy_order_with(params(&[
+    let order = match super::common::exchange_method_request(
+        &client,
+        "place_spot_post_only_limit_buy_order",
+        params(&[
             ("product_symbol", DOGE_USDT_SPOT),
             ("size", size.as_str()),
             ("price", price.as_str()),
-        ]))
-        .await
+        ]),
+    )
+    .await
     {
         Ok(response) => response,
         Err(error)
@@ -66,12 +69,15 @@ async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["order_id", "orderId"])?;
 
-    let cancel = client
-        .cancel_spot_order_with(params(&[
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_spot_order",
+        params(&[
             ("product_symbol", DOGE_USDT_SPOT),
             ("order_id", order_id.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&cancel);
     Ok(())
 }
@@ -119,25 +125,31 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
         None => return Ok(()),
     };
 
-    let leverage = client
-        .submit_leverage_with(params(&[
+    let leverage = super::common::exchange_method_request(
+        &client,
+        "submit_leverage",
+        params(&[
             ("product_symbol", DOGE_USDT_SWAP),
             ("leverage", BITMART_CONTRACT_LEVERAGE),
             ("open_type", "cross"),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&leverage);
 
-    let order = match client
-        .place_contract_post_only_buy_order_with(params(&[
+    let order = match super::common::exchange_method_request(
+        &client,
+        "place_contract_post_only_buy_order",
+        params(&[
             ("product_symbol", DOGE_USDT_SWAP),
             ("price", price.as_str()),
             ("size", size.as_str()),
             ("leverage", BITMART_CONTRACT_LEVERAGE),
             ("open_type", "cross"),
             ("client_order_id", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await
+        ]),
+    )
+    .await
     {
         Ok(response) => response,
         Err(error)
@@ -151,37 +163,46 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["order_id", "orderId"])?;
 
-    let cancel = client
-        .cancel_contract_order_with(params(&[
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_contract_order",
+        params(&[
             ("product_symbol", DOGE_USDT_SWAP),
             ("order_id", order_id.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&cancel);
 
-    let opened = client
-        .place_contract_market_buy_order_with(params(&[
+    let opened = super::common::exchange_method_request(
+        &client,
+        "place_contract_market_buy_order",
+        params(&[
             ("product_symbol", DOGE_USDT_SWAP),
             ("size", size.as_str()),
             ("leverage", BITMART_CONTRACT_LEVERAGE),
             ("open_type", "cross"),
             ("client_order_id", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&opened);
     let opened_id = require_order_id(&opened.data, &["order_id", "orderId"])?;
     eprintln!("BitMart contract market open order_id={opened_id}");
     assert!(wait_for_positive_position(|| bitmart_contract_position_abs(&client)).await? > 0.0);
 
-    let closed = client
-        .place_contract_market_sell_order_with(params(&[
+    let closed = super::common::exchange_method_request(
+        &client,
+        "place_contract_market_sell_order",
+        params(&[
             ("product_symbol", DOGE_USDT_SWAP),
             ("size", size.as_str()),
             ("leverage", BITMART_CONTRACT_LEVERAGE),
             ("open_type", "cross"),
             ("client_order_id", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&closed);
     let closed_id = require_order_id(&closed.data, &["order_id", "orderId"])?;
     eprintln!("BitMart contract market close order_id={closed_id}");
@@ -195,19 +216,22 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 async fn bitmart_contract_open_orders(client: &BitmartClient) -> dcex::Result<bool> {
-    let response = client
-        .get_contract_open_order_with(params(&[
-            ("product_symbol", DOGE_USDT_SWAP),
-            ("limit", "20"),
-        ]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_contract_open_order",
+        params(&[("product_symbol", DOGE_USDT_SWAP), ("limit", "20")]),
+    )
+    .await?;
     Ok(contains_non_empty_array(&response.data, &["data"]))
 }
 
 async fn bitmart_contract_position_abs(client: &BitmartClient) -> dcex::Result<f64> {
-    let response = client
-        .get_contract_position_with(params(&[("product_symbol", DOGE_USDT_SWAP)]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_contract_position",
+        params(&[("product_symbol", DOGE_USDT_SWAP)]),
+    )
+    .await?;
     Ok(sum_abs_values_for_symbols(
         &response.data,
         &["symbol"],
@@ -233,12 +257,12 @@ async fn ensure_bitmart_contract_usdt(
         return Ok(None);
     }
     let amount = format_transfer_amount(needed);
-    let response = client
-        .transfer_contract_with(params(&[
-            ("amount", amount.as_str()),
-            ("type", "spot_to_contract"),
-        ]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "transfer_contract",
+        params(&[("amount", amount.as_str()), ("type", "spot_to_contract")]),
+    )
+    .await?;
     assert_success(&response);
     sleep(Duration::from_secs(2)).await;
     Ok(Some(needed))
@@ -253,12 +277,12 @@ async fn return_bitmart_contract_transfer(client: &BitmartClient, amount: f64) -
         return Ok(());
     }
     let amount = format_transfer_amount(amount);
-    let response = client
-        .transfer_contract_with(params(&[
-            ("amount", amount.as_str()),
-            ("type", "contract_to_spot"),
-        ]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "transfer_contract",
+        params(&[("amount", amount.as_str()), ("type", "contract_to_spot")]),
+    )
+    .await?;
     assert_success(&response);
     Ok(())
 }
@@ -268,24 +292,30 @@ async fn assert_bitmart_contract_records(
     opened_id: &str,
     closed_id: &str,
 ) -> dcex::Result<()> {
-    let opened_detail = client
-        .get_contract_order_detail_with(params(&[
-            ("product_symbol", DOGE_USDT_SWAP),
-            ("order_id", opened_id),
-        ]))
-        .await?;
+    let opened_detail = super::common::exchange_method_request(
+        &client,
+        "get_contract_order_detail",
+        params(&[("product_symbol", DOGE_USDT_SWAP), ("order_id", opened_id)]),
+    )
+    .await?;
     assert_success(&opened_detail);
 
-    let closed_detail = client
-        .get_contract_order_detail_with(params(&[
-            ("product_symbol", DOGE_USDT_SWAP),
-            ("order_id", closed_id),
-        ]))
-        .await?;
+    let closed_detail = super::common::exchange_method_request(
+        &client,
+        "get_contract_order_detail",
+        params(&[("product_symbol", DOGE_USDT_SWAP), ("order_id", closed_id)]),
+    )
+    .await?;
     assert_success(&closed_detail);
 
     let has_history = wait_for_non_empty_records(
-        || client.get_contract_order_history_with(params(&[("product_symbol", DOGE_USDT_SWAP)])),
+        || {
+            super::common::exchange_method_request(
+                &client,
+                "get_contract_order_history",
+                params(&[("product_symbol", DOGE_USDT_SWAP)]),
+            )
+        },
         &["data"],
     )
     .await?;
@@ -295,7 +325,13 @@ async fn assert_bitmart_contract_records(
     );
 
     let has_trades = wait_for_non_empty_records(
-        || client.get_contract_trade_with(params(&[("product_symbol", DOGE_USDT_SWAP)])),
+        || {
+            super::common::exchange_method_request(
+                &client,
+                "get_contract_trade",
+                params(&[("product_symbol", DOGE_USDT_SWAP)]),
+            )
+        },
         &["data"],
     )
     .await?;
@@ -304,20 +340,23 @@ async fn assert_bitmart_contract_records(
         "BitMart contract trade endpoint did not return fills"
     );
 
-    let transaction_history = client
-        .get_contract_transaction_history_with(params(&[
-            ("product_symbol", DOGE_USDT_SWAP),
-            ("page_size", "20"),
-        ]))
-        .await?;
+    let transaction_history = super::common::exchange_method_request(
+        &client,
+        "get_contract_transaction_history",
+        params(&[("product_symbol", DOGE_USDT_SWAP), ("page_size", "20")]),
+    )
+    .await?;
     assert_success(&transaction_history);
     Ok(())
 }
 
 async fn bitmart_spot_usdt(client: &BitmartClient) -> dcex::Result<f64> {
-    let response = client
-        .get_account_balance_with(params(&[("currency", "USDT")]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_account_balance",
+        params(&[("currency", "USDT")]),
+    )
+    .await?;
     Ok(asset_amount(
         &response.data,
         "USDT",

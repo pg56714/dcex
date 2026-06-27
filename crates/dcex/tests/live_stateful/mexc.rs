@@ -31,29 +31,38 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    let orderbook = client
-        .get_spot_orderbook_with(params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]))
-        .await?;
+    let orderbook = super::common::exchange_method_request(
+        &client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
+    )
+    .await?;
     let details = fetch_trading_details(Exchange::Mexc, "mexc", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
 
-    let order = client
-        .place_spot_post_only_limit_buy_order_with(params(&[
+    let order = super::common::exchange_method_request(
+        &client,
+        "place_spot_post_only_limit_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("quantity", quantity.as_str()),
             ("price", price.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
-    let cancel = client
-        .cancel_spot_order_with(params(&[
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_spot_order",
+        params(&[
             ("product_symbol", BTC_USDT_SPOT),
             ("orderId", order_id.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&cancel);
     Ok(())
 }
@@ -82,9 +91,12 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
         return Ok(());
     }
 
-    let ticker = client
-        .get_contract_ticker_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
-        .await?;
+    let ticker = super::common::exchange_method_request(
+        &client,
+        "get_contract_ticker",
+        params(&[("product_symbol", BTC_USDT_SWAP)]),
+    )
+    .await?;
     let bid = find_f64(&ticker.data, &["bid1", "bid", "bidPrice"]).ok_or_else(|| {
         dcex::DcexError::Decode(format!("MEXC contract ticker has no bid: {ticker:?}"))
     })?;
@@ -98,46 +110,58 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
         None => return Ok(()),
     };
 
-    let order = client
-        .place_contract_post_only_buy_order_with(params(&[
+    let order = super::common::exchange_method_request(
+        &client,
+        "place_contract_post_only_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("price", price.as_str()),
             ("vol", quantity.as_str()),
             ("leverage", MEXC_CONTRACT_LEVERAGE),
             ("openType", MEXC_CONTRACT_OPEN_TYPE),
             ("externalOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId", "order_id"])?;
 
-    let cancel = client
-        .cancel_contract_order_with(params(&[("orderId", order_id.as_str())]))
-        .await?;
+    let cancel = super::common::exchange_method_request(
+        &client,
+        "cancel_contract_order",
+        params(&[("orderId", order_id.as_str())]),
+    )
+    .await?;
     assert_success(&cancel);
 
-    let opened = client
-        .place_contract_market_buy_order_with(params(&[
+    let opened = super::common::exchange_method_request(
+        &client,
+        "place_contract_market_buy_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("vol", quantity.as_str()),
             ("leverage", MEXC_CONTRACT_LEVERAGE),
             ("openType", MEXC_CONTRACT_OPEN_TYPE),
             ("externalOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&opened);
     assert!(wait_for_positive_position(|| mexc_contract_position_abs(&client)).await? > 0.0);
 
-    let closed = client
-        .place_contract_market_order_with(params(&[
+    let closed = super::common::exchange_method_request(
+        &client,
+        "place_contract_market_order",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("side", "4"),
             ("vol", quantity.as_str()),
             ("leverage", MEXC_CONTRACT_LEVERAGE),
             ("openType", MEXC_CONTRACT_OPEN_TYPE),
             ("externalOid", unique_client_id("dcexrs").as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&closed);
     assert_eq!(
         wait_for_flat_position(|| mexc_contract_position_abs(&client)).await?,
@@ -148,20 +172,26 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
 }
 
 async fn mexc_contract_open_orders(client: &MexcClient) -> dcex::Result<bool> {
-    let response = client
-        .get_contract_open_orders_with(params(&[
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_contract_open_orders",
+        params(&[
             ("product_symbol", BTC_USDT_SWAP),
             ("page_num", "1"),
             ("page_size", "20"),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     Ok(contains_non_empty_array(&response.data, &["data"]))
 }
 
 async fn mexc_contract_position_abs(client: &MexcClient) -> dcex::Result<f64> {
-    let response = client
-        .get_contract_open_positions_with(params(&[("product_symbol", BTC_USDT_SWAP)]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_contract_open_positions",
+        params(&[("product_symbol", BTC_USDT_SWAP)]),
+    )
+    .await?;
     Ok(sum_abs_values_for_symbols(
         &response.data,
         &["symbol"],
@@ -215,14 +245,17 @@ async fn mexc_transfer(
     amount: f64,
 ) -> dcex::Result<()> {
     let amount = format_transfer_amount(amount);
-    let response = client
-        .user_universal_transfer_with(params(&[
+    let response = super::common::exchange_method_request(
+        &client,
+        "user_universal_transfer",
+        params(&[
             ("fromAccountType", from_account),
             ("toAccountType", to_account),
             ("asset", "USDT"),
             ("amount", amount.as_str()),
-        ]))
-        .await?;
+        ]),
+    )
+    .await?;
     assert_success(&response);
     Ok(())
 }
@@ -233,9 +266,12 @@ async fn mexc_spot_usdt(client: &MexcClient) -> dcex::Result<f64> {
 }
 
 async fn mexc_contract_usdt(client: &MexcClient) -> dcex::Result<f64> {
-    let response = client
-        .get_contract_asset_with(params(&[("currency", "USDT")]))
-        .await?;
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_contract_asset",
+        params(&[("currency", "USDT")]),
+    )
+    .await?;
     Ok(asset_amount(
         &response.data,
         "USDT",

@@ -23,7 +23,7 @@ impl BinanceClient {
                     .await
             }
             "get_income_history" => {
-                self.get_income_history_with(BinanceIncomeHistoryParams {
+                self.send_get_income_history(BinanceIncomeHistoryParams {
                     product_symbol: params.get("product_symbol"),
                     income_type: params.get("incomeType"),
                     start_time: params.u64("startTime")?,
@@ -35,20 +35,20 @@ impl BinanceClient {
             }
             "get_futures_account_info" => self.get_futures_account_info().await,
             "get_wallet_balance" => {
-                self.get_wallet_balance_with(BinanceWalletBalanceParams {
+                self.send_get_wallet_balance(BinanceWalletBalanceParams {
                     quote_asset: params.get("quoteAsset"),
                 })
                 .await
             }
             "get_funding_wallet" => {
-                self.get_funding_wallet_with(BinanceFundingWalletParams {
+                self.send_get_funding_wallet(BinanceFundingWalletParams {
                     asset: params.get("asset"),
                     need_btc_valuation: params.get("needBtcValuation"),
                 })
                 .await
             }
             "create_universal_transfer" => {
-                self.create_universal_transfer_with(
+                self.send_create_universal_transfer(
                     params.required("type")?,
                     params.required("asset")?,
                     params.required("amount")?,
@@ -60,7 +60,7 @@ impl BinanceClient {
                 .await
             }
             "get_universal_transfer_history" => {
-                self.get_universal_transfer_history_with(
+                self.send_get_universal_transfer_history(
                     params.required("type")?,
                     BinanceUniversalTransferHistoryParams {
                         start_time: params.u64("startTime")?,
@@ -90,7 +90,7 @@ impl BinanceClient {
                 .await
             }
             "place_order" => {
-                self.place_order_with(
+                self.send_place_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
                     params.required("type_")?,
@@ -99,7 +99,7 @@ impl BinanceClient {
                 .await
             }
             "test_order" => {
-                self.test_order_with(
+                self.send_test_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
                     params.required("type_")?,
@@ -108,7 +108,7 @@ impl BinanceClient {
                 .await
             }
             "place_futures_algo_order" => {
-                self.place_futures_algo_order_with(
+                self.send_place_futures_algo_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
                     params.required("type_")?,
@@ -118,21 +118,27 @@ impl BinanceClient {
                 .await
             }
             "cancel_futures_algo_order" => {
-                self.cancel_futures_algo_order(BinanceAlgoOrderLookupParams {
-                    algo_id: params.get("algoId"),
-                    client_algo_id: params.get("clientAlgoId"),
-                })
+                self.futures_algo_order_request(
+                    crate::http::HttpMethod::Delete,
+                    BinanceAlgoOrderLookupParams {
+                        algo_id: params.get("algoId"),
+                        client_algo_id: params.get("clientAlgoId"),
+                    },
+                )
                 .await
             }
             "get_futures_algo_order" => {
-                self.get_futures_algo_order(BinanceAlgoOrderLookupParams {
-                    algo_id: params.get("algoId"),
-                    client_algo_id: params.get("clientAlgoId"),
-                })
+                self.futures_algo_order_request(
+                    crate::http::HttpMethod::Get,
+                    BinanceAlgoOrderLookupParams {
+                        algo_id: params.get("algoId"),
+                        client_algo_id: params.get("clientAlgoId"),
+                    },
+                )
                 .await
             }
             "get_all_open_futures_algo_orders" => {
-                self.get_all_open_futures_algo_orders_with(BinanceOpenFuturesAlgoOrdersParams {
+                self.send_get_all_open_futures_algo_orders(BinanceOpenFuturesAlgoOrdersParams {
                     product_symbol: params.get("product_symbol"),
                     algo_type: params.get("algoType"),
                     algo_id: params.get("algoId"),
@@ -140,7 +146,7 @@ impl BinanceClient {
                 .await
             }
             "get_all_futures_algo_orders" => {
-                self.get_all_futures_algo_orders_with(
+                self.send_get_all_futures_algo_orders(
                     params.required("product_symbol")?,
                     BinanceAllFuturesAlgoOrdersParams {
                         algo_id: params.get("algoId"),
@@ -156,7 +162,7 @@ impl BinanceClient {
                     .await
             }
             "place_market_order" => {
-                self.place_market_order_with(
+                self.send_place_market_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
                     params.required("quantity")?,
@@ -169,7 +175,7 @@ impl BinanceClient {
                 .await
             }
             "place_market_buy_order" => {
-                self.place_market_buy_order_with(
+                self.send_place_market_buy_order(
                     params.required("product_symbol")?,
                     params.required("quantity")?,
                     BinanceMarketOrderParams {
@@ -181,7 +187,7 @@ impl BinanceClient {
                 .await
             }
             "place_market_sell_order" => {
-                self.place_market_sell_order_with(
+                self.send_place_market_sell_order(
                     params.required("product_symbol")?,
                     params.required("quantity")?,
                     BinanceMarketOrderParams {
@@ -193,7 +199,7 @@ impl BinanceClient {
                 .await
             }
             "place_limit_order" => {
-                self.place_limit_order_with(
+                self.send_place_limit_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
                     params.required("quantity")?,
@@ -207,7 +213,7 @@ impl BinanceClient {
                 .await
             }
             "place_limit_buy_order" => {
-                self.place_limit_buy_order_with(
+                self.send_place_limit_buy_order(
                     params.required("product_symbol")?,
                     params.required("quantity")?,
                     params.required("price")?,
@@ -220,7 +226,7 @@ impl BinanceClient {
                 .await
             }
             "place_limit_sell_order" => {
-                self.place_limit_sell_order_with(
+                self.send_place_limit_sell_order(
                     params.required("product_symbol")?,
                     params.required("quantity")?,
                     params.required("price")?,
@@ -233,7 +239,7 @@ impl BinanceClient {
                 .await
             }
             "place_post_only_limit_order" => {
-                self.place_post_only_limit_order_with(
+                self.send_place_post_only_limit_order(
                     params.required("product_symbol")?,
                     params.required("side")?,
                     params.required("quantity")?,
@@ -246,7 +252,7 @@ impl BinanceClient {
                 .await
             }
             "place_post_only_limit_buy_order" => {
-                self.place_post_only_limit_buy_order_with(
+                self.send_place_post_only_limit_buy_order(
                     params.required("product_symbol")?,
                     params.required("quantity")?,
                     params.required("price")?,
@@ -258,7 +264,7 @@ impl BinanceClient {
                 .await
             }
             "place_post_only_limit_sell_order" => {
-                self.place_post_only_limit_sell_order_with(
+                self.send_place_post_only_limit_sell_order(
                     params.required("product_symbol")?,
                     params.required("quantity")?,
                     params.required("price")?,
@@ -270,7 +276,8 @@ impl BinanceClient {
                 .await
             }
             "cancel_order" => {
-                self.cancel_order(
+                self.order_lookup_request(
+                    crate::http::HttpMethod::Delete,
                     params.required("product_symbol")?,
                     BinanceOrderLookupParams {
                         order_id: params.get("orderId"),
@@ -280,7 +287,8 @@ impl BinanceClient {
                 .await
             }
             "get_order" => {
-                self.get_order(
+                self.order_lookup_request(
+                    crate::http::HttpMethod::Get,
                     params.required("product_symbol")?,
                     BinanceOrderLookupParams {
                         order_id: params.get("orderId"),
@@ -290,7 +298,7 @@ impl BinanceClient {
                 .await
             }
             "get_open_orders" => {
-                self.get_open_orders_with(
+                self.send_get_open_orders(
                     params.required("product_symbol")?,
                     BinanceOrderLookupParams {
                         order_id: params.get("orderId"),
@@ -300,7 +308,7 @@ impl BinanceClient {
                 .await
             }
             "get_all_open_orders" => {
-                self.get_all_open_orders_with(BinanceAllOpenOrdersParams {
+                self.send_get_all_open_orders(BinanceAllOpenOrdersParams {
                     product_symbol: params.get("product_symbol"),
                     market_type: params.get("market_type"),
                 })
@@ -311,7 +319,7 @@ impl BinanceClient {
                     .await
             }
             "get_future_all_order" => {
-                self.get_future_all_order_with(
+                self.send_get_future_all_order(
                     params.required("product_symbol")?,
                     BinanceAllOrdersParams {
                         order_id: params.get("orderId"),
@@ -323,7 +331,7 @@ impl BinanceClient {
                 .await
             }
             "get_all_orders" => {
-                self.get_all_orders_with(
+                self.send_get_all_orders(
                     params.required("product_symbol")?,
                     BinanceAllOrdersParams {
                         order_id: params.get("orderId"),
@@ -335,7 +343,7 @@ impl BinanceClient {
                 .await
             }
             "get_account_trades" => {
-                self.get_account_trades_with(
+                self.send_get_account_trades(
                     params.required("product_symbol")?,
                     BinanceAccountTradesParams {
                         order_id: params.get("orderId"),
