@@ -14,7 +14,7 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "place_order" => self.place_order_from_params(&params).await,
+            "place_order" => self.place_order_from_params(params).await,
             "place_market_order" => {
                 let mut pairs = params.without(&["orderType"]);
                 pairs.push(("orderType".to_string(), "Market".to_string()));
@@ -78,15 +78,15 @@ impl BybitClient {
                 self.place_order_from_params(&BybitParams::from_pairs(pairs))
                     .await
             }
-            "amend_order" => self.amend_order_from_params(&params).await,
-            "cancel_order" => self.cancel_order_from_params(&params).await,
-            "get_open_orders" => self.get_open_orders_from_params(&params).await,
-            "cancel_batch_orders" => self.batch_request(CANCEL_BATCH_ORDERS, &params).await,
-            "cancel_all_orders" => self.cancel_all_orders_from_params(&params).await,
-            "get_order_history" => self.get_order_history_from_params(&params).await,
-            "get_execution_list" => self.get_execution_list_from_params(&params).await,
-            "place_batch_order" => self.batch_request(BATCH_PLACE_ORDER, &params).await,
-            "amend_batch_order" => self.batch_request(BATCH_AMEND_ORDER, &params).await,
+            "amend_order" => self.amend_order_from_params(params).await,
+            "cancel_order" => self.cancel_order_from_params(params).await,
+            "get_open_orders" => self.get_open_orders_from_params(params).await,
+            "cancel_batch_orders" => self.batch_request(CANCEL_BATCH_ORDERS, params).await,
+            "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
+            "get_order_history" => self.get_order_history_from_params(params).await,
+            "get_execution_list" => self.get_execution_list_from_params(params).await,
+            "place_batch_order" => self.batch_request(BATCH_PLACE_ORDER, params).await,
+            "amend_batch_order" => self.batch_request(BATCH_AMEND_ORDER, params).await,
             "get_borrow_quota" => {
                 let product_symbol = params.required("product_symbol")?;
                 let query = vec![

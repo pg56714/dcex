@@ -362,9 +362,7 @@ impl BitmartClient {
             body.insert("type".to_string(), Value::String(type_override.to_string()));
         }
         for key in CONTRACT_ORDER_STRING_KEYS {
-            if *key != "type" {
-                insert_optional_string(&mut body, key, params.get(key));
-            } else if type_override.is_none() {
+            if *key != "type" || type_override.is_none() {
                 insert_optional_string(&mut body, key, params.get(key));
             }
         }
@@ -464,11 +462,10 @@ impl BitmartClient {
         product_symbol: &str,
         position_type: i64,
     ) -> Result<i64> {
-        let mut query = Vec::new();
-        query.push((
+        let query = vec![(
             "symbol".to_string(),
             self.exchange_symbol(product_symbol, false)?,
-        ));
+        )];
         let response = self
             .get_private(BitmartMarket::Futures, FUTURES_POSITION, query)
             .await?;

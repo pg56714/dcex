@@ -77,6 +77,21 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
     }
 
     pub fn param(mut self, key: impl Into<String>, value: impl ToString) -> Self {
+        let key = key.into();
+        let value = value.to_string();
+        if let Some((_, existing_value)) = self
+            .params
+            .iter_mut()
+            .find(|(existing_key, _)| existing_key == &key)
+        {
+            *existing_value = value;
+        } else {
+            self.params.push((key, value));
+        }
+        self
+    }
+
+    pub fn push_param(mut self, key: impl Into<String>, value: impl ToString) -> Self {
         self.params.push((key.into(), value.to_string()));
         self
     }
@@ -1531,6 +1546,7 @@ macro_rules! impl_exchange_method_wrappers {
 
         impl $client {
             $(
+                #[allow(clippy::too_many_arguments)]
                 pub fn $public_method(
                     &self
                     $(, $public_param: impl ToString)*
@@ -1545,6 +1561,7 @@ macro_rules! impl_exchange_method_wrappers {
             )*
 
             $(
+                #[allow(clippy::too_many_arguments)]
                 pub fn $private_method(
                     &self
                     $(, $private_param: impl ToString)*
@@ -1562,6 +1579,60 @@ macro_rules! impl_exchange_method_wrappers {
 }
 
 pub(crate) use impl_exchange_method_wrappers;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct DummyClient;
+
+    impl ExchangeMethodRequestClient for DummyClient {
+        fn public_request_boxed<'a>(
+            &'a self,
+            _method_name: &'static str,
+            _params: Vec<(String, String)>,
+        ) -> ExchangeMethodFuture<'a> {
+            unreachable!("request dispatch is not used by these tests")
+        }
+
+        fn private_request_boxed<'a>(
+            &'a self,
+            _method_name: &'static str,
+            _params: Vec<(String, String)>,
+        ) -> ExchangeMethodFuture<'a> {
+            unreachable!("request dispatch is not used by these tests")
+        }
+    }
+
+    #[test]
+    fn param_replaces_existing_key() {
+        let client = DummyClient;
+        let request = ExchangeMethodRequest::public(&client, "example", Vec::new())
+            .param("limit", 10)
+            .param("limit", 20);
+
+        assert_eq!(
+            request.params,
+            vec![("limit".to_string(), "20".to_string())]
+        );
+    }
+
+    #[test]
+    fn push_param_preserves_repeated_keys() {
+        let client = DummyClient;
+        let request = ExchangeMethodRequest::public(&client, "example", Vec::new())
+            .param("product_symbols", "BTC-USDT-SPOT")
+            .push_param("product_symbols", "ETH-USDT-SPOT");
+
+        assert_eq!(
+            request.params,
+            vec![
+                ("product_symbols".to_string(), "BTC-USDT-SPOT".to_string()),
+                ("product_symbols".to_string(), "ETH-USDT-SPOT".to_string())
+            ]
+        );
+    }
+}
 
 pub mod aster;
 pub mod backpack;

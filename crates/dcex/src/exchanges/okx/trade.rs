@@ -15,7 +15,7 @@ impl OkxClient {
         params: &OkxParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "place_order" => self.place_order_from_params(&params).await,
+            "place_order" => self.place_order_from_params(params).await,
             "place_batch_orders" => {
                 self.post_request(TRADE_BATCH_ORDERS, params.json_required("orders")?)
                     .await
@@ -80,20 +80,20 @@ impl OkxClient {
                 self.place_order_from_params(&OkxParams::from_pairs(pairs))
                     .await
             }
-            "cancel_order" => self.cancel_order_from_params(&params).await,
+            "cancel_order" => self.cancel_order_from_params(params).await,
             "cancel_batch_orders" => {
                 self.post_request(TRADE_CANCEL_BATCH_ORDERS, params.json_required("orders")?)
                     .await
             }
-            "cancel_all_orders" => self.cancel_all_orders_from_params(&params).await,
-            "amend_order" => self.amend_order_from_params(&params).await,
+            "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
+            "amend_order" => self.amend_order_from_params(params).await,
             "amend_multiple_orders" => {
                 self.post_request(TRADE_AMEND_BATCH_ORDERS, params.json_required("orders")?)
                     .await
             }
             "close_positions" => {
                 let mut body = params.required_body(&["mgnMode"])?;
-                self.insert_required_inst_id(&mut body, &params)?;
+                self.insert_required_inst_id(&mut body, params)?;
                 insert_optional_string(&mut body, "posSide", params.get("posSide"));
                 insert_optional_bool(&mut body, "autoCxl", params.get("autoCxl"))?;
                 insert_optional_string(&mut body, "ccy", params.get("ccy"));
@@ -101,19 +101,19 @@ impl OkxClient {
                 self.post_request(TRADE_CLOSE_POSITION, Value::Object(body))
                     .await
             }
-            "get_order" => self.get_order_lookup(TRADE_ORDER, &params).await,
-            "get_order_list" => self.get_order_list_from_params(&params).await,
+            "get_order" => self.get_order_lookup(TRADE_ORDER, params).await,
+            "get_order_list" => self.get_order_list_from_params(params).await,
             "get_orders_history" => {
-                self.get_order_history_request(TRADE_ORDERS_HISTORY, &params, true)
+                self.get_order_history_request(TRADE_ORDERS_HISTORY, params, true)
                     .await
             }
             "get_orders_history_archive" => {
-                self.get_order_history_request(TRADE_ORDERS_HISTORY_ARCHIVE, &params, true)
+                self.get_order_history_request(TRADE_ORDERS_HISTORY_ARCHIVE, params, true)
                     .await
             }
-            "get_fills" => self.get_fills_request(TRADE_FILLS, &params, false).await,
+            "get_fills" => self.get_fills_request(TRADE_FILLS, params, false).await,
             "get_fills_history" => {
-                self.get_fills_request(TRADE_FILLS_HISTORY, &params, true)
+                self.get_fills_request(TRADE_FILLS_HISTORY, params, true)
                     .await
             }
             "get_account_rate_limit" => {
@@ -181,7 +181,7 @@ impl OkxClient {
                     .iter()
                     .filter_map(|order| order.as_object())
                     .filter(|order| {
-                        selected_inst_id.as_ref().map_or(true, |inst_id| {
+                        selected_inst_id.as_ref().is_none_or(|inst_id| {
                             order.get("instId").and_then(Value::as_str) == Some(inst_id.as_str())
                         })
                     })

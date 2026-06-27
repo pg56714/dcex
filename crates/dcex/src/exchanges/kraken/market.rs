@@ -73,7 +73,7 @@ impl KrakenClient {
         futures_prefix: &str,
     ) -> Result<String> {
         if let Some(symbol) = take_param(params, "symbol") {
-            return Ok(self.exchange_symbol(&symbol, futures_prefix)?);
+            return self.exchange_symbol(&symbol, futures_prefix);
         }
         if let Some(product_symbol) = take_param(params, "product_symbol") {
             return self.exchange_symbol(&product_symbol, futures_prefix);

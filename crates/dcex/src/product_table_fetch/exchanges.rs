@@ -91,7 +91,7 @@ pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>>
     let mut rows = Vec::new();
     for market in value_array(Some(&response.data)) {
         if market.get("visible").and_then(Value::as_bool) == Some(false)
-            || value_string(market, "orderBookState", "").to_ascii_lowercase() != "open"
+            || !value_string(market, "orderBookState", "").eq_ignore_ascii_case("open")
         {
             continue;
         }
@@ -775,7 +775,7 @@ pub(super) async fn fetch_lighter(timeout: Duration) -> Result<Vec<MarketInfo>> 
         ("spot_order_book_details", "spot"),
     ] {
         for market in response_array(&response, &[key]) {
-            if value_string(market, "status", "").to_ascii_lowercase() != "active" {
+            if !value_string(market, "status", "").eq_ignore_ascii_case("active") {
                 continue;
             }
             rows.push(lighter_market_info(market, product_type)?);

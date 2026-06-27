@@ -378,9 +378,9 @@ fn internal_linear_layer(state: &mut [u64; 12]) {
 
 fn poseidon_permute(state: &mut [u64; 12]) {
     external_linear_layer(state);
-    for round_index in 0..4 {
+    for constants in EXTERNAL_CONSTANTS.iter().take(4) {
         for index in 0..12 {
-            state[index] = add_mod(state[index], EXTERNAL_CONSTANTS[round_index][index]);
+            state[index] = add_mod(state[index], constants[index]);
             state[index] = pow_mod(state[index], 7);
         }
         external_linear_layer(state);
@@ -390,9 +390,9 @@ fn poseidon_permute(state: &mut [u64; 12]) {
         state[0] = pow_mod(state[0], 7);
         internal_linear_layer(state);
     }
-    for round_index in 4..8 {
+    for constants in EXTERNAL_CONSTANTS.iter().skip(4) {
         for index in 0..12 {
-            state[index] = add_mod(state[index], EXTERNAL_CONSTANTS[round_index][index]);
+            state[index] = add_mod(state[index], constants[index]);
             state[index] = pow_mod(state[index], 7);
         }
         external_linear_layer(state);

@@ -76,7 +76,7 @@ impl OkxClient {
                 .await
             }
             "get_deposit_withdraw_status" => {
-                validate_deposit_withdraw_status(&params)?;
+                validate_deposit_withdraw_status(params)?;
                 self.get_request(
                     ASSET_DEPOSIT_WITHDRAW_STATUS,
                     params.only(&["wdId", "txId", "ccy", "to", "chain"]),

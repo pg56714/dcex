@@ -114,10 +114,7 @@ pub(super) fn bool_value(value: &str) -> Option<bool> {
 
 pub(super) fn signature_payload_from_value(value: &Value) -> Vec<Vec<(String, String)>> {
     match value {
-        Value::Array(items) => items
-            .iter()
-            .map(|item| signature_pairs_from_value(item))
-            .collect(),
+        Value::Array(items) => items.iter().map(signature_pairs_from_value).collect(),
         Value::Object(_) => vec![signature_pairs_from_value(value)],
         _ => Vec::new(),
     }

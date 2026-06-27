@@ -211,6 +211,7 @@ impl BitmartClient {
             .await
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(super) fn build_request(
         &self,
         method: HttpMethod,

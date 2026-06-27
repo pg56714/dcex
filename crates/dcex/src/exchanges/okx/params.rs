@@ -84,7 +84,7 @@ impl OkxParams {
     }
 }
 
-pub(super) fn normalize_inst_id_query(params: &mut Vec<(String, String)>) {
+pub(super) fn normalize_inst_id_query(params: &mut [(String, String)]) {
     for (key, value) in params.iter_mut() {
         if key == "product_symbol" {
             *key = "instId".to_string();
@@ -102,7 +102,7 @@ pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
 pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> String {
     let mut parts = product_symbol.split('-');
     match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(kind)) if kind == "SPOT" => format!("{base}-{quote}"),
+        (Some(base), Some(quote), Some("SPOT")) => format!("{base}-{quote}"),
         (Some(base), Some(quote), Some(kind)) => format!("{base}-{quote}-{kind}"),
         _ => product_symbol.to_string(),
     }

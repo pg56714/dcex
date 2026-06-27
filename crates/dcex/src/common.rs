@@ -229,7 +229,7 @@ pub fn address_to_bytes(address: &str) -> Result<Vec<u8>> {
 }
 
 pub fn sanitize_url(url: &str) -> String {
-    let value = url.trim().split_whitespace().next().unwrap_or_default();
+    let value = url.split_whitespace().next().unwrap_or_default();
     if value.is_empty() {
         return String::new();
     }

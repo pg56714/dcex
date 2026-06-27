@@ -144,5 +144,5 @@ pub(super) fn python_list_string(value: &str) -> String {
             .join(",");
         return format!("[{values}]");
     }
-    value.replace('\'', "").replace(' ', "")
+    value.replace(['\'', ' '], "")
 }

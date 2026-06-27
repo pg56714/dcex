@@ -40,6 +40,7 @@ impl AsterPrivateWebSocket {
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn with_urls(
         user_address: Option<String>,
         signer_address: String,

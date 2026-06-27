@@ -13,7 +13,7 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
-            "get_positions" => self.get_positions_from_params(&params).await,
+            "get_positions" => self.get_positions_from_params(params).await,
             "set_leverage" => {
                 let product_symbol = params.required("product_symbol")?;
                 let mut body = Map::new();
@@ -44,7 +44,7 @@ impl BybitClient {
                 insert_optional_string(&mut body, "coin", params.get("coin"));
                 self.post_request(SWITCH_POSITION_MODE, body).await
             }
-            "get_closed_pnl" => self.get_closed_pnl_from_params(&params).await,
+            "get_closed_pnl" => self.get_closed_pnl_from_params(params).await,
             _ => return Ok(None),
         };
         Ok(Some(result?))
