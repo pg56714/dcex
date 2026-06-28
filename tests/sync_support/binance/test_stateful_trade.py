@@ -144,12 +144,24 @@ def _safe_buy_order_params(
         if futures
         else _spot_best_bid(client, product_symbol)
     )
-    price = _round_to_step(current_price - tick_size, tick_size, ROUND_DOWN)
+    price = _round_to_step(current_price * Decimal("0.95"), tick_size, ROUND_DOWN)
     required_notional = min_notional * Decimal("1.01")
     quantity = _round_to_step(required_notional / price, step_size, ROUND_UP)
     quantity = max(quantity, min_qty)
 
     return _format_decimal(quantity), _format_decimal(price)
+
+
+def _cancel_order_if_present(client: Client, product_symbol: str, order_id: int) -> None:
+    try:
+        client.cancel_order(product_symbol=product_symbol, orderId=order_id)
+    except FailedRequestError as exc:
+        message = str(exc)
+        if "-2011" in message or "Unknown order" in message:
+            if client.get_open_orders(product_symbol=product_symbol):
+                raise
+            return
+        raise
 
 
 def _safe_market_quantity(client: Client, product_symbol: str) -> str:
@@ -323,10 +335,7 @@ def test_spot_post_only_order_lifecycle(client):
                 assert isinstance(client.get_open_orders(product_symbol=SPOT_SYMBOL), list)
             finally:
                 if order is not None:
-                    client.cancel_order(
-                        product_symbol=SPOT_SYMBOL,
-                        orderId=int(order["orderId"]),
-                    )
+                    _cancel_order_if_present(client, SPOT_SYMBOL, int(order["orderId"]))
     finally:
         _return_transfer(client, transferred, reverse_type)
 
@@ -453,11 +462,16 @@ def test_futures_post_only_order_lifecycle(client):
 
     order = None
     try:
-        order = client.place_post_only_limit_buy_order(
-            product_symbol=FUTURES_SYMBOL,
-            quantity=quantity,
-            price=price,
-        )
+        try:
+            order = client.place_post_only_limit_buy_order(
+                product_symbol=FUTURES_SYMBOL,
+                quantity=quantity,
+                price=price,
+            )
+        except FailedRequestError as exc:
+            if "insufficient" in str(exc).lower() or "-2019" in str(exc):
+                pytest.skip(f"Insufficient Binance futures margin for post-only order: {exc}")
+            raise
         order_id = int(order["orderId"])
         assert (
             client.get_order(product_symbol=FUTURES_SYMBOL, orderId=order_id)["orderId"] == order_id
@@ -466,7 +480,7 @@ def test_futures_post_only_order_lifecycle(client):
         assert isinstance(client.get_all_open_orders(product_symbol=FUTURES_SYMBOL), list)
     finally:
         if order is not None:
-            client.cancel_order(product_symbol=FUTURES_SYMBOL, orderId=int(order["orderId"]))
+            _cancel_order_if_present(client, FUTURES_SYMBOL, int(order["orderId"]))
         _return_transfer(client, transferred, reverse_type)
 
     assert isinstance(client.get_all_orders(product_symbol=FUTURES_SYMBOL, limit=1), list)

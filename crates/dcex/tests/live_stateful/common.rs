@@ -82,10 +82,6 @@ pub(crate) fn require_env(names: &[&str]) -> Option<Vec<String>> {
     }
 }
 
-pub(crate) fn optional_env(name: &str) -> Option<String> {
-    env_value(name)
-}
-
 pub(crate) fn unique_client_id(prefix: &str) -> String {
     format!("{prefix}{}", now_ms())
 }
@@ -293,6 +289,21 @@ pub(crate) fn account_restriction(error: &DcexError, patterns: &[&str]) -> bool 
     patterns
         .iter()
         .any(|pattern| message.contains(&pattern.to_lowercase()))
+}
+
+pub(crate) fn insufficient_funds_error(error: &DcexError) -> bool {
+    account_restriction(
+        error,
+        &[
+            "insufficient",
+            "balance insufficient",
+            "insufficient funds",
+            "insufficient margin",
+            "margin",
+            "51008",
+            "2005",
+        ],
+    )
 }
 
 pub(crate) fn contains_non_empty_array(data: &Value, keys: &[&str]) -> bool {

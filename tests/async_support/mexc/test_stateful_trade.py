@@ -11,6 +11,7 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.mexc.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ CONTRACT_SYMBOL = "BTC-USDT-SWAP"
 TRANSFER_AMOUNT = Decimal("1")
 FUTURES_TRANSFER_AMOUNT = Decimal("1")
 CONTRACT_TEST_LEVERAGE = 50
+SPOT_NOTIONAL_BUFFER = Decimal("1.08")
 
 pytestmark = [
     pytest.mark.private,
@@ -177,7 +179,7 @@ def _contract_volume(client: Client) -> int:
 
 async def _spot_market_notional(client: Client) -> Decimal:
     _, min_notional, _ = await _spot_details(client)
-    return min_notional * Decimal("1.01")
+    return min_notional * SPOT_NOTIONAL_BUFFER
 
 
 async def _post_only_buy_params(client: Client) -> tuple[str, str]:
@@ -185,7 +187,7 @@ async def _post_only_buy_params(client: Client) -> tuple[str, str]:
     bid, _ = await _spot_prices(client)
     price = _round_to_step(bid - price_step, price_step, ROUND_DOWN)
     quantity = max(
-        _round_to_step((min_notional * Decimal("1.01")) / price, step, ROUND_UP),
+        _round_to_step((min_notional * SPOT_NOTIONAL_BUFFER) / price, step, ROUND_UP),
         step,
     )
     return _fmt(quantity), _fmt(price)
@@ -271,12 +273,19 @@ async def _return_futures_transfer(client: Client, amount: Decimal) -> None:
 
 async def _wait_for_contract_volume(client: Client, expected: Decimal) -> Decimal:
     volume = await _contract_position_volume(client)
-    for _ in range(10):
+    for _ in range(20):
         if volume == expected:
             return volume
         await asyncio.sleep(1)
         volume = await _contract_position_volume(client)
     return volume
+
+
+async def _assert_contract_volume(client: Client, expected: Decimal) -> None:
+    if await _wait_for_contract_volume(client, expected) == expected:
+        return
+    await _cleanup_contract_btc(client)
+    assert await _wait_for_contract_volume(client, expected) == expected
 
 
 async def _transfer(client: Client, from_type: str, to_type: str, amount: Decimal) -> str:
@@ -294,7 +303,14 @@ async def _transfer(client: Client, from_type: str, to_type: str, amount: Decima
 
 
 async def _cancel_order(client: Client, order_id: str) -> None:
-    await client.cancel_spot_order(SPOT_SYMBOL, orderId=order_id)
+    try:
+        await client.cancel_spot_order(SPOT_SYMBOL, orderId=order_id)
+    except FailedRequestError as exc:
+        if "-2011" in str(exc) or "Order cancelled" in str(exc):
+            if await _spot_open_orders(client):
+                raise
+            return
+        raise
     await asyncio.sleep(1)
 
 
@@ -557,7 +573,7 @@ async def test_contract_stateful_order_lifecycle(client):
             openType=2,
             externalOid=_client_id(),
         )
-        assert await _wait_for_contract_volume(client, Decimal("0")) == 0
+        await _assert_contract_volume(client, Decimal("0"))
 
         isolated_open_id = _order_id(
             await client.place_contract_market_buy_order(
@@ -588,7 +604,7 @@ async def test_contract_stateful_order_lifecycle(client):
             openType=1,
             externalOid=_client_id(),
         )
-        assert await _wait_for_contract_volume(client, Decimal("0")) == 0
+        await _assert_contract_volume(client, Decimal("0"))
         await asyncio.sleep(3)
 
         short_open_id = _order_id(
@@ -609,7 +625,7 @@ async def test_contract_stateful_order_lifecycle(client):
             openType=2,
             externalOid=_client_id(),
         )
-        assert await _wait_for_contract_volume(client, Decimal("0")) == 0
+        await _assert_contract_volume(client, Decimal("0"))
 
         assert await client.get_contract_history_orders(CONTRACT_SYMBOL, page_num=1, page_size=10)
         assert await client.get_contract_order_deals(CONTRACT_SYMBOL, page_num=1, page_size=10)

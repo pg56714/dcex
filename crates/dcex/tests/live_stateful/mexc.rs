@@ -5,9 +5,10 @@ use dcex::exchanges::mexc::MexcClient;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    format_transfer_amount, leveraged_margin_required, minimum_order_quantity, params,
-    post_only_buy_price, post_only_buy_price_from_bid, require_env, require_live_trading,
+    account_restriction, assert_success, asset_amount, contains_non_empty_array,
+    fetch_trading_details, find_f64, first_bid_price, format_transfer_amount,
+    insufficient_funds_error, leveraged_margin_required, minimum_order_quantity, params,
+    post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
     require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
@@ -38,7 +39,7 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
     )
     .await?;
     let details = fetch_trading_details(Exchange::Mexc, "mexc", BTC_USDT_SPOT).await?;
-    let price = post_only_buy_price(&orderbook.data, &details)?;
+    let price = price_below_market(first_bid_price(&orderbook.data)?, &details, 0.95)?;
     let quantity = minimum_order_quantity(&price, &details)?;
 
     let order = super::common::exchange_method_request(
@@ -54,7 +55,7 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_spot_order",
         params(&[
@@ -62,8 +63,19 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
             ("orderId", order_id.as_str()),
         ]),
     )
-    .await?;
-    assert_success(&cancel);
+    .await;
+    match cancel_result {
+        Ok(cancel) => assert_success(&cancel),
+        Err(error)
+            if account_restriction(&error, &["-2011", "order cancelled", "order canceled"]) =>
+        {
+            if mexc_spot_open_orders(&client).await? {
+                return Err(error);
+            }
+            eprintln!("MEXC spot post-only order was already canceled before cancel response");
+        }
+        Err(error) => return Err(error),
+    }
     Ok(())
 }
 
@@ -110,7 +122,7 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
         None => return Ok(()),
     };
 
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_contract_post_only_buy_order",
         params(&[
@@ -122,7 +134,19 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
             ("externalOid", unique_client_id("dcexrs").as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_mexc_contract_transfer(&client, transferred).await?;
+            eprintln!("skipping MEXC contract live stateful order; insufficient margin for post-only order: {error}");
+            return Ok(());
+        }
+        Err(error) => {
+            return_mexc_contract_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId", "order_id"])?;
 
@@ -134,7 +158,7 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     .await?;
     assert_success(&cancel);
 
-    let opened = super::common::exchange_method_request(
+    let open_result = super::common::exchange_method_request(
         &client,
         "place_contract_market_buy_order",
         params(&[
@@ -145,7 +169,19 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
             ("externalOid", unique_client_id("dcexrs").as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let opened = match open_result {
+        Ok(opened) => opened,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_mexc_contract_transfer(&client, transferred).await?;
+            eprintln!("skipping MEXC contract live stateful order; insufficient margin for market open: {error}");
+            return Ok(());
+        }
+        Err(error) => {
+            return_mexc_contract_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&opened);
     assert!(wait_for_positive_position(|| mexc_contract_position_abs(&client)).await? > 0.0);
 
@@ -180,6 +216,16 @@ async fn mexc_contract_open_orders(client: &MexcClient) -> dcex::Result<bool> {
             ("page_num", "1"),
             ("page_size", "20"),
         ]),
+    )
+    .await?;
+    Ok(contains_non_empty_array(&response.data, &["data"]))
+}
+
+async fn mexc_spot_open_orders(client: &MexcClient) -> dcex::Result<bool> {
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_spot_open_orders",
+        params(&[("product_symbol", BTC_USDT_SPOT)]),
     )
     .await?;
     Ok(contains_non_empty_array(&response.data, &["data"]))

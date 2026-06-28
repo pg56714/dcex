@@ -24,6 +24,7 @@ FUND_ACCOUNT = "fund"
 SPOT_ACCOUNT = "spot"
 SWAP_ACCOUNT = "USDTMPerp"
 LOGGER = logging.getLogger(__name__)
+SPOT_NOTIONAL_BUFFER = Decimal("1.15")
 
 pytestmark = [
     pytest.mark.asyncio,
@@ -226,6 +227,22 @@ async def _spot_open_orders(client: Client) -> list[dict]:
     return orders if isinstance(orders, list) else []
 
 
+async def _cancel_spot_order(client: Client, order_id: str) -> object:
+    for attempt in range(3):
+        try:
+            return await client.cancel_spot_order(
+                product_symbol=SPOT_SYMBOL,
+                orderId=order_id,
+            )
+        except FailedRequestError as exc:
+            if "same order can only be submitted once per second" not in str(exc).lower():
+                raise
+            if attempt == 2:
+                raise
+            await asyncio.sleep(1.2)
+    raise AssertionError("unreachable")
+
+
 async def _positions(client: Client) -> list[dict]:
     data = (await client.get_open_positions(product_symbol=SWAP_SYMBOL)).get("data", [])
     return data if isinstance(data, list) else []
@@ -249,17 +266,29 @@ def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
     )
 
 
+def _spot_min_size(client: Client) -> Decimal:
+    details = client.ptm.get_trading_details("bingx", SPOT_SYMBOL)
+    return max(_dec(details.get("min_size"), "0.000008"), Decimal("0.000008"))
+
+
 async def _spot_order_params(client: Client) -> tuple[str, str]:
     tick, step, min_notional = _spot_details(client)
     best_bid, _ = await _spot_orderbook_prices(client)
     price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
-    quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
+    quantity = _round_to_step(min_notional * SPOT_NOTIONAL_BUFFER / price, step, ROUND_UP)
+    quantity = max(quantity, _spot_min_size(client))
     return _fmt(quantity), _fmt(price)
 
 
 async def _spot_market_quote_amount(client: Client) -> Decimal:
-    _, _, min_notional = _spot_details(client)
-    return min_notional * Decimal("1.01")
+    _, step, min_notional = _spot_details(client)
+    _, best_ask = await _spot_orderbook_prices(client)
+    min_quantity = _round_to_step(
+        max(_spot_min_size(client), min_notional / best_ask) * SPOT_NOTIONAL_BUFFER,
+        step,
+        ROUND_UP,
+    )
+    return min_quantity * best_ask * SPOT_NOTIONAL_BUFFER
 
 
 async def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
@@ -267,6 +296,7 @@ async def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
     _, best_ask = await _spot_orderbook_prices(client)
     price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     quantity = _round_to_step((await _spot_market_quote_amount(client)) / price, step, ROUND_UP)
+    quantity = max(quantity, _spot_min_size(client))
     return _fmt(quantity), _fmt(price)
 
 
@@ -334,7 +364,7 @@ def _swap_details(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
 async def _swap_order_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _swap_details(client)
     best_bid, _ = await _swap_orderbook_prices(client)
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    price = _round_to_step(best_bid * Decimal("0.95"), tick, ROUND_DOWN)
     quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(quantity, min_size)), _fmt(price)
 
@@ -454,13 +484,11 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["orderId"]
         assert await client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
-        assert (
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
-        )
+        assert await _cancel_spot_order(client, order_id) is not None
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+            await _cancel_spot_order(client, order_id)
 
     order_id = None
     try:
@@ -478,7 +506,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         await asyncio.sleep(1)
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+            await _cancel_spot_order(client, order_id)
 
     order_id = None
     try:
@@ -490,13 +518,11 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             clientOrderId=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
-        assert (
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
-        )
+        assert await _cancel_spot_order(client, order_id) is not None
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+            await _cancel_spot_order(client, order_id)
 
     order_id = None
     try:
@@ -507,13 +533,11 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             clientOrderId=_client_order_id(),
         )
         order_id = order["data"]["orderId"]
-        assert (
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
-        )
+        assert await _cancel_spot_order(client, order_id) is not None
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+            await _cancel_spot_order(client, order_id)
 
     order_id = None
     try:
@@ -543,7 +567,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+            await _cancel_spot_order(client, order_id)
 
     quote_amount = await _spot_market_quote_amount(client)
     await _ensure_usdt_for_account(
@@ -628,7 +652,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         assert await client.get_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id) is not None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL, orderId=order_id)
+            await _cancel_spot_order(client, order_id)
         remaining = await _spot_trade_delta(client, before_btc, "BTC")
         sell_quantity = await _spot_sell_quantity(client, remaining)
         if Decimal(sell_quantity) > 0:

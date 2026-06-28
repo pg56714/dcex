@@ -18,6 +18,8 @@ GATEIO_API_SECRET = os.getenv("GATEIO_API_SECRET")
 SPOT_SYMBOL = "BTC-USDT-SPOT"
 FUTURES_SYMBOL = "BTC-USDT-SWAP"
 FUTURES_LEVERAGE = "2"
+SPOT_NOTIONAL_BUFFER = Decimal("1.05")
+MIN_FUTURES_AVAILABLE_USDT = Decimal("1")
 
 pytestmark = [
     pytest.mark.private,
@@ -90,7 +92,7 @@ def _futures_available_usdt(client: Client) -> Decimal:
     data = account.get("data", account) if isinstance(account, dict) else account
     if not isinstance(data, dict):
         return Decimal("0")
-    for key in ("available", "available_margin", "availableBalance", "available_balance"):
+    for key in ("available_margin", "available_balance", "availableBalance", "available"):
         if key in data:
             return _dec(data.get(key))
     return Decimal("0")
@@ -203,7 +205,7 @@ def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     best_bid, _ = _spot_orderbook_prices(client)
     price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
-    amount = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
+    amount = _round_to_step(min_notional * SPOT_NOTIONAL_BUFFER / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
 
@@ -211,7 +213,7 @@ def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
     price = _round_to_step(best_ask + tick, tick, ROUND_UP)
-    amount = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
+    amount = _round_to_step(min_notional * SPOT_NOTIONAL_BUFFER / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
 
@@ -231,11 +233,11 @@ def _spot_market_buy_amount(client: Client) -> Decimal:
     _, step, min_size, min_notional = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
     min_sell_amount = _round_to_step(
-        max(min_size, min_notional / best_ask) * Decimal("1.005"),
+        max(min_size, min_notional / best_ask) * SPOT_NOTIONAL_BUFFER,
         step,
         ROUND_UP,
     )
-    return (min_sell_amount + step) * best_ask * Decimal("1.01")
+    return (min_sell_amount + step) * best_ask * SPOT_NOTIONAL_BUFFER
 
 
 def _spot_sell_amount(client: Client, amount: Decimal) -> str:
@@ -293,7 +295,7 @@ def _contract_post_only_sell_price(client: Client) -> str:
 
 
 def _ensure_futures_usdt(client: Client) -> None:
-    if _futures_available_usdt(client) <= 0:
+    if _futures_available_usdt(client) < MIN_FUTURES_AVAILABLE_USDT:
         pytest.skip("Insufficient Gate futures USDT for stateful order test.")
 
 

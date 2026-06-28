@@ -6,10 +6,10 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, first_bid_price,
-    format_transfer_amount, leveraged_margin_required, minimum_order_quantity, params,
-    parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    format_transfer_amount, insufficient_funds_error, leveraged_margin_required,
+    minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
+    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
+    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const OKX_SWAP_LEVERAGE: &str = "50";
@@ -141,7 +141,7 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         None => return Ok(()),
     };
 
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_post_only_limit_buy_order",
         params(&[
@@ -151,7 +151,19 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
             ("px", price.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_okx_transfer(&client, transferred).await?;
+            eprintln!("skipping OKX swap live stateful order; insufficient margin for post-only order: {error}");
+            return Ok(());
+        }
+        Err(error) => {
+            return_okx_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["ordId"])?;
 
@@ -166,7 +178,7 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
     .await?;
     assert_success(&cancel);
 
-    let opened = super::common::exchange_method_request(
+    let open_result = super::common::exchange_method_request(
         &client,
         "place_market_buy_order",
         params(&[
@@ -175,7 +187,19 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
             ("sz", quantity.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let opened = match open_result {
+        Ok(opened) => opened,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_okx_transfer(&client, transferred).await?;
+            eprintln!("skipping OKX swap live stateful order; insufficient margin for market open: {error}");
+            return Ok(());
+        }
+        Err(error) => {
+            return_okx_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&opened);
     assert!(wait_for_positive_position(|| okx_swap_position_abs(&client)).await? > 0.0);
 

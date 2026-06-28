@@ -23,6 +23,7 @@ SPOT_BASE_CURRENCY = "DOGE"
 CONTRACT_SYMBOL = "DOGE-USDT-SWAP"
 CONTRACT_LEVERAGE = "50"
 CONTRACT_TRANSFER_USDT = Decimal("2")
+SPOT_NOTIONAL_BUFFER = Decimal("1.08")
 
 pytestmark = [
     pytest.mark.private,
@@ -175,13 +176,13 @@ def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = _spot_pair_details(client)
     best_bid, _ = _spot_best_prices(client)
     price = _round_to_step(best_bid - price_step, price_step, ROUND_DOWN)
-    size = _round_to_step((min_notional * Decimal("1.01")) / price, base_step, ROUND_UP)
+    size = _round_to_step((min_notional * SPOT_NOTIONAL_BUFFER) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
 def _spot_market_notional(client: Client) -> str:
     _, min_notional, _ = _spot_pair_details(client)
-    return _fmt(min_notional * Decimal("1.01"))
+    return _fmt(min_notional * SPOT_NOTIONAL_BUFFER)
 
 
 def _spot_sell_size(client: Client, size: Decimal) -> str:
@@ -199,7 +200,7 @@ def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = _spot_pair_details(client)
     _, best_ask = _spot_best_prices(client)
     price = _round_to_step(best_ask + price_step, price_step, ROUND_UP)
-    size = _round_to_step((min_notional * Decimal("1.01")) / price, base_step, ROUND_UP)
+    size = _round_to_step((min_notional * SPOT_NOTIONAL_BUFFER) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
@@ -287,7 +288,7 @@ def _cleanup_spot_base(client: Client, initial_spot_base: Decimal) -> None:
     if remaining <= 0:
         return
 
-    top_up_notional = min_notional * Decimal("1.01")
+    top_up_notional = min_notional * SPOT_NOTIONAL_BUFFER
     if _spot_available(client, "USDT") < top_up_notional:
         return
 

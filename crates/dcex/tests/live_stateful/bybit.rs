@@ -6,11 +6,11 @@ use serde_json::Value;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, first_bid_price,
-    format_transfer_amount_ceil, leveraged_margin_required, minimum_order_quantity, params,
-    parse_positive, post_only_buy_price, push, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_non_empty_records,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    account_restriction, assert_success, asset_amount, contains_non_empty_array,
+    fetch_trading_details, first_bid_price, format_transfer_amount_ceil, leveraged_margin_required,
+    minimum_order_quantity, params, parse_positive, post_only_buy_price, push, require_env,
+    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
+    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const BYBIT_SWAP_LEVERAGE: &str = "50";
@@ -155,7 +155,7 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_order",
         params(&[
@@ -163,8 +163,24 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
             ("orderId", order_id.as_str()),
         ]),
     )
-    .await?;
-    assert_success(&cancel);
+    .await;
+    match cancel_result {
+        Ok(cancel) => assert_success(&cancel),
+        Err(error)
+            if account_restriction(
+                &error,
+                &["110001", "order not exists", "too late to cancel"],
+            ) =>
+        {
+            if bybit_open_swap_orders(&client).await?
+                || bybit_swap_position_abs(&client).await? > 0.0
+            {
+                return Err(error);
+            }
+            eprintln!("Bybit swap post-only order was already absent before cancel");
+        }
+        Err(error) => return Err(error),
+    }
 
     let mut open_params = params(&[
         ("product_symbol", BTC_USDT_SWAP),

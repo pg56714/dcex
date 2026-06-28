@@ -8,7 +8,7 @@ use tokio::time::sleep;
 use super::common::{
     assert_success, contains_non_empty_array, fetch_trading_details, find_f64, first_bid_price,
     format_transfer_amount_ceil, leveraged_margin_required, minimum_order_quantity, params,
-    post_only_buy_price, require_env, require_live_trading, require_order_id,
+    parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
     sum_abs_values_for_symbols, wait_for_flat_position, wait_for_non_empty_records,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
 };
@@ -41,6 +41,15 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
     let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USDT_SPOT).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
+    let required_usdt =
+        parse_positive(&price, "price")? * parse_positive(&quantity, "quantity")? * 1.01;
+    let available_usdt = kraken_spot_balance(&client, "USDT").await?;
+    if available_usdt < required_usdt {
+        eprintln!(
+            "skipping Kraken spot live stateful order; insufficient USDT, required={required_usdt:.8}, available={available_usdt:.8}"
+        );
+        return Ok(());
+    }
 
     let order = super::common::exchange_method_request(
         &client,
@@ -167,6 +176,40 @@ async fn kraken_futures_direct_live_stateful_order() -> dcex::Result<()> {
     assert_kraken_futures_records(&client, &opened_id, &closed_id).await?;
     return_kraken_futures_margin(&client, transferred).await?;
     Ok(())
+}
+
+async fn kraken_spot_balance(client: &KrakenClient, asset: &str) -> dcex::Result<f64> {
+    let response = client.get_spot_account_balance().await?;
+    Ok(kraken_balance_amount(&response.data, asset))
+}
+
+fn kraken_balance_amount(data: &Value, asset: &str) -> f64 {
+    match data {
+        Value::Object(object) => object
+            .get(asset)
+            .and_then(kraken_value_as_f64)
+            .or_else(|| {
+                object
+                    .values()
+                    .map(|value| kraken_balance_amount(value, asset))
+                    .find(|value| *value > 0.0)
+            })
+            .unwrap_or(0.0),
+        Value::Array(values) => values
+            .iter()
+            .map(|value| kraken_balance_amount(value, asset))
+            .find(|value| *value > 0.0)
+            .unwrap_or(0.0),
+        _ => 0.0,
+    }
+}
+
+fn kraken_value_as_f64(value: &Value) -> Option<f64> {
+    match value {
+        Value::Number(value) => value.as_f64(),
+        Value::String(value) => value.parse().ok(),
+        _ => None,
+    }
 }
 
 async fn kraken_futures_open_orders(client: &KrakenClient) -> dcex::Result<bool> {

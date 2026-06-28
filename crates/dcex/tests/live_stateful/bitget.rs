@@ -6,10 +6,11 @@ use serde_json::Value;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, bitget_unified_account_error, contains_non_empty_array,
-    fetch_trading_details, first_bid_price, format_transfer_amount, leveraged_margin_required,
-    minimum_order_quantity, params, post_only_buy_price, push, require_env, require_live_trading,
-    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    account_restriction, assert_success, asset_amount, bitget_unified_account_error,
+    contains_non_empty_array, fetch_trading_details, first_bid_price, format_transfer_amount,
+    leveraged_margin_required, minimum_order_quantity, params, post_only_buy_price,
+    price_below_market, push, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
@@ -41,7 +42,7 @@ async fn bitget_direct_live_stateful_order() -> dcex::Result<()> {
     )
     .await?;
     let details = fetch_trading_details(Exchange::Bitget, "bitget", BTC_USDT_SPOT).await?;
-    let price = post_only_buy_price(&orderbook.data, &details)?;
+    let price = price_below_market(first_bid_price(&orderbook.data)?, &details, 0.95)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     let uta = is_uta(&client).await;
 
@@ -84,12 +85,26 @@ async fn bitget_direct_live_stateful_order() -> dcex::Result<()> {
     } else {
         push(&mut cancel_params, "product_symbol", BTC_USDT_SPOT);
     }
-    let cancel = if uta {
-        super::common::exchange_method_request(&client, "cancel_uta_order", cancel_params).await?
+    let cancel_result = if uta {
+        super::common::exchange_method_request(&client, "cancel_uta_order", cancel_params).await
     } else {
-        super::common::exchange_method_request(&client, "cancel_spot_order", cancel_params).await?
+        super::common::exchange_method_request(&client, "cancel_spot_order", cancel_params).await
     };
-    assert_success(&cancel);
+    match cancel_result {
+        Ok(cancel) => assert_success(&cancel),
+        Err(error)
+            if account_restriction(
+                &error,
+                &["order does not exist", "25204", "does not exist"],
+            ) =>
+        {
+            if bitget_open_spot_orders(&client, uta).await? {
+                return Err(error);
+            }
+            eprintln!("Bitget spot post-only order was already absent before cancel");
+        }
+        Err(error) => return Err(error),
+    }
     Ok(())
 }
 
@@ -203,6 +218,32 @@ async fn bitget_open_swap_orders(client: &BitgetClient, uta: bool) -> dcex::Resu
                 ("productType", BITGET_FUTURES_PRODUCT_TYPE),
                 ("limit", "20"),
             ]),
+        )
+        .await?
+    };
+    Ok(contains_non_empty_array(
+        &response.data,
+        &["orderList", "orders", "list", "data"],
+    ))
+}
+
+async fn bitget_open_spot_orders(client: &BitgetClient, uta: bool) -> dcex::Result<bool> {
+    let response = if uta {
+        super::common::exchange_method_request(
+            &client,
+            "get_uta_open_orders",
+            params(&[
+                ("category", "SPOT"),
+                ("product_symbol", BTC_USDT_SPOT),
+                ("limit", "20"),
+            ]),
+        )
+        .await?
+    } else {
+        super::common::exchange_method_request(
+            &client,
+            "get_spot_open_orders",
+            params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "20")]),
         )
         .await?
     };

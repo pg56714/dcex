@@ -22,6 +22,7 @@ FUND_ACCOUNT = "fund"
 SPOT_ACCOUNT = "spot"
 SWAP_ACCOUNT = "USDTMPerp"
 LOGGER = logging.getLogger(__name__)
+SPOT_NOTIONAL_BUFFER = Decimal("1.15")
 
 pytestmark = [
     pytest.mark.private,
@@ -169,7 +170,7 @@ def _swap_order_params(client: Client) -> tuple[str, str]:
     min_size = _dec(details["min_size"], "0.0001")
     min_notional = max(_dec(details["min_notional"], "2"), Decimal("2"))
     best_bid, _ = _swap_orderbook_prices(client)
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    price = _round_to_step(best_bid * Decimal("0.95"), tick, ROUND_DOWN)
     quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(quantity, min_size)), _fmt(price)
 
@@ -178,11 +179,11 @@ def _spot_order_params(client: Client) -> tuple[str, str]:
     details = client.ptm.get_trading_details("bingx", SPOT_SYMBOL)
     tick = _dec(details["price_precision"], "0.01")
     step = _dec(details["size_precision"], "0.000001")
-    min_size = _dec(details["min_size"], "0.000001")
+    min_size = max(_dec(details.get("min_size"), "0.000008"), Decimal("0.000008"))
     min_notional = max(_dec(details["min_notional"], "0.5"), Decimal("0.5"))
     best_bid, _ = _spot_orderbook_prices(client)
     price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
-    quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
+    quantity = _round_to_step(min_notional * SPOT_NOTIONAL_BUFFER / price, step, ROUND_UP)
     return _fmt(max(quantity, min_size)), _fmt(price)
 
 
@@ -195,16 +196,28 @@ def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
     )
 
 
+def _spot_min_size(client: Client) -> Decimal:
+    details = client.ptm.get_trading_details("bingx", SPOT_SYMBOL)
+    return max(_dec(details.get("min_size"), "0.000008"), Decimal("0.000008"))
+
+
 def _spot_market_quote_amount(client: Client) -> Decimal:
-    _, _, min_notional = _spot_details(client)
-    return min_notional * Decimal("1.01")
+    _, step, min_notional = _spot_details(client)
+    _, best_ask = _spot_orderbook_prices(client)
+    min_quantity = _round_to_step(
+        max(_spot_min_size(client), min_notional / best_ask) * SPOT_NOTIONAL_BUFFER,
+        step,
+        ROUND_UP,
+    )
+    return min_quantity * best_ask * SPOT_NOTIONAL_BUFFER
 
 
 def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
-    tick, step, min_notional = _spot_details(client)
+    tick, step, _ = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
     price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     quantity = _round_to_step(_spot_market_quote_amount(client) / price, step, ROUND_UP)
+    quantity = max(quantity, _spot_min_size(client))
     return _fmt(quantity), _fmt(price)
 
 
