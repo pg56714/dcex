@@ -24,6 +24,7 @@ impl PythonHttpClient {
     }
 
     #[pyo3(signature = (method, base_url, path, query=None, headers=None, body=None))]
+    #[allow(clippy::too_many_arguments)]
     fn request(
         &self,
         py: Python<'_>,
@@ -41,6 +42,7 @@ impl PythonHttpClient {
     }
 
     #[pyo3(signature = (method, base_url, path, query=None, headers=None, body=None))]
+    #[allow(clippy::too_many_arguments)]
     fn request_async<'py>(
         &self,
         py: Python<'py>,

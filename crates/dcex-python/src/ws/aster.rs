@@ -251,6 +251,7 @@ impl PythonAsterPrivateWebSocketClient {
         futures_http_base_url=None,
         ws_base_url=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         signer_address: String,
         private_key: String,

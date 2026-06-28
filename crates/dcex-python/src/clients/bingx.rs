@@ -43,6 +43,7 @@ impl PythonBingxHttpClient {
         headers=None,
         json_body=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw(
         &self,
         py: Python<'_>,
@@ -78,6 +79,7 @@ impl PythonBingxHttpClient {
         headers=None,
         json_body=None
     ))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw_async<'py>(
         &self,
         py: Python<'py>,

@@ -45,6 +45,7 @@ impl PythonMexcHttpClient {
     }
 
     #[pyo3(signature = (method, api, path, params=None, body=None, signed=true))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw(
         &self,
         py: Python<'_>,
@@ -72,6 +73,7 @@ impl PythonMexcHttpClient {
     }
 
     #[pyo3(signature = (method, api, path, params=None, body=None, signed=true))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw_async<'py>(
         &self,
         py: Python<'py>,
