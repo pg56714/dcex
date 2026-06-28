@@ -36,6 +36,6 @@ fn signature_matches_python_vector() {
 fn normalizes_side_and_contract_size() {
     assert_eq!(normalize_side("BUY").expect("buy"), "buy");
     assert_eq!(normalize_side("sell").expect("sell"), "sell");
-    assert_eq!(signed_size("-3", true).expect("positive"), "3");
-    assert_eq!(signed_size("3", false).expect("negative"), "-3");
+    assert_eq!(signed_size("-3", true).expect("positive"), 3);
+    assert_eq!(signed_size("3", false).expect("negative"), -3);
 }

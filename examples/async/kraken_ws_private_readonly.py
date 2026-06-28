@@ -12,7 +12,7 @@ async def main() -> None:
     api_secret = os.environ["KRAKEN_API_SECRET"]
 
     async with kraken.private(api_key=api_key, api_secret=api_secret) as ws:
-        print({"token": ws.token()})
+        print({"token_available": bool(ws.token())})
         await ws.subscribe_balances()
         print(await ws.recv())
 

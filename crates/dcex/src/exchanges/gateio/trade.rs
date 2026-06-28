@@ -367,10 +367,7 @@ impl GateioClient {
             body.insert(
                 "size".to_string(),
                 serde_json::Value::Number(
-                    signed_size(params.required("size")?, positive_size)?
-                        .parse::<i64>()
-                        .unwrap()
-                        .into(),
+                    signed_size(params.required("size")?, positive_size)?.into(),
                 ),
             );
         }

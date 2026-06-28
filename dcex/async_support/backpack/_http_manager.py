@@ -257,7 +257,7 @@ class HTTPManager(BaseHTTPManager):
         self._store_response_headers(response)
         try:
             data: dict[str, Any] | list[Any] | str = response.json()
-        except Exception:
+        except ValueError:
             data = response.text
 
         if response.status_code // 100 != 2:

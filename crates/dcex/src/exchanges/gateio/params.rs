@@ -160,12 +160,11 @@ pub(super) fn normalize_side(value: &str) -> Result<String> {
     Ok(OrderSide::parse(value)?.to_exchange("gateio")?.to_string())
 }
 
-pub(super) fn signed_size(value: &str, positive: bool) -> Result<String> {
+pub(super) fn signed_size(value: &str, positive: bool) -> Result<i64> {
     let size = value.parse::<i64>().map_err(|error| {
         DcexError::InvalidInput(format!("invalid Gate.io contract size {value:?}: {error}"))
     })?;
-    let size = if positive { size.abs() } else { -size.abs() };
-    Ok(size.to_string())
+    Ok(if positive { size.abs() } else { -size.abs() })
 }
 
 pub(super) fn json_value_string(value: &Value) -> String {

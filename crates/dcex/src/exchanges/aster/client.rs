@@ -196,10 +196,11 @@ impl AsterClient {
                     "Signed Aster requests require signer_address and private_key.".to_string(),
                 )
             })?;
-            params.push((
-                "nonce".to_string(),
-                nonce.unwrap_or_else(|| self.next_nonce()).to_string(),
-            ));
+            let nonce = match nonce {
+                Some(nonce) => nonce,
+                None => self.next_nonce()?,
+            };
+            params.push(("nonce".to_string(), nonce.to_string()));
             if market == AsterMarket::Futures {
                 let user_address = self.user_address.as_deref().ok_or_else(|| {
                     DcexError::InvalidInput(
@@ -240,19 +241,20 @@ impl AsterClient {
         Ok(request)
     }
 
-    fn next_nonce(&self) -> u64 {
+    fn next_nonce(&self) -> Result<u64> {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .expect("system time after epoch")
+            .map_err(|error| DcexError::Runtime(error.to_string()))?
             .as_nanos()
             / 1_000;
         let now = u64::try_from(now).unwrap_or(u64::MAX);
-        self.last_nonce
+        Ok(self
+            .last_nonce
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |previous| {
                 Some(now.max(previous.saturating_add(1)))
             })
             .map(|previous| now.max(previous.saturating_add(1)))
-            .unwrap_or(now)
+            .unwrap_or(now))
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
