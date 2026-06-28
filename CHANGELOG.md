@@ -1,3 +1,14 @@
+## 0.25.0 (2026-06-28)
+
+### Feat
+
+- replace optional params with builders
+- align rust endpoint ergonomics with python
+
+### Fix
+
+- remove unsupported kucoin key version usage
+
 ## 0.24.2 (2026-06-22)
 
 ### Fix

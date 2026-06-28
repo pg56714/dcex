@@ -1,3 +1,14 @@
+## 0.4.0 (2026-06-28)
+
+### Feat
+
+- replace optional params with builders
+- align rust endpoint ergonomics with python
+
+### Fix
+
+- refine builder params and lint checks
+
 ## 0.3.2 (2026-06-22)
 
 ### Fix

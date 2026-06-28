@@ -136,7 +136,7 @@ wheels = [
 
 [[package]]
 name = "dcex"
-version = "0.24.2"
+version = "0.25.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
