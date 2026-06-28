@@ -659,6 +659,7 @@ fn rust_direct_clients_expose_python_method_names() {
         place_spot_post_only_limit_sell_order,
         update_delivery_positions_leverage,
         update_futures_positions_leverage,
+        wallet_transfer,
     );
 
     assert_methods!(

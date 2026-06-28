@@ -437,6 +437,10 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("currency", value)
     }
 
+    pub fn currency_pair(self, value: impl ToString) -> Self {
+        self.param("currency_pair", value)
+    }
+
     pub fn current(self, value: impl ToString) -> Self {
         self.param("current", value)
     }
@@ -1101,6 +1105,10 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
         self.param("settleCoin", value)
     }
 
+    pub fn settle(self, value: impl ToString) -> Self {
+        self.param("settle", value)
+    }
+
     pub fn short_leverage(self, value: impl ToString) -> Self {
         self.param("shortLeverage", value)
     }
@@ -1629,6 +1637,22 @@ mod tests {
             vec![
                 ("product_symbols".to_string(), "BTC-USDT-SPOT".to_string()),
                 ("product_symbols".to_string(), "ETH-USDT-SPOT".to_string())
+            ]
+        );
+    }
+
+    #[test]
+    fn gateio_optional_setters_use_native_parameter_names() {
+        let client = DummyClient;
+        let request = ExchangeMethodRequest::private(&client, "wallet_transfer", Vec::new())
+            .currency_pair("BTC_USDT")
+            .settle("usdt");
+
+        assert_eq!(
+            request.params,
+            vec![
+                ("currency_pair".to_string(), "BTC_USDT".to_string()),
+                ("settle".to_string(), "usdt".to_string())
             ]
         );
     }
