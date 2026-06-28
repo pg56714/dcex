@@ -105,10 +105,27 @@ def _spot_best_bid(client: Client, product_symbol: str) -> Decimal:
     return Decimal(str(bids[0][0]))
 
 
+def _spot_best_ask(client: Client, product_symbol: str) -> Decimal:
+    book = client.get_spot_orderbook(product_symbol=product_symbol, limit=5)
+    asks = book.get("asks", []) if isinstance(book, dict) else []
+    if not asks:
+        pytest.skip(f"{product_symbol} spot orderbook did not return asks.")
+    return Decimal(str(asks[0][0]))
+
+
 def _safe_spot_market_quote(client: Client, product_symbol: str) -> Decimal:
     filters = _filters(_symbol_exchange_info(client, product_symbol, futures=False))
+    lot_filter = filters["LOT_SIZE"]
+    step_size = Decimal(lot_filter["stepSize"])
+    min_qty = Decimal(lot_filter["minQty"])
     min_notional = _minimum_notional(filters, Decimal("10"))
-    return min_notional * Decimal("1.01")
+    best_ask = _spot_best_ask(client, product_symbol)
+    min_sell_qty = _round_to_step(
+        max(min_qty, min_notional / best_ask) * Decimal("1.005"),
+        step_size,
+        ROUND_UP,
+    )
+    return (min_sell_qty + step_size) * best_ask * Decimal("1.01")
 
 
 def _safe_buy_order_params(
@@ -572,7 +589,7 @@ def test_advanced_order_validation(client):
     futures_price = Decimal(client.get_futures_ticker(product_symbol=FUTURES_SYMBOL)["askPrice"])
     futures_tick = _tick_size(client, FUTURES_SYMBOL, futures=True)
     trigger_price = _format_decimal(
-        _round_to_step(futures_price + futures_tick, futures_tick, ROUND_UP)
+        _round_to_step(futures_price * Decimal("1.05"), futures_tick, ROUND_UP)
     )
 
     if client.get_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL):

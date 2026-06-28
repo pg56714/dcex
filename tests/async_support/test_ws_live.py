@@ -77,6 +77,10 @@ def _require_env(names: tuple[str, ...]) -> None:
         pytest.skip(f"Set {', '.join(missing)} before running this private live WS test.")
 
 
+def _env_int(name: str) -> int:
+    return int(os.environ[name].strip().lstrip("#"))
+
+
 def _assert_payload(payload: Payload) -> None:
     if isinstance(payload, dict):
         assert payload
@@ -310,8 +314,8 @@ PRIVATE_WS_SPECS = (
         name="lighter",
         env=("LIGHTER_ACCOUNT_INDEX", "LIGHTER_API_KEY_INDEX", "LIGHTER_API_PRIVATE_KEY"),
         factory=lambda: lighter.private(
-            account_index=int(os.environ["LIGHTER_ACCOUNT_INDEX"]),
-            api_key_index=int(os.environ["LIGHTER_API_KEY_INDEX"]),
+            account_index=_env_int("LIGHTER_ACCOUNT_INDEX"),
+            api_key_index=_env_int("LIGHTER_API_KEY_INDEX"),
             api_private_key=os.environ["LIGHTER_API_PRIVATE_KEY"],
             timeout=LIVE_WS_TIMEOUT,
         ),

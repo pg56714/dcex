@@ -274,6 +274,13 @@ def _swap_fillable_limit_sell_price(client: Client) -> float:
     return float(_fmt(price))
 
 
+def _swap_post_only_sell_price(client: Client) -> str:
+    tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
+    _, best_ask = _swap_orderbook_prices(client)
+    price = max(best_ask + tick, best_ask * Decimal("1.001"))
+    return _fmt(_round_to_step(price, tick, ROUND_UP))
+
+
 def _position_id(client: Client, side: str) -> str | None:
     for position in _positions(client):
         if position.get("positionSide") == side and _dec(
@@ -621,9 +628,7 @@ def test_swap_post_only_sell_order_lifecycle(client):
     _skip_if_swap_state(client)
     quantity, _ = _swap_order_params(client)
     _ensure_swap_usdt_for_quantity(client, quantity)
-    tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
-    _, best_ask = _swap_orderbook_prices(client)
-    price = _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
+    price = _swap_post_only_sell_price(client)
     order_id = None
     try:
         order = client.place_swap_post_only_sell_order(

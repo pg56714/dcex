@@ -130,7 +130,7 @@ def _spot_limit_buy_params(client: Client) -> tuple[str, str, str]:
     product_symbol, quote, _, _, _ = _spot_symbol_with_funds(client)
     tick, step, min_size, min_notional = _spot_details(client, product_symbol)
     bid, _ = _spot_prices(client, product_symbol)
-    price = _round_to_step(bid - tick, tick, ROUND_DOWN)
+    price = _round_to_step(min(bid - tick, bid * Decimal("0.999")), tick, ROUND_DOWN)
     volume = max(
         _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP),
         min_size,
@@ -153,7 +153,11 @@ def _spot_txid(response) -> str:
 
 
 def _cancel_spot(client: Client, txid: str) -> None:
-    _assert_spot_ok(client.cancel_spot_order(txid=txid))
+    try:
+        _assert_spot_ok(client.cancel_spot_order(txid=txid))
+    except FailedRequestError as exc:
+        if "Unknown order" not in str(exc):
+            raise
     time.sleep(0.5)
 
 

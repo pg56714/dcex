@@ -20,11 +20,15 @@ L1_ADDRESS_RE = re.compile(r"^0x[a-fA-F0-9]{40}$")
 pytestmark = pytest.mark.private
 
 
+def _env_int(value: str | None) -> int:
+    return int(str(value or "0").strip().lstrip("#"))
+
+
 @pytest.fixture
 def client():
     client_instance = Client(
-        account_index=int(ACCOUNT_INDEX or 0),
-        api_key_index=int(API_KEY_INDEX or 0),
+        account_index=_env_int(ACCOUNT_INDEX),
+        api_key_index=_env_int(API_KEY_INDEX),
         api_private_key=API_PRIVATE_KEY,
         preload_product_table=False,
     )
@@ -81,14 +85,14 @@ def test_auth_token_and_key_check(client):
 
 
 def test_private_account_reads(client):
-    account_index = int(ACCOUNT_INDEX or 0)
+    account_index = _env_int(ACCOUNT_INDEX)
     now = int(time.time())
 
     _assert_response(client.get_account(by="index", value=str(account_index)))
     _assert_response(client.get_account_metadata(by="index", value=str(account_index)))
     _assert_response(client.get_account_limits())
     _assert_response(
-        client.get_api_keys(account_index=account_index, api_key_index=int(API_KEY_INDEX or 0))
+        client.get_api_keys(account_index=account_index, api_key_index=_env_int(API_KEY_INDEX))
     )
     _assert_response(client.get_account_active_orders())
     _assert_response(client.get_account_inactive_orders(limit=5))
@@ -111,7 +115,7 @@ def test_private_account_reads(client):
 
 
 def test_private_bridge_and_history_reads(client):
-    account_index = int(ACCOUNT_INDEX or 0)
+    account_index = _env_int(ACCOUNT_INDEX)
     l1_address = _l1_address(client, account_index)
 
     _assert_response(client.get_accounts_by_l1_address(l1_address=l1_address))
@@ -140,7 +144,7 @@ def test_private_export_read(client):
 
 
 def test_private_referral_lease_reads(client):
-    account_index = int(ACCOUNT_INDEX or 0)
+    account_index = _env_int(ACCOUNT_INDEX)
     l1_address = _l1_address(client, account_index)
 
     _assert_response(client.get_liquidations(limit=5))

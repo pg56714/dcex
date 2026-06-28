@@ -21,11 +21,15 @@ L1_ADDRESS_RE = re.compile(r"^0x[a-fA-F0-9]{40}$")
 pytestmark = pytest.mark.private
 
 
+def _env_int(value: str | None) -> int:
+    return int(str(value or "0").strip().lstrip("#"))
+
+
 @pytest_asyncio.fixture
 async def client():
     async with Client(
-        account_index=int(ACCOUNT_INDEX or 0),
-        api_key_index=int(API_KEY_INDEX or 0),
+        account_index=_env_int(ACCOUNT_INDEX),
+        api_key_index=_env_int(API_KEY_INDEX),
         api_private_key=API_PRIVATE_KEY,
         preload_product_table=False,
     ) as client_instance:
@@ -81,7 +85,7 @@ async def test_auth_token_and_key_check(client):
 
 @pytest.mark.asyncio
 async def test_private_account_reads(client):
-    account_index = int(ACCOUNT_INDEX or 0)
+    account_index = _env_int(ACCOUNT_INDEX)
     now = int(time.time())
 
     _assert_response(await client.get_account(by="index", value=str(account_index)))
@@ -90,7 +94,7 @@ async def test_private_account_reads(client):
     _assert_response(
         await client.get_api_keys(
             account_index=account_index,
-            api_key_index=int(API_KEY_INDEX or 0),
+            api_key_index=_env_int(API_KEY_INDEX),
         )
     )
     _assert_response(await client.get_account_active_orders())
@@ -117,7 +121,7 @@ async def test_private_account_reads(client):
 
 @pytest.mark.asyncio
 async def test_private_bridge_and_history_reads(client):
-    account_index = int(ACCOUNT_INDEX or 0)
+    account_index = _env_int(ACCOUNT_INDEX)
     l1_address = await _l1_address(client, account_index)
 
     _assert_response(await client.get_accounts_by_l1_address(l1_address=l1_address))
@@ -148,7 +152,7 @@ async def test_private_export_read(client):
 
 @pytest.mark.asyncio
 async def test_private_referral_lease_reads(client):
-    account_index = int(ACCOUNT_INDEX or 0)
+    account_index = _env_int(ACCOUNT_INDEX)
     l1_address = await _l1_address(client, account_index)
 
     _assert_response(await client.get_liquidations(limit=5))

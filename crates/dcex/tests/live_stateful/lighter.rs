@@ -108,7 +108,9 @@ fn post_only_buy_order_amounts(market: &Value) -> dcex::Result<(i64, i64)> {
     let min_quote = value_f64_required(market, "min_quote_amount")?;
     let price_step = 1.0 / 10_f64.powi(price_decimals as i32);
     let price = scale_amount(
-        (last_price - price_step).max(price_step),
+        (last_price - price_step)
+            .min(last_price * 0.999)
+            .max(price_step),
         price_decimals,
         false,
     )?;
@@ -125,7 +127,7 @@ async fn active_order_index(
     market_id: &str,
     client_order_index: i64,
 ) -> dcex::Result<String> {
-    for _ in 0..10 {
+    for _ in 0..30 {
         let active = super::common::exchange_method_request(
             &client,
             "get_account_active_orders",

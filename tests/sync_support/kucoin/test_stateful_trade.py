@@ -9,6 +9,7 @@ import pytest
 from dotenv import load_dotenv
 
 from dcex.kucoin.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -111,7 +112,7 @@ def _spot_order_params(client: Client) -> tuple[str, str]:
     min_size = _dec(details["min_size"], "0.00001")
     min_notional = max(_dec(details["min_notional"], "1"), Decimal("1"))
     best_bid = _dec(client.get_spot_orderbook(product_symbol=SPOT_SYMBOL)["data"]["bids"][0][0])
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
 
@@ -139,11 +140,10 @@ def _futures_order_params(client: Client) -> tuple[int, str, Decimal, Decimal]:
     tick = _dec(contract["tickSize"], "0.1")
     lot = _dec(contract["lotSize"], "1")
     multiplier = _dec(contract["multiplier"], "0.001")
-    current_price = _dec(client.get_futures_ticker(product_symbol=FUTURES_SYMBOL)["data"]["price"])
-    best_bid = _dec(
-        client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5)["data"]["bids"][0][0]
-    )
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    ticker = client.get_futures_ticker(product_symbol=FUTURES_SYMBOL)["data"]
+    current_price = _dec(ticker["price"])
+    best_bid = _dec(ticker.get("bestBidPrice"), str(current_price))
+    price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     return int(max(lot, Decimal("1"))), _fmt(price), current_price, multiplier
 
 
@@ -196,6 +196,24 @@ def _wait_until_no_spot_open_orders(client: Client) -> None:
             return
         time.sleep(1)
     assert not _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+
+
+def _wait_for_spot_open_orders(client: Client) -> list[dict]:
+    for _ in range(5):
+        orders = _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+        if orders:
+            return orders
+        time.sleep(1)
+    return []
+
+
+def _cancel_spot_order(client: Client, order_id: str) -> dict:
+    try:
+        return client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+    except FailedRequestError as exc:
+        if "400100" not in str(exc) and "Order not exist" not in str(exc):
+            raise
+        return {"code": "200000", "data": {}}
 
 
 def _skip_if_spot_usdt_insufficient(client: Client, size: str, price: str) -> None:
@@ -254,10 +272,10 @@ def test_spot_post_only_order_lifecycle(client):
             clientOid=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["orderId"]
-        assert _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+        assert _wait_for_spot_open_orders(client)
     finally:
         if order_id is not None:
-            client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            _cancel_spot_order(client, order_id)
 
 
 @pytest.mark.private
@@ -297,13 +315,13 @@ def test_spot_cancel_all_orders(client):
             clientOid=f"dcex-{uuid.uuid4().hex}",
         )
         order_id = order["data"]["orderId"]
-        assert _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+        assert _wait_for_spot_open_orders(client)
         assert client.cancel_spot_all_orders().get("data") is not None
         order_id = None
         _wait_until_no_spot_open_orders(client)
     finally:
         if order_id is not None:
-            client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            _cancel_spot_order(client, order_id)
 
 
 @pytest.mark.private

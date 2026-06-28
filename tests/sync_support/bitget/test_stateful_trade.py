@@ -82,6 +82,11 @@ def _skip_if_unified_account_error(exc: FailedRequestError) -> None:
         )
 
 
+def _is_missing_order_error(exc: FailedRequestError) -> bool:
+    message = str(exc)
+    return "25204" in message or "Order does not exist" in message
+
+
 def _is_uta(client: Client) -> bool:
     global IS_UTA
     if IS_UTA is None:
@@ -313,7 +318,11 @@ def _return_futures_margin(client: Client, amount: Decimal) -> None:
 
 def _cancel_spot(client: Client, order_id: str) -> None:
     if _is_uta(client):
-        _assert_ok(client.cancel_uta_order(orderId=order_id, category="SPOT"))
+        try:
+            _assert_ok(client.cancel_uta_order(orderId=order_id, category="SPOT"))
+        except FailedRequestError as exc:
+            if not _is_missing_order_error(exc):
+                raise
         time.sleep(1)
         return
     _assert_ok(client.cancel_spot_order(SPOT_SYMBOL, orderId=order_id))
@@ -322,7 +331,11 @@ def _cancel_spot(client: Client, order_id: str) -> None:
 
 def _cancel_futures(client: Client, order_id: str) -> None:
     if _is_uta(client):
-        _assert_ok(client.cancel_uta_order(orderId=order_id, category="USDT-FUTURES"))
+        try:
+            _assert_ok(client.cancel_uta_order(orderId=order_id, category="USDT-FUTURES"))
+        except FailedRequestError as exc:
+            if not _is_missing_order_error(exc):
+                raise
         time.sleep(1)
         return
     _assert_ok(client.cancel_futures_order(SWAP_SYMBOL, orderId=order_id))
@@ -396,9 +409,14 @@ def _place_spot_batch(client: Client, side: str, size: str, price: str) -> dict:
 
 def _cancel_spot_batch(client: Client, order_id: str) -> dict:
     if _is_uta(client):
-        return client.cancel_uta_batch_orders(
-            [{"orderId": order_id, "category": "SPOT", "symbol": EXCHANGE_SYMBOL}]
-        )
+        try:
+            return client.cancel_uta_batch_orders(
+                [{"orderId": order_id, "category": "SPOT", "symbol": EXCHANGE_SYMBOL}]
+            )
+        except FailedRequestError as exc:
+            if not _is_missing_order_error(exc):
+                raise
+            return {"code": "00000", "data": {}}
     return client.cancel_spot_batch_orders([{"orderId": order_id}], SPOT_SYMBOL)
 
 
@@ -505,9 +523,14 @@ def _place_futures_batch(client: Client, side: str, size: str, price: str) -> di
 
 def _cancel_futures_batch(client: Client, order_id: str) -> dict:
     if _is_uta(client):
-        return client.cancel_uta_batch_orders(
-            [{"orderId": order_id, "category": "USDT-FUTURES", "symbol": EXCHANGE_SYMBOL}]
-        )
+        try:
+            return client.cancel_uta_batch_orders(
+                [{"orderId": order_id, "category": "USDT-FUTURES", "symbol": EXCHANGE_SYMBOL}]
+            )
+        except FailedRequestError as exc:
+            if not _is_missing_order_error(exc):
+                raise
+            return {"code": "00000", "data": {}}
     return client.cancel_futures_batch_orders(SWAP_SYMBOL, [{"orderId": order_id}])
 
 

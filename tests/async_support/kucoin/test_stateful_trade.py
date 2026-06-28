@@ -11,6 +11,7 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.kucoin.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -258,7 +259,7 @@ async def _spot_order_params(client: Client) -> tuple[str, str]:
     best_bid = _dec(
         (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL))["data"]["bids"][0][0]
     )
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
 
@@ -340,31 +341,32 @@ async def _spot_market_buy_delta(client: Client, funds: Decimal) -> Decimal:
     return await _spot_trade_delta(client, before_btc)
 
 
+async def _cancel_spot_order(client: Client, order_id: str) -> dict:
+    try:
+        return await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+    except FailedRequestError as exc:
+        if "400100" not in str(exc) and "Order not exist" not in str(exc):
+            raise
+        return {"code": "200000", "data": {}}
+
+
 async def _futures_order_params(client: Client) -> tuple[int, str, Decimal, Decimal]:
     contract = (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"]
     tick = _dec(contract["tickSize"], "0.1")
     lot = _dec(contract["lotSize"], "1")
     multiplier = _dec(contract["multiplier"], "0.001")
-    current_price = _dec(
-        (await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]["price"]
-    )
-    best_bid = _dec(
-        (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
-            "bids"
-        ][0][0]
-    )
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    ticker = (await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]
+    current_price = _dec(ticker["price"])
+    best_bid = _dec(ticker.get("bestBidPrice"), str(current_price))
+    price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     return int(max(lot, Decimal("1"))), _fmt(price), current_price, multiplier
 
 
 async def _futures_fillable_buy_price(client: Client) -> str:
     contract = (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"]
     tick = _dec(contract["tickSize"], "0.1")
-    best_ask = _dec(
-        (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
-            "asks"
-        ][0][0]
-    )
+    ticker = (await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]
+    best_ask = _dec(ticker.get("bestAskPrice"), str(ticker["price"]))
     price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     return _fmt(price)
 
@@ -372,11 +374,8 @@ async def _futures_fillable_buy_price(client: Client) -> str:
 async def _futures_fillable_sell_price(client: Client) -> str:
     contract = (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"]
     tick = _dec(contract["tickSize"], "0.1")
-    best_bid = _dec(
-        (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
-            "bids"
-        ][0][0]
-    )
+    ticker = (await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]
+    best_bid = _dec(ticker.get("bestBidPrice"), str(ticker["price"]))
     price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return _fmt(price)
 
@@ -485,13 +484,11 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["orderId"]
         assert await _spot_open_orders(client)
-        assert (
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
-        )
+        assert await _cancel_spot_order(client, order_id) is not None
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            await _cancel_spot_order(client, order_id)
 
     order_id = None
     try:
@@ -509,7 +506,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         await asyncio.sleep(1)
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            await _cancel_spot_order(client, order_id)
 
     order_id = None
     try:
@@ -521,13 +518,11 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             clientOid=_client_oid(),
         )
         order_id = order["data"]["orderId"]
-        assert (
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
-        )
+        assert await _cancel_spot_order(client, order_id) is not None
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            await _cancel_spot_order(client, order_id)
 
     order_id = None
     try:
@@ -538,13 +533,11 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             clientOid=_client_oid(),
         )
         order_id = order["data"]["orderId"]
-        assert (
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
-        )
+        assert await _cancel_spot_order(client, order_id) is not None
         order_id = None
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            await _cancel_spot_order(client, order_id)
 
     assert (
         await client.place_spot_batch_orders(
@@ -593,7 +586,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         await asyncio.sleep(1)
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            await _cancel_spot_order(client, order_id)
 
     funds = await _spot_market_funds(client)
     await _ensure_spot_funds(client, funds)
@@ -720,7 +713,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         assert await _spot_open_orders(client)
     finally:
         if order_id is not None:
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
+            await _cancel_spot_order(client, order_id)
         remaining = await _spot_trade_delta(client, before_btc)
         sell_size = await _spot_sell_quantity(client, remaining)
         if Decimal(sell_size) > 0:
@@ -832,11 +825,8 @@ async def _exercise_futures_stateful_methods(client: Client) -> None:
             (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"]["tickSize"],
             "0.1",
         )
-        best_ask = _dec(
-            (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
-                "asks"
-            ][0][0]
-        )
+        ticker = (await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]
+        best_ask = _dec(ticker.get("bestAskPrice"), str(ticker["price"]))
         high_price = _fmt(
             _round_to_step(
                 best_ask + tick,

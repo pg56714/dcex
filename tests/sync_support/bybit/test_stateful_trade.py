@@ -132,8 +132,9 @@ def _spot_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
 def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     best_bid, _ = _spot_orderbook_prices(client)
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
-    quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
+    price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
+    amended_price = max(price - tick, tick)
+    quantity = _round_to_step(min_notional * Decimal("1.01") / amended_price, step, ROUND_UP)
     return _fmt(max(quantity, min_size)), _fmt(price)
 
 
@@ -148,14 +149,28 @@ def _spot_price(client: Client, value: Decimal) -> str:
     return _fmt(_round_to_step(value, tick, ROUND_DOWN))
 
 
+def _spot_lower_buy_price(client: Client, price: str) -> str:
+    tick, _, _, _ = _spot_details(client)
+    return _spot_price(client, max(Decimal(price) - tick, tick))
+
+
 def _spot_sell_size(client: Client, size: Decimal) -> str:
     _, step, _, _ = _spot_details(client)
     return _fmt(_round_to_step(size, step, ROUND_DOWN))
 
 
 def _spot_market_quote(client: Client) -> Decimal:
-    _, _, _, min_notional = _spot_details(client)
-    return min_notional * Decimal("1.01")
+    _, step, min_size, min_notional = _spot_details(client)
+    _, best_ask = _spot_orderbook_prices(client)
+    min_sell_size = _round_to_step(
+        max(min_size, min_notional / best_ask) * Decimal("1.005"),
+        step,
+        ROUND_UP,
+    )
+    return ((min_sell_size + step) * best_ask * Decimal("1.01")).quantize(
+        Decimal("0.01"),
+        rounding=ROUND_UP,
+    )
 
 
 def _open_orders(client: Client, product_symbol: str) -> list[dict]:
@@ -227,7 +242,11 @@ def _return_to_funding(client: Client, transferred: Decimal) -> None:
 
 
 def _cancel(client: Client, order_id: str) -> None:
-    _assert_ok(client.cancel_order(product_symbol=SPOT_SYMBOL, orderId=order_id))
+    try:
+        _assert_ok(client.cancel_order(product_symbol=SPOT_SYMBOL, orderId=order_id))
+    except FailedRequestError as exc:
+        if "170213" not in str(exc) and "Order does not exist" not in str(exc):
+            raise
 
 
 def _cleanup(client: Client, initial_btc: Decimal) -> Decimal:
@@ -243,7 +262,7 @@ def _cleanup(client: Client, initial_btc: Decimal) -> Decimal:
         _, _, min_size, min_notional = _spot_details(client)
         best_bid, _ = _spot_orderbook_prices(client)
         if delta > 0 and (delta < min_size or delta * best_bid < min_notional):
-            quote = min_notional * Decimal("1.01")
+            quote = _spot_market_quote(client)
             transferred += _ensure_unified_usdt(client, quote)
             before_btc = _wallet_available(client, "BTC")
             _assert_ok(client.place_market_buy_order(SPOT_SYMBOL, _fmt(quote)))
@@ -352,7 +371,7 @@ def test_spot_stateful_order_lifecycle(client):
                     timeInForce="PostOnly",
                 )
             )
-            amended_price = _spot_price(client, Decimal(price) * Decimal("0.99"))
+            amended_price = _spot_lower_buy_price(client, price)
             _assert_ok(
                 client.amend_order(
                     product_symbol=SPOT_SYMBOL,
@@ -392,10 +411,7 @@ def test_spot_stateful_order_lifecycle(client):
                         {
                             "symbol": exchange_symbol,
                             "orderId": order_id,
-                            "price": _spot_price(
-                                client,
-                                Decimal(price) * Decimal("0.97"),
-                            ),
+                            "price": _spot_lower_buy_price(client, price),
                         }
                         for order_id in batch_ids
                     ],

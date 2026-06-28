@@ -6,6 +6,7 @@ import pytest
 from dotenv import load_dotenv
 
 from dcex.bingx.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -19,6 +20,12 @@ def client():
         api_key=BINGX_API_KEY,
         api_secret=BINGX_API_SECRET,
     )
+
+
+def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+    message = str(exc)
+    if "100410" in message or "endpoint trigger frequency limit" in message:
+        pytest.skip("BingX temporarily rate-limited this endpoint.")
 
 
 @pytest.mark.private
@@ -35,7 +42,11 @@ def test_get_account_balance(client):
 
 @pytest.mark.private
 def test_get_spot_account_balance(client):
-    res = client.get_spot_account_balance()
+    try:
+        res = client.get_spot_account_balance()
+    except FailedRequestError as exc:
+        _skip_if_rate_limited(exc)
+        raise
     assert res is not None
 
 

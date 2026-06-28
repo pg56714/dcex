@@ -7,6 +7,7 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.bingx.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -21,6 +22,12 @@ async def client():
         api_secret=BINGX_API_SECRET,
     ) as client_instance:
         yield client_instance
+
+
+def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+    message = str(exc)
+    if "100410" in message or "endpoint trigger frequency limit" in message:
+        pytest.skip("BingX temporarily rate-limited this endpoint.")
 
 
 @pytest.mark.asyncio
@@ -40,7 +47,11 @@ async def test_get_account_balance(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_get_spot_account_balance(client):
-    res = await client.get_spot_account_balance()
+    try:
+        res = await client.get_spot_account_balance()
+    except FailedRequestError as exc:
+        _skip_if_rate_limited(exc)
+        raise
     assert res is not None
 
 

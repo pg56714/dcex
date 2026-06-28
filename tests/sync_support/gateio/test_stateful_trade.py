@@ -187,7 +187,7 @@ def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
     tick = _dec(details["price_precision"], "0.01")
     step = _dec(details["size_precision"], "0.00000001")
     min_size = _dec(details["min_size"], "0.00001")
-    min_notional = max(_dec(details["min_notional"], "1"), Decimal("1"))
+    min_notional = max(_dec(details["min_notional"], "3"), Decimal("3"))
     return tick, step, min_size, min_notional
 
 
@@ -228,8 +228,14 @@ def _spot_post_only_sell_price(client: Client) -> str:
 
 
 def _spot_market_buy_amount(client: Client) -> Decimal:
-    _, _, _, min_notional = _spot_details(client)
-    return min_notional * Decimal("1.01")
+    _, step, min_size, min_notional = _spot_details(client)
+    _, best_ask = _spot_orderbook_prices(client)
+    min_sell_amount = _round_to_step(
+        max(min_size, min_notional / best_ask) * Decimal("1.005"),
+        step,
+        ROUND_UP,
+    )
+    return (min_sell_amount + step) * best_ask * Decimal("1.01")
 
 
 def _spot_sell_amount(client: Client, amount: Decimal) -> str:
@@ -253,7 +259,7 @@ def _futures_order_params(client: Client) -> tuple[int, str, Decimal]:
         _, asks_price = _contract_orderbook_prices(client)
         last_price = asks_price
     best_bid, _ = _contract_orderbook_prices(client)
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     return int(min_size), _fmt(price), last_price
 
 

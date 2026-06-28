@@ -353,6 +353,13 @@ async def _swap_fillable_limit_sell_price(client: Client) -> float:
     return float(_fmt(price))
 
 
+async def _swap_post_only_sell_price(client: Client) -> str:
+    tick, _, _, _ = _swap_details(client)
+    _, best_ask = await _swap_orderbook_prices(client)
+    price = max(best_ask + tick, best_ask * Decimal("1.001"))
+    return _fmt(_round_to_step(price, tick, ROUND_UP))
+
+
 async def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
     required = (
         Decimal(quantity) * await _swap_current_price(client) / Decimal("10") * Decimal("1.05")
@@ -755,9 +762,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
 
     order_id = None
     try:
-        tick = _swap_details(client)[0]
-        _, best_ask = await _swap_orderbook_prices(client)
-        high_price = _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
+        high_price = await _swap_post_only_sell_price(client)
         order = await client.place_swap_post_only_sell_order(
             SWAP_SYMBOL,
             quantity=float(quantity),

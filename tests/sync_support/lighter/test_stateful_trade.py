@@ -27,11 +27,15 @@ pytestmark = [
 ]
 
 
+def _env_int(value: str | None) -> int:
+    return int(str(value or "0").strip().lstrip("#"))
+
+
 @pytest.fixture
 def client():
     client_instance = Client(
-        account_index=int(ACCOUNT_INDEX or 0),
-        api_key_index=int(API_KEY_INDEX or 0),
+        account_index=_env_int(ACCOUNT_INDEX),
+        api_key_index=_env_int(API_KEY_INDEX),
         api_private_key=API_PRIVATE_KEY,
         preload_product_table=False,
     )
@@ -60,7 +64,8 @@ def _post_only_buy_order(market: dict) -> tuple[int, int, int]:
     size_decimals = int(market["size_decimals"])
     last_price = Decimal(str(market["last_trade_price"]))
     price_step = Decimal(1).scaleb(-price_decimals)
-    price = (last_price - price_step).quantize(price_step, rounding=ROUND_DOWN)
+    price = max(price_step, min(last_price - price_step, last_price * Decimal("0.999")))
+    price = price.quantize(price_step, rounding=ROUND_DOWN)
     min_base = Decimal(str(market["min_base_amount"]))
     min_quote = Decimal(str(market["min_quote_amount"]))
     min_size = Decimal(1).scaleb(-size_decimals)
@@ -84,8 +89,10 @@ def _ioc_market_order(client: Client, market: dict) -> tuple[int, int, int, int]
     min_size = Decimal(1).scaleb(-size_decimals)
     base = max(min_base, min_quote / best_ask).quantize(min_size, rounding=ROUND_CEILING)
     price_step = Decimal(1).scaleb(-price_decimals)
-    buy_price = (best_ask + price_step).quantize(price_step, rounding=ROUND_CEILING)
-    sell_price = (best_bid - price_step).quantize(price_step, rounding=ROUND_DOWN)
+    buy_price = max(best_ask + price_step, best_ask * Decimal("1.001"))
+    buy_price = buy_price.quantize(price_step, rounding=ROUND_CEILING)
+    sell_price = min(best_bid - price_step, best_bid * Decimal("0.999"))
+    sell_price = sell_price.quantize(price_step, rounding=ROUND_DOWN)
     return (
         market_index,
         int(base * (Decimal(10) ** size_decimals)),
@@ -103,7 +110,7 @@ def _assert_signed(result) -> None:
 
 
 def _active_order_index(client: Client, market_index: int, client_order_index: int) -> int:
-    for _ in range(10):
+    for _ in range(30):
         active_orders = client.get_account_active_orders(market_id=market_index)
         for order in active_orders.get("orders", []):
             if int(order.get("client_order_index", -1)) == client_order_index:
@@ -115,21 +122,25 @@ def _active_order_index(client: Client, market_index: int, client_order_index: i
 def _wait_for_trade_client_ids(
     client: Client, market_index: int, client_order_ids: set[int]
 ) -> None:
-    account_index = int(ACCOUNT_INDEX or 0)
+    account_index = _env_int(ACCOUNT_INDEX)
     pending = {str(client_order_id) for client_order_id in client_order_ids}
-    for _ in range(12):
+    for _ in range(30):
         res = client.get_trades(
             account_index=account_index,
             market_id=market_index,
             sort_by="timestamp",
-            limit=20,
+            limit=100,
         )
         for trade in res.get("trades", []):
             pending.discard(str(trade.get("ask_client_id")))
             pending.discard(str(trade.get("bid_client_id")))
+            pending.discard(str(trade.get("ask_client_order_index")))
+            pending.discard(str(trade.get("bid_client_order_index")))
+            pending.discard(str(trade.get("client_order_index")))
+            pending.discard(str(trade.get("client_order_id")))
         if not pending:
             return
-        time.sleep(0.5)
+        time.sleep(1)
     pytest.fail(f"Lighter trades not found for client_order_ids={sorted(pending)}")
 
 
