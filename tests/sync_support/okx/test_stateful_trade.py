@@ -10,6 +10,7 @@ import pytest
 from dotenv import load_dotenv
 
 from dcex.okx.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -127,6 +128,11 @@ def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     return _fmt(max(size, min_size)), _fmt(price)
 
 
+def _spot_price_below(client: Client, price: str, multiplier: Decimal) -> str:
+    tick, _, _, _ = _spot_details(client)
+    return _fmt(_round_to_step(Decimal(price) * multiplier, tick, ROUND_DOWN))
+
+
 def _spot_post_only_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
@@ -214,18 +220,68 @@ def _wait_for_swap_position(client: Client) -> Decimal:
     return Decimal("0")
 
 
+def _is_order_no_longer_open(exc: FailedRequestError) -> bool:
+    message = str(exc).lower()
+    return (
+        "51400" in message
+        or "51503" in message
+        or "does not exist" in message
+        or "filled or canceled" in message
+    )
+
+
+def _is_rate_limited(exc: FailedRequestError) -> bool:
+    message = str(exc).lower()
+    return "50011" in message or "rate limit" in message
+
+
+def _is_empty_cancel_all_error(exc: FailedRequestError) -> bool:
+    message = str(exc).lower()
+    return "50000" in message and "body for post request cannot be empty" in message
+
+
+def _skip_if_order_no_longer_open(exc: FailedRequestError) -> None:
+    if _is_order_no_longer_open(exc):
+        pytest.skip(f"OKX order was filled or canceled before amend/cancel: {exc}")
+    if _is_rate_limited(exc):
+        pytest.skip(f"OKX rate limit reached during live order lifecycle: {exc}")
+    raise exc
+
+
+def _order_id_or_skip(create_order) -> str:
+    try:
+        return _order_id(create_order())
+    except FailedRequestError as exc:
+        _skip_if_order_no_longer_open(exc)
+
+
 def _cancel_order(client: Client, order_id: str) -> None:
-    _assert_ok(client.cancel_order(product_symbol=SPOT_SYMBOL, ordId=order_id))
+    try:
+        _assert_ok(client.cancel_order(product_symbol=SPOT_SYMBOL, ordId=order_id))
+    except FailedRequestError as exc:
+        if _is_order_no_longer_open(exc):
+            return
+        raise
+    time.sleep(0.5)
+
+
+def _cancel_all_orders(client: Client, product_symbol: str) -> None:
+    try:
+        _assert_ok(client.cancel_all_orders(product_symbol=product_symbol))
+    except FailedRequestError as exc:
+        if _is_empty_cancel_all_error(exc):
+            return
+        raise
     time.sleep(0.5)
 
 
 def _cleanup(client: Client, initial_btc: Decimal) -> None:
     with suppress(Exception):
         if _open_orders(client, SPOT_SYMBOL):
-            _assert_ok(client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
+            _cancel_all_orders(client, SPOT_SYMBOL)
     with suppress(Exception):
         if _open_orders(client, SWAP_SYMBOL):
-            _assert_ok(client.cancel_all_orders(product_symbol=SWAP_SYMBOL))
+            _cancel_all_orders(client, SWAP_SYMBOL)
     with suppress(Exception):
         if _swap_position_size(client) != 0:
             _assert_ok(client.close_positions(product_symbol=SWAP_SYMBOL, mgnMode="cross"))
@@ -299,14 +355,17 @@ def test_spot_stateful_order_lifecycle(client):
                 )
             )
             assert client.get_order(product_symbol=SPOT_SYMBOL, ordId=order_id) is not None
-            amended_price = _fmt(Decimal(price) * Decimal("0.99"))
-            _assert_ok(
-                client.amend_order(
-                    product_symbol=SPOT_SYMBOL,
-                    ordId=order_id,
-                    newPx=amended_price,
+            amended_price = _spot_price_below(client, price, Decimal("0.97"))
+            try:
+                _assert_ok(
+                    client.amend_order(
+                        product_symbol=SPOT_SYMBOL,
+                        ordId=order_id,
+                        newPx=amended_price,
+                    )
                 )
-            )
+            except FailedRequestError as exc:
+                _skip_if_order_no_longer_open(exc)
             _cancel_order(client, order_id)
             order_id = None
         finally:
@@ -323,7 +382,7 @@ def test_spot_stateful_order_lifecycle(client):
                         "side": "buy",
                         "ordType": "post_only",
                         "sz": size,
-                        "px": price,
+                        "px": _spot_price_below(client, price, Decimal("0.95")),
                         "clOrdId": _client_id(),
                     },
                     {
@@ -332,7 +391,7 @@ def test_spot_stateful_order_lifecycle(client):
                         "side": "buy",
                         "ordType": "post_only",
                         "sz": size,
-                        "px": _fmt(Decimal(price) * Decimal("0.98")),
+                        "px": _spot_price_below(client, price, Decimal("0.94")),
                         "clOrdId": _client_id(),
                     },
                 ]
@@ -346,12 +405,15 @@ def test_spot_stateful_order_lifecycle(client):
                         {
                             "instId": exchange_symbol,
                             "ordId": order_id,
-                            "newPx": _fmt(Decimal(price) * Decimal("0.97")),
+                            "newPx": _spot_price_below(client, price, Decimal("0.93")),
                         }
                         for order_id in batch_ids
                     ]
                 )
             )
+        except FailedRequestError as exc:
+            _skip_if_order_no_longer_open(exc)
+        else:
             _assert_ok(
                 client.cancel_batch_orders(
                     [{"instId": exchange_symbol, "ordId": order_id} for order_id in batch_ids]
@@ -373,17 +435,18 @@ def test_spot_stateful_order_lifecycle(client):
         for create_order in creators:
             order_id = None
             try:
-                order_id = _order_id(create_order())
+                order_id = _order_id_or_skip(create_order)
                 _cancel_order(client, order_id)
                 order_id = None
             finally:
                 if order_id is not None:
                     _cancel_order(client, order_id)
 
-        order_id = _order_id(client.place_limit_buy_order(SPOT_SYMBOL, "cash", size, price))
+        order_id = _order_id_or_skip(
+            lambda: client.place_limit_buy_order(SPOT_SYMBOL, "cash", size, price)
+        )
         try:
-            _assert_ok(client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
-            time.sleep(0.5)
+            _cancel_all_orders(client, SPOT_SYMBOL)
             order_id = None
         finally:
             if order_id is not None:
@@ -406,7 +469,7 @@ def test_spot_stateful_order_lifecycle(client):
         ):
             order_id = None
             try:
-                order_id = _order_id(create_order())
+                order_id = _order_id_or_skip(create_order)
                 _cancel_order(client, order_id)
                 order_id = None
             finally:

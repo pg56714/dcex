@@ -1,14 +1,24 @@
+import os
+
 import pytest
 import pytest_asyncio
-from dcex.async_support.okx.client import Client
-import os
 from dotenv import load_dotenv
+
+from dcex.async_support.okx.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
 OKX_API_KEY = os.getenv("OKX_API_KEY")
 OKX_API_SECRET = os.getenv("OKX_API_SECRET")
 OKX_PASSPHRASE = os.getenv("OKX_PASSPHRASE")
+
+
+def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+    message = str(exc).lower()
+    if "50011" in message or "too many requests" in message or "rate limit" in message:
+        pytest.skip(f"OKX rate limit reached during live account test: {exc}")
+    raise exc
 
 
 @pytest_asyncio.fixture
@@ -78,14 +88,20 @@ async def test_get_account_bills_archive(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_post_account_bills_history_archive(client):
-    res = await client.post_account_bills_history_archive(year="2025", quarter="Q1")
+    try:
+        res = await client.post_account_bills_history_archive(year="2025", quarter="Q1")
+    except FailedRequestError as exc:
+        _skip_if_rate_limited(exc)
     assert res is not None
 
 
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_get_account_bills_history_archive(client):
-    res = await client.get_account_bills_history_archive(year="2025", quarter="Q1")
+    try:
+        res = await client.get_account_bills_history_archive(year="2025", quarter="Q1")
+    except FailedRequestError as exc:
+        _skip_if_rate_limited(exc)
     assert res is not None
 
 

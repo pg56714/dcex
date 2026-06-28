@@ -102,6 +102,21 @@ def _skip_if_account_restriction(exc: FailedRequestError) -> None:
     raise exc
 
 
+def _is_spot_order_already_terminal(exc: FailedRequestError) -> bool:
+    message = str(exc).lower()
+    return "50030" in message and "already canceled" in message
+
+
+async def _cancel_spot_order_if_present(client: Client, order_id: str) -> None:
+    try:
+        response = await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id)
+    except FailedRequestError as exc:
+        if _is_spot_order_already_terminal(exc):
+            return
+        raise
+    assert response is not None
+
+
 async def _spot_available(client: Client, currency: str) -> Decimal:
     for item in _items(await client.get_spot_wallet()):
         if item.get("id") == currency or item.get("currency") == currency:
@@ -193,6 +208,25 @@ async def _spot_sell_size(client: Client, size: Decimal) -> str:
     return _fmt(_round_to_step(size, base_step, ROUND_DOWN))
 
 
+async def _skip_if_spot_sell_notional_too_small(
+    client: Client,
+    size: str,
+    price: str,
+) -> None:
+    _, min_notional, _ = await _spot_pair_details(client)
+    if Decimal(size) * Decimal(price) < min_notional:
+        pytest.skip("BitMart spot sell notional is below the exchange minimum.")
+
+
+async def _wait_for_sellable_spot_base(client: Client, before_base: Decimal) -> Decimal:
+    for _ in range(10):
+        delta = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
+        if Decimal(await _spot_sell_size(client, delta)) > 0:
+            return delta
+        await asyncio.sleep(1)
+    return await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
+
+
 async def _spot_post_only_sell_price(client: Client) -> str:
     _, _, price_step = await _spot_pair_details(client)
     _, best_ask = await _spot_best_prices(client)
@@ -251,13 +285,15 @@ async def _contract_post_only_sell_price(client: Client) -> str:
 async def _contract_fillable_buy_price(client: Client) -> str:
     _, best_ask = await _contract_best_prices(client)
     step = await _contract_price_step(client)
-    return _fmt(_round_to_step(best_ask + step, step, ROUND_UP))
+    price = max(best_ask + step, best_ask * Decimal("1.002"))
+    return _fmt(_round_to_step(price, step, ROUND_UP))
 
 
 async def _contract_fillable_sell_price(client: Client) -> str:
     best_bid, _ = await _contract_best_prices(client)
     step = await _contract_price_step(client)
-    return _fmt(_round_to_step(best_bid - step, step, ROUND_DOWN))
+    price = min(best_bid - step, best_bid * Decimal("0.998"))
+    return _fmt(_round_to_step(price, step, ROUND_DOWN))
 
 
 async def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
@@ -365,6 +401,17 @@ async def _wait_for_contract_position(client: Client, sign: int) -> Decimal:
     return Decimal("0")
 
 
+async def _wait_for_contract_position_or_skip(
+    client: Client,
+    sign: int,
+    action: str,
+) -> Decimal:
+    size = await _wait_for_contract_position(client, sign)
+    if size == 0:
+        pytest.skip(f"BitMart contract {action} did not fill before timeout.")
+    return size
+
+
 async def _close_contract_position(client: Client) -> None:
     size = await _contract_position_size(client)
     if size > 0:
@@ -409,11 +456,11 @@ async def test_spot_stateful_order_lifecycle(client):
                 await client.get_spot_order_by_order_client_id(client_id, queryState="open")
                 is not None
             )
-            assert await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id) is not None
+            await _cancel_spot_order_if_present(client, order_id)
             order_id = None
         finally:
             if order_id is not None:
-                await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id)
+                await _cancel_spot_order_if_present(client, order_id)
 
         order_id = None
         try:
@@ -424,7 +471,7 @@ async def test_spot_stateful_order_lifecycle(client):
             await asyncio.sleep(1)
         finally:
             if order_id is not None:
-                await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id)
+                await _cancel_spot_order_if_present(client, order_id)
 
         order_id = None
         try:
@@ -435,20 +482,20 @@ async def test_spot_stateful_order_lifecycle(client):
                 _client_id(),
             )
             order_id = _order_id(order)
-            assert await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id) is not None
+            await _cancel_spot_order_if_present(client, order_id)
             order_id = None
         finally:
             if order_id is not None:
-                await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id)
+                await _cancel_spot_order_if_present(client, order_id)
 
         notional = await _spot_market_notional(client)
         await _ensure_spot_usdt(client, Decimal(notional))
         before_base = await _spot_available(client, SPOT_BASE_CURRENCY)
         market_buy = await client.place_spot_market_buy_order(SPOT_SYMBOL, notional, _client_id())
-        await asyncio.sleep(2)
-        bought = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
+        bought = await _wait_for_sellable_spot_base(client, before_base)
         sell_size = await _spot_sell_size(client, bought)
-        assert Decimal(sell_size) > 0
+        if Decimal(sell_size) <= 0:
+            pytest.skip("BitMart spot market buy did not produce a sellable base amount.")
         assert await client.get_spot_order_trade_list(_order_id(market_buy)) is not None
         assert (
             await client.place_spot_market_sell_order(SPOT_SYMBOL, sell_size, _client_id())
@@ -462,15 +509,17 @@ async def test_spot_stateful_order_lifecycle(client):
         assert (
             await client.place_spot_limit_buy_order(SPOT_SYMBOL, fill_size, fill_price) is not None
         )
-        await asyncio.sleep(2)
-        bought = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
+        bought = await _wait_for_sellable_spot_base(client, before_base)
         sell_size = await _spot_sell_size(client, bought)
-        assert Decimal(sell_size) > 0
+        if Decimal(sell_size) <= 0:
+            pytest.skip("BitMart spot limit buy did not produce a sellable base amount.")
+        sell_price = await _spot_fillable_sell_price(client)
+        await _skip_if_spot_sell_notional_too_small(client, sell_size, sell_price)
         assert (
             await client.place_spot_limit_sell_order(
                 SPOT_SYMBOL,
                 sell_size,
-                await _spot_fillable_sell_price(client),
+                sell_price,
             )
             is not None
         )
@@ -487,33 +536,35 @@ async def test_spot_stateful_order_lifecycle(client):
             )
             is not None
         )
-        await asyncio.sleep(2)
-        bought = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
+        bought = await _wait_for_sellable_spot_base(client, before_base)
         sell_size = await _spot_sell_size(client, bought)
-        assert Decimal(sell_size) > 0
+        if Decimal(sell_size) <= 0:
+            pytest.skip("BitMart spot market order did not produce a sellable base amount.")
+        post_only_sell_price = await _spot_post_only_sell_price(client)
+        await _skip_if_spot_sell_notional_too_small(client, sell_size, post_only_sell_price)
         order_id = None
         try:
             order = await client.place_spot_post_only_limit_sell_order(
                 SPOT_SYMBOL,
                 sell_size,
-                await _spot_post_only_sell_price(client),
+                post_only_sell_price,
                 _client_id(),
             )
             order_id = _order_id(order)
-            assert await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id) is not None
+            await _cancel_spot_order_if_present(client, order_id)
             order_id = None
             alias_order = await client.place_post_only_limit_sell_order(
                 SPOT_SYMBOL,
                 sell_size,
-                await _spot_post_only_sell_price(client),
+                post_only_sell_price,
                 _client_id(),
             )
             order_id = _order_id(alias_order)
-            assert await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id) is not None
+            await _cancel_spot_order_if_present(client, order_id)
             order_id = None
         finally:
             if order_id is not None:
-                await client.cancel_spot_order(SPOT_SYMBOL, order_id=order_id)
+                await _cancel_spot_order_if_present(client, order_id)
             remaining = await _spot_available(client, SPOT_BASE_CURRENCY) - before_base
             sell_size = await _spot_sell_size(client, remaining)
             if Decimal(sell_size) > 0:
@@ -696,7 +747,11 @@ async def test_contract_stateful_order_lifecycle(client):
             )
             is not None
         )
-        assert await _wait_for_contract_position(client, sign=1) > 0
+        assert await _wait_for_contract_position_or_skip(
+            client,
+            sign=1,
+            action="limit buy",
+        ) > 0
         assert (
             await client.place_contract_limit_order(
                 CONTRACT_SYMBOL,

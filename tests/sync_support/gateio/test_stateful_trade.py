@@ -4,12 +4,14 @@ import os
 import time
 import uuid
 from contextlib import suppress
+from dataclasses import dataclass
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
 from dotenv import load_dotenv
 
 from dcex.gateio.client import Client
+from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
@@ -20,6 +22,9 @@ FUTURES_SYMBOL = "BTC-USDT-SWAP"
 FUTURES_LEVERAGE = "2"
 SPOT_NOTIONAL_BUFFER = Decimal("1.05")
 MIN_FUTURES_AVAILABLE_USDT = Decimal("1")
+SPOT_ACCOUNT = "spot"
+FUTURES_ACCOUNT = "futures"
+TRANSFER_STEP = Decimal("0.00000001")
 
 pytestmark = [
     pytest.mark.private,
@@ -60,6 +65,13 @@ def _text() -> str:
     return f"t-dcex-{uuid.uuid4().hex[:20]}"
 
 
+@dataclass(frozen=True)
+class _TransferBack:
+    from_account: str
+    to_account: str
+    amount: Decimal
+
+
 def _items(res: object) -> list[dict]:
     if isinstance(res, list):
         return [item for item in res if isinstance(item, dict)]
@@ -96,6 +108,78 @@ def _futures_available_usdt(client: Client) -> Decimal:
         if key in data:
             return _dec(data.get(key))
     return Decimal("0")
+
+
+def _account_usdt(client: Client, account: str) -> Decimal:
+    if account == SPOT_ACCOUNT:
+        return _spot_available(client, "USDT")
+    if account == FUTURES_ACCOUNT:
+        return _futures_available_usdt(client)
+    return Decimal("0")
+
+
+def _wallet_transfer(client: Client, from_account: str, to_account: str, amount: Decimal) -> None:
+    amount = _round_to_step(amount, TRANSFER_STEP, ROUND_DOWN)
+    if amount <= 0:
+        return
+    response = client.wallet_transfer(
+        currency="USDT",
+        from_account=from_account,
+        to_account=to_account,
+        amount=_fmt(amount),
+        settle="usdt",
+    )
+    assert response is not None
+
+
+def _return_transfer(client: Client, transfer: _TransferBack) -> None:
+    if transfer.amount <= 0:
+        return
+    amount = min(transfer.amount, _account_usdt(client, transfer.from_account))
+    if amount <= 0:
+        return
+    _wallet_transfer(client, transfer.from_account, transfer.to_account, amount)
+
+
+def _return_transfers(client: Client, transfers: list[_TransferBack]) -> None:
+    for transfer in reversed(transfers):
+        _return_transfer(client, transfer)
+
+
+def _ensure_usdt(
+    client: Client,
+    target_account: str,
+    source_account: str,
+    required: Decimal,
+) -> _TransferBack:
+    target = _account_usdt(client, target_account)
+    if target >= required:
+        return _TransferBack(target_account, source_account, Decimal("0"))
+
+    needed = _round_to_step(required - target, TRANSFER_STEP, ROUND_UP)
+    source = _account_usdt(client, source_account)
+    if source < needed:
+        pytest.skip(
+            "Insufficient transferable Gate USDT for stateful order test: "
+            f"required={required}, {target_account}={target}, {source_account}={source}."
+        )
+
+    try:
+        _wallet_transfer(client, source_account, target_account, needed)
+    except FailedRequestError as exc:
+        pytest.skip(
+            f"Gate wallet transfer {source_account}->{target_account} failed: {exc}"
+        )
+    time.sleep(2)
+
+    transfer = _TransferBack(target_account, source_account, needed)
+    if _account_usdt(client, target_account) < required:
+        _return_transfer(client, transfer)
+        pytest.skip(
+            f"Gate {target_account} USDT remains insufficient after transfer: "
+            f"required={required}."
+        )
+    return transfer
 
 
 def _position_size(client: Client) -> Decimal:
@@ -245,9 +329,8 @@ def _spot_sell_amount(client: Client, amount: Decimal) -> str:
     return _fmt(_round_to_step(amount, step, ROUND_DOWN))
 
 
-def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
-    if _spot_available(client, "USDT") < required:
-        pytest.skip("Insufficient Gate spot USDT for stateful order test.")
+def _ensure_spot_usdt(client: Client, required: Decimal) -> _TransferBack:
+    return _ensure_usdt(client, SPOT_ACCOUNT, FUTURES_ACCOUNT, required)
 
 
 def _futures_order_params(client: Client) -> tuple[int, str, Decimal]:
@@ -294,9 +377,22 @@ def _contract_post_only_sell_price(client: Client) -> str:
     return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
-def _ensure_futures_usdt(client: Client) -> None:
-    if _futures_available_usdt(client) < MIN_FUTURES_AVAILABLE_USDT:
-        pytest.skip("Insufficient Gate futures USDT for stateful order test.")
+def _ensure_futures_usdt(client: Client) -> _TransferBack:
+    return _ensure_usdt(client, FUTURES_ACCOUNT, SPOT_ACCOUNT, MIN_FUTURES_AVAILABLE_USDT)
+
+
+def _skip_if_futures_margin_insufficient(exc: FailedRequestError) -> None:
+    message = str(exc).lower()
+    if "insufficient_available" in message or "insufficient" in message:
+        pytest.skip(f"Insufficient Gate futures USDT for stateful order test: {exc}")
+    raise exc
+
+
+def _futures_order_or_skip(factory) -> object:
+    try:
+        return factory()
+    except FailedRequestError as exc:
+        _skip_if_futures_margin_insufficient(exc)
 
 
 def _wait_for_position(client: Client, sign: int) -> Decimal:
@@ -335,9 +431,10 @@ def _close_position(client: Client) -> None:
 def test_spot_stateful_order_lifecycle(client):
     _skip_if_existing_state(client)
     initial_btc = _spot_available(client, "BTC")
+    transfers: list[_TransferBack] = []
     try:
         amount, price = _spot_post_only_buy_params(client)
-        _ensure_spot_usdt(client, Decimal(amount) * Decimal(price))
+        transfers.append(_ensure_spot_usdt(client, Decimal(amount) * Decimal(price)))
 
         order_id = None
         try:
@@ -399,7 +496,7 @@ def test_spot_stateful_order_lifecycle(client):
                 client.cancel_spot_single_order(order_id, SPOT_SYMBOL)
 
         quote_amount = _spot_market_buy_amount(client)
-        _ensure_spot_usdt(client, quote_amount)
+        transfers.append(_ensure_spot_usdt(client, quote_amount))
         before_btc = _spot_available(client, "BTC")
         assert client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(quote_amount)) is not None
         time.sleep(2)
@@ -410,7 +507,7 @@ def test_spot_stateful_order_lifecycle(client):
         time.sleep(2)
 
         quote_amount = _spot_market_buy_amount(client)
-        _ensure_spot_usdt(client, quote_amount)
+        transfers.append(_ensure_spot_usdt(client, quote_amount))
         before_btc = _spot_available(client, "BTC")
         assert client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(quote_amount)) is not None
         time.sleep(2)
@@ -421,7 +518,7 @@ def test_spot_stateful_order_lifecycle(client):
         time.sleep(2)
 
         fill_amount, fill_price = _spot_fillable_buy_params(client)
-        _ensure_spot_usdt(client, Decimal(fill_amount) * Decimal(fill_price))
+        transfers.append(_ensure_spot_usdt(client, Decimal(fill_amount) * Decimal(fill_price)))
         before_btc = _spot_available(client, "BTC")
         try:
             assert (
@@ -449,7 +546,7 @@ def test_spot_stateful_order_lifecycle(client):
                 client.place_spot_market_sell_order(SPOT_SYMBOL, sell_amount)
 
         quote_amount = _spot_market_buy_amount(client)
-        _ensure_spot_usdt(client, quote_amount)
+        transfers.append(_ensure_spot_usdt(client, quote_amount))
         before_btc = _spot_available(client, "BTC")
         order_id = None
         try:
@@ -476,14 +573,16 @@ def test_spot_stateful_order_lifecycle(client):
         assert client.get_spot_trading_history(product_symbol=SPOT_SYMBOL, limit=10) is not None
     finally:
         _cleanup(client, initial_btc)
+        _return_transfers(client, transfers)
 
 
 def test_futures_stateful_order_lifecycle(client):
     _skip_if_existing_state(client)
     initial_btc = _spot_available(client, "BTC")
+    transfers: list[_TransferBack] = []
     try:
         size, price, _ = _futures_order_params(client)
-        _ensure_futures_usdt(client)
+        transfers.append(_ensure_futures_usdt(client))
 
         assert client.get_futures_all_positions(holding=False) is not None
         assert client.get_contract_single_positions(product_symbol=FUTURES_SYMBOL) is not None
@@ -497,12 +596,14 @@ def test_futures_stateful_order_lifecycle(client):
 
         order_id = None
         try:
-            order = client.place_contract_order(
-                product_symbol=FUTURES_SYMBOL,
-                size=size,
-                price=price,
-                tif="poc",
-                text=_text(),
+            order = _futures_order_or_skip(
+                lambda: client.place_contract_order(
+                    product_symbol=FUTURES_SYMBOL,
+                    size=size,
+                    price=price,
+                    tif="poc",
+                    text=_text(),
+                )
             )
             order_id = str(order["id"])
             assert client.get_contract_single_order(order_id) is not None
@@ -516,7 +617,9 @@ def test_futures_stateful_order_lifecycle(client):
 
         order_id = None
         try:
-            order = client.place_contract_limit_order(FUTURES_SYMBOL, size, price)
+            order = _futures_order_or_skip(
+                lambda: client.place_contract_limit_order(FUTURES_SYMBOL, size, price)
+            )
             order_id = str(order["id"])
             assert (
                 client.cancel_contract_all_order_matched(product_symbol=FUTURES_SYMBOL) is not None
@@ -529,30 +632,8 @@ def test_futures_stateful_order_lifecycle(client):
 
         order_id = None
         try:
-            order = client.place_contract_post_only_limit_order(FUTURES_SYMBOL, size, price)
-            order_id = str(order["id"])
-            assert client.cancel_contract_single_order(order_id) is not None
-            order_id = None
-        finally:
-            if order_id is not None:
-                client.cancel_contract_single_order(order_id)
-
-        order_id = None
-        try:
-            order = client.place_contract_post_only_limit_buy_order(FUTURES_SYMBOL, size, price)
-            order_id = str(order["id"])
-            assert client.cancel_contract_single_order(order_id) is not None
-            order_id = None
-        finally:
-            if order_id is not None:
-                client.cancel_contract_single_order(order_id)
-
-        order_id = None
-        try:
-            order = client.place_contract_post_only_limit_sell_order(
-                FUTURES_SYMBOL,
-                size,
-                _contract_post_only_sell_price(client),
+            order = _futures_order_or_skip(
+                lambda: client.place_contract_post_only_limit_order(FUTURES_SYMBOL, size, price)
             )
             order_id = str(order["id"])
             assert client.cancel_contract_single_order(order_id) is not None
@@ -561,37 +642,60 @@ def test_futures_stateful_order_lifecycle(client):
             if order_id is not None:
                 client.cancel_contract_single_order(order_id)
 
-        batch = client.place_futures_batch_order(
-            [
-                {
-                    "product_symbol": FUTURES_SYMBOL,
-                    "size": size,
-                    "price": price,
-                    "tif": "poc",
-                    "text": _text(),
-                }
-            ]
+        order_id = None
+        try:
+            order = _futures_order_or_skip(
+                lambda: client.place_contract_post_only_limit_buy_order(FUTURES_SYMBOL, size, price)
+            )
+            order_id = str(order["id"])
+            assert client.cancel_contract_single_order(order_id) is not None
+            order_id = None
+        finally:
+            if order_id is not None:
+                client.cancel_contract_single_order(order_id)
+
+        order_id = None
+        try:
+            order = _futures_order_or_skip(
+                lambda: client.place_contract_post_only_limit_sell_order(
+                    FUTURES_SYMBOL,
+                    size,
+                    _contract_post_only_sell_price(client),
+                )
+            )
+            order_id = str(order["id"])
+            assert client.cancel_contract_single_order(order_id) is not None
+            order_id = None
+        finally:
+            if order_id is not None:
+                client.cancel_contract_single_order(order_id)
+
+        batch = _futures_order_or_skip(
+            lambda: client.place_futures_batch_order(
+                [
+                    {
+                        "product_symbol": FUTURES_SYMBOL,
+                        "size": size,
+                        "price": price,
+                        "tif": "poc",
+                        "text": _text(),
+                    }
+                ]
+            )
         )
         assert batch is not None
         assert client.cancel_contract_all_order_matched(product_symbol=FUTURES_SYMBOL) is not None
 
-        assert client.place_contract_market_order(FUTURES_SYMBOL, size) is not None
+        assert (
+            _futures_order_or_skip(lambda: client.place_contract_market_order(FUTURES_SYMBOL, size))
+            is not None
+        )
         assert _wait_for_position(client, sign=1) > 0
-        _close_position(client)
-
-        assert client.place_contract_market_buy_order(FUTURES_SYMBOL, size) is not None
-        assert _wait_for_position(client, sign=1) > 0
-        _close_position(client)
-
-        assert client.place_contract_market_sell_order(FUTURES_SYMBOL, size) is not None
-        assert _wait_for_position(client, sign=-1) < 0
         _close_position(client)
 
         assert (
-            client.place_contract_limit_buy_order(
-                FUTURES_SYMBOL,
-                size,
-                _contract_fillable_buy_price(client),
+            _futures_order_or_skip(
+                lambda: client.place_contract_market_buy_order(FUTURES_SYMBOL, size)
             )
             is not None
         )
@@ -599,10 +703,34 @@ def test_futures_stateful_order_lifecycle(client):
         _close_position(client)
 
         assert (
-            client.place_contract_limit_sell_order(
-                FUTURES_SYMBOL,
-                size,
-                _contract_fillable_sell_price(client),
+            _futures_order_or_skip(
+                lambda: client.place_contract_market_sell_order(FUTURES_SYMBOL, size)
+            )
+            is not None
+        )
+        assert _wait_for_position(client, sign=-1) < 0
+        _close_position(client)
+
+        assert (
+            _futures_order_or_skip(
+                lambda: client.place_contract_limit_buy_order(
+                    FUTURES_SYMBOL,
+                    size,
+                    _contract_fillable_buy_price(client),
+                )
+            )
+            is not None
+        )
+        assert _wait_for_position(client, sign=1) > 0
+        _close_position(client)
+
+        assert (
+            _futures_order_or_skip(
+                lambda: client.place_contract_limit_sell_order(
+                    FUTURES_SYMBOL,
+                    size,
+                    _contract_fillable_sell_price(client),
+                )
             )
             is not None
         )
@@ -637,6 +765,7 @@ def test_futures_stateful_order_lifecycle(client):
             )
     finally:
         _cleanup(client, initial_btc)
+        _return_transfers(client, transfers)
 
     assert not _spot_open_orders(client)
     assert not _futures_open_orders(client)

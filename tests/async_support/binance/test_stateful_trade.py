@@ -422,29 +422,41 @@ async def test_spot_market_order_round_trip(client):
             )
         )
         for create_order in (
-            lambda: client.place_limit_sell_order(
-                SPOT_SYMBOL, _format_decimal(acquired), sell_price
-            ),
-            lambda: client.place_post_only_limit_sell_order(
-                SPOT_SYMBOL, _format_decimal(acquired), sell_price
+            lambda quantity: client.place_limit_sell_order(SPOT_SYMBOL, quantity, sell_price),
+            lambda quantity: client.place_post_only_limit_sell_order(
+                SPOT_SYMBOL, quantity, sell_price
             ),
         ):
+            remaining = _round_to_step(
+                await _spot_free(client, "BTC") - btc_before,
+                step_size,
+                ROUND_DOWN,
+            )
+            if remaining <= 0:
+                break
             sell_order = None
             try:
-                sell_order = await create_order()
+                sell_order = await create_order(_format_decimal(remaining))
             finally:
                 if sell_order is not None:
-                    await client.cancel_order(
-                        product_symbol=SPOT_SYMBOL,
-                        orderId=int(sell_order["orderId"]),
+                    await _cancel_order_if_present(
+                        client,
+                        SPOT_SYMBOL,
+                        int(sell_order["orderId"]),
                     )
 
-        sell = await client.place_market_sell_order(
-            product_symbol=SPOT_SYMBOL,
-            quantity=_format_decimal(acquired),
-            newOrderRespType="FULL",
+        remaining = _round_to_step(
+            await _spot_free(client, "BTC") - btc_before,
+            step_size,
+            ROUND_DOWN,
         )
-        assert sell["status"] == "FILLED"
+        if remaining > 0:
+            sell = await client.place_market_sell_order(
+                product_symbol=SPOT_SYMBOL,
+                quantity=_format_decimal(remaining),
+                newOrderRespType="FULL",
+            )
+            assert sell["status"] == "FILLED"
     finally:
         remaining = _round_to_step(
             await _spot_free(client, "BTC") - btc_before,

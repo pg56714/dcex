@@ -4,6 +4,7 @@ import asyncio
 import os
 import uuid
 from contextlib import suppress
+from dataclasses import dataclass
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -22,6 +23,9 @@ FUTURES_SYMBOL = "BTC-USDT-SWAP"
 FUTURES_LEVERAGE = "2"
 SPOT_NOTIONAL_BUFFER = Decimal("1.05")
 MIN_FUTURES_AVAILABLE_USDT = Decimal("1")
+SPOT_ACCOUNT = "spot"
+FUTURES_ACCOUNT = "futures"
+TRANSFER_STEP = Decimal("0.00000001")
 
 pytestmark = [
     pytest.mark.asyncio,
@@ -64,6 +68,13 @@ def _text() -> str:
     return f"t-dcex-{uuid.uuid4().hex[:20]}"
 
 
+@dataclass(frozen=True)
+class _TransferBack:
+    from_account: str
+    to_account: str
+    amount: Decimal
+
+
 def _items(res: object) -> list[dict]:
     if isinstance(res, list):
         return [item for item in res if isinstance(item, dict)]
@@ -98,6 +109,83 @@ async def _futures_available_usdt(client: Client) -> Decimal:
         if key in data:
             return _dec(data.get(key))
     return Decimal("0")
+
+
+async def _account_usdt(client: Client, account: str) -> Decimal:
+    if account == SPOT_ACCOUNT:
+        return await _spot_available(client, "USDT")
+    if account == FUTURES_ACCOUNT:
+        return await _futures_available_usdt(client)
+    return Decimal("0")
+
+
+async def _wallet_transfer(
+    client: Client,
+    from_account: str,
+    to_account: str,
+    amount: Decimal,
+) -> None:
+    amount = _round_to_step(amount, TRANSFER_STEP, ROUND_DOWN)
+    if amount <= 0:
+        return
+    response = await client.wallet_transfer(
+        currency="USDT",
+        from_account=from_account,
+        to_account=to_account,
+        amount=_fmt(amount),
+        settle="usdt",
+    )
+    assert response is not None
+
+
+async def _return_transfer(client: Client, transfer: _TransferBack) -> None:
+    if transfer.amount <= 0:
+        return
+    amount = min(transfer.amount, await _account_usdt(client, transfer.from_account))
+    if amount <= 0:
+        return
+    await _wallet_transfer(client, transfer.from_account, transfer.to_account, amount)
+
+
+async def _return_transfers(client: Client, transfers: list[_TransferBack]) -> None:
+    for transfer in reversed(transfers):
+        await _return_transfer(client, transfer)
+
+
+async def _ensure_usdt(
+    client: Client,
+    target_account: str,
+    source_account: str,
+    required: Decimal,
+) -> _TransferBack:
+    target = await _account_usdt(client, target_account)
+    if target >= required:
+        return _TransferBack(target_account, source_account, Decimal("0"))
+
+    needed = _round_to_step(required - target, TRANSFER_STEP, ROUND_UP)
+    source = await _account_usdt(client, source_account)
+    if source < needed:
+        pytest.skip(
+            "Insufficient transferable Gate USDT for stateful order test: "
+            f"required={required}, {target_account}={target}, {source_account}={source}."
+        )
+
+    try:
+        await _wallet_transfer(client, source_account, target_account, needed)
+    except FailedRequestError as exc:
+        pytest.skip(
+            f"Gate wallet transfer {source_account}->{target_account} failed: {exc}"
+        )
+    await asyncio.sleep(2)
+
+    transfer = _TransferBack(target_account, source_account, needed)
+    if await _account_usdt(client, target_account) < required:
+        await _return_transfer(client, transfer)
+        pytest.skip(
+            f"Gate {target_account} USDT remains insufficient after transfer: "
+            f"required={required}."
+        )
+    return transfer
 
 
 async def _position_size(client: Client) -> Decimal:
@@ -247,9 +335,8 @@ def _spot_sell_amount(client: Client, amount: Decimal) -> str:
     return _fmt(_round_to_step(amount, step, ROUND_DOWN))
 
 
-async def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
-    if await _spot_available(client, "USDT") < required:
-        pytest.skip("Insufficient Gate spot USDT for stateful order test.")
+async def _ensure_spot_usdt(client: Client, required: Decimal) -> _TransferBack:
+    return await _ensure_usdt(client, SPOT_ACCOUNT, FUTURES_ACCOUNT, required)
 
 
 async def _contract_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
@@ -296,9 +383,13 @@ async def _contract_post_only_sell_price(client: Client) -> str:
     return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
-async def _ensure_futures_usdt(client: Client) -> None:
-    if await _futures_available_usdt(client) < MIN_FUTURES_AVAILABLE_USDT:
-        pytest.skip("Insufficient Gate futures USDT for stateful order test.")
+async def _ensure_futures_usdt(client: Client) -> _TransferBack:
+    return await _ensure_usdt(
+        client,
+        FUTURES_ACCOUNT,
+        SPOT_ACCOUNT,
+        MIN_FUTURES_AVAILABLE_USDT,
+    )
 
 
 def _skip_if_futures_margin_insufficient(exc: FailedRequestError) -> None:
@@ -351,9 +442,10 @@ async def _close_position(client: Client) -> None:
 async def test_spot_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
     initial_btc = await _spot_available(client, "BTC")
+    transfers: list[_TransferBack] = []
     try:
         amount, price = await _spot_post_only_buy_params(client)
-        await _ensure_spot_usdt(client, Decimal(amount) * Decimal(price))
+        transfers.append(await _ensure_spot_usdt(client, Decimal(amount) * Decimal(price)))
 
         order_id = None
         try:
@@ -415,7 +507,7 @@ async def test_spot_stateful_order_lifecycle(client):
                 await client.cancel_spot_single_order(order_id, SPOT_SYMBOL)
 
         quote_amount = await _spot_market_buy_amount(client)
-        await _ensure_spot_usdt(client, quote_amount)
+        transfers.append(await _ensure_spot_usdt(client, quote_amount))
         before_btc = await _spot_available(client, "BTC")
         assert await client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(quote_amount)) is not None
         await asyncio.sleep(2)
@@ -426,7 +518,7 @@ async def test_spot_stateful_order_lifecycle(client):
         await asyncio.sleep(2)
 
         quote_amount = await _spot_market_buy_amount(client)
-        await _ensure_spot_usdt(client, quote_amount)
+        transfers.append(await _ensure_spot_usdt(client, quote_amount))
         before_btc = await _spot_available(client, "BTC")
         assert (
             await client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(quote_amount)) is not None
@@ -439,7 +531,9 @@ async def test_spot_stateful_order_lifecycle(client):
         await asyncio.sleep(2)
 
         fill_amount, fill_price = await _spot_fillable_buy_params(client)
-        await _ensure_spot_usdt(client, Decimal(fill_amount) * Decimal(fill_price))
+        transfers.append(
+            await _ensure_spot_usdt(client, Decimal(fill_amount) * Decimal(fill_price))
+        )
         before_btc = await _spot_available(client, "BTC")
         try:
             assert (
@@ -468,7 +562,7 @@ async def test_spot_stateful_order_lifecycle(client):
                 await client.place_spot_market_sell_order(SPOT_SYMBOL, sell_amount)
 
         quote_amount = await _spot_market_buy_amount(client)
-        await _ensure_spot_usdt(client, quote_amount)
+        transfers.append(await _ensure_spot_usdt(client, quote_amount))
         before_btc = await _spot_available(client, "BTC")
         order_id = None
         try:
@@ -500,14 +594,16 @@ async def test_spot_stateful_order_lifecycle(client):
         )
     finally:
         await _cleanup(client, initial_btc)
+        await _return_transfers(client, transfers)
 
 
 async def test_futures_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
     initial_btc = await _spot_available(client, "BTC")
+    transfers: list[_TransferBack] = []
     try:
         size, price, _ = await _futures_order_params(client)
-        await _ensure_futures_usdt(client)
+        transfers.append(await _ensure_futures_usdt(client))
 
         assert await client.get_futures_all_positions(holding=False) is not None
         assert await client.get_contract_single_positions(product_symbol=FUTURES_SYMBOL) is not None
@@ -706,6 +802,7 @@ async def test_futures_stateful_order_lifecycle(client):
             )
     finally:
         await _cleanup(client, initial_btc)
+        await _return_transfers(client, transfers)
 
     assert not (await _spot_open_orders(client))
     assert not (await _futures_open_orders(client))

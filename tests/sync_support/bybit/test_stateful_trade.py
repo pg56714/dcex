@@ -461,23 +461,29 @@ def test_spot_stateful_order_lifecycle(client):
         _assert_ok(client.place_market_buy_order(SPOT_SYMBOL, _fmt(quote)))
         bought = _wait_for_spot_delta(client, before_btc)
         assert bought > 0
-        sell_size = _spot_sell_size(client, bought)
         sell_price = _spot_post_only_sell_price(client)
 
         for create_order in (
-            lambda: client.place_limit_sell_order(SPOT_SYMBOL, sell_size, sell_price),
-            lambda: client.place_post_only_limit_sell_order(SPOT_SYMBOL, sell_size, sell_price),
+            lambda quantity: client.place_limit_sell_order(SPOT_SYMBOL, quantity, sell_price),
+            lambda quantity: client.place_post_only_limit_sell_order(
+                SPOT_SYMBOL, quantity, sell_price
+            ),
         ):
+            remaining = _spot_sell_size(client, _wallet_available(client, "BTC") - before_btc)
+            if Decimal(remaining) <= 0:
+                break
             order_id = None
             try:
-                order_id = _order_id(create_order())
+                order_id = _order_id(create_order(remaining))
                 _cancel(client, order_id)
                 order_id = None
             finally:
                 if order_id is not None:
                     _cancel(client, order_id)
 
-        _assert_ok(client.place_market_sell_order(SPOT_SYMBOL, sell_size))
+        remaining = _spot_sell_size(client, _wallet_available(client, "BTC") - before_btc)
+        if Decimal(remaining) > 0:
+            _assert_ok(client.place_market_sell_order(SPOT_SYMBOL, remaining))
         time.sleep(2)
 
         transferred += _ensure_unified_usdt(client, quote)

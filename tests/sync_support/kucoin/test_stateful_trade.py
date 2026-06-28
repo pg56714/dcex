@@ -216,8 +216,22 @@ def _cancel_spot_order(client: Client, order_id: str) -> dict:
         return {"code": "200000", "data": {}}
 
 
+def _is_futures_order_not_cancelable(exc: FailedRequestError) -> bool:
+    message = str(exc).lower()
+    return "100004" in message and "cannot be canceled" in message
+
+
+def _cancel_futures_order(client: Client, order_id: str) -> dict:
+    try:
+        return client.cancel_futures_order(orderId=order_id)
+    except FailedRequestError as exc:
+        if _is_futures_order_not_cancelable(exc):
+            return {"code": "200000", "data": {}}
+        raise
+
+
 def _skip_if_spot_usdt_insufficient(client: Client, size: str, price: str) -> None:
-    required = Decimal(size) * Decimal(price)
+    required = Decimal(size) * Decimal(price) * Decimal("1.02")
     available = _available(client, "USDT", "trade")
     if available >= required:
         return
@@ -376,7 +390,7 @@ def test_futures_post_only_order_lifecycle(client):
         assert client.get_futures_open_order_value(product_symbol=FUTURES_SYMBOL).get("data")
     finally:
         if order_id is not None:
-            client.cancel_futures_order(orderId=order_id)
+            _cancel_futures_order(client, order_id)
 
 
 @pytest.mark.private
@@ -407,7 +421,7 @@ def test_futures_cancel_by_client_oid(client):
         order_id = None
     finally:
         if order_id is not None:
-            client.cancel_futures_order(orderId=order_id)
+            _cancel_futures_order(client, order_id)
 
 
 @pytest.mark.private
@@ -431,7 +445,7 @@ def test_futures_cancel_all_orders(client):
         order_id = None
     finally:
         if order_id is not None:
-            client.cancel_futures_order(orderId=order_id)
+            _cancel_futures_order(client, order_id)
 
 
 @pytest.mark.private

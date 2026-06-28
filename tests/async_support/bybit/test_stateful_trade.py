@@ -467,24 +467,30 @@ async def test_spot_stateful_order_lifecycle(client):
         _assert_ok(await client.place_market_buy_order(SPOT_SYMBOL, _fmt(quote)))
         bought = await _wait_for_spot_delta(client, before_btc)
         assert bought > 0
-        sell_size = _spot_sell_size(client, bought)
         sell_price = await _spot_post_only_sell_price(client)
 
         creators = (
-            lambda: client.place_limit_sell_order(SPOT_SYMBOL, sell_size, sell_price),
-            lambda: client.place_post_only_limit_sell_order(SPOT_SYMBOL, sell_size, sell_price),
+            lambda quantity: client.place_limit_sell_order(SPOT_SYMBOL, quantity, sell_price),
+            lambda quantity: client.place_post_only_limit_sell_order(
+                SPOT_SYMBOL, quantity, sell_price
+            ),
         )
         for create_order in creators:
+            remaining = _spot_sell_size(client, await _wallet_available(client, "BTC") - before_btc)
+            if Decimal(remaining) <= 0:
+                break
             order_id = None
             try:
-                order_id = _order_id(await create_order())
+                order_id = _order_id(await create_order(remaining))
                 await _cancel(client, order_id)
                 order_id = None
             finally:
                 if order_id is not None:
                     await _cancel(client, order_id)
 
-        _assert_ok(await client.place_market_sell_order(SPOT_SYMBOL, sell_size))
+        remaining = _spot_sell_size(client, await _wallet_available(client, "BTC") - before_btc)
+        if Decimal(remaining) > 0:
+            _assert_ok(await client.place_market_sell_order(SPOT_SYMBOL, remaining))
         await asyncio.sleep(2)
 
         transferred += await _ensure_unified_usdt(client, quote)
