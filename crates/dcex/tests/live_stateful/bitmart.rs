@@ -7,10 +7,11 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
     fetch_trading_details, find_f64, first_bid_price, format_transfer_amount_ceil,
-    leveraged_margin_required, margin_target, minimum_order_quantity_with_step, params,
-    post_only_buy_price, post_only_buy_price_from_bid, require_env, require_live_trading,
-    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
-    wait_for_non_empty_records, wait_for_positive_position, DOGE_USDT_SPOT, DOGE_USDT_SWAP,
+    format_transfer_amount_floor, leveraged_margin_required, margin_target,
+    minimum_order_quantity_with_step, params, post_only_buy_price, post_only_buy_price_from_bid,
+    require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
+    unique_client_id, wait_for_flat_position, wait_for_non_empty_records,
+    wait_for_positive_position, DOGE_USDT_SPOT, DOGE_USDT_SWAP,
 };
 
 const BITMART_CONTRACT_LEVERAGE: &str = "50";
@@ -302,7 +303,7 @@ async fn return_bitmart_contract_transfer(client: &BitmartClient, amount: f64) -
     if amount <= 0.0 {
         return Ok(());
     }
-    let amount = bitmart_transfer_amount(amount);
+    let amount = format_transfer_amount_floor(amount, 2);
     let response = super::common::exchange_method_request(
         &client,
         "transfer_contract",

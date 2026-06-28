@@ -183,6 +183,18 @@ pub(crate) fn format_transfer_amount_ceil(value: f64, decimals: usize) -> String
         .to_string()
 }
 
+pub(crate) fn format_transfer_amount_floor(value: f64, decimals: usize) -> String {
+    if !value.is_finite() || value <= 0.0 {
+        return "0".to_string();
+    }
+    let multiplier = 10_f64.powi(decimals as i32);
+    let value = (value * multiplier).floor() / multiplier;
+    format!("{value:.decimals$}")
+        .trim_end_matches('0')
+        .trim_end_matches('.')
+        .to_string()
+}
+
 pub(crate) fn first_bid_price(data: &Value) -> Result<f64> {
     first_book_price(data, &["bids", "b", "levels"], Some("Buy"))
 }
@@ -645,5 +657,11 @@ mod tests {
         });
 
         assert_eq!(first_bid_price(&data).expect("bid"), 63567.0);
+    }
+
+    #[test]
+    fn transfer_amount_floor_never_rounds_above_input() {
+        assert_eq!(format_transfer_amount_floor(1.23456789, 6), "1.234567");
+        assert_eq!(format_transfer_amount_floor(0.0000009, 6), "0");
     }
 }

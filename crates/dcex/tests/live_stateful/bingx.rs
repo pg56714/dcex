@@ -5,11 +5,11 @@ use dcex::exchanges::bingx::BingxClient;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    first_bid_price, format_transfer_amount, insufficient_funds_error, leveraged_margin_required,
-    margin_target, minimum_order_quantity, params, post_only_buy_price, price_below_market,
-    require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
-    unique_client_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    first_bid_price, format_transfer_amount_floor, insufficient_funds_error,
+    leveraged_margin_required, margin_target, minimum_order_quantity, params, post_only_buy_price,
+    price_below_market, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 use tokio::time::sleep;
 
@@ -403,7 +403,7 @@ async fn bingx_transfer(
     to_account: &str,
     amount: f64,
 ) -> dcex::Result<()> {
-    let amount = format_transfer_amount(amount);
+    let amount = format_transfer_amount_floor(amount, 6);
     let response = super::common::exchange_method_request(
         &client,
         "asset_transfer",

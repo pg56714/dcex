@@ -8,9 +8,9 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, bitget_unified_account_error,
     contains_non_empty_array, fetch_trading_details, first_bid_price, format_transfer_amount,
-    leveraged_margin_required, margin_target, minimum_order_quantity, params, post_only_buy_price,
-    price_below_market, push, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    format_transfer_amount_floor, leveraged_margin_required, margin_target, minimum_order_quantity,
+    params, post_only_buy_price, price_below_market, push, require_env, require_live_trading,
+    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
@@ -359,7 +359,7 @@ async fn return_bitget_futures_margin(
     if amount <= 0.0 {
         return Ok(());
     }
-    let amount = format_transfer_amount(amount);
+    let amount = format_transfer_amount_floor(amount, 6);
     let response = super::common::exchange_method_request(
         &client,
         "transfer",

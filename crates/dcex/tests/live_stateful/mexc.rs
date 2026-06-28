@@ -7,9 +7,10 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
     fetch_trading_details, find_f64, first_bid_price, format_transfer_amount,
-    insufficient_funds_error, leveraged_margin_required, margin_target, minimum_order_quantity,
-    params, post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
-    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    format_transfer_amount_floor, insufficient_funds_error, leveraged_margin_required,
+    margin_target, minimum_order_quantity, params, post_only_buy_price_from_bid,
+    price_below_market, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
@@ -288,7 +289,11 @@ async fn return_mexc_contract_transfer(client: &MexcClient, amount: f64) -> dcex
     if amount <= 0.0 {
         return Ok(());
     }
-    mexc_transfer(client, "FUTURES", "SPOT", amount).await
+    let amount = format_transfer_amount_floor(amount, 6);
+    if amount == "0" {
+        return Ok(());
+    }
+    mexc_transfer_formatted(client, "FUTURES", "SPOT", amount.as_str()).await
 }
 
 async fn mexc_transfer(
@@ -298,6 +303,15 @@ async fn mexc_transfer(
     amount: f64,
 ) -> dcex::Result<()> {
     let amount = format_transfer_amount(amount);
+    mexc_transfer_formatted(client, from_account, to_account, amount.as_str()).await
+}
+
+async fn mexc_transfer_formatted(
+    client: &MexcClient,
+    from_account: &str,
+    to_account: &str,
+    amount: &str,
+) -> dcex::Result<()> {
     let response = super::common::exchange_method_request(
         &client,
         "user_universal_transfer",
@@ -305,7 +319,7 @@ async fn mexc_transfer(
             ("fromAccountType", from_account),
             ("toAccountType", to_account),
             ("asset", "USDT"),
-            ("amount", amount.as_str()),
+            ("amount", amount),
         ]),
     )
     .await?;

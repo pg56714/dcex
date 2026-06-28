@@ -6,10 +6,11 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    first_bid_price, format_transfer_amount, leveraged_margin_required, margin_target,
-    minimum_order_quantity, parse_positive, post_only_buy_price_from_bid, price_below_market,
-    require_env, require_live_trading, require_order_id, sum_abs_values, wait_for_flat_position,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    first_bid_price, format_transfer_amount, format_transfer_amount_floor,
+    leveraged_margin_required, margin_target, minimum_order_quantity, parse_positive,
+    post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
+    require_order_id, sum_abs_values, wait_for_flat_position, wait_for_positive_position,
+    BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 struct TransferBack {
@@ -265,7 +266,7 @@ async fn return_binance_transfer(
     if amount <= 0.0 {
         return Ok(());
     }
-    let amount = format_transfer_amount(amount);
+    let amount = format_transfer_amount_floor(amount, 6);
     let response = client
         .create_universal_transfer(transfer.transfer_type, "USDT", amount.as_str())
         .await?;

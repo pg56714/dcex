@@ -6,10 +6,11 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, first_bid_price,
-    format_transfer_amount, insufficient_funds_error, leveraged_margin_required, margin_target,
-    minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
-    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    format_transfer_amount, format_transfer_amount_floor, insufficient_funds_error,
+    leveraged_margin_required, margin_target, minimum_order_quantity, params, parse_positive,
+    post_only_buy_price, require_env, require_live_trading, require_order_id,
+    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const OKX_SWAP_LEVERAGE: &str = "50";
@@ -254,7 +255,7 @@ async fn return_okx_transfer(client: &OkxClient, amount: f64) -> dcex::Result<()
         return Ok(());
     }
     let available = trading_usdt(client).await?;
-    let amount = format_transfer_amount(amount.min(available));
+    let amount = format_transfer_amount_floor(amount.min(available), 6);
     if amount == "0" {
         return Ok(());
     }

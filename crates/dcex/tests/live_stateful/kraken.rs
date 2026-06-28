@@ -7,9 +7,9 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, contains_non_empty_array, fetch_trading_details, find_f64, first_bid_price,
-    format_transfer_amount_ceil, leveraged_margin_required, minimum_order_quantity, optional_env,
-    params, parse_positive, post_only_buy_price, require_env, require_live_trading,
-    require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
+    format_transfer_amount_ceil, format_transfer_amount_floor, leveraged_margin_required,
+    minimum_order_quantity, optional_env, params, parse_positive, post_only_buy_price, require_env,
+    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
     wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
 };
 
@@ -150,7 +150,7 @@ async fn return_kraken_spot_transfer(
     if amount <= 0.0 {
         return Ok(());
     }
-    let amount = format_transfer_amount_ceil(amount, 8);
+    let amount = format_transfer_amount_floor(amount, 8);
     let response = super::common::exchange_method_request(
         &client,
         "wallet_transfer_to_futures",
@@ -167,7 +167,7 @@ async fn return_kraken_spot_transfer(
     if transfer.futures_wallet == "flex" {
         let accounts = client.get_futures_accounts().await?;
         let available = kraken_cash_available(&accounts.data, "usdt");
-        let amount = format_transfer_amount_ceil(
+        let amount = format_transfer_amount_floor(
             transfer
                 .amount
                 .min(available)
@@ -408,7 +408,7 @@ async fn return_kraken_futures_margin(client: &KrakenClient, amount: f64) -> dce
     if amount <= 0.0 {
         return Ok(());
     }
-    let amount = format_transfer_amount_ceil(amount, 8);
+    let amount = format_transfer_amount_floor(amount, 8);
     let response = super::common::exchange_method_request(
         &client,
         "futures_wallet_transfer",

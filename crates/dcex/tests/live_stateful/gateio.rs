@@ -6,10 +6,10 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    format_transfer_amount, insufficient_funds_error, leveraged_margin_required, margin_target,
-    minimum_order_quantity, params, post_only_buy_price, require_env, require_live_trading,
-    require_order_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    format_transfer_amount, format_transfer_amount_floor, insufficient_funds_error,
+    leveraged_margin_required, margin_target, minimum_order_quantity, params, post_only_buy_price,
+    require_env, require_live_trading, require_order_id, wait_for_flat_position,
+    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const GATEIO_CONTRACT_LEVERAGE_VALUE: f64 = 2.0;
@@ -312,7 +312,17 @@ async fn return_gateio_transfer(
     if amount <= 0.0 {
         return Ok(());
     }
-    gateio_transfer(client, transfer.from_account, transfer.to_account, amount).await
+    let amount = format_transfer_amount_floor(amount, 6);
+    if amount == "0" {
+        return Ok(());
+    }
+    gateio_transfer_formatted(
+        client,
+        transfer.from_account,
+        transfer.to_account,
+        amount.as_str(),
+    )
+    .await
 }
 
 async fn gateio_transfer(
@@ -322,6 +332,15 @@ async fn gateio_transfer(
     amount: f64,
 ) -> dcex::Result<()> {
     let amount = format_transfer_amount(amount);
+    gateio_transfer_formatted(client, from_account, to_account, amount.as_str()).await
+}
+
+async fn gateio_transfer_formatted(
+    client: &GateioClient,
+    from_account: &str,
+    to_account: &str,
+    amount: &str,
+) -> dcex::Result<()> {
     let response = super::common::exchange_method_request(
         &client,
         "wallet_transfer",
@@ -329,7 +348,7 @@ async fn gateio_transfer(
             ("currency", "USDT"),
             ("from", from_account),
             ("to", to_account),
-            ("amount", amount.as_str()),
+            ("amount", amount),
             ("settle", "usdt"),
         ]),
     )

@@ -7,11 +7,11 @@ use tokio::time::sleep;
 
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
-    fetch_trading_details, first_bid_price, format_transfer_amount_ceil, leveraged_margin_required,
-    margin_target, minimum_order_quantity, params, parse_positive, post_only_buy_price, push,
-    require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
-    wait_for_flat_position, wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    fetch_trading_details, first_bid_price, format_transfer_amount_ceil,
+    format_transfer_amount_floor, leveraged_margin_required, margin_target, minimum_order_quantity,
+    params, parse_positive, post_only_buy_price, push, require_env, require_live_trading,
+    require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
+    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const BYBIT_SWAP_LEVERAGE: &str = "50";
@@ -273,7 +273,7 @@ async fn return_bybit_transfer(client: &BybitClient, amount: f64) -> dcex::Resul
         return Ok(());
     }
     let available = account_usdt(client, "UNIFIED").await?;
-    let amount = format_transfer_amount_ceil(amount.min(available), 4);
+    let amount = format_transfer_amount_floor(amount.min(available), 4);
     if amount == "0" {
         return Ok(());
     }
