@@ -7,10 +7,10 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, bitget_unified_account_error, contains_non_empty_array,
-    fetch_trading_details, format_transfer_amount, leveraged_margin_required,
-    minimum_order_quantity, params, parse_positive, post_only_buy_price, push, require_env,
-    require_live_trading, require_order_id, sum_abs_values_for_symbols, unique_client_id,
-    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    fetch_trading_details, first_bid_price, format_transfer_amount, leveraged_margin_required,
+    minimum_order_quantity, params, post_only_buy_price, push, require_env, require_live_trading,
+    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const BITGET_FUTURES_PRODUCT_TYPE: &str = "USDT-FUTURES";
@@ -134,7 +134,7 @@ async fn bitget_swap_direct_live_stateful_order() -> dcex::Result<()> {
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     set_bitget_swap_leverage(&client, uta).await?;
-    let market_price_estimate = parse_positive(&price, "price")? / 0.95;
+    let market_price_estimate = first_bid_price(&orderbook.data)?;
     let required_usdt = leveraged_margin_required(
         market_price_estimate,
         &quantity,

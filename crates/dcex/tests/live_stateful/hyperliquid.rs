@@ -82,7 +82,7 @@ fn hyperliquid_post_only_buy_price(bid: f64) -> dcex::Result<String> {
             "invalid Hyperliquid bid price: {bid}"
         )));
     }
-    Ok((bid * 0.9).floor().to_string())
+    Ok(((bid.floor() - 1.0).max(1.0) as i64).to_string())
 }
 
 fn hyperliquid_order_size(price: &str, minimum_size: &str) -> dcex::Result<String> {

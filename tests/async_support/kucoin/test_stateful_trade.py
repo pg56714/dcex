@@ -17,6 +17,7 @@ load_dotenv()
 KUCOIN_API_KEY = os.getenv("KUCOIN_API_KEY")
 KUCOIN_API_SECRET = os.getenv("KUCOIN_API_SECRET")
 KUCOIN_API_PASSPHRASE = os.getenv("KUCOIN_API_PASSPHRASE")
+KUCOIN_API_KEY_VERSION = os.getenv("KUCOIN_API_KEY_VERSION") or None
 SPOT_SYMBOL = "BTC-USDT-SPOT"
 FUTURES_SYMBOL = "BTC-USDT-SWAP"
 FUTURES_LEVERAGE = Decimal("20")
@@ -39,6 +40,7 @@ async def client():
         api_key=KUCOIN_API_KEY,
         api_secret=KUCOIN_API_SECRET,
         passphrase=KUCOIN_API_PASSPHRASE,
+        api_key_version=KUCOIN_API_KEY_VERSION,
         timeout=20,
     ) as client_instance:
         yield client_instance
@@ -255,11 +257,11 @@ async def _spot_order_params(client: Client) -> tuple[str, str]:
     step = _dec(details["size_precision"], "0.00000001")
     min_size = _dec(details["min_size"], "0.00001")
     min_notional = max(_dec(details["min_notional"], "1"), Decimal("1"))
-    current_price = _dec(
-        (await client.get_spot_ticker(product_symbol=SPOT_SYMBOL))["data"]["price"]
+    best_bid = _dec(
+        (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL))["data"]["bids"][0][0]
     )
-    price = _round_to_step(current_price * Decimal("0.50"), tick, ROUND_DOWN)
-    size = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
 
 
@@ -270,8 +272,8 @@ async def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
     best_ask = _dec(
         (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL))["data"]["asks"][0][0]
     )
-    price = _round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP)
-    size = _round_to_step(max(min_notional * Decimal("1.25"), Decimal("1")) / price, step, ROUND_UP)
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
+    size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
 
 
@@ -280,7 +282,7 @@ async def _spot_fillable_limit_sell_price(client: Client) -> str:
     best_bid = _dec(
         (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL))["data"]["bids"][0][0]
     )
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - tick, tick, ROUND_DOWN))
 
 
 async def _spot_post_only_sell_price(client: Client) -> str:
@@ -288,7 +290,7 @@ async def _spot_post_only_sell_price(client: Client) -> str:
     best_ask = _dec(
         (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL))["data"]["asks"][0][0]
     )
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 async def _spot_sell_quantity(client: Client, quantity: Decimal) -> str:
@@ -298,7 +300,7 @@ async def _spot_sell_quantity(client: Client, quantity: Decimal) -> str:
 
 async def _spot_market_funds(client: Client) -> Decimal:
     _, _, min_notional = _spot_step_and_min(client)
-    return max(min_notional * Decimal("1.25"), Decimal("1"))
+    return min_notional * Decimal("1.01")
 
 
 async def _ensure_spot_funds(client: Client, funds: Decimal) -> None:
@@ -348,31 +350,36 @@ async def _futures_order_params(client: Client) -> tuple[int, str, Decimal, Deci
     current_price = _dec(
         (await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]["price"]
     )
-    price = _round_to_step(current_price * Decimal("0.50"), tick, ROUND_DOWN)
+    best_bid = _dec(
+        (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
+            "bids"
+        ][0][0]
+    )
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return int(max(lot, Decimal("1"))), _fmt(price), current_price, multiplier
 
 
 async def _futures_fillable_buy_price(client: Client) -> str:
     contract = (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"]
     tick = _dec(contract["tickSize"], "0.1")
-    price = _round_to_step(
-        _dec((await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]["price"])
-        * Decimal("1.02"),
-        tick,
-        ROUND_UP,
+    best_ask = _dec(
+        (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
+            "asks"
+        ][0][0]
     )
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     return _fmt(price)
 
 
 async def _futures_fillable_sell_price(client: Client) -> str:
     contract = (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"]
     tick = _dec(contract["tickSize"], "0.1")
-    price = _round_to_step(
-        _dec((await client.get_futures_ticker(product_symbol=FUTURES_SYMBOL))["data"]["price"])
-        * Decimal("0.98"),
-        tick,
-        ROUND_DOWN,
+    best_bid = _dec(
+        (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
+            "bids"
+        ][0][0]
     )
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return _fmt(price)
 
 
@@ -401,7 +408,7 @@ async def _ensure_futures_margin(
     leverage: Decimal = FUTURES_LEVERAGE,
 ) -> None:
     await _ensure_futures_cross_leverage(client)
-    required_margin = Decimal(price) * multiplier * Decimal(size) / leverage * Decimal("1.25")
+    required_margin = Decimal(price) * multiplier * Decimal(size) / leverage * Decimal("1.05")
     available = await _futures_available_usdt(client)
     if available >= required_margin:
         return
@@ -481,8 +488,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         order_id = order["data"]["orderId"]
         assert await _spot_open_orders(client)
         assert (
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
-            is not None
+            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
         )
         order_id = None
     finally:
@@ -518,8 +524,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["orderId"]
         assert (
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
-            is not None
+            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
         )
         order_id = None
     finally:
@@ -536,8 +541,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
         )
         order_id = order["data"]["orderId"]
         assert (
-            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL)
-            is not None
+            await client.cancel_spot_order(orderId=order_id, product_symbol=SPOT_SYMBOL) is not None
         )
         order_id = None
     finally:
@@ -826,15 +830,19 @@ async def _exercise_futures_stateful_methods(client: Client) -> None:
 
     order_id = None
     try:
+        tick = _dec(
+            (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"]["tickSize"],
+            "0.1",
+        )
+        best_ask = _dec(
+            (await client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5))["data"][
+                "asks"
+            ][0][0]
+        )
         high_price = _fmt(
             _round_to_step(
-                current_price * Decimal("1.50"),
-                _dec(
-                    (await client.get_futures_contract(product_symbol=FUTURES_SYMBOL))["data"][
-                        "tickSize"
-                    ],
-                    "0.1",
-                ),
+                best_ask + tick,
+                tick,
                 ROUND_UP,
             )
         )

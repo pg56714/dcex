@@ -123,6 +123,16 @@ def _transfer_sources(to_account: str) -> tuple[str, ...]:
     return (FUND_ACCOUNT, SPOT_ACCOUNT, SWAP_ACCOUNT)
 
 
+def _spot_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
+    data = client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]
+    return _dec(data["bids"][0][0]), _dec(data["asks"][0][0])
+
+
+def _swap_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
+    data = client.get_orderbook(product_symbol=SWAP_SYMBOL, limit=5)["data"]
+    return _dec(data["bids"][0][0]), _dec(data["asks"][0][0])
+
+
 def _swap_open_orders(client: Client) -> list[dict]:
     data = client.get_open_orders(product_symbol=SWAP_SYMBOL).get("data", {})
     orders = data.get("orders", []) if isinstance(data, dict) else []
@@ -158,9 +168,9 @@ def _swap_order_params(client: Client) -> tuple[str, str]:
     step = _dec(details["size_precision"], "0.0001")
     min_size = _dec(details["min_size"], "0.0001")
     min_notional = max(_dec(details["min_notional"], "2"), Decimal("2"))
-    current_price = _dec(client.get_ticker(product_symbol=SWAP_SYMBOL)["data"]["lastPrice"])
-    price = _round_to_step(current_price * Decimal("0.50"), tick, ROUND_DOWN)
-    quantity = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    best_bid, _ = _swap_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(quantity, min_size)), _fmt(price)
 
 
@@ -170,11 +180,9 @@ def _spot_order_params(client: Client) -> tuple[str, str]:
     step = _dec(details["size_precision"], "0.000001")
     min_size = _dec(details["min_size"], "0.000001")
     min_notional = max(_dec(details["min_notional"], "0.5"), Decimal("0.5"))
-    best_bid = _dec(
-        client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]["bids"][0][0]
-    )
-    price = _round_to_step(best_bid * Decimal("0.50"), tick, ROUND_DOWN)
-    quantity = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    best_bid, _ = _spot_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(quantity, min_size)), _fmt(price)
 
 
@@ -189,33 +197,27 @@ def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
 
 def _spot_market_quote_amount(client: Client) -> Decimal:
     _, _, min_notional = _spot_details(client)
-    return max(min_notional * Decimal("2"), Decimal("2"))
+    return min_notional * Decimal("1.01")
 
 
 def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_notional = _spot_details(client)
-    best_ask = _dec(
-        client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]["asks"][0][0]
-    )
-    price = _round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP)
+    _, best_ask = _spot_orderbook_prices(client)
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     quantity = _round_to_step(_spot_market_quote_amount(client) / price, step, ROUND_UP)
     return _fmt(quantity), _fmt(price)
 
 
 def _spot_fillable_limit_sell_price(client: Client) -> str:
     tick, _, _ = _spot_details(client)
-    best_bid = _dec(
-        client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]["bids"][0][0]
-    )
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+    best_bid, _ = _spot_orderbook_prices(client)
+    return _fmt(_round_to_step(best_bid - tick, tick, ROUND_DOWN))
 
 
 def _spot_post_only_sell_price(client: Client) -> str:
     tick, _, _ = _spot_details(client)
-    best_ask = _dec(
-        client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5)["data"]["asks"][0][0]
-    )
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    _, best_ask = _spot_orderbook_prices(client)
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 def _spot_trade_delta(client: Client, before: Decimal, asset: str) -> Decimal:
@@ -247,7 +249,7 @@ def _swap_current_price(client: Client) -> Decimal:
 
 def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
     current_price = _swap_current_price(client)
-    required = Decimal(quantity) * current_price / Decimal("10") * Decimal("1.50")
+    required = Decimal(quantity) * current_price / Decimal("10") * Decimal("1.05")
     _ensure_usdt_for_account(
         client=client,
         to_account=SWAP_ACCOUNT,
@@ -260,13 +262,15 @@ def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
 
 def _swap_fillable_limit_buy_price(client: Client) -> float:
     tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
-    price = _round_to_step(_swap_current_price(client) * Decimal("1.02"), tick, ROUND_UP)
+    _, best_ask = _swap_orderbook_prices(client)
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     return float(_fmt(price))
 
 
 def _swap_fillable_limit_sell_price(client: Client) -> float:
     tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
-    price = _round_to_step(_swap_current_price(client) * Decimal("0.98"), tick, ROUND_DOWN)
+    best_bid, _ = _swap_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return float(_fmt(price))
 
 
@@ -302,7 +306,7 @@ def _ensure_usdt_for_account(
         current_available = _account_available_usdt(client, to_account)
         if current_available >= required:
             return
-        amount = max(required - current_available + Decimal("0.5"), Decimal("1"))
+        amount = (required - current_available) * Decimal("1.01")
         try:
             transferable = _transferable(client, from_account, to_account, "USDT")
             source_available = _account_available_usdt(client, from_account)
@@ -340,7 +344,7 @@ def _ensure_usdt_for_account(
 
 
 def _ensure_swap_usdt(client: Client, quantity: str, price: str) -> None:
-    required = Decimal(quantity) * Decimal(price) / Decimal("10") * Decimal("1.25")
+    required = Decimal(quantity) * Decimal(price) / Decimal("10") * Decimal("1.05")
     _ensure_usdt_for_account(
         client=client,
         to_account=SWAP_ACCOUNT,
@@ -618,7 +622,8 @@ def test_swap_post_only_sell_order_lifecycle(client):
     quantity, _ = _swap_order_params(client)
     _ensure_swap_usdt_for_quantity(client, quantity)
     tick = _dec(client.ptm.get_trading_details("bingx", SWAP_SYMBOL)["price_precision"], "0.1")
-    price = _fmt(_round_to_step(_swap_current_price(client) * Decimal("1.50"), tick, ROUND_UP))
+    _, best_ask = _swap_orderbook_prices(client)
+    price = _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
     order_id = None
     try:
         order = client.place_swap_post_only_sell_order(

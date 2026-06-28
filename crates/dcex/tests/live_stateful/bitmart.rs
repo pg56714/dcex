@@ -6,9 +6,9 @@ use tokio::time::sleep;
 
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
-    fetch_trading_details, find_f64, format_transfer_amount, leveraged_margin_required,
-    minimum_order_quantity_with_step, params, parse_positive, post_only_buy_price,
-    price_below_market, require_env, require_live_trading, require_order_id,
+    fetch_trading_details, find_f64, first_bid_price, format_transfer_amount,
+    leveraged_margin_required, minimum_order_quantity_with_step, params, post_only_buy_price,
+    post_only_buy_price_from_bid, require_env, require_live_trading, require_order_id,
     sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_non_empty_records, wait_for_positive_position, DOGE_USDT_SPOT, DOGE_USDT_SWAP,
 };
@@ -43,7 +43,7 @@ async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
         ))
     })?;
     let details = fetch_trading_details(Exchange::BitMart, "bitmart", DOGE_USDT_SPOT).await?;
-    let price = price_below_market(bid, &details, 0.95)?;
+    let price = post_only_buy_price_from_bid(bid, &details)?;
     let size = minimum_order_quantity_with_step(&price, &details, Some(&details.min_size))?;
 
     let order = match super::common::exchange_method_request(
@@ -113,7 +113,7 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
     let details = fetch_trading_details(Exchange::BitMart, "bitmart", DOGE_USDT_SWAP).await?;
     let price = post_only_buy_price(&orderbook.data, &details)?;
     let size = minimum_order_quantity_with_step(&price, &details, Some(&details.min_size))?;
-    let market_price_estimate = parse_positive(&price, "price")? / 0.95;
+    let market_price_estimate = first_bid_price(&orderbook.data)?;
     let required_usdt = leveraged_margin_required(
         market_price_estimate,
         &size,

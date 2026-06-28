@@ -20,7 +20,6 @@ SPOT_SYMBOL = "BTC-USDT-SPOT"
 CONTRACT_SYMBOL = "BTC-USDT-SWAP"
 TRANSFER_AMOUNT = Decimal("1")
 FUTURES_TRANSFER_AMOUNT = Decimal("1")
-SPOT_TEST_NOTIONAL = Decimal("1.5")
 CONTRACT_TEST_LEVERAGE = 50
 CONTRACT_TEST_VOL = 1
 
@@ -162,20 +161,25 @@ async def _contract_prices(client: Client) -> tuple[Decimal, Decimal]:
 
 async def _contract_post_only_buy_price(client: Client) -> str:
     bid, _ = await _contract_prices(client)
-    return _fmt(_round_to_step(bid * Decimal("0.50"), Decimal("0.1"), ROUND_DOWN))
+    return _fmt(_round_to_step(bid - Decimal("0.1"), Decimal("0.1"), ROUND_DOWN))
 
 
 async def _contract_post_only_sell_price(client: Client) -> str:
     _, ask = await _contract_prices(client)
-    return _fmt(_round_to_step(ask * Decimal("1.50"), Decimal("0.1"), ROUND_UP))
+    return _fmt(_round_to_step(ask + Decimal("0.1"), Decimal("0.1"), ROUND_UP))
+
+
+async def _spot_market_notional(client: Client) -> Decimal:
+    _, min_notional, _ = await _spot_details(client)
+    return min_notional * Decimal("1.01")
 
 
 async def _post_only_buy_params(client: Client) -> tuple[str, str]:
     step, min_notional, price_step = await _spot_details(client)
     bid, _ = await _spot_prices(client)
-    price = _round_to_step(bid * Decimal("0.80"), price_step, ROUND_DOWN)
+    price = _round_to_step(bid - price_step, price_step, ROUND_DOWN)
     quantity = max(
-        _round_to_step((min_notional * Decimal("1.5")) / price, step, ROUND_UP),
+        _round_to_step((min_notional * Decimal("1.01")) / price, step, ROUND_UP),
         step,
     )
     return _fmt(quantity), _fmt(price)
@@ -184,7 +188,7 @@ async def _post_only_buy_params(client: Client) -> tuple[str, str]:
 async def _post_only_sell_price(client: Client) -> str:
     _, ask = await _spot_prices(client)
     _, _, price_step = await _spot_details(client)
-    return _fmt(_round_to_step(ask * Decimal("1.20"), price_step, ROUND_UP))
+    return _fmt(_round_to_step(ask + price_step, price_step, ROUND_UP))
 
 
 async def _sell_size(client: Client, amount: Decimal) -> Decimal:
@@ -324,7 +328,8 @@ async def test_transfer_round_trip(client):
 async def test_spot_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
     initial_btc = await _spot_available(client, "BTC")
-    await _ensure_spot_usdt(client, SPOT_TEST_NOTIONAL * Decimal("3"))
+    spot_notional = await _spot_market_notional(client)
+    await _ensure_spot_usdt(client, spot_notional * Decimal("3"))
 
     try:
         quantity, price = await _post_only_buy_params(client)
@@ -382,7 +387,7 @@ async def test_spot_stateful_order_lifecycle(client):
         before_btc = await _spot_available(client, "BTC")
         buy_order = await client.place_spot_market_buy_order(
             SPOT_SYMBOL,
-            _fmt(SPOT_TEST_NOTIONAL),
+            _fmt(spot_notional),
             _client_id(),
         )
         buy_order_id = _order_id(buy_order)
@@ -428,7 +433,7 @@ async def test_spot_stateful_order_lifecycle(client):
         assert await client.place_spot_market_order(
             SPOT_SYMBOL,
             "BUY",
-            quoteOrderQty=_fmt(SPOT_TEST_NOTIONAL),
+            quoteOrderQty=_fmt(spot_notional),
             newClientOrderId=_client_id(),
         )
         await asyncio.sleep(3)

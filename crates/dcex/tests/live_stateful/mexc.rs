@@ -7,8 +7,8 @@ use tokio::time::sleep;
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
     format_transfer_amount, leveraged_margin_required, minimum_order_quantity, params,
-    post_only_buy_price, price_below_market, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    post_only_buy_price, post_only_buy_price_from_bid, require_env, require_live_trading,
+    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
@@ -101,7 +101,7 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
         dcex::DcexError::Decode(format!("MEXC contract ticker has no bid: {ticker:?}"))
     })?;
     let details = fetch_trading_details(Exchange::Mexc, "mexc", BTC_USDT_SWAP).await?;
-    let price = price_below_market(bid, &details, 0.50)?;
+    let price = post_only_buy_price_from_bid(bid, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     let required_usdt =
         leveraged_margin_required(bid, &quantity, &details, MEXC_CONTRACT_LEVERAGE_VALUE)?;

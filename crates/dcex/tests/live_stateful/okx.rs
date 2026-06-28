@@ -5,7 +5,7 @@ use dcex::exchanges::okx::OkxClient;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, contains_non_empty_array, fetch_trading_details,
+    assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, first_bid_price,
     format_transfer_amount, leveraged_margin_required, minimum_order_quantity, params,
     parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
     sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
@@ -129,7 +129,7 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
     )
     .await?;
     assert_success(&leverage);
-    let market_price_estimate = parse_positive(&price, "price")? / 0.95;
+    let market_price_estimate = first_bid_price(&orderbook.data)?;
     let required_usdt = leveraged_margin_required(
         market_price_estimate,
         &quantity,

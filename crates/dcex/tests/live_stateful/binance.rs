@@ -7,9 +7,9 @@ use tokio::time::sleep;
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
     format_transfer_amount, leveraged_margin_required, minimum_order_quantity, parse_positive,
-    post_only_buy_price, price_below_market, require_env, require_live_trading, require_order_id,
-    sum_abs_values, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    post_only_buy_price, post_only_buy_price_from_bid, require_env, require_live_trading,
+    require_order_id, sum_abs_values, wait_for_flat_position, wait_for_positive_position,
+    BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 struct TransferBack {
@@ -103,7 +103,7 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     let bid = find_f64(&ticker.data, &["bidPrice", "bid"]).ok_or_else(|| {
         dcex::DcexError::Decode(format!("Binance futures ticker has no bid: {ticker:?}"))
     })?;
-    let price = price_below_market(bid, &details, 0.95)?;
+    let price = post_only_buy_price_from_bid(bid, &details)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     let leverage = client
         .set_leverage(BTC_USDT_SWAP, BINANCE_FUTURES_LEVERAGE)

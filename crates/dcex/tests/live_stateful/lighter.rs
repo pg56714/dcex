@@ -106,7 +106,12 @@ fn post_only_buy_order_amounts(market: &Value) -> dcex::Result<(i64, i64)> {
     let last_price = value_f64_required(market, "last_trade_price")?;
     let min_base = value_f64_required(market, "min_base_amount")?;
     let min_quote = value_f64_required(market, "min_quote_amount")?;
-    let price = scale_amount(last_price * 0.8, price_decimals, false)?;
+    let price_step = 1.0 / 10_f64.powi(price_decimals as i32);
+    let price = scale_amount(
+        (last_price - price_step).max(price_step),
+        price_decimals,
+        false,
+    )?;
     let price_float = (price as f64) / 10_f64.powi(price_decimals as i32);
     let min_size = 1.0 / 10_f64.powi(size_decimals as i32);
     let base = min_base.max(min_quote / price_float).max(min_size);

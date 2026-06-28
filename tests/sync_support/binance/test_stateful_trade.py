@@ -16,7 +16,6 @@ BINANCE_API_KEY = os.getenv("BINANCE_API_KEY")
 BINANCE_API_SECRET = os.getenv("BINANCE_API_SECRET")
 SPOT_SYMBOL = "BTC-USDT-SPOT"
 FUTURES_SYMBOL = "BTC-USDT-SWAP"
-SPOT_ROUND_TRIP_QUOTE = Decimal("12")
 TRANSFER_AMOUNT = Decimal("0.1")
 
 pytestmark = [
@@ -98,6 +97,20 @@ def _tick_size(client: Client, product_symbol: str, *, futures: bool) -> Decimal
     )
 
 
+def _spot_best_bid(client: Client, product_symbol: str) -> Decimal:
+    book = client.get_spot_orderbook(product_symbol=product_symbol, limit=5)
+    bids = book.get("bids", []) if isinstance(book, dict) else []
+    if not bids:
+        pytest.skip(f"{product_symbol} spot orderbook did not return bids.")
+    return Decimal(str(bids[0][0]))
+
+
+def _safe_spot_market_quote(client: Client, product_symbol: str) -> Decimal:
+    filters = _filters(_symbol_exchange_info(client, product_symbol, futures=False))
+    min_notional = _minimum_notional(filters, Decimal("10"))
+    return min_notional * Decimal("1.01")
+
+
 def _safe_buy_order_params(
     client: Client, product_symbol: str, *, futures: bool
 ) -> tuple[str, str]:
@@ -112,10 +125,10 @@ def _safe_buy_order_params(
     current_price = (
         Decimal(client.get_futures_ticker(product_symbol=product_symbol)["bidPrice"])
         if futures
-        else Decimal(client.get_spot_price(product_symbol=product_symbol)["price"])
+        else _spot_best_bid(client, product_symbol)
     )
-    price = _round_to_step(current_price * Decimal("0.90"), tick_size, ROUND_DOWN)
-    required_notional = max(min_notional * Decimal("1.10"), Decimal("11"))
+    price = _round_to_step(current_price - tick_size, tick_size, ROUND_DOWN)
+    required_notional = min_notional * Decimal("1.01")
     quantity = _round_to_step(required_notional / price, step_size, ROUND_UP)
     quantity = max(quantity, min_qty)
 
@@ -129,7 +142,7 @@ def _safe_market_quantity(client: Client, product_symbol: str) -> str:
     min_qty = Decimal(lot_filter["minQty"])
     min_notional = _minimum_notional(filters, Decimal("100"))
     price = Decimal(client.get_futures_ticker(product_symbol=product_symbol)["askPrice"])
-    required_notional = max(min_notional * Decimal("1.10"), Decimal("110"))
+    required_notional = min_notional * Decimal("1.01")
     quantity = _round_to_step(required_notional / price, step_size, ROUND_UP)
     return _format_decimal(max(quantity, min_qty))
 
@@ -331,9 +344,10 @@ def test_spot_cancel_all_open_orders(client):
 
 @pytest.mark.private
 def test_spot_market_order_round_trip(client):
+    quote_amount = _safe_spot_market_quote(client, SPOT_SYMBOL)
     transferred, reverse_type = _ensure_balance(
         client,
-        SPOT_ROUND_TRIP_QUOTE,
+        quote_amount,
         "spot",
     )
     step_size = _step_size(client, SPOT_SYMBOL, futures=False)
@@ -344,7 +358,7 @@ def test_spot_market_order_round_trip(client):
             product_symbol=SPOT_SYMBOL,
             side="BUY",
             type_="MARKET",
-            quoteOrderQty=_format_decimal(SPOT_ROUND_TRIP_QUOTE),
+            quoteOrderQty=_format_decimal(quote_amount),
             newOrderRespType="FULL",
         )
         assert order["status"] == "FILLED"
@@ -357,8 +371,7 @@ def test_spot_market_order_round_trip(client):
         assert acquired > 0
         sell_price = _format_decimal(
             _round_to_step(
-                Decimal(client.get_spot_price(product_symbol=SPOT_SYMBOL)["price"])
-                * Decimal("1.10"),
+                Decimal(client.get_spot_price(product_symbol=SPOT_SYMBOL)["price"]) + tick_size,
                 tick_size,
                 ROUND_UP,
             )
@@ -408,7 +421,7 @@ def test_futures_post_only_order_lifecycle(client):
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
     transferred, reverse_type = _ensure_balance(
         client,
-        Decimal(quantity) * Decimal(price) / Decimal("20") * Decimal("1.10"),
+        Decimal(quantity) * Decimal(price) / Decimal("20") * Decimal("1.05"),
         "futures",
     )
     test_res = client.test_order(
@@ -456,7 +469,7 @@ def test_futures_cancel_all_open_orders(client):
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
     transferred, reverse_type = _ensure_balance(
         client,
-        Decimal(quantity) * Decimal(price) / Decimal("20") * Decimal("1.10"),
+        Decimal(quantity) * Decimal(price) / Decimal("20") * Decimal("1.05"),
         "futures",
     )
     try:
@@ -480,7 +493,12 @@ def test_futures_market_long_round_trip(client):
 
     quantity = _safe_market_quantity(client, FUTURES_SYMBOL)
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
-    transferred, reverse_type = _ensure_balance(client, Decimal("7"), "futures")
+    price = Decimal(client.get_futures_ticker(product_symbol=FUTURES_SYMBOL)["askPrice"])
+    transferred, reverse_type = _ensure_balance(
+        client,
+        Decimal(quantity) * price / Decimal("20") * Decimal("1.05"),
+        "futures",
+    )
     try:
         open_order = client.place_market_buy_order(
             product_symbol=FUTURES_SYMBOL,
@@ -502,7 +520,12 @@ def test_futures_market_short_round_trip(client):
 
     quantity = _safe_market_quantity(client, FUTURES_SYMBOL)
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
-    transferred, reverse_type = _ensure_balance(client, Decimal("7"), "futures")
+    price = Decimal(client.get_futures_ticker(product_symbol=FUTURES_SYMBOL)["bidPrice"])
+    transferred, reverse_type = _ensure_balance(
+        client,
+        Decimal(quantity) * price / Decimal("20") * Decimal("1.05"),
+        "futures",
+    )
     try:
         open_order = client.place_market_sell_order(
             product_symbol=FUTURES_SYMBOL,
@@ -549,13 +572,17 @@ def test_advanced_order_validation(client):
     futures_price = Decimal(client.get_futures_ticker(product_symbol=FUTURES_SYMBOL)["askPrice"])
     futures_tick = _tick_size(client, FUTURES_SYMBOL, futures=True)
     trigger_price = _format_decimal(
-        _round_to_step(futures_price * Decimal("1.10"), futures_tick, ROUND_UP)
+        _round_to_step(futures_price + futures_tick, futures_tick, ROUND_UP)
     )
 
     if client.get_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL):
         pytest.skip("BTCUSDT futures already has algo orders; not canceling unrelated orders.")
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
-    transferred, reverse_type = _ensure_balance(client, Decimal("7"), "futures")
+    transferred, reverse_type = _ensure_balance(
+        client,
+        Decimal(futures_quantity) * futures_price / Decimal("20") * Decimal("1.05"),
+        "futures",
+    )
     algo_order = None
     client_algo_id = f"dcx{int(time.time() * 1000)}"
     try:

@@ -19,10 +19,7 @@ ASTER_SIGNER_ADDRESS = os.getenv("ASTER_SIGNER_ADDRESS")
 ASTER_PRIVATE_KEY = os.getenv("ASTER_PRIVATE_KEY")
 SPOT_SYMBOL = "USDCUSDT"
 FUTURES_SYMBOL = "ASTERUSDT"
-SPOT_TRANSFER_AMOUNT = Decimal("5.1")
 SPOT_USDT_BUFFER = Decimal("0.02")
-SPOT_ORDER_QUANTITY = "5"
-SPOT_BUY_QUOTE = "5.01"
 
 pytestmark = [
     pytest.mark.private,
@@ -78,7 +75,7 @@ async def _futures_balance(client: Client, asset: str) -> Decimal:
     return _dec(item.get("balance"))
 
 
-async def _market_info(client: Client) -> tuple[Decimal, Decimal]:
+async def _market_info(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
     response = await client.get_spot_exchange_info(SPOT_SYMBOL)
     assert isinstance(response, dict)
     market = next(
@@ -91,15 +88,38 @@ async def _market_info(client: Client) -> tuple[Decimal, Decimal]:
         for item in market.get("filters", [])
         if isinstance(item, dict) and item.get("filterType")
     }
-    return _dec(filters["PRICE_FILTER"]["tickSize"]), _dec(filters["MIN_NOTIONAL"]["minNotional"])
+    return (
+        _dec(filters["PRICE_FILTER"]["tickSize"]),
+        _dec(filters["LOT_SIZE"]["stepSize"]),
+        _dec(filters["LOT_SIZE"]["minQty"]),
+        _dec(filters["MIN_NOTIONAL"]["minNotional"]),
+    )
+
+
+def _round_to_step(value: Decimal, step: Decimal, rounding: str) -> Decimal:
+    return (value / step).to_integral_value(rounding=rounding) * step
+
+
+async def _spot_order_params(client: Client) -> tuple[str, Decimal, Decimal]:
+    _, step, min_qty, min_notional = await _market_info(client)
+    book = await client.get_spot_orderbook(SPOT_SYMBOL, limit=5)
+    assert isinstance(book, dict)
+    bid = _dec(book["bids"][0][0])
+    quantity = max(
+        _round_to_step(min_notional * Decimal("1.01") / bid, step, ROUND_UP),
+        min_qty,
+    )
+    transfer_amount = quantity
+    buy_quote = min_notional * Decimal("1.01")
+    return format(quantity, "f"), transfer_amount, buy_quote
 
 
 async def _safe_sell_price(client: Client) -> str:
-    tick, _ = await _market_info(client)
+    tick, _, _, _ = await _market_info(client)
     book = await client.get_spot_orderbook(SPOT_SYMBOL, limit=5)
     assert isinstance(book, dict)
     ask = _dec(book["asks"][0][0])
-    value = (ask * Decimal("1.05") / tick).to_integral_value(rounding=ROUND_UP) * tick
+    value = _round_to_step(ask + tick, tick, ROUND_UP)
     return format(value, "f")
 
 
@@ -133,15 +153,27 @@ async def _futures_order_params(client: Client) -> tuple[str, str, str, str]:
     book = await client.get_futures_orderbook(FUTURES_SYMBOL, limit=5)
     assert isinstance(book, dict)
     bid = _dec(book["bids"][0][0])
-    quantity = ((min_notional * Decimal("1.10") / bid) / step).to_integral_value(
-        rounding=ROUND_UP
-    ) * step
 
-    def price(multiplier: str) -> str:
-        value = (bid * Decimal(multiplier) / tick).to_integral_value(rounding=ROUND_DOWN) * tick
-        return format(value, "f")
+    def price_value(ticks_below: int) -> Decimal:
+        value = _round_to_step(bid - tick * ticks_below, tick, ROUND_DOWN)
+        if value <= 0:
+            pytest.skip(f"{FUTURES_SYMBOL} futures bid is too small for a post-only test order.")
+        return value
 
-    return format(quantity, "f"), price("0.95"), price("0.94"), price("0.93")
+    first_price = price_value(1)
+    modified_price = price_value(2)
+    batch_price = price_value(3)
+    quantity = _round_to_step(
+        min_notional * Decimal("1.01") / batch_price,
+        step,
+        ROUND_UP,
+    )
+    return (
+        format(quantity, "f"),
+        format(first_price, "f"),
+        format(modified_price, "f"),
+        format(batch_price, "f"),
+    )
 
 
 async def _futures_safe_sell_price(client: Client) -> str:
@@ -149,7 +181,7 @@ async def _futures_safe_sell_price(client: Client) -> str:
     book = await client.get_futures_orderbook(FUTURES_SYMBOL, limit=5)
     assert isinstance(book, dict)
     ask = _dec(book["asks"][0][0])
-    value = (ask * Decimal("1.05") / tick).to_integral_value(rounding=ROUND_UP) * tick
+    value = _round_to_step(ask + tick, tick, ROUND_UP)
     return format(value, "f")
 
 
@@ -295,8 +327,9 @@ async def _return_test_funds(
 async def test_spot_order_and_transfer_lifecycle(client):
     if await client.get_spot_open_orders(SPOT_SYMBOL):
         pytest.skip(f"Aster already has {SPOT_SYMBOL} open orders.")
-    if await _futures_balance(client, "USDC") < SPOT_TRANSFER_AMOUNT:
-        pytest.skip("Aster futures wallet requires at least 5.1 USDC.")
+    spot_quantity, spot_transfer_amount, spot_buy_quote = await _spot_order_params(client)
+    if await _futures_balance(client, "USDC") < spot_transfer_amount:
+        pytest.skip("Aster futures wallet lacks the minimum USDC for this spot test.")
     if await _futures_balance(client, "USDT") < SPOT_USDT_BUFFER:
         pytest.skip("Aster futures wallet requires at least 0.02 USDT.")
 
@@ -304,7 +337,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
     try:
         await _transfer(
             client,
-            amount=SPOT_TRANSFER_AMOUNT,
+            amount=spot_transfer_amount,
             asset="USDC",
             kind_type="FUTURE_SPOT",
             market="futures",
@@ -324,7 +357,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
                 SPOT_SYMBOL,
                 side="SELL",
                 type_="LIMIT",
-                quantity=SPOT_ORDER_QUANTITY,
+                quantity=spot_quantity,
                 price=price,
                 timeInForce="GTC",
             )
@@ -347,7 +380,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
                 SPOT_SYMBOL,
                 side="SELL",
                 type_="LIMIT",
-                quantity=SPOT_ORDER_QUANTITY,
+                quantity=spot_quantity,
                 price=price,
                 timeInForce="GTC",
             )
@@ -365,7 +398,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
                 SPOT_SYMBOL,
                 side="SELL",
                 type_="MARKET",
-                quantity=SPOT_ORDER_QUANTITY,
+                quantity=spot_quantity,
             ),
             dict,
         )
@@ -373,14 +406,14 @@ async def test_spot_order_and_transfer_lifecycle(client):
         gained_usdt = (await _spot_balances(client)).get(
             "USDT", Decimal("0")
         ) - initial_balances.get("USDT", Decimal("0"))
-        assert gained_usdt >= Decimal(SPOT_BUY_QUOTE)
+        assert gained_usdt >= spot_buy_quote
 
         assert isinstance(
             await client.place_spot_order(
                 SPOT_SYMBOL,
                 side="BUY",
                 type_="MARKET",
-                quoteOrderQty=SPOT_BUY_QUOTE,
+                quoteOrderQty=format(spot_buy_quote, "f"),
             ),
             dict,
         )

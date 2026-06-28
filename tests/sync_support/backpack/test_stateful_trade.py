@@ -110,8 +110,8 @@ def _safe_limit_price(client: Client, symbol: str, side: str) -> str:
     tick, _, _ = _market_details(client, symbol)
     bid, ask = _book_prices(client, symbol)
     if side == "Bid":
-        return _fmt(_round_to_step(bid * Decimal("0.5"), tick, ROUND_DOWN))
-    return _fmt(_round_to_step(ask * Decimal("1.5"), tick, ROUND_UP))
+        return _fmt(_round_to_step(bid - tick, tick, ROUND_DOWN))
+    return _fmt(_round_to_step(ask + tick, tick, ROUND_UP))
 
 
 def _min_quantity(client: Client, symbol: str) -> Decimal:
@@ -178,7 +178,7 @@ def test_spot_stateful_order_lifecycle(client):
     min_qty = _min_quantity(client, SPOT_SYMBOL)
     qty = min_qty * 2
     _, ask = _book_prices(client, SPOT_SYMBOL)
-    _ensure_usdc(client, qty * ask * Decimal("1.2"))
+    _ensure_usdc(client, qty * ask * Decimal("1.01"))
     initial_sol = _total_asset(client, "SOL")
     if initial_sol >= min_qty:
         pytest.skip("Backpack already has a tradable SOL balance.")

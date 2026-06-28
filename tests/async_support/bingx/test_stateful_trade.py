@@ -141,6 +141,16 @@ def _transfer_sources(to_account: str) -> tuple[str, ...]:
     return (FUND_ACCOUNT, SPOT_ACCOUNT, SWAP_ACCOUNT)
 
 
+async def _spot_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
+    data = (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5))["data"]
+    return _dec(data["bids"][0][0]), _dec(data["asks"][0][0])
+
+
+async def _swap_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
+    data = (await client.get_orderbook(product_symbol=SWAP_SYMBOL, limit=5))["data"]
+    return _dec(data["bids"][0][0]), _dec(data["asks"][0][0])
+
+
 async def _asset_transfer(
     client: Client,
     from_account: str,
@@ -173,7 +183,7 @@ async def _ensure_usdt_for_account(
         current_available = await _account_available_usdt(client, to_account)
         if current_available >= required:
             return
-        amount = max(required - current_available + Decimal("0.5"), Decimal("1"))
+        amount = (required - current_available) * Decimal("1.01")
         try:
             transferable = await _transferable(client, from_account, to_account, "USDT")
             source_available = await _account_available_usdt(client, from_account)
@@ -241,43 +251,35 @@ def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
 
 async def _spot_order_params(client: Client) -> tuple[str, str]:
     tick, step, min_notional = _spot_details(client)
-    best_bid = _dec(
-        (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5))["data"]["bids"][0][0]
-    )
-    price = _round_to_step(best_bid * Decimal("0.50"), tick, ROUND_DOWN)
-    quantity = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    best_bid, _ = await _spot_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(quantity), _fmt(price)
 
 
 async def _spot_market_quote_amount(client: Client) -> Decimal:
     _, _, min_notional = _spot_details(client)
-    return max(min_notional * Decimal("2"), Decimal("2"))
+    return min_notional * Decimal("1.01")
 
 
 async def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
     tick, step, _ = _spot_details(client)
-    best_ask = _dec(
-        (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5))["data"]["asks"][0][0]
-    )
-    price = _round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP)
+    _, best_ask = await _spot_orderbook_prices(client)
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     quantity = _round_to_step((await _spot_market_quote_amount(client)) / price, step, ROUND_UP)
     return _fmt(quantity), _fmt(price)
 
 
 async def _spot_fillable_limit_sell_price(client: Client) -> str:
     tick, _, _ = _spot_details(client)
-    best_bid = _dec(
-        (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5))["data"]["bids"][0][0]
-    )
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+    best_bid, _ = await _spot_orderbook_prices(client)
+    return _fmt(_round_to_step(best_bid - tick, tick, ROUND_DOWN))
 
 
 async def _spot_post_only_sell_price(client: Client) -> str:
     tick, _, _ = _spot_details(client)
-    best_ask = _dec(
-        (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL, limit=5))["data"]["asks"][0][0]
-    )
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    _, best_ask = await _spot_orderbook_prices(client)
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 async def _spot_trade_delta(client: Client, before: Decimal, asset: str) -> Decimal:
@@ -331,26 +333,29 @@ def _swap_details(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
 
 async def _swap_order_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _swap_details(client)
-    price = _round_to_step((await _swap_current_price(client)) * Decimal("0.50"), tick, ROUND_DOWN)
-    quantity = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    best_bid, _ = await _swap_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    quantity = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(quantity, min_size)), _fmt(price)
 
 
 async def _swap_fillable_limit_buy_price(client: Client) -> float:
     tick, _, _, _ = _swap_details(client)
-    price = _round_to_step((await _swap_current_price(client)) * Decimal("1.02"), tick, ROUND_UP)
+    _, best_ask = await _swap_orderbook_prices(client)
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
     return float(_fmt(price))
 
 
 async def _swap_fillable_limit_sell_price(client: Client) -> float:
     tick, _, _, _ = _swap_details(client)
-    price = _round_to_step((await _swap_current_price(client)) * Decimal("0.98"), tick, ROUND_DOWN)
+    best_bid, _ = await _swap_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return float(_fmt(price))
 
 
 async def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
     required = (
-        Decimal(quantity) * await _swap_current_price(client) / Decimal("10") * Decimal("1.75")
+        Decimal(quantity) * await _swap_current_price(client) / Decimal("10") * Decimal("1.05")
     )
     await _ensure_usdt_for_account(
         client=client,
@@ -537,7 +542,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
     await _ensure_usdt_for_account(
         client,
         SPOT_ACCOUNT,
-        quote_amount + Decimal("0.5"),
+        quote_amount,
         await _spot_available(client, "USDT"),
     )
     bought = await _spot_market_buy_delta(client, quote_amount)
@@ -597,7 +602,7 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
     await _ensure_usdt_for_account(
         client,
         SPOT_ACCOUNT,
-        quote_amount + Decimal("0.5"),
+        quote_amount,
         await _spot_available(client, "USDT"),
     )
     before_btc = await _spot_available(client, "BTC")
@@ -750,13 +755,9 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
 
     order_id = None
     try:
-        high_price = _fmt(
-            _round_to_step(
-                (await _swap_current_price(client)) * Decimal("1.50"),
-                _swap_details(client)[0],
-                ROUND_UP,
-            )
-        )
+        tick = _swap_details(client)[0]
+        _, best_ask = await _swap_orderbook_prices(client)
+        high_price = _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
         order = await client.place_swap_post_only_sell_order(
             SWAP_SYMBOL,
             quantity=float(quantity),

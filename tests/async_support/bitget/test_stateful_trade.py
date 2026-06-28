@@ -21,7 +21,6 @@ BITGET_PASSPHRASE = os.getenv("BITGET_PASSPHRASE")
 SPOT_SYMBOL = "BTC-USDT-SPOT"
 SWAP_SYMBOL = "BTC-USDT-SWAP"
 EXCHANGE_SYMBOL = "BTCUSDT"
-SPOT_TEST_NOTIONAL = Decimal("5.8")
 FUTURES_TRANSFER_AMOUNT = Decimal("2")
 FUTURES_SIZE = Decimal("0.0001")
 IS_UTA: bool | None = None
@@ -147,9 +146,9 @@ async def _spot_prices(client: Client) -> tuple[Decimal, Decimal]:
 async def _spot_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     bid, _ = await _spot_prices(client)
-    price = _round_to_step(bid * Decimal("0.98"), tick, ROUND_DOWN)
+    price = _round_to_step(bid - tick, tick, ROUND_DOWN)
     size = max(
-        _round_to_step((min_notional * Decimal("1.12")) / price, step, ROUND_UP),
+        _round_to_step((min_notional * Decimal("1.01")) / price, step, ROUND_UP),
         min_size,
     )
     return _fmt(size), _fmt(price)
@@ -158,7 +157,12 @@ async def _spot_buy_params(client: Client) -> tuple[str, str]:
 async def _spot_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     _, ask = await _spot_prices(client)
-    return _fmt(_round_to_step(ask * Decimal("1.02"), tick, ROUND_UP))
+    return _fmt(_round_to_step(ask + tick, tick, ROUND_UP))
+
+
+def _spot_market_notional(client: Client) -> Decimal:
+    _, _, _, min_notional = _spot_details(client)
+    return min_notional * Decimal("1.01")
 
 
 def _spot_sell_size(client: Client, amount: Decimal) -> Decimal:
@@ -179,14 +183,14 @@ async def _futures_prices(client: Client) -> tuple[Decimal, Decimal]:
 async def _futures_buy_params(client: Client) -> tuple[str, str]:
     tick, min_size = _futures_details(client)
     bid, _ = await _futures_prices(client)
-    price = _round_to_step(bid * Decimal("0.98"), tick, ROUND_DOWN)
+    price = _round_to_step(bid - tick, tick, ROUND_DOWN)
     return _fmt(max(FUTURES_SIZE, min_size)), _fmt(price)
 
 
 async def _futures_sell_price(client: Client) -> str:
     tick, _ = _futures_details(client)
     _, ask = await _futures_prices(client)
-    return _fmt(_round_to_step(ask * Decimal("1.02"), tick, ROUND_UP))
+    return _fmt(_round_to_step(ask + tick, tick, ROUND_UP))
 
 
 def _order_id(response) -> str:
@@ -571,7 +575,8 @@ async def test_transfer_round_trip(client):
 async def test_spot_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
     initial_btc = await _spot_available(client, "BTC")
-    await _ensure_spot_usdt(client, SPOT_TEST_NOTIONAL)
+    spot_notional = _spot_market_notional(client)
+    await _ensure_spot_usdt(client, spot_notional)
 
     try:
         size, price = await _spot_buy_params(client)
@@ -594,11 +599,9 @@ async def test_spot_stateful_order_lifecycle(client):
 
         before_btc = await _spot_available(client, "BTC")
         if await _is_uta(client):
-            _assert_ok(await _place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+            _assert_ok(await _place_spot_market(client, "buy", _fmt(spot_notional)))
         else:
-            _assert_ok(
-                await client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(SPOT_TEST_NOTIONAL))
-            )
+            _assert_ok(await client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(spot_notional)))
         await asyncio.sleep(2)
         acquired = _spot_sell_size(client, await _spot_available(client, "BTC") - before_btc)
         assert acquired > 0
@@ -635,10 +638,10 @@ async def test_spot_stateful_order_lifecycle(client):
 
         before_btc = await _spot_available(client, "BTC")
         if await _is_uta(client):
-            _assert_ok(await _place_spot_market(client, "buy", _fmt(SPOT_TEST_NOTIONAL)))
+            _assert_ok(await _place_spot_market(client, "buy", _fmt(spot_notional)))
         else:
             _assert_ok(
-                await client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(SPOT_TEST_NOTIONAL))
+                await client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(spot_notional))
             )
         await asyncio.sleep(2)
         acquired = _spot_sell_size(client, await _spot_available(client, "BTC") - before_btc)

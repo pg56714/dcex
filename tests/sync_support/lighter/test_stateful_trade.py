@@ -59,10 +59,8 @@ def _post_only_buy_order(market: dict) -> tuple[int, int, int]:
     price_decimals = int(market["price_decimals"])
     size_decimals = int(market["size_decimals"])
     last_price = Decimal(str(market["last_trade_price"]))
-    price = (last_price * Decimal("0.8")).quantize(
-        Decimal(1).scaleb(-price_decimals),
-        rounding=ROUND_DOWN,
-    )
+    price_step = Decimal(1).scaleb(-price_decimals)
+    price = (last_price - price_step).quantize(price_step, rounding=ROUND_DOWN)
     min_base = Decimal(str(market["min_base_amount"]))
     min_quote = Decimal(str(market["min_quote_amount"]))
     min_size = Decimal(1).scaleb(-size_decimals)
@@ -86,8 +84,8 @@ def _ioc_market_order(client: Client, market: dict) -> tuple[int, int, int, int]
     min_size = Decimal(1).scaleb(-size_decimals)
     base = max(min_base, min_quote / best_ask).quantize(min_size, rounding=ROUND_CEILING)
     price_step = Decimal(1).scaleb(-price_decimals)
-    buy_price = (best_ask * Decimal("1.02")).quantize(price_step, rounding=ROUND_CEILING)
-    sell_price = (best_bid * Decimal("0.98")).quantize(price_step, rounding=ROUND_DOWN)
+    buy_price = (best_ask + price_step).quantize(price_step, rounding=ROUND_CEILING)
+    sell_price = (best_bid - price_step).quantize(price_step, rounding=ROUND_DOWN)
     return (
         market_index,
         int(base * (Decimal(10) ** size_decimals)),

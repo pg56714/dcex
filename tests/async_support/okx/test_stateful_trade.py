@@ -125,15 +125,15 @@ async def _spot_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
 async def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     best_bid, _ = await _spot_orderbook_prices(client)
-    price = _round_to_step(best_bid * Decimal("0.50"), tick, ROUND_DOWN)
-    size = _round_to_step(min_notional * Decimal("1.5") / price, step, ROUND_UP)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
 
 
 async def _spot_post_only_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     _, best_ask = await _spot_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 def _spot_sell_size(client: Client, size: Decimal) -> str:
@@ -143,7 +143,7 @@ def _spot_sell_size(client: Client, size: Decimal) -> str:
 
 def _spot_market_quote(client: Client) -> Decimal:
     _, _, _, min_notional = _spot_details(client)
-    return max(min_notional * Decimal("2"), Decimal("2"))
+    return min_notional * Decimal("1.01")
 
 
 async def _open_orders(client: Client, product_symbol: str) -> list[dict]:

@@ -202,34 +202,34 @@ def _spot_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
 def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     best_bid, _ = _spot_orderbook_prices(client)
-    price = _round_to_step(best_bid * Decimal("0.50"), tick, ROUND_DOWN)
-    amount = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    amount = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
 
 def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
-    price = _round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP)
-    amount = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
+    amount = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
 
 def _spot_fillable_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     best_bid, _ = _spot_orderbook_prices(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - tick, tick, ROUND_DOWN))
 
 
 def _spot_post_only_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 def _spot_market_buy_amount(client: Client) -> Decimal:
     _, _, _, min_notional = _spot_details(client)
-    return max(min_notional * Decimal("1.25"), Decimal("1"))
+    return min_notional * Decimal("1.01")
 
 
 def _spot_sell_amount(client: Client, amount: Decimal) -> str:
@@ -252,7 +252,8 @@ def _futures_order_params(client: Client) -> tuple[int, str, Decimal]:
     if last_price <= 0:
         _, asks_price = _contract_orderbook_prices(client)
         last_price = asks_price
-    price = _round_to_step(last_price * Decimal("0.50"), tick, ROUND_DOWN)
+    best_bid, _ = _contract_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return int(min_size), _fmt(price), last_price
 
 
@@ -268,21 +269,21 @@ def _contract_fillable_buy_price(client: Client) -> str:
     details = client.ptm.get_trading_details("gateio", FUTURES_SYMBOL)
     tick = _dec(details["price_precision"], "0.1")
     _, best_ask = _contract_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 def _contract_fillable_sell_price(client: Client) -> str:
     details = client.ptm.get_trading_details("gateio", FUTURES_SYMBOL)
     tick = _dec(details["price_precision"], "0.1")
     best_bid, _ = _contract_orderbook_prices(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - tick, tick, ROUND_DOWN))
 
 
 def _contract_post_only_sell_price(client: Client) -> str:
     details = client.ptm.get_trading_details("gateio", FUTURES_SYMBOL)
     tick = _dec(details["price_precision"], "0.1")
     _, best_ask = _contract_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 def _ensure_futures_usdt(client: Client) -> None:
@@ -416,8 +417,7 @@ def test_spot_stateful_order_lifecycle(client):
         before_btc = _spot_available(client, "BTC")
         try:
             assert (
-                client.place_spot_limit_buy_order(SPOT_SYMBOL, fill_amount, fill_price)
-                is not None
+                client.place_spot_limit_buy_order(SPOT_SYMBOL, fill_amount, fill_price) is not None
             )
             time.sleep(2)
             acquired = _spot_available(client, "BTC") - before_btc
@@ -511,8 +511,7 @@ def test_futures_stateful_order_lifecycle(client):
             order = client.place_contract_limit_order(FUTURES_SYMBOL, size, price)
             order_id = str(order["id"])
             assert (
-                client.cancel_contract_all_order_matched(product_symbol=FUTURES_SYMBOL)
-                is not None
+                client.cancel_contract_all_order_matched(product_symbol=FUTURES_SYMBOL) is not None
             )
             order_id = None
             time.sleep(1)

@@ -15,6 +15,7 @@ load_dotenv()
 KUCOIN_API_KEY = os.getenv("KUCOIN_API_KEY")
 KUCOIN_API_SECRET = os.getenv("KUCOIN_API_SECRET")
 KUCOIN_API_PASSPHRASE = os.getenv("KUCOIN_API_PASSPHRASE")
+KUCOIN_API_KEY_VERSION = os.getenv("KUCOIN_API_KEY_VERSION") or None
 SPOT_SYMBOL = "BTC-USDT-SPOT"
 FUTURES_SYMBOL = "BTC-USDT-SWAP"
 FUTURES_LEVERAGE = Decimal("20")
@@ -36,6 +37,7 @@ def client():
         api_key=KUCOIN_API_KEY,
         api_secret=KUCOIN_API_SECRET,
         passphrase=KUCOIN_API_PASSPHRASE,
+        api_key_version=KUCOIN_API_KEY_VERSION,
     )
 
 
@@ -110,9 +112,9 @@ def _spot_order_params(client: Client) -> tuple[str, str]:
     step = _dec(details["size_precision"], "0.00000001")
     min_size = _dec(details["min_size"], "0.00001")
     min_notional = max(_dec(details["min_notional"], "1"), Decimal("1"))
-    current_price = _dec(client.get_spot_ticker(product_symbol=SPOT_SYMBOL)["data"]["price"])
-    price = _round_to_step(current_price * Decimal("0.50"), tick, ROUND_DOWN)
-    size = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    best_bid = _dec(client.get_spot_orderbook(product_symbol=SPOT_SYMBOL)["data"]["bids"][0][0])
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
 
 
@@ -140,7 +142,10 @@ def _futures_order_params(client: Client) -> tuple[int, str, Decimal, Decimal]:
     lot = _dec(contract["lotSize"], "1")
     multiplier = _dec(contract["multiplier"], "0.001")
     current_price = _dec(client.get_futures_ticker(product_symbol=FUTURES_SYMBOL)["data"]["price"])
-    price = _round_to_step(current_price * Decimal("0.50"), tick, ROUND_DOWN)
+    best_bid = _dec(
+        client.get_futures_orderbook(product_symbol=FUTURES_SYMBOL, depth=5)["data"]["bids"][0][0]
+    )
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return int(max(lot, Decimal("1"))), _fmt(price), current_price, multiplier
 
 
@@ -164,7 +169,7 @@ def _skip_if_futures_margin_insufficient(
     leverage: Decimal = FUTURES_LEVERAGE,
 ) -> None:
     _ensure_futures_cross_leverage(client)
-    required_margin = Decimal(price) * multiplier * Decimal(size) / leverage * Decimal("1.25")
+    required_margin = Decimal(price) * multiplier * Decimal(size) / leverage * Decimal("1.05")
     available = _futures_available_usdt(client)
     if available >= required_margin:
         return
@@ -306,7 +311,7 @@ def test_spot_cancel_all_orders(client):
 @pytest.mark.private
 def test_spot_market_round_trip(client):
     step, min_size, min_notional = _spot_step_and_min(client)
-    funds = max(min_notional * Decimal("1.25"), Decimal("1"))
+    funds = min_notional * Decimal("1.01")
     _skip_if_spot_funds_insufficient(client, funds)
 
     btc_before = _available(client, "BTC", "trade")

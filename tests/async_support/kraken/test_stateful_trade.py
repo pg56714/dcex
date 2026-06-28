@@ -117,10 +117,10 @@ async def _spot_symbol_with_funds(client: Client) -> tuple[str, str, Decimal, De
             _, ask = await _spot_prices(client, product_symbol)
             _, step, min_size, min_notional = _spot_details(client, product_symbol)
             volume = max(
-                _round_to_step(min_notional * Decimal("1.2") / ask, step, ROUND_UP),
+                _round_to_step(min_notional * Decimal("1.01") / ask, step, ROUND_UP),
                 min_size,
             )
-            if await _spot_available(client, quote) >= volume * ask * Decimal("1.05"):
+            if await _spot_available(client, quote) >= volume * ask * Decimal("1.01"):
                 return product_symbol, quote, step, min_size, volume
     pytest.skip("Insufficient Kraken spot quote balance for BTC spot order tests.")
 
@@ -129,9 +129,9 @@ async def _spot_limit_buy_params(client: Client) -> tuple[str, str, str]:
     product_symbol, quote, _, _, _ = await _spot_symbol_with_funds(client)
     tick, step, min_size, min_notional = _spot_details(client, product_symbol)
     bid, _ = await _spot_prices(client, product_symbol)
-    price = _round_to_step(bid * Decimal("0.50"), tick, ROUND_DOWN)
+    price = _round_to_step(bid - tick, tick, ROUND_DOWN)
     volume = max(
-        _round_to_step(min_notional * Decimal("1.2") / price, step, ROUND_UP),
+        _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP),
         min_size,
     )
     if await _spot_available(client, quote) < price * volume:
@@ -142,7 +142,7 @@ async def _spot_limit_buy_params(client: Client) -> tuple[str, str, str]:
 async def _spot_high_sell_price(client: Client, product_symbol: str) -> str:
     tick, _, _, _ = _spot_details(client, product_symbol)
     _, ask = await _spot_prices(client, product_symbol)
-    return _fmt(_round_to_step(ask * Decimal("1.50"), tick, ROUND_UP))
+    return _fmt(_round_to_step(ask + tick, tick, ROUND_UP))
 
 
 def _spot_txid(response) -> str:
@@ -264,9 +264,9 @@ async def _futures_order_params(client: Client, side: str) -> tuple[str, str]:
     asks = book.get("asks", []) if isinstance(book, dict) else []
     assert bids and asks
     if side == "buy":
-        price = _round_to_step(_dec(bids[0][0]) * Decimal("0.50"), tick, ROUND_DOWN)
+        price = _round_to_step(_dec(bids[0][0]) - tick, tick, ROUND_DOWN)
     else:
-        price = _round_to_step(_dec(asks[0][0]) * Decimal("1.50"), tick, ROUND_UP)
+        price = _round_to_step(_dec(asks[0][0]) + tick, tick, ROUND_UP)
     return _fmt(min_size), _fmt(price)
 
 

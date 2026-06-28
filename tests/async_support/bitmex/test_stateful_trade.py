@@ -108,22 +108,28 @@ async def _tick_size(client: Client) -> Decimal:
     return _dec(data[0].get("tickSize"), "0.1")
 
 
+async def _order_qty(client: Client) -> int:
+    data = await client.get_instrument_info(product_symbol=SYMBOL)
+    if not data:
+        return ORDER_QTY
+    lot_size = _dec(data[0].get("lotSize"), str(ORDER_QTY))
+    return int(max(lot_size, Decimal("1")))
+
+
 def _round_to_tick(value: Decimal, tick: Decimal, rounding: str) -> Decimal:
     return (value / tick).to_integral_value(rounding=rounding) * tick
 
 
 async def _post_only_buy_price(client: Client) -> float:
     best_bid, _ = await _best_prices(client)
-    return float(
-        _round_to_tick(best_bid * Decimal("0.50"), await _tick_size(client), ROUND_DOWN)
-    )
+    tick = await _tick_size(client)
+    return float(_round_to_tick(best_bid - tick, tick, ROUND_DOWN))
 
 
 async def _post_only_sell_price(client: Client) -> float:
     _, best_ask = await _best_prices(client)
-    return float(
-        _round_to_tick(best_ask * Decimal("1.50"), await _tick_size(client), ROUND_UP)
-    )
+    tick = await _tick_size(client)
+    return float(_round_to_tick(best_ask + tick, tick, ROUND_UP))
 
 
 async def _fillable_buy_price(client: Client) -> float:
@@ -147,7 +153,7 @@ async def _available_margin(client: Client) -> Decimal:
 
 async def _ensure_margin(client: Client) -> None:
     leverage = max(_dec((await _position(client)).get("leverage"), "1"), Decimal("1"))
-    required_margin = Decimal(ORDER_QTY) / leverage * MARGIN_UNIT * Decimal("1.5")
+    required_margin = Decimal(await _order_qty(client)) / leverage * MARGIN_UNIT * Decimal("1.05")
     if await _available_margin(client) < required_margin:
         pytest.skip("Insufficient BitMEX available margin for stateful order test.")
 
@@ -197,6 +203,7 @@ async def _assert_order_visible(client: Client, order_id: str) -> None:
 async def test_async_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
     await _ensure_margin(client)
+    qty = await _order_qty(client)
 
     try:
         order_id = None
@@ -205,7 +212,7 @@ async def test_async_stateful_order_lifecycle(client):
             order = await client.place_order(
                 SYMBOL,
                 side="Buy",
-                orderQty=ORDER_QTY,
+                orderQty=qty,
                 ordType="Limit",
                 price=price,
                 execInst="ParticipateDoNotInitiate",
@@ -216,8 +223,7 @@ async def test_async_stateful_order_lifecycle(client):
             await _assert_order_visible(client, order_id)
             assert await client.amend_order(orderID=order_id, price=price - 1.0) is not None
             assert (
-                await client.cancel_order(orderID=order_id, text="dcex stateful cancel")
-                is not None
+                await client.cancel_order(orderID=order_id, text="dcex stateful cancel") is not None
             )
             order_id = None
         finally:
@@ -229,7 +235,7 @@ async def test_async_stateful_order_lifecycle(client):
             order = await client.place_limit_order(
                 SYMBOL,
                 side="Buy",
-                orderQty=ORDER_QTY,
+                orderQty=qty,
                 price=await _post_only_buy_price(client),
                 clOrdID=_client_id(),
             )
@@ -249,7 +255,7 @@ async def test_async_stateful_order_lifecycle(client):
             order = await client.place_post_only_order(
                 SYMBOL,
                 side="Buy",
-                orderQty=ORDER_QTY,
+                orderQty=qty,
                 price=await _post_only_buy_price(client),
                 clOrdID=_client_id(),
             )
@@ -264,7 +270,7 @@ async def test_async_stateful_order_lifecycle(client):
         try:
             order = await client.place_post_only_buy_order(
                 SYMBOL,
-                orderQty=ORDER_QTY,
+                orderQty=qty,
                 price=await _post_only_buy_price(client),
                 clOrdID=_client_id(),
             )
@@ -279,7 +285,7 @@ async def test_async_stateful_order_lifecycle(client):
         try:
             order = await client.place_post_only_sell_order(
                 SYMBOL,
-                orderQty=ORDER_QTY,
+                orderQty=qty,
                 price=await _post_only_sell_price(client),
                 clOrdID=_client_id(),
             )
@@ -290,31 +296,22 @@ async def test_async_stateful_order_lifecycle(client):
             if order_id is not None:
                 await client.cancel_order(orderID=order_id)
 
-        assert (
-            await client.place_market_buy_order(SYMBOL, ORDER_QTY, clOrdID=_client_id())
-            is not None
-        )
+        assert await client.place_market_buy_order(SYMBOL, qty, clOrdID=_client_id()) is not None
         assert await _wait_for_position(client, sign=1) > 0
         await _close_position(client)
 
-        assert (
-            await client.place_market_sell_order(SYMBOL, ORDER_QTY, clOrdID=_client_id())
-            is not None
-        )
+        assert await client.place_market_sell_order(SYMBOL, qty, clOrdID=_client_id()) is not None
         assert await _wait_for_position(client, sign=-1) < 0
         await _close_position(client)
 
-        assert (
-            await client.place_market_order(SYMBOL, "Buy", ORDER_QTY, clOrdID=_client_id())
-            is not None
-        )
+        assert await client.place_market_order(SYMBOL, "Buy", qty, clOrdID=_client_id()) is not None
         assert await _wait_for_position(client, sign=1) > 0
         await _close_position(client)
 
         assert (
             await client.place_limit_buy_order(
                 SYMBOL,
-                ORDER_QTY,
+                qty,
                 await _fillable_buy_price(client),
                 clOrdID=_client_id(),
             )
@@ -326,7 +323,7 @@ async def test_async_stateful_order_lifecycle(client):
         assert (
             await client.place_limit_sell_order(
                 SYMBOL,
-                ORDER_QTY,
+                qty,
                 await _fillable_sell_price(client),
                 clOrdID=_client_id(),
             )

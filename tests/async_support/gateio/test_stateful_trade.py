@@ -203,34 +203,34 @@ async def _spot_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
 async def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     best_bid, _ = await _spot_orderbook_prices(client)
-    price = _round_to_step(best_bid * Decimal("0.50"), tick, ROUND_DOWN)
-    amount = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    amount = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
 
 async def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     _, best_ask = await _spot_orderbook_prices(client)
-    price = _round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP)
-    amount = _round_to_step(min_notional * Decimal("1.25") / price, step, ROUND_UP)
+    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
+    amount = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
 
 async def _spot_fillable_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     best_bid, _ = await _spot_orderbook_prices(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - tick, tick, ROUND_DOWN))
 
 
 async def _spot_post_only_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     _, best_ask = await _spot_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 def _spot_market_buy_amount(client: Client) -> Decimal:
     _, _, _, min_notional = _spot_details(client)
-    return max(min_notional * Decimal("1.25"), Decimal("1"))
+    return min_notional * Decimal("1.01")
 
 
 def _spot_sell_amount(client: Client, amount: Decimal) -> str:
@@ -261,7 +261,8 @@ async def _futures_order_params(client: Client) -> tuple[int, str, Decimal]:
     if last_price <= 0:
         _, asks_price = await _contract_orderbook_prices(client)
         last_price = asks_price
-    price = _round_to_step(last_price * Decimal("0.50"), tick, ROUND_DOWN)
+    best_bid, _ = await _contract_orderbook_prices(client)
+    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
     return int(min_size), _fmt(price), last_price
 
 
@@ -269,21 +270,21 @@ async def _contract_fillable_buy_price(client: Client) -> str:
     details = client.ptm.get_trading_details("gateio", FUTURES_SYMBOL)
     tick = _dec(details["price_precision"], "0.1")
     _, best_ask = await _contract_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.02"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 async def _contract_fillable_sell_price(client: Client) -> str:
     details = client.ptm.get_trading_details("gateio", FUTURES_SYMBOL)
     tick = _dec(details["price_precision"], "0.1")
     best_bid, _ = await _contract_orderbook_prices(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), tick, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - tick, tick, ROUND_DOWN))
 
 
 async def _contract_post_only_sell_price(client: Client) -> str:
     details = client.ptm.get_trading_details("gateio", FUTURES_SYMBOL)
     tick = _dec(details["price_precision"], "0.1")
     _, best_ask = await _contract_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), tick, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
 
 
 async def _ensure_futures_usdt(client: Client) -> None:
@@ -405,8 +406,7 @@ async def test_spot_stateful_order_lifecycle(client):
         await _ensure_spot_usdt(client, quote_amount)
         before_btc = await _spot_available(client, "BTC")
         assert (
-            await client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(quote_amount))
-            is not None
+            await client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(quote_amount)) is not None
         )
         await asyncio.sleep(2)
         acquired = await _spot_available(client, "BTC") - before_btc
@@ -473,8 +473,7 @@ async def test_spot_stateful_order_lifecycle(client):
                 await client.place_spot_market_sell_order(SPOT_SYMBOL, sell_amount)
 
         assert (
-            await client.get_spot_trading_history(product_symbol=SPOT_SYMBOL, limit=10)
-            is not None
+            await client.get_spot_trading_history(product_symbol=SPOT_SYMBOL, limit=10) is not None
         )
     finally:
         await _cleanup(client, initial_btc)
@@ -510,8 +509,7 @@ async def test_futures_stateful_order_lifecycle(client):
             assert await client.get_contract_single_order(order_id) is not None
             amended_price = _fmt(Decimal(price) * Decimal("0.99"))
             assert (
-                await client.amend_futures_single_order(order_id, price=amended_price)
-                is not None
+                await client.amend_futures_single_order(order_id, price=amended_price) is not None
             )
             assert await client.cancel_contract_single_order(order_id) is not None
             order_id = None

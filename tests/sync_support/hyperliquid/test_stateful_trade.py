@@ -19,8 +19,8 @@ PRIVATE_KEY = os.getenv("HYPERLIQUID_PRIVATE_KEY")
 SYMBOL = "BTC-USD-SWAP"
 SPOT_SYMBOL = "PURR-USDC-SPOT"
 ORDER_SIZE = Decimal("0.0002")
-SPOT_ORDER_NOTIONAL = Decimal("12")
-SPOT_REQUIRED_USDC = Decimal("12.5")
+SPOT_ORDER_NOTIONAL = Decimal("10.5")
+SPOT_REQUIRED_USDC = Decimal("10.6")
 ACCOUNT_USER: str | None = None
 PERPS_ACCOUNT_VALUE: Decimal | None = None
 SPOT_AVAILABLE_USDC: Decimal | None = None
@@ -85,11 +85,11 @@ def _mid_price(client: Client) -> Decimal:
 
 
 def _post_only_buy_price(client: Client) -> str:
-    return str(int(_mid_price(client) * Decimal("0.9")))
+    return str(max(int(_mid_price(client)) - 1, 1))
 
 
 def _post_only_sell_price(client: Client) -> str:
-    return str(int(_mid_price(client) * Decimal("1.1")))
+    return str(int(_mid_price(client)) + 1)
 
 
 def _format_hyperliquid_price(value: Decimal, rounding: str) -> str:
@@ -247,7 +247,7 @@ def _cancel_open_orders(client: Client) -> None:
 
 def _spot_post_only_buy_price(client: Client) -> str:
     best_bid = Decimal(str(client.get_l2book(product_symbol=SPOT_SYMBOL)["levels"][0][0]["px"]))
-    return _format_hyperliquid_price(best_bid * Decimal("0.8"), ROUND_DOWN)
+    return _format_hyperliquid_price(best_bid, ROUND_DOWN)
 
 
 def _spot_post_only_buy(client: Client) -> tuple[str, str]:
@@ -258,7 +258,7 @@ def _spot_post_only_buy(client: Client) -> tuple[str, str]:
 
 def _spot_aggressive_buy(client: Client) -> tuple[str, str]:
     best_ask = Decimal(str(client.get_l2book(product_symbol=SPOT_SYMBOL)["levels"][1][0]["px"]))
-    price = Decimal(_format_hyperliquid_price(best_ask * Decimal("1.025"), rounding=ROUND_UP))
+    price = Decimal(_format_hyperliquid_price(best_ask * Decimal("1.005"), rounding=ROUND_UP))
     size = int((SPOT_ORDER_NOTIONAL / price).to_integral_value(rounding=ROUND_DOWN))
     return str(size), format(price, "f")
 
@@ -273,7 +273,7 @@ def _spot_aggressive_sell_price(client: Client, size: Decimal | None = None) -> 
         cumulative += Decimal(str(level["sz"]))
         if cumulative >= target:
             break
-    return _format_hyperliquid_price(price * Decimal("0.975"), ROUND_DOWN)
+    return _format_hyperliquid_price(price * Decimal("0.995"), ROUND_DOWN)
 
 
 def _close_spot_test_delta(client: Client, before: Decimal, remaining: Decimal) -> None:

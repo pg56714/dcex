@@ -82,6 +82,10 @@ pub(crate) fn require_env(names: &[&str]) -> Option<Vec<String>> {
     }
 }
 
+pub(crate) fn optional_env(name: &str) -> Option<String> {
+    env_value(name)
+}
+
 pub(crate) fn unique_client_id(prefix: &str) -> String {
     format!("{prefix}{}", now_ms())
 }
@@ -194,7 +198,24 @@ pub(crate) async fn fetch_trading_details(
 }
 
 pub(crate) fn post_only_buy_price(data: &Value, details: &TradingDetails) -> Result<String> {
-    price_below_market(first_bid_price(data)?, details, 0.95)
+    post_only_buy_price_from_bid(first_bid_price(data)?, details)
+}
+
+pub(crate) fn post_only_buy_price_from_bid(bid: f64, details: &TradingDetails) -> Result<String> {
+    if !bid.is_finite() || bid <= 0.0 {
+        return Err(DcexError::Decode(format!("invalid bid price: {bid}")));
+    }
+    let price_step = positive_decimal(&details.price_precision, "price_precision")?;
+    let candidate = if bid > price_step {
+        bid - price_step
+    } else {
+        bid * 0.99
+    };
+    let price = round_down_to_step(candidate, price_step);
+    if price > 0.0 && price < bid {
+        return format_step_decimal(price, price_step);
+    }
+    price_below_market(bid, details, 0.95)
 }
 
 pub(crate) fn price_below_market(
@@ -239,7 +260,7 @@ pub(crate) fn leveraged_margin_required(
     if !leverage.is_finite() || leverage <= 0.0 {
         return Err(DcexError::Decode(format!("invalid leverage: {leverage}")));
     }
-    Ok(order_notional(price, quantity, details)? / leverage * 1.25)
+    Ok(order_notional(price, quantity, details)? / leverage * 1.05)
 }
 
 pub(crate) fn minimum_order_quantity_with_step(

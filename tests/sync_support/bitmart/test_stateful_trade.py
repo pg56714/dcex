@@ -24,7 +24,6 @@ CONTRACT_SYMBOL = "DOGE-USDT-SWAP"
 CONTRACT_SIZE = 1
 CONTRACT_LEVERAGE = "50"
 CONTRACT_TRANSFER_USDT = Decimal("2")
-SPOT_TEST_NOTIONAL = Decimal("5.4")
 
 pytestmark = [
     pytest.mark.private,
@@ -95,11 +94,7 @@ def _order_id(res: dict) -> str:
 
 def _skip_if_account_restriction(exc: FailedRequestError) -> None:
     message = str(exc)
-    if (
-        "33136" in message
-        or "personal verification" in message.lower()
-        or "60052" in message
-    ):
+    if "33136" in message or "personal verification" in message.lower() or "60052" in message:
         pytest.skip(f"BitMart account restriction prevented live trading endpoint: {exc}")
     raise exc
 
@@ -180,14 +175,14 @@ def _spot_best_prices(client: Client) -> tuple[Decimal, Decimal]:
 def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = _spot_pair_details(client)
     best_bid, _ = _spot_best_prices(client)
-    price = _round_to_step(best_bid * Decimal("0.98"), price_step, ROUND_DOWN)
-    size = _round_to_step((min_notional * Decimal("1.05")) / price, base_step, ROUND_UP)
+    price = _round_to_step(best_bid - price_step, price_step, ROUND_DOWN)
+    size = _round_to_step((min_notional * Decimal("1.01")) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
 def _spot_market_notional(client: Client) -> str:
     _, min_notional, _ = _spot_pair_details(client)
-    return _fmt(max(min_notional * Decimal("1.2"), SPOT_TEST_NOTIONAL))
+    return _fmt(min_notional * Decimal("1.01"))
 
 
 def _spot_sell_size(client: Client, size: Decimal) -> str:
@@ -198,14 +193,14 @@ def _spot_sell_size(client: Client, size: Decimal) -> str:
 def _spot_post_only_sell_price(client: Client) -> str:
     _, _, price_step = _spot_pair_details(client)
     _, best_ask = _spot_best_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.50"), price_step, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + price_step, price_step, ROUND_UP))
 
 
 def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     base_step, min_notional, price_step = _spot_pair_details(client)
     _, best_ask = _spot_best_prices(client)
     price = _round_to_step(best_ask + price_step, price_step, ROUND_UP)
-    size = _round_to_step((min_notional * Decimal("1.2")) / price, base_step, ROUND_UP)
+    size = _round_to_step((min_notional * Decimal("1.01")) / price, base_step, ROUND_UP)
     return _fmt(size), _fmt(price)
 
 
@@ -233,26 +228,26 @@ def _contract_price_step(client: Client) -> Decimal:
 
 def _contract_post_only_buy_price(client: Client) -> str:
     best_bid, _ = _contract_best_prices(client)
-    return _fmt(
-        _round_to_step(best_bid * Decimal("0.98"), _contract_price_step(client), ROUND_DOWN)
-    )
+    step = _contract_price_step(client)
+    return _fmt(_round_to_step(best_bid - step, step, ROUND_DOWN))
 
 
 def _contract_post_only_sell_price(client: Client) -> str:
     _, best_ask = _contract_best_prices(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.02"), _contract_price_step(client), ROUND_UP))
+    step = _contract_price_step(client)
+    return _fmt(_round_to_step(best_ask + step, step, ROUND_UP))
 
 
 def _contract_fillable_buy_price(client: Client) -> str:
     _, best_ask = _contract_best_prices(client)
     step = _contract_price_step(client)
-    return _fmt(_round_to_step(best_ask * Decimal("1.02"), step, ROUND_UP))
+    return _fmt(_round_to_step(best_ask + step, step, ROUND_UP))
 
 
 def _contract_fillable_sell_price(client: Client) -> str:
     best_bid, _ = _contract_best_prices(client)
     step = _contract_price_step(client)
-    return _fmt(_round_to_step(best_bid * Decimal("0.98"), step, ROUND_DOWN))
+    return _fmt(_round_to_step(best_bid - step, step, ROUND_DOWN))
 
 
 def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
@@ -286,7 +281,7 @@ def _cleanup_spot_base(client: Client, initial_spot_base: Decimal) -> None:
     if remaining <= 0:
         return
 
-    top_up_notional = max(min_notional * Decimal("1.05"), SPOT_TEST_NOTIONAL)
+    top_up_notional = min_notional * Decimal("1.01")
     if _spot_available(client, "USDT") < top_up_notional:
         return
 
@@ -440,21 +435,27 @@ def test_spot_stateful_order_lifecycle(client):
         bought = _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = _spot_sell_size(client, bought)
         assert Decimal(sell_size) > 0
-        assert client.place_spot_limit_sell_order(
-            SPOT_SYMBOL,
-            sell_size,
-            _spot_fillable_sell_price(client),
-        ) is not None
+        assert (
+            client.place_spot_limit_sell_order(
+                SPOT_SYMBOL,
+                sell_size,
+                _spot_fillable_sell_price(client),
+            )
+            is not None
+        )
         time.sleep(2)
 
         notional = _spot_market_notional(client)
         _ensure_spot_usdt(client, Decimal(notional))
         before_base = _spot_available(client, SPOT_BASE_CURRENCY)
-        assert client.place_spot_market_order(
-            SPOT_SYMBOL,
-            side="buy",
-            notional=notional,
-        ) is not None
+        assert (
+            client.place_spot_market_order(
+                SPOT_SYMBOL,
+                side="buy",
+                notional=notional,
+            )
+            is not None
+        )
         time.sleep(2)
         bought = _spot_available(client, SPOT_BASE_CURRENCY) - before_base
         sell_size = _spot_sell_size(client, bought)
@@ -502,11 +503,14 @@ def test_contract_stateful_order_lifecycle(client):
     initial_contract_usdt = _contract_available_usdt(client)
     try:
         _ensure_contract_margin(client)
-        assert client.submit_leverage(
-            CONTRACT_SYMBOL,
-            leverage=CONTRACT_LEVERAGE,
-            open_type="cross",
-        ) is not None
+        assert (
+            client.submit_leverage(
+                CONTRACT_SYMBOL,
+                leverage=CONTRACT_LEVERAGE,
+                open_type="cross",
+            )
+            is not None
+        )
 
         price = _contract_post_only_buy_price(client)
         order_id = None
@@ -525,12 +529,15 @@ def test_contract_stateful_order_lifecycle(client):
             )
             order_id = _order_id(order)
             assert client.get_contract_order_detail(CONTRACT_SYMBOL, order_id) is not None
-            assert client.modify_limit_order(
-                CONTRACT_SYMBOL,
-                order_id=order_id,
-                price=_contract_post_only_buy_price(client),
-                size=CONTRACT_SIZE,
-            ) is not None
+            assert (
+                client.modify_limit_order(
+                    CONTRACT_SYMBOL,
+                    order_id=order_id,
+                    price=_contract_post_only_buy_price(client),
+                    size=CONTRACT_SIZE,
+                )
+                is not None
+            )
             assert client.cancel_contract_order(CONTRACT_SYMBOL, order_id=order_id) is not None
             order_id = None
         finally:
@@ -600,46 +607,61 @@ def test_contract_stateful_order_lifecycle(client):
             if order_id is not None:
                 client.cancel_contract_order(CONTRACT_SYMBOL, order_id=order_id)
 
-        assert client.place_contract_market_buy_order(
-            CONTRACT_SYMBOL,
-            CONTRACT_SIZE,
-            _client_id(),
-        ) is not None
+        assert (
+            client.place_contract_market_buy_order(
+                CONTRACT_SYMBOL,
+                CONTRACT_SIZE,
+                _client_id(),
+            )
+            is not None
+        )
         assert _wait_for_contract_position(client, sign=1) > 0
-        assert client.place_contract_market_sell_order(
-            CONTRACT_SYMBOL,
-            CONTRACT_SIZE,
-            _client_id(),
-        ) is not None
+        assert (
+            client.place_contract_market_sell_order(
+                CONTRACT_SYMBOL,
+                CONTRACT_SIZE,
+                _client_id(),
+            )
+            is not None
+        )
         time.sleep(2)
         assert _contract_position_size(client) == 0
 
-        assert client.place_contract_market_order(
-            CONTRACT_SYMBOL,
-            side=1,
-            size=CONTRACT_SIZE,
-            client_order_id=_client_id(),
-        ) is not None
+        assert (
+            client.place_contract_market_order(
+                CONTRACT_SYMBOL,
+                side=1,
+                size=CONTRACT_SIZE,
+                client_order_id=_client_id(),
+            )
+            is not None
+        )
         assert _wait_for_contract_position(client, sign=1) > 0
         _close_contract_position(client)
 
-        assert client.place_contract_limit_order(
-            CONTRACT_SYMBOL,
-            side=1,
-            price=_contract_fillable_buy_price(client),
-            size=CONTRACT_SIZE,
-            client_order_id=_client_id(),
-            mode=3,
-        ) is not None
+        assert (
+            client.place_contract_limit_order(
+                CONTRACT_SYMBOL,
+                side=1,
+                price=_contract_fillable_buy_price(client),
+                size=CONTRACT_SIZE,
+                client_order_id=_client_id(),
+                mode=3,
+            )
+            is not None
+        )
         assert _wait_for_contract_position(client, sign=1) > 0
-        assert client.place_contract_limit_order(
-            CONTRACT_SYMBOL,
-            side=3,
-            price=_contract_fillable_sell_price(client),
-            size=CONTRACT_SIZE,
-            client_order_id=_client_id(),
-            mode=3,
-        ) is not None
+        assert (
+            client.place_contract_limit_order(
+                CONTRACT_SYMBOL,
+                side=3,
+                price=_contract_fillable_sell_price(client),
+                size=CONTRACT_SIZE,
+                client_order_id=_client_id(),
+                mode=3,
+            )
+            is not None
+        )
         _wait_for_contract_flat(client)
 
         assert client.get_contract_open_order(product_symbol=CONTRACT_SYMBOL, limit=10) is not None
