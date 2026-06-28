@@ -5,10 +5,11 @@ use dcex::exchanges::bingx::BingxClient;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    format_transfer_amount, leveraged_margin_required, minimum_order_quantity, params,
-    post_only_buy_price, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    first_bid_price, format_transfer_amount, insufficient_funds_error, leveraged_margin_required,
+    margin_target, minimum_order_quantity, params, post_only_buy_price, price_below_market,
+    require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
+    unique_client_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 use tokio::time::sleep;
 
@@ -17,6 +18,12 @@ const BINGX_FUND_ACCOUNT: &str = "fund";
 const BINGX_SPOT_ACCOUNT: &str = "spot";
 const BINGX_SWAP_ACCOUNT: &str = "USDTMPerp";
 const BINGX_LEVERAGE_VALUE: f64 = 10.0;
+
+struct BingxTransferBack {
+    from_account: &'static str,
+    to_account: &'static str,
+    amount: f64,
+}
 
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
@@ -52,14 +59,17 @@ async fn bingx_spot_direct_live_stateful_order() -> dcex::Result<()> {
         &quantity,
         &details,
     )?;
-    if !ensure_bingx_usdt(&client, BINGX_SPOT_ACCOUNT, required_usdt).await? {
-        eprintln!(
-            "skipping BingX spot live stateful order; insufficient transferable USDT, required={required_usdt:.8}"
-        );
-        return Ok(());
-    }
+    let transfers = match ensure_bingx_usdt(&client, BINGX_SPOT_ACCOUNT, required_usdt).await? {
+        Some(transfers) => transfers,
+        None => {
+            eprintln!(
+                "skipping BingX spot live stateful order; insufficient transferable USDT, required={required_usdt:.8}"
+            );
+            return Ok(());
+        }
+    };
 
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_spot_post_only_buy_order",
         params(&[
@@ -69,11 +79,18 @@ async fn bingx_spot_direct_live_stateful_order() -> dcex::Result<()> {
             ("clientOrderId", unique_client_id("dcexrs").as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) => {
+            return_bingx_transfers(&client, &transfers).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_spot_order",
         params(&[
@@ -81,7 +98,9 @@ async fn bingx_spot_direct_live_stateful_order() -> dcex::Result<()> {
             ("orderId", order_id.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    return_bingx_transfers(&client, &transfers).await?;
+    let cancel = cancel_result?;
     assert_success(&cancel);
     Ok(())
 }
@@ -117,19 +136,28 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
     )
     .await?;
     let details = fetch_trading_details(Exchange::BingX, "bingx", BTC_USDT_SWAP).await?;
-    let price = post_only_buy_price(&orderbook.data, &details)?;
+    let price = price_below_market(first_bid_price(&orderbook.data)?, &details, 0.95)?;
     let quantity = minimum_order_quantity(&price, &details)?;
     let market_price = bingx_swap_market_price(&client).await?;
     let required_usdt =
         leveraged_margin_required(market_price, &quantity, &details, BINGX_LEVERAGE_VALUE)?;
-    if !ensure_bingx_usdt(&client, BINGX_SWAP_ACCOUNT, required_usdt).await? {
-        eprintln!(
-            "skipping BingX swap live stateful order; insufficient transferable USDT, required={required_usdt:.8}"
-        );
-        return Ok(());
-    }
+    let transfers = match ensure_bingx_usdt(
+        &client,
+        BINGX_SWAP_ACCOUNT,
+        margin_target(required_usdt),
+    )
+    .await?
+    {
+        Some(transfers) => transfers,
+        None => {
+            eprintln!(
+                    "skipping BingX swap live stateful order; insufficient transferable USDT, required={required_usdt:.8}"
+                );
+            return Ok(());
+        }
+    };
 
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_swap_post_only_buy_order",
         params(&[
@@ -140,11 +168,25 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
             ("clientOrderId", unique_client_id("dcexrs").as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_bingx_transfers(&client, &transfers).await?;
+            eprintln!(
+                "skipping BingX swap live stateful order; insufficient margin for post-only order: {error}"
+            );
+            return Ok(());
+        }
+        Err(error) => {
+            return_bingx_transfers(&client, &transfers).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_swap_order",
         params(&[
@@ -152,10 +194,17 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
             ("orderId", order_id.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let cancel = match cancel_result {
+        Ok(cancel) => cancel,
+        Err(error) => {
+            return_bingx_transfers(&client, &transfers).await?;
+            return Err(error);
+        }
+    };
     assert_success(&cancel);
 
-    let market_order = super::common::exchange_method_request(
+    let market_order_result = super::common::exchange_method_request(
         &client,
         "place_swap_market_buy_order",
         params(&[
@@ -165,7 +214,21 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
             ("clientOrderId", unique_client_id("dcexrs").as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let market_order = match market_order_result {
+        Ok(market_order) => market_order,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_bingx_transfers(&client, &transfers).await?;
+            eprintln!(
+                "skipping BingX swap live stateful order; insufficient margin for market open: {error}"
+            );
+            return Ok(());
+        }
+        Err(error) => {
+            return_bingx_transfers(&client, &transfers).await?;
+            return Err(error);
+        }
+    };
     assert_success(&market_order);
     assert!(wait_for_positive_position(|| bingx_swap_position_abs(&client)).await? > 0.0);
 
@@ -180,6 +243,7 @@ async fn bingx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         wait_for_flat_position(|| bingx_swap_position_abs(&client)).await?,
         0.0
     );
+    return_bingx_transfers(&client, &transfers).await?;
     Ok(())
 }
 
@@ -248,17 +312,18 @@ async fn bingx_swap_usdt(client: &BingxClient) -> dcex::Result<f64> {
 
 async fn ensure_bingx_usdt(
     client: &BingxClient,
-    target_account: &str,
+    target_account: &'static str,
     required: f64,
-) -> dcex::Result<bool> {
+) -> dcex::Result<Option<Vec<BingxTransferBack>>> {
+    let mut transfers = Vec::new();
     if bingx_account_usdt(client, target_account).await? >= required {
-        return Ok(true);
+        return Ok(Some(transfers));
     }
 
     for source_account in transfer_sources_for(target_account) {
         let current = bingx_account_usdt(client, target_account).await?;
         if current >= required {
-            return Ok(true);
+            return Ok(Some(transfers));
         }
         let needed = required - current;
         let source_available = match bingx_account_usdt(client, source_account).await {
@@ -290,32 +355,68 @@ async fn ensure_bingx_usdt(
         if amount <= 0.0 {
             continue;
         }
-        let amount = format_transfer_amount(amount);
-        let transfer = super::common::exchange_method_request(
-            &client,
-            "asset_transfer",
-            params(&[
-                ("fromAccount", source_account),
-                ("toAccount", target_account),
-                ("asset", "USDT"),
-                ("amount", amount.as_str()),
-            ]),
-        )
-        .await;
-        let transfer = match transfer {
-            Ok(response) => response,
+        match bingx_transfer(client, source_account, target_account, amount).await {
+            Ok(()) => {
+                transfers.push(BingxTransferBack {
+                    from_account: target_account,
+                    to_account: source_account,
+                    amount,
+                });
+                sleep(Duration::from_secs(2)).await;
+            }
             Err(error) => {
                 eprintln!(
                     "skipping BingX transfer route {source_account}->{target_account}; transfer failed: {error}"
                 );
-                continue;
             }
-        };
-        assert_success(&transfer);
-        sleep(Duration::from_secs(2)).await;
+        }
     }
 
-    Ok(bingx_account_usdt(client, target_account).await? >= required)
+    if bingx_account_usdt(client, target_account).await? >= required {
+        return Ok(Some(transfers));
+    }
+    return_bingx_transfers(client, &transfers).await?;
+    Ok(None)
+}
+
+async fn return_bingx_transfers(
+    client: &BingxClient,
+    transfers: &[BingxTransferBack],
+) -> dcex::Result<()> {
+    for transfer in transfers.iter().rev() {
+        if transfer.amount <= 0.0 {
+            continue;
+        }
+        let available = bingx_account_usdt(client, transfer.from_account).await?;
+        let amount = transfer.amount.min(available);
+        if amount <= 0.0 {
+            continue;
+        }
+        bingx_transfer(client, transfer.from_account, transfer.to_account, amount).await?;
+    }
+    Ok(())
+}
+
+async fn bingx_transfer(
+    client: &BingxClient,
+    from_account: &str,
+    to_account: &str,
+    amount: f64,
+) -> dcex::Result<()> {
+    let amount = format_transfer_amount(amount);
+    let response = super::common::exchange_method_request(
+        &client,
+        "asset_transfer",
+        params(&[
+            ("fromAccount", from_account),
+            ("toAccount", to_account),
+            ("asset", "USDT"),
+            ("amount", amount.as_str()),
+        ]),
+    )
+    .await?;
+    assert_success(&response);
+    Ok(())
 }
 
 fn transfer_sources_for(target_account: &str) -> &'static [&'static str] {

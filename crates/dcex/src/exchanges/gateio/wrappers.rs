@@ -70,5 +70,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_spot_post_only_limit_sell_order(product_symbol => "product_symbol", amount => "amount", price => "price"),
         update_delivery_positions_leverage(product_symbol => "product_symbol", leverage => "leverage"),
         update_futures_positions_leverage(product_symbol => "product_symbol", leverage => "leverage"),
+        wallet_transfer(currency => "currency", from_account => "from", to_account => "to", amount => "amount"),
     ];
 }

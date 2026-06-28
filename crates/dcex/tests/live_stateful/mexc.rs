@@ -7,8 +7,8 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
     fetch_trading_details, find_f64, first_bid_price, format_transfer_amount,
-    insufficient_funds_error, leveraged_margin_required, minimum_order_quantity, params,
-    post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
+    insufficient_funds_error, leveraged_margin_required, margin_target, minimum_order_quantity,
+    params, post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
     require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
@@ -117,7 +117,8 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     let quantity = minimum_order_quantity(&price, &details)?;
     let required_usdt =
         leveraged_margin_required(bid, &quantity, &details, MEXC_CONTRACT_LEVERAGE_VALUE)?;
-    let transferred = match ensure_mexc_contract_usdt(&client, required_usdt).await? {
+    let transferred = match ensure_mexc_contract_usdt(&client, margin_target(required_usdt)).await?
+    {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -262,9 +263,15 @@ async fn ensure_mexc_contract_usdt(
         );
         return Ok(None);
     }
-    mexc_transfer(client, "SPOT", "FUTURES", needed).await?;
+    if let Err(error) = mexc_transfer(client, "SPOT", "FUTURES", needed).await {
+        eprintln!(
+            "skipping MEXC contract live stateful order; transfer SPOT->FUTURES failed: {error}"
+        );
+        return Ok(None);
+    }
     sleep(Duration::from_secs(3)).await;
     if mexc_contract_usdt(client).await? < required {
+        return_mexc_contract_transfer(client, needed).await?;
         eprintln!(
             "skipping MEXC contract live stateful order; futures USDT remains insufficient, required={required:.8}"
         );
@@ -321,6 +328,6 @@ async fn mexc_contract_usdt(client: &MexcClient) -> dcex::Result<f64> {
     Ok(asset_amount(
         &response.data,
         "USDT",
-        &["availableBalance", "available", "balance"],
+        &["availableBalance", "available"],
     ))
 }

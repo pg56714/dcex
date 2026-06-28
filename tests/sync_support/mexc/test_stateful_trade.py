@@ -207,14 +207,25 @@ def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
 
 
 def _ensure_contract_usdt(client: Client, required: Decimal) -> Decimal:
-    if _contract_available(client) >= required:
+    target = _margin_target(required)
+    contract = _contract_available(client)
+    if contract >= target:
         return Decimal("0")
-    _ensure_spot_usdt(client, FUTURES_TRANSFER_AMOUNT)
-    _transfer(client, "SPOT", "FUTURES", FUTURES_TRANSFER_AMOUNT)
+    needed = target - contract
+    _ensure_spot_usdt(client, needed)
+    try:
+        _transfer(client, "SPOT", "FUTURES", needed)
+    except FailedRequestError as exc:
+        pytest.skip(f"MEXC futures USDT transfer failed: {exc}")
     time.sleep(3)
-    if _contract_available(client) < required:
+    if _contract_available(client) < target:
+        _return_futures_transfer(client, needed)
         pytest.skip("Insufficient MEXC futures USDT for stateful test.")
-    return FUTURES_TRANSFER_AMOUNT
+    return needed
+
+
+def _margin_target(required: Decimal) -> Decimal:
+    return max(required * Decimal("2"), required + Decimal("1"))
 
 
 def _skip_if_existing_state(client: Client) -> None:

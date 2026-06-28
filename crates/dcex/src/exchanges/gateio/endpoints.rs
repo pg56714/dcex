@@ -2,6 +2,7 @@ pub(super) const BASE_URL: &str = "https://api.gateio.ws";
 pub(super) const API_PREFIX: &str = "/api/v4";
 
 pub(super) const WALLET_TOTAL_BALANCE: &str = "/wallet/total_balance";
+pub(super) const WALLET_TRANSFERS: &str = "/wallet/transfers";
 pub(super) const UNIFIED_ACCOUNTS: &str = "/unified/accounts";
 
 pub(super) const FUTURES_CONTRACTS: &str = "/futures/{settle}/contracts";

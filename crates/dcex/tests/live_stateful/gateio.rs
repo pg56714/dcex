@@ -6,12 +6,21 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    leveraged_margin_required, minimum_order_quantity, params, post_only_buy_price, require_env,
-    require_live_trading, require_order_id, wait_for_flat_position, wait_for_positive_position,
-    BTC_USDT_SPOT, BTC_USDT_SWAP,
+    format_transfer_amount, insufficient_funds_error, leveraged_margin_required, margin_target,
+    minimum_order_quantity, params, post_only_buy_price, require_env, require_live_trading,
+    require_order_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const GATEIO_CONTRACT_LEVERAGE_VALUE: f64 = 2.0;
+const GATEIO_SPOT_ACCOUNT: &str = "spot";
+const GATEIO_FUTURES_ACCOUNT: &str = "futures";
+
+struct GateioTransferBack {
+    from_account: &'static str,
+    to_account: &'static str,
+    amount: f64,
+}
 
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
@@ -44,14 +53,12 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
     let amount = minimum_order_quantity(&price, &details)?;
     let required_usdt =
         super::common::order_notional(price.parse::<f64>().unwrap_or_default(), &amount, &details)?;
-    if gateio_spot_usdt(&client).await? < required_usdt {
-        eprintln!(
-            "skipping Gate.io spot live stateful order; insufficient spot USDT, required={required_usdt:.8}"
-        );
-        return Ok(());
-    }
+    let transfer = match ensure_gateio_spot_usdt(&client, required_usdt).await? {
+        Some(transfer) => transfer,
+        None => return Ok(()),
+    };
 
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_spot_post_only_limit_buy_order",
         params(&[
@@ -60,11 +67,18 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
             ("price", price.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) => {
+            return_gateio_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["id", "order_id", "orderId"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_spot_single_order",
         params(&[
@@ -72,7 +86,9 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
             ("product_symbol", BTC_USDT_SPOT),
         ]),
     )
-    .await?;
+    .await;
+    return_gateio_transfer(&client, &transfer).await?;
+    let cancel = cancel_result?;
     assert_success(&cancel);
     Ok(())
 }
@@ -117,14 +133,12 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
         &details,
         GATEIO_CONTRACT_LEVERAGE_VALUE,
     )?;
-    if gateio_futures_usdt(&client).await? < required_usdt {
-        eprintln!(
-            "skipping Gate.io contract live stateful order; insufficient futures USDT, required={required_usdt:.8}"
-        );
-        return Ok(());
-    }
+    let transfer = match ensure_gateio_futures_usdt(&client, margin_target(required_usdt)).await? {
+        Some(transfer) => transfer,
+        None => return Ok(()),
+    };
 
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_contract_post_only_limit_buy_order",
         params(&[
@@ -133,24 +147,59 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
             ("price", price.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_gateio_transfer(&client, &transfer).await?;
+            eprintln!(
+                "skipping Gate.io contract live stateful order; insufficient margin for post-only order: {error}"
+            );
+            return Ok(());
+        }
+        Err(error) => {
+            return_gateio_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["id", "order_id", "orderId"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_contract_single_order",
         params(&[("order_id", order_id.as_str())]),
     )
-    .await?;
+    .await;
+    let cancel = match cancel_result {
+        Ok(cancel) => cancel,
+        Err(error) => {
+            return_gateio_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&cancel);
 
-    let opened = super::common::exchange_method_request(
+    let open_result = super::common::exchange_method_request(
         &client,
         "place_contract_market_buy_order",
         params(&[("product_symbol", BTC_USDT_SWAP), ("size", size.as_str())]),
     )
-    .await?;
+    .await;
+    let opened = match open_result {
+        Ok(opened) => opened,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_gateio_transfer(&client, &transfer).await?;
+            eprintln!(
+                "skipping Gate.io contract live stateful order; insufficient margin for market open: {error}"
+            );
+            return Ok(());
+        }
+        Err(error) => {
+            return_gateio_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&opened);
     let opened_id = require_order_id(&opened.data, &["id", "order_id", "orderId"])?;
     eprintln!("Gate.io contract market open order_id={opened_id}");
@@ -177,7 +226,124 @@ async fn gateio_contract_direct_live_stateful_order() -> dcex::Result<()> {
         0.0
     );
     assert_gateio_contract_records(&client).await?;
+    return_gateio_transfer(&client, &transfer).await?;
     Ok(())
+}
+
+async fn ensure_gateio_spot_usdt(
+    client: &GateioClient,
+    required: f64,
+) -> dcex::Result<Option<GateioTransferBack>> {
+    ensure_gateio_usdt(
+        client,
+        GATEIO_SPOT_ACCOUNT,
+        GATEIO_FUTURES_ACCOUNT,
+        required,
+    )
+    .await
+}
+
+async fn ensure_gateio_futures_usdt(
+    client: &GateioClient,
+    required: f64,
+) -> dcex::Result<Option<GateioTransferBack>> {
+    ensure_gateio_usdt(
+        client,
+        GATEIO_FUTURES_ACCOUNT,
+        GATEIO_SPOT_ACCOUNT,
+        required,
+    )
+    .await
+}
+
+async fn ensure_gateio_usdt(
+    client: &GateioClient,
+    target_account: &'static str,
+    source_account: &'static str,
+    required: f64,
+) -> dcex::Result<Option<GateioTransferBack>> {
+    let target = gateio_account_usdt(client, target_account).await?;
+    if target >= required {
+        return Ok(Some(GateioTransferBack {
+            from_account: target_account,
+            to_account: source_account,
+            amount: 0.0,
+        }));
+    }
+    let needed = required - target;
+    let source = gateio_account_usdt(client, source_account).await?;
+    if source < needed {
+        eprintln!(
+            "skipping Gate.io live stateful order; insufficient transferable USDT, required={required:.8}, {target_account}={target:.8}, {source_account}={source:.8}"
+        );
+        return Ok(None);
+    }
+    if let Err(error) = gateio_transfer(client, source_account, target_account, needed).await {
+        eprintln!(
+            "skipping Gate.io live stateful order; transfer {source_account}->{target_account} failed: {error}"
+        );
+        return Ok(None);
+    }
+    sleep(Duration::from_secs(2)).await;
+    let transfer = GateioTransferBack {
+        from_account: target_account,
+        to_account: source_account,
+        amount: needed,
+    };
+    if gateio_account_usdt(client, target_account).await? < required {
+        return_gateio_transfer(client, &transfer).await?;
+        eprintln!(
+            "skipping Gate.io live stateful order; {target_account} USDT remains insufficient, required={required:.8}"
+        );
+        return Ok(None);
+    }
+    Ok(Some(transfer))
+}
+
+async fn return_gateio_transfer(
+    client: &GateioClient,
+    transfer: &GateioTransferBack,
+) -> dcex::Result<()> {
+    if transfer.amount <= 0.0 {
+        return Ok(());
+    }
+    let available = gateio_account_usdt(client, transfer.from_account).await?;
+    let amount = transfer.amount.min(available);
+    if amount <= 0.0 {
+        return Ok(());
+    }
+    gateio_transfer(client, transfer.from_account, transfer.to_account, amount).await
+}
+
+async fn gateio_transfer(
+    client: &GateioClient,
+    from_account: &str,
+    to_account: &str,
+    amount: f64,
+) -> dcex::Result<()> {
+    let amount = format_transfer_amount(amount);
+    let response = super::common::exchange_method_request(
+        &client,
+        "wallet_transfer",
+        params(&[
+            ("currency", "USDT"),
+            ("from", from_account),
+            ("to", to_account),
+            ("amount", amount.as_str()),
+            ("settle", "usdt"),
+        ]),
+    )
+    .await?;
+    assert_success(&response);
+    Ok(())
+}
+
+async fn gateio_account_usdt(client: &GateioClient, account: &str) -> dcex::Result<f64> {
+    match account {
+        GATEIO_SPOT_ACCOUNT => gateio_spot_usdt(client).await,
+        GATEIO_FUTURES_ACCOUNT => gateio_futures_usdt(client).await,
+        _ => Ok(0.0),
+    }
 }
 
 async fn gateio_spot_open_orders(client: &GateioClient) -> dcex::Result<bool> {
@@ -228,16 +394,16 @@ async fn gateio_spot_usdt(client: &GateioClient) -> dcex::Result<f64> {
 
 async fn gateio_futures_usdt(client: &GateioClient) -> dcex::Result<f64> {
     let response = client.get_futures_account().await?;
-    Ok(asset_amount(
+    Ok(find_f64(
         &response.data,
-        "USDT",
         &[
-            "available",
             "available_margin",
-            "availableBalance",
             "available_balance",
+            "availableBalance",
+            "available",
         ],
-    ))
+    )
+    .unwrap_or(0.0))
 }
 
 async fn gateio_contract_market_price(client: &GateioClient) -> dcex::Result<f64> {

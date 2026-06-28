@@ -7,13 +7,18 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, contains_non_empty_array, fetch_trading_details, find_f64, first_bid_price,
-    format_transfer_amount_ceil, leveraged_margin_required, minimum_order_quantity, params,
-    parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_non_empty_records,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
+    format_transfer_amount_ceil, leveraged_margin_required, minimum_order_quantity, optional_env,
+    params, parse_positive, post_only_buy_price, require_env, require_live_trading,
+    require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
+    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
 };
 
 const KRAKEN_FUTURES_MARGIN_LEVERAGE_VALUE: f64 = 50.0;
+
+struct KrakenSpotTransferBack {
+    amount: f64,
+    futures_wallet: &'static str,
+}
 
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
@@ -24,11 +29,13 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
     let Some(keys) = require_env(&["KRAKEN_SPOT_API_KEY", "KRAKEN_SPOT_API_SECRET"]) else {
         return Ok(());
     };
+    let futures_key = optional_env("KRAKEN_FUTURES_API_KEY");
+    let futures_secret = optional_env("KRAKEN_FUTURES_API_SECRET");
     let client = KrakenClient::new(
         Some(keys[0].clone()),
         Some(keys[1].clone()),
-        None,
-        None,
+        futures_key,
+        futures_secret,
         Duration::from_secs(20),
     )?;
 
@@ -43,15 +50,12 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
     let quantity = minimum_order_quantity(&price, &details)?;
     let required_usdt =
         parse_positive(&price, "price")? * parse_positive(&quantity, "quantity")? * 1.01;
-    let available_usdt = kraken_spot_balance(&client, "USDT").await?;
-    if available_usdt < required_usdt {
-        eprintln!(
-            "skipping Kraken spot live stateful order; insufficient USDT, required={required_usdt:.8}, available={available_usdt:.8}"
-        );
-        return Ok(());
-    }
+    let transfer = match ensure_kraken_spot_usdt(&client, required_usdt).await? {
+        Some(transfer) => transfer,
+        None => return Ok(()),
+    };
 
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_spot_post_only_limit_buy_order",
         params(&[
@@ -60,17 +64,151 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
             ("price", price.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) => {
+            return_kraken_spot_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["txid"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_spot_order",
         params(&[("txid", order_id.as_str())]),
     )
-    .await?;
+    .await;
+    return_kraken_spot_transfer(&client, &transfer).await?;
+    let cancel = cancel_result?;
     assert_success(&cancel);
+    Ok(())
+}
+
+async fn ensure_kraken_spot_usdt(
+    client: &KrakenClient,
+    required: f64,
+) -> dcex::Result<Option<KrakenSpotTransferBack>> {
+    let spot = kraken_spot_balance(client, "USDT").await?;
+    if spot >= required {
+        return Ok(Some(KrakenSpotTransferBack {
+            amount: 0.0,
+            futures_wallet: "cash",
+        }));
+    }
+    let needed = required - spot;
+    let accounts = match client.get_futures_accounts().await {
+        Ok(accounts) => accounts,
+        Err(error) => {
+            eprintln!(
+                "skipping Kraken spot live stateful order; insufficient spot USDT and futures balance unavailable, required={required:.8}, spot={spot:.8}: {error}"
+            );
+            return Ok(None);
+        }
+    };
+    let cash = kraken_cash_available(&accounts.data, "usdt");
+    let flex = kraken_flex_available(&accounts.data);
+    let futures_wallet = if cash >= needed {
+        "cash"
+    } else if flex >= needed {
+        "flex"
+    } else {
+        eprintln!(
+            "skipping Kraken spot live stateful order; insufficient transferable USDT, required={required:.8}, spot={spot:.8}, cash={cash:.8}, flex={flex:.8}"
+        );
+        return Ok(None);
+    };
+
+    withdraw_kraken_futures_to_spot(client, needed, futures_wallet).await?;
+    sleep(Duration::from_secs(5)).await;
+    let transfer = KrakenSpotTransferBack {
+        amount: needed,
+        futures_wallet,
+    };
+    if kraken_spot_balance(client, "USDT").await? < required {
+        return_kraken_spot_transfer(client, &transfer).await?;
+        eprintln!(
+            "skipping Kraken spot live stateful order; spot USDT remains insufficient, required={required:.8}"
+        );
+        return Ok(None);
+    }
+    Ok(Some(transfer))
+}
+
+async fn return_kraken_spot_transfer(
+    client: &KrakenClient,
+    transfer: &KrakenSpotTransferBack,
+) -> dcex::Result<()> {
+    if transfer.amount <= 0.0 {
+        return Ok(());
+    }
+    let amount = transfer
+        .amount
+        .min(kraken_spot_balance(client, "USDT").await?);
+    if amount <= 0.0 {
+        return Ok(());
+    }
+    let amount = format_transfer_amount_ceil(amount, 8);
+    let response = super::common::exchange_method_request(
+        &client,
+        "wallet_transfer_to_futures",
+        params(&[
+            ("asset", "USDT"),
+            ("amount", amount.as_str()),
+            ("from", "Spot Wallet"),
+            ("to", "Futures Wallet"),
+        ]),
+    )
+    .await?;
+    assert_success(&response);
+    sleep(Duration::from_secs(5)).await;
+    if transfer.futures_wallet == "flex" {
+        let accounts = client.get_futures_accounts().await?;
+        let available = kraken_cash_available(&accounts.data, "usdt");
+        let amount = format_transfer_amount_ceil(
+            transfer
+                .amount
+                .min(available)
+                .min(amount.parse::<f64>().unwrap_or_default()),
+            8,
+        );
+        if amount != "0" {
+            let response = super::common::exchange_method_request(
+                &client,
+                "futures_wallet_transfer",
+                params(&[
+                    ("amount", amount.as_str()),
+                    ("fromAccount", "cash"),
+                    ("toAccount", "flex"),
+                    ("unit", "USDT"),
+                ]),
+            )
+            .await?;
+            assert_success(&response);
+        }
+    }
+    Ok(())
+}
+
+async fn withdraw_kraken_futures_to_spot(
+    client: &KrakenClient,
+    amount: f64,
+    source_wallet: &str,
+) -> dcex::Result<()> {
+    let amount = format_transfer_amount_ceil(amount, 8);
+    let response = super::common::exchange_method_request(
+        &client,
+        "withdraw_futures_to_spot_wallet",
+        params(&[
+            ("amount", amount.as_str()),
+            ("currency", "USDT"),
+            ("sourceWallet", source_wallet),
+        ]),
+    )
+    .await?;
+    assert_success(&response);
     Ok(())
 }
 

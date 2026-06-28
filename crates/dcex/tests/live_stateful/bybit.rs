@@ -8,9 +8,10 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
     fetch_trading_details, first_bid_price, format_transfer_amount_ceil, leveraged_margin_required,
-    minimum_order_quantity, params, parse_positive, post_only_buy_price, push, require_env,
-    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
-    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    margin_target, minimum_order_quantity, params, parse_positive, post_only_buy_price, push,
+    require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
+    wait_for_flat_position, wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const BYBIT_SWAP_LEVERAGE: &str = "50";
@@ -133,7 +134,7 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
         &details,
         BYBIT_SWAP_LEVERAGE_VALUE,
     )?;
-    let transferred = match ensure_unified_usdt(&client, required_usdt).await? {
+    let transferred = match ensure_unified_usdt(&client, margin_target(required_usdt)).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };
@@ -146,12 +147,19 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     if let Some(position_idx) = position_idx {
         push(&mut order_params, "positionIdx", position_idx);
     }
-    let order = super::common::exchange_method_request(
+    let order_result = super::common::exchange_method_request(
         &client,
         "place_post_only_limit_buy_order",
         order_params,
     )
-    .await?;
+    .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) => {
+            return_bybit_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
 
@@ -179,7 +187,10 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
             }
             eprintln!("Bybit swap post-only order was already absent before cancel");
         }
-        Err(error) => return Err(error),
+        Err(error) => {
+            return_bybit_transfer(&client, transferred).await?;
+            return Err(error);
+        }
     }
 
     let mut open_params = params(&[
@@ -189,9 +200,16 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     if let Some(position_idx) = position_idx {
         push(&mut open_params, "positionIdx", position_idx);
     }
-    let opened =
+    let open_result =
         super::common::exchange_method_request(&client, "place_market_buy_order", open_params)
-            .await?;
+            .await;
+    let opened = match open_result {
+        Ok(opened) => opened,
+        Err(error) => {
+            return_bybit_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&opened);
     let opened_id = require_order_id(&opened.data, &["orderId"])?;
     eprintln!("Bybit swap market open orderId={opened_id}");

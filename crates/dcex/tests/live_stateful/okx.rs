@@ -6,7 +6,7 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, first_bid_price,
-    format_transfer_amount, insufficient_funds_error, leveraged_margin_required,
+    format_transfer_amount, insufficient_funds_error, leveraged_margin_required, margin_target,
     minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
     require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
@@ -136,7 +136,7 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         &details,
         OKX_SWAP_LEVERAGE_VALUE,
     )?;
-    let transferred = match ensure_trading_usdt(&client, required_usdt).await? {
+    let transferred = match ensure_trading_usdt(&client, margin_target(required_usdt)).await? {
         Some(amount) => amount,
         None => return Ok(()),
     };

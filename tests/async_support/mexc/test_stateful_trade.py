@@ -210,14 +210,25 @@ async def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
 
 
 async def _ensure_contract_usdt(client: Client, required: Decimal) -> Decimal:
-    if await _contract_available(client) >= required:
+    target = _margin_target(required)
+    contract = await _contract_available(client)
+    if contract >= target:
         return Decimal("0")
-    await _ensure_spot_usdt(client, FUTURES_TRANSFER_AMOUNT)
-    await _transfer(client, "SPOT", "FUTURES", FUTURES_TRANSFER_AMOUNT)
+    needed = target - contract
+    await _ensure_spot_usdt(client, needed)
+    try:
+        await _transfer(client, "SPOT", "FUTURES", needed)
+    except FailedRequestError as exc:
+        pytest.skip(f"MEXC futures USDT transfer failed: {exc}")
     await asyncio.sleep(3)
-    if await _contract_available(client) < required:
+    if await _contract_available(client) < target:
+        await _return_futures_transfer(client, needed)
         pytest.skip("Insufficient MEXC futures USDT for stateful test.")
-    return FUTURES_TRANSFER_AMOUNT
+    return needed
+
+
+def _margin_target(required: Decimal) -> Decimal:
+    return max(required * Decimal("2"), required + Decimal("1"))
 
 
 async def _skip_if_existing_state(client: Client) -> None:

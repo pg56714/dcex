@@ -8,7 +8,7 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, bitget_unified_account_error,
     contains_non_empty_array, fetch_trading_details, first_bid_price, format_transfer_amount,
-    leveraged_margin_required, minimum_order_quantity, params, post_only_buy_price,
+    leveraged_margin_required, margin_target, minimum_order_quantity, params, post_only_buy_price,
     price_below_market, push, require_env, require_live_trading, require_order_id,
     sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
@@ -156,18 +156,40 @@ async fn bitget_swap_direct_live_stateful_order() -> dcex::Result<()> {
         &details,
         BITGET_SWAP_LEVERAGE_VALUE,
     )?;
-    let transferred = match ensure_bitget_futures_margin(&client, uta, required_usdt).await? {
-        Some(amount) => amount,
-        None => return Ok(()),
-    };
+    let transferred =
+        match ensure_bitget_futures_margin(&client, uta, margin_target(required_usdt)).await? {
+            Some(amount) => amount,
+            None => return Ok(()),
+        };
 
-    let order = bitget_place_swap_post_only_buy(&client, uta, &quantity, &price).await?;
+    let order_result = bitget_place_swap_post_only_buy(&client, uta, &quantity, &price).await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) => {
+            return_bitget_futures_margin(&client, uta, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
-    let cancel = bitget_cancel_swap_order(&client, uta, &order_id).await?;
+    let cancel_result = bitget_cancel_swap_order(&client, uta, &order_id).await;
+    let cancel = match cancel_result {
+        Ok(cancel) => cancel,
+        Err(error) => {
+            return_bitget_futures_margin(&client, uta, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&cancel);
 
-    let opened = bitget_place_swap_market_buy(&client, uta, &quantity).await?;
+    let open_result = bitget_place_swap_market_buy(&client, uta, &quantity).await;
+    let opened = match open_result {
+        Ok(opened) => opened,
+        Err(error) => {
+            return_bitget_futures_margin(&client, uta, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&opened);
     assert!(wait_for_positive_position(|| bitget_swap_position_abs(&client, uta)).await? > 0.0);
 

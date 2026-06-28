@@ -82,6 +82,10 @@ pub(crate) fn require_env(names: &[&str]) -> Option<Vec<String>> {
     }
 }
 
+pub(crate) fn optional_env(name: &str) -> Option<String> {
+    env_value(name)
+}
+
 pub(crate) fn unique_client_id(prefix: &str) -> String {
     format!("{prefix}{}", now_ms())
 }
@@ -257,6 +261,10 @@ pub(crate) fn leveraged_margin_required(
         return Err(DcexError::Decode(format!("invalid leverage: {leverage}")));
     }
     Ok(order_notional(price, quantity, details)? / leverage * 1.05)
+}
+
+pub(crate) fn margin_target(required: f64) -> f64 {
+    (required * 2.0).max(required + 1.0)
 }
 
 pub(crate) fn minimum_order_quantity_with_step(

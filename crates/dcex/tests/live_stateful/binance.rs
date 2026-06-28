@@ -6,9 +6,9 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    first_bid_price, format_transfer_amount, leveraged_margin_required, minimum_order_quantity,
-    parse_positive, post_only_buy_price_from_bid, price_below_market, require_env,
-    require_live_trading, require_order_id, sum_abs_values, wait_for_flat_position,
+    first_bid_price, format_transfer_amount, leveraged_margin_required, margin_target,
+    minimum_order_quantity, parse_positive, post_only_buy_price_from_bid, price_below_market,
+    require_env, require_live_trading, require_order_id, sum_abs_values, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
@@ -111,25 +111,46 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&leverage);
     let required_usdt =
         leveraged_margin_required(bid, &quantity, &details, BINANCE_FUTURES_LEVERAGE_VALUE)?;
-    let transfer = match ensure_futures_usdt(&client, required_usdt).await? {
+    let transfer = match ensure_futures_usdt(&client, margin_target(required_usdt)).await? {
         Some(transfer) => transfer,
         None => return Ok(()),
     };
 
-    let order = client
+    let order_result = client
         .place_post_only_limit_buy_order(BTC_USDT_SWAP, quantity.as_str(), price.as_str())
-        .await?;
+        .await;
+    let order = match order_result {
+        Ok(order) => order,
+        Err(error) => {
+            return_binance_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["orderId"])?;
-    let cancel = client
+    let cancel_result = client
         .cancel_order(BTC_USDT_SWAP)
         .param("orderId", order_id.as_str())
-        .await?;
+        .await;
+    let cancel = match cancel_result {
+        Ok(cancel) => cancel,
+        Err(error) => {
+            return_binance_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&cancel);
 
-    let opened = client
+    let open_result = client
         .place_market_buy_order(BTC_USDT_SWAP, quantity.as_str())
-        .await?;
+        .await;
+    let opened = match open_result {
+        Ok(opened) => opened,
+        Err(error) => {
+            return_binance_transfer(&client, &transfer).await?;
+            return Err(error);
+        }
+    };
     assert_success(&opened);
     assert!(wait_for_positive_position(|| futures_position_abs(&client)).await? > 0.0);
 

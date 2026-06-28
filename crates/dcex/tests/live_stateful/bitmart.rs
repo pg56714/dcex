@@ -6,10 +6,10 @@ use tokio::time::sleep;
 
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
-    fetch_trading_details, find_f64, first_bid_price, format_transfer_amount,
-    leveraged_margin_required, minimum_order_quantity_with_step, params, post_only_buy_price,
-    post_only_buy_price_from_bid, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    fetch_trading_details, find_f64, first_bid_price, format_transfer_amount_ceil,
+    leveraged_margin_required, margin_target, minimum_order_quantity_with_step, params,
+    post_only_buy_price, post_only_buy_price_from_bid, require_env, require_live_trading,
+    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
     wait_for_non_empty_records, wait_for_positive_position, DOGE_USDT_SPOT, DOGE_USDT_SWAP,
 };
 
@@ -120,12 +120,13 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
         &details,
         BITMART_CONTRACT_LEVERAGE_VALUE,
     )?;
-    let transferred = match ensure_bitmart_contract_usdt(&client, required_usdt).await? {
-        Some(amount) => amount,
-        None => return Ok(()),
-    };
+    let transferred =
+        match ensure_bitmart_contract_usdt(&client, margin_target(required_usdt)).await? {
+            Some(amount) => amount,
+            None => return Ok(()),
+        };
 
-    let leverage = super::common::exchange_method_request(
+    let leverage_result = super::common::exchange_method_request(
         &client,
         "submit_leverage",
         params(&[
@@ -134,7 +135,14 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
             ("open_type", "cross"),
         ]),
     )
-    .await?;
+    .await;
+    let leverage = match leverage_result {
+        Ok(leverage) => leverage,
+        Err(error) => {
+            return_bitmart_contract_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&leverage);
 
     let order = match super::common::exchange_method_request(
@@ -155,15 +163,19 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
         Err(error)
             if account_restriction(&error, &["33136", "60052", "personal verification", "kyc"]) =>
         {
+            return_bitmart_contract_transfer(&client, transferred).await?;
             eprintln!("skipping BitMart contract stateful order due account restriction: {error}");
             return Ok(());
         }
-        Err(error) => return Err(error),
+        Err(error) => {
+            return_bitmart_contract_transfer(&client, transferred).await?;
+            return Err(error);
+        }
     };
     assert_success(&order);
     let order_id = require_order_id(&order.data, &["order_id", "orderId"])?;
 
-    let cancel = super::common::exchange_method_request(
+    let cancel_result = super::common::exchange_method_request(
         &client,
         "cancel_contract_order",
         params(&[
@@ -171,10 +183,17 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
             ("order_id", order_id.as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let cancel = match cancel_result {
+        Ok(cancel) => cancel,
+        Err(error) => {
+            return_bitmart_contract_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&cancel);
 
-    let opened = super::common::exchange_method_request(
+    let open_result = super::common::exchange_method_request(
         &client,
         "place_contract_market_buy_order",
         params(&[
@@ -185,7 +204,14 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
             ("client_order_id", unique_client_id("dcexrs").as_str()),
         ]),
     )
-    .await?;
+    .await;
+    let opened = match open_result {
+        Ok(opened) => opened,
+        Err(error) => {
+            return_bitmart_contract_transfer(&client, transferred).await?;
+            return Err(error);
+        }
+    };
     assert_success(&opened);
     let opened_id = require_order_id(&opened.data, &["order_id", "orderId"])?;
     eprintln!("BitMart contract market open order_id={opened_id}");
@@ -256,7 +282,7 @@ async fn ensure_bitmart_contract_usdt(
         );
         return Ok(None);
     }
-    let amount = format_transfer_amount(needed);
+    let amount = bitmart_transfer_amount(needed);
     let response = super::common::exchange_method_request(
         &client,
         "transfer_contract",
@@ -276,7 +302,7 @@ async fn return_bitmart_contract_transfer(client: &BitmartClient, amount: f64) -
     if amount <= 0.0 {
         return Ok(());
     }
-    let amount = format_transfer_amount(amount);
+    let amount = bitmart_transfer_amount(amount);
     let response = super::common::exchange_method_request(
         &client,
         "transfer_contract",
@@ -371,4 +397,8 @@ async fn bitmart_contract_usdt(client: &BitmartClient) -> dcex::Result<f64> {
         "USDT",
         &["available_balance", "availableBalance", "available"],
     ))
+}
+
+fn bitmart_transfer_amount(value: f64) -> String {
+    format_transfer_amount_ceil(value, 2)
 }

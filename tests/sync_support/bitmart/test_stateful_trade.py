@@ -267,12 +267,19 @@ def _ensure_contract_margin(client: Client) -> None:
         return
     _ensure_spot_usdt(client, CONTRACT_TRANSFER_USDT)
     assert (
-        client.transfer_contract(amount=_fmt(CONTRACT_TRANSFER_USDT), type="spot_to_contract")
+        client.transfer_contract(
+            amount=_transfer_amount(CONTRACT_TRANSFER_USDT, ROUND_UP),
+            type="spot_to_contract",
+        )
         is not None
     )
     time.sleep(2)
     if _contract_available_usdt(client) < Decimal("1"):
         pytest.skip("Insufficient BitMart contract USDT after transfer.")
+
+
+def _transfer_amount(value: Decimal, rounding: str) -> str:
+    return _fmt(_round_to_step(value, Decimal("0.01"), rounding))
 
 
 def _cleanup_spot_base(client: Client, initial_spot_base: Decimal) -> None:
@@ -308,10 +315,13 @@ def _cleanup_contract_excess(client: Client, initial_contract_usdt: Decimal) -> 
     for _ in range(4):
         time.sleep(2)
         excess_contract = _contract_available_usdt(client) - initial_contract_usdt
-        transfer_amount = _round_to_step(excess_contract, Decimal("0.1"), ROUND_DOWN)
+        transfer_amount = _round_to_step(excess_contract, Decimal("0.01"), ROUND_DOWN)
         if transfer_amount <= 0:
             return
-        client.transfer_contract(amount=_fmt(transfer_amount), type="contract_to_spot")
+        client.transfer_contract(
+            amount=_transfer_amount(transfer_amount, ROUND_DOWN),
+            type="contract_to_spot",
+        )
         time.sleep(2)
 
 

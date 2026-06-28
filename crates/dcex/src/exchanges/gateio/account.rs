@@ -1,3 +1,5 @@
+use serde_json::Value;
+
 use crate::exchange::ValidatedResponse;
 use crate::Result;
 
@@ -15,6 +17,21 @@ impl GateioClient {
             "get_total_balance" => {
                 self.private_get(WALLET_TOTAL_BALANCE, params.only(&["currency"]))
                     .await
+            }
+            "wallet_transfer" => {
+                let body = Value::Object(params.body(
+                    &[
+                        "currency",
+                        "from",
+                        "to",
+                        "amount",
+                        "currency_pair",
+                        "settle",
+                    ],
+                    &[],
+                    &[],
+                ));
+                self.private_post_json(WALLET_TRANSFERS, body).await
             }
             "get_unified_accounts" => {
                 self.private_get(UNIFIED_ACCOUNTS, params.only(&["currency", "sub_uid"]))

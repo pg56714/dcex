@@ -270,12 +270,19 @@ async def _ensure_contract_margin(client: Client) -> None:
         return
     await _ensure_spot_usdt(client, CONTRACT_TRANSFER_USDT)
     assert (
-        await client.transfer_contract(amount=_fmt(CONTRACT_TRANSFER_USDT), type="spot_to_contract")
+        await client.transfer_contract(
+            amount=_transfer_amount(CONTRACT_TRANSFER_USDT, ROUND_UP),
+            type="spot_to_contract",
+        )
         is not None
     )
     await asyncio.sleep(2)
     if await _contract_available_usdt(client) < Decimal("1"):
         pytest.skip("Insufficient BitMart contract USDT after transfer.")
+
+
+def _transfer_amount(value: Decimal, rounding: str) -> str:
+    return _fmt(_round_to_step(value, Decimal("0.01"), rounding))
 
 
 async def _cleanup_spot_base(client: Client, initial_spot_base: Decimal) -> None:
@@ -311,10 +318,13 @@ async def _cleanup_contract_excess(client: Client, initial_contract_usdt: Decima
     for _ in range(4):
         await asyncio.sleep(2)
         excess_contract = await _contract_available_usdt(client) - initial_contract_usdt
-        transfer_amount = _round_to_step(excess_contract, Decimal("0.1"), ROUND_DOWN)
+        transfer_amount = _round_to_step(excess_contract, Decimal("0.01"), ROUND_DOWN)
         if transfer_amount <= 0:
             return
-        await client.transfer_contract(amount=_fmt(transfer_amount), type="contract_to_spot")
+        await client.transfer_contract(
+            amount=_transfer_amount(transfer_amount, ROUND_DOWN),
+            type="contract_to_spot",
+        )
         await asyncio.sleep(2)
 
 
