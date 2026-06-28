@@ -21,7 +21,6 @@ CONTRACT_SYMBOL = "BTC-USDT-SWAP"
 TRANSFER_AMOUNT = Decimal("1")
 FUTURES_TRANSFER_AMOUNT = Decimal("1")
 CONTRACT_TEST_LEVERAGE = 50
-CONTRACT_TEST_VOL = 1
 
 pytestmark = [
     pytest.mark.private,
@@ -167,6 +166,13 @@ async def _contract_post_only_buy_price(client: Client) -> str:
 async def _contract_post_only_sell_price(client: Client) -> str:
     _, ask = await _contract_prices(client)
     return _fmt(_round_to_step(ask + Decimal("0.1"), Decimal("0.1"), ROUND_UP))
+
+
+def _contract_volume(client: Client) -> int:
+    details = client.ptm.get_trading_details("mexc", CONTRACT_SYMBOL)
+    step = max(_dec(details.get("size_precision"), "1"), Decimal("1"))
+    min_size = max(_dec(details.get("min_size"), "1"), step)
+    return int(_round_to_step(min_size, step, ROUND_UP).to_integral_value(rounding=ROUND_UP))
 
 
 async def _spot_market_notional(client: Client) -> Decimal:
@@ -462,6 +468,7 @@ async def test_contract_stateful_order_lifecycle(client):
 
     try:
         transferred = await _ensure_contract_usdt(client, Decimal("0.5"))
+        contract_vol = _contract_volume(client)
         buy_price = await _contract_post_only_buy_price(client)
         sell_price = await _contract_post_only_sell_price(client)
 
@@ -471,7 +478,7 @@ async def test_contract_stateful_order_lifecycle(client):
                 side=1,
                 type_=2,
                 openType=2,
-                vol=CONTRACT_TEST_VOL,
+                vol=contract_vol,
                 price=buy_price,
                 leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=_client_id(),
@@ -487,7 +494,7 @@ async def test_contract_stateful_order_lifecycle(client):
                 CONTRACT_SYMBOL,
                 side=1,
                 price=buy_price,
-                vol=CONTRACT_TEST_VOL,
+                vol=contract_vol,
                 leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=external_id,
             )
@@ -501,25 +508,25 @@ async def test_contract_stateful_order_lifecycle(client):
             lambda: client.place_contract_limit_buy_order(
                 CONTRACT_SYMBOL,
                 buy_price,
-                CONTRACT_TEST_VOL,
+                contract_vol,
                 externalOid=_client_id(),
             ),
             lambda: client.place_contract_limit_sell_order(
                 CONTRACT_SYMBOL,
                 sell_price,
-                CONTRACT_TEST_VOL,
+                contract_vol,
                 externalOid=_client_id(),
             ),
             lambda: client.place_contract_post_only_buy_order(
                 CONTRACT_SYMBOL,
                 buy_price,
-                CONTRACT_TEST_VOL,
+                contract_vol,
                 externalOid=_client_id(),
             ),
             lambda: client.place_contract_post_only_sell_order(
                 CONTRACT_SYMBOL,
                 sell_price,
-                CONTRACT_TEST_VOL,
+                contract_vol,
                 externalOid=_client_id(),
             ),
         ):
@@ -535,17 +542,17 @@ async def test_contract_stateful_order_lifecycle(client):
         long_open_id = _order_id(
             await client.place_contract_market_buy_order(
                 CONTRACT_SYMBOL,
-                vol=CONTRACT_TEST_VOL,
+                vol=contract_vol,
                 leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=_client_id(),
             )
         )
-        assert await _wait_for_contract_volume(client, Decimal(CONTRACT_TEST_VOL)) > 0
+        assert await _wait_for_contract_volume(client, Decimal(contract_vol)) > 0
         assert await client.get_contract_order(long_open_id) is not None
         assert await client.place_contract_market_order(
             CONTRACT_SYMBOL,
             side=4,
-            vol=CONTRACT_TEST_VOL,
+            vol=contract_vol,
             leverage=CONTRACT_TEST_LEVERAGE,
             openType=2,
             externalOid=_client_id(),
@@ -555,13 +562,13 @@ async def test_contract_stateful_order_lifecycle(client):
         isolated_open_id = _order_id(
             await client.place_contract_market_buy_order(
                 CONTRACT_SYMBOL,
-                vol=CONTRACT_TEST_VOL,
+                vol=contract_vol,
                 leverage=CONTRACT_TEST_LEVERAGE,
                 openType=1,
                 externalOid=_client_id(),
             )
         )
-        assert await _wait_for_contract_volume(client, Decimal(CONTRACT_TEST_VOL)) > 0
+        assert await _wait_for_contract_volume(client, Decimal(contract_vol)) > 0
         long_position = next(
             position
             for position in await _contract_positions(client)
@@ -576,7 +583,7 @@ async def test_contract_stateful_order_lifecycle(client):
         assert await client.place_contract_market_order(
             CONTRACT_SYMBOL,
             side=4,
-            vol=CONTRACT_TEST_VOL,
+            vol=contract_vol,
             leverage=CONTRACT_TEST_LEVERAGE,
             openType=1,
             externalOid=_client_id(),
@@ -587,17 +594,17 @@ async def test_contract_stateful_order_lifecycle(client):
         short_open_id = _order_id(
             await client.place_contract_market_sell_order(
                 CONTRACT_SYMBOL,
-                vol=CONTRACT_TEST_VOL,
+                vol=contract_vol,
                 leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=_client_id(),
             )
         )
-        assert await _wait_for_contract_volume(client, Decimal(CONTRACT_TEST_VOL)) > 0
+        assert await _wait_for_contract_volume(client, Decimal(contract_vol)) > 0
         assert await client.get_contract_order(short_open_id) is not None
         assert await client.place_contract_market_order(
             CONTRACT_SYMBOL,
             side=2,
-            vol=CONTRACT_TEST_VOL,
+            vol=contract_vol,
             leverage=CONTRACT_TEST_LEVERAGE,
             openType=2,
             externalOid=_client_id(),

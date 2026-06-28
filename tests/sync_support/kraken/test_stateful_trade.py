@@ -20,7 +20,6 @@ KRAKEN_FUTURES_API_SECRET = os.getenv("KRAKEN_FUTURES_API_SECRET")
 SPOT_QUOTES = ("USDT", "USDC", "USD")
 FUTURES_SYMBOL = "BTC-USD-SWAP"
 FUTURES_EXCHANGE_SYMBOL = "PF_XBTUSD"
-FUTURES_SIZE = Decimal("0.0001")
 SPOT_TRANSFER_AMOUNT = Decimal("1")
 FUTURES_TRANSFER_AMOUNT = Decimal("0.1")
 
@@ -255,10 +254,15 @@ def _skip_if_futures_state(client: Client) -> None:
         pytest.skip("Kraken Futures already has a BTC position; not changing unrelated exposure.")
 
 
-def _futures_order_params(client: Client, side: str) -> tuple[str, str]:
+def _futures_min_size(client: Client) -> Decimal:
     details = client.ptm.get_trading_details("kraken", FUTURES_SYMBOL)
+    step = _dec(details.get("size_precision"), "0.0001")
+    min_size = max(_dec(details.get("min_size"), "0.0001"), step)
+    return _round_to_step(min_size, step, ROUND_UP)
+
+
+def _futures_order_params(client: Client, side: str) -> tuple[str, str]:
     tick = Decimal("0.5")
-    min_size = max(_dec(details.get("min_size"), "0.0001"), FUTURES_SIZE)
     book = _assert_futures_ok(client.get_futures_orderbook(FUTURES_SYMBOL)).get("orderBook", {})
     bids = book.get("bids", []) if isinstance(book, dict) else []
     asks = book.get("asks", []) if isinstance(book, dict) else []
@@ -267,7 +271,7 @@ def _futures_order_params(client: Client, side: str) -> tuple[str, str]:
         price = _round_to_step(_dec(bids[0][0]) - tick, tick, ROUND_DOWN)
     else:
         price = _round_to_step(_dec(asks[0][0]) + tick, tick, ROUND_UP)
-    return _fmt(min_size), _fmt(price)
+    return _fmt(_futures_min_size(client)), _fmt(price)
 
 
 def _futures_order_id(response) -> str:
@@ -549,30 +553,27 @@ def test_futures_cancel_all_orders(client):
 def test_futures_market_round_trip(client):
     _skip_if_futures_state(client)
     transferred = _ensure_futures_margin(client)
+    size = _fmt(_futures_min_size(client))
     try:
-        _assert_futures_ok(
-            client.place_futures_market_order(FUTURES_SYMBOL, "buy", _fmt(FUTURES_SIZE))
-        )
+        _assert_futures_ok(client.place_futures_market_order(FUTURES_SYMBOL, "buy", size))
         time.sleep(2)
         _assert_futures_ok(
             client.place_futures_market_sell_order(
                 FUTURES_SYMBOL,
-                _fmt(FUTURES_SIZE),
+                size,
                 reduceOnly=True,
             )
         )
         time.sleep(2)
         assert _futures_position_size(client) == 0
 
-        _assert_futures_ok(
-            client.place_futures_market_buy_order(FUTURES_SYMBOL, _fmt(FUTURES_SIZE))
-        )
+        _assert_futures_ok(client.place_futures_market_buy_order(FUTURES_SYMBOL, size))
         time.sleep(2)
         _assert_futures_ok(
             client.place_futures_market_order(
                 FUTURES_SYMBOL,
                 "sell",
-                _fmt(FUTURES_SIZE),
+                size,
                 reduceOnly=True,
             )
         )
@@ -583,7 +584,7 @@ def test_futures_market_round_trip(client):
             with suppress(Exception):
                 client.place_futures_market_sell_order(
                     FUTURES_SYMBOL,
-                    _fmt(FUTURES_SIZE),
+                    size,
                     reduceOnly=True,
                 )
         _return_futures_margin(client, transferred)

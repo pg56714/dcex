@@ -18,7 +18,7 @@ WALLET_ADDRESS = os.getenv("HYPERLIQUID_WALLET_ADDRESS")
 PRIVATE_KEY = os.getenv("HYPERLIQUID_PRIVATE_KEY")
 SYMBOL = "BTC-USD-SWAP"
 SPOT_SYMBOL = "PURR-USDC-SPOT"
-ORDER_SIZE = Decimal("0.0002")
+PERP_ORDER_NOTIONAL = Decimal("10.5")
 SPOT_ORDER_NOTIONAL = Decimal("10.5")
 SPOT_REQUIRED_USDC = Decimal("10.6")
 ACCOUNT_USER: str | None = None
@@ -99,8 +99,35 @@ def _format_hyperliquid_price(value: Decimal, rounding: str) -> str:
     return format(value.quantize(precision_step, rounding=rounding).normalize(), "f")
 
 
-def _size() -> str:
-    return format(ORDER_SIZE.normalize(), "f")
+def _dec(value: object, default: str = "0") -> Decimal:
+    if value is None or value == "":
+        value = default
+    return Decimal(str(value))
+
+
+def _fmt(value: Decimal) -> str:
+    return format(value.normalize(), "f")
+
+
+def _round_to_step(value: Decimal, step: Decimal, rounding: str) -> Decimal:
+    if step <= 0:
+        return value
+    return (value / step).to_integral_value(rounding=rounding) * step
+
+
+def _size(client: Client) -> str:
+    details = client.ptm.get_trading_details(Common.HYPERLIQUID, SYMBOL)
+    step = _dec(details.get("size_precision"), "0.00001")
+    min_size = max(_dec(details.get("min_size"), "0.00001"), step)
+    min_notional = max(
+        _dec(details.get("min_notional"), str(PERP_ORDER_NOTIONAL)),
+        PERP_ORDER_NOTIONAL,
+    )
+    size = max(
+        _round_to_step(min_notional * Decimal("1.01") / _mid_price(client), step, ROUND_UP),
+        _round_to_step(min_size, step, ROUND_UP),
+    )
+    return _fmt(size)
 
 
 def _assert_exchange_response(res: dict) -> None:
@@ -340,7 +367,7 @@ def test_signed_account_actions_that_do_not_require_margin(client):
 def test_signed_error_response_trade_endpoints(client):
     cloid = _cloid()
     price = _post_only_buy_price(client)
-    size = _size()
+    size = _size(client)
 
     _assert_exchange_response(
         client.place_order(
@@ -432,6 +459,7 @@ def test_post_only_order_lifecycle(client):
     _skip_if_account_state(client)
     _skip_if_unfunded(client)
 
+    size = _size(client)
     oid = None
     cloid = _cloid()
     try:
@@ -439,7 +467,7 @@ def test_post_only_order_lifecycle(client):
             product_symbol=SYMBOL,
             isBuy=True,
             price=_post_only_buy_price(client),
-            size=_size(),
+            size=size,
             reduceOnly=False,
             tif="Alo",
             cloid=cloid,
@@ -460,6 +488,7 @@ def test_limit_wrappers_and_cancel_by_cloid(client):
     _skip_if_account_state(client)
     _skip_if_unfunded(client)
 
+    size = _size(client)
     order_ids: list[int] = []
     try:
         for order in (
@@ -467,19 +496,19 @@ def test_limit_wrappers_and_cancel_by_cloid(client):
                 product_symbol=SYMBOL,
                 isBuy=True,
                 price=_post_only_buy_price(client),
-                size=_size(),
+                size=size,
                 tif="Alo",
             ),
             client.place_future_limit_buy_order(
                 product_symbol=SYMBOL,
                 price=_post_only_buy_price(client),
-                size=_size(),
+                size=size,
                 tif="Alo",
             ),
             client.place_future_limit_sell_order(
                 product_symbol=SYMBOL,
                 price=_post_only_sell_price(client),
-                size=_size(),
+                size=size,
                 tif="Alo",
             ),
         ):
@@ -492,7 +521,7 @@ def test_limit_wrappers_and_cancel_by_cloid(client):
             product_symbol=SYMBOL,
             isBuy=True,
             price=_post_only_buy_price(client),
-            size=_size(),
+            size=size,
             reduceOnly=False,
             tif="Alo",
             cloid=cloid,
@@ -600,12 +629,13 @@ def test_modify_order_wrappers(client):
     _skip_if_account_state(client)
     _skip_if_unfunded(client)
 
+    size = _size(client)
     oid = None
     try:
         order = client.place_future_limit_buy_order(
             product_symbol=SYMBOL,
             price=_post_only_buy_price(client),
-            size=_size(),
+            size=size,
             tif="Alo",
         )
         oid = _extract_oid(order)
@@ -618,7 +648,7 @@ def test_modify_order_wrappers(client):
                 product_symbol=SYMBOL,
                 isBuy=True,
                 price=new_price,
-                size=_size(),
+                size=size,
                 reduceOnly=False,
                 tif="Alo",
             )
@@ -632,7 +662,7 @@ def test_modify_order_wrappers(client):
                             "a": _asset_id(client),
                             "b": True,
                             "p": _post_only_buy_price(client),
-                            "s": _size(),
+                            "s": size,
                             "r": False,
                             "t": {"limit": {"tif": "Alo"}},
                         },
@@ -651,23 +681,24 @@ def test_market_wrappers_round_trip(client):
     _skip_if_account_state(client)
     _skip_if_unfunded(client)
 
+    size = _size(client)
     try:
         _assert_exchange_response(
-            client.place_future_market_buy_order(product_symbol=SYMBOL, size=_size())
+            client.place_future_market_buy_order(product_symbol=SYMBOL, size=size)
         )
         time.sleep(2)
         _close_btc_position(client)
         assert _btc_position_size(client) == 0
 
         _assert_exchange_response(
-            client.place_future_market_order(product_symbol=SYMBOL, isBuy=True, size=_size())
+            client.place_future_market_order(product_symbol=SYMBOL, isBuy=True, size=size)
         )
         time.sleep(2)
         _close_btc_position(client)
         assert _btc_position_size(client) == 0
 
         _assert_exchange_response(
-            client.place_future_market_sell_order(product_symbol=SYMBOL, size=_size())
+            client.place_future_market_sell_order(product_symbol=SYMBOL, size=size)
         )
         time.sleep(2)
         _close_btc_position(client)

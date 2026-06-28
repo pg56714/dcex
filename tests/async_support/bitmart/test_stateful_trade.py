@@ -22,7 +22,6 @@ SPOT_SYMBOL = "DOGE-USDT-SPOT"
 SPOT_EXCHANGE_SYMBOL = "DOGE_USDT"
 SPOT_BASE_CURRENCY = "DOGE"
 CONTRACT_SYMBOL = "DOGE-USDT-SWAP"
-CONTRACT_SIZE = 1
 CONTRACT_LEVERAGE = "50"
 CONTRACT_TRANSFER_USDT = Decimal("2")
 
@@ -227,6 +226,13 @@ async def _contract_price_step(client: Client) -> Decimal:
     if symbols:
         return _dec(symbols[0].get("price_precision"), "0.1")
     return Decimal("0.1")
+
+
+def _contract_size(client: Client) -> int:
+    details = client.ptm.get_trading_details("bitmart", CONTRACT_SYMBOL)
+    step = _dec(details.get("size_precision"), "1")
+    min_size = max(_dec(details.get("min_size"), "1"), step, Decimal("1"))
+    return int(_round_to_step(min_size, step, ROUND_UP).to_integral_value(rounding=ROUND_UP))
 
 
 async def _contract_post_only_buy_price(client: Client) -> str:
@@ -531,6 +537,7 @@ async def test_contract_stateful_order_lifecycle(client):
             is not None
         )
 
+        contract_size = _contract_size(client)
         price = await _contract_post_only_buy_price(client)
         order_id = None
         client_id = _client_id()
@@ -538,7 +545,7 @@ async def test_contract_stateful_order_lifecycle(client):
             order = await client.place_contract_order(
                 CONTRACT_SYMBOL,
                 side=1,
-                size=CONTRACT_SIZE,
+                size=contract_size,
                 price=price,
                 client_order_id=client_id,
                 type="limit",
@@ -553,7 +560,7 @@ async def test_contract_stateful_order_lifecycle(client):
                     CONTRACT_SYMBOL,
                     order_id=order_id,
                     price=await _contract_post_only_buy_price(client),
-                    size=CONTRACT_SIZE,
+                    size=contract_size,
                 )
                 is not None
             )
@@ -571,7 +578,7 @@ async def test_contract_stateful_order_lifecycle(client):
                 CONTRACT_SYMBOL,
                 side=1,
                 price=price,
-                size=CONTRACT_SIZE,
+                size=contract_size,
                 client_order_id=_client_id(),
                 mode=4,
             )
@@ -593,7 +600,7 @@ async def test_contract_stateful_order_lifecycle(client):
                     CONTRACT_SYMBOL,
                     side=side,
                     price=await price_func(client),
-                    size=CONTRACT_SIZE,
+                    size=contract_size,
                     client_order_id=_client_id(),
                 )
                 order_id = _order_id(order)
@@ -611,7 +618,7 @@ async def test_contract_stateful_order_lifecycle(client):
             order = await client.place_contract_post_only_buy_order(
                 CONTRACT_SYMBOL,
                 price=await _contract_post_only_buy_price(client),
-                size=CONTRACT_SIZE,
+                size=contract_size,
                 client_order_id=_client_id(),
             )
             order_id = _order_id(order)
@@ -623,7 +630,7 @@ async def test_contract_stateful_order_lifecycle(client):
             order = await client.place_contract_post_only_sell_order(
                 CONTRACT_SYMBOL,
                 price=await _contract_post_only_sell_price(client),
-                size=CONTRACT_SIZE,
+                size=contract_size,
                 client_order_id=_client_id(),
             )
             order_id = _order_id(order)
@@ -638,7 +645,7 @@ async def test_contract_stateful_order_lifecycle(client):
         assert (
             await client.place_contract_market_buy_order(
                 CONTRACT_SYMBOL,
-                CONTRACT_SIZE,
+                contract_size,
                 _client_id(),
             )
             is not None
@@ -647,7 +654,7 @@ async def test_contract_stateful_order_lifecycle(client):
         assert (
             await client.place_contract_market_sell_order(
                 CONTRACT_SYMBOL,
-                CONTRACT_SIZE,
+                contract_size,
                 _client_id(),
             )
             is not None
@@ -659,7 +666,7 @@ async def test_contract_stateful_order_lifecycle(client):
             await client.place_contract_market_order(
                 CONTRACT_SYMBOL,
                 side=1,
-                size=CONTRACT_SIZE,
+                size=contract_size,
                 client_order_id=_client_id(),
             )
             is not None
@@ -672,7 +679,7 @@ async def test_contract_stateful_order_lifecycle(client):
                 CONTRACT_SYMBOL,
                 side=1,
                 price=await _contract_fillable_buy_price(client),
-                size=CONTRACT_SIZE,
+                size=contract_size,
                 client_order_id=_client_id(),
                 mode=3,
             )
@@ -684,7 +691,7 @@ async def test_contract_stateful_order_lifecycle(client):
                 CONTRACT_SYMBOL,
                 side=3,
                 price=await _contract_fillable_sell_price(client),
-                size=CONTRACT_SIZE,
+                size=contract_size,
                 client_order_id=_client_id(),
                 mode=3,
             )

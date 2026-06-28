@@ -22,7 +22,6 @@ SPOT_SYMBOL = "BTC-USDT-SPOT"
 SWAP_SYMBOL = "BTC-USDT-SWAP"
 EXCHANGE_SYMBOL = "BTCUSDT"
 FUTURES_TRANSFER_AMOUNT = Decimal("2")
-FUTURES_SIZE = Decimal("0.0001")
 IS_UTA: bool | None = None
 
 pytestmark = [
@@ -175,9 +174,14 @@ def _spot_sell_size(client: Client, amount: Decimal) -> Decimal:
     return _round_to_step(amount, step, ROUND_DOWN)
 
 
-def _futures_details(client: Client) -> tuple[Decimal, Decimal]:
+def _futures_details(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
     details = client.ptm.get_trading_details("bitget", SWAP_SYMBOL)
-    return _dec(details.get("price_precision"), "0.1"), _dec(details.get("min_size"), "0.0001")
+    return (
+        _dec(details.get("price_precision"), "0.1"),
+        _dec(details.get("size_precision"), "0.0001"),
+        _dec(details.get("min_size"), "0.0001"),
+        _dec(details.get("min_notional"), "0"),
+    )
 
 
 async def _futures_prices(client: Client) -> tuple[Decimal, Decimal]:
@@ -186,14 +190,20 @@ async def _futures_prices(client: Client) -> tuple[Decimal, Decimal]:
 
 
 async def _futures_buy_params(client: Client) -> tuple[str, str]:
-    tick, min_size = _futures_details(client)
+    tick, step, min_size, min_notional = _futures_details(client)
     bid, _ = await _futures_prices(client)
     price = _round_to_step(bid - tick, tick, ROUND_DOWN)
-    return _fmt(max(FUTURES_SIZE, min_size)), _fmt(price)
+    size = max(_round_to_step(min_size, step, ROUND_UP), step)
+    if min_notional > 0:
+        size = max(
+            size,
+            _round_to_step((min_notional * Decimal("1.01")) / price, step, ROUND_UP),
+        )
+    return _fmt(size), _fmt(price)
 
 
 async def _futures_sell_price(client: Client) -> str:
-    tick, _ = _futures_details(client)
+    tick, _, _, _ = _futures_details(client)
     _, ask = await _futures_prices(client)
     return _fmt(_round_to_step(ask + tick, tick, ROUND_UP))
 
@@ -731,35 +741,31 @@ async def test_futures_stateful_order_lifecycle(client):
         await asyncio.sleep(1)
 
         if await _is_uta(client):
-            _assert_ok(await _place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+            _assert_ok(await _place_futures_market(client, "buy", size))
         else:
-            _assert_ok(
-                await client.place_futures_market_order(SWAP_SYMBOL, "buy", _fmt(FUTURES_SIZE))
-            )
+            _assert_ok(await client.place_futures_market_order(SWAP_SYMBOL, "buy", size))
         await asyncio.sleep(2)
         assert await _futures_position_size(client) > 0
         if await _is_uta(client):
-            _assert_ok(await _place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+            _assert_ok(await _place_futures_market(client, "sell", size, "yes"))
         else:
-            _assert_ok(
-                await client.place_futures_market_sell_order(SWAP_SYMBOL, _fmt(FUTURES_SIZE), "YES")
-            )
+            _assert_ok(await client.place_futures_market_sell_order(SWAP_SYMBOL, size, "YES"))
         await asyncio.sleep(2)
 
         if await _is_uta(client):
-            _assert_ok(await _place_futures_market(client, "buy", _fmt(FUTURES_SIZE)))
+            _assert_ok(await _place_futures_market(client, "buy", size))
         else:
-            _assert_ok(await client.place_futures_market_buy_order(SWAP_SYMBOL, _fmt(FUTURES_SIZE)))
+            _assert_ok(await client.place_futures_market_buy_order(SWAP_SYMBOL, size))
         await asyncio.sleep(2)
         assert await _futures_position_size(client) > 0
         if await _is_uta(client):
-            _assert_ok(await _place_futures_market(client, "sell", _fmt(FUTURES_SIZE), "yes"))
+            _assert_ok(await _place_futures_market(client, "sell", size, "yes"))
         else:
             _assert_ok(
                 await client.place_futures_market_order(
                     SWAP_SYMBOL,
                     "sell",
-                    _fmt(FUTURES_SIZE),
+                    size,
                     reduceOnly="YES",
                 )
             )
