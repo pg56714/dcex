@@ -1,3 +1,10 @@
+## 0.4.1 (2026-06-28)
+
+### Fix
+
+- harden native request error paths
+- expose Gate.io transfer request helpers
+
 ## 0.4.0 (2026-06-28)
 
 ### Feat

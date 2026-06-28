@@ -1,3 +1,14 @@
+## 0.26.0 (2026-06-28)
+
+### Feat
+
+- add Gate.io wallet transfer python wrapper
+
+### Fix
+
+- allow clippy argument lint for python bindings
+- harden native request error paths
+
 ## 0.25.0 (2026-06-28)
 
 ### Feat
