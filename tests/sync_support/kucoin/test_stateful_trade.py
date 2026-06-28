@@ -15,7 +15,6 @@ load_dotenv()
 KUCOIN_API_KEY = os.getenv("KUCOIN_API_KEY")
 KUCOIN_API_SECRET = os.getenv("KUCOIN_API_SECRET")
 KUCOIN_API_PASSPHRASE = os.getenv("KUCOIN_API_PASSPHRASE")
-KUCOIN_API_KEY_VERSION = os.getenv("KUCOIN_API_KEY_VERSION") or None
 SPOT_SYMBOL = "BTC-USDT-SPOT"
 FUTURES_SYMBOL = "BTC-USDT-SWAP"
 FUTURES_LEVERAGE = Decimal("20")
@@ -37,7 +36,6 @@ def client():
         api_key=KUCOIN_API_KEY,
         api_secret=KUCOIN_API_SECRET,
         passphrase=KUCOIN_API_PASSPHRASE,
-        api_key_version=KUCOIN_API_KEY_VERSION,
     )
 
 
