@@ -12,6 +12,27 @@ class AccountHTTP(HTTPManager):
             self._native_params(currency=currency),
         )
 
+    async def wallet_transfer(
+        self,
+        currency: str,
+        from_account: str,
+        to_account: str,
+        amount: str,
+        currency_pair: str | None = None,
+        settle: str | None = None,
+    ) -> dict[str, Any]:
+        return await self._native_private(
+            "wallet_transfer",
+            self._native_params(
+                currency=currency,
+                from_=from_account,
+                to=to_account,
+                amount=amount,
+                currency_pair=currency_pair,
+                settle=settle,
+            ),
+        )
+
     async def get_unified_accounts(
         self,
         currency: str | None = None,

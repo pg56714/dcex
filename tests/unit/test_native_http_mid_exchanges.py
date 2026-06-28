@@ -894,6 +894,37 @@ def test_sync_gateio_manager_uses_native_transport() -> None:
     assert received.get_nowait()["path"] == "/api/v4/test?settle=usdt"
 
 
+def test_sync_gateio_wallet_transfer_uses_native_dispatcher() -> None:
+    from dcex.gateio.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            api_secret="secret",
+            base_url=base_url,
+            preload_product_table=False,
+        )
+        result = client.wallet_transfer(
+            currency="USDT",
+            from_account="spot",
+            to_account="futures",
+            amount="1.23",
+            settle="usdt",
+        )
+
+    client.close()
+    request = received.get_nowait()
+    assert result == {"ok": True}
+    assert urlsplit(request["path"]).path == "/api/v4/wallet/transfers"
+    assert json.loads(request["body"]) == {
+        "amount": "1.23",
+        "currency": "USDT",
+        "from": "spot",
+        "settle": "usdt",
+        "to": "futures",
+    }
+
+
 @pytest.mark.asyncio
 async def test_async_gateio_manager_uses_native_transport() -> None:
     from dcex.async_support.gateio._http_manager import HTTPManager
@@ -914,3 +945,38 @@ async def test_async_gateio_manager_uses_native_transport() -> None:
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/api/v4/test?settle=usdt"
+
+
+@pytest.mark.asyncio
+async def test_async_gateio_wallet_transfer_uses_native_dispatcher() -> None:
+    from dcex.async_support.gateio.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            api_secret="secret",
+            base_url=base_url,
+            preload_product_table=False,
+        )
+        await client.async_init()
+        result = await client.wallet_transfer(
+            currency="USDT",
+            from_account="futures",
+            to_account="spot",
+            amount="0.5",
+            currency_pair="BTC_USDT",
+            settle="usdt",
+        )
+
+    await client.close()
+    request = received.get_nowait()
+    assert result == {"ok": True}
+    assert urlsplit(request["path"]).path == "/api/v4/wallet/transfers"
+    assert json.loads(request["body"]) == {
+        "amount": "0.5",
+        "currency": "USDT",
+        "currency_pair": "BTC_USDT",
+        "from": "futures",
+        "settle": "usdt",
+        "to": "spot",
+    }
