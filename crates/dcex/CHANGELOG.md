@@ -1,3 +1,10 @@
+## 0.4.3 (2026-06-29)
+
+### Fix
+
+- require API key for listen key requests
+- require BitMEX credentials for signed requests
+
 ## 0.4.2 (2026-06-29)
 
 ### Fix

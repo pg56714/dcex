@@ -1,3 +1,11 @@
+## 0.26.2 (2026-06-29)
+
+### Fix
+
+- reject non-2xx Gate.io responses
+- require API key for listen key requests
+- require BitMEX credentials for signed requests
+
 ## 0.26.1 (2026-06-29)
 
 ### Fix
