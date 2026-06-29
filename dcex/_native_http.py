@@ -41,7 +41,7 @@ class NativeResponse:
 
 def _response_from_json(
     status: int, headers: Mapping[str, str], body: object
-) -> tuple[NativeResponse, object]:
+) -> tuple[NativeResponse, Any]:
     response = NativeResponse(status, dict(headers), b"")
     return response, body
 
@@ -50,7 +50,7 @@ def _response_from_bytes(
     status: int,
     headers: Mapping[str, str],
     body: bytes | bytearray | memoryview,
-) -> tuple[NativeResponse, object]:
+) -> tuple[NativeResponse, Any]:
     response = NativeResponse(status, dict(headers), bytes(body))
     return response, response.json()
 
@@ -60,7 +60,7 @@ def request_native_json(
     request_method: str,
     method_name: str,
     params: list[tuple[str, str]],
-) -> tuple[NativeResponse, object]:
+) -> tuple[NativeResponse, Any]:
     """Call a native exchange request and return response metadata plus JSON body."""
     json_method = f"{request_method}_json"
     if hasattr(native_client, json_method):
@@ -75,7 +75,7 @@ async def request_native_json_async(
     request_method: str,
     method_name: str,
     params: list[tuple[str, str]],
-) -> tuple[NativeResponse, object]:
+) -> tuple[NativeResponse, Any]:
     """Call an async native exchange request and return response metadata plus JSON body."""
     json_method = f"{request_method}_json_async"
     if hasattr(native_client, json_method):

@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from types import TracebackType
 from typing import Any, cast
 
-from .._native_http import NativeResponse, load_native
+from .._native_http import NativeResponse, load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -109,7 +109,12 @@ class HTTPManager(BaseHTTPManager):
         if not hasattr(self._native_client, "public_request"):
             raise RuntimeError("Hyperliquid native client public_request is unavailable.")
         try:
-            status, headers, body = self._native_client.public_request(method_name, params)
+            response, data = request_native_json(
+                self._native_client,
+                "public_request",
+                method_name,
+                params,
+            )
         except RuntimeError as exc:
             raise FailedRequestError(
                 request=f"HYPERLIQUID {method_name} | Params: {params}",
@@ -117,9 +122,8 @@ class HTTPManager(BaseHTTPManager):
                 status_code="Unknown",
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
-        response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     def _native_private(
         self,
@@ -132,7 +136,12 @@ class HTTPManager(BaseHTTPManager):
         if not hasattr(self._native_client, "private_request"):
             raise RuntimeError("Hyperliquid native client private_request is unavailable.")
         try:
-            status, headers, body = self._native_client.private_request(method_name, params)
+            response, data = request_native_json(
+                self._native_client,
+                "private_request",
+                method_name,
+                params,
+            )
         except RuntimeError as exc:
             raise FailedRequestError(
                 request=f"HYPERLIQUID {method_name} | Params: {params}",
@@ -140,9 +149,8 @@ class HTTPManager(BaseHTTPManager):
                 status_code="Unknown",
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
-        response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     @staticmethod
     def _native_params(**kwargs: object) -> list[tuple[str, str]]:

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
-from ..._native_http import NativeResponse, load_native
+from ..._native_http import NativeResponse, load_native, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -106,11 +106,20 @@ class HTTPManager(BaseHTTPManager):
         if self._native_client is None:
             await self.async_init()
         native_client = self._native_client
-        method = "private_request_async" if private else "public_request_async"
-        if native_client is None or not hasattr(native_client, method):
-            raise RuntimeError(f"Lighter native client {method} is unavailable.")
+        method = "private_request" if private else "public_request"
+        async_method = f"{method}_async"
+        json_method = f"{method}_json_async"
+        if native_client is None or not (
+            hasattr(native_client, json_method) or hasattr(native_client, async_method)
+        ):
+            raise RuntimeError(f"Lighter native client {async_method} is unavailable.")
         try:
-            status, headers, body = await getattr(native_client, method)(method_name, params)
+            response, data = await request_native_json_async(
+                native_client,
+                method,
+                method_name,
+                params,
+            )
         except RuntimeError as exc:
             raise FailedRequestError(
                 request=f"LIGHTER {method_name} | Params: {params}",
@@ -118,9 +127,8 @@ class HTTPManager(BaseHTTPManager):
                 status_code="Unknown",
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
-        response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     async def _native_public(
         self,

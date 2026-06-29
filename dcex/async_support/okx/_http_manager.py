@@ -5,7 +5,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Self, cast
 
-from ..._native_http import NativeResponse, load_native
+from ..._native_http import NativeResponse, load_native, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -100,7 +100,9 @@ class HTTPManager(BaseHTTPManager):
         if self._native_client is None:
             raise RuntimeError("OKX native client is required for private methods.")
         try:
-            status, headers, body = await self._native_client.private_request_async(
+            response, data = await request_native_json_async(
+                self._native_client,
+                "private_request",
                 method_name,
                 params,
             )
@@ -111,9 +113,8 @@ class HTTPManager(BaseHTTPManager):
                 status_code="Unknown",
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
-        response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     @staticmethod
     def _native_params(**kwargs: object) -> list[tuple[str, str]]:

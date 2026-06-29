@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, cast
 
-from .._native_http import NativeResponse, load_native
+from .._native_http import NativeResponse, load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -95,7 +95,7 @@ class HTTPManager(BaseHTTPManager):
             raise RuntimeError(f"Aster native client {method} is unavailable.")
         request_summary = self._native_request_summary(method_name, params)
         try:
-            status, headers, body = getattr(self._native_client, method)(method_name, params)
+            response, data = request_native_json(self._native_client, method, method_name, params)
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
@@ -105,9 +105,8 @@ class HTTPManager(BaseHTTPManager):
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=resp_headers,
             ) from exc
-        response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     def _native_public(
         self,

@@ -5,7 +5,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Self, cast
 
-from ..._native_http import NativeResponse, load_native
+from ..._native_http import NativeResponse, load_native, request_native_json_async
 from ...aster._http_manager import (
     _filtered_query,
     _format_value,
@@ -78,12 +78,18 @@ class HTTPManager(BaseHTTPManager):
             await self.async_init()
         if self._native_client is None:
             raise RuntimeError("Aster native client is required.")
-        method = "private_request_async" if private else "public_request_async"
-        if not hasattr(self._native_client, method):
-            raise RuntimeError(f"Aster native client {method} is unavailable.")
+        method = "private_request" if private else "public_request"
+        async_method = f"{method}_async"
+        json_method = f"{method}_json_async"
+        if not (
+            hasattr(self._native_client, json_method) or hasattr(self._native_client, async_method)
+        ):
+            raise RuntimeError(f"Aster native client {async_method} is unavailable.")
         request_summary = self._native_request_summary(method_name, params)
         try:
-            status, headers, body = await getattr(self._native_client, method)(
+            response, data = await request_native_json_async(
+                self._native_client,
+                method,
                 method_name,
                 params,
             )
@@ -96,9 +102,8 @@ class HTTPManager(BaseHTTPManager):
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=resp_headers,
             ) from exc
-        response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     async def _native_public(
         self,

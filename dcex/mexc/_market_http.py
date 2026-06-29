@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from .._native_http import NativeResponse
+from .._native_http import request_native_json
 from ._http_manager import HTTPManager
 
 
@@ -17,10 +17,14 @@ class MarketHTTP(HTTPManager):
         """Call a Rust-backed MEXC public method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("MEXC native client is required for public market methods.")
-        status, headers, body = self._native_client.public_request(method_name, params)
-        response = NativeResponse(status, dict(headers), bytes(body))
+        response, data = request_native_json(
+            self._native_client,
+            "public_request",
+            method_name,
+            params,
+        )
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     def ping(self) -> dict[str, Any] | list[Any]:
         """Test MEXC Spot API connectivity."""
