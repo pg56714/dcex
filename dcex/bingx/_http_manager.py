@@ -130,6 +130,13 @@ class HTTPManager(BaseHTTPManager):
 
         self._uses_native_transport()
         url = self.base_url + path
+        json_body = None
+        if not signed and method.upper() in {"POST", "PUT"}:
+            json_body = json.dumps(
+                query or {},
+                separators=(",", ":"),
+                ensure_ascii=False,
+            ).encode()
         try:
             status, response_headers, data = cast(
                 Any,
@@ -140,6 +147,7 @@ class HTTPManager(BaseHTTPManager):
                 list(_prepare_query(query or {}).items()),
                 signed,
                 None if signed else request_headers,
+                json_body,
             )
             response = NativeResponse(status, dict(response_headers))
 

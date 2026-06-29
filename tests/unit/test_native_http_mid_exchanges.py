@@ -70,6 +70,28 @@ def test_sync_bingx_manager_uses_native_transport() -> None:
     assert received.get_nowait()["path"] == "/test?symbol=BTCUSDT"
 
 
+def test_sync_bingx_manager_sends_unsigned_json_body() -> None:
+    from dcex.bingx._http_manager import HTTPManager
+
+    with _http_server() as (base_url, received):
+        manager = HTTPManager(
+            base_url=base_url,
+            preload_product_table=False,
+        )
+        result = manager._request(
+            "POST",
+            "/test",
+            {"symbol": "BTCUSDT", "limit": 1},
+            signed=False,
+        )
+
+    manager.close()
+    request = received.get_nowait()
+    assert result == {"ok": True}
+    assert request["path"] == "/test"
+    assert request["body"] == '{"symbol":"BTCUSDT","limit":1}'
+
+
 @pytest.mark.asyncio
 async def test_async_bingx_manager_uses_native_transport() -> None:
     from dcex.async_support.bingx._http_manager import HTTPManager
