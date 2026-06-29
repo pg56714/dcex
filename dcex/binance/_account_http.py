@@ -1,6 +1,6 @@
 from typing import Any, cast
 
-from .._native_http import NativeResponse
+from .._native_http import request_native_json
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
 from ._http_manager import HTTPManager
@@ -19,7 +19,12 @@ class AccountHTTP(HTTPManager):
         if self._native_client is None:
             raise RuntimeError("Binance native client is required for private account methods.")
         try:
-            status, headers, body = self._native_client.private_request(method_name, params)
+            response, data = request_native_json(
+                self._native_client,
+                "private_request",
+                method_name,
+                params,
+            )
         except RuntimeError as exc:
             raise FailedRequestError(
                 request=f"BINANCE {method_name} | Params: {params}",
@@ -27,9 +32,8 @@ class AccountHTTP(HTTPManager):
                 status_code="Unknown",
                 time=str(generate_timestamp(iso_format=True)),
             ) from exc
-        response = NativeResponse(status, dict(headers), bytes(body))
         self._store_response_headers(response)
-        return response.json()
+        return data
 
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
