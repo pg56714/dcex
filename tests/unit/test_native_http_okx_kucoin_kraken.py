@@ -23,7 +23,7 @@ def test_native_okx_signed_request() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "GET",
             "/api/v5/account/balance",
             [("ccy", "BTC")],
@@ -39,7 +39,7 @@ def test_native_okx_signed_request() -> None:
     ).decode()
 
     assert status == 200
-    assert json.loads(body) == {"code": "0", "data": []}
+    assert body == {"code": "0", "data": []}
     assert request["OK-ACCESS-KEY"] == "api-key"
     assert request["OK-ACCESS-PASSPHRASE"] == "passphrase"
     assert request["OK-ACCESS-SIGN"] == expected_signature
@@ -101,7 +101,7 @@ def test_native_kucoin_signed_request() -> None:
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "GET",
             "spot",
             "/api/v1/accounts",
@@ -121,7 +121,7 @@ def test_native_kucoin_signed_request() -> None:
     ).decode()
 
     assert status == 200
-    assert json.loads(body) == {"code": "200000", "data": {}}
+    assert body == {"code": "200000", "data": {}}
     assert request["KC-API-KEY"] == "api-key"
     assert request["KC-API-SIGN"] == expected_signature
     assert request["KC-API-PASSPHRASE"] == expected_passphrase
@@ -185,7 +185,7 @@ def test_native_kraken_spot_signed_request() -> None:
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "spot",
             "/0/private/Balance",
@@ -203,7 +203,7 @@ def test_native_kraken_spot_signed_request() -> None:
     ).decode()
 
     assert status == 200
-    assert json.loads(body) == {"error": [], "result": {}}
+    assert body == {"error": [], "result": {}}
     assert request["kraken_api-key"] == "api-key"
     assert request["kraken_api-sign"] == expected_signature
     assert request["path"] == "/0/private/Balance"
@@ -221,7 +221,7 @@ def test_native_kraken_futures_signed_request() -> None:
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "futures",
             "/derivatives/api/v3/sendorder",
@@ -239,7 +239,7 @@ def test_native_kraken_futures_signed_request() -> None:
     ).decode()
 
     assert status == 200
-    assert json.loads(body) == {"result": "success"}
+    assert body == {"result": "success"}
     assert request["kraken_apikey"] == "api-key"
     assert request["kraken_authent"] == expected_signature
 

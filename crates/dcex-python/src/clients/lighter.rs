@@ -49,44 +49,6 @@ impl PythonLighterHttpClient {
         content_type="json"
     ))]
     #[allow(clippy::too_many_arguments)]
-    fn request_raw(
-        &self,
-        py: Python<'_>,
-        method: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        body: Option<Vec<(String, String)>>,
-        signed: bool,
-        headers: Option<BTreeMap<String, String>>,
-        content_type: &str,
-    ) -> PyResult<PythonHttpResponse> {
-        let method = http_method(method)?;
-        let content_type = lighter_content_type(content_type)?;
-        py.allow_threads(|| {
-            self.client.request_raw_blocking(
-                method,
-                path,
-                params.unwrap_or_default(),
-                body.unwrap_or_default(),
-                signed,
-                headers.unwrap_or_default(),
-                content_type,
-            )
-        })
-        .map(python_http_response)
-        .map_err(to_py_runtime_error)
-    }
-
-    #[pyo3(signature = (
-        method,
-        path,
-        params=None,
-        body=None,
-        signed=false,
-        headers=None,
-        content_type="json"
-    ))]
-    #[allow(clippy::too_many_arguments)]
     fn request_raw_json(
         &self,
         py: Python<'_>,
@@ -111,42 +73,6 @@ impl PythonLighterHttpClient {
                 headers.unwrap_or_default(),
                 content_type,
             )
-        })
-    }
-
-    #[pyo3(signature = (
-        method,
-        path,
-        params=None,
-        body=None,
-        signed=false,
-        headers=None,
-        content_type="json"
-    ))]
-    #[allow(clippy::too_many_arguments)]
-    fn request_raw_async<'py>(
-        &self,
-        py: Python<'py>,
-        method: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        body: Option<Vec<(String, String)>>,
-        signed: bool,
-        headers: Option<BTreeMap<String, String>>,
-        content_type: &str,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        let method = http_method(method)?;
-        let content_type = lighter_content_type(content_type)?;
-        let params = params.unwrap_or_default();
-        let body = body.unwrap_or_default();
-        let headers = headers.unwrap_or_default();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .request_raw(method, path, params, body, signed, headers, content_type)
-                .await
-                .map(python_http_response)
-                .map_err(to_py_runtime_error)
         })
     }
 

@@ -21,7 +21,7 @@ def test_native_bingx_signed_request() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "GET",
             "/test",
             [("symbol", "BTC USDT"), ("limit", "10")],
@@ -40,7 +40,7 @@ def test_native_bingx_signed_request() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["bingx_api_key"] == "api-key"
     assert signed_pairs[0] == ("limit", "10")
     assert signed_pairs[1] == ("symbol", "BTC USDT")
@@ -213,7 +213,7 @@ def test_native_mexc_spot_signed_request() -> None:
             base_url=base_url,
             contract_base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "GET",
             "spot",
             "/test",
@@ -232,7 +232,7 @@ def test_native_mexc_spot_signed_request() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["X-MEXC-APIKEY"] == "api-key"
     assert pairs[-1] == ("signature", expected_signature)
 
@@ -249,7 +249,7 @@ def test_native_mexc_contract_signed_body() -> None:
             base_url=base_url,
             contract_base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "contract",
             "/test",
@@ -266,7 +266,7 @@ def test_native_mexc_contract_signed_body() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["ApiKey"] == "api-key"
     assert request["Signature"] == expected_signature
     assert request["body"] == request_body.decode()
@@ -434,7 +434,7 @@ def test_native_bitmex_signed_get() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "GET",
             "/test",
             [("symbol", "XBT USD")],
@@ -451,7 +451,7 @@ def test_native_bitmex_signed_get() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["bitmex_api_key"] == "api-key"
     assert request["api-signature"] == expected_signature
     assert request["path"] == "/test?symbol=XBT+USD"
@@ -595,7 +595,7 @@ def test_native_bitmart_signed_body() -> None:
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "spot",
             "/test",
@@ -613,7 +613,7 @@ def test_native_bitmart_signed_body() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"code": 1000}
+    assert body == {"code": 1000}
     assert request["X-BM-KEY"] == "api-key"
     assert request["X-BM-MEMO"] == "memo"
     assert request["X-BM-SIGN"] == expected_signature
@@ -673,7 +673,7 @@ def test_native_bitget_signed_body() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "/test",
             [],
@@ -688,7 +688,7 @@ def test_native_bitget_signed_body() -> None:
     ).decode()
 
     assert status == 200
-    assert json.loads(body) == {"code": "00000"}
+    assert body == {"code": "00000"}
     assert request["ACCESS-KEY"] == "api-key"
     assert request["ACCESS-PASSPHRASE"] == "passphrase"
     assert request["ACCESS-SIGN"] == expected_signature
@@ -755,7 +755,7 @@ def test_native_bybit_signed_body() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "/test",
             [],
@@ -775,7 +775,7 @@ def test_native_bybit_signed_body() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"retCode": 0}
+    assert body == {"retCode": 0}
     assert request["X-BAPI-API-KEY"] == "api-key"
     assert request["X-BAPI-SIGN"] == expected_signature
     assert request["body"] == request_body.decode()
@@ -847,7 +847,7 @@ def test_native_gateio_signed_body() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "/api/v4/test",
             [("settle", "usdt")],
@@ -867,7 +867,7 @@ def test_native_gateio_signed_body() -> None:
     ).hexdigest()
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["gateio_key"] == "api-key"
     assert request["gateio_sign"] == expected_signature
     assert request["body"] == request_body.decode()

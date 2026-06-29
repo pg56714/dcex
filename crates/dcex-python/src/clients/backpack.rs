@@ -50,46 +50,6 @@ impl PythonBackpackHttpClient {
         headers=None
     ))]
     #[allow(clippy::too_many_arguments)]
-    fn request_raw(
-        &self,
-        py: Python<'_>,
-        method: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        body: Option<Vec<u8>>,
-        signed: bool,
-        instruction: Option<String>,
-        signature_payload: Option<SignaturePayload>,
-        headers: Option<BTreeMap<String, String>>,
-    ) -> PyResult<PythonHttpResponse> {
-        let method = http_method(method)?;
-        py.allow_threads(|| {
-            self.client.request_raw_blocking(
-                method,
-                path,
-                params.unwrap_or_default(),
-                body,
-                signed,
-                instruction,
-                signature_payload,
-                headers.unwrap_or_default(),
-            )
-        })
-        .map(python_http_response)
-        .map_err(to_py_runtime_error)
-    }
-
-    #[pyo3(signature = (
-        method,
-        path,
-        params=None,
-        body=None,
-        signed=false,
-        instruction=None,
-        signature_payload=None,
-        headers=None
-    ))]
-    #[allow(clippy::too_many_arguments)]
     fn request_raw_json(
         &self,
         py: Python<'_>,
@@ -115,51 +75,6 @@ impl PythonBackpackHttpClient {
                 signature_payload,
                 headers.unwrap_or_default(),
             )
-        })
-    }
-
-    #[pyo3(signature = (
-        method,
-        path,
-        params=None,
-        body=None,
-        signed=false,
-        instruction=None,
-        signature_payload=None,
-        headers=None
-    ))]
-    #[allow(clippy::too_many_arguments)]
-    fn request_raw_async<'py>(
-        &self,
-        py: Python<'py>,
-        method: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        body: Option<Vec<u8>>,
-        signed: bool,
-        instruction: Option<String>,
-        signature_payload: Option<SignaturePayload>,
-        headers: Option<BTreeMap<String, String>>,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        let method = http_method(method)?;
-        let params = params.unwrap_or_default();
-        let headers = headers.unwrap_or_default();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .request_raw(
-                    method,
-                    path,
-                    params,
-                    body,
-                    signed,
-                    instruction,
-                    signature_payload,
-                    headers,
-                )
-                .await
-                .map(python_http_response)
-                .map_err(to_py_runtime_error)
         })
     }
 

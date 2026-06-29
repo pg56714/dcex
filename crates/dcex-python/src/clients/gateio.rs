@@ -32,25 +32,6 @@ impl PythonGateioHttpClient {
     }
 
     #[pyo3(signature = (method, path, params=None, body=None, signed=true))]
-    fn request_raw(
-        &self,
-        py: Python<'_>,
-        method: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        body: Option<Vec<u8>>,
-        signed: bool,
-    ) -> PyResult<PythonHttpResponse> {
-        let method = http_method(method)?;
-        py.allow_threads(|| {
-            self.client
-                .request_raw_blocking(method, path, params.unwrap_or_default(), body, signed)
-        })
-        .map(python_http_response)
-        .map_err(to_py_runtime_error)
-    }
-
-    #[pyo3(signature = (method, path, params=None, body=None, signed=true))]
     fn request_raw_json(
         &self,
         py: Python<'_>,
@@ -64,28 +45,6 @@ impl PythonGateioHttpClient {
         let method = http_method(method)?;
         python_json_http_request(py, move || {
             client.request_raw_blocking(method, path, params.unwrap_or_default(), body, signed)
-        })
-    }
-
-    #[pyo3(signature = (method, path, params=None, body=None, signed=true))]
-    fn request_raw_async<'py>(
-        &self,
-        py: Python<'py>,
-        method: &str,
-        path: String,
-        params: Option<Vec<(String, String)>>,
-        body: Option<Vec<u8>>,
-        signed: bool,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        let method = http_method(method)?;
-        let params = params.unwrap_or_default();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .request_raw(method, path, params, body, signed)
-                .await
-                .map(python_http_response)
-                .map_err(to_py_runtime_error)
         })
     }
 

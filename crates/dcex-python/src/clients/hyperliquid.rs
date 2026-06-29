@@ -45,25 +45,6 @@ impl PythonHyperliquidHttpClient {
     }
 
     #[pyo3(signature = (method, path, query_json, action_msgpack=None, signed=true))]
-    fn request_raw(
-        &self,
-        py: Python<'_>,
-        method: &str,
-        path: String,
-        query_json: Vec<u8>,
-        action_msgpack: Option<Vec<u8>>,
-        signed: bool,
-    ) -> PyResult<PythonHttpResponse> {
-        let method = http_method(method)?;
-        py.allow_threads(|| {
-            self.client
-                .request_raw_blocking(method, path, query_json, action_msgpack, signed)
-        })
-        .map(python_http_response)
-        .map_err(to_py_runtime_error)
-    }
-
-    #[pyo3(signature = (method, path, query_json, action_msgpack=None, signed=true))]
     fn request_raw_json(
         &self,
         py: Python<'_>,
@@ -77,27 +58,6 @@ impl PythonHyperliquidHttpClient {
         let method = http_method(method)?;
         python_json_http_request(py, move || {
             client.request_raw_blocking(method, path, query_json, action_msgpack, signed)
-        })
-    }
-
-    #[pyo3(signature = (method, path, query_json, action_msgpack=None, signed=true))]
-    fn request_raw_async<'py>(
-        &self,
-        py: Python<'py>,
-        method: &str,
-        path: String,
-        query_json: Vec<u8>,
-        action_msgpack: Option<Vec<u8>>,
-        signed: bool,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        let method = http_method(method)?;
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .request_raw(method, path, query_json, action_msgpack, signed)
-                .await
-                .map(python_http_response)
-                .map_err(to_py_runtime_error)
         })
     }
 

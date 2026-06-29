@@ -22,7 +22,7 @@ def test_native_backpack_signed_request() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "GET",
             "/api/v1/order",
             [("symbol", "BTC_USDC"), ("orderId", "test-order-id")],
@@ -35,7 +35,7 @@ def test_native_backpack_signed_request() -> None:
 
     request = received.get_nowait()
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["backpack_x-api-key"] == api_key
     assert len(base64.b64decode(request["backpack_x-signature"])) == 64
     assert request["path"] == ("/api/v1/order?symbol=BTC_USDC&orderId=test-order-id")
@@ -89,7 +89,7 @@ def test_native_lighter_form_request() -> None:
 
     with _http_server({"code": 0}) as (base_url, received):
         client = native.LighterHttpClient(timeout=2, base_url=base_url)
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "/api/v1/sendTx",
             [("account_index", "1")],
@@ -101,7 +101,7 @@ def test_native_lighter_form_request() -> None:
 
     request = received.get_nowait()
     assert status == 200
-    assert json.loads(body) == {"code": 0}
+    assert body == {"code": 0}
     assert request["path"] == "/api/v1/sendTx?account_index=1"
     assert request["body"] == "tx_type=14&tx_info=%7B%22Price%22%3A100%7D"
 
@@ -159,7 +159,7 @@ def test_native_aster_signed_request() -> None:
             spot_base_url=base_url,
             futures_base_url=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "spot",
             "/api/v3/order",
@@ -174,7 +174,7 @@ def test_native_aster_signed_request() -> None:
     from dcex.aster._http_manager import sign_message
 
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert signature == sign_message(message, "0x" + "11" * 32)
 
 
@@ -227,7 +227,7 @@ def test_native_hyperliquid_signed_request() -> None:
             timeout=2,
             endpoint=base_url,
         )
-        status, _headers, body = client.request_raw(
+        status, _headers, body = client.request_raw_json(
             "POST",
             "/exchange",
             json.dumps({"action": action}, separators=(",", ":")).encode(),
@@ -238,7 +238,7 @@ def test_native_hyperliquid_signed_request() -> None:
     request = received.get_nowait()
     payload = json.loads(request["body"])
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert payload["signature"]["v"] in {27, 28}
     assert payload["signature"]["r"].startswith("0x")
     assert payload["signature"]["s"].startswith("0x")
