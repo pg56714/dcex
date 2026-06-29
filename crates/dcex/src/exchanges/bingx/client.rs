@@ -6,7 +6,7 @@ use serde_json::Value;
 use crate::exchange::{ExchangeHttpClient, ValidatedResponse};
 use crate::http::{block_on, HttpMethod, HttpRequest, HttpResponse};
 use crate::product_table::ProductTable;
-use crate::Result;
+use crate::{DcexError, Result};
 
 use super::endpoints::BASE_URL;
 use super::params::{exchange_symbol_fallback, is_canonical_product_symbol};
@@ -157,11 +157,10 @@ impl BingxClient {
         path: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
-        let headers = self
-            .api_key
-            .as_ref()
-            .map(|api_key| vec![("X-BX-APIKEY".to_string(), api_key.to_string())])
-            .unwrap_or_default();
+        let api_key = self.api_key.as_deref().ok_or_else(|| {
+            DcexError::InvalidInput("BingX API key is required for this request.".to_string())
+        })?;
+        let headers = vec![("X-BX-APIKEY".to_string(), api_key.to_string())];
         self.request(HttpMethod::Post, path, params, false, headers, None)
             .await
     }

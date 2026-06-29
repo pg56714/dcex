@@ -49,6 +49,50 @@ def test_native_bingx_signed_request() -> None:
     assert signature == expected_signature
 
 
+def test_native_bingx_listen_key_requires_api_key() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    client = native.BingxHttpClient(timeout=2)
+    with pytest.raises(ValueError, match="BingX API key is required for this request"):
+        client.private_request_json("get_listen_key")
+
+
+def test_sync_bingx_listen_key_uses_api_key_without_secret() -> None:
+    from dcex.bingx.client import Client
+
+    with _http_server({"code": 0, "listenKey": "listen-key"}) as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            base_url=base_url,
+            preload_product_table=False,
+        )
+        result = client.get_listen_key()
+
+    client.close()
+    request = received.get_nowait()
+    assert result == "listen-key"
+    assert request["bingx_api_key"] == "api-key"
+
+
+@pytest.mark.asyncio
+async def test_async_bingx_listen_key_uses_api_key_without_secret() -> None:
+    from dcex.async_support.bingx.client import Client
+
+    with _http_server({"code": 0, "listenKey": "listen-key"}) as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            base_url=base_url,
+            preload_product_table=False,
+        )
+        await client.async_init()
+        result = await client.get_listen_key()
+
+    await client.close()
+    request = received.get_nowait()
+    assert result == "listen-key"
+    assert request["bingx_api_key"] == "api-key"
+
+
 def test_sync_bingx_manager_uses_native_transport() -> None:
     from dcex.bingx._http_manager import HTTPManager
 

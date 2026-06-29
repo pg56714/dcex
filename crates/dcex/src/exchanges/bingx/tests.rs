@@ -1,6 +1,8 @@
 use crate::exchange::RequestSigner;
-use crate::http::{HttpMethod, HttpRequest};
+use crate::http::{block_on, HttpMethod, HttpRequest};
+use std::time::Duration;
 
+use super::client::BingxClient;
 use super::endpoints::BASE_URL;
 use super::signing::BingxSigner;
 
@@ -35,5 +37,16 @@ fn signer_uses_unescaped_sorted_payload() {
     assert_eq!(
         request.headers.get("X-BX-APIKEY").map(String::as_str),
         Some("api-key")
+    );
+}
+
+#[test]
+fn listen_key_requires_api_key() {
+    let client = BingxClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move { client.private_request("get_listen_key", Vec::new()).await })
+        .expect_err("missing API key should fail before sending");
+    assert_eq!(
+        error.to_string(),
+        "BingX API key is required for this request."
     );
 }
