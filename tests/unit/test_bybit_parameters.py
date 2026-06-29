@@ -15,13 +15,13 @@ def _capture_sync_public_request(manager: _RequestManager) -> dict[str, Any]:
     captured: dict[str, Any] = {}
 
     class NativeClient:
-        def public_request(
+        def public_request_json(
             self,
             method_name: str,
             params: list[tuple[str, str]],
-        ) -> tuple[int, dict[str, str], bytes]:
+        ) -> tuple[int, dict[str, str], object]:
             captured.update({"method_name": method_name, "params": params})
-            return 200, {}, b"{}"
+            return 200, {}, {}
 
     manager._native_client = NativeClient()
     return captured
@@ -31,13 +31,13 @@ def _capture_async_public_request(manager: _RequestManager) -> dict[str, Any]:
     captured: dict[str, Any] = {}
 
     class NativeClient:
-        async def public_request_async(
+        async def public_request_json_async(
             self,
             method_name: str,
             params: list[tuple[str, str]],
-        ) -> tuple[int, dict[str, str], bytes]:
+        ) -> tuple[int, dict[str, str], object]:
             captured.update({"method_name": method_name, "params": params})
-            return 200, {}, b"{}"
+            return 200, {}, {}
 
     manager._native_client = NativeClient()
     return captured
@@ -47,13 +47,13 @@ def _capture_sync_private_request(manager: _RequestManager) -> dict[str, Any]:
     captured: dict[str, Any] = {}
 
     class NativeClient:
-        def private_request(
+        def private_request_json(
             self,
             method_name: str,
             params: list[tuple[str, str]],
-        ) -> tuple[int, dict[str, str], bytes]:
+        ) -> tuple[int, dict[str, str], object]:
             captured.update({"method_name": method_name, "params": params})
-            return 200, {}, b"{}"
+            return 200, {}, {}
 
     manager._native_client = NativeClient()
     return captured
@@ -63,13 +63,13 @@ def _capture_async_private_request(manager: _RequestManager) -> dict[str, Any]:
     captured: dict[str, Any] = {}
 
     class NativeClient:
-        async def private_request_async(
+        async def private_request_json_async(
             self,
             method_name: str,
             params: list[tuple[str, str]],
-        ) -> tuple[int, dict[str, str], bytes]:
+        ) -> tuple[int, dict[str, str], object]:
             captured.update({"method_name": method_name, "params": params})
-            return 200, {}, b"{}"
+            return 200, {}, {}
 
     manager._native_client = NativeClient()
     return captured

@@ -6,7 +6,6 @@ from __future__ import annotations
 import ast
 import base64
 import inspect
-import json
 from dataclasses import dataclass
 from importlib import import_module
 from pathlib import Path
@@ -106,33 +105,17 @@ class FakeSyncNativePublicClient:
         self.calls = calls
 
     @staticmethod
-    def _body(method_name: str) -> bytes:
+    def _body(method_name: str) -> object:
         if "listen_key" in method_name:
-            return b'{"listenKey":"test-listen-key"}'
-        return b'{"ok":true}'
-
-    def public_request(
-        self,
-        method_name: str,
-        params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
-        self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
-        return 200, {"x-response": "native"}, self._body(method_name)
+            return {"listenKey": "test-listen-key"}
+        return {"ok": True}
 
     def public_request_json(
         self,
         method_name: str,
         params: list[tuple[str, str]],
     ) -> tuple[int, dict[str, str], object]:
-        status, headers, body = self.public_request(method_name, params)
-        return status, headers, json.loads(body)
-
-    def private_request(
-        self,
-        method_name: str,
-        params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
-        self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
+        self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
 
     def private_request_json(
@@ -140,8 +123,8 @@ class FakeSyncNativePublicClient:
         method_name: str,
         params: list[tuple[str, str]],
     ) -> tuple[int, dict[str, str], object]:
-        status, headers, body = self.private_request(method_name, params)
-        return status, headers, json.loads(body)
+        self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
+        return 200, {"x-response": "native"}, self._body(method_name)
 
     def create_auth_token(
         self,
@@ -175,33 +158,17 @@ class FakeAsyncNativePublicClient:
         self.calls = calls
 
     @staticmethod
-    def _body(method_name: str) -> bytes:
+    def _body(method_name: str) -> object:
         if "listen_key" in method_name:
-            return b'{"listenKey":"test-listen-key"}'
-        return b'{"ok":true}'
-
-    async def public_request_async(
-        self,
-        method_name: str,
-        params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
-        self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
-        return 200, {"x-response": "native"}, self._body(method_name)
+            return {"listenKey": "test-listen-key"}
+        return {"ok": True}
 
     async def public_request_json_async(
         self,
         method_name: str,
         params: list[tuple[str, str]],
     ) -> tuple[int, dict[str, str], object]:
-        status, headers, body = await self.public_request_async(method_name, params)
-        return status, headers, json.loads(body)
-
-    async def private_request_async(
-        self,
-        method_name: str,
-        params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
-        self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
+        self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
 
     async def private_request_json_async(
@@ -209,8 +176,8 @@ class FakeAsyncNativePublicClient:
         method_name: str,
         params: list[tuple[str, str]],
     ) -> tuple[int, dict[str, str], object]:
-        status, headers, body = await self.private_request_async(method_name, params)
-        return status, headers, json.loads(body)
+        self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
+        return 200, {"x-response": "native"}, self._body(method_name)
 
     def create_auth_token(
         self,

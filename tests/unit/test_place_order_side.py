@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401, D100, D103, D213
 """Offline tests that order placement converts the side to each venue's value.
 
 Each sync/async trade client is built with a fake product-table manager and a
@@ -72,15 +73,15 @@ def _wire_native(manager: Any) -> dict[str, Any]:
     captured: dict[str, Any] = {}
 
     class NativeClient:
-        def private_request(
+        def private_request_json(
             self,
             method_name: str,
             params: list[tuple[str, str]],
-        ) -> tuple[int, dict[str, str], bytes]:
+        ) -> tuple[int, dict[str, str], object]:
             captured.clear()
             captured["method_name"] = method_name
             captured.update(params)
-            return 200, {}, b"{}"
+            return 200, {}, {}
 
     manager._native_client = NativeClient()
     return captured
@@ -91,15 +92,15 @@ def _wire_native_async(manager: Any) -> dict[str, Any]:
     captured: dict[str, Any] = {}
 
     class NativeClient:
-        async def private_request_async(
+        async def private_request_json_async(
             self,
             method_name: str,
             params: list[tuple[str, str]],
-        ) -> tuple[int, dict[str, str], bytes]:
+        ) -> tuple[int, dict[str, str], object]:
             captured.clear()
             captured["method_name"] = method_name
             captured.update(params)
-            return 200, {}, b"{}"
+            return 200, {}, {}
 
     manager._native_client = NativeClient()
     return captured

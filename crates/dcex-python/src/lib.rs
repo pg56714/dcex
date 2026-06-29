@@ -166,22 +166,6 @@ pub(crate) use product_table::PythonProductTable;
 
 type PythonRequestParams = Vec<(String, String)>;
 
-fn python_validated_request<F, Fut>(
-    py: Python<'_>,
-    method_name: String,
-    params: Option<PythonRequestParams>,
-    request: F,
-) -> PyResult<PythonHttpResponse>
-where
-    F: FnOnce(String, PythonRequestParams) -> Fut + Send,
-    Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
-{
-    let params = params.unwrap_or_default();
-    py.allow_threads(|| block_on(request(method_name, params)))
-        .map_err(to_py_runtime_error)
-        .and_then(python_validated_response)
-}
-
 fn python_validated_json_request<F, Fut>(
     py: Python<'_>,
     method_name: String,
@@ -205,25 +189,6 @@ where
     py.allow_threads(request)
         .map_err(to_py_runtime_error)
         .and_then(python_json_http_response)
-}
-
-fn python_validated_request_async<'py, F, Fut>(
-    py: Python<'py>,
-    method_name: String,
-    params: Option<PythonRequestParams>,
-    request: F,
-) -> PyResult<Bound<'py, PyAny>>
-where
-    F: FnOnce(String, PythonRequestParams) -> Fut + Send + 'static,
-    Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
-{
-    let params = params.unwrap_or_default();
-    pyo3_async_runtimes::tokio::future_into_py(py, async move {
-        request(method_name, params)
-            .await
-            .map_err(to_py_runtime_error)
-            .and_then(python_validated_response)
-    })
 }
 
 fn python_validated_json_request_async<'py, F, Fut>(

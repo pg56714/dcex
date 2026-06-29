@@ -7,42 +7,42 @@ class _SyncNative:
     def __init__(self) -> None:
         self.calls: list[tuple[str, list[tuple[str, str]]]] = []
 
-    def public_request(
+    def public_request_json(
         self,
         method_name: str,
         params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
+    ) -> tuple[int, dict[str, str], object]:
         self.calls.append((method_name, params))
-        return 200, {}, b'{"ok":true}'
+        return 200, {}, {"ok": True}
 
-    def private_request(
+    def private_request_json(
         self,
         method_name: str,
         params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
+    ) -> tuple[int, dict[str, str], object]:
         self.calls.append((method_name, params))
-        return 200, {}, b'{"ok":true}'
+        return 200, {}, {"ok": True}
 
 
 class _AsyncNative:
     def __init__(self) -> None:
         self.calls: list[tuple[str, list[tuple[str, str]]]] = []
 
-    async def public_request_async(
+    async def public_request_json_async(
         self,
         method_name: str,
         params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
+    ) -> tuple[int, dict[str, str], object]:
         self.calls.append((method_name, params))
-        return 200, {}, b'{"ok":true}'
+        return 200, {}, {"ok": True}
 
-    async def private_request_async(
+    async def private_request_json_async(
         self,
         method_name: str,
         params: list[tuple[str, str]],
-    ) -> tuple[int, dict[str, str], bytes]:
+    ) -> tuple[int, dict[str, str], object]:
         self.calls.append((method_name, params))
-        return 200, {}, b'{"ok":true}'
+        return 200, {}, {"ok": True}
 
 
 def _params(params: list[tuple[str, str]]) -> dict[str, str]:

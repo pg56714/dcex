@@ -158,7 +158,7 @@ def test_native_bingx_private_spot_order_uses_dispatcher() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.private_request(
+        status, _headers, body = client.private_request_json(
             "place_spot_limit_buy_order",
             [
                 ("product_symbol", "BTC-USDT-SPOT"),
@@ -170,7 +170,7 @@ def test_native_bingx_private_spot_order_uses_dispatcher() -> None:
     request = received.get_nowait()
     query = dict(parse_qsl(urlsplit(request["path"]).query))
     assert status == 200
-    assert json.loads(body) == {"code": 0, "data": {"orderId": "1"}}
+    assert body == {"code": 0, "data": {"orderId": "1"}}
     assert urlsplit(request["path"]).path == "/openApi/spot/v1/trade/order"
     assert request["bingx_api_key"] == "api-key"
     assert query["symbol"] == "BTC-USDT"
@@ -192,7 +192,7 @@ def test_native_bingx_private_batch_order_normalizes_numbers() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.private_request(
+        status, _headers, body = client.private_request_json(
             "place_swap_batch_order",
             [
                 (
@@ -217,7 +217,7 @@ def test_native_bingx_private_batch_order_normalizes_numbers() -> None:
     query = dict(parse_qsl(urlsplit(request["path"]).query))
     orders = json.loads(query["batchOrders"])
     assert status == 200
-    assert json.loads(body) == {"code": 0, "data": {"orders": []}}
+    assert body == {"code": 0, "data": {"orders": []}}
     assert urlsplit(request["path"]).path == "/openApi/swap/v2/trade/batchOrders"
     assert orders[0]["quantity"] == 0.001
     assert orders[0]["price"] == 100
@@ -354,14 +354,14 @@ def test_native_mexc_public_dispatcher_normalizes_product_symbol() -> None:
             base_url=base_url,
             contract_base_url=base_url,
         )
-        status, _headers, body = client.public_request(
+        status, _headers, body = client.public_request_json(
             "get_contract_depth",
             [("product_symbol", "BTC-USDT-SWAP"), ("limit", "5")],
         )
 
     request = received.get_nowait()
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["path"] == "/api/v1/contract/depth/BTC_USDT?limit=5"
 
 
@@ -376,7 +376,7 @@ def test_native_mexc_private_spot_batch_order_converts_product_symbols() -> None
             base_url=base_url,
             contract_base_url=base_url,
         )
-        status, _headers, body = client.private_request(
+        status, _headers, body = client.private_request_json(
             "place_spot_batch_orders",
             [
                 (
@@ -401,7 +401,7 @@ def test_native_mexc_private_spot_batch_order_converts_product_symbols() -> None
     query = dict(parse_qsl(urlsplit(request["path"]).query))
     batch_orders = json.loads(query["batchOrders"])
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert urlsplit(request["path"]).path == "/api/v3/batchOrders"
     assert batch_orders[0]["symbol"] == "BTCUSDT"
     assert "product_symbol" not in batch_orders[0]
@@ -419,7 +419,7 @@ def test_native_mexc_private_contract_order_builds_json_body() -> None:
             base_url=base_url,
             contract_base_url=base_url,
         )
-        status, _headers, body = client.private_request(
+        status, _headers, body = client.private_request_json(
             "place_contract_order",
             [
                 ("product_symbol", "BTC-USDT-SWAP"),
@@ -436,7 +436,7 @@ def test_native_mexc_private_contract_order_builds_json_body() -> None:
     request = received.get_nowait()
     payload = json.loads(request["body"])
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["path"] == "/api/v1/private/order/create"
     assert payload["symbol"] == "BTC_USDT"
     assert payload["side"] == 1
@@ -555,7 +555,7 @@ def test_native_bitmex_private_limit_order_builds_json_body() -> None:
             timeout=2,
             base_url=base_url,
         )
-        status, _headers, body = client.private_request(
+        status, _headers, body = client.private_request_json(
             "place_limit_buy_order",
             [
                 ("product_symbol", "XBT-USD-SWAP"),
@@ -567,7 +567,7 @@ def test_native_bitmex_private_limit_order_builds_json_body() -> None:
     request = received.get_nowait()
     payload = json.loads(request["body"])
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert request["path"] == "/api/v2/order"
     assert payload == {
         "ordType": "Limit",

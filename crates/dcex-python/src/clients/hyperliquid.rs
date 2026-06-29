@@ -81,19 +81,6 @@ impl PythonHyperliquidHttpClient {
     }
 
     #[pyo3(signature = (method_name, params=None))]
-    fn public_request(
-        &self,
-        py: Python<'_>,
-        method_name: String,
-        params: Option<PythonRequestParams>,
-    ) -> PyResult<PythonHttpResponse> {
-        let client = self.client.clone();
-        python_validated_request(py, method_name, params, |method_name, params| async move {
-            client.public_request(&method_name, params).await
-        })
-    }
-
-    #[pyo3(signature = (method_name, params=None))]
     fn public_request_json(
         &self,
         py: Python<'_>,
@@ -102,19 +89,6 @@ impl PythonHyperliquidHttpClient {
     ) -> PyResult<PythonJsonResponse> {
         let client = self.client.clone();
         python_validated_json_request(py, method_name, params, |method_name, params| async move {
-            client.public_request(&method_name, params).await
-        })
-    }
-
-    #[pyo3(signature = (method_name, params=None))]
-    fn public_request_async<'py>(
-        &self,
-        py: Python<'py>,
-        method_name: String,
-        params: Option<PythonRequestParams>,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        python_validated_request_async(py, method_name, params, |method_name, params| async move {
             client.public_request(&method_name, params).await
         })
     }
@@ -136,19 +110,6 @@ impl PythonHyperliquidHttpClient {
     }
 
     #[pyo3(signature = (method_name, params=None))]
-    fn private_request(
-        &self,
-        py: Python<'_>,
-        method_name: String,
-        params: Option<PythonRequestParams>,
-    ) -> PyResult<PythonHttpResponse> {
-        let client = self.client.clone();
-        python_validated_request(py, method_name, params, |method_name, params| async move {
-            client.private_request(&method_name, params).await
-        })
-    }
-
-    #[pyo3(signature = (method_name, params=None))]
     fn private_request_json(
         &self,
         py: Python<'_>,
@@ -157,19 +118,6 @@ impl PythonHyperliquidHttpClient {
     ) -> PyResult<PythonJsonResponse> {
         let client = self.client.clone();
         python_validated_json_request(py, method_name, params, |method_name, params| async move {
-            client.private_request(&method_name, params).await
-        })
-    }
-
-    #[pyo3(signature = (method_name, params=None))]
-    fn private_request_async<'py>(
-        &self,
-        py: Python<'py>,
-        method_name: String,
-        params: Option<PythonRequestParams>,
-    ) -> PyResult<Bound<'py, PyAny>> {
-        let client = self.client.clone();
-        python_validated_request_async(py, method_name, params, |method_name, params| async move {
             client.private_request(&method_name, params).await
         })
     }

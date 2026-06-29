@@ -257,7 +257,7 @@ def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> 
             timeout=2,
             endpoint=base_url,
         )
-        status, _headers, body = client.private_request(
+        status, _headers, body = client.private_request_json(
             "place_order",
             [
                 ("product_symbol", "BTC-USD-SWAP"),
@@ -273,7 +273,7 @@ def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> 
     request = received.get_nowait()
     action = json.loads(request["body"])["action"]
     assert status == 200
-    assert json.loads(body) == {"ok": True}
+    assert body == {"ok": True}
     assert action["builder"] == {"b": builder_address, "f": 10}
     assert "feeTenBp" not in action
 
@@ -288,7 +288,7 @@ def test_native_hyperliquid_market_order_uses_ioc_limit_payload() -> None:
             timeout=2,
             endpoint=base_url,
         )
-        client.private_request(
+        client.private_request_json(
             "place_future_market_buy_order",
             [("product_symbol", "BTC-USD-SWAP"), ("size", "1")],
         )
