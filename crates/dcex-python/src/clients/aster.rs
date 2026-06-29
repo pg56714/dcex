@@ -24,17 +24,13 @@ impl PythonAsterHttpClient {
         spot_base_url: Option<String>,
         futures_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "HTTP timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = http_timeout(timeout)?;
         Ok(Self {
             client: AsterClient::with_base_urls(
                 user_address,
                 signer_address,
                 private_key,
-                Duration::from_secs_f64(timeout),
+                timeout,
                 spot_base_url.unwrap_or_else(|| "https://sapi.asterdex.com".to_string()),
                 futures_base_url.unwrap_or_else(|| "https://fapi.asterdex.com".to_string()),
             )

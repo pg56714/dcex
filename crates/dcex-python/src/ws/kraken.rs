@@ -20,15 +20,11 @@ impl PythonKrakenPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            KrakenPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            KrakenPublicWebSocket::with_url(base_url, timeout)
         } else {
-            KrakenPublicWebSocket::new(Duration::from_secs_f64(timeout))
+            KrakenPublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -205,12 +201,7 @@ impl PythonKrakenPrivateWebSocketClient {
         spot_http_base_url: Option<String>,
         ws_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
-        let timeout = Duration::from_secs_f64(timeout);
+        let timeout = websocket_timeout(timeout)?;
         let client = match (spot_http_base_url, ws_base_url) {
             (None, None) => KrakenPrivateWebSocket::new(api_key, api_secret, timeout),
             (spot_http_base_url, ws_base_url) => KrakenPrivateWebSocket::with_urls(

@@ -20,16 +20,12 @@ impl PythonAsterPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (market="futures", timeout=10.0, base_url=None))]
     fn new(market: &str, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let market = aster_market(market)?;
         let client = if let Some(base_url) = base_url {
-            AsterPublicWebSocket::with_url(market, base_url, Duration::from_secs_f64(timeout))
+            AsterPublicWebSocket::with_url(market, base_url, timeout)
         } else {
-            AsterPublicWebSocket::new(market, Duration::from_secs_f64(timeout))
+            AsterPublicWebSocket::new(market, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -262,13 +258,8 @@ impl PythonAsterPrivateWebSocketClient {
         futures_http_base_url: Option<String>,
         ws_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let market = aster_market(market)?;
-        let timeout = Duration::from_secs_f64(timeout);
         let client = match (spot_http_base_url, futures_http_base_url, ws_base_url) {
             (None, None, None) => AsterPrivateWebSocket::new(
                 user_address,

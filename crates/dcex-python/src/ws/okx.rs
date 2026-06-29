@@ -21,15 +21,11 @@ impl PythonOkxPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            OkxPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            OkxPublicWebSocket::with_url(base_url, timeout)
         } else {
-            OkxPublicWebSocket::new(Duration::from_secs_f64(timeout))
+            OkxPublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -217,26 +213,11 @@ impl PythonOkxPrivateWebSocketClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            OkxPrivateWebSocket::with_url(
-                api_key,
-                api_secret,
-                passphrase,
-                base_url,
-                Duration::from_secs_f64(timeout),
-            )
+            OkxPrivateWebSocket::with_url(api_key, api_secret, passphrase, base_url, timeout)
         } else {
-            OkxPrivateWebSocket::new(
-                api_key,
-                api_secret,
-                passphrase,
-                Duration::from_secs_f64(timeout),
-            )
+            OkxPrivateWebSocket::new(api_key, api_secret, passphrase, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

@@ -20,15 +20,11 @@ impl PythonBingxPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BingxPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            BingxPublicWebSocket::with_url(base_url, timeout)
         } else {
-            BingxPublicWebSocket::new(Duration::from_secs_f64(timeout))
+            BingxPublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -196,12 +192,7 @@ impl PythonBingxPrivateWebSocketClient {
         http_base_url: Option<String>,
         ws_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
-        let timeout = Duration::from_secs_f64(timeout);
+        let timeout = websocket_timeout(timeout)?;
         let client = match (http_base_url, ws_base_url) {
             (None, None) => BingxPrivateWebSocket::new(api_key, api_secret, timeout),
             (http_base_url, ws_base_url) => BingxPrivateWebSocket::with_urls(

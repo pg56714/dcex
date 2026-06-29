@@ -38,6 +38,25 @@ fn to_py_runtime_error(error: dcex::DcexError) -> PyErr {
     }
 }
 
+fn positive_duration_from_secs(timeout: f64, label: &str) -> PyResult<Duration> {
+    if timeout <= 0.0 {
+        return Err(PyValueError::new_err(format!(
+            "{label} timeout must be a positive finite number."
+        )));
+    }
+    Duration::try_from_secs_f64(timeout).map_err(|_| {
+        PyValueError::new_err(format!("{label} timeout must be a positive finite number."))
+    })
+}
+
+fn http_timeout(timeout: f64) -> PyResult<Duration> {
+    positive_duration_from_secs(timeout, "HTTP")
+}
+
+fn websocket_timeout(timeout: f64) -> PyResult<Duration> {
+    positive_duration_from_secs(timeout, "WebSocket")
+}
+
 fn http_method(method: &str) -> PyResult<HttpMethod> {
     match method.to_ascii_uppercase().as_str() {
         "DELETE" => Ok(HttpMethod::Delete),

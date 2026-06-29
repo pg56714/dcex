@@ -20,15 +20,11 @@ impl PythonBitmexPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BitmexPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            BitmexPublicWebSocket::with_url(base_url, timeout)
         } else {
-            BitmexPublicWebSocket::new(Duration::from_secs_f64(timeout))
+            BitmexPublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -245,20 +241,11 @@ impl PythonBitmexPrivateWebSocketClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BitmexPrivateWebSocket::with_url(
-                api_key,
-                api_secret,
-                base_url,
-                Duration::from_secs_f64(timeout),
-            )
+            BitmexPrivateWebSocket::with_url(api_key, api_secret, base_url, timeout)
         } else {
-            BitmexPrivateWebSocket::new(api_key, api_secret, Duration::from_secs_f64(timeout))
+            BitmexPrivateWebSocket::new(api_key, api_secret, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

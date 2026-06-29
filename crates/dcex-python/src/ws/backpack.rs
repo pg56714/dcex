@@ -20,15 +20,11 @@ impl PythonBackpackPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BackpackPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            BackpackPublicWebSocket::with_url(base_url, timeout)
         } else {
-            BackpackPublicWebSocket::new(Duration::from_secs_f64(timeout))
+            BackpackPublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -284,26 +280,11 @@ impl PythonBackpackPrivateWebSocketClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BackpackPrivateWebSocket::with_url(
-                api_key,
-                api_secret,
-                window,
-                base_url,
-                Duration::from_secs_f64(timeout),
-            )
+            BackpackPrivateWebSocket::with_url(api_key, api_secret, window, base_url, timeout)
         } else {
-            BackpackPrivateWebSocket::new(
-                api_key,
-                api_secret,
-                window,
-                Duration::from_secs_f64(timeout),
-            )
+            BackpackPrivateWebSocket::new(api_key, api_secret, window, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

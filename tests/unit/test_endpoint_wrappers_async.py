@@ -116,6 +116,67 @@ async def test_async_hyperliquid_market_order_uses_ioc_limit_payload(
     }
 
 
+@pytest.mark.parametrize(
+    ("exchange", "method_name", "kwargs"),
+    [
+        (
+            "aster",
+            "place_spot_order",
+            {
+                "product_symbol": "ASTER-USDT-SPOT",
+                "side": "BUY",
+                "type_": "LIMIT",
+            },
+        ),
+        (
+            "kucoin",
+            "place_futures_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "side": "buy",
+                "type_": "limit",
+                "size": "1",
+            },
+        ),
+        (
+            "mexc",
+            "place_contract_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "side": 1,
+                "type_": 1,
+                "openType": 1,
+                "vol": "1",
+            },
+        ),
+        (
+            "mexc",
+            "change_contract_margin",
+            {
+                "positionId": 1,
+                "amount": "1",
+                "type_": "ADD",
+            },
+        ),
+    ],
+)
+@pytest.mark.asyncio
+async def test_async_type_keyword_wrappers_send_native_type_key(
+    exchange: str,
+    method_name: str,
+    kwargs: dict[str, object],
+) -> None:
+    client = _client_class("async", exchange)(**_client_kwargs(exchange))
+    calls = _wire_async(client)
+
+    result = await getattr(client, method_name)(**kwargs)
+
+    assert result == {"ok": True}
+    keys = [key for key, _value in calls[0]["query"]]
+    assert "type" in keys
+    assert "type_" not in keys
+
+
 @pytest.mark.asyncio
 async def test_async_bitmart_modify_limit_order_uses_documented_payload_types() -> None:
     client = _client_class("async", "bitmart")(**_client_kwargs("bitmart"))

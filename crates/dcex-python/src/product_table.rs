@@ -372,19 +372,11 @@ fn fetch_product_table(
     exchange_name: Option<&str>,
     timeout: f64,
 ) -> PyResult<PythonProductTable> {
-    if !timeout.is_finite() || timeout <= 0.0 {
-        return Err(PyValueError::new_err(
-            "HTTP timeout must be a positive finite number.",
-        ));
-    }
+    let timeout = http_timeout(timeout)?;
     let exchange = exchange_name.map(exchange_from_name).transpose()?;
-    py.allow_threads(|| {
-        block_on(
-            async move { ProductTable::fetch(exchange, Duration::from_secs_f64(timeout)).await },
-        )
-    })
-    .map(|table| PythonProductTable { table })
-    .map_err(to_py_runtime_error)
+    py.allow_threads(|| block_on(async move { ProductTable::fetch(exchange, timeout).await }))
+        .map(|table| PythonProductTable { table })
+        .map_err(to_py_runtime_error)
 }
 
 #[pyfunction]
@@ -394,17 +386,13 @@ fn fetch_product_table_async<'py>(
     exchange_name: Option<String>,
     timeout: f64,
 ) -> PyResult<Bound<'py, PyAny>> {
-    if !timeout.is_finite() || timeout <= 0.0 {
-        return Err(PyValueError::new_err(
-            "HTTP timeout must be a positive finite number.",
-        ));
-    }
+    let timeout = http_timeout(timeout)?;
     let exchange = exchange_name
         .as_deref()
         .map(exchange_from_name)
         .transpose()?;
     pyo3_async_runtimes::tokio::future_into_py(py, async move {
-        ProductTable::fetch(exchange, Duration::from_secs_f64(timeout))
+        ProductTable::fetch(exchange, timeout)
             .await
             .map(|table| PythonProductTable { table })
             .map_err(to_py_runtime_error)

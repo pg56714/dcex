@@ -22,17 +22,13 @@ impl PythonBitgetHttpClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "HTTP timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = http_timeout(timeout)?;
         Ok(Self {
             client: BitgetClient::with_base_url(
                 api_key,
                 api_secret,
                 passphrase,
-                Duration::from_secs_f64(timeout),
+                timeout,
                 base_url.unwrap_or_else(|| "https://api.bitget.com".to_string()),
             )
             .map_err(to_py_runtime_error)?,

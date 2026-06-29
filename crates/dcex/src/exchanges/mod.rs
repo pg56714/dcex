@@ -546,7 +546,7 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
     }
 
     pub fn from_(self, value: impl ToString) -> Self {
-        self.param("from_", value)
+        self.param("from", value)
     }
 
     pub fn from_account(self, value: impl ToString) -> Self {
@@ -1646,13 +1646,110 @@ mod tests {
         let client = DummyClient;
         let request = ExchangeMethodRequest::private(&client, "wallet_transfer", Vec::new())
             .currency_pair("BTC_USDT")
+            .from_("spot")
             .settle("usdt");
 
         assert_eq!(
             request.params,
             vec![
                 ("currency_pair".to_string(), "BTC_USDT".to_string()),
+                ("from".to_string(), "spot".to_string()),
                 ("settle".to_string(), "usdt".to_string())
+            ]
+        );
+    }
+
+    #[test]
+    fn type_keyword_builders_use_native_type_parameter_name() {
+        let client =
+            crate::exchanges::aster::AsterClient::public(std::time::Duration::from_secs(1))
+                .expect("client");
+
+        let spot = client.place_spot_order("ASTER-USDT-SPOT", "buy", "MARKET");
+        assert_eq!(
+            spot.params,
+            vec![
+                ("product_symbol".to_string(), "ASTER-USDT-SPOT".to_string()),
+                ("side".to_string(), "buy".to_string()),
+                ("type".to_string(), "MARKET".to_string())
+            ]
+        );
+
+        let futures = client.place_futures_order("ASTER-USDT-SWAP", "sell", "LIMIT");
+        assert_eq!(
+            futures.params,
+            vec![
+                ("product_symbol".to_string(), "ASTER-USDT-SWAP".to_string()),
+                ("side".to_string(), "sell".to_string()),
+                ("type".to_string(), "LIMIT".to_string())
+            ]
+        );
+
+        let margin = client.modify_futures_position_margin("ASTER-USDT-SWAP", "10", "ADD");
+        assert_eq!(
+            margin.params,
+            vec![
+                ("product_symbol".to_string(), "ASTER-USDT-SWAP".to_string()),
+                ("amount".to_string(), "10".to_string()),
+                ("type".to_string(), "ADD".to_string())
+            ]
+        );
+
+        let client =
+            crate::exchanges::kucoin::KucoinClient::public(std::time::Duration::from_secs(1))
+                .expect("client");
+        let spot = client.place_spot_order("BTC-USDT-SPOT", "buy", "market");
+        assert_eq!(
+            spot.params,
+            vec![
+                ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                ("side".to_string(), "buy".to_string()),
+                ("type".to_string(), "market".to_string())
+            ]
+        );
+
+        let futures = client.place_futures_order("BTC-USDT-SWAP", "sell", "limit", "1");
+        assert_eq!(
+            futures.params,
+            vec![
+                ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+                ("side".to_string(), "sell".to_string()),
+                ("type".to_string(), "limit".to_string()),
+                ("size".to_string(), "1".to_string())
+            ]
+        );
+
+        let client = crate::exchanges::mexc::MexcClient::public(std::time::Duration::from_secs(1))
+            .expect("client");
+        let spot = client.place_spot_order("MX-USDT-SPOT", "BUY", "MARKET");
+        assert_eq!(
+            spot.params,
+            vec![
+                ("product_symbol".to_string(), "MX-USDT-SPOT".to_string()),
+                ("side".to_string(), "BUY".to_string()),
+                ("type".to_string(), "MARKET".to_string())
+            ]
+        );
+
+        let contract = client.place_contract_order("BTC-USDT-SWAP", "1", "5", "1", "10");
+        assert_eq!(
+            contract.params,
+            vec![
+                ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+                ("side".to_string(), "1".to_string()),
+                ("type".to_string(), "5".to_string()),
+                ("openType".to_string(), "1".to_string()),
+                ("vol".to_string(), "10".to_string())
+            ]
+        );
+
+        let margin = client.change_contract_margin("123", "10", "ADD");
+        assert_eq!(
+            margin.params,
+            vec![
+                ("positionId".to_string(), "123".to_string()),
+                ("amount".to_string(), "10".to_string()),
+                ("type".to_string(), "ADD".to_string())
             ]
         );
     }

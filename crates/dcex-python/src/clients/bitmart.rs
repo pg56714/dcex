@@ -24,17 +24,13 @@ impl PythonBitmartHttpClient {
         spot_base_url: Option<String>,
         futures_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "HTTP timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = http_timeout(timeout)?;
         Ok(Self {
             client: BitmartClient::with_base_urls(
                 api_key,
                 api_secret,
                 memo,
-                Duration::from_secs_f64(timeout),
+                timeout,
                 spot_base_url.unwrap_or_else(|| "https://api-cloud.bitmart.com".to_string()),
                 futures_base_url.unwrap_or_else(|| "https://api-cloud-v2.bitmart.com".to_string()),
             )

@@ -22,16 +22,12 @@ impl PythonBinanceHttpClient {
         spot_base_url: Option<String>,
         futures_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "HTTP timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = http_timeout(timeout)?;
         Ok(Self {
             client: BinanceClient::with_base_urls(
                 api_key,
                 api_secret,
-                Duration::from_secs_f64(timeout),
+                timeout,
                 spot_base_url.unwrap_or_else(|| "https://api.binance.com".to_string()),
                 futures_base_url.unwrap_or_else(|| "https://fapi.binance.com".to_string()),
             )

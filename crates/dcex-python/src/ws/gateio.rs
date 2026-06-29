@@ -20,15 +20,11 @@ impl PythonGateioPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            GateioPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            GateioPublicWebSocket::with_url(base_url, timeout)
         } else {
-            GateioPublicWebSocket::new(Duration::from_secs_f64(timeout))
+            GateioPublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -214,20 +210,11 @@ impl PythonGateioPrivateWebSocketClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            GateioPrivateWebSocket::with_url(
-                api_key,
-                api_secret,
-                base_url,
-                Duration::from_secs_f64(timeout),
-            )
+            GateioPrivateWebSocket::with_url(api_key, api_secret, base_url, timeout)
         } else {
-            GateioPrivateWebSocket::new(api_key, api_secret, Duration::from_secs_f64(timeout))
+            GateioPrivateWebSocket::new(api_key, api_secret, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

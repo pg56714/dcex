@@ -20,15 +20,11 @@ impl PythonLighterPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None))]
     fn new(testnet: bool, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            LighterPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            LighterPublicWebSocket::with_url(base_url, timeout)
         } else {
-            LighterPublicWebSocket::new(testnet, Duration::from_secs_f64(timeout))
+            LighterPublicWebSocket::new(testnet, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -281,12 +277,7 @@ impl PythonLighterPrivateWebSocketClient {
         ws_base_url: Option<String>,
         http_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
-        let timeout = Duration::from_secs_f64(timeout);
+        let timeout = websocket_timeout(timeout)?;
         let client = match (ws_base_url, http_base_url) {
             (None, None) => LighterPrivateWebSocket::new(
                 account_index,

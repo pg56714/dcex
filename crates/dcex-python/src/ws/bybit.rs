@@ -20,15 +20,11 @@ impl PythonBybitPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (category, timeout=10.0, base_url=None))]
     fn new(category: String, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BybitPublicWebSocket::with_url(category, base_url, Duration::from_secs_f64(timeout))
+            BybitPublicWebSocket::with_url(category, base_url, timeout)
         } else {
-            BybitPublicWebSocket::new(category, Duration::from_secs_f64(timeout))
+            BybitPublicWebSocket::new(category, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -199,20 +195,11 @@ impl PythonBybitPrivateWebSocketClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BybitPrivateWebSocket::with_url(
-                api_key,
-                api_secret,
-                base_url,
-                Duration::from_secs_f64(timeout),
-            )
+            BybitPrivateWebSocket::with_url(api_key, api_secret, base_url, timeout)
         } else {
-            BybitPrivateWebSocket::new(api_key, api_secret, Duration::from_secs_f64(timeout))
+            BybitPrivateWebSocket::new(api_key, api_secret, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

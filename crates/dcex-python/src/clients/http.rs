@@ -11,12 +11,7 @@ impl PythonHttpClient {
     #[new]
     #[pyo3(signature = (timeout=10.0))]
     fn new(timeout: f64) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "HTTP timeout must be a positive finite number.",
-            ));
-        }
-        let timeout = Duration::from_secs_f64(timeout);
+        let timeout = http_timeout(timeout)?;
         Ok(Self {
             async_client: AsyncHttpClient::new(timeout).map_err(to_py_runtime_error)?,
             blocking_client: BlockingHttpClient::new(timeout).map_err(to_py_runtime_error)?,

@@ -20,15 +20,11 @@ impl PythonBitmartPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BitmartPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            BitmartPublicWebSocket::with_url(base_url, timeout)
         } else {
-            BitmartPublicWebSocket::new(Duration::from_secs_f64(timeout))
+            BitmartPublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -240,26 +236,11 @@ impl PythonBitmartPrivateWebSocketClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BitmartPrivateWebSocket::with_url(
-                api_key,
-                api_secret,
-                memo,
-                base_url,
-                Duration::from_secs_f64(timeout),
-            )
+            BitmartPrivateWebSocket::with_url(api_key, api_secret, memo, base_url, timeout)
         } else {
-            BitmartPrivateWebSocket::new(
-                api_key,
-                api_secret,
-                memo,
-                Duration::from_secs_f64(timeout),
-            )
+            BitmartPrivateWebSocket::new(api_key, api_secret, memo, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

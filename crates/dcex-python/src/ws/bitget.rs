@@ -20,15 +20,11 @@ impl PythonBitgetPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (inst_type, timeout=10.0, base_url=None))]
     fn new(inst_type: String, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BitgetPublicWebSocket::with_url(inst_type, base_url, Duration::from_secs_f64(timeout))
+            BitgetPublicWebSocket::with_url(inst_type, base_url, timeout)
         } else {
-            BitgetPublicWebSocket::new(inst_type, Duration::from_secs_f64(timeout))
+            BitgetPublicWebSocket::new(inst_type, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -206,26 +202,11 @@ impl PythonBitgetPrivateWebSocketClient {
         timeout: f64,
         base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BitgetPrivateWebSocket::with_url(
-                api_key,
-                api_secret,
-                passphrase,
-                base_url,
-                Duration::from_secs_f64(timeout),
-            )
+            BitgetPrivateWebSocket::with_url(api_key, api_secret, passphrase, base_url, timeout)
         } else {
-            BitgetPrivateWebSocket::new(
-                api_key,
-                api_secret,
-                passphrase,
-                Duration::from_secs_f64(timeout),
-            )
+            BitgetPrivateWebSocket::new(api_key, api_secret, passphrase, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

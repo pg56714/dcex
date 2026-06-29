@@ -22,11 +22,7 @@ impl PythonHyperliquidHttpClient {
         timeout: f64,
         endpoint: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "HTTP timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = http_timeout(timeout)?;
         let default_endpoint = if testnet {
             "https://api.hyperliquid-testnet.xyz"
         } else {
@@ -37,7 +33,7 @@ impl PythonHyperliquidHttpClient {
                 testnet,
                 wallet_address,
                 private_key,
-                Duration::from_secs_f64(timeout),
+                timeout,
                 endpoint.unwrap_or_else(|| default_endpoint.to_string()),
             )
             .map_err(to_py_runtime_error)?,

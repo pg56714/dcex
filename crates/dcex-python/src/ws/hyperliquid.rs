@@ -21,15 +21,11 @@ impl PythonHyperliquidPublicWebSocketClient {
     #[new]
     #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None))]
     fn new(testnet: bool, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            HyperliquidPublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            HyperliquidPublicWebSocket::with_url(base_url, timeout)
         } else {
-            HyperliquidPublicWebSocket::new(testnet, Duration::from_secs_f64(timeout))
+            HyperliquidPublicWebSocket::new(testnet, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -246,15 +242,11 @@ impl PythonHyperliquidPrivateWebSocketClient {
     #[new]
     #[pyo3(signature = (user, testnet=false, timeout=10.0, base_url=None))]
     fn new(user: String, testnet: bool, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            HyperliquidPrivateWebSocket::with_url(user, base_url, Duration::from_secs_f64(timeout))
+            HyperliquidPrivateWebSocket::with_url(user, base_url, timeout)
         } else {
-            HyperliquidPrivateWebSocket::new(user, testnet, Duration::from_secs_f64(timeout))
+            HyperliquidPrivateWebSocket::new(user, testnet, timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {

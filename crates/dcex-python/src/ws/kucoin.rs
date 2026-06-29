@@ -24,12 +24,7 @@ impl PythonKucoinPublicWebSocketClient {
         spot_http_base_url: Option<String>,
         futures_http_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
-        let timeout = Duration::from_secs_f64(timeout);
+        let timeout = websocket_timeout(timeout)?;
         let client = match (spot_http_base_url, futures_http_base_url) {
             (None, None) => KucoinPublicWebSocket::new(timeout),
             (spot_http_base_url, futures_http_base_url) => KucoinPublicWebSocket::with_base_urls(
@@ -203,12 +198,7 @@ impl PythonKucoinPrivateWebSocketClient {
         spot_http_base_url: Option<String>,
         futures_http_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
-        let timeout = Duration::from_secs_f64(timeout);
+        let timeout = websocket_timeout(timeout)?;
         let client = match (spot_http_base_url, futures_http_base_url) {
             (None, None) => KucoinPrivateWebSocket::new(api_key, api_secret, passphrase, timeout),
             (spot_http_base_url, futures_http_base_url) => KucoinPrivateWebSocket::with_base_urls(

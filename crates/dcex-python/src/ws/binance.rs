@@ -20,15 +20,11 @@ impl PythonBinancePublicWebSocketClient {
     #[new]
     #[pyo3(signature = (timeout=10.0, base_url=None))]
     fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
-            BinancePublicWebSocket::with_url(base_url, Duration::from_secs_f64(timeout))
+            BinancePublicWebSocket::with_url(base_url, timeout)
         } else {
-            BinancePublicWebSocket::new(Duration::from_secs_f64(timeout))
+            BinancePublicWebSocket::new(timeout)
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -210,12 +206,7 @@ impl PythonBinancePrivateWebSocketClient {
         futures_http_base_url: Option<String>,
         ws_base_url: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "WebSocket timeout must be a positive finite number.",
-            ));
-        }
-        let timeout = Duration::from_secs_f64(timeout);
+        let timeout = websocket_timeout(timeout)?;
         let client = match (spot_http_base_url, futures_http_base_url, ws_base_url) {
             (None, None, None) => BinancePrivateWebSocket::new(api_key, api_secret, timeout),
             (spot_http_base_url, futures_http_base_url, ws_base_url) => {

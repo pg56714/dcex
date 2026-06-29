@@ -22,14 +22,10 @@ impl PythonLighterHttpClient {
         api_key_index: Option<u64>,
         api_private_key: Option<String>,
     ) -> PyResult<Self> {
-        if !timeout.is_finite() || timeout <= 0.0 {
-            return Err(PyValueError::new_err(
-                "HTTP timeout must be a positive finite number.",
-            ));
-        }
+        let timeout = http_timeout(timeout)?;
         Ok(Self {
             client: LighterClient::with_base_url_and_credentials(
-                Duration::from_secs_f64(timeout),
+                timeout,
                 base_url.unwrap_or_else(|| "https://mainnet.zklighter.elliot.ai".to_string()),
                 account_index,
                 api_key_index,
