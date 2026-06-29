@@ -980,6 +980,21 @@ def test_sync_gateio_manager_uses_native_transport() -> None:
     assert received.get_nowait()["path"] == "/api/v4/test?settle=usdt"
 
 
+def test_sync_gateio_manager_rejects_non_2xx_status() -> None:
+    from dcex.gateio._http_manager import HTTPManager
+    from dcex.utils.errors import FailedRequestError
+
+    with _http_server(response_status=302) as (base_url, _received):
+        manager = HTTPManager(
+            base_url=base_url,
+            preload_product_table=False,
+        )
+        with pytest.raises(FailedRequestError, match="GATEIO API Error: 302"):
+            manager._request("GET", "/redirect", signed=False)
+
+    manager.close()
+
+
 def test_sync_gateio_wallet_transfer_uses_native_dispatcher() -> None:
     from dcex.gateio.client import Client
 

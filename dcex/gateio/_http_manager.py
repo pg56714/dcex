@@ -215,7 +215,7 @@ class HTTPManager(BaseHTTPManager):
 
             self._store_response_headers(response)
             data = response_body
-            if response.ok:
+            if response.status_code // 100 == 2:
                 return data
 
             self._log_failed_request(

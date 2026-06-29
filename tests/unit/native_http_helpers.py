@@ -12,6 +12,7 @@ from typing import Any
 @contextmanager
 def _http_server(
     response_payload: dict[str, Any] | None = None,
+    response_status: int = 200,
 ) -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
     received: queue.Queue[dict[str, Any]] = queue.Queue()
     response_payload = response_payload or {"ok": True}
@@ -94,7 +95,7 @@ def _http_server(
                 else response_payload
             )
             body = json.dumps(payload, separators=(",", ":")).encode()
-            self.send_response(200)
+            self.send_response(response_status)
             self.send_header("Content-Type", "application/json")
             self.send_header("X-Response", "native")
             self.send_header("Content-Length", str(len(body)))
