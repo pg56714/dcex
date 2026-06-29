@@ -256,7 +256,7 @@ impl ProductTable {
         product_type: Option<&str>,
         exchange_type: Option<&str>,
     ) -> Option<usize> {
-        let index = match (product_type, exchange_type) {
+        match (product_type, exchange_type) {
             (Some(product_type), None) => lookup_typed_unique_index(
                 &self.by_exchange_exchange_symbol_product_type,
                 exchange,
@@ -280,8 +280,7 @@ impl ProductTable {
             .flatten()
             .filter(|index| self.rows[*index].exchange_type == exchange_type),
             (None, None) => None,
-        };
-        index
+        }
     }
 
     fn get_product_field(
@@ -368,12 +367,7 @@ impl ProductTable {
     }
 }
 
-fn insert_unique_index(
-    index: &mut UniqueIndex,
-    exchange: &str,
-    symbol: &str,
-    row_index: usize,
-) {
+fn insert_unique_index(index: &mut UniqueIndex, exchange: &str, symbol: &str, row_index: usize) {
     index
         .entry(exchange.to_string())
         .or_default()
