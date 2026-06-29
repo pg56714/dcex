@@ -7,6 +7,10 @@ use crate::{DcexError, Result};
 #[path = "product_table_fetch.rs"]
 mod fetch;
 
+type UniqueIndex = HashMap<String, HashMap<String, Option<usize>>>;
+type MultiIndex = HashMap<String, HashMap<String, Vec<usize>>>;
+type TypedUniqueIndex = HashMap<String, HashMap<String, HashMap<String, Option<usize>>>>;
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MarketInfo {
     pub exchange: String,
@@ -44,10 +48,10 @@ pub struct ProductFilter<'a> {
 #[derive(Clone, Debug, Default)]
 pub struct ProductTable {
     rows: Vec<MarketInfo>,
-    by_exchange_product: HashMap<(String, String), Option<usize>>,
-    by_exchange_exchange_symbol: HashMap<(String, String), Vec<usize>>,
-    by_exchange_exchange_symbol_product_type: HashMap<(String, String, String), Option<usize>>,
-    by_exchange_exchange_symbol_exchange_type: HashMap<(String, String, String), Option<usize>>,
+    by_exchange_product: UniqueIndex,
+    by_exchange_exchange_symbol: MultiIndex,
+    by_exchange_exchange_symbol_product_type: TypedUniqueIndex,
+    by_exchange_exchange_symbol_exchange_type: TypedUniqueIndex,
 }
 
 impl ProductTable {
@@ -107,11 +111,8 @@ impl ProductTable {
     }
 
     pub fn get_exchange_symbol(&self, exchange: &str, product_symbol: &str) -> Result<String> {
-        match self
-            .by_exchange_product
-            .get(&(exchange.to_string(), product_symbol.to_string()))
-        {
-            Some(Some(index)) => Ok(self.rows[*index].exchange_symbol.clone()),
+        match lookup_unique_index(&self.by_exchange_product, exchange, product_symbol) {
+            Some(Some(index)) => Ok(self.rows[index].exchange_symbol.clone()),
             _ => self.get(
                 "exchange_symbol",
                 ProductFilter {
@@ -221,29 +222,28 @@ impl ProductTable {
         for (index, row) in self.rows.iter().enumerate() {
             insert_unique_index(
                 &mut self.by_exchange_product,
-                (row.exchange.clone(), row.product_symbol.clone()),
+                &row.exchange,
+                &row.product_symbol,
                 index,
             );
-            self.by_exchange_exchange_symbol
-                .entry((row.exchange.clone(), row.exchange_symbol.clone()))
-                .or_default()
-                .push(index);
-            insert_unique_index(
+            insert_multi_index(
+                &mut self.by_exchange_exchange_symbol,
+                &row.exchange,
+                &row.exchange_symbol,
+                index,
+            );
+            insert_typed_unique_index(
                 &mut self.by_exchange_exchange_symbol_product_type,
-                (
-                    row.exchange.clone(),
-                    row.exchange_symbol.clone(),
-                    row.product_type.clone(),
-                ),
+                &row.exchange,
+                &row.exchange_symbol,
+                &row.product_type,
                 index,
             );
-            insert_unique_index(
+            insert_typed_unique_index(
                 &mut self.by_exchange_exchange_symbol_exchange_type,
-                (
-                    row.exchange.clone(),
-                    row.exchange_symbol.clone(),
-                    row.exchange_type.clone(),
-                ),
+                &row.exchange,
+                &row.exchange_symbol,
+                &row.exchange_type,
                 index,
             );
         }
@@ -257,34 +257,28 @@ impl ProductTable {
         exchange_type: Option<&str>,
     ) -> Option<usize> {
         let index = match (product_type, exchange_type) {
-            (Some(product_type), None) => self
-                .by_exchange_exchange_symbol_product_type
-                .get(&(
-                    exchange.to_string(),
-                    exchange_symbol.to_string(),
-                    product_type.to_string(),
-                ))
-                .copied()
-                .flatten(),
-            (None, Some(exchange_type)) => self
-                .by_exchange_exchange_symbol_exchange_type
-                .get(&(
-                    exchange.to_string(),
-                    exchange_symbol.to_string(),
-                    exchange_type.to_string(),
-                ))
-                .copied()
-                .flatten(),
-            (Some(product_type), Some(exchange_type)) => self
-                .by_exchange_exchange_symbol_product_type
-                .get(&(
-                    exchange.to_string(),
-                    exchange_symbol.to_string(),
-                    product_type.to_string(),
-                ))
-                .copied()
-                .flatten()
-                .filter(|index| self.rows[*index].exchange_type == exchange_type),
+            (Some(product_type), None) => lookup_typed_unique_index(
+                &self.by_exchange_exchange_symbol_product_type,
+                exchange,
+                exchange_symbol,
+                product_type,
+            )
+            .flatten(),
+            (None, Some(exchange_type)) => lookup_typed_unique_index(
+                &self.by_exchange_exchange_symbol_exchange_type,
+                exchange,
+                exchange_symbol,
+                exchange_type,
+            )
+            .flatten(),
+            (Some(product_type), Some(exchange_type)) => lookup_typed_unique_index(
+                &self.by_exchange_exchange_symbol_product_type,
+                exchange,
+                exchange_symbol,
+                product_type,
+            )
+            .flatten()
+            .filter(|index| self.rows[*index].exchange_type == exchange_type),
             (None, None) => None,
         };
         index
@@ -301,9 +295,8 @@ impl ProductTable {
             return self.get_product_value(key, exchange, product_symbol);
         }
         if let Some(exchange_symbol) = exchange_symbol {
-            if let Some(indexes) = self
-                .by_exchange_exchange_symbol
-                .get(&(exchange.to_string(), exchange_symbol.to_string()))
+            if let Some(indexes) =
+                lookup_multi_index(&self.by_exchange_exchange_symbol, exchange, exchange_symbol)
             {
                 if indexes.len() == 1 {
                     return row_value(&self.rows[indexes[0]], key)
@@ -333,11 +326,8 @@ impl ProductTable {
     }
 
     fn unique_product(&self, exchange: &str, product_symbol: &str) -> Result<&MarketInfo> {
-        match self
-            .by_exchange_product
-            .get(&(exchange.to_string(), product_symbol.to_string()))
-        {
-            Some(Some(index)) => Ok(&self.rows[*index]),
+        match lookup_unique_index(&self.by_exchange_product, exchange, product_symbol) {
+            Some(Some(index)) => Ok(&self.rows[index]),
             _ => {
                 let matches = self
                     .rows
@@ -378,15 +368,65 @@ impl ProductTable {
     }
 }
 
-fn insert_unique_index<K: std::hash::Hash + Eq>(
-    index: &mut HashMap<K, Option<usize>>,
-    key: K,
+fn insert_unique_index(
+    index: &mut UniqueIndex,
+    exchange: &str,
+    symbol: &str,
     row_index: usize,
 ) {
     index
-        .entry(key)
+        .entry(exchange.to_string())
+        .or_default()
+        .entry(symbol.to_string())
         .and_modify(|value| *value = None)
         .or_insert(Some(row_index));
+}
+
+fn lookup_unique_index(index: &UniqueIndex, exchange: &str, symbol: &str) -> Option<Option<usize>> {
+    index.get(exchange)?.get(symbol).copied()
+}
+
+fn insert_multi_index(index: &mut MultiIndex, exchange: &str, symbol: &str, row_index: usize) {
+    index
+        .entry(exchange.to_string())
+        .or_default()
+        .entry(symbol.to_string())
+        .or_default()
+        .push(row_index);
+}
+
+fn lookup_multi_index<'a>(
+    index: &'a MultiIndex,
+    exchange: &str,
+    symbol: &str,
+) -> Option<&'a [usize]> {
+    index.get(exchange)?.get(symbol).map(Vec::as_slice)
+}
+
+fn insert_typed_unique_index(
+    index: &mut TypedUniqueIndex,
+    exchange: &str,
+    symbol: &str,
+    kind: &str,
+    row_index: usize,
+) {
+    index
+        .entry(exchange.to_string())
+        .or_default()
+        .entry(symbol.to_string())
+        .or_default()
+        .entry(kind.to_string())
+        .and_modify(|value| *value = None)
+        .or_insert(Some(row_index));
+}
+
+fn lookup_typed_unique_index(
+    index: &TypedUniqueIndex,
+    exchange: &str,
+    symbol: &str,
+    kind: &str,
+) -> Option<Option<usize>> {
+    index.get(exchange)?.get(symbol)?.get(kind).copied()
 }
 
 fn row_matches(row: &MarketInfo, filter: ProductFilter<'_>) -> bool {
