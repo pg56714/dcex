@@ -5,6 +5,7 @@ from typing import Any
 NativeHeaders = dict[str, str]
 NativeParams = list[tuple[str, str]]
 NativeResponse = tuple[int, NativeHeaders, bytes]
+NativeJsonResponse = tuple[int, NativeHeaders, Any]
 LighterSignedTransaction = tuple[int, str, str, str | None]
 
 class ProductColumn:
@@ -99,15 +100,27 @@ class _NativeExchangeClient:
     def public_request(
         self, method_name: str, params: NativeParams | None = None
     ) -> NativeResponse: ...
+    def public_request_json(
+        self, method_name: str, params: NativeParams | None = None
+    ) -> NativeJsonResponse: ...
     async def public_request_async(
         self, method_name: str, params: NativeParams | None = None
     ) -> NativeResponse: ...
+    async def public_request_json_async(
+        self, method_name: str, params: NativeParams | None = None
+    ) -> NativeJsonResponse: ...
     def private_request(
         self, method_name: str, params: NativeParams | None = None
     ) -> NativeResponse: ...
+    def private_request_json(
+        self, method_name: str, params: NativeParams | None = None
+    ) -> NativeJsonResponse: ...
     async def private_request_async(
         self, method_name: str, params: NativeParams | None = None
     ) -> NativeResponse: ...
+    async def private_request_json_async(
+        self, method_name: str, params: NativeParams | None = None
+    ) -> NativeJsonResponse: ...
     def request_raw(self, *args: object, **kwargs: object) -> NativeResponse: ...
     async def request_raw_async(self, *args: object, **kwargs: object) -> NativeResponse: ...
 

@@ -118,6 +118,26 @@ def test_native_binance_signed_request() -> None:
     assert signature == expected_signature
 
 
+def test_native_binance_public_request_json_preserves_headers() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server(response_payload={"ok": True, "count": 2}) as (base_url, received):
+        client = native.BinanceHttpClient(
+            timeout=2,
+            spot_base_url=base_url,
+            futures_base_url=base_url,
+        )
+        status, headers, body = client.public_request_json(
+            "get_spot_orderbook",
+            [("product_symbol", "BTC-USDT-SPOT"), ("limit", "5")],
+        )
+
+    assert status == 200
+    assert headers["x-response"] == "native"
+    assert body == {"ok": True, "count": 2}
+    assert received.get_nowait()["path"] == "/api/v3/depth?symbol=BTCUSDT&limit=5"
+
+
 @pytest.mark.asyncio
 async def test_native_binance_async_public_request() -> None:
     native = pytest.importorskip("dcex._native")
@@ -139,6 +159,27 @@ async def test_native_binance_async_public_request() -> None:
     assert status == 200
     assert json.loads(body) == {"ok": True}
     assert received.get_nowait()["path"] == "/test?symbol=ETHUSDT"
+
+
+@pytest.mark.asyncio
+async def test_native_binance_async_public_request_json_preserves_headers() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server(response_payload={"ok": True, "count": 3}) as (base_url, received):
+        client = native.BinanceHttpClient(
+            timeout=2,
+            spot_base_url=base_url,
+            futures_base_url=base_url,
+        )
+        status, headers, body = await client.public_request_json_async(
+            "get_spot_orderbook",
+            [("product_symbol", "BTC-USDT-SPOT"), ("limit", "10")],
+        )
+
+    assert status == 200
+    assert headers["x-response"] == "native"
+    assert body == {"ok": True, "count": 3}
+    assert received.get_nowait()["path"] == "/api/v3/depth?symbol=BTCUSDT&limit=10"
 
 
 def test_sync_binance_public_wrapper_uses_native_dispatcher() -> None:

@@ -134,15 +134,25 @@ impl PythonAsterHttpClient {
         &self,
         py: Python<'_>,
         method_name: String,
-        params: Option<Vec<(String, String)>>,
+        params: Option<PythonRequestParams>,
     ) -> PyResult<PythonHttpResponse> {
         let client = self.client.clone();
-        let params = params.unwrap_or_default();
-        py.allow_threads(|| {
-            block_on(async move { client.public_request(&method_name, params).await })
+        python_validated_request(py, method_name, params, |method_name, params| async move {
+            client.public_request(&method_name, params).await
         })
-        .map_err(to_py_runtime_error)
-        .and_then(python_validated_response)
+    }
+
+    #[pyo3(signature = (method_name, params=None))]
+    fn public_request_json(
+        &self,
+        py: Python<'_>,
+        method_name: String,
+        params: Option<PythonRequestParams>,
+    ) -> PyResult<PythonJsonResponse> {
+        let client = self.client.clone();
+        python_validated_json_request(py, method_name, params, |method_name, params| async move {
+            client.public_request(&method_name, params).await
+        })
     }
 
     #[pyo3(signature = (method_name, params=None))]
@@ -150,17 +160,28 @@ impl PythonAsterHttpClient {
         &self,
         py: Python<'py>,
         method_name: String,
-        params: Option<Vec<(String, String)>>,
+        params: Option<PythonRequestParams>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        let params = params.unwrap_or_default();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .public_request(&method_name, params)
-                .await
-                .map_err(to_py_runtime_error)
-                .and_then(python_validated_response)
+        python_validated_request_async(py, method_name, params, |method_name, params| async move {
+            client.public_request(&method_name, params).await
         })
+    }
+
+    #[pyo3(signature = (method_name, params=None))]
+    fn public_request_json_async<'py>(
+        &self,
+        py: Python<'py>,
+        method_name: String,
+        params: Option<PythonRequestParams>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        python_validated_json_request_async(
+            py,
+            method_name,
+            params,
+            |method_name, params| async move { client.public_request(&method_name, params).await },
+        )
     }
 
     #[pyo3(signature = (method_name, params=None))]
@@ -168,15 +189,25 @@ impl PythonAsterHttpClient {
         &self,
         py: Python<'_>,
         method_name: String,
-        params: Option<Vec<(String, String)>>,
+        params: Option<PythonRequestParams>,
     ) -> PyResult<PythonHttpResponse> {
         let client = self.client.clone();
-        let params = params.unwrap_or_default();
-        py.allow_threads(|| {
-            block_on(async move { client.private_request(&method_name, params).await })
+        python_validated_request(py, method_name, params, |method_name, params| async move {
+            client.private_request(&method_name, params).await
         })
-        .map_err(to_py_runtime_error)
-        .and_then(python_validated_response)
+    }
+
+    #[pyo3(signature = (method_name, params=None))]
+    fn private_request_json(
+        &self,
+        py: Python<'_>,
+        method_name: String,
+        params: Option<PythonRequestParams>,
+    ) -> PyResult<PythonJsonResponse> {
+        let client = self.client.clone();
+        python_validated_json_request(py, method_name, params, |method_name, params| async move {
+            client.private_request(&method_name, params).await
+        })
     }
 
     #[pyo3(signature = (method_name, params=None))]
@@ -184,17 +215,28 @@ impl PythonAsterHttpClient {
         &self,
         py: Python<'py>,
         method_name: String,
-        params: Option<Vec<(String, String)>>,
+        params: Option<PythonRequestParams>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
-        let params = params.unwrap_or_default();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            client
-                .private_request(&method_name, params)
-                .await
-                .map_err(to_py_runtime_error)
-                .and_then(python_validated_response)
+        python_validated_request_async(py, method_name, params, |method_name, params| async move {
+            client.private_request(&method_name, params).await
         })
+    }
+
+    #[pyo3(signature = (method_name, params=None))]
+    fn private_request_json_async<'py>(
+        &self,
+        py: Python<'py>,
+        method_name: String,
+        params: Option<PythonRequestParams>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        python_validated_json_request_async(
+            py,
+            method_name,
+            params,
+            |method_name, params| async move { client.private_request(&method_name, params).await },
+        )
     }
 }
 

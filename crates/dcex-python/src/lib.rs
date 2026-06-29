@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::future::Future;
 use std::time::Duration;
 
 use dcex::common::{self, OrderSide};
@@ -25,7 +26,9 @@ use dcex::lighter;
 use dcex::product_table::{MarketInfo, ProductFilter, ProductTable};
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
-use pyo3::types::PyBytes;
+use pyo3::types::{PyBytes, PyDict, PyList};
+use pyo3::IntoPyObjectExt;
+use serde_json::Value;
 
 fn to_py_value_error(error: dcex::DcexError) -> PyErr {
     PyValueError::new_err(error.to_string())
@@ -88,6 +91,7 @@ fn http_request(
 }
 
 type PythonHttpResponse = (u16, BTreeMap<String, String>, Py<PyBytes>);
+type PythonJsonResponse = (u16, BTreeMap<String, String>, Py<PyAny>);
 
 fn python_http_response(response: HttpResponse) -> PythonHttpResponse {
     let body = Python::with_gil(|py| PyBytes::new(py, &response.body).unbind());
@@ -101,7 +105,120 @@ fn python_validated_response(response: ValidatedResponse) -> PyResult<PythonHttp
     Ok((response.status, response.headers, body))
 }
 
+fn python_validated_json_response(response: ValidatedResponse) -> PyResult<PythonJsonResponse> {
+    let body = Python::with_gil(|py| json_value_to_py(py, &response.data))?;
+    Ok((response.status, response.headers, body))
+}
+
+fn json_value_to_py(py: Python<'_>, value: &Value) -> PyResult<Py<PyAny>> {
+    match value {
+        Value::Null => Ok(py.None()),
+        Value::Bool(value) => value.into_py_any(py),
+        Value::Number(value) => json_number_to_py(py, value),
+        Value::String(value) => value.into_py_any(py),
+        Value::Array(values) => {
+            let list = PyList::empty(py);
+            for value in values {
+                list.append(json_value_to_py(py, value)?)?;
+            }
+            Ok(list.into_any().unbind())
+        }
+        Value::Object(values) => {
+            let dict = PyDict::new(py);
+            for (key, value) in values {
+                dict.set_item(key, json_value_to_py(py, value)?)?;
+            }
+            Ok(dict.into_any().unbind())
+        }
+    }
+}
+
+fn json_number_to_py(py: Python<'_>, value: &serde_json::Number) -> PyResult<Py<PyAny>> {
+    if let Some(value) = value.as_i64() {
+        return value.into_py_any(py);
+    }
+    if let Some(value) = value.as_u64() {
+        return value.into_py_any(py);
+    }
+    if let Some(value) = value.as_f64() {
+        return value.into_py_any(py);
+    }
+    value.to_string().into_py_any(py)
+}
+
 pub(crate) use product_table::PythonProductTable;
+
+type PythonRequestParams = Vec<(String, String)>;
+
+fn python_validated_request<F, Fut>(
+    py: Python<'_>,
+    method_name: String,
+    params: Option<PythonRequestParams>,
+    request: F,
+) -> PyResult<PythonHttpResponse>
+where
+    F: FnOnce(String, PythonRequestParams) -> Fut + Send,
+    Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
+{
+    let params = params.unwrap_or_default();
+    py.allow_threads(|| block_on(request(method_name, params)))
+        .map_err(to_py_runtime_error)
+        .and_then(python_validated_response)
+}
+
+fn python_validated_json_request<F, Fut>(
+    py: Python<'_>,
+    method_name: String,
+    params: Option<PythonRequestParams>,
+    request: F,
+) -> PyResult<PythonJsonResponse>
+where
+    F: FnOnce(String, PythonRequestParams) -> Fut + Send,
+    Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
+{
+    let params = params.unwrap_or_default();
+    py.allow_threads(|| block_on(request(method_name, params)))
+        .map_err(to_py_runtime_error)
+        .and_then(python_validated_json_response)
+}
+
+fn python_validated_request_async<'py, F, Fut>(
+    py: Python<'py>,
+    method_name: String,
+    params: Option<PythonRequestParams>,
+    request: F,
+) -> PyResult<Bound<'py, PyAny>>
+where
+    F: FnOnce(String, PythonRequestParams) -> Fut + Send + 'static,
+    Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
+{
+    let params = params.unwrap_or_default();
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        request(method_name, params)
+            .await
+            .map_err(to_py_runtime_error)
+            .and_then(python_validated_response)
+    })
+}
+
+fn python_validated_json_request_async<'py, F, Fut>(
+    py: Python<'py>,
+    method_name: String,
+    params: Option<PythonRequestParams>,
+    request: F,
+) -> PyResult<Bound<'py, PyAny>>
+where
+    F: FnOnce(String, PythonRequestParams) -> Fut + Send + 'static,
+    Fut: Future<Output = dcex::Result<ValidatedResponse>> + Send + 'static,
+{
+    let params = params.unwrap_or_default();
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        request(method_name, params)
+            .await
+            .map_err(to_py_runtime_error)
+            .and_then(python_validated_json_response)
+    })
+}
 
 fn binance_market(market: &str) -> PyResult<BinanceMarket> {
     match market.to_ascii_lowercase().as_str() {
