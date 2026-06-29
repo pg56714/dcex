@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, cast
 from urllib.parse import parse_qsl, urlencode
 
-from .._native_http import NativeResponse, load_native, request_native_json
+from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -98,8 +98,8 @@ class HTTPManager(BaseHTTPManager):
         """Call a Rust-backed MEXC private method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("MEXC native client is required for private methods.")
-        if not hasattr(self._native_client, "private_request"):
-            raise RuntimeError("MEXC native client private_request is unavailable.")
+        if not hasattr(self._native_client, "private_request_json"):
+            raise RuntimeError("MEXC native client private_request_json is unavailable.")
         try:
             response, data = request_native_json(
                 self._native_client,
@@ -164,7 +164,7 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = cast(
                 Any,
                 self._native_client,
-            ).request_raw(
+            ).request_raw_json(
                 method,
                 api,
                 request_path,
@@ -172,11 +172,7 @@ class HTTPManager(BaseHTTPManager):
                 body,
                 signed,
             )
-            response = NativeResponse(
-                status,
-                dict(response_headers),
-                bytes(response_body),
-            )
+            response = NativeResponse(status, dict(response_headers))
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
@@ -188,21 +184,11 @@ class HTTPManager(BaseHTTPManager):
             ) from exc
 
         self._store_response_headers(response)
-        try:
-            data = response.json()
-        except Exception as exc:
-            raise FailedRequestError(
-                request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Failed to decode JSON response: {exc}",
-                status_code=response.status_code,
-                time=str(generate_timestamp(iso_format=True)),
-                resp_headers=dict(response.headers),
-            ) from exc
-
+        data = response_body
         if response.status_code // 100 != 2:
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"HTTP Error {response.status_code}: {response.text}",
+                message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
                 status_code=response.status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=dict(response.headers),

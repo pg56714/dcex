@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, cast
 from urllib.parse import urlencode
 
-from .._native_http import NativeResponse, load_native, request_native_json
+from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -231,7 +231,7 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = cast(
                 Any,
                 self._native_client,
-            ).request_raw(
+            ).request_raw_json(
                 method,
                 selected_auth_type,
                 str(path),
@@ -239,11 +239,7 @@ class HTTPManager(BaseHTTPManager):
                 json_body,
                 signed,
             )
-            response = NativeResponse(
-                status,
-                dict(response_headers),
-                bytes(response_body),
-            )
+            response = NativeResponse(status, dict(response_headers))
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
             raise FailedRequestError(
@@ -255,17 +251,7 @@ class HTTPManager(BaseHTTPManager):
             ) from e
         else:
             self._store_response_headers(response)
-            try:
-                data = response.json()
-            except Exception as exc:
-                raise FailedRequestError(
-                    request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"Failed to decode JSON response: {exc}",
-                    status_code=response.status_code,
-                    time=str(generate_timestamp(iso_format=True)),
-                    resp_headers=dict(response.headers),
-                ) from exc
-
+            data = response_body
             timestamp = str(generate_timestamp(iso_format=True))
             error_message = _kraken_error_message(data)
             if error_message:
@@ -280,7 +266,7 @@ class HTTPManager(BaseHTTPManager):
             if response.status_code // 100 != 2:
                 raise FailedRequestError(
                     request=f"{method.upper()} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {response.text}",
+                    message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
                     status_code=response.status_code,
                     time=timestamp,
                     resp_headers=dict(response.headers),

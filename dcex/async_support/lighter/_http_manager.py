@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
-from ..._native_http import NativeResponse, load_native, request_native_json_async
+from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -107,12 +107,9 @@ class HTTPManager(BaseHTTPManager):
             await self.async_init()
         native_client = self._native_client
         method = "private_request" if private else "public_request"
-        async_method = f"{method}_async"
         json_method = f"{method}_json_async"
-        if native_client is None or not (
-            hasattr(native_client, json_method) or hasattr(native_client, async_method)
-        ):
-            raise RuntimeError(f"Lighter native client {async_method} is unavailable.")
+        if native_client is None or not hasattr(native_client, json_method):
+            raise RuntimeError(f"Lighter native client {json_method} is unavailable.")
         try:
             response, data = await request_native_json_async(
                 native_client,
@@ -191,7 +188,7 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = await cast(
                 Any,
                 self._native_client,
-            ).request_raw_async(
+            ).request_raw_json_async(
                 method,
                 request_path,
                 [(key, _format_value(value)) for key, value in filtered_query.items()],
@@ -200,11 +197,7 @@ class HTTPManager(BaseHTTPManager):
                 {key: value for key, value in (headers or {}).items() if value},
                 content_type,
             )
-            response = NativeResponse(
-                status,
-                dict(response_headers),
-                bytes(response_body),
-            )
+            response = NativeResponse(status, dict(response_headers))
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
@@ -216,25 +209,15 @@ class HTTPManager(BaseHTTPManager):
             ) from exc
 
         self._store_response_headers(response)
+        data = response_body
         if response.status_code // 100 != 2:
             raise FailedRequestError(
                 request=f"{method.upper()} {url} | Body: {query}",
-                message=f"HTTP Error {response.status_code}: {response.text}",
+                message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
                 status_code=response.status_code,
                 time=str(generate_timestamp(iso_format=True)),
                 resp_headers=dict(response.headers),
             )
-
-        try:
-            data = response.json()
-        except Exception as exc:
-            raise FailedRequestError(
-                request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Failed to decode JSON response: {exc}",
-                status_code=response.status_code,
-                time=str(generate_timestamp(iso_format=True)),
-                resp_headers=dict(response.headers),
-            ) from exc
 
         if isinstance(data, dict):
             code = data.get("code")

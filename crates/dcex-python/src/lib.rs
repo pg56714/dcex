@@ -98,6 +98,22 @@ fn python_http_response(response: HttpResponse) -> PythonHttpResponse {
     (response.status, response.headers, body)
 }
 
+fn python_json_http_response(response: HttpResponse) -> PyResult<PythonJsonResponse> {
+    let HttpResponse {
+        status,
+        headers,
+        body,
+    } = response;
+    let body = if body.is_empty() {
+        Python::with_gil(|py| py.None())
+    } else {
+        let data: Value = serde_json::from_slice(&body)
+            .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+        Python::with_gil(|py| json_value_to_py(py, &data))?
+    };
+    Ok((status, headers, body))
+}
+
 fn python_validated_response(response: ValidatedResponse) -> PyResult<PythonHttpResponse> {
     let body = serde_json::to_vec(&response.data)
         .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
@@ -182,6 +198,15 @@ where
         .and_then(python_validated_json_response)
 }
 
+fn python_json_http_request<F>(py: Python<'_>, request: F) -> PyResult<PythonJsonResponse>
+where
+    F: FnOnce() -> dcex::Result<HttpResponse> + Send,
+{
+    py.allow_threads(request)
+        .map_err(to_py_runtime_error)
+        .and_then(python_json_http_response)
+}
+
 fn python_validated_request_async<'py, F, Fut>(
     py: Python<'py>,
     method_name: String,
@@ -217,6 +242,21 @@ where
             .await
             .map_err(to_py_runtime_error)
             .and_then(python_validated_json_response)
+    })
+}
+
+fn python_json_http_request_async<'py, Fut>(
+    py: Python<'py>,
+    request: Fut,
+) -> PyResult<Bound<'py, PyAny>>
+where
+    Fut: Future<Output = dcex::Result<HttpResponse>> + Send + 'static,
+{
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        request
+            .await
+            .map_err(to_py_runtime_error)
+            .and_then(python_json_http_response)
     })
 }
 

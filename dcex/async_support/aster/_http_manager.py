@@ -79,12 +79,9 @@ class HTTPManager(BaseHTTPManager):
         if self._native_client is None:
             raise RuntimeError("Aster native client is required.")
         method = "private_request" if private else "public_request"
-        async_method = f"{method}_async"
         json_method = f"{method}_json_async"
-        if not (
-            hasattr(self._native_client, json_method) or hasattr(self._native_client, async_method)
-        ):
-            raise RuntimeError(f"Aster native client {async_method} is unavailable.")
+        if not hasattr(self._native_client, json_method):
+            raise RuntimeError(f"Aster native client {json_method} is unavailable.")
         request_summary = self._native_request_summary(method_name, params)
         try:
             response, data = await request_native_json_async(
@@ -173,17 +170,13 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = await cast(
                 Any,
                 self._native_client,
-            ).request_raw_auto_async(
+            ).request_raw_auto_json_async(
                 method,
                 request_path,
                 list(params.items()),
                 signed,
             )
-            response = NativeResponse(
-                status,
-                dict(response_headers),
-                bytes(response_body),
-            )
+            response = NativeResponse(status, dict(response_headers))
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
@@ -195,17 +188,7 @@ class HTTPManager(BaseHTTPManager):
             ) from exc
 
         self._store_response_headers(response)
-        try:
-            data: dict[str, Any] | list[Any] = response.json()
-        except Exception as exc:
-            raise FailedRequestError(
-                request=f"{method_upper} {url} | Body: {params}",
-                message=f"Failed to decode JSON response: {exc}",
-                status_code=response.status_code,
-                time=str(generate_timestamp(iso_format=True)),
-                resp_headers=dict(response.headers),
-            ) from exc
-
+        data = response_body
         error_code = data.get("code") if isinstance(data, dict) else None
         if response.status_code // 100 != 2 or (
             error_code is not None and str(error_code) not in {"0", "200"}

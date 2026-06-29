@@ -6,6 +6,7 @@ from __future__ import annotations
 import ast
 import base64
 import inspect
+import json
 from dataclasses import dataclass
 from importlib import import_module
 from pathlib import Path
@@ -118,6 +119,14 @@ class FakeSyncNativePublicClient:
         self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
 
+    def public_request_json(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], object]:
+        status, headers, body = self.public_request(method_name, params)
+        return status, headers, json.loads(body)
+
     def private_request(
         self,
         method_name: str,
@@ -125,6 +134,14 @@ class FakeSyncNativePublicClient:
     ) -> tuple[int, dict[str, str], bytes]:
         self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
+
+    def private_request_json(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], object]:
+        status, headers, body = self.private_request(method_name, params)
+        return status, headers, json.loads(body)
 
     def create_auth_token(
         self,
@@ -171,6 +188,14 @@ class FakeAsyncNativePublicClient:
         self.calls.append({"method": "NATIVE_PUBLIC", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
 
+    async def public_request_json_async(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], object]:
+        status, headers, body = await self.public_request_async(method_name, params)
+        return status, headers, json.loads(body)
+
     async def private_request_async(
         self,
         method_name: str,
@@ -178,6 +203,14 @@ class FakeAsyncNativePublicClient:
     ) -> tuple[int, dict[str, str], bytes]:
         self.calls.append({"method": "NATIVE_PRIVATE", "path": method_name, "query": params})
         return 200, {"x-response": "native"}, self._body(method_name)
+
+    async def private_request_json_async(
+        self,
+        method_name: str,
+        params: list[tuple[str, str]],
+    ) -> tuple[int, dict[str, str], object]:
+        status, headers, body = await self.private_request_async(method_name, params)
+        return status, headers, json.loads(body)
 
     def create_auth_token(
         self,

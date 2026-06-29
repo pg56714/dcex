@@ -5,7 +5,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Self, cast
 
-from ..._native_http import NativeResponse, load_native, request_native_json_async
+from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -191,18 +191,14 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = await cast(
                 Any,
                 self._native_client,
-            ).request_raw_async(
+            ).request_raw_json_async(
                 method,
                 path,
                 params,
                 body_str.encode() if method_upper == "POST" else None,
                 signed,
             )
-            response = NativeResponse(
-                status,
-                dict(response_headers),
-                bytes(response_body),
-            )
+            response = NativeResponse(status, dict(response_headers))
 
         except RuntimeError as e:
             status_code, resp_headers = self._exception_response_details(e)
@@ -215,16 +211,7 @@ class HTTPManager(BaseHTTPManager):
             ) from e
         else:
             self._store_response_headers(response)
-            try:
-                data = response.json()
-            except Exception as exc:
-                raise FailedRequestError(
-                    request=f"{method_upper} {url} | Body: {query}",
-                    message=f"Failed to decode JSON response: {exc}",
-                    status_code=response.status_code,
-                    time=str(timestamp),
-                    resp_headers=dict(response.headers),
-                ) from exc
+            data = response_body
             if not isinstance(data, dict):
                 raise FailedRequestError(
                     request=f"{method_upper} {url} | Body: {query}",
@@ -248,7 +235,7 @@ class HTTPManager(BaseHTTPManager):
             if not response.status_code // 100 == 2:
                 raise FailedRequestError(
                     request=f"{method_upper} {url} | Body: {query}",
-                    message=f"HTTP Error {response.status_code}: {response.text}",
+                    message=f"HTTP Error {response.status_code}: {native_body_text(data)}",
                     status_code=response.status_code,
                     time=str(timestamp),
                     resp_headers=dict(response.headers),

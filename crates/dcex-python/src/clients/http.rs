@@ -38,6 +38,23 @@ impl PythonHttpClient {
 
     #[pyo3(signature = (method, base_url, path, query=None, headers=None, body=None))]
     #[allow(clippy::too_many_arguments)]
+    fn request_json(
+        &self,
+        py: Python<'_>,
+        method: &str,
+        base_url: String,
+        path: String,
+        query: Option<Vec<(String, String)>>,
+        headers: Option<BTreeMap<String, String>>,
+        body: Option<Vec<u8>>,
+    ) -> PyResult<PythonJsonResponse> {
+        let request = http_request(method, base_url, path, query, headers, body)?;
+        let client = self.blocking_client.clone();
+        python_json_http_request(py, move || client.execute(request))
+    }
+
+    #[pyo3(signature = (method, base_url, path, query=None, headers=None, body=None))]
+    #[allow(clippy::too_many_arguments)]
     fn request_async<'py>(
         &self,
         py: Python<'py>,
@@ -57,6 +74,23 @@ impl PythonHttpClient {
                 .map(python_http_response)
                 .map_err(to_py_runtime_error)
         })
+    }
+
+    #[pyo3(signature = (method, base_url, path, query=None, headers=None, body=None))]
+    #[allow(clippy::too_many_arguments)]
+    fn request_json_async<'py>(
+        &self,
+        py: Python<'py>,
+        method: &str,
+        base_url: String,
+        path: String,
+        query: Option<Vec<(String, String)>>,
+        headers: Option<BTreeMap<String, String>>,
+        body: Option<Vec<u8>>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.async_client.clone();
+        let request = http_request(method, base_url, path, query, headers, body)?;
+        python_json_http_request_async(py, async move { client.execute(request).await })
     }
 }
 

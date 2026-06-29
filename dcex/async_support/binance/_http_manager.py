@@ -1,9 +1,8 @@
-import json
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Self, cast
 
-from ..._native_http import load_native
+from ..._native_http import load_native, native_body_text
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError
@@ -66,14 +65,13 @@ class HTTPManager(BaseHTTPManager):
         self._uses_native_transport()
         native_client = cast(Any, self._native_client)
         try:
-            status_code, response_headers, body = await native_client.request_raw_auto_async(
+            status_code, response_headers, data = await native_client.request_raw_auto_json_async(
                 method,
                 request_path,
                 [(str(key), str(value)) for key, value in query.items()],
                 signed,
             )
             response_headers = dict(response_headers)
-            response_text = bytes(body).decode(errors="replace")
             self.last_response_headers = response_headers
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
@@ -83,17 +81,6 @@ class HTTPManager(BaseHTTPManager):
                 status_code=status_code,
                 time=str(query.get("timestamp", "Unknown")),
                 resp_headers=resp_headers,
-            ) from exc
-
-        try:
-            data = json.loads(body)
-        except Exception as exc:
-            raise FailedRequestError(
-                request=f"{method.upper()} {url} | Body: {query}",
-                message=f"Failed to decode JSON response: {exc}",
-                status_code=status_code,
-                time=str(generate_timestamp(iso_format=True)),
-                resp_headers=response_headers,
             ) from exc
 
         timestamp = generate_timestamp(iso_format=True)
@@ -110,6 +97,7 @@ class HTTPManager(BaseHTTPManager):
             )
 
         if not status_code // 100 == 2:
+            response_text = native_body_text(data)
             self._log_failed_request(
                 f"HTTP Error {status_code}: {response_text}",
                 status_code,

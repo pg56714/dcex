@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, cast
 
-from .._native_http import NativeResponse, load_native, request_native_json
+from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -90,8 +90,8 @@ class HTTPManager(BaseHTTPManager):
         """Call a Rust-backed Gate.io private method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("Gate.io native client is required for private methods.")
-        if not hasattr(self._native_client, "private_request"):
-            raise RuntimeError("Gate.io native client private_request is unavailable.")
+        if not hasattr(self._native_client, "private_request_json"):
+            raise RuntimeError("Gate.io native client private_request_json is unavailable.")
         try:
             response, data = request_native_json(
                 self._native_client,
@@ -204,38 +204,26 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = cast(
                 Any,
                 self._native_client,
-            ).request_raw(
+            ).request_raw_json(
                 method,
                 full_path,
                 [(key, str(value)) for key, value in query.items()],
                 body_string.encode() if body_string and body else None,
                 signed,
             )
-            response = NativeResponse(
-                status,
-                dict(response_headers),
-                bytes(response_body),
-            )
+            response = NativeResponse(status, dict(response_headers))
 
             self._store_response_headers(response)
-            try:
-                data = response.json()
-            except Exception as exc:
-                raise FailedRequestError(
-                    request=f"{method_upper} {url}",
-                    message=f"Failed to decode JSON response: {exc}",
-                    status_code=response.status_code,
-                    time=timestamp,
-                    resp_headers=dict(response.headers),
-                ) from exc
-
+            data = response_body
             if response.ok:
                 return data
 
-            self._log_failed_request(f"GATEIO API Error: {response.text}", response.status_code)
+            self._log_failed_request(
+                f"GATEIO API Error: {native_body_text(data)}", response.status_code
+            )
             raise FailedRequestError(
                 request=f"{method_upper} {url}",
-                message=f"GATEIO API Error: {response.status_code}, {response.text}",
+                message=f"GATEIO API Error: {response.status_code}, {native_body_text(data)}",
                 status_code=response.status_code,
                 time=timestamp,
                 resp_headers=dict(response.headers),

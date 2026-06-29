@@ -72,6 +72,33 @@ impl PythonKucoinHttpClient {
 
     #[pyo3(signature = (method, market, path, params=None, body=None, signed=true))]
     #[allow(clippy::too_many_arguments)]
+    fn request_raw_json(
+        &self,
+        py: Python<'_>,
+        method: &str,
+        market: &str,
+        path: String,
+        params: Option<Vec<(String, String)>>,
+        body: Option<Vec<u8>>,
+        signed: bool,
+    ) -> PyResult<PythonJsonResponse> {
+        let client = self.client.clone();
+        let method = http_method(method)?;
+        let market = kucoin_market(market)?;
+        python_json_http_request(py, move || {
+            client.request_raw_blocking(
+                method,
+                market,
+                path,
+                params.unwrap_or_default(),
+                body,
+                signed,
+            )
+        })
+    }
+
+    #[pyo3(signature = (method, market, path, params=None, body=None, signed=true))]
+    #[allow(clippy::too_many_arguments)]
     fn request_raw_async<'py>(
         &self,
         py: Python<'py>,
@@ -92,6 +119,29 @@ impl PythonKucoinHttpClient {
                 .await
                 .map(python_http_response)
                 .map_err(to_py_runtime_error)
+        })
+    }
+
+    #[pyo3(signature = (method, market, path, params=None, body=None, signed=true))]
+    #[allow(clippy::too_many_arguments)]
+    fn request_raw_json_async<'py>(
+        &self,
+        py: Python<'py>,
+        method: &str,
+        market: &str,
+        path: String,
+        params: Option<Vec<(String, String)>>,
+        body: Option<Vec<u8>>,
+        signed: bool,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        let method = http_method(method)?;
+        let market = kucoin_market(market)?;
+        let params = params.unwrap_or_default();
+        python_json_http_request_async(py, async move {
+            client
+                .request_raw(method, market, path, params, body, signed)
+                .await
         })
     }
 

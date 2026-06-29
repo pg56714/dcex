@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, cast
 from urllib.parse import urlencode
 
-from .._native_http import NativeResponse, load_native, request_native_json
+from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
@@ -115,8 +115,8 @@ class HTTPManager(BaseHTTPManager):
         """Call a Rust-backed Backpack public method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("Backpack native client is required for public methods.")
-        if not hasattr(self._native_client, "public_request"):
-            raise RuntimeError("Backpack native client public_request is unavailable.")
+        if not hasattr(self._native_client, "public_request_json"):
+            raise RuntimeError("Backpack native client public_request_json is unavailable.")
         try:
             response, data = request_native_json(
                 self._native_client,
@@ -142,8 +142,8 @@ class HTTPManager(BaseHTTPManager):
         """Call a Rust-backed Backpack private method and decode its JSON body."""
         if self._native_client is None:
             raise RuntimeError("Backpack native client is required for private methods.")
-        if not hasattr(self._native_client, "private_request"):
-            raise RuntimeError("Backpack native client private_request is unavailable.")
+        if not hasattr(self._native_client, "private_request_json"):
+            raise RuntimeError("Backpack native client private_request_json is unavailable.")
         try:
             response, data = request_native_json(
                 self._native_client,
@@ -222,7 +222,7 @@ class HTTPManager(BaseHTTPManager):
             status, response_headers, response_body = cast(
                 Any,
                 self._native_client,
-            ).request_raw(
+            ).request_raw_json(
                 method,
                 request_path,
                 _native_items(query_payload) if query_payload is not None else [],
@@ -232,11 +232,7 @@ class HTTPManager(BaseHTTPManager):
                 _native_signature_payload(signed_payload),
                 {key: value for key, value in (headers or {}).items() if value},
             )
-            response = NativeResponse(
-                status,
-                dict(response_headers),
-                bytes(response_body),
-            )
+            response = NativeResponse(status, dict(response_headers))
         except RuntimeError as exc:
             status_code, resp_headers = self._exception_response_details(exc)
             raise FailedRequestError(
@@ -248,15 +244,11 @@ class HTTPManager(BaseHTTPManager):
             ) from exc
 
         self._store_response_headers(response)
-        try:
-            data: dict[str, Any] | list[Any] | str = response.json()
-        except ValueError:
-            data = response.text
-
+        data = response_body
         if response.status_code // 100 != 2:
-            message = response.text
+            message = native_body_text(data)
             if isinstance(data, dict):
-                message = str(data.get("message") or data.get("code") or response.text)
+                message = str(data.get("message") or data.get("code") or native_body_text(data))
             raise FailedRequestError(
                 request=f"{method_upper} {url} | Body: {query}",
                 message=f"HTTP Error {response.status_code}: {message}",
