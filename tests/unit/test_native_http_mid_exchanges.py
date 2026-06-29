@@ -500,6 +500,15 @@ def test_sync_bitmex_manager_uses_native_transport() -> None:
     assert received.get_nowait()["path"] == "/test?symbol=XBTUSD"
 
 
+def test_sync_bitmex_private_wrapper_requires_credentials() -> None:
+    from dcex.bitmex.client import Client
+
+    client = Client(preload_product_table=False)
+    with pytest.raises(ValueError, match="Signed request requires API Key and Secret"):
+        client.get_wallet_summary()
+    client.close()
+
+
 @pytest.mark.asyncio
 async def test_async_bitmex_manager_uses_native_signed_body() -> None:
     from dcex.async_support.bitmex._http_manager import HTTPManager
@@ -530,6 +539,17 @@ async def test_async_bitmex_manager_uses_native_signed_body() -> None:
     assert manager.last_response_headers["x-response"] == "native"
     assert request["body"] == '{"symbol":"XBTUSD","orderQty":1}'
     assert request["api-signature"] == expected_signature
+
+
+@pytest.mark.asyncio
+async def test_async_bitmex_private_wrapper_requires_credentials() -> None:
+    from dcex.async_support.bitmex.client import Client
+
+    client = Client(preload_product_table=False)
+    await client.async_init()
+    with pytest.raises(ValueError, match="Signed request requires API Key and Secret"):
+        await client.get_wallet_summary()
+    await client.close()
 
 
 def test_sync_bitmex_public_wrapper_uses_native_dispatcher() -> None:

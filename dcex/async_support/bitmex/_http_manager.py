@@ -95,6 +95,11 @@ class HTTPManager(BaseHTTPManager):
             )
         return True
 
+    def _require_credentials(self) -> None:
+        """Validate credentials before entering a signed BitMEX request path."""
+        if not (self.api_key and self.api_secret):
+            raise ValueError("Signed request requires API Key and Secret.")
+
     async def _native_private(
         self,
         method_name: str,
@@ -105,6 +110,7 @@ class HTTPManager(BaseHTTPManager):
             raise RuntimeError("BitMEX native client is required for private methods.")
         if not hasattr(self._native_client, "private_request_json_async"):
             raise RuntimeError("BitMEX native client private_request_json_async is unavailable.")
+        self._require_credentials()
         try:
             response, data = await request_native_json_async(
                 self._native_client,
@@ -174,6 +180,8 @@ class HTTPManager(BaseHTTPManager):
             self._log_request(method, url)
 
             self._uses_native_transport()
+            if signed:
+                self._require_credentials()
             params = _query_pairs(query) if method_upper == "GET" else []
             body_bytes = (
                 json.dumps(query, separators=(",", ":")).encode()

@@ -157,22 +157,30 @@ impl BitmexClient {
             request.body = body.clone().map(RequestBody::Raw).unwrap_or_default();
         }
         if signed {
-            if let (Some(api_key), Some(api_secret)) = (&self.api_key, &self.api_secret) {
-                let body = String::from_utf8_lossy(body.as_deref().unwrap_or_default());
-                let payload = format!("{}{full_path}{expires}{body}", http_method_name(method));
-                let signature = hmac_sha256_hex(api_secret.as_bytes(), payload.as_bytes())?;
-                request
-                    .headers
-                    .insert("api-key".to_string(), api_key.clone());
-                request
-                    .headers
-                    .insert("api-signature".to_string(), signature);
-                request
-                    .headers
-                    .insert("api-expires".to_string(), expires.to_string());
-            }
+            let (api_key, api_secret) = self.credentials()?;
+            let body = String::from_utf8_lossy(body.as_deref().unwrap_or_default());
+            let payload = format!("{}{full_path}{expires}{body}", http_method_name(method));
+            let signature = hmac_sha256_hex(api_secret.as_bytes(), payload.as_bytes())?;
+            request
+                .headers
+                .insert("api-key".to_string(), api_key.to_string());
+            request
+                .headers
+                .insert("api-signature".to_string(), signature);
+            request
+                .headers
+                .insert("api-expires".to_string(), expires.to_string());
         }
         Ok(request)
+    }
+
+    fn credentials(&self) -> Result<(&str, &str)> {
+        match (&self.api_key, &self.api_secret) {
+            (Some(api_key), Some(api_secret)) => Ok((api_key, api_secret)),
+            _ => Err(DcexError::InvalidInput(
+                "Signed BitMEX requests require api_key and api_secret.".to_string(),
+            )),
+        }
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {

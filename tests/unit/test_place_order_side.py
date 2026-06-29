@@ -165,7 +165,7 @@ def test_bitmart_contract_int_side_is_untouched() -> None:
 def test_bitmex_side_conversion() -> None:
     from dcex.bitmex._trade_http import TradeHTTP
 
-    m = TradeHTTP(preload_product_table=False)
+    m = TradeHTTP(api_key="api-key", api_secret="api-secret", preload_product_table=False)
     cap = _wire_native(m)
     m.place_order(product_symbol="XBT-USD-SWAP", side=OrderSide.BUY, ordType="Market", orderQty=1)
     assert cap["method_name"] == "place_order"
@@ -248,7 +248,7 @@ async def test_async_bitmart_contract_int_side_is_untouched() -> None:
 async def test_async_bitmex_side_conversion() -> None:
     from dcex.async_support.bitmex._trade_http import TradeHTTP
 
-    m = TradeHTTP(preload_product_table=False)
+    m = TradeHTTP(api_key="api-key", api_secret="api-secret", preload_product_table=False)
     cap = _wire_native_async(m)
     await m.place_order(product_symbol="XBT-USD-SWAP", side=OrderSide.BUY, ordType="Market")
     assert cap["method_name"] == "place_order"

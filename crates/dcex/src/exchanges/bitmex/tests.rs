@@ -32,6 +32,26 @@ fn signature_includes_encoded_query_path() {
 }
 
 #[test]
+fn signed_request_requires_credentials() {
+    let client = BitmexClient::public(Duration::from_secs(1)).expect("client");
+    let error = client
+        .build_request(
+            HttpMethod::Get,
+            "/api/v1/order",
+            Vec::new(),
+            None,
+            true,
+            1_700_000_005,
+        )
+        .expect_err("missing credentials should fail before sending");
+
+    assert_eq!(
+        error.to_string(),
+        "Signed BitMEX requests require api_key and api_secret."
+    );
+}
+
+#[test]
 fn limit_buy_shortcut_builds_order_body_without_side_param() {
     let client = BitmexClient::public(Duration::from_secs(1)).expect("client");
     let params = params::BitmexParams::from_pairs(vec![
