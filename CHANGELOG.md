@@ -1,3 +1,22 @@
+## 0.26.1 (2026-06-29)
+
+### Fix
+
+- send bingx unsigned json body
+- align native params and timeout validation
+
+### Refactor
+
+- remove bytes exchange dispatchers
+- remove bytes raw exchange bindings
+
+### Perf
+
+- route raw rest requests through native json
+- use native json across exchange wrappers
+- use native json in binance wrappers
+- add native json response bindings
+
 ## 0.26.0 (2026-06-28)
 
 ### Feat

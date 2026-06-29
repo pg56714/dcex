@@ -1,3 +1,14 @@
+## 0.4.2 (2026-06-29)
+
+### Fix
+
+- satisfy product table lint checks
+- align native params and timeout validation
+
+### Perf
+
+- reduce product table lookup allocations
+
 ## 0.4.1 (2026-06-28)
 
 ### Fix
