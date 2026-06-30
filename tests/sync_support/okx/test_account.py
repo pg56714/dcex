@@ -121,7 +121,12 @@ def test_get_leverage(client):
 
 @pytest.mark.private
 def test_get_adjust_leverage(client):
-    res = client.get_adjust_leverage(product_symbol="BTC-USDT-SWAP", instType="SWAP", mgnMode="cross", lever="3")
+    res = client.get_adjust_leverage(
+        product_symbol="BTC-USDT-SWAP",
+        instType="SWAP",
+        mgnMode="cross",
+        lever="3",
+    )
     assert res is not None
 
 
