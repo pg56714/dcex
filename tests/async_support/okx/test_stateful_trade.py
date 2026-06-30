@@ -40,7 +40,11 @@ async def client():
         api_secret=OKX_API_SECRET,
         passphrase=OKX_PASSPHRASE,
     ) as client_instance:
-        yield client_instance
+        await _cleanup(client_instance, Decimal("0"))
+        try:
+            yield client_instance
+        finally:
+            await _cleanup(client_instance, Decimal("0"))
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -167,10 +171,7 @@ async def _swap_position_size(client: Client) -> Decimal:
 
 
 async def _skip_if_existing_state(client: Client) -> None:
-    if await _open_orders(client, SPOT_SYMBOL) or await _open_orders(client, SWAP_SYMBOL):
-        pytest.skip("OKX already has open BTC orders; not touching unrelated orders.")
-    if await _swap_position_size(client) != 0:
-        pytest.skip("OKX BTC-USDT swap already has a position; not changing exposure.")
+    await _cleanup(client, Decimal("0"))
 
 
 async def _ensure_trading_usdt(client: Client, required: Decimal) -> Decimal:
@@ -179,7 +180,7 @@ async def _ensure_trading_usdt(client: Client, required: Decimal) -> Decimal:
         return Decimal("0")
     needed = required - available
     if await _funding_available(client, "USDT") < needed:
-        pytest.skip("Insufficient OKX USDT for stateful trading tests.")
+        pytest.fail("Insufficient OKX USDT for stateful trading tests.", pytrace=False)
     _assert_ok(
         await client.funds_transfer(
             ccy="USDT",
@@ -190,7 +191,7 @@ async def _ensure_trading_usdt(client: Client, required: Decimal) -> Decimal:
     )
     await asyncio.sleep(2)
     if await _spot_available(client, "USDT") < required:
-        pytest.skip("OKX trading USDT remains insufficient after transfer.")
+        pytest.fail("OKX trading USDT remains insufficient after transfer.", pytrace=False)
     return needed
 
 
@@ -248,9 +249,9 @@ def _is_empty_cancel_all_error(exc: FailedRequestError) -> bool:
 
 def _skip_if_order_no_longer_open(exc: FailedRequestError) -> None:
     if _is_order_no_longer_open(exc):
-        pytest.skip(f"OKX order was filled or canceled before amend/cancel: {exc}")
+        pytest.fail(f"OKX order was filled or canceled before amend/cancel: {exc}", pytrace=False)
     if _is_rate_limited(exc):
-        pytest.skip(f"OKX rate limit reached during live order lifecycle: {exc}")
+        pytest.fail(f"OKX rate limit reached during live order lifecycle: {exc}", pytrace=False)
     raise exc
 
 
@@ -282,28 +283,48 @@ async def _cancel_all_orders(client: Client, product_symbol: str) -> None:
 
 
 async def _cleanup(client: Client, initial_btc: Decimal) -> None:
-    with suppress(Exception):
-        if await _open_orders(client, SPOT_SYMBOL):
-            await _cancel_all_orders(client, SPOT_SYMBOL)
-    with suppress(Exception):
-        if await _open_orders(client, SWAP_SYMBOL):
-            await _cancel_all_orders(client, SWAP_SYMBOL)
-    with suppress(Exception):
-        if await _swap_position_size(client) != 0:
-            _assert_ok(await client.close_positions(product_symbol=SWAP_SYMBOL, mgnMode="cross"))
+    if await _open_orders(client, SPOT_SYMBOL):
+        await _cancel_all_orders(client, SPOT_SYMBOL)
+    if await _open_orders(client, SWAP_SYMBOL):
+        await _cancel_all_orders(client, SWAP_SYMBOL)
+    if await _swap_position_size(client) != 0:
+        _assert_ok(await client.close_positions(product_symbol=SWAP_SYMBOL, mgnMode="cross"))
+        await asyncio.sleep(2)
+    await _cleanup_spot_btc(client, initial_btc)
+
+    if await _open_orders(client, SPOT_SYMBOL) or await _open_orders(client, SWAP_SYMBOL):
+        pytest.fail("OKX still has open BTC orders after cleanup.", pytrace=False)
+    if await _swap_position_size(client) != 0:
+        pytest.fail("OKX BTC-USDT swap position still exists after cleanup.", pytrace=False)
+    _, step, _, _ = _spot_details(client)
+    if await _spot_available(client, "BTC") - initial_btc > step:
+        pytest.fail("OKX BTC spot balance still exists after cleanup.", pytrace=False)
+
+
+async def _cleanup_spot_btc(client: Client, initial_btc: Decimal) -> None:
+    _, step, min_size, min_notional = _spot_details(client)
+    delta = await _spot_available(client, "BTC") - initial_btc
+    if delta <= step:
+        return
+
+    sell_size = Decimal(_spot_sell_size(client, delta))
+    best_bid, _ = await _spot_orderbook_prices(client)
+    transferred = Decimal("0")
+    try:
+        if sell_size < min_size or sell_size * best_bid < min_notional:
+            quote = _spot_market_quote(client)
+            transferred += await _ensure_trading_usdt(client, quote)
+            _assert_ok(await client.place_market_buy_order(SPOT_SYMBOL, "cash", _fmt(quote)))
             await asyncio.sleep(2)
-    with suppress(Exception):
-        delta = await _spot_available(client, "BTC") - initial_btc
-        sell_size = _spot_sell_size(client, delta)
-        if Decimal(sell_size) > 0:
-            _assert_ok(
-                await client.place_market_sell_order(
-                    product_symbol=SPOT_SYMBOL,
-                    tdMode="cash",
-                    sz=sell_size,
-                )
+            sell_size = Decimal(
+                _spot_sell_size(client, await _spot_available(client, "BTC") - initial_btc)
             )
+
+        if sell_size > 0:
+            _assert_ok(await client.place_market_sell_order(SPOT_SYMBOL, "cash", _fmt(sell_size)))
             await asyncio.sleep(2)
+    finally:
+        await _return_to_funding(client, transferred)
 
 
 async def test_funds_transfer_round_trip(client):
@@ -314,7 +335,7 @@ async def test_funds_transfer_round_trip(client):
     elif trading >= TRANSFER_AMOUNT:
         from_account, to_account = "TRADING", "FUND"
     else:
-        pytest.skip("Insufficient OKX USDT for transfer round-trip.")
+        pytest.fail("Insufficient OKX USDT for transfer round-trip.", pytrace=False)
 
     response = _assert_ok(
         await client.funds_transfer(

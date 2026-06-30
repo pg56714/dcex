@@ -8,9 +8,9 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
     fetch_trading_details, first_bid_price, format_transfer_amount_ceil,
-    format_transfer_amount_floor, leveraged_margin_required, margin_target, minimum_order_quantity,
-    params, parse_positive, post_only_buy_price, push, require_env, require_live_trading,
-    require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
+    format_transfer_amount_floor, leveraged_margin_required, live_test_error, margin_target,
+    minimum_order_quantity, params, parse_positive, post_only_buy_price, push, require_env,
+    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
     wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
@@ -33,6 +33,7 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
         true,
         Duration::from_secs(20),
     )?;
+    cleanup_bybit_orders(&client, BTC_USDT_SPOT).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -46,7 +47,11 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
     let required_usdt = parse_positive(&price, "price")? * parse_positive(&quantity, "quantity")?;
     let transferred = match ensure_unified_usdt(&client, required_usdt * 1.01).await? {
         Some(amount) => amount,
-        None => return Ok(()),
+        None => {
+            return Err(live_test_error(
+                "Bybit unified account has insufficient transferable USDT for live stateful order",
+            ));
+        }
     };
 
     let order_result = super::common::exchange_method_request(
@@ -101,20 +106,13 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    if bybit_open_swap_orders(&client).await? {
-        eprintln!("skipping Bybit swap live stateful order; open BTC-USDT swap orders exist");
-        return Ok(());
-    }
+    cleanup_bybit_swap_state(&client).await?;
     let position_response = super::common::exchange_method_request(
         &client,
         "get_positions",
         params(&[("product_symbol", BTC_USDT_SWAP)]),
     )
     .await?;
-    if bybit_swap_position_abs_from(&position_response.data) > 0.0 {
-        eprintln!("skipping Bybit swap live stateful order; BTC-USDT swap position exists");
-        return Ok(());
-    }
     let position_idx = bybit_long_position_idx(&position_response.data);
 
     let orderbook = super::common::exchange_method_request(
@@ -136,7 +134,11 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
     let transferred = match ensure_unified_usdt(&client, margin_target(required_usdt)).await? {
         Some(amount) => amount,
-        None => return Ok(()),
+        None => {
+            return Err(live_test_error(
+                "Bybit swap has insufficient transferable USDT for live stateful order",
+            ));
+        }
     };
 
     let mut order_params = params(&[
@@ -246,9 +248,6 @@ async fn ensure_unified_usdt(client: &BybitClient, required: f64) -> dcex::Resul
     }
     let needed = required - unified;
     if account_usdt(client, "FUND").await? < needed {
-        eprintln!(
-            "skipping Bybit live stateful order; insufficient transferable USDT, required={required:.8}, unified={unified:.8}"
-        );
         return Ok(None);
     }
     let amount = format_transfer_amount_ceil(needed, 4);
@@ -309,6 +308,69 @@ async fn account_usdt(client: &BybitClient, account_type: &str) -> dcex::Result<
             "availableBalance",
         ],
     ))
+}
+
+async fn cleanup_bybit_orders(client: &BybitClient, product_symbol: &str) -> dcex::Result<()> {
+    let open = super::common::exchange_method_request(
+        client,
+        "get_open_orders",
+        params(&[("product_symbol", product_symbol), ("limit", "20")]),
+    )
+    .await?;
+    if contains_non_empty_array(&open.data, &["list"]) {
+        let cancel = super::common::exchange_method_request(
+            client,
+            "cancel_all_orders",
+            params(&[("product_symbol", product_symbol)]),
+        )
+        .await?;
+        assert_success(&cancel);
+        sleep(Duration::from_secs(1)).await;
+    }
+    let remaining = super::common::exchange_method_request(
+        client,
+        "get_open_orders",
+        params(&[("product_symbol", product_symbol), ("limit", "20")]),
+    )
+    .await?;
+    if contains_non_empty_array(&remaining.data, &["list"]) {
+        return Err(live_test_error(format!(
+            "Bybit {product_symbol} still has open orders after cleanup"
+        )));
+    }
+    Ok(())
+}
+
+async fn cleanup_bybit_swap_state(client: &BybitClient) -> dcex::Result<()> {
+    cleanup_bybit_orders(client, BTC_USDT_SWAP).await?;
+    let position = bybit_swap_position_abs(client).await?;
+    if position > 0.0 {
+        let response = super::common::exchange_method_request(
+            client,
+            "get_positions",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+        let mut close_params = params(&[
+            ("product_symbol", BTC_USDT_SWAP),
+            ("qty", format_transfer_amount_floor(position, 8).as_str()),
+            ("reduceOnly", "true"),
+        ]);
+        if let Some(position_idx) = bybit_long_position_idx(&response.data) {
+            push(&mut close_params, "positionIdx", position_idx);
+        }
+        let close =
+            super::common::exchange_method_request(client, "place_market_sell_order", close_params)
+                .await?;
+        assert_success(&close);
+        sleep(Duration::from_secs(2)).await;
+    }
+    if wait_for_flat_position(|| bybit_swap_position_abs(client)).await? != 0.0 {
+        return Err(live_test_error(
+            "Bybit BTC-USDT swap position still exists after cleanup",
+        ));
+    }
+    Ok(())
 }
 
 async fn bybit_open_swap_orders(client: &BybitClient) -> dcex::Result<bool> {

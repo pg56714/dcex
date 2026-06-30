@@ -43,7 +43,11 @@ async def client():
         futures_api_key=KRAKEN_FUTURES_API_KEY,
         futures_api_secret=KRAKEN_FUTURES_API_SECRET,
     ) as client_instance:
-        yield client_instance
+        await _cleanup_state(client_instance)
+        try:
+            yield client_instance
+        finally:
+            await _cleanup_state(client_instance)
 
 
 def _dec(value, default="0") -> Decimal:
@@ -121,7 +125,7 @@ async def _spot_symbol_with_funds(client: Client) -> tuple[str, str, Decimal, De
             )
             if await _spot_available(client, quote) >= volume * ask * Decimal("1.01"):
                 return product_symbol, quote, step, min_size, volume
-    pytest.skip("Insufficient Kraken spot quote balance for BTC spot order tests.")
+    pytest.fail("Insufficient Kraken spot quote balance for BTC spot order tests.", pytrace=False)
 
 
 async def _spot_limit_buy_params(client: Client) -> tuple[str, str, str]:
@@ -134,7 +138,7 @@ async def _spot_limit_buy_params(client: Client) -> tuple[str, str, str]:
         min_size,
     )
     if await _spot_available(client, quote) < price * volume:
-        pytest.skip("Insufficient Kraken spot quote balance for post-only order.")
+        pytest.fail("Insufficient Kraken spot quote balance for post-only order.", pytrace=False)
     return product_symbol, _fmt(volume), _fmt(price)
 
 
@@ -160,11 +164,7 @@ async def _cancel_spot(client: Client, txid: str) -> None:
 
 
 async def _skip_if_spot_open_orders(client: Client) -> None:
-    open_orders = (
-        _assert_spot_ok(await client.get_spot_open_orders()).get("result", {}).get("open", {})
-    )
-    if open_orders:
-        pytest.skip("Kraken spot already has open orders; not touching unrelated orders.")
+    await _cleanup_spot_state(client, Decimal("0"))
 
 
 async def _futures_accounts(client: Client) -> dict:
@@ -195,7 +195,7 @@ async def _ensure_futures_margin(client: Client, required: Decimal = Decimal("0.
     needed = required - await _futures_flex_available(client)
     amount = needed.quantize(Decimal("0.00000001"), rounding=ROUND_UP)
     if await _futures_cash_available(client, "usdt") < amount:
-        pytest.skip("Insufficient Kraken Futures cash USDT to fund flex margin.")
+        pytest.fail("Insufficient Kraken Futures cash USDT to fund flex margin.", pytrace=False)
     _assert_futures_ok(
         await client.futures_wallet_transfer(
             amount=_fmt(amount),
@@ -206,7 +206,9 @@ async def _ensure_futures_margin(client: Client, required: Decimal = Decimal("0.
     )
     await asyncio.sleep(2)
     if await _futures_flex_available(client) < required:
-        pytest.skip("Kraken Futures flex margin remains insufficient after transfer.")
+        pytest.fail(
+            "Kraken Futures flex margin remains insufficient after transfer.", pytrace=False
+        )
     return amount
 
 
@@ -248,11 +250,7 @@ async def _futures_position_size(client: Client) -> Decimal:
 
 
 async def _skip_if_futures_state(client: Client) -> None:
-    open_orders = _assert_futures_ok(await client.get_futures_open_orders()).get("openOrders", [])
-    if open_orders:
-        pytest.skip("Kraken Futures already has open orders; not touching unrelated orders.")
-    if await _futures_position_size(client) != 0:
-        pytest.skip("Kraken Futures already has a BTC position; not changing unrelated exposure.")
+    await _cleanup_futures_state(client)
 
 
 def _futures_min_size(client: Client) -> Decimal:
@@ -288,6 +286,112 @@ def _futures_order_id(response) -> str:
 async def _cancel_futures(client: Client, order_id: str) -> None:
     _assert_futures_ok(await client.cancel_futures_order(order_id=order_id))
     await asyncio.sleep(0.5)
+
+
+async def _spot_product_for_btc_cleanup(client: Client) -> tuple[str, str]:
+    for quote in SPOT_QUOTES:
+        product_symbol = f"BTC-{quote}-SPOT"
+        with suppress(Exception):
+            client.ptm.get_exchange_symbol("kraken", product_symbol)
+            await _spot_prices(client, product_symbol)
+            return product_symbol, quote
+    pytest.fail("No Kraken BTC spot market is available for cleanup.", pytrace=False)
+
+
+async def _cleanup_spot_btc(client: Client, initial_btc: Decimal) -> None:
+    current = await _spot_available(client, "BTC")
+    delta = current - initial_btc
+    if delta <= 0:
+        return
+
+    product_symbol, quote = await _spot_product_for_btc_cleanup(client)
+    _, step, min_size, min_notional = _spot_details(client, product_symbol)
+    sellable = _round_to_step(delta, step, ROUND_DOWN)
+    if sellable <= 0:
+        return
+
+    bid, ask = await _spot_prices(client, product_symbol)
+    if sellable < min_size or sellable * bid < min_notional:
+        target_base = max(min_size, min_notional / bid)
+        buy_volume = _round_to_step(target_base - sellable + step, step, ROUND_UP)
+        if buy_volume > 0:
+            required_quote = buy_volume * ask * Decimal("1.02")
+            if await _spot_available(client, quote) < required_quote:
+                pytest.fail(
+                    "Insufficient Kraken quote balance to top up BTC dust for cleanup.",
+                    pytrace=False,
+                )
+            _assert_spot_ok(
+                await client.place_spot_market_buy_order(product_symbol, _fmt(buy_volume))
+            )
+            await asyncio.sleep(3)
+            sellable = _round_to_step(
+                await _spot_available(client, "BTC") - initial_btc,
+                step,
+                ROUND_DOWN,
+            )
+
+    if sellable > 0:
+        _assert_spot_ok(await client.place_spot_market_sell_order(product_symbol, _fmt(sellable)))
+        await asyncio.sleep(3)
+
+
+async def _cleanup_spot_state(client: Client, initial_btc: Decimal) -> None:
+    open_orders = (
+        _assert_spot_ok(await client.get_spot_open_orders()).get("result", {}).get("open", {})
+    )
+    if open_orders:
+        _assert_spot_ok(await client.cancel_spot_all_orders())
+        await asyncio.sleep(1)
+    await _cleanup_spot_btc(client, initial_btc)
+
+    open_orders = (
+        _assert_spot_ok(await client.get_spot_open_orders()).get("result", {}).get("open", {})
+    )
+    if open_orders:
+        pytest.fail("Kraken spot still has open orders after cleanup.", pytrace=False)
+    if await _spot_available(client, "BTC") - initial_btc > Decimal("0"):
+        product_symbol, _ = await _spot_product_for_btc_cleanup(client)
+        _, step, _, _ = _spot_details(client, product_symbol)
+        if await _spot_available(client, "BTC") - initial_btc > step:
+            pytest.fail("Kraken BTC spot balance still exists after cleanup.", pytrace=False)
+
+
+async def _cleanup_futures_state(client: Client) -> None:
+    open_orders = _assert_futures_ok(await client.get_futures_open_orders()).get("openOrders", [])
+    if open_orders:
+        _assert_futures_ok(await client.cancel_futures_all_orders(product_symbol=FUTURES_SYMBOL))
+        await asyncio.sleep(1)
+
+    size = await _futures_position_size(client)
+    if size > 0:
+        _assert_futures_ok(
+            await client.place_futures_market_sell_order(
+                FUTURES_SYMBOL,
+                _fmt(abs(size)),
+                reduceOnly=True,
+            )
+        )
+        await asyncio.sleep(2)
+    elif size < 0:
+        _assert_futures_ok(
+            await client.place_futures_market_buy_order(
+                FUTURES_SYMBOL,
+                _fmt(abs(size)),
+                reduceOnly=True,
+            )
+        )
+        await asyncio.sleep(2)
+
+    if _assert_futures_ok(await client.get_futures_open_orders()).get("openOrders", []):
+        pytest.fail("Kraken Futures still has open orders after cleanup.", pytrace=False)
+    if await _futures_position_size(client) != 0:
+        pytest.fail("Kraken Futures BTC position still exists after cleanup.", pytrace=False)
+
+
+async def _cleanup_state(client: Client) -> None:
+    await _cleanup_spot_state(client, Decimal("0"))
+    await _cleanup_futures_state(client)
 
 
 def _is_kraken_service_unavailable(exc: FailedRequestError) -> bool:
@@ -337,7 +441,10 @@ async def _withdraw_futures_to_spot_safely(
 async def test_wallet_transfer_round_trip(client):
     initial_spot = await _spot_available(client, "USDT")
     if initial_spot < SPOT_TRANSFER_AMOUNT:
-        pytest.skip("Insufficient Kraken spot USDT for Spot-to-Futures transfer round-trip.")
+        pytest.fail(
+            "Insufficient Kraken spot USDT for Spot-to-Futures transfer round-trip.",
+            pytrace=False,
+        )
 
     transferred = False
     try:
@@ -361,14 +468,13 @@ async def test_wallet_transfer_round_trip(client):
         )
     finally:
         if transferred:
-            with suppress(Exception):
-                await _withdraw_futures_to_spot_safely(
-                    client,
-                    amount=_fmt(SPOT_TRANSFER_AMOUNT),
-                    currency="USDT",
-                    sourceWallet="flex",
-                    restored_spot_floor=initial_spot,
-                )
+            await _withdraw_futures_to_spot_safely(
+                client,
+                amount=_fmt(SPOT_TRANSFER_AMOUNT),
+                currency="USDT",
+                sourceWallet="flex",
+                restored_spot_floor=initial_spot,
+            )
         await asyncio.sleep(2)
 
 
@@ -378,8 +484,12 @@ async def test_futures_internal_transfer_round_trip(client):
     elif await _futures_cash_available(client, "usdt") >= FUTURES_TRANSFER_AMOUNT:
         from_account, to_account = "cash", "flex"
     else:
-        pytest.skip("Insufficient Kraken Futures USDT for internal transfer round-trip.")
+        pytest.fail(
+            "Insufficient Kraken Futures USDT for internal transfer round-trip.",
+            pytrace=False,
+        )
 
+    transferred = False
     _assert_futures_ok(
         await client.futures_wallet_transfer(
             amount=_fmt(FUTURES_TRANSFER_AMOUNT),
@@ -388,15 +498,22 @@ async def test_futures_internal_transfer_round_trip(client):
             unit="USDT",
         )
     )
-    await asyncio.sleep(2)
-    _assert_futures_ok(
-        await client.futures_wallet_transfer(
-            amount=_fmt(FUTURES_TRANSFER_AMOUNT),
-            fromAccount=to_account,
-            toAccount=from_account,
-            unit="USDT",
-        )
-    )
+    transferred = True
+    try:
+        await asyncio.sleep(2)
+    finally:
+        if transferred:
+            _assert_futures_ok(
+                await client.futures_wallet_transfer(
+                    amount=_fmt(FUTURES_TRANSFER_AMOUNT),
+                    fromAccount=to_account,
+                    toAccount=from_account,
+                    unit="USDT",
+                )
+            )
+            transferred = False
+
+    _assert_futures_ok(await client.get_futures_accounts())
 
 
 async def test_spot_post_only_order_lifecycle(client):
@@ -444,6 +561,7 @@ async def test_spot_market_round_trip_and_sell_wrappers(client):
     await _skip_if_spot_open_orders(client)
     product_symbol, _, step, min_size, volume = await _spot_symbol_with_funds(client)
     before = await _spot_available(client, "BTC")
+    initial_btc = before
     acquired = Decimal("0")
     try:
         _assert_spot_ok(await client.place_spot_market_order(product_symbol, "buy", _fmt(volume)))
@@ -481,11 +599,7 @@ async def test_spot_market_round_trip_and_sell_wrappers(client):
         )
         acquired = Decimal("0")
     finally:
-        leftover = _round_to_step(await _spot_available(client, "BTC") - before, step, ROUND_DOWN)
-        cleanup_size = max(leftover, acquired)
-        if cleanup_size >= min_size:
-            with suppress(Exception):
-                await client.place_spot_market_sell_order(product_symbol, _fmt(cleanup_size))
+        await _cleanup_spot_btc(client, initial_btc)
 
     _assert_spot_ok(await client.get_spot_closed_orders())
     _assert_spot_ok(await client.get_spot_trade_history())
@@ -588,11 +702,7 @@ async def test_futures_market_round_trip(client):
         await asyncio.sleep(2)
         assert await _futures_position_size(client) == 0
     finally:
-        if await _futures_position_size(client) > 0:
-            with suppress(Exception):
-                await client.place_futures_market_sell_order(
-                    FUTURES_SYMBOL,
-                    size,
-                    reduceOnly=True,
-                )
-        await _return_futures_margin(client, transferred)
+        try:
+            await _cleanup_futures_state(client)
+        finally:
+            await _return_futures_margin(client, transferred)

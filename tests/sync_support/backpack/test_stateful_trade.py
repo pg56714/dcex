@@ -36,8 +36,10 @@ def client():
         timeout=20,
     )
     try:
+        _cleanup_test_state(client_instance)
         yield client_instance
     finally:
+        _cleanup_test_state(client_instance)
         client_instance.close()
 
 
@@ -148,18 +150,9 @@ def _position_size(client: Client, symbol: str) -> Decimal:
     return size
 
 
-def _skip_if_existing_state(client: Client) -> None:
-    if _open_orders(client, SPOT_SYMBOL):
-        pytest.skip("Backpack spot already has SOL_USDC open orders.")
-    if _open_orders(client, PERP_SYMBOL):
-        pytest.skip("Backpack perp already has SOL_USDC_PERP open orders.")
-    if _position_size(client, PERP_SYMBOL) != 0:
-        pytest.skip("Backpack already has a SOL_USDC_PERP position.")
-
-
 def _ensure_usdc(client: Client, required: Decimal) -> None:
     if _available(client, "USDC") + _lent(client, "USDC") < required:
-        pytest.skip("Insufficient Backpack USDC for stateful test.")
+        pytest.fail("Insufficient Backpack USDC for stateful test.")
 
 
 def _cancel_order(client: Client, symbol: str, order_id: str) -> None:
@@ -173,15 +166,57 @@ def _cancel_all_symbol_orders(client: Client, symbol: str) -> None:
     time.sleep(1)
 
 
+def _return_spot_sol_delta(client: Client, initial_sol: Decimal) -> None:
+    _, step, min_qty = _market_details(client, SPOT_SYMBOL)
+    acquired = max(_total_asset(client, "SOL") - initial_sol, Decimal("0"))
+    remaining = _round_to_step(acquired, step, ROUND_DOWN)
+    if remaining >= min_qty:
+        client.place_market_order(
+            SPOT_SYMBOL,
+            side="Ask",
+            quantity=_fmt(remaining),
+            autoLend=True,
+            autoLendRedeem=True,
+        )
+        time.sleep(1)
+    if initial_sol == 0 and 0 < _total_asset(client, "SOL") < min_qty:
+        client.convert_dust("SOL")
+        time.sleep(1)
+
+
+def _close_perp_position(client: Client) -> None:
+    for _ in range(3):
+        size = _position_size(client, PERP_SYMBOL)
+        if size == 0:
+            return
+        client.place_market_order(
+            PERP_SYMBOL,
+            side="Ask" if size > 0 else "Bid",
+            quantity=_fmt(abs(size)),
+            reduceOnly=True,
+            autoLend=True,
+        )
+        time.sleep(2)
+    assert _position_size(client, PERP_SYMBOL) == 0
+
+
+def _cleanup_test_state(client: Client) -> None:
+    _cancel_all_symbol_orders(client, SPOT_SYMBOL)
+    _cancel_all_symbol_orders(client, PERP_SYMBOL)
+    _close_perp_position(client)
+    _return_spot_sol_delta(client, Decimal("0"))
+    assert _open_orders(client, SPOT_SYMBOL) == []
+    assert _open_orders(client, PERP_SYMBOL) == []
+    assert _position_size(client, PERP_SYMBOL) == 0
+
+
 def test_spot_stateful_order_lifecycle(client):
-    _skip_if_existing_state(client)
+    _cleanup_test_state(client)
     min_qty = _min_quantity(client, SPOT_SYMBOL)
     qty = min_qty * 2
     _, ask = _book_prices(client, SPOT_SYMBOL)
     _ensure_usdc(client, qty * ask * Decimal("1.01"))
     initial_sol = _total_asset(client, "SOL")
-    if initial_sol >= min_qty:
-        pytest.skip("Backpack already has a tradable SOL balance.")
 
     try:
         client.place_market_order(
@@ -241,25 +276,11 @@ def test_spot_stateful_order_lifecycle(client):
         assert isinstance(client.get_fill_history(product_symbol=SPOT_SYMBOL, limit=20), list)
     finally:
         _cancel_all_symbol_orders(client, SPOT_SYMBOL)
-        with suppress(Exception):
-            _, step, min_qty = _market_details(client, SPOT_SYMBOL)
-            acquired = max(_total_asset(client, "SOL") - initial_sol, Decimal("0"))
-            remaining = _round_to_step(acquired, step, ROUND_DOWN)
-            if remaining >= min_qty:
-                client.place_market_order(
-                    SPOT_SYMBOL,
-                    side="Ask",
-                    quantity=_fmt(remaining),
-                    autoLend=True,
-                    autoLendRedeem=True,
-                )
-                time.sleep(1)
-            if initial_sol == 0 and 0 < _total_asset(client, "SOL") < min_qty:
-                client.convert_dust("SOL")
+        _return_spot_sol_delta(client, initial_sol)
 
 
 def test_perp_stateful_order_lifecycle(client):
-    _skip_if_existing_state(client)
+    _cleanup_test_state(client)
     qty = _min_quantity(client, PERP_SYMBOL)
     _, ask = _book_prices(client, PERP_SYMBOL)
     _ensure_usdc(client, qty * ask * Decimal("0.2"))
@@ -317,13 +338,4 @@ def test_perp_stateful_order_lifecycle(client):
         assert isinstance(client.get_fill_history(product_symbol=PERP_SYMBOL, limit=20), list)
     finally:
         _cancel_all_symbol_orders(client, PERP_SYMBOL)
-        with suppress(Exception):
-            size = _position_size(client, PERP_SYMBOL)
-            if size > 0:
-                client.place_market_order(
-                    PERP_SYMBOL,
-                    side="Ask",
-                    quantity=_fmt(size),
-                    reduceOnly=True,
-                    autoLend=True,
-                )
+        _close_perp_position(client)

@@ -71,7 +71,11 @@ def account_snapshot():
 @pytest_asyncio.fixture
 async def client(account_snapshot):
     async with Client(wallet_address=WALLET_ADDRESS, private_key=PRIVATE_KEY) as client_instance:
-        yield client_instance
+        await _cleanup_account_state(client_instance)
+        try:
+            yield client_instance
+        finally:
+            await _cleanup_account_state(client_instance)
 
 
 def _cloid() -> str:
@@ -167,8 +171,6 @@ async def _btc_position_size(client: Client) -> Decimal:
 
 
 async def _account_value(client: Client) -> Decimal:
-    if PERPS_ACCOUNT_VALUE is not None:
-        return PERPS_ACCOUNT_VALUE
     data = await client.clearinghouse_state(user=await _account_user(client))
     summary = data.get("marginSummary", {}) if isinstance(data, dict) else {}
     return Decimal(str(summary.get("accountValue", "0")))
@@ -179,10 +181,6 @@ async def _spot_available_usdc(client: Client) -> Decimal:
 
 
 async def _spot_available(client: Client, coin: str) -> Decimal:
-    if SPOT_AVAILABLE_USDC is not None:
-        if coin != "USDC":
-            return await _spot_available_uncached(client, coin)
-        return SPOT_AVAILABLE_USDC
     return await _spot_available_uncached(client, coin)
 
 
@@ -194,20 +192,27 @@ async def _spot_available_uncached(client: Client, coin: str) -> Decimal:
     return Decimal("0")
 
 
-async def _skip_if_account_state(client: Client) -> None:
+async def _cleanup_account_state(client: Client) -> None:
+    await _cancel_open_orders(client)
+    await _close_btc_position(client)
+    await _close_spot_test_delta(client, Decimal("0"), await _spot_available(client, "PURR"))
+    await _cancel_open_orders(client)
     if await _open_orders(client):
-        pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
-    if await _positions(client):
-        pytest.skip("Hyperliquid account already has a position; not changing exposure.")
+        pytest.fail("Hyperliquid account still has open orders after cleanup.", pytrace=False)
+    if await _btc_position_size(client) != 0:
+        pytest.fail("Hyperliquid BTC position still exists after cleanup.", pytrace=False)
+    if await _spot_available(client, "PURR") >= Decimal("1"):
+        pytest.fail("Hyperliquid PURR spot balance still exists after cleanup.", pytrace=False)
 
 
 async def _skip_if_unfunded(client: Client) -> None:
     if await _account_value(client) <= 0:
         spot_usdc = await _spot_available_usdc(client)
         if spot_usdc < Decimal("2"):
-            pytest.skip(
+            pytest.fail(
                 "Hyperliquid perps accountValue is 0 and spot USDC is too low "
-                f"for unified account margin: {spot_usdc}."
+                f"for unified account margin: {spot_usdc}.",
+                pytrace=False,
             )
 
 
@@ -270,7 +275,12 @@ async def _cancel_open_orders(client: Client) -> None:
         coin = order.get("coin")
         if oid is None:
             continue
-        product_symbol = SPOT_SYMBOL if coin == "PURR" else SYMBOL
+        if coin == "PURR":
+            product_symbol = SPOT_SYMBOL
+        elif coin == "BTC":
+            product_symbol = SYMBOL
+        else:
+            pytest.fail(f"Unexpected Hyperliquid open order coin during cleanup: {order}")
         await client.cancel_order(product_symbol=product_symbol, oid=int(oid))
     await asyncio.sleep(2)
 
@@ -348,13 +358,39 @@ async def _close_btc_position(client: Client) -> None:
         return
     size = format(abs(position_size).normalize(), "f")
     if position_size > 0:
-        _assert_exchange_response(
-            await client.place_future_market_sell_order(product_symbol=SYMBOL, size=size)
+        price = _format_hyperliquid_price(
+            Decimal(str((await client.get_l2book(product_symbol=SYMBOL))["levels"][0][0]["px"]))
+            * Decimal("0.995"),
+            ROUND_DOWN,
+        )
+        close_order = await client.place_order(
+            product_symbol=SYMBOL,
+            isBuy=False,
+            price=price,
+            size=size,
+            reduceOnly=True,
+            tif="Ioc",
+            cloid=_cloid(),
         )
     else:
-        _assert_exchange_response(
-            await client.place_future_market_buy_order(product_symbol=SYMBOL, size=size)
+        price = _format_hyperliquid_price(
+            Decimal(str((await client.get_l2book(product_symbol=SYMBOL))["levels"][1][0]["px"]))
+            * Decimal("1.005"),
+            ROUND_UP,
         )
+        close_order = await client.place_order(
+            product_symbol=SYMBOL,
+            isBuy=True,
+            price=price,
+            size=size,
+            reduceOnly=True,
+            tif="Ioc",
+            cloid=_cloid(),
+        )
+    _assert_exchange_response(close_order)
+    message = _order_error_message(close_order)
+    if message:
+        pytest.fail(f"Hyperliquid BTC reduce-only close failed: {message}", pytrace=False)
 
     for _ in range(10):
         await asyncio.sleep(1)
@@ -474,7 +510,7 @@ async def test_signed_error_response_trade_endpoints(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_post_only_order_lifecycle(client):
-    await _skip_if_account_state(client)
+    await _cleanup_account_state(client)
     await _skip_if_unfunded(client)
 
     size = await _size(client)
@@ -504,7 +540,7 @@ async def test_post_only_order_lifecycle(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_limit_wrappers_and_cancel_by_cloid(client):
-    await _skip_if_account_state(client)
+    await _cleanup_account_state(client)
     await _skip_if_unfunded(client)
 
     size = await _size(client)
@@ -561,10 +597,9 @@ async def test_limit_wrappers_and_cancel_by_cloid(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_spot_post_only_order_lifecycle(client):
-    if await _open_orders(client):
-        pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
+    await _cleanup_account_state(client)
     if await _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
-        pytest.skip("Insufficient spot USDC for Hyperliquid spot post-only order.")
+        pytest.fail("Insufficient spot USDC for Hyperliquid spot post-only order.", pytrace=False)
 
     oid = None
     try:
@@ -591,10 +626,9 @@ async def test_spot_post_only_order_lifecycle(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_spot_market_round_trip(client):
-    if await _open_orders(client):
-        pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
+    await _cleanup_account_state(client)
     if await _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
-        pytest.skip("Insufficient spot USDC for Hyperliquid spot market round-trip.")
+        pytest.fail("Insufficient spot USDC for Hyperliquid spot market round-trip.", pytrace=False)
 
     before = await _spot_available(client, "PURR")
     bought_size = Decimal("0")
@@ -650,7 +684,7 @@ async def test_spot_market_round_trip(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_modify_order_wrappers(client):
-    await _skip_if_account_state(client)
+    await _cleanup_account_state(client)
     await _skip_if_unfunded(client)
 
     size = await _size(client)
@@ -664,7 +698,7 @@ async def test_modify_order_wrappers(client):
         )
         oid = _extract_oid(order)
         if oid is None:
-            pytest.skip(f"Hyperliquid did not rest modify source order: {order}")
+            pytest.fail(f"Hyperliquid did not rest modify source order: {order}", pytrace=False)
         new_price = str(int(Decimal(await _post_only_buy_price(client)) * Decimal("0.99")))
         _assert_exchange_response(
             await client.modify_order(
@@ -703,7 +737,7 @@ async def test_modify_order_wrappers(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_market_wrapper_buy_and_sell_are_reachable_when_funded(client):
-    await _skip_if_account_state(client)
+    await _cleanup_account_state(client)
     await _skip_if_unfunded(client)
 
     size = await _size(client)

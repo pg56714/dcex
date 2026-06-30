@@ -3,7 +3,6 @@
 import os
 import time
 import uuid
-from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -42,8 +41,10 @@ def client():
         timeout=20,
     )
     try:
+        _cleanup_state(client_instance)
         yield client_instance
     finally:
+        _cleanup_state(client_instance)
         client_instance.close()
 
 
@@ -76,8 +77,9 @@ def _assert_ok(response):
 
 def _skip_if_unified_account_error(exc: FailedRequestError) -> None:
     if "40085" in str(exc) or "Unified Account mode" in str(exc):
-        pytest.skip(
-            "Bitget account is in Unified Account mode; Classic Account API is unsupported."
+        pytest.fail(
+            "Bitget account is in Unified Account mode; Classic Account API is unsupported.",
+            pytrace=False,
         )
 
 
@@ -270,20 +272,9 @@ def _futures_position_size(client: Client) -> Decimal:
     return size
 
 
-def _skip_if_existing_state(client: Client) -> None:
-    if _spot_open_orders(client):
-        pytest.skip("Bitget spot already has BTCUSDT open orders; not touching unrelated orders.")
-    if _futures_open_orders(client):
-        pytest.skip(
-            "Bitget futures already has BTCUSDT open orders; not touching unrelated orders."
-        )
-    if _futures_position_size(client) != 0:
-        pytest.skip("Bitget futures already has a BTCUSDT position; not changing exposure.")
-
-
 def _ensure_spot_usdt(client: Client, amount: Decimal) -> None:
     if _spot_available(client, "USDT") < amount:
-        pytest.skip("Insufficient Bitget spot USDT for stateful test.")
+        pytest.fail("Insufficient Bitget spot USDT for stateful test.")
 
 
 def _transfer(client: Client, amount: Decimal, from_type: str, to_type: str) -> None:
@@ -302,14 +293,14 @@ def _transfer(client: Client, amount: Decimal, from_type: str, to_type: str) -> 
 def _ensure_futures_margin(client: Client, amount: Decimal = FUTURES_TRANSFER_AMOUNT) -> Decimal:
     if _is_uta(client):
         if _futures_available(client) < Decimal("1"):
-            pytest.skip("Insufficient Bitget UTA USDT for futures stateful test.")
+            pytest.fail("Insufficient Bitget UTA USDT for futures stateful test.")
         return Decimal("0")
     if _futures_available(client) >= Decimal("1"):
         return Decimal("0")
     _ensure_spot_usdt(client, amount)
     _transfer(client, amount, "spot", "usdt_futures")
     if _futures_available(client) <= 0:
-        pytest.skip("Bitget futures USDT remains unavailable after transfer.")
+        pytest.fail("Bitget futures USDT remains unavailable after transfer.")
     return amount
 
 
@@ -564,20 +555,48 @@ def _get_futures_fills(client: Client) -> dict:
 
 def _cleanup_spot_btc(client: Client, initial_btc: Decimal) -> None:
     extra = _spot_sell_size(client, _spot_available(client, "BTC") - initial_btc)
-    _, _, _, min_notional = _spot_details(client)
+    _, step, min_size, min_notional = _spot_details(client)
     bid, _ = _spot_prices(client)
+    if extra > 0 and (extra < min_size or extra * bid < min_notional):
+        notional = _spot_market_notional(client)
+        _ensure_spot_usdt(client, notional)
+        _assert_ok(_place_spot_market(client, "buy", _fmt(notional)))
+        time.sleep(2)
+        extra = _spot_sell_size(client, _spot_available(client, "BTC") - initial_btc)
+        bid, _ = _spot_prices(client)
     if extra > 0 and extra * bid >= min_notional:
         _assert_ok(_place_spot_market(client, "sell", _fmt(extra)))
         time.sleep(2)
+    assert _spot_available(client, "BTC") - initial_btc <= step
 
 
 def _cleanup_futures(client: Client) -> None:
-    size = _futures_position_size(client)
-    if size > 0:
-        _assert_ok(_place_futures_market(client, "sell", _fmt(abs(size)), "yes"))
-    elif size < 0:
-        _assert_ok(_place_futures_market(client, "buy", _fmt(abs(size)), "yes"))
-    time.sleep(2)
+    for _ in range(3):
+        size = _futures_position_size(client)
+        if size == 0:
+            return
+        if size > 0:
+            _assert_ok(_place_futures_market(client, "sell", _fmt(abs(size)), "yes"))
+        elif size < 0:
+            _assert_ok(_place_futures_market(client, "buy", _fmt(abs(size)), "yes"))
+        time.sleep(2)
+    assert _futures_position_size(client) == 0
+
+
+def _cleanup_state(client: Client) -> None:
+    for order in _spot_open_orders(client):
+        order_id = order.get("orderId") or order.get("order_id")
+        if order_id:
+            _cancel_spot(client, str(order_id))
+    for order in _futures_open_orders(client):
+        order_id = order.get("orderId") or order.get("order_id")
+        if order_id:
+            _cancel_futures(client, str(order_id))
+    _cleanup_futures(client)
+    _cleanup_spot_btc(client, Decimal("0"))
+    assert _spot_open_orders(client) == []
+    assert _futures_open_orders(client) == []
+    assert _futures_position_size(client) == 0
 
 
 def _safe_setting_call(call) -> None:
@@ -592,8 +611,11 @@ def _safe_setting_call(call) -> None:
 
 def test_transfer_round_trip(client):
     if _is_uta(client):
-        pytest.skip("Bitget UTA uses shared margin; spot-to-futures transfer is not applicable.")
-    _skip_if_existing_state(client)
+        pytest.fail(
+            "Bitget UTA uses shared margin; spot-to-futures transfer is not applicable.",
+            pytrace=False,
+        )
+    _cleanup_state(client)
     _ensure_spot_usdt(client, Decimal("1"))
     _transfer(client, Decimal("1"), "spot", "usdt_futures")
     _transfer(client, Decimal("1"), "usdt_futures", "spot")
@@ -601,7 +623,7 @@ def test_transfer_round_trip(client):
 
 
 def test_spot_stateful_order_lifecycle(client):
-    _skip_if_existing_state(client)
+    _cleanup_state(client)
     initial_btc = _spot_available(client, "BTC")
     spot_notional = _spot_market_notional(client)
     _ensure_spot_usdt(client, spot_notional)
@@ -689,12 +711,11 @@ def test_spot_stateful_order_lifecycle(client):
         _assert_ok(_get_spot_history_orders(client))
         _assert_ok(_get_spot_fills(client))
     finally:
-        with suppress(Exception):
-            _cleanup_spot_btc(client, initial_btc)
+        _cleanup_spot_btc(client, initial_btc)
 
 
 def test_futures_stateful_order_lifecycle(client):
-    _skip_if_existing_state(client)
+    _cleanup_state(client)
     transferred = _ensure_futures_margin(client)
     try:
         if _is_uta(client):
@@ -787,6 +808,5 @@ def test_futures_stateful_order_lifecycle(client):
         _assert_ok(_get_futures_history_orders(client))
         _assert_ok(_get_futures_fills(client))
     finally:
-        with suppress(Exception):
-            _cleanup_futures(client)
+        _cleanup_futures(client)
         _return_futures_margin(client, transferred)

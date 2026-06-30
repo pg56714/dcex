@@ -30,10 +30,19 @@ pytestmark = [
 
 @pytest.fixture
 def client():
-    return Client(
+    client_instance = Client(
         api_key=BINANCE_API_KEY,
         api_secret=BINANCE_API_SECRET,
     )
+    _cleanup_futures_test_state(client_instance)
+    _return_spot_btc_delta(client_instance, Decimal("0"))
+    try:
+        yield client_instance
+    finally:
+        try:
+            _return_spot_btc_delta(client_instance, Decimal("0"))
+        finally:
+            _cleanup_futures_test_state(client_instance)
 
 
 def _filters(exchange_info: dict) -> dict[str, dict]:
@@ -101,7 +110,7 @@ def _spot_best_bid(client: Client, product_symbol: str) -> Decimal:
     book = client.get_spot_orderbook(product_symbol=product_symbol, limit=5)
     bids = book.get("bids", []) if isinstance(book, dict) else []
     if not bids:
-        pytest.skip(f"{product_symbol} spot orderbook did not return bids.")
+        pytest.fail(f"{product_symbol} spot orderbook did not return bids.", pytrace=False)
     return Decimal(str(bids[0][0]))
 
 
@@ -109,7 +118,7 @@ def _spot_best_ask(client: Client, product_symbol: str) -> Decimal:
     book = client.get_spot_orderbook(product_symbol=product_symbol, limit=5)
     asks = book.get("asks", []) if isinstance(book, dict) else []
     if not asks:
-        pytest.skip(f"{product_symbol} spot orderbook did not return asks.")
+        pytest.fail(f"{product_symbol} spot orderbook did not return asks.", pytrace=False)
     return Decimal(str(asks[0][0]))
 
 
@@ -198,6 +207,20 @@ def _futures_available(client: Client, asset: str) -> Decimal:
     return Decimal("0")
 
 
+def _rows(payload: object, *keys: str) -> list:
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict):
+        for key in keys:
+            value = payload.get(key)
+            if isinstance(value, list):
+                return value
+        value = payload.get("data")
+        if isinstance(value, list):
+            return value
+    return []
+
+
 def _ensure_balance(
     client: Client,
     required: Decimal,
@@ -229,7 +252,7 @@ def _ensure_balance(
             )
             time.sleep(1)
             return needed, reverse_type
-    pytest.skip(f"Insufficient Binance USDT for {destination} stateful tests.")
+    pytest.fail(f"Insufficient Binance USDT for {destination} stateful tests.", pytrace=False)
 
 
 def _return_transfer(client: Client, amount: Decimal, transfer_type: str | None) -> None:
@@ -260,15 +283,80 @@ def _futures_position_amt(client: Client, product_symbol: str) -> Decimal:
 
 
 def _close_futures_position(client: Client, product_symbol: str) -> None:
-    amount = _futures_position_amt(client, product_symbol)
-    if amount == 0:
-        return
-    client.place_market_order(
-        product_symbol=product_symbol,
-        side="SELL" if amount > 0 else "BUY",
-        quantity=_format_decimal(abs(amount)),
-        reduceOnly="true",
-    )
+    for _ in range(3):
+        amount = _futures_position_amt(client, product_symbol)
+        if amount == 0:
+            return
+        client.place_market_order(
+            product_symbol=product_symbol,
+            side="SELL" if amount > 0 else "BUY",
+            quantity=_format_decimal(abs(amount)),
+            reduceOnly="true",
+            newOrderRespType="RESULT",
+        )
+        for _ in range(10):
+            time.sleep(1)
+            if _futures_position_amt(client, product_symbol) == 0:
+                return
+    raise AssertionError(f"{product_symbol} futures position did not close.")
+
+
+def _cleanup_futures_test_state(client: Client) -> None:
+    if client.get_open_orders(product_symbol=FUTURES_SYMBOL):
+        client.cancel_all_open_orders(product_symbol=FUTURES_SYMBOL)
+    if _rows(client.get_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL), "orders"):
+        client.cancel_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL)
+    _close_futures_position(client, FUTURES_SYMBOL)
+    if client.get_open_orders(product_symbol=FUTURES_SYMBOL):
+        pytest.fail("Binance futures still has open orders after cleanup.", pytrace=False)
+    if _rows(client.get_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL), "orders"):
+        pytest.fail("Binance futures still has open algo orders after cleanup.", pytrace=False)
+    if _futures_position_amt(client, FUTURES_SYMBOL) != 0:
+        pytest.fail("Binance futures position still exists after cleanup.", pytrace=False)
+
+
+def _return_spot_btc_delta(client: Client, btc_before: Decimal) -> None:
+    filters = _filters(_symbol_exchange_info(client, SPOT_SYMBOL, futures=False))
+    step_size = _step_size(client, SPOT_SYMBOL, futures=False)
+    min_qty = Decimal(filters["LOT_SIZE"]["minQty"])
+    min_notional = _minimum_notional(filters, Decimal("10"))
+    for _ in range(3):
+        remaining = _round_to_step(_spot_free(client, "BTC") - btc_before, step_size, ROUND_DOWN)
+        if remaining <= 0:
+            return
+        best_bid = _spot_best_bid(client, SPOT_SYMBOL)
+        transferred = Decimal("0")
+        reverse_type = None
+        try:
+            if remaining < min_qty or remaining * best_bid < min_notional:
+                quote_amount = _safe_spot_market_quote(client, SPOT_SYMBOL)
+                transferred, reverse_type = _ensure_balance(client, quote_amount, "spot")
+                client.place_order(
+                    product_symbol=SPOT_SYMBOL,
+                    side="BUY",
+                    type_="MARKET",
+                    quoteOrderQty=_format_decimal(quote_amount),
+                    newOrderRespType="FULL",
+                )
+                time.sleep(1)
+                remaining = _round_to_step(
+                    _spot_free(client, "BTC") - btc_before,
+                    step_size,
+                    ROUND_DOWN,
+                )
+
+            if remaining <= 0:
+                return
+            client.place_market_sell_order(
+                product_symbol=SPOT_SYMBOL,
+                quantity=_format_decimal(remaining),
+                newOrderRespType="FULL",
+            )
+            time.sleep(1)
+        finally:
+            _return_transfer(client, transferred, reverse_type)
+    remaining = _round_to_step(_spot_free(client, "BTC") - btc_before, step_size, ROUND_DOWN)
+    assert remaining <= 0
 
 
 def test_universal_transfer_round_trip(client):
@@ -282,7 +370,7 @@ def test_universal_transfer_round_trip(client):
     elif futures >= TRANSFER_AMOUNT:
         forward, reverse = "UMFUTURE_MAIN", "MAIN_UMFUTURE"
     else:
-        pytest.skip("Insufficient Binance USDT for universal transfer round-trip.")
+        pytest.fail("Insufficient Binance USDT for universal transfer round-trip.", pytrace=False)
 
     response = client.create_universal_transfer(
         type_=forward,
@@ -304,6 +392,7 @@ def test_universal_transfer_round_trip(client):
 @pytest.mark.private
 def test_spot_post_only_order_lifecycle(client):
     quantity, price = _safe_buy_order_params(client, SPOT_SYMBOL, futures=False)
+    btc_before = _spot_free(client, "BTC")
     transferred, reverse_type = _ensure_balance(
         client,
         Decimal(quantity) * Decimal(price) * Decimal("1.05"),
@@ -337,6 +426,7 @@ def test_spot_post_only_order_lifecycle(client):
                 if order is not None:
                     _cancel_order_if_present(client, SPOT_SYMBOL, int(order["orderId"]))
     finally:
+        _return_spot_btc_delta(client, btc_before)
         _return_transfer(client, transferred, reverse_type)
 
     assert isinstance(client.get_all_orders(product_symbol=SPOT_SYMBOL, limit=1), list)
@@ -346,9 +436,10 @@ def test_spot_post_only_order_lifecycle(client):
 @pytest.mark.private
 def test_spot_cancel_all_open_orders(client):
     if client.get_open_orders(product_symbol=SPOT_SYMBOL):
-        pytest.skip("BTCUSDT spot already has open orders; not canceling unrelated orders.")
+        client.cancel_all_open_orders(product_symbol=SPOT_SYMBOL)
 
     quantity, price = _safe_buy_order_params(client, SPOT_SYMBOL, futures=False)
+    btc_before = _spot_free(client, "BTC")
     transferred, reverse_type = _ensure_balance(
         client,
         Decimal(quantity) * Decimal(price) * Decimal("1.05"),
@@ -365,6 +456,7 @@ def test_spot_cancel_all_open_orders(client):
     finally:
         if client.get_open_orders(product_symbol=SPOT_SYMBOL):
             client.cancel_all_open_orders(product_symbol=SPOT_SYMBOL)
+        _return_spot_btc_delta(client, btc_before)
         _return_transfer(client, transferred, reverse_type)
 
 
@@ -435,22 +527,13 @@ def test_spot_market_order_round_trip(client):
             )
             assert sell["status"] == "FILLED"
     finally:
-        remaining = _round_to_step(
-            _spot_free(client, "BTC") - btc_before,
-            step_size,
-            ROUND_DOWN,
-        )
-        if remaining > 0:
-            client.place_market_sell_order(
-                product_symbol=SPOT_SYMBOL,
-                quantity=_format_decimal(remaining),
-                newOrderRespType="FULL",
-            )
+        _return_spot_btc_delta(client, btc_before)
         _return_transfer(client, transferred, reverse_type)
 
 
 @pytest.mark.private
 def test_futures_post_only_order_lifecycle(client):
+    _cleanup_futures_test_state(client)
     quantity, price = _safe_buy_order_params(client, FUTURES_SYMBOL, futures=True)
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
     transferred, reverse_type = _ensure_balance(
@@ -478,7 +561,10 @@ def test_futures_post_only_order_lifecycle(client):
             )
         except FailedRequestError as exc:
             if "insufficient" in str(exc).lower() or "-2019" in str(exc):
-                pytest.skip(f"Insufficient Binance futures margin for post-only order: {exc}")
+                pytest.fail(
+                    f"Insufficient Binance futures margin for post-only order: {exc}",
+                    pytrace=False,
+                )
             raise
         order_id = int(order["orderId"])
         assert (
@@ -489,6 +575,7 @@ def test_futures_post_only_order_lifecycle(client):
     finally:
         if order is not None:
             _cancel_order_if_present(client, FUTURES_SYMBOL, int(order["orderId"]))
+        _cleanup_futures_test_state(client)
         _return_transfer(client, transferred, reverse_type)
 
     assert isinstance(client.get_all_orders(product_symbol=FUTURES_SYMBOL, limit=1), list)
@@ -499,10 +586,7 @@ def test_futures_post_only_order_lifecycle(client):
 
 @pytest.mark.private
 def test_futures_cancel_all_open_orders(client):
-    if client.get_open_orders(product_symbol=FUTURES_SYMBOL):
-        pytest.skip("BTCUSDT futures already has open orders; not canceling unrelated orders.")
-    if _futures_position_amt(client, FUTURES_SYMBOL) != 0:
-        pytest.skip("BTCUSDT futures already has a position; not changing unrelated exposure.")
+    _cleanup_futures_test_state(client)
 
     quantity, price = _safe_buy_order_params(client, FUTURES_SYMBOL, futures=True)
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
@@ -522,13 +606,13 @@ def test_futures_cancel_all_open_orders(client):
     finally:
         if client.get_open_orders(product_symbol=FUTURES_SYMBOL):
             client.cancel_all_open_orders(product_symbol=FUTURES_SYMBOL)
+        _cleanup_futures_test_state(client)
         _return_transfer(client, transferred, reverse_type)
 
 
 @pytest.mark.private
 def test_futures_market_long_round_trip(client):
-    if _futures_position_amt(client, FUTURES_SYMBOL) != 0:
-        pytest.skip("BTCUSDT futures already has a position; not changing unrelated exposure.")
+    _cleanup_futures_test_state(client)
 
     quantity = _safe_market_quantity(client, FUTURES_SYMBOL)
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
@@ -554,8 +638,7 @@ def test_futures_market_long_round_trip(client):
 
 @pytest.mark.private
 def test_futures_market_short_round_trip(client):
-    if _futures_position_amt(client, FUTURES_SYMBOL) != 0:
-        pytest.skip("BTCUSDT futures already has a position; not changing unrelated exposure.")
+    _cleanup_futures_test_state(client)
 
     quantity = _safe_market_quantity(client, FUTURES_SYMBOL)
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
@@ -614,8 +697,7 @@ def test_advanced_order_validation(client):
         _round_to_step(futures_price * Decimal("1.05"), futures_tick, ROUND_UP)
     )
 
-    if client.get_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL):
-        pytest.skip("BTCUSDT futures already has algo orders; not canceling unrelated orders.")
+    _cleanup_futures_test_state(client)
     assert client.set_leverage(product_symbol=FUTURES_SYMBOL, leverage=20)["leverage"] == 20
     transferred, reverse_type = _ensure_balance(
         client,
@@ -657,6 +739,7 @@ def test_advanced_order_validation(client):
     finally:
         if algo_order is not None:
             client.cancel_all_open_futures_algo_orders(product_symbol=FUTURES_SYMBOL)
+        _cleanup_futures_test_state(client)
         _return_transfer(client, transferred, reverse_type)
 
     assert isinstance(

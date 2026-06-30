@@ -3,7 +3,6 @@
 import os
 import time
 import uuid
-from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -36,9 +35,11 @@ pytestmark = [
 @pytest.fixture
 def client():
     client_instance = Client(api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET, timeout=20)
+    _cleanup_state(client_instance)
     try:
         yield client_instance
     finally:
+        _cleanup_state(client_instance)
         client_instance.close()
 
 
@@ -203,7 +204,7 @@ def _sell_size(client: Client, amount: Decimal) -> Decimal:
 
 def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
     if _spot_available(client, "USDT") < required:
-        pytest.skip("Insufficient MEXC spot USDT for stateful test.")
+        pytest.fail("Insufficient MEXC spot USDT for stateful test.", pytrace=False)
 
 
 def _ensure_contract_usdt(client: Client, required: Decimal) -> Decimal:
@@ -216,11 +217,11 @@ def _ensure_contract_usdt(client: Client, required: Decimal) -> Decimal:
     try:
         _transfer(client, "SPOT", "FUTURES", needed)
     except FailedRequestError as exc:
-        pytest.skip(f"MEXC futures USDT transfer failed: {exc}")
+        pytest.fail(f"MEXC futures USDT transfer failed: {exc}", pytrace=False)
     time.sleep(3)
     if _contract_available(client) < target:
         _return_futures_transfer(client, needed)
-        pytest.skip("Insufficient MEXC futures USDT for stateful test.")
+        pytest.fail("Insufficient MEXC futures USDT for stateful test.", pytrace=False)
     return needed
 
 
@@ -229,25 +230,31 @@ def _margin_target(required: Decimal) -> Decimal:
 
 
 def _skip_if_existing_state(client: Client) -> None:
-    if _spot_open_orders(client):
-        pytest.skip("MEXC spot already has BTCUSDT open orders; not touching unrelated orders.")
+    _cleanup_state(client)
 
 
 def _skip_if_existing_contract_state(client: Client) -> None:
-    if _contract_open_orders(client):
-        pytest.skip("MEXC futures already has BTC_USDT open orders; not touching unrelated orders.")
-    if _contract_position_volume(client) > 0:
-        pytest.skip(
-            "MEXC futures already has a BTC_USDT position; not touching unrelated position."
-        )
+    _cleanup_state(client)
 
 
 def _cleanup_spot_btc(client: Client, initial_btc: Decimal) -> None:
-    extra = _sell_size(client, _spot_available(client, "BTC") - initial_btc)
-    if extra > 0:
-        with suppress(Exception):
-            client.place_spot_market_sell_order(SPOT_SYMBOL, _fmt(extra), _client_id())
-            time.sleep(2)
+    step, min_notional, _ = _spot_details(client)
+    extra = _spot_available(client, "BTC") - initial_btc
+    if extra <= step:
+        return
+
+    sell_size = _sell_size(client, extra)
+    bid, _ = _spot_prices(client)
+    if sell_size * bid < min_notional:
+        notional = _spot_market_notional(client)
+        _ensure_spot_usdt(client, notional)
+        assert client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(notional), _client_id())
+        time.sleep(3)
+        sell_size = _sell_size(client, _spot_available(client, "BTC") - initial_btc)
+
+    if sell_size > 0:
+        assert client.place_spot_market_sell_order(SPOT_SYMBOL, _fmt(sell_size), _client_id())
+        time.sleep(3)
 
 
 def _cleanup_contract_btc(client: Client) -> None:
@@ -257,15 +264,14 @@ def _cleanup_contract_btc(client: Client) -> None:
             continue
         position_type = int(_dec(position.get("positionType"), "1"))
         side = 4 if position_type == 1 else 2
-        with suppress(Exception):
-            client.place_contract_market_order(
-                CONTRACT_SYMBOL,
-                side=side,
-                vol=volume,
-                leverage=CONTRACT_TEST_LEVERAGE,
-                openType=int(_dec(position.get("openType"), "2")),
-            )
-            time.sleep(3)
+        assert client.place_contract_market_order(
+            CONTRACT_SYMBOL,
+            side=side,
+            vol=volume,
+            leverage=CONTRACT_TEST_LEVERAGE,
+            openType=int(_dec(position.get("openType"), "2")),
+        )
+        time.sleep(3)
 
 
 def _return_futures_transfer(client: Client, amount: Decimal) -> None:
@@ -274,9 +280,29 @@ def _return_futures_transfer(client: Client, amount: Decimal) -> None:
     available = _round_to_step(_contract_available(client), Decimal("0.000001"), ROUND_DOWN)
     amount = min(amount, available)
     if amount > 0:
-        with suppress(Exception):
-            _transfer(client, "FUTURES", "SPOT", amount)
-            time.sleep(3)
+        _transfer(client, "FUTURES", "SPOT", amount)
+        time.sleep(3)
+
+
+def _cleanup_state(client: Client) -> None:
+    if _spot_open_orders(client):
+        assert client.cancel_spot_open_orders(SPOT_SYMBOL) is not None
+        time.sleep(1)
+    if _contract_open_orders(client):
+        assert client.cancel_all_contract_orders(CONTRACT_SYMBOL) is not None
+        time.sleep(1)
+    _cleanup_contract_btc(client)
+    _cleanup_spot_btc(client, Decimal("0"))
+
+    if _spot_open_orders(client):
+        pytest.fail("MEXC spot still has open BTCUSDT orders after cleanup.", pytrace=False)
+    if _contract_open_orders(client):
+        pytest.fail("MEXC contract still has open BTC_USDT orders after cleanup.", pytrace=False)
+    if _contract_position_volume(client) > 0:
+        pytest.fail("MEXC contract BTC_USDT position still exists after cleanup.", pytrace=False)
+    step, _, _ = _spot_details(client)
+    if _spot_available(client, "BTC") > step:
+        pytest.fail("MEXC BTC spot balance still exists after cleanup.", pytrace=False)
 
 
 def _wait_for_contract_volume(client: Client, expected: Decimal) -> Decimal:
@@ -326,22 +352,37 @@ def test_transfer_round_trip(client):
     _skip_if_existing_state(client)
     _ensure_spot_usdt(client, TRANSFER_AMOUNT)
 
+    transferred = False
     first_id = _transfer(client, "SPOT", "FUTURES", TRANSFER_AMOUNT)
-    time.sleep(3)
-    assert client.get_user_universal_transfer_by_id(first_id) is not None
-    assert (
-        client.get_user_universal_transfer_history(
-            "SPOT",
-            "FUTURES",
-            page=1,
-            size=10,
+    transferred = True
+    try:
+        time.sleep(3)
+        assert client.get_user_universal_transfer_by_id(first_id) is not None
+        assert (
+            client.get_user_universal_transfer_history(
+                "SPOT",
+                "FUTURES",
+                page=1,
+                size=10,
+            )
+            is not None
         )
-        is not None
-    )
+    finally:
+        if transferred:
+            second_id = _transfer(client, "FUTURES", "SPOT", TRANSFER_AMOUNT)
+            transferred = False
+            time.sleep(3)
+            assert client.get_user_universal_transfer_by_id(second_id) is not None
+            assert (
+                client.get_user_universal_transfer_history(
+                    "FUTURES",
+                    "SPOT",
+                    page=1,
+                    size=10,
+                )
+                is not None
+            )
 
-    second_id = _transfer(client, "FUTURES", "SPOT", TRANSFER_AMOUNT)
-    time.sleep(3)
-    assert client.get_user_universal_transfer_by_id(second_id) is not None
     assert (
         client.get_user_universal_transfer_history(
             "FUTURES",
@@ -476,8 +517,8 @@ def test_spot_stateful_order_lifecycle(client):
         assert client.get_spot_all_orders(SPOT_SYMBOL, limit=10) is not None
         assert client.get_spot_open_orders(SPOT_SYMBOL) is not None
     finally:
-        with suppress(Exception):
-            client.cancel_spot_open_orders(SPOT_SYMBOL)
+        if _spot_open_orders(client):
+            assert client.cancel_spot_open_orders(SPOT_SYMBOL) is not None
         _cleanup_spot_btc(client, initial_btc)
 
 
@@ -637,7 +678,7 @@ def test_contract_stateful_order_lifecycle(client):
         assert client.get_contract_order_deal_details(long_open_id)
         assert client.get_contract_open_orders(CONTRACT_SYMBOL, page_num=1, page_size=10)
     finally:
-        with suppress(Exception):
-            client.cancel_all_contract_orders(CONTRACT_SYMBOL)
+        if _contract_open_orders(client):
+            assert client.cancel_all_contract_orders(CONTRACT_SYMBOL) is not None
         _cleanup_contract_btc(client)
         _return_futures_transfer(client, transferred)

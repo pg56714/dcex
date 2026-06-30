@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, D100, D103
+
 import os
 
 import pytest
@@ -14,10 +16,10 @@ OKX_API_SECRET = os.getenv("OKX_API_SECRET")
 OKX_PASSPHRASE = os.getenv("OKX_PASSPHRASE")
 
 
-def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+def _fail_if_rate_limited(exc: FailedRequestError) -> None:
     message = str(exc).lower()
     if "50011" in message or "too many requests" in message or "rate limit" in message:
-        pytest.skip(f"OKX rate limit reached during live account test: {exc}")
+        pytest.fail(f"OKX rate limit reached during live account test: {exc}", pytrace=False)
     raise exc
 
 
@@ -91,7 +93,7 @@ async def test_post_account_bills_history_archive(client):
     try:
         res = await client.post_account_bills_history_archive(year="2025", quarter="Q1")
     except FailedRequestError as exc:
-        _skip_if_rate_limited(exc)
+        _fail_if_rate_limited(exc)
     assert res is not None
 
 
@@ -101,7 +103,7 @@ async def test_get_account_bills_history_archive(client):
     try:
         res = await client.get_account_bills_history_archive(year="2025", quarter="Q1")
     except FailedRequestError as exc:
-        _skip_if_rate_limited(exc)
+        _fail_if_rate_limited(exc)
     assert res is not None
 
 

@@ -37,7 +37,13 @@ async def client():
         api_key=BYBIT_API_KEY,
         api_secret=BYBIT_API_SECRET,
     ) as client_instance:
-        yield client_instance
+        transferred = await _cleanup(client_instance, Decimal("0"))
+        await _return_to_funding(client_instance, transferred)
+        try:
+            yield client_instance
+        finally:
+            transferred = await _cleanup(client_instance, Decimal("0"))
+            await _return_to_funding(client_instance, transferred)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -186,13 +192,6 @@ async def _positions(client: Client) -> list[dict]:
     return [item for item in items if isinstance(item, dict)]
 
 
-async def _skip_if_existing_state(client: Client) -> None:
-    if await _open_orders(client, SPOT_SYMBOL) or await _open_orders(client, SWAP_SYMBOL):
-        pytest.skip("Bybit already has open BTC orders; not touching unrelated orders.")
-    if any(_dec(item.get("size")) != 0 for item in await _positions(client)):
-        pytest.skip("Bybit BTC-USDT swap already has a position; not changing exposure.")
-
-
 async def _wait_for_spot_delta(client: Client, before: Decimal) -> Decimal:
     for _ in range(8):
         delta = await _wallet_available(client, "BTC") - before
@@ -209,7 +208,7 @@ async def _ensure_unified_usdt(client: Client, required: Decimal) -> Decimal:
 
     needed = (required - available).quantize(Decimal("0.0001"), rounding=ROUND_UP)
     if await _transferable_balance(client, "FUND", "USDT") < needed:
-        pytest.skip("Insufficient Bybit total USDT for spot stateful orders.")
+        pytest.fail("Insufficient Bybit total USDT for spot stateful orders.")
     _assert_ok(
         await client.create_internal_transfer(
             coin="USDT",
@@ -220,7 +219,7 @@ async def _ensure_unified_usdt(client: Client, required: Decimal) -> Decimal:
     )
     await asyncio.sleep(2)
     if await _wallet_available(client, "USDT") < required:
-        pytest.skip("Bybit unified USDT remains insufficient after transfer.")
+        pytest.fail("Bybit unified USDT remains insufficient after transfer.")
     return needed
 
 
@@ -257,14 +256,14 @@ async def _cancel(client: Client, order_id: str) -> None:
 
 async def _cleanup(client: Client, initial_btc: Decimal) -> Decimal:
     transferred = Decimal("0")
-    with suppress(Exception):
-        if await _open_orders(client, SPOT_SYMBOL):
-            _assert_ok(await client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
-    with suppress(Exception):
-        if await _open_orders(client, SWAP_SYMBOL):
-            _assert_ok(await client.cancel_all_orders(product_symbol=SWAP_SYMBOL))
-    with suppress(Exception):
-        delta = await _wallet_available(client, "BTC") - initial_btc
+    if await _open_orders(client, SPOT_SYMBOL):
+        _assert_ok(await client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
+    if await _open_orders(client, SWAP_SYMBOL):
+        _assert_ok(await client.cancel_all_orders(product_symbol=SWAP_SYMBOL))
+    await _close_swap_positions(client)
+
+    delta = await _wallet_available(client, "BTC") - initial_btc
+    if delta > 0:
         _, _, min_size, min_notional = _spot_details(client)
         best_bid, _ = await _spot_orderbook_prices(client)
         if delta > 0 and (delta < min_size or delta * best_bid < min_notional):
@@ -277,7 +276,35 @@ async def _cleanup(client: Client, initial_btc: Decimal) -> Decimal:
         if Decimal(sell_size) >= min_size:
             _assert_ok(await client.place_market_sell_order(SPOT_SYMBOL, sell_size))
             await asyncio.sleep(2)
+    _, step, _, _ = _spot_details(client)
+    assert await _open_orders(client, SPOT_SYMBOL) == []
+    assert await _open_orders(client, SWAP_SYMBOL) == []
+    assert not any(_dec(item.get("size")) != 0 for item in await _positions(client))
+    assert await _wallet_available(client, "BTC") - initial_btc <= step
     return transferred
+
+
+async def _close_swap_positions(client: Client) -> None:
+    for _ in range(3):
+        active = [item for item in await _positions(client) if _dec(item.get("size")) != 0]
+        if not active:
+            return
+        for position in active:
+            size = _dec(position.get("size"))
+            side = str(position.get("side", "")).lower()
+            close_side = "Sell" if side == "buy" else "Buy"
+            position_idx = int(_dec(position.get("positionIdx")))
+            _assert_ok(
+                await client.place_market_order(
+                    SWAP_SYMBOL,
+                    close_side,
+                    _fmt(size),
+                    reduceOnly=True,
+                    positionIdx=position_idx,
+                )
+            )
+        await asyncio.sleep(2)
+    assert not any(_dec(item.get("size")) != 0 for item in await _positions(client))
 
 
 async def _accept_unchanged(call, codes: tuple[str, ...]) -> None:
@@ -293,7 +320,10 @@ async def test_account_settings_and_internal_transfer(client):
     unified_status = str(account_info.get("unifiedMarginStatus", ""))
     if unified_status in {"1", "2"}:
         _assert_ok(await client.upgrade_to_unified_trading_account())
-        pytest.skip("Bybit unified account upgrade submitted; rerun after it completes.")
+        pytest.fail(
+            "Bybit unified account upgrade submitted; rerun after it completes.",
+            pytrace=False,
+        )
     else:
         assert unified_status
 
@@ -332,7 +362,7 @@ async def test_account_settings_and_internal_transfer(client):
     elif unified_balance >= TRANSFER_AMOUNT:
         from_account, to_account = "UNIFIED", "FUND"
     else:
-        pytest.skip("Insufficient Bybit USDT for internal transfer round-trip.")
+        pytest.fail("Insufficient Bybit USDT for internal transfer round-trip.")
 
     _assert_ok(
         await client.create_internal_transfer(
@@ -357,7 +387,8 @@ async def test_account_settings_and_internal_transfer(client):
 
 
 async def test_spot_stateful_order_lifecycle(client):
-    await _skip_if_existing_state(client)
+    transferred = await _cleanup(client, Decimal("0"))
+    await _return_to_funding(client, transferred)
     initial_btc = await _wallet_available(client, "BTC")
     transferred = Decimal("0")
     try:

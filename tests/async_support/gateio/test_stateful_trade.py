@@ -3,7 +3,6 @@
 import asyncio
 import os
 import uuid
-from contextlib import suppress
 from dataclasses import dataclass
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
@@ -45,7 +44,11 @@ async def client():
         api_secret=GATEIO_API_SECRET,
         timeout=20,
     ) as client_instance:
-        yield client_instance
+        await _cleanup(client_instance, Decimal("0"))
+        try:
+            yield client_instance
+        finally:
+            await _cleanup(client_instance, Decimal("0"))
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -165,25 +168,27 @@ async def _ensure_usdt(
     needed = _round_to_step(required - target, TRANSFER_STEP, ROUND_UP)
     source = await _account_usdt(client, source_account)
     if source < needed:
-        pytest.skip(
+        pytest.fail(
             "Insufficient transferable Gate USDT for stateful order test: "
-            f"required={required}, {target_account}={target}, {source_account}={source}."
+            f"required={required}, {target_account}={target}, {source_account}={source}.",
+            pytrace=False,
         )
 
     try:
         await _wallet_transfer(client, source_account, target_account, needed)
     except FailedRequestError as exc:
-        pytest.skip(
-            f"Gate wallet transfer {source_account}->{target_account} failed: {exc}"
+        pytest.fail(
+            f"Gate wallet transfer {source_account}->{target_account} failed: {exc}",
+            pytrace=False,
         )
     await asyncio.sleep(2)
 
     transfer = _TransferBack(target_account, source_account, needed)
     if await _account_usdt(client, target_account) < required:
         await _return_transfer(client, transfer)
-        pytest.skip(
-            f"Gate {target_account} USDT remains insufficient after transfer: "
-            f"required={required}."
+        pytest.fail(
+            f"Gate {target_account} USDT remains insufficient after transfer: required={required}.",
+            pytrace=False,
         )
     return transfer
 
@@ -225,53 +230,30 @@ async def _delivery_product_symbol(client: Client) -> str | None:
 
 
 async def _skip_if_existing_state(client: Client) -> None:
-    if await _spot_open_orders(client):
-        pytest.skip("Gate spot already has open orders; not touching unrelated orders.")
-    if await _futures_open_orders(client):
-        pytest.skip("Gate futures already has open orders; not touching unrelated orders.")
-    if await _position_size(client) != 0:
-        pytest.skip("Gate futures already has a position; not changing exposure.")
+    await _cleanup(client, Decimal("0"))
 
 
 async def _cleanup(client: Client, initial_spot_btc: Decimal) -> None:
-    with suppress(Exception):
-        if await _spot_open_orders(client):
-            await client.cancel_spot_order(product_symbol=SPOT_SYMBOL)
-            await asyncio.sleep(1)
+    if await _spot_open_orders(client):
+        await client.cancel_spot_order(product_symbol=SPOT_SYMBOL)
+        await asyncio.sleep(1)
 
-    with suppress(Exception):
-        if await _futures_open_orders(client):
-            await client.cancel_contract_all_order_matched(product_symbol=FUTURES_SYMBOL)
-            await asyncio.sleep(1)
+    if await _futures_open_orders(client):
+        await client.cancel_contract_all_order_matched(product_symbol=FUTURES_SYMBOL)
+        await asyncio.sleep(1)
 
-    with suppress(Exception):
-        position_size = await _position_size(client)
-        if position_size > 0:
-            await client.place_contract_order(
-                product_symbol=FUTURES_SYMBOL,
-                size=-int(abs(position_size)),
-                price="0",
-                tif="ioc",
-                reduce_only=True,
-            )
-            await asyncio.sleep(2)
-        elif position_size < 0:
-            await client.place_contract_order(
-                product_symbol=FUTURES_SYMBOL,
-                size=int(abs(position_size)),
-                price="0",
-                tif="ioc",
-                reduce_only=True,
-            )
-            await asyncio.sleep(2)
+    await _close_position(client)
+    await _cleanup_spot_btc(client, initial_spot_btc)
 
-    with suppress(Exception):
-        btc_delta = await _spot_available(client, "BTC") - initial_spot_btc
-        if btc_delta > 0:
-            sell_amount = _spot_sell_amount(client, btc_delta)
-            if Decimal(sell_amount) > 0:
-                await client.place_spot_market_sell_order(SPOT_SYMBOL, amount=sell_amount)
-                await asyncio.sleep(2)
+    if await _spot_open_orders(client):
+        pytest.fail("Gate spot still has open orders after cleanup.", pytrace=False)
+    if await _futures_open_orders(client):
+        pytest.fail("Gate futures still has open orders after cleanup.", pytrace=False)
+    if await _position_size(client) != 0:
+        pytest.fail("Gate futures position still exists after cleanup.", pytrace=False)
+    _, step, _, _ = _spot_details(client)
+    if await _spot_available(client, "BTC") - initial_spot_btc > step:
+        pytest.fail("Gate BTC spot balance still exists after cleanup.", pytrace=False)
 
 
 def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
@@ -335,6 +317,41 @@ def _spot_sell_amount(client: Client, amount: Decimal) -> str:
     return _fmt(_round_to_step(amount, step, ROUND_DOWN))
 
 
+async def _cleanup_spot_btc(client: Client, initial_spot_btc: Decimal) -> None:
+    _, step, min_size, min_notional = _spot_details(client)
+    delta = await _spot_available(client, "BTC") - initial_spot_btc
+    if delta <= step:
+        return
+
+    sell_amount = Decimal(_spot_sell_amount(client, delta))
+    best_bid, _ = await _spot_orderbook_prices(client)
+    transfer = _TransferBack(SPOT_ACCOUNT, FUTURES_ACCOUNT, Decimal("0"))
+    try:
+        if sell_amount < min_size or sell_amount * best_bid < min_notional:
+            quote_amount = await _spot_market_buy_amount(client)
+            transfer = await _ensure_spot_usdt(client, quote_amount)
+            assert (
+                await client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(quote_amount))
+                is not None
+            )
+            await asyncio.sleep(2)
+            sell_amount = Decimal(
+                _spot_sell_amount(client, await _spot_available(client, "BTC") - initial_spot_btc)
+            )
+
+        if sell_amount > 0:
+            assert (
+                await client.place_spot_market_sell_order(
+                    SPOT_SYMBOL,
+                    amount=_fmt(sell_amount),
+                )
+                is not None
+            )
+            await asyncio.sleep(2)
+    finally:
+        await _return_transfer(client, transfer)
+
+
 async def _ensure_spot_usdt(client: Client, required: Decimal) -> _TransferBack:
     return await _ensure_usdt(client, SPOT_ACCOUNT, FUTURES_ACCOUNT, required)
 
@@ -395,7 +412,10 @@ async def _ensure_futures_usdt(client: Client) -> _TransferBack:
 def _skip_if_futures_margin_insufficient(exc: FailedRequestError) -> None:
     message = str(exc).lower()
     if "insufficient_available" in message or "insufficient" in message:
-        pytest.skip(f"Insufficient Gate futures USDT for stateful order test: {exc}")
+        pytest.fail(
+            f"Insufficient Gate futures USDT for stateful order test: {exc}",
+            pytrace=False,
+        )
     raise exc
 
 

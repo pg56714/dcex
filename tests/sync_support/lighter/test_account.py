@@ -43,11 +43,14 @@ def _assert_response(res) -> None:
     assert res.get("code", 200) == 200
 
 
-def _skip_if_no_export_data(exc: FailedRequestError) -> None:
+def _fail_if_no_export_data(exc: FailedRequestError) -> None:
     if exc.status_code == 400 and (
         "22504" in exc.message or "no export data found" in exc.message.lower()
     ):
-        pytest.skip("Lighter account has no export data for the requested interval.")
+        pytest.fail(
+            "Lighter account has no export data for the requested interval.",
+            pytrace=False,
+        )
 
 
 def _find_l1_address(value) -> str | None:
@@ -73,7 +76,7 @@ def _find_l1_address(value) -> str | None:
 def _l1_address(client: Client, account_index: int) -> str:
     address = _find_l1_address(client.get_account(by="index", value=str(account_index)))
     if address is None:
-        pytest.skip("Lighter account response did not include an L1 address.")
+        pytest.fail("Lighter account response did not include an L1 address.", pytrace=False)
     return address
 
 
@@ -137,7 +140,7 @@ def test_private_export_read(client):
             end_timestamp=now_ms,
         )
     except FailedRequestError as exc:
-        _skip_if_no_export_data(exc)
+        _fail_if_no_export_data(exc)
         raise
 
     _assert_response(response)

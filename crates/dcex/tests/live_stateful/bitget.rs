@@ -8,10 +8,10 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, bitget_unified_account_error,
     contains_non_empty_array, fetch_trading_details, first_bid_price, format_transfer_amount,
-    format_transfer_amount_floor, leveraged_margin_required, margin_target, minimum_order_quantity,
-    params, post_only_buy_price, price_below_market, push, require_env, require_live_trading,
-    require_order_id, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    format_transfer_amount_floor, leveraged_margin_required, live_test_error, margin_target,
+    minimum_order_quantity, params, post_only_buy_price, price_below_market, push, require_env,
+    require_live_trading, require_order_id, sum_abs_values_for_symbols, unique_client_id,
+    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const BITGET_FUTURES_PRODUCT_TYPE: &str = "USDT-FUTURES";
@@ -71,8 +71,9 @@ async fn bitget_direct_live_stateful_order() -> dcex::Result<()> {
     let order = match order_result {
         Ok(response) => response,
         Err(error) if bitget_unified_account_error(&error) => {
-            eprintln!("skipping Bitget classic stateful order on unified account: {error}");
-            return Ok(());
+            return Err(live_test_error(format!(
+                "Bitget classic stateful order is unsupported on unified account: {error}"
+            )));
         }
         Err(error) => return Err(error),
     };
@@ -126,14 +127,7 @@ async fn bitget_swap_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
     let uta = is_uta(&client).await;
 
-    if bitget_open_swap_orders(&client, uta).await? {
-        eprintln!("skipping Bitget swap live stateful order; open BTC-USDT swap orders exist");
-        return Ok(());
-    }
-    if bitget_swap_position_abs(&client, uta).await? > 0.0 {
-        eprintln!("skipping Bitget swap live stateful order; BTC-USDT swap position exists");
-        return Ok(());
-    }
+    cleanup_bitget_swap_state(&client, uta).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -159,7 +153,11 @@ async fn bitget_swap_direct_live_stateful_order() -> dcex::Result<()> {
     let transferred =
         match ensure_bitget_futures_margin(&client, uta, margin_target(required_usdt)).await? {
             Some(amount) => amount,
-            None => return Ok(()),
+            None => {
+                return Err(live_test_error(
+                    "Bitget swap has insufficient transferable USDT for live stateful order",
+                ));
+            }
         };
 
     let order_result = bitget_place_swap_post_only_buy(&client, uta, &quantity, &price).await;
@@ -305,6 +303,27 @@ async fn bitget_swap_position_abs(client: &BitgetClient, uta: bool) -> dcex::Res
     ))
 }
 
+async fn cleanup_bitget_swap_state(client: &BitgetClient, uta: bool) -> dcex::Result<()> {
+    if bitget_open_swap_orders(client, uta).await? {
+        return Err(live_test_error(
+            "Bitget swap has open BTC-USDT orders before live stateful order",
+        ));
+    }
+    let position = bitget_swap_position_abs(client, uta).await?;
+    if position > 0.0 {
+        let quantity = format_transfer_amount_floor(position, 8);
+        let close = bitget_place_swap_market_sell_reduce_only(client, uta, &quantity).await?;
+        assert_success(&close);
+        sleep(Duration::from_secs(2)).await;
+    }
+    if wait_for_flat_position(|| bitget_swap_position_abs(client, uta)).await? != 0.0 {
+        return Err(live_test_error(
+            "Bitget BTC-USDT swap position still exists after cleanup",
+        ));
+    }
+    Ok(())
+}
+
 async fn ensure_bitget_futures_margin(
     client: &BitgetClient,
     uta: bool,
@@ -316,16 +335,10 @@ async fn ensure_bitget_futures_margin(
     }
     let needed = required - futures;
     if uta {
-        eprintln!(
-            "skipping Bitget UTA swap live stateful order; insufficient USDT, required={required:.8}, futures={futures:.8}"
-        );
         return Ok(None);
     }
     let spot = bitget_spot_usdt(client).await?;
     if spot < needed {
-        eprintln!(
-            "skipping Bitget swap live stateful order; insufficient transferable USDT, required={required:.8}, futures={futures:.8}, spot={spot:.8}"
-        );
         return Ok(None);
     }
     let amount = format_transfer_amount(needed);

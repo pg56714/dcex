@@ -33,11 +33,17 @@ pytestmark = [
 
 @pytest.fixture
 def client():
-    return Client(
+    client_instance = Client(
         api_key=KUCOIN_API_KEY,
         api_secret=KUCOIN_API_SECRET,
         passphrase=KUCOIN_API_PASSPHRASE,
     )
+    _cleanup(client_instance, _snapshot_balances(client_instance))
+    clean_initial = _snapshot_balances(client_instance)
+    try:
+        yield client_instance
+    finally:
+        _cleanup(client_instance, clean_initial)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -85,7 +91,7 @@ def _futures_available_usdt(client: Client) -> Decimal:
 def _transfer_from_main(client: Client, amount: Decimal, to_account_type: str, reason: str) -> None:
     main_available = _available(client, "USDT", "main")
     if main_available < amount:
-        pytest.skip(reason)
+        pytest.fail(reason, pytrace=False)
 
     client.flex_transfer(
         currency="USDT",
@@ -111,7 +117,7 @@ def _spot_order_params(client: Client) -> tuple[str, str]:
     step = _dec(details["size_precision"], "0.00000001")
     min_size = _dec(details["min_size"], "0.00001")
     min_notional = max(_dec(details["min_notional"], "1"), Decimal("1"))
-    best_bid = _dec(client.get_spot_orderbook(product_symbol=SPOT_SYMBOL)["data"]["bids"][0][0])
+    best_bid, _ = _spot_prices(client)
     price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
@@ -123,6 +129,30 @@ def _spot_step_and_min(client: Client) -> tuple[Decimal, Decimal, Decimal]:
     min_size = _dec(details["min_size"], "0.00001")
     min_notional = max(_dec(details["min_notional"], "1"), Decimal("1"))
     return step, min_size, min_notional
+
+
+def _spot_prices(client: Client) -> tuple[Decimal, Decimal]:
+    book = client.get_spot_orderbook(product_symbol=SPOT_SYMBOL)["data"]
+    return _dec(book["bids"][0][0]), _dec(book["asks"][0][0])
+
+
+def _spot_market_funds(client: Client) -> Decimal:
+    _, _, min_notional = _spot_step_and_min(client)
+    return min_notional * Decimal("1.01")
+
+
+def _spot_sell_quantity(client: Client, quantity: Decimal) -> str:
+    step, _, _ = _spot_step_and_min(client)
+    return _fmt(_round_to_step(quantity, step, ROUND_DOWN))
+
+
+def _spot_sellable_quantity(client: Client, quantity: Decimal) -> str:
+    step, min_size, min_notional = _spot_step_and_min(client)
+    bid, _ = _spot_prices(client)
+    size = _round_to_step(quantity, step, ROUND_DOWN)
+    if size < min_size or size * bid < min_notional:
+        return "0"
+    return _fmt(size)
 
 
 def _futures_position_size(client: Client) -> Decimal:
@@ -145,6 +175,14 @@ def _futures_order_params(client: Client) -> tuple[int, str, Decimal, Decimal]:
     best_bid = _dec(ticker.get("bestBidPrice"), str(current_price))
     price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     return int(max(lot, Decimal("1"))), _fmt(price), current_price, multiplier
+
+
+def _snapshot_balances(client: Client) -> dict[str, Decimal]:
+    return {
+        "trade_usdt": _available(client, "USDT", "trade"),
+        "trade_btc": _available(client, "BTC", "trade"),
+        "contract_usdt": _futures_available_usdt(client),
+    }
 
 
 def _ensure_futures_cross_leverage(client: Client) -> None:
@@ -182,12 +220,11 @@ def _skip_if_futures_margin_insufficient(
     )
     available = _futures_available_usdt(client)
     if available < required_margin:
-        pytest.skip("Insufficient futures USDT for KuCoin futures post-only order.")
+        pytest.fail("Insufficient futures USDT for KuCoin futures post-only order.", pytrace=False)
 
 
 def _skip_if_spot_open_orders(client: Client) -> None:
-    if _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL)):
-        pytest.skip("BTC-USDT spot already has open orders; not touching unrelated orders.")
+    _cancel_spot_open_orders(client)
 
 
 def _wait_until_no_spot_open_orders(client: Client) -> None:
@@ -196,6 +233,16 @@ def _wait_until_no_spot_open_orders(client: Client) -> None:
             return
         time.sleep(1)
     assert not _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+
+
+def _wait_until_no_futures_open_orders(client: Client) -> None:
+    for _ in range(5):
+        if not _items(
+            client.get_futures_order_list(product_symbol=FUTURES_SYMBOL, status="active")
+        ):
+            return
+        time.sleep(1)
+    assert not _items(client.get_futures_order_list(product_symbol=FUTURES_SYMBOL, status="active"))
 
 
 def _wait_for_spot_open_orders(client: Client) -> list[dict]:
@@ -216,6 +263,12 @@ def _cancel_spot_order(client: Client, order_id: str) -> dict:
         return {"code": "200000", "data": {}}
 
 
+def _cancel_spot_open_orders(client: Client) -> None:
+    if _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL)):
+        client.cancel_spot_all_orders_by_symbol(product_symbol=SPOT_SYMBOL)
+        _wait_until_no_spot_open_orders(client)
+
+
 def _is_futures_order_not_cancelable(exc: FailedRequestError) -> bool:
     message = str(exc).lower()
     return "100004" in message and "cannot be canceled" in message
@@ -228,6 +281,132 @@ def _cancel_futures_order(client: Client, order_id: str) -> dict:
         if _is_futures_order_not_cancelable(exc):
             return {"code": "200000", "data": {}}
         raise
+
+
+def _cancel_futures_open_orders(client: Client) -> None:
+    if _items(client.get_futures_order_list(product_symbol=FUTURES_SYMBOL, status="active")):
+        client.cancel_futures_all_orders(product_symbol=FUTURES_SYMBOL)
+        _wait_until_no_futures_open_orders(client)
+
+
+def _wait_until_flat(client: Client) -> None:
+    for _ in range(10):
+        if _futures_position_size(client) == 0:
+            return
+        time.sleep(1)
+    assert _futures_position_size(client) == 0
+
+
+def _close_futures_position(client: Client) -> None:
+    for _ in range(3):
+        position_size = _futures_position_size(client)
+        if position_size == 0:
+            return
+        close_size = int(abs(position_size))
+        if close_size <= 0:
+            raise AssertionError(f"Invalid KuCoin futures position size: {position_size}")
+        if position_size > 0:
+            client.place_futures_market_sell_order(
+                product_symbol=FUTURES_SYMBOL,
+                size=close_size,
+                clientOid=f"dcex-{uuid.uuid4().hex}",
+                leverage=int(FUTURES_LEVERAGE),
+                marginMode="CROSS",
+                positionSide="BOTH",
+                reduceOnly=True,
+            )
+        else:
+            client.place_futures_market_buy_order(
+                product_symbol=FUTURES_SYMBOL,
+                size=close_size,
+                clientOid=f"dcex-{uuid.uuid4().hex}",
+                leverage=int(FUTURES_LEVERAGE),
+                marginMode="CROSS",
+                positionSide="BOTH",
+                reduceOnly=True,
+            )
+        time.sleep(2)
+        if _futures_position_size(client) == 0:
+            return
+    _wait_until_flat(client)
+
+
+def _top_up_spot_btc_for_sell(client: Client, btc_delta: Decimal) -> None:
+    if btc_delta <= 0:
+        return
+    step, min_size, min_notional = _spot_step_and_min(client)
+    bid, ask = _spot_prices(client)
+    sellable = _round_to_step(btc_delta, step, ROUND_DOWN)
+    target = max(min_size, _round_to_step(min_notional / bid, step, ROUND_UP))
+    top_up_size = target - sellable
+    if top_up_size <= 0:
+        return
+    funds = top_up_size * ask * Decimal("1.02")
+    _skip_if_spot_funds_insufficient(client, funds)
+    client.place_spot_market_buy_order(
+        product_symbol=SPOT_SYMBOL,
+        funds=_fmt(funds),
+        clientOid=f"dcex-{uuid.uuid4().hex}",
+    )
+    time.sleep(2)
+
+
+def _return_spot_btc_delta(client: Client, initial_btc: Decimal) -> None:
+    for _ in range(4):
+        btc_delta = _available(client, "BTC", "trade") - initial_btc
+        if btc_delta <= 0:
+            return
+        sell_size = _spot_sellable_quantity(client, btc_delta)
+        if Decimal(sell_size) <= 0:
+            _top_up_spot_btc_for_sell(client, btc_delta)
+            continue
+        client.place_spot_market_sell_order(
+            product_symbol=SPOT_SYMBOL,
+            size=sell_size,
+            clientOid=f"dcex-{uuid.uuid4().hex}",
+        )
+        time.sleep(2)
+
+    step, _, _ = _spot_step_and_min(client)
+    remaining = _available(client, "BTC", "trade") - initial_btc
+    assert remaining <= step
+
+
+def _return_excess_balances(client: Client, initial: dict[str, Decimal]) -> None:
+    trade_usdt = _available(client, "USDT", "trade")
+    excess_usdt = trade_usdt - initial["trade_usdt"]
+    if excess_usdt > Decimal("0.00000001"):
+        client.flex_transfer(
+            currency="USDT",
+            amount=_fmt_usdt_transfer(excess_usdt),
+            fromAccountType="TRADE",
+            toAccountType="MAIN",
+            clientOid=f"dcex-{uuid.uuid4().hex}",
+        )
+        time.sleep(2)
+
+    contract_usdt = _futures_available_usdt(client)
+    excess_contract_usdt = contract_usdt - initial["contract_usdt"]
+    if excess_contract_usdt > Decimal("0.00000001"):
+        client.flex_transfer(
+            currency="USDT",
+            amount=_fmt_usdt_transfer(excess_contract_usdt),
+            fromAccountType="CONTRACT",
+            toAccountType="MAIN",
+            clientOid=f"dcex-{uuid.uuid4().hex}",
+        )
+        time.sleep(2)
+
+
+def _cleanup(client: Client, initial: dict[str, Decimal]) -> None:
+    _cancel_spot_open_orders(client)
+    _cancel_futures_open_orders(client)
+    _close_futures_position(client)
+    _return_spot_btc_delta(client, initial["trade_btc"])
+    _return_excess_balances(client, initial)
+    assert not _items(client.get_spot_open_orders(product_symbol=SPOT_SYMBOL))
+    assert not _items(client.get_futures_order_list(product_symbol=FUTURES_SYMBOL, status="active"))
+    assert _futures_position_size(client) == 0
 
 
 def _skip_if_spot_usdt_insufficient(client: Client, size: str, price: str) -> None:
@@ -245,7 +424,7 @@ def _skip_if_spot_usdt_insufficient(client: Client, size: str, price: str) -> No
         "Insufficient main USDT to fund KuCoin spot stateful order test.",
     )
     if _available(client, "USDT", "trade") < required:
-        pytest.skip("Insufficient spot trade USDT for KuCoin spot post-only order.")
+        pytest.fail("Insufficient spot trade USDT for KuCoin spot post-only order.", pytrace=False)
 
 
 def _skip_if_spot_funds_insufficient(client: Client, funds: Decimal) -> None:
@@ -262,14 +441,14 @@ def _skip_if_spot_funds_insufficient(client: Client, funds: Decimal) -> None:
         "Insufficient main USDT to fund KuCoin spot market round-trip.",
     )
     if _available(client, "USDT", "trade") < funds:
-        pytest.skip("Insufficient spot trade USDT for KuCoin spot market round-trip.")
+        pytest.fail(
+            "Insufficient spot trade USDT for KuCoin spot market round-trip.", pytrace=False
+        )
 
 
 def _skip_if_futures_state(client: Client) -> None:
-    if _items(client.get_futures_order_list(product_symbol=FUTURES_SYMBOL, status="active")):
-        pytest.skip("BTC-USDT futures already has open orders; not touching unrelated orders.")
-    if _futures_position_size(client) != 0:
-        pytest.skip("BTC-USDT futures already has a position; not changing exposure.")
+    _cancel_futures_open_orders(client)
+    _close_futures_position(client)
 
 
 @pytest.mark.private
@@ -340,24 +519,27 @@ def test_spot_cancel_all_orders(client):
 
 @pytest.mark.private
 def test_spot_market_round_trip(client):
-    step, min_size, min_notional = _spot_step_and_min(client)
-    funds = min_notional * Decimal("1.01")
+    step, min_size, _ = _spot_step_and_min(client)
+    funds = _spot_market_funds(client)
     _skip_if_spot_funds_insufficient(client, funds)
 
     btc_before = _available(client, "BTC", "trade")
-    client.place_spot_market_buy_order(
-        product_symbol=SPOT_SYMBOL,
-        funds=_fmt(funds),
-        clientOid=f"dcex-{uuid.uuid4().hex}",
-    )
-    time.sleep(2)
-    acquired = _round_to_step(_available(client, "BTC", "trade") - btc_before, step, ROUND_DOWN)
-    assert acquired >= min_size
-    client.place_spot_market_sell_order(
-        product_symbol=SPOT_SYMBOL,
-        size=_fmt(acquired),
-        clientOid=f"dcex-{uuid.uuid4().hex}",
-    )
+    try:
+        client.place_spot_market_buy_order(
+            product_symbol=SPOT_SYMBOL,
+            funds=_fmt(funds),
+            clientOid=f"dcex-{uuid.uuid4().hex}",
+        )
+        time.sleep(2)
+        acquired = _round_to_step(_available(client, "BTC", "trade") - btc_before, step, ROUND_DOWN)
+        assert acquired >= min_size
+        client.place_spot_market_sell_order(
+            product_symbol=SPOT_SYMBOL,
+            size=_fmt(acquired),
+            clientOid=f"dcex-{uuid.uuid4().hex}",
+        )
+    finally:
+        _return_spot_btc_delta(client, btc_before)
 
 
 @pytest.mark.private
@@ -459,39 +641,19 @@ def test_futures_market_round_trip(client):
         multiplier,
     )
 
-    client.place_futures_market_buy_order(
-        product_symbol=FUTURES_SYMBOL,
-        size=size,
-        clientOid=f"dcex-{uuid.uuid4().hex}",
-        leverage=int(FUTURES_LEVERAGE),
-        marginMode="CROSS",
-        positionSide="BOTH",
-    )
-    time.sleep(2)
     try:
-        client.place_futures_market_sell_order(
+        client.place_futures_market_buy_order(
             product_symbol=FUTURES_SYMBOL,
             size=size,
             clientOid=f"dcex-{uuid.uuid4().hex}",
             leverage=int(FUTURES_LEVERAGE),
             marginMode="CROSS",
             positionSide="BOTH",
-            reduceOnly=True,
         )
         time.sleep(2)
-        assert _futures_position_size(client) == 0
-    except Exception:
-        if _futures_position_size(client) > 0:
-            client.place_futures_market_sell_order(
-                product_symbol=FUTURES_SYMBOL,
-                size=size,
-                clientOid=f"dcex-{uuid.uuid4().hex}",
-                leverage=int(FUTURES_LEVERAGE),
-                marginMode="CROSS",
-                positionSide="BOTH",
-                reduceOnly=True,
-            )
-        raise
+        assert _futures_position_size(client) > 0
+    finally:
+        _close_futures_position(client)
 
 
 @pytest.mark.private

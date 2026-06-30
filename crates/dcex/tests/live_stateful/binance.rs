@@ -7,10 +7,10 @@ use tokio::time::sleep;
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
     first_bid_price, format_transfer_amount, format_transfer_amount_floor,
-    leveraged_margin_required, margin_target, minimum_order_quantity, parse_positive,
-    post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
-    require_order_id, sum_abs_values, wait_for_flat_position, wait_for_positive_position,
-    BTC_USDT_SPOT, BTC_USDT_SWAP,
+    insufficient_funds_error, leveraged_margin_required, live_test_error, margin_target,
+    minimum_order_quantity, parse_positive, post_only_buy_price_from_bid, price_below_market,
+    require_env, require_live_trading, require_order_id, wait_for_flat_position,
+    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 struct TransferBack {
@@ -47,7 +47,11 @@ async fn binance_direct_live_stateful_order() -> dcex::Result<()> {
             amount: "0".to_string(),
             transfer_type: "",
         },
-        None => return Ok(()),
+        None => {
+            return Err(live_test_error(
+                "Binance spot has insufficient transferable USDT for live stateful order",
+            ));
+        }
     };
 
     let order_result = client
@@ -87,14 +91,7 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
         Some(keys[1].clone()),
         Duration::from_secs(20),
     )?;
-    if binance_open_swap_orders(&client).await? {
-        eprintln!("skipping Binance futures live stateful order; open BTC-USDT swap orders exist");
-        return Ok(());
-    }
-    if futures_position_abs(&client).await? > 0.0 {
-        eprintln!("skipping Binance futures live stateful order; BTC-USDT swap position exists");
-        return Ok(());
-    }
+    cleanup_binance_futures_state(&client).await?;
 
     let ticker = client
         .get_futures_ticker()
@@ -114,7 +111,11 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
         leveraged_margin_required(bid, &quantity, &details, BINANCE_FUTURES_LEVERAGE_VALUE)?;
     let transfer = match ensure_futures_usdt(&client, margin_target(required_usdt)).await? {
         Some(transfer) => transfer,
-        None => return Ok(()),
+        None => {
+            return Err(live_test_error(
+                "Binance futures has insufficient transferable USDT for live stateful order",
+            ));
+        }
     };
 
     let order_result = client
@@ -147,6 +148,12 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
         .await;
     let opened = match open_result {
         Ok(opened) => opened,
+        Err(error) if insufficient_funds_error(&error) => {
+            return_binance_transfer(&client, &transfer).await?;
+            return Err(live_test_error(format!(
+                "Binance futures insufficient margin for market open: {error}"
+            )));
+        }
         Err(error) => {
             return_binance_transfer(&client, &transfer).await?;
             return Err(error);
@@ -202,9 +209,6 @@ async fn ensure_spot_usdt(
             }));
         }
     }
-    eprintln!(
-        "skipping Binance live stateful order; insufficient transferable USDT, required={required:.8}"
-    );
     Ok(None)
 }
 
@@ -242,10 +246,62 @@ async fn ensure_futures_usdt(
             }));
         }
     }
-    eprintln!(
-        "skipping Binance futures live stateful order; insufficient transferable USDT, required={required:.8}"
-    );
     Ok(None)
+}
+
+async fn cleanup_binance_futures_state(client: &BinanceClient) -> dcex::Result<()> {
+    if binance_open_swap_orders(client).await? {
+        let cancel = client.cancel_all_open_orders(BTC_USDT_SWAP).await?;
+        assert_success(&cancel);
+        sleep(Duration::from_secs(1)).await;
+    }
+    let open_algo = client
+        .get_all_open_futures_algo_orders()
+        .param("product_symbol", BTC_USDT_SWAP)
+        .await?;
+    if contains_non_empty_array(&open_algo.data, &["orders", "data"]) {
+        let cancel = client
+            .cancel_all_open_futures_algo_orders(BTC_USDT_SWAP)
+            .await?;
+        assert_success(&cancel);
+        sleep(Duration::from_secs(1)).await;
+    }
+
+    let amount = futures_position_amt(client).await?;
+    if amount != 0.0 {
+        let quantity = format_transfer_amount_floor(amount.abs(), 8);
+        let close = client
+            .place_market_order(
+                BTC_USDT_SWAP,
+                if amount > 0.0 { "SELL" } else { "BUY" },
+                quantity.as_str(),
+            )
+            .param("reduceOnly", "true")
+            .await?;
+        assert_success(&close);
+        sleep(Duration::from_secs(1)).await;
+    }
+
+    if binance_open_swap_orders(client).await? {
+        return Err(live_test_error(
+            "Binance futures still has open BTC-USDT swap orders after cleanup",
+        ));
+    }
+    let open_algo = client
+        .get_all_open_futures_algo_orders()
+        .param("product_symbol", BTC_USDT_SWAP)
+        .await?;
+    if contains_non_empty_array(&open_algo.data, &["orders", "data"]) {
+        return Err(live_test_error(
+            "Binance futures still has open BTC-USDT algo orders after cleanup",
+        ));
+    }
+    if wait_for_flat_position(|| futures_position_abs(client)).await? != 0.0 {
+        return Err(live_test_error(
+            "Binance futures BTC-USDT swap position still exists after cleanup",
+        ));
+    }
+    Ok(())
 }
 
 async fn return_binance_transfer(
@@ -298,8 +354,12 @@ async fn futures_usdt(client: &BinanceClient) -> dcex::Result<f64> {
 }
 
 async fn futures_position_abs(client: &BinanceClient) -> dcex::Result<f64> {
+    Ok(futures_position_amt(client).await?.abs())
+}
+
+async fn futures_position_amt(client: &BinanceClient) -> dcex::Result<f64> {
     let response = client.get_future_position(BTC_USDT_SWAP).await?;
-    Ok(sum_abs_values(&response.data, &["positionAmt"]))
+    Ok(find_f64(&response.data, &["positionAmt"]).unwrap_or(0.0))
 }
 
 async fn binance_open_swap_orders(client: &BinanceClient) -> dcex::Result<bool> {

@@ -95,6 +95,10 @@ pub(crate) fn assert_success(response: &ValidatedResponse) {
     assert!(!response.data.is_null(), "{response:?}");
 }
 
+pub(crate) fn live_test_error(message: impl Into<String>) -> DcexError {
+    DcexError::InvalidInput(message.into())
+}
+
 pub(crate) fn require_order_id(data: &Value, keys: &[&str]) -> Result<String> {
     find_string(data, keys).ok_or_else(|| {
         DcexError::Decode(format!(
@@ -344,28 +348,6 @@ pub(crate) fn contains_non_empty_array(data: &Value, keys: &[&str]) -> bool {
         }
         Value::Array(values) => !values.is_empty(),
         _ => false,
-    }
-}
-
-pub(crate) fn sum_abs_values(data: &Value, keys: &[&str]) -> f64 {
-    match data {
-        Value::Object(object) => {
-            let own = keys
-                .iter()
-                .filter_map(|key| object.get(*key))
-                .filter_map(value_as_f64)
-                .map(f64::abs)
-                .sum::<f64>();
-            own + object
-                .values()
-                .map(|value| sum_abs_values(value, keys))
-                .sum::<f64>()
-        }
-        Value::Array(values) => values
-            .iter()
-            .map(|value| sum_abs_values(value, keys))
-            .sum::<f64>(),
-        _ => 0.0,
     }
 }
 

@@ -36,7 +36,11 @@ async def client():
         preload_product_table=False,
         timeout=20,
     ) as client_instance:
-        yield client_instance
+        await _cleanup_test_state(client_instance)
+        try:
+            yield client_instance
+        finally:
+            await _cleanup_test_state(client_instance)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -146,18 +150,9 @@ async def _position_size(client: Client, symbol: str) -> Decimal:
     return size
 
 
-async def _skip_if_existing_state(client: Client) -> None:
-    if await _open_orders(client, SPOT_SYMBOL):
-        pytest.skip("Backpack spot already has SOL_USDC open orders.")
-    if await _open_orders(client, PERP_SYMBOL):
-        pytest.skip("Backpack perp already has SOL_USDC_PERP open orders.")
-    if await _position_size(client, PERP_SYMBOL) != 0:
-        pytest.skip("Backpack already has a SOL_USDC_PERP position.")
-
-
 async def _ensure_usdc(client: Client, required: Decimal) -> None:
     if await _available(client, "USDC") + await _lent(client, "USDC") < required:
-        pytest.skip("Insufficient Backpack USDC for stateful test.")
+        pytest.fail("Insufficient Backpack USDC for stateful test.")
 
 
 async def _cancel_order(client: Client, symbol: str, order_id: str) -> None:
@@ -171,16 +166,58 @@ async def _cancel_all_symbol_orders(client: Client, symbol: str) -> None:
     await asyncio.sleep(1)
 
 
+async def _return_spot_sol_delta(client: Client, initial_sol: Decimal) -> None:
+    _, step, min_qty = await _market_details(client, SPOT_SYMBOL)
+    acquired = max(await _total_asset(client, "SOL") - initial_sol, Decimal("0"))
+    remaining = _round_to_step(acquired, step, ROUND_DOWN)
+    if remaining >= min_qty:
+        await client.place_market_order(
+            SPOT_SYMBOL,
+            side="Ask",
+            quantity=_fmt(remaining),
+            autoLend=True,
+            autoLendRedeem=True,
+        )
+        await asyncio.sleep(1)
+    if initial_sol == 0 and 0 < await _total_asset(client, "SOL") < min_qty:
+        await client.convert_dust("SOL")
+        await asyncio.sleep(1)
+
+
+async def _close_perp_position(client: Client) -> None:
+    for _ in range(3):
+        size = await _position_size(client, PERP_SYMBOL)
+        if size == 0:
+            return
+        await client.place_market_order(
+            PERP_SYMBOL,
+            side="Ask" if size > 0 else "Bid",
+            quantity=_fmt(abs(size)),
+            reduceOnly=True,
+            autoLend=True,
+        )
+        await asyncio.sleep(2)
+    assert await _position_size(client, PERP_SYMBOL) == 0
+
+
+async def _cleanup_test_state(client: Client) -> None:
+    await _cancel_all_symbol_orders(client, SPOT_SYMBOL)
+    await _cancel_all_symbol_orders(client, PERP_SYMBOL)
+    await _close_perp_position(client)
+    await _return_spot_sol_delta(client, Decimal("0"))
+    assert await _open_orders(client, SPOT_SYMBOL) == []
+    assert await _open_orders(client, PERP_SYMBOL) == []
+    assert await _position_size(client, PERP_SYMBOL) == 0
+
+
 @pytest.mark.asyncio
 async def test_spot_stateful_order_lifecycle(client):
-    await _skip_if_existing_state(client)
+    await _cleanup_test_state(client)
     min_qty = await _min_quantity(client, SPOT_SYMBOL)
     qty = min_qty * 2
     _, ask = await _book_prices(client, SPOT_SYMBOL)
     await _ensure_usdc(client, qty * ask * Decimal("1.01"))
     initial_sol = await _total_asset(client, "SOL")
-    if initial_sol >= min_qty:
-        pytest.skip("Backpack already has a tradable SOL balance.")
 
     try:
         await client.place_market_order(
@@ -243,29 +280,12 @@ async def test_spot_stateful_order_lifecycle(client):
         assert isinstance(await client.get_fill_history(product_symbol=SPOT_SYMBOL, limit=20), list)
     finally:
         await _cancel_all_symbol_orders(client, SPOT_SYMBOL)
-        with suppress(Exception):
-            _, step, min_qty = await _market_details(client, SPOT_SYMBOL)
-            acquired = max(
-                await _total_asset(client, "SOL") - initial_sol,
-                Decimal("0"),
-            )
-            remaining = _round_to_step(acquired, step, ROUND_DOWN)
-            if remaining >= min_qty:
-                await client.place_market_order(
-                    SPOT_SYMBOL,
-                    side="Ask",
-                    quantity=_fmt(remaining),
-                    autoLend=True,
-                    autoLendRedeem=True,
-                )
-                await asyncio.sleep(1)
-            if initial_sol == 0 and 0 < await _total_asset(client, "SOL") < min_qty:
-                await client.convert_dust("SOL")
+        await _return_spot_sol_delta(client, initial_sol)
 
 
 @pytest.mark.asyncio
 async def test_perp_stateful_order_lifecycle(client):
-    await _skip_if_existing_state(client)
+    await _cleanup_test_state(client)
     qty = await _min_quantity(client, PERP_SYMBOL)
     _, ask = await _book_prices(client, PERP_SYMBOL)
     await _ensure_usdc(client, qty * ask * Decimal("0.2"))
@@ -326,13 +346,4 @@ async def test_perp_stateful_order_lifecycle(client):
         assert isinstance(await client.get_fill_history(product_symbol=PERP_SYMBOL, limit=20), list)
     finally:
         await _cancel_all_symbol_orders(client, PERP_SYMBOL)
-        with suppress(Exception):
-            size = await _position_size(client, PERP_SYMBOL)
-            if size > 0:
-                await client.place_market_order(
-                    PERP_SYMBOL,
-                    side="Ask",
-                    quantity=_fmt(size),
-                    reduceOnly=True,
-                    autoLend=True,
-                )
+        await _close_perp_position(client)

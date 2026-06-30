@@ -4,7 +4,6 @@ import asyncio
 import json
 import os
 import uuid
-from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -41,7 +40,11 @@ async def client():
         api_secret=BITMEX_API_SECRET,
         timeout=20,
     ) as client_instance:
-        yield client_instance
+        await _cleanup(client_instance)
+        try:
+            yield client_instance
+        finally:
+            await _cleanup(client_instance)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -79,13 +82,6 @@ async def _open_orders(client: Client) -> list[dict]:
     return [item for item in orders if isinstance(item, dict)]
 
 
-async def _skip_if_existing_state(client: Client) -> None:
-    if await _open_orders(client):
-        pytest.skip("BitMEX already has open orders; not touching unrelated orders.")
-    if await _position_qty(client) != 0:
-        pytest.skip("BitMEX already has a position; not changing exposure.")
-
-
 async def _best_prices(client: Client) -> tuple[Decimal, Decimal]:
     bids: list[Decimal] = []
     asks: list[Decimal] = []
@@ -98,7 +94,7 @@ async def _best_prices(client: Client) -> tuple[Decimal, Decimal]:
         elif level.get("side") == "Sell":
             asks.append(price)
     if not bids or not asks:
-        pytest.skip("BitMEX orderbook did not return both bid and ask prices.")
+        pytest.fail("BitMEX orderbook did not return both bid and ask prices.")
     return max(bids), min(asks)
 
 
@@ -158,7 +154,7 @@ async def _ensure_margin(client: Client) -> None:
     leverage = max(_dec((await _position(client)).get("leverage"), "1"), Decimal("1"))
     required_margin = Decimal(await _order_qty(client)) / leverage * MARGIN_UNIT * Decimal("1.05")
     if await _available_margin(client) < required_margin:
-        pytest.skip("Insufficient BitMEX available margin for stateful order test.")
+        pytest.fail("Insufficient BitMEX available margin for stateful order test.")
 
 
 async def _wait_for_position(client: Client, sign: int) -> int:
@@ -175,7 +171,7 @@ async def _wait_for_position(client: Client, sign: int) -> int:
 async def _wait_for_position_or_skip(client: Client, sign: int, action: str) -> int:
     qty = await _wait_for_position(client, sign)
     if qty == 0:
-        pytest.skip(f"BitMEX {action} did not fill before timeout.")
+        pytest.fail(f"BitMEX {action} did not fill before timeout.")
     return qty
 
 
@@ -190,20 +186,34 @@ async def _wait_until_flat(client: Client) -> None:
 async def _close_position(client: Client) -> None:
     qty = await _position_qty(client)
     if qty > 0:
-        await client.place_market_sell_order(SYMBOL, orderQty=abs(qty), clOrdID=_client_id())
+        await client.place_order(
+            SYMBOL,
+            side="Sell",
+            orderQty=abs(qty),
+            ordType="Market",
+            execInst="ReduceOnly",
+            clOrdID=_client_id(),
+        )
     elif qty < 0:
-        await client.place_market_buy_order(SYMBOL, orderQty=abs(qty), clOrdID=_client_id())
+        await client.place_order(
+            SYMBOL,
+            side="Buy",
+            orderQty=abs(qty),
+            ordType="Market",
+            execInst="ReduceOnly",
+            clOrdID=_client_id(),
+        )
     await asyncio.sleep(2)
     await _wait_until_flat(client)
 
 
 async def _cleanup(client: Client) -> None:
-    with suppress(Exception):
-        if await _open_orders(client):
-            await client.cancel_all_orders(product_symbol=SYMBOL, text="dcex cleanup")
-            await asyncio.sleep(1)
-    with suppress(Exception):
-        await _close_position(client)
+    if await _open_orders(client):
+        await client.cancel_all_orders(product_symbol=SYMBOL, text="dcex cleanup")
+        await asyncio.sleep(1)
+    await _close_position(client)
+    assert not await _open_orders(client)
+    assert await _position_qty(client) == 0
 
 
 async def _assert_order_visible(client: Client, order_id: str) -> None:
@@ -219,7 +229,7 @@ async def _assert_order_visible(client: Client, order_id: str) -> None:
         if any(isinstance(order, dict) and order.get("orderID") == order_id for order in orders):
             return
         await asyncio.sleep(1)
-    pytest.skip(f"BitMEX order {order_id} was not visible before live assertion.")
+    pytest.fail(f"BitMEX order {order_id} was not visible before live assertion.")
 
 
 def _is_invalid_order_id(exc: FailedRequestError) -> bool:
@@ -231,7 +241,7 @@ async def _amend_order_or_skip(client: Client, order_id: str, price: float) -> d
         return await client.amend_order(orderID=order_id, price=price)
     except FailedRequestError as exc:
         if _is_invalid_order_id(exc):
-            pytest.skip(f"BitMEX order {order_id} was no longer amendable: {exc}")
+            pytest.fail(f"BitMEX order {order_id} was no longer amendable: {exc}")
         raise
 
 
@@ -251,7 +261,7 @@ async def _cancel_order_if_present(
 
 
 async def test_async_stateful_order_lifecycle(client):
-    await _skip_if_existing_state(client)
+    await _cleanup(client)
     await _ensure_margin(client)
     qty = await _order_qty(client)
 

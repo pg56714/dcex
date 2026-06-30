@@ -3,7 +3,6 @@
 import asyncio
 import os
 import uuid
-from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -42,7 +41,12 @@ async def client():
         passphrase=KUCOIN_API_PASSPHRASE,
         timeout=20,
     ) as client_instance:
-        yield client_instance
+        await _cleanup(client_instance, await _snapshot_balances(client_instance))
+        clean_initial = await _snapshot_balances(client_instance)
+        try:
+            yield client_instance
+        finally:
+            await _cleanup(client_instance, clean_initial)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -138,7 +142,7 @@ async def _transfer_from_main(
 ) -> None:
     main_available = await _available(client, "USDT", "main")
     if main_available < amount:
-        pytest.skip(reason)
+        pytest.fail(reason, pytrace=False)
     await _flex_transfer(client, "USDT", amount, "MAIN", to_account_type)
 
 
@@ -158,12 +162,7 @@ async def _futures_open_orders(client: Client) -> list[dict]:
 
 
 async def _skip_if_existing_state(client: Client) -> None:
-    if await _spot_open_orders(client, product_symbol=None):
-        pytest.skip("KuCoin spot already has open orders; not touching unrelated orders.")
-    if await _futures_open_orders(client):
-        pytest.skip("BTC-USDT futures already has open orders; not touching unrelated orders.")
-    if await _futures_position_size(client) != 0:
-        pytest.skip("BTC-USDT futures already has a position; not changing exposure.")
+    await _cleanup(client, await _snapshot_balances(client))
 
 
 async def _snapshot_balances(client: Client) -> dict[str, Decimal]:
@@ -175,71 +174,14 @@ async def _snapshot_balances(client: Client) -> dict[str, Decimal]:
 
 
 async def _cleanup(client: Client, initial: dict[str, Decimal]) -> None:
-    with suppress(Exception):
-        if await _spot_open_orders(client):
-            await client.cancel_spot_all_orders_by_symbol(product_symbol=SPOT_SYMBOL)
-            await asyncio.sleep(1)
-
-    with suppress(Exception):
-        if await _futures_open_orders(client):
-            await client.cancel_futures_all_orders(product_symbol=FUTURES_SYMBOL)
-            await asyncio.sleep(1)
-
-    with suppress(Exception):
-        position_size = await _futures_position_size(client)
-        if position_size > 0:
-            await client.place_futures_market_sell_order(
-                product_symbol=FUTURES_SYMBOL,
-                size=int(position_size),
-                clientOid=_client_oid(),
-                leverage=int(FUTURES_LEVERAGE),
-                marginMode="CROSS",
-                positionSide="BOTH",
-                reduceOnly=True,
-            )
-            await asyncio.sleep(2)
-        elif position_size < 0:
-            await client.place_futures_market_buy_order(
-                product_symbol=FUTURES_SYMBOL,
-                size=int(abs(position_size)),
-                clientOid=_client_oid(),
-                leverage=int(FUTURES_LEVERAGE),
-                marginMode="CROSS",
-                positionSide="BOTH",
-                reduceOnly=True,
-            )
-            await asyncio.sleep(2)
-
-    with suppress(Exception):
-        trade_btc = await _available(client, "BTC", "trade")
-        excess_btc = trade_btc - initial["trade_btc"]
-        if excess_btc > 0:
-            size = await _spot_sell_quantity(client, excess_btc)
-            if Decimal(size) > 0:
-                await client.place_spot_market_sell_order(
-                    product_symbol=SPOT_SYMBOL,
-                    size=size,
-                    clientOid=_client_oid(),
-                )
-                await asyncio.sleep(2)
-
-    with suppress(Exception):
-        trade_usdt = await _available(client, "USDT", "trade")
-        excess_usdt = trade_usdt - initial["trade_usdt"]
-        if excess_usdt > Decimal("0.00000001"):
-            await _flex_transfer(client, "USDT", excess_usdt, "TRADE", "MAIN")
-
-    with suppress(Exception):
-        trade_btc = await _available(client, "BTC", "trade")
-        excess_btc = trade_btc - initial["trade_btc"]
-        if excess_btc > Decimal("0.00000001"):
-            await _flex_transfer(client, "BTC", excess_btc, "TRADE", "MAIN")
-
-    with suppress(Exception):
-        contract_usdt = await _futures_available_usdt(client)
-        excess_contract_usdt = contract_usdt - initial["contract_usdt"]
-        if excess_contract_usdt > Decimal("0.00000001"):
-            await _flex_transfer(client, "USDT", excess_contract_usdt, "CONTRACT", "MAIN")
+    await _cancel_spot_open_orders(client)
+    await _cancel_futures_open_orders(client)
+    await _close_futures_position(client)
+    await _return_spot_btc_delta(client, initial["trade_btc"])
+    await _return_excess_balances(client, initial)
+    assert not await _spot_open_orders(client)
+    assert not await _futures_open_orders(client)
+    assert await _futures_position_size(client) == 0
 
 
 def _spot_step_and_min(client: Client) -> tuple[Decimal, Decimal, Decimal]:
@@ -262,6 +204,11 @@ async def _spot_order_params(client: Client) -> tuple[str, str]:
     price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     size = _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP)
     return _fmt(max(size, min_size)), _fmt(price)
+
+
+async def _spot_prices(client: Client) -> tuple[Decimal, Decimal]:
+    book = (await client.get_spot_orderbook(product_symbol=SPOT_SYMBOL))["data"]
+    return _dec(book["bids"][0][0]), _dec(book["asks"][0][0])
 
 
 async def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
@@ -297,6 +244,15 @@ async def _spot_sell_quantity(client: Client, quantity: Decimal) -> str:
     return _fmt(_round_to_step(quantity, step, ROUND_DOWN))
 
 
+async def _spot_sellable_quantity(client: Client, quantity: Decimal) -> str:
+    step, min_size, min_notional = _spot_step_and_min(client)
+    bid, _ = await _spot_prices(client)
+    size = _round_to_step(quantity, step, ROUND_DOWN)
+    if size < min_size or size * bid < min_notional:
+        return "0"
+    return _fmt(size)
+
+
 async def _spot_market_funds(client: Client) -> Decimal:
     _, _, min_notional = _spot_step_and_min(client)
     return min_notional * Decimal("1.01")
@@ -316,7 +272,9 @@ async def _ensure_spot_funds(client: Client, funds: Decimal) -> None:
         "Insufficient main USDT to fund KuCoin spot stateful order test.",
     )
     if await _available(client, "USDT", "trade") < funds:
-        pytest.skip("Insufficient spot trade USDT for KuCoin spot stateful order test.")
+        pytest.fail(
+            "Insufficient spot trade USDT for KuCoin spot stateful order test.", pytrace=False
+        )
 
 
 async def _ensure_spot_order_funds(client: Client, size: str, price: str) -> None:
@@ -350,6 +308,20 @@ async def _cancel_spot_order(client: Client, order_id: str) -> dict:
         return {"code": "200000", "data": {}}
 
 
+async def _wait_until_no_spot_open_orders(client: Client) -> None:
+    for _ in range(5):
+        if not await _spot_open_orders(client):
+            return
+        await asyncio.sleep(1)
+    assert not await _spot_open_orders(client)
+
+
+async def _cancel_spot_open_orders(client: Client) -> None:
+    if await _spot_open_orders(client):
+        await client.cancel_spot_all_orders_by_symbol(product_symbol=SPOT_SYMBOL)
+        await _wait_until_no_spot_open_orders(client)
+
+
 def _is_futures_order_not_cancelable(exc: FailedRequestError) -> bool:
     message = str(exc).lower()
     return "100004" in message and "cannot be canceled" in message
@@ -361,6 +333,80 @@ async def _cancel_futures_order(client: Client, order_id: str) -> dict:
     except FailedRequestError as exc:
         if _is_futures_order_not_cancelable(exc):
             return {"code": "200000", "data": {}}
+        raise
+
+
+async def _wait_until_no_futures_open_orders(client: Client) -> None:
+    for _ in range(5):
+        if not await _futures_open_orders(client):
+            return
+        await asyncio.sleep(1)
+    assert not await _futures_open_orders(client)
+
+
+async def _cancel_futures_open_orders(client: Client) -> None:
+    if await _futures_open_orders(client):
+        await client.cancel_futures_all_orders(product_symbol=FUTURES_SYMBOL)
+        await _wait_until_no_futures_open_orders(client)
+
+
+async def _top_up_spot_btc_for_sell(client: Client, btc_delta: Decimal) -> None:
+    if btc_delta <= 0:
+        return
+    step, min_size, min_notional = _spot_step_and_min(client)
+    bid, ask = await _spot_prices(client)
+    sellable = _round_to_step(btc_delta, step, ROUND_DOWN)
+    target = max(min_size, _round_to_step(min_notional / bid, step, ROUND_UP))
+    top_up_size = target - sellable
+    if top_up_size <= 0:
+        return
+    funds = top_up_size * ask * Decimal("1.02")
+    await _ensure_spot_funds(client, funds)
+    assert (
+        await client.place_spot_market_buy_order(
+            product_symbol=SPOT_SYMBOL,
+            funds=_fmt(funds),
+            clientOid=_client_oid(),
+        )
+        is not None
+    )
+    await asyncio.sleep(2)
+
+
+async def _return_spot_btc_delta(client: Client, initial_btc: Decimal) -> None:
+    for _ in range(4):
+        btc_delta = await _available(client, "BTC", "trade") - initial_btc
+        if btc_delta <= 0:
+            return
+        sell_size = await _spot_sellable_quantity(client, btc_delta)
+        if Decimal(sell_size) <= 0:
+            await _top_up_spot_btc_for_sell(client, btc_delta)
+            continue
+        assert (
+            await client.place_spot_market_sell_order(
+                product_symbol=SPOT_SYMBOL,
+                size=sell_size,
+                clientOid=_client_oid(),
+            )
+            is not None
+        )
+        await asyncio.sleep(2)
+
+    step, _, _ = _spot_step_and_min(client)
+    remaining = await _available(client, "BTC", "trade") - initial_btc
+    assert remaining <= step
+
+
+async def _return_excess_balances(client: Client, initial: dict[str, Decimal]) -> None:
+    trade_usdt = await _available(client, "USDT", "trade")
+    excess_usdt = trade_usdt - initial["trade_usdt"]
+    if excess_usdt > Decimal("0.00000001"):
+        await _flex_transfer(client, "USDT", excess_usdt, "TRADE", "MAIN")
+
+    contract_usdt = await _futures_available_usdt(client)
+    excess_contract_usdt = contract_usdt - initial["contract_usdt"]
+    if excess_contract_usdt > Decimal("0.00000001"):
+        await _flex_transfer(client, "USDT", excess_contract_usdt, "CONTRACT", "MAIN")
         raise
 
 
@@ -435,7 +481,9 @@ async def _ensure_futures_margin(
         "Insufficient main USDT to fund KuCoin futures stateful order test.",
     )
     if await _futures_available_usdt(client) < required_margin:
-        pytest.skip("Insufficient futures USDT for KuCoin futures stateful order test.")
+        pytest.fail(
+            "Insufficient futures USDT for KuCoin futures stateful order test.", pytrace=False
+        )
 
 
 async def _wait_for_futures_position(client: Client, sign: int) -> Decimal:
@@ -456,7 +504,7 @@ async def _wait_for_futures_position_or_skip(
 ) -> Decimal:
     size = await _wait_for_futures_position(client, sign)
     if size == 0:
-        pytest.skip(f"KuCoin futures {action} did not fill before timeout.")
+        pytest.fail(f"KuCoin futures {action} did not fill before timeout.", pytrace=False)
     return size
 
 
@@ -469,28 +517,36 @@ async def _wait_until_flat(client: Client) -> None:
 
 
 async def _close_futures_position(client: Client) -> None:
-    position_size = await _futures_position_size(client)
-    if position_size > 0:
-        await client.place_futures_market_sell_order(
-            product_symbol=FUTURES_SYMBOL,
-            size=int(position_size),
-            clientOid=_client_oid(),
-            leverage=int(FUTURES_LEVERAGE),
-            marginMode="CROSS",
-            positionSide="BOTH",
-            reduceOnly=True,
-        )
-    elif position_size < 0:
-        await client.place_futures_market_buy_order(
-            product_symbol=FUTURES_SYMBOL,
-            size=int(abs(position_size)),
-            clientOid=_client_oid(),
-            leverage=int(FUTURES_LEVERAGE),
-            marginMode="CROSS",
-            positionSide="BOTH",
-            reduceOnly=True,
-        )
-    await asyncio.sleep(2)
+    for _ in range(3):
+        position_size = await _futures_position_size(client)
+        if position_size == 0:
+            return
+        close_size = int(abs(position_size))
+        if close_size <= 0:
+            raise AssertionError(f"Invalid KuCoin futures position size: {position_size}")
+        if position_size > 0:
+            await client.place_futures_market_sell_order(
+                product_symbol=FUTURES_SYMBOL,
+                size=close_size,
+                clientOid=_client_oid(),
+                leverage=int(FUTURES_LEVERAGE),
+                marginMode="CROSS",
+                positionSide="BOTH",
+                reduceOnly=True,
+            )
+        else:
+            await client.place_futures_market_buy_order(
+                product_symbol=FUTURES_SYMBOL,
+                size=close_size,
+                clientOid=_client_oid(),
+                leverage=int(FUTURES_LEVERAGE),
+                marginMode="CROSS",
+                positionSide="BOTH",
+                reduceOnly=True,
+            )
+        await asyncio.sleep(2)
+        if await _futures_position_size(client) == 0:
+            return
     await _wait_until_flat(client)
 
 

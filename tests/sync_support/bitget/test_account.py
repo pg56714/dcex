@@ -38,10 +38,11 @@ def _assert_ok(response) -> dict:
     return response
 
 
-def _skip_if_unified_account_error(exc: FailedRequestError) -> None:
+def _fail_if_unified_account_error(exc: FailedRequestError) -> None:
     if "40085" in str(exc) or "Unified Account mode" in str(exc):
-        pytest.skip(
-            "Bitget account is in Unified Account mode; Classic Account API is unsupported."
+        pytest.fail(
+            "Bitget account is in Unified Account mode; Classic Account API is unsupported.",
+            pytrace=False,
         )
 
 
@@ -50,7 +51,7 @@ def test_common_account_read_endpoints(client):
         _assert_ok(client.get_all_account_balance())
         _assert_ok(client.get_funding_assets(coin="USDT"))
     except FailedRequestError as exc:
-        _skip_if_unified_account_error(exc)
+        _fail_if_unified_account_error(exc)
         raise
 
 
@@ -73,7 +74,7 @@ def test_spot_account_read_endpoints(client):
             )
         )
     except FailedRequestError as exc:
-        _skip_if_unified_account_error(exc)
+        _fail_if_unified_account_error(exc)
         raise
 
 
@@ -85,7 +86,7 @@ def test_futures_account_read_endpoints(client):
         _assert_ok(client.get_futures_positions())
         _assert_ok(client.get_futures_position(product_symbol="BTC-USDT-SWAP"))
     except FailedRequestError as exc:
-        _skip_if_unified_account_error(exc)
+        _fail_if_unified_account_error(exc)
         raise
 
 
@@ -98,5 +99,5 @@ def test_private_trade_read_endpoints(client):
         _assert_ok(client.get_futures_history_orders(product_symbol="BTC-USDT-SWAP", limit=20))
         _assert_ok(client.get_futures_fills(product_symbol="BTC-USDT-SWAP", limit=20))
     except FailedRequestError as exc:
-        _skip_if_unified_account_error(exc)
+        _fail_if_unified_account_error(exc)
         raise

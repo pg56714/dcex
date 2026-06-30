@@ -5,7 +5,8 @@ use serde_json::Value;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, find_string, require_env, require_live_trading, unique_client_id,
+    assert_success, find_f64, find_string, live_test_error, require_env, require_live_trading,
+    unique_client_id,
 };
 
 const LIGHTER_BASE_URL: &str = "https://mainnet.zklighter.elliot.ai";
@@ -33,9 +34,11 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
         Some(keys[2].clone()),
     )?;
     if let Some(message) = client.check_client().await? {
-        eprintln!("skipping Lighter live stateful order; {message}");
-        return Ok(());
+        return Err(live_test_error(format!(
+            "Lighter live stateful order client check failed: {message}"
+        )));
     }
+    cleanup_lighter_state(&client, account_index).await?;
 
     let market = active_lighter_market(&client).await?;
     let market_id = value_string(&market, "market_id")?;
@@ -76,6 +79,166 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
     .await?;
     assert_success(&cancel);
     Ok(())
+}
+
+async fn cleanup_lighter_state(client: &LighterClient, account_index: u64) -> dcex::Result<()> {
+    let active = super::common::exchange_method_request(
+        client,
+        "get_account_active_orders",
+        vec![("account_index".to_string(), account_index.to_string())],
+    )
+    .await?;
+    for order in active
+        .data
+        .get("orders")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+    {
+        let market_id =
+            value_string(order, "market_id").or_else(|_| value_string(order, "market_index"))?;
+        let order_index = value_string(order, "order_index")?;
+        let cancel = super::common::exchange_method_request(
+            client,
+            "cancel_order",
+            vec![
+                ("market_index".to_string(), market_id),
+                ("order_index".to_string(), order_index),
+            ],
+        )
+        .await?;
+        assert_success(&cancel);
+    }
+
+    let account = super::common::exchange_method_request(
+        client,
+        "get_account",
+        vec![
+            ("by".to_string(), "index".to_string()),
+            ("value".to_string(), account_index.to_string()),
+        ],
+    )
+    .await?;
+    let details = client.get_order_book_details().await?;
+    let markets = details
+        .data
+        .get("order_book_details")
+        .and_then(Value::as_array)
+        .ok_or_else(|| {
+            dcex::DcexError::Decode(format!("missing Lighter order_book_details: {details:?}"))
+        })?;
+
+    for position in lighter_positions(&account.data) {
+        let market_id = value_string(position, "market_id")?;
+        let signed_size = signed_lighter_position_size(position)?;
+        if signed_size == 0.0 {
+            continue;
+        }
+        let market = markets
+            .iter()
+            .find(|market| value_string(market, "market_id").ok().as_deref() == Some(&market_id))
+            .ok_or_else(|| {
+                dcex::DcexError::Decode(format!("missing Lighter market {market_id}"))
+            })?;
+        close_lighter_position(client, market, signed_size).await?;
+    }
+
+    let remaining = super::common::exchange_method_request(
+        client,
+        "get_account",
+        vec![
+            ("by".to_string(), "index".to_string()),
+            ("value".to_string(), account_index.to_string()),
+        ],
+    )
+    .await?;
+    if lighter_positions(&remaining.data)
+        .iter()
+        .any(|position| signed_lighter_position_size(position).unwrap_or(0.0) != 0.0)
+    {
+        return Err(live_test_error(
+            "Lighter positions still exist after cleanup",
+        ));
+    }
+    Ok(())
+}
+
+async fn close_lighter_position(
+    client: &LighterClient,
+    market: &Value,
+    signed_size: f64,
+) -> dcex::Result<()> {
+    let market_id = value_string(market, "market_id")?;
+    let price_decimals = value_u32(market, "price_decimals")?;
+    let size_decimals = value_u32(market, "size_decimals")?;
+    let min_base = value_f64_required(market, "min_base_amount")?;
+    let base = signed_size.abs().max(min_base);
+    let base_amount = scale_amount(base, size_decimals, true)?;
+    let book = super::common::exchange_method_request(
+        client,
+        "get_order_book_orders",
+        vec![
+            ("market_id".to_string(), market_id.clone()),
+            ("limit".to_string(), "5".to_string()),
+        ],
+    )
+    .await?;
+    let bid = first_lighter_book_price(&book.data, "bids")?;
+    let ask = first_lighter_book_price(&book.data, "asks")?;
+    let (is_ask, price) = if signed_size > 0.0 {
+        (
+            true,
+            scale_amount((bid * 0.995).max(0.0), price_decimals, false)?,
+        )
+    } else {
+        (false, scale_amount(ask * 1.005, price_decimals, true)?)
+    };
+    let close = super::common::exchange_method_request(
+        client,
+        "create_order",
+        vec![
+            ("market_index".to_string(), market_id),
+            (
+                "client_order_index".to_string(),
+                unique_client_id("").to_string(),
+            ),
+            ("base_amount".to_string(), base_amount.to_string()),
+            ("price".to_string(), price.to_string()),
+            ("is_ask".to_string(), is_ask.to_string()),
+            ("order_type".to_string(), "1".to_string()),
+            ("time_in_force".to_string(), "0".to_string()),
+            ("reduce_only".to_string(), "true".to_string()),
+            ("order_expiry".to_string(), "0".to_string()),
+        ],
+    )
+    .await?;
+    assert_success(&close);
+    Ok(())
+}
+
+fn lighter_positions(data: &Value) -> Vec<&Value> {
+    data.get("accounts")
+        .and_then(Value::as_array)
+        .and_then(|accounts| accounts.first())
+        .and_then(|account| account.get("positions"))
+        .and_then(Value::as_array)
+        .map(|positions| positions.iter().collect())
+        .unwrap_or_default()
+}
+
+fn signed_lighter_position_size(position: &Value) -> dcex::Result<f64> {
+    let size = find_f64(position, &["position"]).unwrap_or(0.0);
+    let sign = find_f64(position, &["sign"]).unwrap_or(1.0);
+    Ok(if sign < 0.0 { -size } else { size })
+}
+
+fn first_lighter_book_price(data: &Value, key: &str) -> dcex::Result<f64> {
+    data.get(key)
+        .and_then(Value::as_array)
+        .and_then(|levels| levels.first())
+        .and_then(|level| level.get("price"))
+        .and_then(value_f64)
+        .ok_or_else(|| dcex::DcexError::Decode(format!("missing Lighter {key} price: {data}")))
 }
 
 async fn active_lighter_market(client: &LighterClient) -> dcex::Result<Value> {

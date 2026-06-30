@@ -16,12 +16,15 @@ OKX_API_SECRET = os.getenv("OKX_API_SECRET")
 OKX_PASSPHRASE = os.getenv("OKX_PASSPHRASE")
 
 
-def _skip_if_deposit_withdraw_status_unavailable(exc) -> None:
+def _fail_if_deposit_withdraw_status_unavailable(exc) -> None:
     message = str(exc)
     if "58214" in message:
-        pytest.skip("OKX deposit/withdraw status is unavailable during chain maintenance.")
+        pytest.fail(
+            "OKX deposit/withdraw status is unavailable during chain maintenance.",
+            pytrace=False,
+        )
     if "50011" in message or "Too many requests" in message:
-        pytest.skip("OKX rate-limited the deposit/withdraw status endpoint.")
+        pytest.fail("OKX rate-limited the deposit/withdraw status endpoint.", pytrace=False)
 
 
 @pytest_asyncio.fixture
@@ -99,7 +102,7 @@ async def test_get_deposit_withdraw_status(client):
         None,
     )
     if deposit is None:
-        pytest.skip("OKX account has no complete USDT deposit record to query.")
+        pytest.fail("OKX account has no complete USDT deposit record to query.", pytrace=False)
     try:
         res = await client.get_deposit_withdraw_status(
             txId=deposit["txId"],
@@ -108,7 +111,7 @@ async def test_get_deposit_withdraw_status(client):
             chain=deposit["chain"],
         )
     except FailedRequestError as exc:
-        _skip_if_deposit_withdraw_status_unavailable(exc)
+        _fail_if_deposit_withdraw_status_unavailable(exc)
         raise
     assert res is not None
 

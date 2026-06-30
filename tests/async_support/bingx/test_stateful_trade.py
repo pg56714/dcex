@@ -4,7 +4,6 @@ import asyncio
 import logging
 import os
 import uuid
-from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -44,7 +43,11 @@ async def client():
         api_secret=BINGX_API_SECRET,
         timeout=20,
     ) as client_instance:
-        yield client_instance
+        await _cleanup(client_instance)
+        try:
+            yield client_instance
+        finally:
+            await _cleanup(client_instance)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -70,7 +73,7 @@ def _client_order_id() -> str:
 def _skip_if_rate_limited(exc: FailedRequestError) -> None:
     message = str(exc)
     if "100410" in message or "endpoint trigger frequency limit" in message:
-        pytest.skip("BingX temporarily rate-limited this endpoint.")
+        pytest.fail("BingX temporarily rate-limited this endpoint.", pytrace=False)
 
 
 async def _swap_available_usdt(client: Client) -> Decimal:
@@ -212,7 +215,7 @@ async def _ensure_usdt_for_account(
             continue
 
     if await _account_available_usdt(client, to_account) < required:
-        pytest.skip(f"Insufficient transferable BingX USDT to transfer into {to_account}.")
+        pytest.fail(f"Insufficient transferable BingX USDT to transfer into {to_account}.")
 
 
 async def _swap_open_orders(client: Client) -> list[dict]:
@@ -271,12 +274,7 @@ async def _positions(client: Client) -> list[dict]:
 
 
 async def _skip_if_existing_state(client: Client) -> None:
-    if await _spot_open_orders(client):
-        pytest.skip("BTC-USDT spot already has open orders; not touching unrelated orders.")
-    if await _swap_open_orders(client):
-        pytest.skip("BTC-USDT swap already has open orders; not touching unrelated orders.")
-    if await _positions(client):
-        pytest.skip("BTC-USDT swap already has a position; not changing exposure.")
+    await _cleanup(client)
 
 
 def _spot_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
@@ -352,7 +350,7 @@ async def _ensure_spot_usdt(client: Client, quantity: str, price: str) -> None:
         current_available=await _spot_available(client, "USDT"),
     )
     if await _spot_available(client, "USDT") < required:
-        pytest.skip("BingX spot USDT remains insufficient after internal transfer.")
+        pytest.fail("BingX spot USDT remains insufficient after internal transfer.")
 
 
 async def _spot_market_buy_delta(client: Client, quote_amount: Decimal) -> Decimal:
@@ -425,7 +423,7 @@ async def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
         current_available=await _swap_available_usdt(client),
     )
     if await _swap_available_usdt(client) < required:
-        pytest.skip("BingX swap USDT remains insufficient after internal transfer.")
+        pytest.fail("BingX swap USDT remains insufficient after internal transfer.")
 
 
 def _position_id(positions: list[dict], side: str) -> str | None:
@@ -450,52 +448,62 @@ async def _wait_for_position(client: Client, side: str) -> str | None:
 async def _wait_for_position_or_skip(client: Client, side: str, action: str) -> str:
     position_id = await _wait_for_position(client, side)
     if position_id is None:
-        pytest.skip(f"BingX {action} did not fill before timeout.")
+        pytest.fail(f"BingX {action} did not fill before timeout.")
     return position_id
 
 
 async def _cleanup(client: Client) -> None:
-    with suppress(Exception):
-        if await _spot_open_orders(client):
-            await client.cancel_spot_open_orders(product_symbol=SPOT_SYMBOL)
-            await asyncio.sleep(1)
+    if await _spot_open_orders(client):
+        await client.cancel_spot_open_orders(product_symbol=SPOT_SYMBOL)
+        await asyncio.sleep(1)
 
-    with suppress(Exception):
-        if await _swap_open_orders(client):
-            await client.cancel_swap_all_orders(product_symbol=SWAP_SYMBOL)
-            await asyncio.sleep(1)
+    if await _swap_open_orders(client):
+        await client.cancel_swap_all_orders(product_symbol=SWAP_SYMBOL)
+        await asyncio.sleep(1)
 
-    with suppress(Exception):
-        if await _positions(client):
-            await client.close_swap_all_positions(product_symbol=SWAP_SYMBOL)
-            await asyncio.sleep(3)
+    if await _positions(client):
+        await client.close_swap_all_positions(product_symbol=SWAP_SYMBOL)
+        await asyncio.sleep(3)
 
-    with suppress(Exception):
-        btc = await _spot_available(client, "BTC")
-        if btc > Decimal("0"):
-            sell_quantity = await _spot_sell_quantity(client, btc)
-            if Decimal(sell_quantity) > 0:
-                await client.place_spot_market_sell_order(
-                    product_symbol=SPOT_SYMBOL,
-                    quantity=sell_quantity,
-                    clientOrderId=_client_order_id(),
-                )
-                await asyncio.sleep(3)
+    await _cleanup_spot_btc(client)
 
-    with suppress(Exception):
-        spot_usdt = await _spot_available(client, "USDT")
-        if spot_usdt > Decimal("0.0001"):
-            await _asset_transfer(client, SPOT_ACCOUNT, FUND_ACCOUNT, "USDT", spot_usdt)
+    spot_usdt = await _spot_available(client, "USDT")
+    if spot_usdt > Decimal("0.0001"):
+        await _asset_transfer(client, SPOT_ACCOUNT, FUND_ACCOUNT, "USDT", spot_usdt)
 
-    with suppress(Exception):
-        spot_btc = await _spot_available(client, "BTC")
-        if spot_btc > Decimal("0"):
-            await _asset_transfer(client, SPOT_ACCOUNT, FUND_ACCOUNT, "BTC", spot_btc)
+    swap_usdt = await _swap_available_usdt(client)
+    if swap_usdt > Decimal("0.0001"):
+        await _asset_transfer(client, SWAP_ACCOUNT, FUND_ACCOUNT, "USDT", swap_usdt)
 
-    with suppress(Exception):
-        swap_usdt = await _swap_available_usdt(client)
-        if swap_usdt > Decimal("0.0001"):
-            await _asset_transfer(client, SWAP_ACCOUNT, FUND_ACCOUNT, "USDT", swap_usdt)
+    assert await _spot_open_orders(client) == []
+    assert await _swap_open_orders(client) == []
+    assert await _positions(client) == []
+
+
+async def _cleanup_spot_btc(client: Client, initial_btc: Decimal = Decimal("0")) -> None:
+    _, step, min_notional = _spot_details(client)
+    remaining = await _spot_available(client, "BTC") - initial_btc
+    sell_quantity = Decimal(await _spot_sell_quantity(client, remaining))
+    best_bid, _ = await _spot_orderbook_prices(client)
+    if sell_quantity > 0 and sell_quantity * best_bid < min_notional:
+        quote_amount = await _spot_market_quote_amount(client)
+        await _ensure_usdt_for_account(
+            client=client,
+            to_account=SPOT_ACCOUNT,
+            required=quote_amount,
+            current_available=await _spot_available(client, "USDT"),
+        )
+        await _spot_market_buy_delta(client, quote_amount)
+        remaining = await _spot_available(client, "BTC") - initial_btc
+        sell_quantity = Decimal(await _spot_sell_quantity(client, remaining))
+    if sell_quantity > 0:
+        await client.place_spot_market_sell_order(
+            product_symbol=SPOT_SYMBOL,
+            quantity=_fmt(sell_quantity),
+            clientOrderId=_client_order_id(),
+        )
+        await asyncio.sleep(3)
+    assert await _spot_available(client, "BTC") - initial_btc <= step
 
 
 async def _exercise_spot_stateful_methods(client: Client) -> None:

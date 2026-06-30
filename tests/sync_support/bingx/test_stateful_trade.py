@@ -36,10 +36,15 @@ pytestmark = [
 
 @pytest.fixture
 def client():
-    return Client(
+    client_instance = Client(
         api_key=BINGX_API_KEY,
         api_secret=BINGX_API_SECRET,
     )
+    _cleanup_state(client_instance)
+    try:
+        yield client_instance
+    finally:
+        _cleanup_state(client_instance)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -61,7 +66,7 @@ def _fmt(value: Decimal) -> str:
 def _skip_if_rate_limited(exc: FailedRequestError) -> None:
     message = str(exc)
     if "100410" in message or "endpoint trigger frequency limit" in message:
-        pytest.skip("BingX temporarily rate-limited this endpoint.")
+        pytest.fail("BingX temporarily rate-limited this endpoint.", pytrace=False)
 
 
 def _swap_available_usdt(client: Client) -> Decimal:
@@ -177,15 +182,11 @@ def _positions(client: Client) -> list[dict]:
 
 
 def _skip_if_swap_state(client: Client) -> None:
-    if _swap_open_orders(client):
-        pytest.skip("BTC-USDT swap already has open orders; not touching unrelated orders.")
-    if _positions(client):
-        pytest.skip("BTC-USDT swap already has a position; not changing exposure.")
+    _cleanup_swap_state(client)
 
 
 def _skip_if_spot_state(client: Client) -> None:
-    if _spot_open_orders(client):
-        pytest.skip("BTC-USDT spot already has open orders; not touching unrelated orders.")
+    _cleanup_spot_state(client)
 
 
 def _swap_order_params(client: Client) -> tuple[str, str]:
@@ -295,7 +296,7 @@ def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
         current_available=_swap_available_usdt(client),
     )
     if _swap_available_usdt(client) < required:
-        pytest.skip("BingX swap USDT remains insufficient after internal transfer.")
+        pytest.fail("BingX swap USDT remains insufficient after internal transfer.")
 
 
 def _swap_fillable_limit_buy_price(client: Client) -> float:
@@ -343,7 +344,7 @@ def _wait_for_position(client: Client, side: str) -> str | None:
 def _wait_for_position_or_skip(client: Client, side: str, action: str) -> str:
     position_id = _wait_for_position(client, side)
     if position_id is None:
-        pytest.skip(f"BingX {action} did not fill before timeout.")
+        pytest.fail(f"BingX {action} did not fill before timeout.")
     return position_id
 
 
@@ -394,7 +395,7 @@ def _ensure_usdt_for_account(
         time.sleep(2)
 
     if _account_available_usdt(client, to_account) < required:
-        pytest.skip(f"Insufficient transferable BingX USDT to transfer into {to_account}.")
+        pytest.fail(f"Insufficient transferable BingX USDT to transfer into {to_account}.")
 
 
 def _ensure_swap_usdt(client: Client, quantity: str, price: str) -> None:
@@ -406,7 +407,7 @@ def _ensure_swap_usdt(client: Client, quantity: str, price: str) -> None:
         current_available=_swap_available_usdt(client),
     )
     if _swap_available_usdt(client) < required:
-        pytest.skip("BingX swap USDT remains insufficient after internal transfer.")
+        pytest.fail("BingX swap USDT remains insufficient after internal transfer.")
 
 
 def _ensure_spot_usdt(client: Client, quantity: str, price: str) -> None:
@@ -418,7 +419,58 @@ def _ensure_spot_usdt(client: Client, quantity: str, price: str) -> None:
         current_available=_spot_available(client, "USDT"),
     )
     if _spot_available(client, "USDT") < required:
-        pytest.skip("BingX spot USDT remains insufficient after internal transfer.")
+        pytest.fail("BingX spot USDT remains insufficient after internal transfer.")
+
+
+def _cleanup_swap_state(client: Client) -> None:
+    if _swap_open_orders(client):
+        client.cancel_swap_all_orders(product_symbol=SWAP_SYMBOL)
+        time.sleep(1)
+    if _positions(client):
+        client.close_swap_all_positions(product_symbol=SWAP_SYMBOL)
+        time.sleep(3)
+    assert not _swap_open_orders(client)
+    assert not _positions(client)
+
+
+def _cleanup_spot_btc(client: Client, initial_btc: Decimal = Decimal("0")) -> None:
+    tick, step, min_notional = _spot_details(client)
+    del tick
+    remaining = _spot_available(client, "BTC") - initial_btc
+    sell_quantity = Decimal(_spot_sell_quantity(client, remaining))
+    best_bid, _ = _spot_orderbook_prices(client)
+    if sell_quantity > 0 and sell_quantity * best_bid < min_notional:
+        quote_amount = _spot_market_quote_amount(client)
+        _ensure_usdt_for_account(
+            client=client,
+            to_account=SPOT_ACCOUNT,
+            required=quote_amount,
+            current_available=_spot_available(client, "USDT"),
+        )
+        _spot_market_buy_delta(client, quote_amount)
+        remaining = _spot_available(client, "BTC") - initial_btc
+        sell_quantity = Decimal(_spot_sell_quantity(client, remaining))
+    if sell_quantity > 0:
+        client.place_spot_market_sell_order(
+            product_symbol=SPOT_SYMBOL,
+            quantity=_fmt(sell_quantity),
+            clientOrderId=f"dcex{uuid.uuid4().hex[:16]}",
+        )
+        time.sleep(2)
+    assert _spot_available(client, "BTC") - initial_btc <= step
+
+
+def _cleanup_spot_state(client: Client) -> None:
+    if _spot_open_orders(client):
+        client.cancel_spot_open_orders(product_symbol=SPOT_SYMBOL)
+        time.sleep(1)
+    _cleanup_spot_btc(client)
+    assert not _spot_open_orders(client)
+
+
+def _cleanup_state(client: Client) -> None:
+    _cleanup_spot_state(client)
+    _cleanup_swap_state(client)
 
 
 @pytest.mark.private

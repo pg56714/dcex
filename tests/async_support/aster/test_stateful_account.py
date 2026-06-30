@@ -44,11 +44,11 @@ def _assert_response(response: object) -> None:
 
 async def _require_idle_account(client: Client) -> None:
     if await client.get_futures_open_orders():
-        pytest.skip("Aster has existing futures open orders.")
+        pytest.fail("Aster has existing futures open orders.", pytrace=False)
     positions = await client.get_futures_position_risk()
     assert isinstance(positions, list)
     if any(float(position.get("positionAmt", 0)) != 0 for position in positions):
-        pytest.skip("Aster has an existing futures position.")
+        pytest.fail("Aster has an existing futures position.", pytrace=False)
 
 
 @pytest.mark.asyncio

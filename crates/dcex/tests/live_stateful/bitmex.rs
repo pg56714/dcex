@@ -7,8 +7,7 @@ use tokio::time::sleep;
 use super::common::{
     assert_success, contains_non_empty_array, fetch_trading_details, minimum_order_quantity,
     params, post_only_buy_price, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
-    wait_for_positive_position, XBT_USDT_SWAP,
+    unique_client_id, wait_for_flat_position, wait_for_positive_position, XBT_USDT_SWAP,
 };
 
 #[tokio::test]
@@ -25,17 +24,11 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
         Some(keys[1].clone()),
         Duration::from_secs(20),
     )?;
-    if bitmex_open_orders(&client).await? {
-        eprintln!("skipping BitMEX live stateful order; open XBT-USDT swap orders exist");
-        return Ok(());
-    }
-    if bitmex_position_abs(&client).await? > 0.0 {
-        eprintln!("skipping BitMEX live stateful order; XBT-USDT swap position exists");
-        return Ok(());
-    }
+    cleanup_bitmex_state(&client).await?;
     if bitmex_available_margin(&client).await? <= 0.0 {
-        eprintln!("skipping BitMEX live stateful order; insufficient available margin");
-        return Ok(());
+        return Err(super::common::live_test_error(
+            "BitMEX live stateful order has insufficient available margin",
+        ));
     }
 
     let orderbook = client
@@ -88,6 +81,7 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
             ("product_symbol", XBT_USDT_SWAP),
             ("orderQty", quantity.as_str()),
             ("clOrdID", unique_client_id("dcexrs").as_str()),
+            ("execInst", "ReduceOnly"),
         ]),
     )
     .await?;
@@ -97,6 +91,54 @@ async fn bitmex_direct_live_stateful_order() -> dcex::Result<()> {
         wait_for_flat_position(|| bitmex_position_abs(&client)).await?,
         0.0
     );
+    Ok(())
+}
+
+async fn cleanup_bitmex_state(client: &BitmexClient) -> dcex::Result<()> {
+    if bitmex_open_orders(client).await? {
+        let cancel = super::common::exchange_method_request(
+            client,
+            "cancel_all_orders",
+            params(&[("product_symbol", XBT_USDT_SWAP)]),
+        )
+        .await?;
+        assert_success(&cancel);
+        sleep(Duration::from_secs(1)).await;
+    }
+
+    let qty = bitmex_position_qty(client).await?;
+    if qty != 0.0 {
+        let method = if qty > 0.0 {
+            "place_market_sell_order"
+        } else {
+            "place_market_buy_order"
+        };
+        let order_qty = (qty.abs().ceil() as i64).to_string();
+        let close = super::common::exchange_method_request(
+            client,
+            method,
+            params(&[
+                ("product_symbol", XBT_USDT_SWAP),
+                ("orderQty", order_qty.as_str()),
+                ("clOrdID", unique_client_id("dcexrs").as_str()),
+                ("execInst", "ReduceOnly"),
+            ]),
+        )
+        .await?;
+        assert_success(&close);
+        sleep(Duration::from_secs(1)).await;
+    }
+
+    if bitmex_open_orders(client).await? {
+        return Err(super::common::live_test_error(
+            "BitMEX still has open XBT-USDT swap orders after cleanup",
+        ));
+    }
+    if wait_for_flat_position(|| bitmex_position_abs(client)).await? != 0.0 {
+        return Err(super::common::live_test_error(
+            "BitMEX XBT-USDT swap position still exists after cleanup",
+        ));
+    }
     Ok(())
 }
 
@@ -115,19 +157,18 @@ async fn bitmex_open_orders(client: &BitmexClient) -> dcex::Result<bool> {
     Ok(contains_non_empty_array(&response.data, &["data"]))
 }
 
-async fn bitmex_position_abs(client: &BitmexClient) -> dcex::Result<f64> {
+async fn bitmex_position_qty(client: &BitmexClient) -> dcex::Result<f64> {
     let response = super::common::exchange_method_request(
         &client,
         "get_positions",
         params(&[("filter", "{\"symbol\":\"XBTUSDT\"}")]),
     )
     .await?;
-    Ok(sum_abs_values_for_symbols(
-        &response.data,
-        &["symbol"],
-        &["XBTUSDT"],
-        &["currentQty"],
-    ))
+    Ok(super::common::find_f64(&response.data, &["currentQty"]).unwrap_or(0.0))
+}
+
+async fn bitmex_position_abs(client: &BitmexClient) -> dcex::Result<f64> {
+    Ok(bitmex_position_qty(client).await?.abs())
 }
 
 async fn bitmex_available_margin(client: &BitmexClient) -> dcex::Result<f64> {

@@ -4,8 +4,8 @@ use dcex::exchange::Exchange;
 use dcex::exchanges::backpack::BackpackClient;
 
 use super::common::{
-    assert_success, fetch_trading_details, minimum_order_quantity, params, post_only_buy_price,
-    require_env, require_live_trading, require_order_id,
+    assert_success, fetch_trading_details, live_test_error, minimum_order_quantity, params,
+    post_only_buy_price, require_env, require_live_trading, require_order_id,
 };
 
 const BTC_USDC_SPOT: &str = "BTC-USDC-SPOT";
@@ -37,8 +37,28 @@ async fn backpack_direct_live_stateful_order() -> dcex::Result<()> {
         .as_array()
         .is_some_and(|orders| !orders.is_empty())
     {
-        eprintln!("skipping Backpack live stateful order; open BTC-USDC spot orders exist");
-        return Ok(());
+        let cancel = super::common::exchange_method_request(
+            &client,
+            "cancel_open_orders",
+            params(&[("product_symbol", BTC_USDC_SPOT)]),
+        )
+        .await?;
+        assert_success(&cancel);
+        let remaining = super::common::exchange_method_request(
+            &client,
+            "get_open_orders",
+            params(&[("product_symbol", BTC_USDC_SPOT)]),
+        )
+        .await?;
+        if remaining
+            .data
+            .as_array()
+            .is_some_and(|orders| !orders.is_empty())
+        {
+            return Err(live_test_error(
+                "Backpack still has open BTC-USDC spot orders after cleanup",
+            ));
+        }
     }
 
     let orderbook = super::common::exchange_method_request(

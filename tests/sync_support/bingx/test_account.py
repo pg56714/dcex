@@ -22,10 +22,10 @@ def client():
     )
 
 
-def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+def _fail_if_rate_limited(exc: FailedRequestError) -> None:
     message = str(exc)
     if "100410" in message or "endpoint trigger frequency limit" in message:
-        pytest.skip("BingX temporarily rate-limited this endpoint.")
+        pytest.fail("BingX temporarily rate-limited this endpoint.", pytrace=False)
 
 
 @pytest.mark.private
@@ -45,7 +45,7 @@ def test_get_spot_account_balance(client):
     try:
         res = client.get_spot_account_balance()
     except FailedRequestError as exc:
-        _skip_if_rate_limited(exc)
+        _fail_if_rate_limited(exc)
         raise
     assert res is not None
 

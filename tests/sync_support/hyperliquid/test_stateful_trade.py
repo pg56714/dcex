@@ -68,7 +68,13 @@ def account_snapshot():
 
 @pytest.fixture
 def client(account_snapshot):
-    return Client(wallet_address=WALLET_ADDRESS, private_key=PRIVATE_KEY)
+    client_instance = Client(wallet_address=WALLET_ADDRESS, private_key=PRIVATE_KEY)
+    _cleanup_account_state(client_instance)
+    try:
+        yield client_instance
+    finally:
+        _cleanup_account_state(client_instance)
+        client_instance.close()
 
 
 def _cloid() -> str:
@@ -164,8 +170,6 @@ def _btc_position_size(client: Client) -> Decimal:
 
 
 def _account_value(client: Client) -> Decimal:
-    if PERPS_ACCOUNT_VALUE is not None:
-        return PERPS_ACCOUNT_VALUE
     data = client.clearinghouse_state(user=_account_user(client))
     summary = data.get("marginSummary", {}) if isinstance(data, dict) else {}
     return Decimal(str(summary.get("accountValue", "0")))
@@ -176,10 +180,6 @@ def _spot_available_usdc(client: Client) -> Decimal:
 
 
 def _spot_available(client: Client, coin: str) -> Decimal:
-    if SPOT_AVAILABLE_USDC is not None:
-        if coin != "USDC":
-            return _spot_available_uncached(client, coin)
-        return SPOT_AVAILABLE_USDC
     return _spot_available_uncached(client, coin)
 
 
@@ -191,20 +191,27 @@ def _spot_available_uncached(client: Client, coin: str) -> Decimal:
     return Decimal("0")
 
 
-def _skip_if_account_state(client: Client) -> None:
+def _cleanup_account_state(client: Client) -> None:
+    _cancel_open_orders(client)
+    _close_btc_position(client)
+    _close_spot_test_delta(client, Decimal("0"), _spot_available(client, "PURR"))
+    _cancel_open_orders(client)
     if _open_orders(client):
-        pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
-    if _positions(client):
-        pytest.skip("Hyperliquid account already has a position; not changing exposure.")
+        pytest.fail("Hyperliquid account still has open orders after cleanup.", pytrace=False)
+    if _btc_position_size(client) != 0:
+        pytest.fail("Hyperliquid BTC position still exists after cleanup.", pytrace=False)
+    if _spot_available(client, "PURR") >= Decimal("1"):
+        pytest.fail("Hyperliquid PURR spot balance still exists after cleanup.", pytrace=False)
 
 
 def _skip_if_unfunded(client: Client) -> None:
     if _account_value(client) <= 0:
         spot_usdc = _spot_available_usdc(client)
         if spot_usdc < Decimal("2"):
-            pytest.skip(
+            pytest.fail(
                 "Hyperliquid perps accountValue is 0 and spot USDC is too low "
-                f"for unified account margin: {spot_usdc}."
+                f"for unified account margin: {spot_usdc}.",
+                pytrace=False,
             )
 
 
@@ -267,7 +274,12 @@ def _cancel_open_orders(client: Client) -> None:
         coin = order.get("coin")
         if oid is None:
             continue
-        product_symbol = SPOT_SYMBOL if coin == "PURR" else SYMBOL
+        if coin == "PURR":
+            product_symbol = SPOT_SYMBOL
+        elif coin == "BTC":
+            product_symbol = SYMBOL
+        else:
+            pytest.fail(f"Unexpected Hyperliquid open order coin during cleanup: {order}")
         client.cancel_order(product_symbol=product_symbol, oid=int(oid))
     time.sleep(2)
 
@@ -337,13 +349,39 @@ def _close_btc_position(client: Client) -> None:
         return
     size = format(abs(position_size).normalize(), "f")
     if position_size > 0:
-        _assert_exchange_response(
-            client.place_future_market_sell_order(product_symbol=SYMBOL, size=size)
+        price = _format_hyperliquid_price(
+            Decimal(str(client.get_l2book(product_symbol=SYMBOL)["levels"][0][0]["px"]))
+            * Decimal("0.995"),
+            ROUND_DOWN,
+        )
+        close_order = client.place_order(
+            product_symbol=SYMBOL,
+            isBuy=False,
+            price=price,
+            size=size,
+            reduceOnly=True,
+            tif="Ioc",
+            cloid=_cloid(),
         )
     else:
-        _assert_exchange_response(
-            client.place_future_market_buy_order(product_symbol=SYMBOL, size=size)
+        price = _format_hyperliquid_price(
+            Decimal(str(client.get_l2book(product_symbol=SYMBOL)["levels"][1][0]["px"]))
+            * Decimal("1.005"),
+            ROUND_UP,
         )
+        close_order = client.place_order(
+            product_symbol=SYMBOL,
+            isBuy=True,
+            price=price,
+            size=size,
+            reduceOnly=True,
+            tif="Ioc",
+            cloid=_cloid(),
+        )
+    _assert_exchange_response(close_order)
+    message = _order_error_message(close_order)
+    if message:
+        pytest.fail(f"Hyperliquid BTC reduce-only close failed: {message}", pytrace=False)
 
     for _ in range(10):
         time.sleep(1)
@@ -456,7 +494,7 @@ def test_signed_error_response_trade_endpoints(client):
 
 @pytest.mark.private
 def test_post_only_order_lifecycle(client):
-    _skip_if_account_state(client)
+    _cleanup_account_state(client)
     _skip_if_unfunded(client)
 
     size = _size(client)
@@ -485,7 +523,7 @@ def test_post_only_order_lifecycle(client):
 
 @pytest.mark.private
 def test_limit_wrappers_and_cancel_by_cloid(client):
-    _skip_if_account_state(client)
+    _cleanup_account_state(client)
     _skip_if_unfunded(client)
 
     size = _size(client)
@@ -539,10 +577,9 @@ def test_limit_wrappers_and_cancel_by_cloid(client):
 
 @pytest.mark.private
 def test_spot_post_only_order_lifecycle(client):
-    if _open_orders(client):
-        pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
+    _cleanup_account_state(client)
     if _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
-        pytest.skip("Insufficient spot USDC for Hyperliquid spot post-only order.")
+        pytest.fail("Insufficient spot USDC for Hyperliquid spot post-only order.", pytrace=False)
 
     oid = None
     try:
@@ -568,10 +605,9 @@ def test_spot_post_only_order_lifecycle(client):
 
 @pytest.mark.private
 def test_spot_market_round_trip(client):
-    if _open_orders(client):
-        pytest.skip("Hyperliquid account already has open orders; not touching unrelated orders.")
+    _cleanup_account_state(client)
     if _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
-        pytest.skip("Insufficient spot USDC for Hyperliquid spot market round-trip.")
+        pytest.fail("Insufficient spot USDC for Hyperliquid spot market round-trip.", pytrace=False)
 
     before = _spot_available(client, "PURR")
     bought_size = Decimal("0")
@@ -626,7 +662,7 @@ def test_spot_market_round_trip(client):
 
 @pytest.mark.private
 def test_modify_order_wrappers(client):
-    _skip_if_account_state(client)
+    _cleanup_account_state(client)
     _skip_if_unfunded(client)
 
     size = _size(client)
@@ -640,7 +676,7 @@ def test_modify_order_wrappers(client):
         )
         oid = _extract_oid(order)
         if oid is None:
-            pytest.skip(f"Hyperliquid did not rest modify source order: {order}")
+            pytest.fail(f"Hyperliquid did not rest modify source order: {order}", pytrace=False)
         new_price = str(int(Decimal(_post_only_buy_price(client)) * Decimal("0.99")))
         _assert_exchange_response(
             client.modify_order(
@@ -678,7 +714,7 @@ def test_modify_order_wrappers(client):
 
 @pytest.mark.private
 def test_market_wrappers_round_trip(client):
-    _skip_if_account_state(client)
+    _cleanup_account_state(client)
     _skip_if_unfunded(client)
 
     size = _size(client)

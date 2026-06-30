@@ -7,7 +7,7 @@ use tokio::time::sleep;
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
     fetch_trading_details, find_f64, first_bid_price, format_transfer_amount_ceil,
-    format_transfer_amount_floor, leveraged_margin_required, margin_target,
+    format_transfer_amount_floor, leveraged_margin_required, live_test_error, margin_target,
     minimum_order_quantity_with_step, params, post_only_buy_price, post_only_buy_price_from_bid,
     require_env, require_live_trading, require_order_id, sum_abs_values_for_symbols,
     unique_client_id, wait_for_flat_position, wait_for_non_empty_records,
@@ -32,6 +32,7 @@ async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
         Some(keys[2].clone()),
         Duration::from_secs(20),
     )?;
+    cleanup_bitmart_spot_orders(&client).await?;
 
     let ticker = client.get_ticker_of_a_pair(DOGE_USDT_SPOT).await?;
     let bid = find_f64(
@@ -62,8 +63,9 @@ async fn bitmart_direct_live_stateful_order() -> dcex::Result<()> {
         Err(error)
             if account_restriction(&error, &["33136", "60052", "personal verification", "kyc"]) =>
         {
-            eprintln!("skipping BitMart stateful order due account restriction: {error}");
-            return Ok(());
+            return Err(live_test_error(format!(
+                "BitMart stateful order blocked by account restriction: {error}"
+            )));
         }
         Err(error) => return Err(error),
     };
@@ -99,16 +101,7 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    if bitmart_contract_open_orders(&client).await? {
-        eprintln!(
-            "skipping BitMart contract live stateful order; open DOGE-USDT swap orders exist"
-        );
-        return Ok(());
-    }
-    if bitmart_contract_position_abs(&client).await? > 0.0 {
-        eprintln!("skipping BitMart contract live stateful order; DOGE-USDT swap position exists");
-        return Ok(());
-    }
+    cleanup_bitmart_contract_state(&client).await?;
 
     let orderbook = client.get_depth(DOGE_USDT_SWAP).await?;
     let details = fetch_trading_details(Exchange::BitMart, "bitmart", DOGE_USDT_SWAP).await?;
@@ -124,7 +117,11 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
     let transferred =
         match ensure_bitmart_contract_usdt(&client, margin_target(required_usdt)).await? {
             Some(amount) => amount,
-            None => return Ok(()),
+            None => {
+                return Err(live_test_error(
+                    "BitMart contract has insufficient transferable USDT for live stateful order",
+                ));
+            }
         };
 
     let leverage_result = super::common::exchange_method_request(
@@ -165,8 +162,9 @@ async fn bitmart_contract_direct_live_stateful_order() -> dcex::Result<()> {
             if account_restriction(&error, &["33136", "60052", "personal verification", "kyc"]) =>
         {
             return_bitmart_contract_transfer(&client, transferred).await?;
-            eprintln!("skipping BitMart contract stateful order due account restriction: {error}");
-            return Ok(());
+            return Err(live_test_error(format!(
+                "BitMart contract stateful order blocked by account restriction: {error}"
+            )));
         }
         Err(error) => {
             return_bitmart_contract_transfer(&client, transferred).await?;
@@ -252,6 +250,57 @@ async fn bitmart_contract_open_orders(client: &BitmartClient) -> dcex::Result<bo
     Ok(contains_non_empty_array(&response.data, &["data"]))
 }
 
+async fn cleanup_bitmart_spot_orders(client: &BitmartClient) -> dcex::Result<()> {
+    let cancel =
+        super::common::exchange_method_request(client, "cancel_spot_all_order", params(&[]))
+            .await?;
+    assert_success(&cancel);
+    sleep(Duration::from_secs(1)).await;
+    Ok(())
+}
+
+async fn cleanup_bitmart_contract_state(client: &BitmartClient) -> dcex::Result<()> {
+    if bitmart_contract_open_orders(client).await? {
+        let cancel = super::common::exchange_method_request(
+            client,
+            "cancel_all_contract_order",
+            params(&[("product_symbol", DOGE_USDT_SWAP)]),
+        )
+        .await?;
+        assert_success(&cancel);
+        sleep(Duration::from_secs(1)).await;
+    }
+    let position = bitmart_contract_position_abs(client).await?;
+    if position > 0.0 {
+        let size = format_transfer_amount_floor(position, 0);
+        let close = super::common::exchange_method_request(
+            client,
+            "place_contract_market_sell_order",
+            params(&[
+                ("product_symbol", DOGE_USDT_SWAP),
+                ("size", size.as_str()),
+                ("leverage", BITMART_CONTRACT_LEVERAGE),
+                ("open_type", "cross"),
+                ("client_order_id", unique_client_id("dcexrs").as_str()),
+            ]),
+        )
+        .await?;
+        assert_success(&close);
+        sleep(Duration::from_secs(2)).await;
+    }
+    if bitmart_contract_open_orders(client).await? {
+        return Err(live_test_error(
+            "BitMart contract still has open DOGE-USDT swap orders after cleanup",
+        ));
+    }
+    if wait_for_flat_position(|| bitmart_contract_position_abs(client)).await? != 0.0 {
+        return Err(live_test_error(
+            "BitMart DOGE-USDT swap position still exists after cleanup",
+        ));
+    }
+    Ok(())
+}
+
 async fn bitmart_contract_position_abs(client: &BitmartClient) -> dcex::Result<f64> {
     let response = super::common::exchange_method_request(
         &client,
@@ -278,9 +327,6 @@ async fn ensure_bitmart_contract_usdt(
     let needed = required - contract;
     let spot = bitmart_spot_usdt(client).await?;
     if spot < needed {
-        eprintln!(
-            "skipping BitMart contract live stateful order; insufficient transferable USDT, required={required:.8}, contract={contract:.8}, spot={spot:.8}"
-        );
         return Ok(None);
     }
     let amount = bitmart_transfer_amount(needed);

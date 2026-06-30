@@ -262,15 +262,38 @@ def test_hyperliquid_close_btc_position_waits_until_flat(
     )
     positions = iter((Decimal("-0.0002"), Decimal("-0.0002"), Decimal("0")))
     sleep = Mock()
-    client = SimpleNamespace(place_future_market_buy_order=Mock(return_value={}))
+    client = SimpleNamespace(
+        get_l2book=Mock(
+            return_value={
+                "levels": [
+                    [{"px": "59000", "sz": "1"}],
+                    [{"px": "60000", "sz": "1"}],
+                ]
+            }
+        ),
+        place_order=Mock(
+            return_value={
+                "status": "ok",
+                "response": {
+                    "type": "order",
+                    "data": {"statuses": [{"filled": {"totalSz": "0.0002"}}]},
+                },
+            }
+        ),
+    )
     monkeypatch.setattr(module, "_btc_position_size", lambda *_: next(positions))
     monkeypatch.setattr(module.time, "sleep", sleep)
 
     module._close_btc_position(client)
 
-    client.place_future_market_buy_order.assert_called_once_with(
+    client.place_order.assert_called_once_with(
         product_symbol=module.SYMBOL,
+        isBuy=True,
+        price="60300",
         size="0.0002",
+        reduceOnly=True,
+        tif="Ioc",
+        cloid=client.place_order.call_args.kwargs["cloid"],
     )
     assert sleep.call_count == 2
 
@@ -285,7 +308,25 @@ async def test_async_hyperliquid_close_btc_position_waits_until_flat(
     )
     positions = iter((Decimal("-0.0002"), Decimal("-0.0002"), Decimal("0")))
     sleep = AsyncMock()
-    client = SimpleNamespace(place_future_market_buy_order=AsyncMock(return_value={}))
+    client = SimpleNamespace(
+        get_l2book=AsyncMock(
+            return_value={
+                "levels": [
+                    [{"px": "59000", "sz": "1"}],
+                    [{"px": "60000", "sz": "1"}],
+                ]
+            }
+        ),
+        place_order=AsyncMock(
+            return_value={
+                "status": "ok",
+                "response": {
+                    "type": "order",
+                    "data": {"statuses": [{"filled": {"totalSz": "0.0002"}}]},
+                },
+            }
+        ),
+    )
 
     async def position_size(*_args: object) -> Decimal:
         return next(positions)
@@ -295,9 +336,14 @@ async def test_async_hyperliquid_close_btc_position_waits_until_flat(
 
     await module._close_btc_position(client)
 
-    client.place_future_market_buy_order.assert_awaited_once_with(
+    client.place_order.assert_awaited_once_with(
         product_symbol=module.SYMBOL,
+        isBuy=True,
+        price="60300",
         size="0.0002",
+        reduceOnly=True,
+        tif="Ioc",
+        cloid=client.place_order.call_args.kwargs["cloid"],
     )
     assert sleep.await_count == 2
 
@@ -335,6 +381,7 @@ def test_hyperliquid_spot_round_trip_restores_test_delta_after_sell_failure(
     monkeypatch.setattr(module, "_spot_aggressive_buy", lambda *_: ("120", "0.1"))
     monkeypatch.setattr(module, "_spot_aggressive_sell_price", lambda *_: "0.1")
     monkeypatch.setattr(module, "_cancel_open_orders", Mock())
+    monkeypatch.setattr(module, "_cleanup_account_state", Mock())
     monkeypatch.setattr(module.time, "sleep", lambda _: None)
 
     with pytest.raises(pytest.fail.Exception, match="Primary sell failed"):
@@ -367,6 +414,7 @@ def test_hyperliquid_spot_round_trip_does_not_retry_ambiguous_sell(
     monkeypatch.setattr(module, "_spot_aggressive_buy", lambda *_: ("120", "0.1"))
     monkeypatch.setattr(module, "_spot_aggressive_sell_price", lambda *_: "0.1")
     monkeypatch.setattr(module, "_cancel_open_orders", Mock())
+    monkeypatch.setattr(module, "_cleanup_account_state", Mock())
     monkeypatch.setattr(module.time, "sleep", lambda _: None)
 
     with pytest.raises(TimeoutError, match="outcome unknown"):
@@ -413,6 +461,7 @@ async def test_async_hyperliquid_spot_round_trip_restores_test_delta_after_sell_
     monkeypatch.setattr(module, "_spot_aggressive_buy", AsyncMock(return_value=("120", "0.1")))
     monkeypatch.setattr(module, "_spot_aggressive_sell_price", AsyncMock(return_value="0.1"))
     monkeypatch.setattr(module, "_cancel_open_orders", AsyncMock())
+    monkeypatch.setattr(module, "_cleanup_account_state", AsyncMock())
     monkeypatch.setattr(module.asyncio, "sleep", AsyncMock())
 
     with pytest.raises(pytest.fail.Exception, match="Primary sell failed"):
@@ -446,9 +495,83 @@ async def test_async_hyperliquid_spot_round_trip_does_not_retry_ambiguous_sell(
     monkeypatch.setattr(module, "_spot_aggressive_buy", AsyncMock(return_value=("120", "0.1")))
     monkeypatch.setattr(module, "_spot_aggressive_sell_price", AsyncMock(return_value="0.1"))
     monkeypatch.setattr(module, "_cancel_open_orders", AsyncMock())
+    monkeypatch.setattr(module, "_cleanup_account_state", AsyncMock())
     monkeypatch.setattr(module.asyncio, "sleep", AsyncMock())
 
     with pytest.raises(TimeoutError, match="outcome unknown"):
         await module.test_spot_market_round_trip(client)
 
     assert place_order.await_count == 2
+
+
+def test_binance_cleanup_flattens_triggered_algo_position(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "sync_support/binance/test_stateful_trade.py",
+        "dcex_sync_binance_cleanup_test",
+    )
+    positions = iter((Decimal("0.004"), Decimal("0"), Decimal("0")))
+    client = SimpleNamespace(
+        get_open_orders=Mock(side_effect=([{"orderId": 1}], [])),
+        cancel_all_open_orders=Mock(return_value={}),
+        get_all_open_futures_algo_orders=Mock(side_effect=([{"algoId": 1}], [])),
+        cancel_all_open_futures_algo_orders=Mock(return_value={}),
+        get_future_position=Mock(
+            side_effect=lambda **_: [{"symbol": "BTCUSDT", "positionAmt": str(next(positions))}]
+        ),
+        place_market_order=Mock(return_value={"status": "FILLED"}),
+    )
+    monkeypatch.setattr(module.time, "sleep", lambda _: None)
+
+    module._cleanup_futures_test_state(client)
+
+    client.cancel_all_open_orders.assert_called_once_with(product_symbol=module.FUTURES_SYMBOL)
+    client.cancel_all_open_futures_algo_orders.assert_called_once_with(
+        product_symbol=module.FUTURES_SYMBOL
+    )
+    client.place_market_order.assert_called_once_with(
+        product_symbol=module.FUTURES_SYMBOL,
+        side="SELL",
+        quantity="0.004",
+        reduceOnly="true",
+        newOrderRespType="RESULT",
+    )
+
+
+@pytest.mark.asyncio
+async def test_async_binance_cleanup_flattens_triggered_algo_position(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_test_module(
+        "async_support/binance/test_stateful_trade.py",
+        "dcex_async_binance_cleanup_test",
+    )
+    positions = iter((Decimal("0.004"), Decimal("0"), Decimal("0")))
+
+    async def get_future_position(**_kwargs: object) -> list[dict[str, str]]:
+        return [{"symbol": "BTCUSDT", "positionAmt": str(next(positions))}]
+
+    client = SimpleNamespace(
+        get_open_orders=AsyncMock(side_effect=([{"orderId": 1}], [])),
+        cancel_all_open_orders=AsyncMock(return_value={}),
+        get_all_open_futures_algo_orders=AsyncMock(side_effect=([{"algoId": 1}], [])),
+        cancel_all_open_futures_algo_orders=AsyncMock(return_value={}),
+        get_future_position=AsyncMock(side_effect=get_future_position),
+        place_market_order=AsyncMock(return_value={"status": "FILLED"}),
+    )
+    monkeypatch.setattr(module.asyncio, "sleep", AsyncMock())
+
+    await module._cleanup_futures_test_state(client)
+
+    client.cancel_all_open_orders.assert_awaited_once_with(product_symbol=module.FUTURES_SYMBOL)
+    client.cancel_all_open_futures_algo_orders.assert_awaited_once_with(
+        product_symbol=module.FUTURES_SYMBOL
+    )
+    client.place_market_order.assert_awaited_once_with(
+        product_symbol=module.FUTURES_SYMBOL,
+        side="SELL",
+        quantity="0.004",
+        reduceOnly="true",
+        newOrderRespType="RESULT",
+    )

@@ -31,10 +31,17 @@ pytestmark = [
 
 @pytest.fixture
 def client():
-    return Client(
+    client_instance = Client(
         api_key=BYBIT_API_KEY,
         api_secret=BYBIT_API_SECRET,
     )
+    transferred = _cleanup(client_instance, Decimal("0"))
+    _return_to_funding(client_instance, transferred)
+    try:
+        yield client_instance
+    finally:
+        transferred = _cleanup(client_instance, Decimal("0"))
+        _return_to_funding(client_instance, transferred)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -183,13 +190,6 @@ def _positions(client: Client) -> list[dict]:
     return [item for item in items if isinstance(item, dict)]
 
 
-def _skip_if_existing_state(client: Client) -> None:
-    if _open_orders(client, SPOT_SYMBOL) or _open_orders(client, SWAP_SYMBOL):
-        pytest.skip("Bybit already has open BTC orders; not touching unrelated orders.")
-    if any(_dec(item.get("size")) != 0 for item in _positions(client)):
-        pytest.skip("Bybit BTC-USDT swap already has a position; not changing exposure.")
-
-
 def _wait_for_spot_delta(client: Client, before: Decimal) -> Decimal:
     for _ in range(8):
         delta = _wallet_available(client, "BTC") - before
@@ -206,7 +206,7 @@ def _ensure_unified_usdt(client: Client, required: Decimal) -> Decimal:
 
     needed = (required - available).quantize(Decimal("0.0001"), rounding=ROUND_UP)
     if _transferable_balance(client, "FUND", "USDT") < needed:
-        pytest.skip("Insufficient Bybit total USDT for spot stateful orders.")
+        pytest.fail("Insufficient Bybit total USDT for spot stateful orders.")
     _assert_ok(
         client.create_internal_transfer(
             coin="USDT",
@@ -217,7 +217,7 @@ def _ensure_unified_usdt(client: Client, required: Decimal) -> Decimal:
     )
     time.sleep(2)
     if _wallet_available(client, "USDT") < required:
-        pytest.skip("Bybit unified USDT remains insufficient after transfer.")
+        pytest.fail("Bybit unified USDT remains insufficient after transfer.")
     return needed
 
 
@@ -251,14 +251,14 @@ def _cancel(client: Client, order_id: str) -> None:
 
 def _cleanup(client: Client, initial_btc: Decimal) -> Decimal:
     transferred = Decimal("0")
-    with suppress(Exception):
-        if _open_orders(client, SPOT_SYMBOL):
-            _assert_ok(client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
-    with suppress(Exception):
-        if _open_orders(client, SWAP_SYMBOL):
-            _assert_ok(client.cancel_all_orders(product_symbol=SWAP_SYMBOL))
-    with suppress(Exception):
-        delta = _wallet_available(client, "BTC") - initial_btc
+    if _open_orders(client, SPOT_SYMBOL):
+        _assert_ok(client.cancel_all_orders(product_symbol=SPOT_SYMBOL))
+    if _open_orders(client, SWAP_SYMBOL):
+        _assert_ok(client.cancel_all_orders(product_symbol=SWAP_SYMBOL))
+    _close_swap_positions(client)
+
+    delta = _wallet_available(client, "BTC") - initial_btc
+    if delta > 0:
         _, _, min_size, min_notional = _spot_details(client)
         best_bid, _ = _spot_orderbook_prices(client)
         if delta > 0 and (delta < min_size or delta * best_bid < min_notional):
@@ -271,7 +271,35 @@ def _cleanup(client: Client, initial_btc: Decimal) -> Decimal:
         if Decimal(sell_size) >= min_size:
             _assert_ok(client.place_market_sell_order(SPOT_SYMBOL, sell_size))
             time.sleep(2)
+    _, step, _, _ = _spot_details(client)
+    assert _open_orders(client, SPOT_SYMBOL) == []
+    assert _open_orders(client, SWAP_SYMBOL) == []
+    assert not any(_dec(item.get("size")) != 0 for item in _positions(client))
+    assert _wallet_available(client, "BTC") - initial_btc <= step
     return transferred
+
+
+def _close_swap_positions(client: Client) -> None:
+    for _ in range(3):
+        active = [item for item in _positions(client) if _dec(item.get("size")) != 0]
+        if not active:
+            return
+        for position in active:
+            size = _dec(position.get("size"))
+            side = str(position.get("side", "")).lower()
+            close_side = "Sell" if side == "buy" else "Buy"
+            position_idx = int(_dec(position.get("positionIdx")))
+            _assert_ok(
+                client.place_market_order(
+                    SWAP_SYMBOL,
+                    close_side,
+                    _fmt(size),
+                    reduceOnly=True,
+                    positionIdx=position_idx,
+                )
+            )
+        time.sleep(2)
+    assert not any(_dec(item.get("size")) != 0 for item in _positions(client))
 
 
 def _accept_unchanged(call, codes: tuple[str, ...]) -> None:
@@ -287,7 +315,10 @@ def test_account_settings_and_internal_transfer(client):
     unified_status = str(account_info.get("unifiedMarginStatus", ""))
     if unified_status in {"1", "2"}:
         _assert_ok(client.upgrade_to_unified_trading_account())
-        pytest.skip("Bybit unified account upgrade submitted; rerun after it completes.")
+        pytest.fail(
+            "Bybit unified account upgrade submitted; rerun after it completes.",
+            pytrace=False,
+        )
     else:
         assert unified_status
 
@@ -326,7 +357,7 @@ def test_account_settings_and_internal_transfer(client):
     elif unified_balance >= TRANSFER_AMOUNT:
         from_account, to_account = "UNIFIED", "FUND"
     else:
-        pytest.skip("Insufficient Bybit USDT for internal transfer round-trip.")
+        pytest.fail("Insufficient Bybit USDT for internal transfer round-trip.")
 
     _assert_ok(
         client.create_internal_transfer(
@@ -351,7 +382,8 @@ def test_account_settings_and_internal_transfer(client):
 
 
 def test_spot_stateful_order_lifecycle(client):
-    _skip_if_existing_state(client)
+    transferred = _cleanup(client, Decimal("0"))
+    _return_to_funding(client, transferred)
     initial_btc = _wallet_available(client, "BTC")
     transferred = Decimal("0")
     try:

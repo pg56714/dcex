@@ -40,8 +40,10 @@ def client():
         timeout=20,
     )
     try:
+        _cleanup_account(client_instance)
         yield client_instance
     finally:
+        _cleanup_account(client_instance)
         client_instance.close()
 
 
@@ -159,7 +161,7 @@ def _futures_order_params(client: Client) -> tuple[str, str, str, str]:
     def price_value(ticks_below: int) -> Decimal:
         value = _round_to_step(bid - tick * ticks_below, tick, ROUND_DOWN)
         if value <= 0:
-            pytest.skip(f"{FUTURES_SYMBOL} futures bid is too small for a post-only test order.")
+            pytest.fail(f"{FUTURES_SYMBOL} futures bid is too small for a post-only test order.")
         return value
 
     first_price = price_value(1)
@@ -318,14 +320,22 @@ def _return_test_funds(
             )
 
 
-def test_spot_order_and_transfer_lifecycle(client):
+def _cleanup_account(client: Client) -> None:
     if client.get_spot_open_orders(SPOT_SYMBOL):
-        pytest.skip(f"Aster already has {SPOT_SYMBOL} open orders.")
+        client.cancel_all_spot_open_orders(SPOT_SYMBOL)
+    _cleanup_futures(client)
+    assert client.get_spot_open_orders(SPOT_SYMBOL) == []
+    assert client.get_futures_open_orders(FUTURES_SYMBOL) == []
+    assert _futures_position_amount(client) == 0
+
+
+def test_spot_order_and_transfer_lifecycle(client):
+    _cleanup_account(client)
     spot_quantity, spot_transfer_amount, spot_buy_quote = _spot_order_params(client)
     if _futures_balance(client, "USDC") < spot_transfer_amount:
-        pytest.skip("Aster futures wallet lacks the minimum USDC for this spot test.")
+        pytest.fail("Aster futures wallet lacks the minimum USDC for this spot test.")
     if _futures_balance(client, "USDT") < SPOT_USDT_BUFFER:
-        pytest.skip("Aster futures wallet requires at least 0.02 USDT.")
+        pytest.fail("Aster futures wallet requires at least 0.02 USDT.")
 
     initial_balances = _spot_balances(client)
     try:
@@ -411,10 +421,7 @@ def test_spot_order_and_transfer_lifecycle(client):
 
 
 def test_futures_order_lifecycle(client):
-    if client.get_futures_open_orders(FUTURES_SYMBOL):
-        pytest.skip(f"Aster already has {FUTURES_SYMBOL} open orders.")
-    if _futures_position_amount(client) != 0:
-        pytest.skip(f"Aster already has a {FUTURES_SYMBOL} position.")
+    _cleanup_account(client)
 
     position_mode = client.get_futures_position_mode()
     multi_assets_mode = client.get_futures_multi_assets_mode()
@@ -600,10 +607,7 @@ def test_futures_order_lifecycle(client):
 
 
 def test_futures_strategy_documented_payloads(client):
-    if client.get_futures_open_orders(FUTURES_SYMBOL):
-        pytest.skip(f"Aster already has {FUTURES_SYMBOL} open orders.")
-    if _futures_position_amount(client) != 0:
-        pytest.skip(f"Aster already has a {FUTURES_SYMBOL} position.")
+    _cleanup_account(client)
 
     quantity, price, _, _ = _futures_order_params(client)
     sell_price = _futures_safe_sell_price(client)

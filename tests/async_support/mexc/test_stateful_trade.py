@@ -3,7 +3,6 @@
 import asyncio
 import os
 import uuid
-from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -39,7 +38,11 @@ async def client():
     async with Client(
         api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET, timeout=20
     ) as client_instance:
-        yield client_instance
+        await _cleanup_state(client_instance)
+        try:
+            yield client_instance
+        finally:
+            await _cleanup_state(client_instance)
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -206,7 +209,7 @@ async def _sell_size(client: Client, amount: Decimal) -> Decimal:
 
 async def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
     if await _spot_available(client, "USDT") < required:
-        pytest.skip("Insufficient MEXC spot USDT for stateful test.")
+        pytest.fail("Insufficient MEXC spot USDT for stateful test.", pytrace=False)
 
 
 async def _ensure_contract_usdt(client: Client, required: Decimal) -> Decimal:
@@ -219,11 +222,11 @@ async def _ensure_contract_usdt(client: Client, required: Decimal) -> Decimal:
     try:
         await _transfer(client, "SPOT", "FUTURES", needed)
     except FailedRequestError as exc:
-        pytest.skip(f"MEXC futures USDT transfer failed: {exc}")
+        pytest.fail(f"MEXC futures USDT transfer failed: {exc}", pytrace=False)
     await asyncio.sleep(3)
     if await _contract_available(client) < target:
         await _return_futures_transfer(client, needed)
-        pytest.skip("Insufficient MEXC futures USDT for stateful test.")
+        pytest.fail("Insufficient MEXC futures USDT for stateful test.", pytrace=False)
     return needed
 
 
@@ -232,25 +235,31 @@ def _margin_target(required: Decimal) -> Decimal:
 
 
 async def _skip_if_existing_state(client: Client) -> None:
-    if await _spot_open_orders(client):
-        pytest.skip("MEXC spot already has BTCUSDT open orders; not touching unrelated orders.")
+    await _cleanup_state(client)
 
 
 async def _skip_if_existing_contract_state(client: Client) -> None:
-    if await _contract_open_orders(client):
-        pytest.skip("MEXC futures already has BTC_USDT open orders; not touching unrelated orders.")
-    if await _contract_position_volume(client) > 0:
-        pytest.skip(
-            "MEXC futures already has a BTC_USDT position; not touching unrelated position."
-        )
+    await _cleanup_state(client)
 
 
 async def _cleanup_spot_btc(client: Client, initial_btc: Decimal) -> None:
-    extra = await _sell_size(client, await _spot_available(client, "BTC") - initial_btc)
-    if extra > 0:
-        with suppress(Exception):
-            await client.place_spot_market_sell_order(SPOT_SYMBOL, _fmt(extra), _client_id())
-            await asyncio.sleep(2)
+    step, min_notional, _ = await _spot_details(client)
+    extra = await _spot_available(client, "BTC") - initial_btc
+    if extra <= step:
+        return
+
+    sell_size = await _sell_size(client, extra)
+    bid, _ = await _spot_prices(client)
+    if sell_size * bid < min_notional:
+        notional = await _spot_market_notional(client)
+        await _ensure_spot_usdt(client, notional)
+        assert await client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(notional), _client_id())
+        await asyncio.sleep(3)
+        sell_size = await _sell_size(client, await _spot_available(client, "BTC") - initial_btc)
+
+    if sell_size > 0:
+        assert await client.place_spot_market_sell_order(SPOT_SYMBOL, _fmt(sell_size), _client_id())
+        await asyncio.sleep(3)
 
 
 async def _cleanup_contract_btc(client: Client) -> None:
@@ -260,15 +269,14 @@ async def _cleanup_contract_btc(client: Client) -> None:
             continue
         position_type = int(_dec(position.get("positionType"), "1"))
         side = 4 if position_type == 1 else 2
-        with suppress(Exception):
-            await client.place_contract_market_order(
-                CONTRACT_SYMBOL,
-                side=side,
-                vol=volume,
-                leverage=CONTRACT_TEST_LEVERAGE,
-                openType=int(_dec(position.get("openType"), "2")),
-            )
-            await asyncio.sleep(3)
+        assert await client.place_contract_market_order(
+            CONTRACT_SYMBOL,
+            side=side,
+            vol=volume,
+            leverage=CONTRACT_TEST_LEVERAGE,
+            openType=int(_dec(position.get("openType"), "2")),
+        )
+        await asyncio.sleep(3)
 
 
 async def _return_futures_transfer(client: Client, amount: Decimal) -> None:
@@ -277,9 +285,29 @@ async def _return_futures_transfer(client: Client, amount: Decimal) -> None:
     available = _round_to_step(await _contract_available(client), Decimal("0.000001"), ROUND_DOWN)
     amount = min(amount, available)
     if amount > 0:
-        with suppress(Exception):
-            await _transfer(client, "FUTURES", "SPOT", amount)
-            await asyncio.sleep(3)
+        await _transfer(client, "FUTURES", "SPOT", amount)
+        await asyncio.sleep(3)
+
+
+async def _cleanup_state(client: Client) -> None:
+    if await _spot_open_orders(client):
+        assert await client.cancel_spot_open_orders(SPOT_SYMBOL) is not None
+        await asyncio.sleep(1)
+    if await _contract_open_orders(client):
+        assert await client.cancel_all_contract_orders(CONTRACT_SYMBOL) is not None
+        await asyncio.sleep(1)
+    await _cleanup_contract_btc(client)
+    await _cleanup_spot_btc(client, Decimal("0"))
+
+    if await _spot_open_orders(client):
+        pytest.fail("MEXC spot still has open BTCUSDT orders after cleanup.", pytrace=False)
+    if await _contract_open_orders(client):
+        pytest.fail("MEXC contract still has open BTC_USDT orders after cleanup.", pytrace=False)
+    if await _contract_position_volume(client) > 0:
+        pytest.fail("MEXC contract BTC_USDT position still exists after cleanup.", pytrace=False)
+    step, _, _ = await _spot_details(client)
+    if await _spot_available(client, "BTC") > step:
+        pytest.fail("MEXC BTC spot balance still exists after cleanup.", pytrace=False)
 
 
 async def _wait_for_contract_volume(client: Client, expected: Decimal) -> Decimal:
@@ -330,22 +358,37 @@ async def test_transfer_round_trip(client):
     await _skip_if_existing_state(client)
     await _ensure_spot_usdt(client, TRANSFER_AMOUNT)
 
+    transferred = False
     first_id = await _transfer(client, "SPOT", "FUTURES", TRANSFER_AMOUNT)
-    await asyncio.sleep(3)
-    assert await client.get_user_universal_transfer_by_id(first_id) is not None
-    assert (
-        await client.get_user_universal_transfer_history(
-            "SPOT",
-            "FUTURES",
-            page=1,
-            size=10,
+    transferred = True
+    try:
+        await asyncio.sleep(3)
+        assert await client.get_user_universal_transfer_by_id(first_id) is not None
+        assert (
+            await client.get_user_universal_transfer_history(
+                "SPOT",
+                "FUTURES",
+                page=1,
+                size=10,
+            )
+            is not None
         )
-        is not None
-    )
+    finally:
+        if transferred:
+            second_id = await _transfer(client, "FUTURES", "SPOT", TRANSFER_AMOUNT)
+            transferred = False
+            await asyncio.sleep(3)
+            assert await client.get_user_universal_transfer_by_id(second_id) is not None
+            assert (
+                await client.get_user_universal_transfer_history(
+                    "FUTURES",
+                    "SPOT",
+                    page=1,
+                    size=10,
+                )
+                is not None
+            )
 
-    second_id = await _transfer(client, "FUTURES", "SPOT", TRANSFER_AMOUNT)
-    await asyncio.sleep(3)
-    assert await client.get_user_universal_transfer_by_id(second_id) is not None
     assert (
         await client.get_user_universal_transfer_history(
             "FUTURES",
@@ -483,8 +526,8 @@ async def test_spot_stateful_order_lifecycle(client):
         assert await client.get_spot_all_orders(SPOT_SYMBOL, limit=10) is not None
         assert await client.get_spot_open_orders(SPOT_SYMBOL) is not None
     finally:
-        with suppress(Exception):
-            await client.cancel_spot_open_orders(SPOT_SYMBOL)
+        if await _spot_open_orders(client):
+            assert await client.cancel_spot_open_orders(SPOT_SYMBOL) is not None
         await _cleanup_spot_btc(client, initial_btc)
 
 
@@ -643,7 +686,7 @@ async def test_contract_stateful_order_lifecycle(client):
         assert await client.get_contract_order_deal_details(long_open_id)
         assert await client.get_contract_open_orders(CONTRACT_SYMBOL, page_num=1, page_size=10)
     finally:
-        with suppress(Exception):
-            await client.cancel_all_contract_orders(CONTRACT_SYMBOL)
+        if await _contract_open_orders(client):
+            assert await client.cancel_all_contract_orders(CONTRACT_SYMBOL) is not None
         await _cleanup_contract_btc(client)
         await _return_futures_transfer(client, transferred)

@@ -3,7 +3,6 @@
 import os
 import time
 import uuid
-from contextlib import suppress
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 import pytest
@@ -37,12 +36,17 @@ pytestmark = [
 
 @pytest.fixture
 def client():
-    return Client(
+    client_instance = Client(
         api_key=BITMART_API_KEY,
         api_secret=BITMART_API_SECRET,
         memo=BITMART_MEMO,
         timeout=20,
     )
+    try:
+        _cleanup(client_instance, Decimal("0"), _contract_available_usdt(client_instance))
+        yield client_instance
+    finally:
+        _cleanup(client_instance, Decimal("0"), _contract_available_usdt(client_instance))
 
 
 def _dec(value: object, default: str = "0") -> Decimal:
@@ -95,7 +99,10 @@ def _order_id(res: dict) -> str:
 def _skip_if_account_restriction(exc: FailedRequestError) -> None:
     message = str(exc)
     if "33136" in message or "personal verification" in message.lower() or "60052" in message:
-        pytest.skip(f"BitMart account restriction prevented live trading endpoint: {exc}")
+        pytest.fail(
+            f"BitMart account restriction prevented live trading endpoint: {exc}",
+            pytrace=False,
+        )
     raise exc
 
 
@@ -151,15 +158,6 @@ def _contract_position_size(client: Client) -> Decimal:
     return size
 
 
-def _skip_if_existing_state(client: Client) -> None:
-    if _spot_open_orders(client):
-        pytest.skip("BitMart spot already has open orders; not touching unrelated orders.")
-    if _contract_open_orders(client):
-        pytest.skip("BitMart contract already has open orders; not touching unrelated orders.")
-    if _contract_position_size(client) != 0:
-        pytest.skip("BitMart contract already has a position; not changing exposure.")
-
-
 def _spot_pair_details(client: Client) -> tuple[Decimal, Decimal, Decimal]:
     for item in _items(client.get_trading_pairs_details()):
         if item.get("symbol") == SPOT_EXCHANGE_SYMBOL:
@@ -183,7 +181,7 @@ def _spot_best_prices(client: Client) -> tuple[Decimal, Decimal]:
     bid = _dec(data.get("bid_px", data.get("last")))
     ask = _dec(data.get("ask_px", data.get("last")))
     if bid <= 0 or ask <= 0:
-        pytest.skip("BitMart spot ticker did not return bid/ask prices.")
+        pytest.fail("BitMart spot ticker did not return bid/ask prices.")
     return bid, ask
 
 
@@ -208,7 +206,7 @@ def _spot_sell_size(client: Client, size: Decimal) -> str:
 def _skip_if_spot_sell_notional_too_small(client: Client, size: str, price: str) -> None:
     _, min_notional, _ = _spot_pair_details(client)
     if Decimal(size) * Decimal(price) < min_notional:
-        pytest.skip("BitMart spot sell notional is below the exchange minimum.")
+        pytest.fail("BitMart spot sell notional is below the exchange minimum.")
 
 
 def _wait_for_sellable_spot_base(client: Client, before_base: Decimal) -> Decimal:
@@ -245,7 +243,7 @@ def _contract_best_prices(client: Client) -> tuple[Decimal, Decimal]:
     bids = data.get("bids", [])
     asks = data.get("asks", [])
     if not bids or not asks:
-        pytest.skip("BitMart contract depth did not return bid/ask prices.")
+        pytest.fail("BitMart contract depth did not return bid/ask prices.")
     return _dec(bids[0][0]), _dec(asks[0][0])
 
 
@@ -291,7 +289,7 @@ def _contract_fillable_sell_price(client: Client) -> str:
 
 def _ensure_spot_usdt(client: Client, required: Decimal) -> None:
     if _spot_available(client, "USDT") < required:
-        pytest.skip("Insufficient BitMart spot USDT for stateful order test.")
+        pytest.fail("Insufficient BitMart spot USDT for stateful order test.")
 
 
 def _ensure_contract_margin(client: Client) -> None:
@@ -307,7 +305,7 @@ def _ensure_contract_margin(client: Client) -> None:
     )
     time.sleep(2)
     if _contract_available_usdt(client) < Decimal("1"):
-        pytest.skip("Insufficient BitMart contract USDT after transfer.")
+        pytest.fail("Insufficient BitMart contract USDT after transfer.")
 
 
 def _transfer_amount(value: Decimal, rounding: str) -> str:
@@ -358,25 +356,20 @@ def _cleanup_contract_excess(client: Client, initial_contract_usdt: Decimal) -> 
 
 
 def _cleanup(client: Client, initial_spot_base: Decimal, initial_contract_usdt: Decimal) -> None:
-    with suppress(Exception):
-        if _spot_open_orders(client):
-            client.cancel_spot_all_order(product_symbol=SPOT_SYMBOL)
-            time.sleep(1)
-    with suppress(Exception):
-        if _contract_open_orders(client):
-            client.cancel_all_contract_order(product_symbol=CONTRACT_SYMBOL)
-            time.sleep(1)
-    with suppress(Exception):
-        size = _contract_position_size(client)
-        if size > 0:
-            client.place_contract_market_order(CONTRACT_SYMBOL, side=3, size=int(abs(size)))
-        elif size < 0:
-            client.place_contract_market_order(CONTRACT_SYMBOL, side=2, size=int(abs(size)))
-        time.sleep(2)
-    with suppress(Exception):
-        _cleanup_spot_base(client, initial_spot_base)
-    with suppress(Exception):
-        _cleanup_contract_excess(client, initial_contract_usdt)
+    if _spot_open_orders(client):
+        client.cancel_spot_all_order(product_symbol=SPOT_SYMBOL)
+        time.sleep(1)
+    if _contract_open_orders(client):
+        client.cancel_all_contract_order(product_symbol=CONTRACT_SYMBOL)
+        time.sleep(1)
+    _close_contract_position(client)
+    _cleanup_spot_base(client, initial_spot_base)
+    _cleanup_contract_excess(client, initial_contract_usdt)
+    base_step, _, _ = _spot_pair_details(client)
+    assert _spot_open_orders(client) == []
+    assert _contract_open_orders(client) == []
+    assert _contract_position_size(client) == 0
+    assert _spot_available(client, SPOT_BASE_CURRENCY) - initial_spot_base <= base_step
 
 
 def _wait_for_contract_position(client: Client, sign: int) -> Decimal:
@@ -393,7 +386,7 @@ def _wait_for_contract_position(client: Client, sign: int) -> Decimal:
 def _wait_for_contract_position_or_skip(client: Client, sign: int, action: str) -> Decimal:
     size = _wait_for_contract_position(client, sign)
     if size == 0:
-        pytest.skip(f"BitMart contract {action} did not fill before timeout.")
+        pytest.fail(f"BitMart contract {action} did not fill before timeout.")
     return size
 
 
@@ -416,7 +409,7 @@ def _wait_for_contract_flat(client: Client) -> None:
 
 
 def test_spot_stateful_order_lifecycle(client):
-    _skip_if_existing_state(client)
+    _cleanup(client, Decimal("0"), _contract_available_usdt(client))
     initial_base = _spot_available(client, SPOT_BASE_CURRENCY)
     initial_contract_usdt = _contract_available_usdt(client)
     try:
@@ -478,7 +471,7 @@ def test_spot_stateful_order_lifecycle(client):
         bought = _wait_for_sellable_spot_base(client, before_base)
         sell_size = _spot_sell_size(client, bought)
         if Decimal(sell_size) <= 0:
-            pytest.skip("BitMart spot market buy did not produce a sellable base amount.")
+            pytest.fail("BitMart spot market buy did not produce a sellable base amount.")
         assert client.get_spot_order_trade_list(_order_id(market_buy)) is not None
         assert client.place_spot_market_sell_order(SPOT_SYMBOL, sell_size, _client_id()) is not None
         time.sleep(2)
@@ -490,7 +483,7 @@ def test_spot_stateful_order_lifecycle(client):
         bought = _wait_for_sellable_spot_base(client, before_base)
         sell_size = _spot_sell_size(client, bought)
         if Decimal(sell_size) <= 0:
-            pytest.skip("BitMart spot limit buy did not produce a sellable base amount.")
+            pytest.fail("BitMart spot limit buy did not produce a sellable base amount.")
         sell_price = _spot_fillable_sell_price(client)
         _skip_if_spot_sell_notional_too_small(client, sell_size, sell_price)
         assert (
@@ -517,7 +510,7 @@ def test_spot_stateful_order_lifecycle(client):
         bought = _wait_for_sellable_spot_base(client, before_base)
         sell_size = _spot_sell_size(client, bought)
         if Decimal(sell_size) <= 0:
-            pytest.skip("BitMart spot market order did not produce a sellable base amount.")
+            pytest.fail("BitMart spot market order did not produce a sellable base amount.")
         post_only_sell_price = _spot_post_only_sell_price(client)
         _skip_if_spot_sell_notional_too_small(client, sell_size, post_only_sell_price)
         order_id = None
@@ -558,7 +551,7 @@ def test_spot_stateful_order_lifecycle(client):
 
 
 def test_contract_stateful_order_lifecycle(client):
-    _skip_if_existing_state(client)
+    _cleanup(client, Decimal("0"), _contract_available_usdt(client))
     initial_base = _spot_available(client, SPOT_BASE_CURRENCY)
     initial_contract_usdt = _contract_available_usdt(client)
     try:

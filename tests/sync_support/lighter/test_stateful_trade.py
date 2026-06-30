@@ -2,7 +2,6 @@
 
 import os
 import time
-from contextlib import suppress
 from decimal import ROUND_CEILING, ROUND_DOWN, Decimal
 
 import pytest
@@ -40,14 +39,22 @@ def client():
         preload_product_table=False,
     )
     try:
+        _cleanup_account(client_instance)
         yield client_instance
     finally:
+        _cleanup_account(client_instance)
         client_instance.close()
 
 
 def _assert_response(res) -> None:
     assert isinstance(res, dict)
     assert res.get("code", 200) == 200
+
+
+def _dec(value: object, default: str = "0") -> Decimal:
+    if value is None or value == "":
+        value = default
+    return Decimal(str(value))
 
 
 def _market(client: Client, preferred_symbols: set[str] | None = None) -> dict:
@@ -144,6 +151,148 @@ def _wait_for_trade_client_ids(
     pytest.fail(f"Lighter trades not found for client_order_ids={sorted(pending)}")
 
 
+def _active_orders(client: Client) -> list:
+    orders = client.get_account_active_orders()
+    return orders.get("orders", []) if isinstance(orders, dict) else []
+
+
+def _cancel_open_orders(client: Client) -> None:
+    for order in _active_orders(client):
+        market_id = order.get("market_id") or order.get("market_index")
+        order_index = order.get("order_index")
+        if market_id is None or order_index is None:
+            pytest.fail(f"Lighter active order is missing cancel identifiers: {order}")
+        _assert_response(
+            client.cancel_order(market_index=int(market_id), order_index=int(order_index))
+        )
+    time.sleep(1)
+
+
+def _market_map(client: Client) -> dict[int, dict]:
+    details = client.get_order_book_details()
+    markets = details.get("order_book_details", []) if isinstance(details, dict) else []
+    return {int(market["market_id"]): market for market in markets}
+
+
+def _account_positions(client: Client) -> list[dict]:
+    account_index = _env_int(ACCOUNT_INDEX)
+    account = client.get_account(by="index", value=str(account_index))
+    accounts = account.get("accounts", []) if isinstance(account, dict) else []
+    if not accounts:
+        return []
+    positions = accounts[0].get("positions", []) if isinstance(accounts[0], dict) else []
+    active_positions = []
+    for position in positions if isinstance(positions, list) else []:
+        if not isinstance(position, dict):
+            continue
+        size = _dec(position.get("position"))
+        if size == 0:
+            continue
+        sign = int(position.get("sign", 1) or 1)
+        signed_size = size if sign >= 0 else -size
+        active_positions.append(
+            {
+                "market_id": int(position["market_id"]),
+                "symbol": position.get("symbol"),
+                "signed_size": signed_size,
+            }
+        )
+    return active_positions
+
+
+def _price_amount(price: Decimal, price_decimals: int, rounding: str) -> int:
+    price_step = Decimal(1).scaleb(-price_decimals)
+    return int(price.quantize(price_step, rounding=rounding) * (Decimal(10) ** price_decimals))
+
+
+def _close_position_once(
+    client: Client,
+    market: dict,
+    signed_size: Decimal,
+    client_order_index: int,
+    base_amount: int | None = None,
+) -> None:
+    market_index = int(market["market_id"])
+    price_decimals = int(market["price_decimals"])
+    size_decimals = int(market["size_decimals"])
+    if base_amount is None:
+        base_amount = int(
+            (abs(signed_size) * (Decimal(10) ** size_decimals)).to_integral_value(
+                rounding=ROUND_CEILING
+            )
+        )
+    order_book = client.get_order_book_orders(market_id=market_index, limit=5)
+    best_bid = _dec(order_book["bids"][0]["price"])
+    best_ask = _dec(order_book["asks"][0]["price"])
+    if signed_size > 0:
+        is_ask = True
+        price = _price_amount(best_bid * Decimal("0.995"), price_decimals, ROUND_DOWN)
+    else:
+        is_ask = False
+        price = _price_amount(best_ask * Decimal("1.005"), price_decimals, ROUND_CEILING)
+    _assert_response(
+        client.create_order(
+            market_index=market_index,
+            client_order_index=client_order_index,
+            base_amount=base_amount,
+            price=price,
+            is_ask=is_ask,
+            order_type=1,
+            time_in_force=0,
+            reduce_only=True,
+            order_expiry=0,
+        )
+    )
+
+
+def _close_positions(client: Client) -> None:
+    markets = _market_map(client)
+    for index, position in enumerate(_account_positions(client)):
+        market = markets.get(position["market_id"])
+        if market is None:
+            pytest.fail(f"Lighter market details not found for market_id={position['market_id']}")
+        signed_size = position["signed_size"]
+        client_order_index = int(time.time() * 1000) + index
+        try:
+            _close_position_once(client, market, signed_size, client_order_index)
+        except FailedRequestError as exc:
+            message = str(exc).lower()
+            if "min" not in message and "amount" not in message:
+                raise
+            size_decimals = int(market["size_decimals"])
+            exact_base_amount = int(
+                (abs(signed_size) * (Decimal(10) ** size_decimals)).to_integral_value(
+                    rounding=ROUND_CEILING
+                )
+            )
+            min_base_amount = int(
+                (
+                    _dec(market.get("min_base_amount")) * (Decimal(10) ** size_decimals)
+                ).to_integral_value(rounding=ROUND_CEILING)
+            )
+            _close_position_once(
+                client,
+                market,
+                signed_size,
+                client_order_index + 10_000,
+                max(exact_base_amount, min_base_amount),
+            )
+        time.sleep(2)
+
+
+def _cleanup_account(client: Client) -> None:
+    _cancel_open_orders(client)
+    _close_positions(client)
+    for _ in range(10):
+        if not _active_orders(client) and not _account_positions(client):
+            return
+        _cancel_open_orders(client)
+        _close_positions(client)
+        time.sleep(1)
+    assert _active_orders(client) == []
+    assert _account_positions(client) == []
+
+
 def test_signing_helpers(client):
     market = _market(client)
     market_index, base_amount, price = _post_only_buy_order(market)
@@ -219,7 +368,7 @@ def test_post_only_order_lifecycle(client):
     except FailedRequestError as exc:
         message = str(exc).lower()
         if any(term in message for term in ("insufficient", "balance", "collateral", "margin")):
-            pytest.skip(f"Lighter account has insufficient collateral for order test: {exc}")
+            pytest.fail(f"Lighter account has insufficient collateral for order test: {exc}")
         raise
     finally:
         time.sleep(1)
@@ -268,22 +417,18 @@ def test_ioc_market_fill_lifecycle(client):
     except FailedRequestError as exc:
         message = str(exc).lower()
         if any(term in message for term in ("insufficient", "balance", "collateral", "margin")):
-            pytest.skip(f"Lighter account has insufficient collateral for fill test: {exc}")
+            pytest.fail(f"Lighter account has insufficient collateral for fill test: {exc}")
         raise
     finally:
         if buy_sent and not sell_sent:
-            with suppress(Exception):
-                client.create_order(
-                    market_index=market_index,
-                    client_order_index=close_client_order_index,
-                    base_amount=base_amount,
-                    price=sell_price,
-                    is_ask=True,
-                    order_type=1,
-                    time_in_force=0,
-                    reduce_only=True,
-                    order_expiry=0,
-                )
+            _close_position_once(
+                client,
+                market,
+                Decimal(base_amount) / (Decimal(10) ** int(market["size_decimals"])),
+                close_client_order_index,
+                base_amount,
+            )
         time.sleep(2)
+        _cleanup_account(client)
 
     _wait_for_trade_client_ids(client, market_index, {client_order_index, close_client_order_index})

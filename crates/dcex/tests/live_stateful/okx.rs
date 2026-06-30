@@ -7,8 +7,8 @@ use tokio::time::sleep;
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, first_bid_price,
     format_transfer_amount, format_transfer_amount_floor, insufficient_funds_error,
-    leveraged_margin_required, margin_target, minimum_order_quantity, params, parse_positive,
-    post_only_buy_price, require_env, require_live_trading, require_order_id,
+    leveraged_margin_required, live_test_error, margin_target, minimum_order_quantity, params,
+    parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
     sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
     BTC_USDT_SWAP,
 };
@@ -32,6 +32,7 @@ async fn okx_direct_live_stateful_order() -> dcex::Result<()> {
         "0".to_string(),
         Duration::from_secs(20),
     )?;
+    cleanup_okx_orders(&client, BTC_USDT_SPOT).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -45,7 +46,11 @@ async fn okx_direct_live_stateful_order() -> dcex::Result<()> {
     let required_usdt = parse_positive(&price, "price")? * parse_positive(&quantity, "quantity")?;
     let transferred = match ensure_trading_usdt(&client, required_usdt * 1.01).await? {
         Some(amount) => amount,
-        None => return Ok(()),
+        None => {
+            return Err(live_test_error(
+                "OKX trading account has insufficient transferable USDT for live stateful order",
+            ));
+        }
     };
 
     let order_result = super::common::exchange_method_request(
@@ -101,14 +106,7 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
 
-    if okx_open_swap_orders(&client).await? {
-        eprintln!("skipping OKX swap live stateful order; open BTC-USDT swap orders exist");
-        return Ok(());
-    }
-    if okx_swap_position_abs(&client).await? > 0.0 {
-        eprintln!("skipping OKX swap live stateful order; BTC-USDT swap position exists");
-        return Ok(());
-    }
+    cleanup_okx_swap_state(&client).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -139,7 +137,11 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
     let transferred = match ensure_trading_usdt(&client, margin_target(required_usdt)).await? {
         Some(amount) => amount,
-        None => return Ok(()),
+        None => {
+            return Err(live_test_error(
+                "OKX swap has insufficient transferable USDT for live stateful order",
+            ));
+        }
     };
 
     let order_result = super::common::exchange_method_request(
@@ -157,8 +159,9 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         Ok(order) => order,
         Err(error) if insufficient_funds_error(&error) => {
             return_okx_transfer(&client, transferred).await?;
-            eprintln!("skipping OKX swap live stateful order; insufficient margin for post-only order: {error}");
-            return Ok(());
+            return Err(live_test_error(format!(
+                "OKX swap insufficient margin for post-only order: {error}"
+            )));
         }
         Err(error) => {
             return_okx_transfer(&client, transferred).await?;
@@ -193,8 +196,9 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
         Ok(opened) => opened,
         Err(error) if insufficient_funds_error(&error) => {
             return_okx_transfer(&client, transferred).await?;
-            eprintln!("skipping OKX swap live stateful order; insufficient margin for market open: {error}");
-            return Ok(());
+            return Err(live_test_error(format!(
+                "OKX swap insufficient margin for market open: {error}"
+            )));
         }
         Err(error) => {
             return_okx_transfer(&client, transferred).await?;
@@ -228,9 +232,6 @@ async fn ensure_trading_usdt(client: &OkxClient, required: f64) -> dcex::Result<
     let needed = required - trading;
     let funding = funding_usdt(client).await?;
     if funding < needed {
-        eprintln!(
-            "skipping OKX live stateful order; insufficient transferable USDT, required={required:.8}, trading={trading:.8}, funding={funding:.8}"
-        );
         return Ok(None);
     }
     let amount = format_transfer_amount(needed);
@@ -299,14 +300,55 @@ async fn funding_usdt(client: &OkxClient) -> dcex::Result<f64> {
     ))
 }
 
-async fn okx_open_swap_orders(client: &OkxClient) -> dcex::Result<bool> {
+async fn cleanup_okx_orders(client: &OkxClient, product_symbol: &str) -> dcex::Result<()> {
     let response = super::common::exchange_method_request(
-        &client,
+        client,
         "get_order_list",
-        params(&[("product_symbol", BTC_USDT_SWAP), ("limit", "20")]),
+        params(&[("product_symbol", product_symbol), ("limit", "20")]),
     )
     .await?;
-    Ok(contains_non_empty_array(&response.data, &["data"]))
+    if contains_non_empty_array(&response.data, &["data"]) {
+        let cancel = super::common::exchange_method_request(
+            client,
+            "cancel_all_orders",
+            params(&[("product_symbol", product_symbol)]),
+        )
+        .await?;
+        assert_success(&cancel);
+        sleep(Duration::from_secs(1)).await;
+    }
+    let remaining = super::common::exchange_method_request(
+        client,
+        "get_order_list",
+        params(&[("product_symbol", product_symbol), ("limit", "20")]),
+    )
+    .await?;
+    if contains_non_empty_array(&remaining.data, &["data"]) {
+        return Err(live_test_error(format!(
+            "OKX {product_symbol} still has open orders after cleanup"
+        )));
+    }
+    Ok(())
+}
+
+async fn cleanup_okx_swap_state(client: &OkxClient) -> dcex::Result<()> {
+    cleanup_okx_orders(client, BTC_USDT_SWAP).await?;
+    if okx_swap_position_abs(client).await? != 0.0 {
+        let close = super::common::exchange_method_request(
+            client,
+            "close_positions",
+            params(&[("product_symbol", BTC_USDT_SWAP), ("mgnMode", "cross")]),
+        )
+        .await?;
+        assert_success(&close);
+        sleep(Duration::from_secs(2)).await;
+    }
+    if wait_for_flat_position(|| okx_swap_position_abs(client)).await? != 0.0 {
+        return Err(live_test_error(
+            "OKX BTC-USDT swap position still exists after cleanup",
+        ));
+    }
+    Ok(())
 }
 
 async fn okx_swap_position_abs(client: &OkxClient) -> dcex::Result<f64> {

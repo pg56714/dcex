@@ -4,8 +4,9 @@ use dcex::exchange::Exchange;
 use dcex::exchanges::kucoin::KucoinClient;
 
 use super::common::{
-    assert_success, fetch_trading_details, minimum_order_quantity, params, post_only_buy_price,
-    require_env, require_live_trading, require_order_id, unique_client_id, BTC_USDT_SPOT,
+    assert_success, fetch_trading_details, live_test_error, minimum_order_quantity, params,
+    post_only_buy_price, require_env, require_live_trading, require_order_id, unique_client_id,
+    BTC_USDT_SPOT,
 };
 
 #[tokio::test]
@@ -40,8 +41,29 @@ async fn kucoin_spot_direct_live_stateful_order() -> dcex::Result<()> {
         .and_then(|v| v.as_array())
         .is_some_and(|items| !items.is_empty())
     {
-        eprintln!("skipping KuCoin spot live stateful order; open BTC-USDT spot orders exist");
-        return Ok(());
+        let cancel = super::common::exchange_method_request(
+            &client,
+            "cancel_spot_all_orders_by_symbol",
+            params(&[("product_symbol", BTC_USDT_SPOT)]),
+        )
+        .await?;
+        assert_success(&cancel);
+        let remaining = super::common::exchange_method_request(
+            &client,
+            "get_spot_open_orders",
+            params(&[("product_symbol", BTC_USDT_SPOT)]),
+        )
+        .await?;
+        if remaining
+            .data
+            .get("items")
+            .and_then(|v| v.as_array())
+            .is_some_and(|items| !items.is_empty())
+        {
+            return Err(live_test_error(
+                "KuCoin spot still has open BTC-USDT orders after cleanup",
+            ));
+        }
     }
 
     let orderbook = super::common::exchange_method_request(

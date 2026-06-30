@@ -4,8 +4,8 @@ use dcex::exchange::Exchange;
 use dcex::exchanges::aster::AsterClient;
 
 use super::common::{
-    assert_success, fetch_trading_details, minimum_order_quantity, params, post_only_buy_price,
-    require_env, require_live_trading, require_order_id, BTC_USDT_SWAP,
+    assert_success, fetch_trading_details, live_test_error, minimum_order_quantity, params,
+    post_only_buy_price, require_env, require_live_trading, require_order_id, BTC_USDT_SWAP,
 };
 
 #[tokio::test]
@@ -39,8 +39,28 @@ async fn aster_futures_direct_live_stateful_order() -> dcex::Result<()> {
         .as_array()
         .is_some_and(|orders| !orders.is_empty())
     {
-        eprintln!("skipping Aster futures live stateful order; open BTC-USDT swap orders exist");
-        return Ok(());
+        let cancel = super::common::exchange_method_request(
+            &client,
+            "cancel_all_futures_open_orders",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+        assert_success(&cancel);
+        let remaining = super::common::exchange_method_request(
+            &client,
+            "get_futures_open_orders",
+            params(&[("product_symbol", BTC_USDT_SWAP)]),
+        )
+        .await?;
+        if remaining
+            .data
+            .as_array()
+            .is_some_and(|orders| !orders.is_empty())
+        {
+            return Err(live_test_error(
+                "Aster futures still has open BTC-USDT swap orders after cleanup",
+            ));
+        }
     }
 
     let orderbook = client.get_futures_orderbook(BTC_USDT_SWAP).limit(5).await?;
