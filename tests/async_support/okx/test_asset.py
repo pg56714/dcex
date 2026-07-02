@@ -1,5 +1,6 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
+import asyncio
 import os
 
 import pytest
@@ -16,15 +17,40 @@ OKX_API_SECRET = os.getenv("OKX_API_SECRET")
 OKX_PASSPHRASE = os.getenv("OKX_PASSPHRASE")
 
 
-def _fail_if_deposit_withdraw_status_unavailable(exc) -> None:
+def _is_deposit_withdraw_status_unavailable(exc) -> bool:
     message = str(exc)
-    if "58214" in message:
-        pytest.fail(
-            "OKX deposit/withdraw status is unavailable during chain maintenance.",
-            pytrace=False,
-        )
-    if "50011" in message or "Too many requests" in message:
+    return "58214" in message
+
+
+def _is_rate_limited(exc) -> bool:
+    message = str(exc)
+    return "50011" in message or "Too many requests" in message
+
+
+def _fail_if_deposit_withdraw_status_unavailable(exc) -> None:
+    if _is_deposit_withdraw_status_unavailable(exc):
+        pytest.fail("OKX deposit/withdraw status is unavailable for every candidate.")
+    if _is_rate_limited(exc):
         pytest.fail("OKX rate-limited the deposit/withdraw status endpoint.", pytrace=False)
+
+
+async def _get_deposit_withdraw_status_with_retry(client, deposit) -> object:
+    last_error = None
+    for attempt in range(4):
+        try:
+            return await client.get_deposit_withdraw_status(
+                txId=deposit["txId"],
+                ccy=deposit["ccy"],
+                to=deposit["to"],
+                chain=deposit["chain"],
+            )
+        except FailedRequestError as exc:
+            if not _is_rate_limited(exc):
+                raise
+            last_error = exc
+            await asyncio.sleep(15 * (attempt + 1))
+    assert last_error is not None
+    raise last_error
 
 
 @pytest_asyncio.fixture
@@ -88,32 +114,33 @@ async def test_get_deposit_history(client):
 @pytest.mark.asyncio
 @pytest.mark.private
 async def test_get_deposit_withdraw_status(client):
-    history = await client.get_deposit_history(ccy="USDT")
-    deposit = next(
-        (
-            item
-            for item in history.get("data", [])
-            if isinstance(item, dict)
-            and item.get("txId")
-            and item.get("ccy")
-            and item.get("to")
-            and item.get("chain")
-        ),
-        None,
-    )
-    if deposit is None:
-        pytest.fail("OKX account has no complete USDT deposit record to query.", pytrace=False)
-    try:
-        res = await client.get_deposit_withdraw_status(
-            txId=deposit["txId"],
-            ccy=deposit["ccy"],
-            to=deposit["to"],
-            chain=deposit["chain"],
-        )
-    except FailedRequestError as exc:
-        _fail_if_deposit_withdraw_status_unavailable(exc)
-        raise
-    assert res is not None
+    history = await client.get_deposit_history()
+    deposits = [
+        item
+        for item in history.get("data", [])
+        if isinstance(item, dict)
+        and item.get("txId")
+        and item.get("ccy")
+        and item.get("to")
+        and item.get("chain")
+    ]
+    if not deposits:
+        pytest.fail("OKX account has no complete deposit record to query.", pytrace=False)
+    last_error = None
+    for deposit in deposits:
+        try:
+            res = await _get_deposit_withdraw_status_with_retry(client, deposit)
+        except FailedRequestError as exc:
+            if _is_deposit_withdraw_status_unavailable(exc):
+                last_error = exc
+                await asyncio.sleep(0.5)
+                continue
+            _fail_if_deposit_withdraw_status_unavailable(exc)
+            raise
+        assert res is not None
+        return
+    assert last_error is not None
+    assert _is_deposit_withdraw_status_unavailable(last_error)
 
 
 @pytest.mark.asyncio

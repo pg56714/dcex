@@ -103,6 +103,15 @@ def _spot_available(client: Client, currency: str) -> Decimal:
     )
 
 
+def _wait_for_spot_delta(client: Client, before: Decimal) -> Decimal:
+    for _ in range(10):
+        delta = _spot_available(client, "BTC") - before
+        if delta > 0:
+            return delta
+        time.sleep(1)
+    return Decimal("0")
+
+
 def _futures_available_usdt(client: Client) -> Decimal:
     account = client.get_futures_account()
     data = account.get("data", account) if isinstance(account, dict) else account
@@ -271,7 +280,7 @@ def _spot_orderbook_prices(client: Client) -> tuple[Decimal, Decimal]:
 def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     best_bid, _ = _spot_orderbook_prices(client)
-    price = _round_to_step(best_bid - tick, tick, ROUND_DOWN)
+    price = _round_to_step(min(best_bid - tick, best_bid * Decimal("0.999")), tick, ROUND_DOWN)
     amount = _round_to_step(min_notional * SPOT_NOTIONAL_BUFFER / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
@@ -279,7 +288,7 @@ def _spot_post_only_buy_params(client: Client) -> tuple[str, str]:
 def _spot_fillable_buy_params(client: Client) -> tuple[str, str]:
     tick, step, min_size, min_notional = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
-    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
+    price = _round_to_step(max(best_ask + tick, best_ask * Decimal("1.01")), tick, ROUND_UP)
     amount = _round_to_step(min_notional * SPOT_NOTIONAL_BUFFER / price, step, ROUND_UP)
     return _fmt(max(amount, min_size)), _fmt(price)
 
@@ -293,7 +302,7 @@ def _spot_fillable_sell_price(client: Client) -> str:
 def _spot_post_only_sell_price(client: Client) -> str:
     tick, _, _, _ = _spot_details(client)
     _, best_ask = _spot_orderbook_prices(client)
-    return _fmt(_round_to_step(best_ask + tick, tick, ROUND_UP))
+    return _fmt(_round_to_step(max(best_ask + tick, best_ask * Decimal("1.001")), tick, ROUND_UP))
 
 
 def _spot_market_buy_amount(client: Client) -> Decimal:
@@ -517,8 +526,7 @@ def test_spot_stateful_order_lifecycle(client):
         transfers.append(_ensure_spot_usdt(client, quote_amount))
         before_btc = _spot_available(client, "BTC")
         assert client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(quote_amount)) is not None
-        time.sleep(2)
-        acquired = _spot_available(client, "BTC") - before_btc
+        acquired = _wait_for_spot_delta(client, before_btc)
         sell_amount = _spot_sell_amount(client, acquired)
         assert Decimal(sell_amount) > 0
         assert client.place_spot_market_sell_order(SPOT_SYMBOL, sell_amount) is not None
@@ -528,8 +536,7 @@ def test_spot_stateful_order_lifecycle(client):
         transfers.append(_ensure_spot_usdt(client, quote_amount))
         before_btc = _spot_available(client, "BTC")
         assert client.place_spot_market_order(SPOT_SYMBOL, "buy", _fmt(quote_amount)) is not None
-        time.sleep(2)
-        acquired = _spot_available(client, "BTC") - before_btc
+        acquired = _wait_for_spot_delta(client, before_btc)
         sell_amount = _spot_sell_amount(client, acquired)
         assert Decimal(sell_amount) > 0
         assert client.place_spot_market_order(SPOT_SYMBOL, "sell", sell_amount) is not None
@@ -542,10 +549,10 @@ def test_spot_stateful_order_lifecycle(client):
             assert (
                 client.place_spot_limit_buy_order(SPOT_SYMBOL, fill_amount, fill_price) is not None
             )
-            time.sleep(2)
-            acquired = _spot_available(client, "BTC") - before_btc
+            acquired = _wait_for_spot_delta(client, before_btc)
             sell_amount = _spot_sell_amount(client, acquired)
-            assert Decimal(sell_amount) > 0
+            if Decimal(sell_amount) <= 0:
+                pytest.fail("Gate spot fillable limit buy did not fill before timeout.")
             assert (
                 client.place_spot_limit_sell_order(
                     SPOT_SYMBOL,
@@ -569,8 +576,7 @@ def test_spot_stateful_order_lifecycle(client):
         order_id = None
         try:
             assert client.place_spot_market_buy_order(SPOT_SYMBOL, _fmt(quote_amount)) is not None
-            time.sleep(2)
-            acquired = _spot_available(client, "BTC") - before_btc
+            acquired = _wait_for_spot_delta(client, before_btc)
             sell_amount = _spot_sell_amount(client, acquired)
             assert Decimal(sell_amount) > 0
             order = client.place_spot_post_only_limit_sell_order(

@@ -237,6 +237,20 @@ def _is_rate_limited(exc: FailedRequestError) -> bool:
     return "50011" in message or "rate limit" in message
 
 
+def _rate_limited_request(factory) -> object:
+    last_error = None
+    for attempt in range(4):
+        try:
+            return factory()
+        except FailedRequestError as exc:
+            if not _is_rate_limited(exc):
+                raise
+            last_error = exc
+            time.sleep(5 * (attempt + 1))
+    assert last_error is not None
+    raise last_error
+
+
 def _is_empty_cancel_all_error(exc: FailedRequestError) -> bool:
     message = str(exc).lower()
     return "50000" in message and "body for post request cannot be empty" in message
@@ -250,16 +264,31 @@ def _skip_if_order_no_longer_open(exc: FailedRequestError) -> None:
     raise exc
 
 
+def _cleanup_if_order_no_longer_open(
+    client: Client,
+    initial_btc: Decimal,
+    exc: FailedRequestError,
+) -> bool:
+    if not _is_order_no_longer_open(exc):
+        _skip_if_order_no_longer_open(exc)
+    _cleanup(client, initial_btc)
+    return True
+
+
 def _order_id_or_skip(create_order) -> str:
     try:
-        return _order_id(create_order())
+        return _order_id(_rate_limited_request(create_order))
     except FailedRequestError as exc:
         _skip_if_order_no_longer_open(exc)
 
 
 def _cancel_order(client: Client, order_id: str) -> None:
     try:
-        _assert_ok(client.cancel_order(product_symbol=SPOT_SYMBOL, ordId=order_id))
+        _assert_ok(
+            _rate_limited_request(
+                lambda: client.cancel_order(product_symbol=SPOT_SYMBOL, ordId=order_id)
+            )
+        )
     except FailedRequestError as exc:
         if _is_order_no_longer_open(exc):
             return
@@ -269,7 +298,9 @@ def _cancel_order(client: Client, order_id: str) -> None:
 
 def _cancel_all_orders(client: Client, product_symbol: str) -> None:
     try:
-        _assert_ok(client.cancel_all_orders(product_symbol=product_symbol))
+        _assert_ok(
+            _rate_limited_request(lambda: client.cancel_all_orders(product_symbol=product_symbol))
+        )
     except FailedRequestError as exc:
         if _is_empty_cancel_all_error(exc):
             return
@@ -309,14 +340,22 @@ def _cleanup_spot_btc(client: Client, initial_btc: Decimal) -> None:
         if sell_size < min_size or sell_size * best_bid < min_notional:
             quote = _spot_market_quote(client)
             transferred += _ensure_trading_usdt(client, quote)
-            _assert_ok(client.place_market_buy_order(SPOT_SYMBOL, "cash", _fmt(quote)))
+            _assert_ok(
+                _rate_limited_request(
+                    lambda: client.place_market_buy_order(SPOT_SYMBOL, "cash", _fmt(quote))
+                )
+            )
             time.sleep(2)
             sell_size = Decimal(
                 _spot_sell_size(client, _spot_available(client, "BTC") - initial_btc)
             )
 
         if sell_size > 0:
-            _assert_ok(client.place_market_sell_order(SPOT_SYMBOL, "cash", _fmt(sell_size)))
+            _assert_ok(
+                _rate_limited_request(
+                    lambda: client.place_market_sell_order(SPOT_SYMBOL, "cash", _fmt(sell_size))
+                )
+            )
             time.sleep(2)
     finally:
         _return_to_funding(client, transferred)
@@ -387,9 +426,11 @@ def test_spot_stateful_order_lifecycle(client):
                     )
                 )
             except FailedRequestError as exc:
-                _skip_if_order_no_longer_open(exc)
-            _cancel_order(client, order_id)
-            order_id = None
+                if _cleanup_if_order_no_longer_open(client, initial_btc, exc):
+                    order_id = None
+            else:
+                _cancel_order(client, order_id)
+                order_id = None
         finally:
             if order_id is not None:
                 _cancel_order(client, order_id)
@@ -434,7 +475,8 @@ def test_spot_stateful_order_lifecycle(client):
                 )
             )
         except FailedRequestError as exc:
-            _skip_if_order_no_longer_open(exc)
+            if _cleanup_if_order_no_longer_open(client, initial_btc, exc):
+                batch_ids = []
         else:
             _assert_ok(
                 client.cancel_batch_orders(

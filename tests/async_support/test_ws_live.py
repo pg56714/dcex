@@ -74,7 +74,10 @@ def _skip_if_unselected(exchange: str) -> None:
 def _require_env(names: tuple[str, ...]) -> None:
     missing = [name for name in names if not os.getenv(name)]
     if missing:
-        pytest.skip(f"Set {', '.join(missing)} before running this private live WS test.")
+        pytest.fail(
+            f"Set {', '.join(missing)} before running this private live WS test.",
+            pytrace=False,
+        )
 
 
 def _env_int(name: str) -> int:
@@ -374,7 +377,10 @@ async def test_private_ws_live_connects_and_subscribes(spec: WebSocketSpec) -> N
             payload = await _recv_optional(ws)
     except RuntimeError as exc:
         if _is_permission_error(exc):
-            pytest.skip(f"{spec.name} private WebSocket credentials lack required permission.")
+            pytest.fail(
+                f"{spec.name} private WebSocket credentials lack required permission.",
+                pytrace=False,
+            )
         raise
 
     if payload is not None:

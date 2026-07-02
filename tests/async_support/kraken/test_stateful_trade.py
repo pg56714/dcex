@@ -112,8 +112,6 @@ async def _spot_prices(client: Client, product_symbol: str) -> tuple[Decimal, De
 
 async def _spot_symbol_with_funds(client: Client) -> tuple[str, str, Decimal, Decimal, Decimal]:
     for quote in SPOT_QUOTES:
-        if await _spot_available(client, quote) <= 0:
-            continue
         product_symbol = f"BTC-{quote}-SPOT"
         with suppress(Exception):
             client.ptm.get_exchange_symbol("kraken", product_symbol)
@@ -123,7 +121,9 @@ async def _spot_symbol_with_funds(client: Client) -> tuple[str, str, Decimal, De
                 _round_to_step(min_notional * Decimal("1.01") / ask, step, ROUND_UP),
                 min_size,
             )
-            if await _spot_available(client, quote) >= volume * ask * Decimal("1.01"):
+            required = volume * ask * Decimal("1.01")
+            await _ensure_spot_quote(client, quote, required)
+            if await _spot_available(client, quote) >= required:
                 return product_symbol, quote, step, min_size, volume
     pytest.fail("Insufficient Kraken spot quote balance for BTC spot order tests.", pytrace=False)
 
@@ -137,6 +137,8 @@ async def _spot_limit_buy_params(client: Client) -> tuple[str, str, str]:
         _round_to_step(min_notional * Decimal("1.01") / price, step, ROUND_UP),
         min_size,
     )
+    if await _spot_available(client, quote) < price * volume:
+        await _ensure_spot_quote(client, quote, price * volume * Decimal("1.01"))
     if await _spot_available(client, quote) < price * volume:
         pytest.fail("Insufficient Kraken spot quote balance for post-only order.", pytrace=False)
     return product_symbol, _fmt(volume), _fmt(price)
@@ -187,6 +189,41 @@ async def _futures_cash_available(client: Client, unit: str) -> Decimal:
         if key in item:
             return _dec(item[key])
     return Decimal("0")
+
+
+async def _ensure_spot_quote(client: Client, quote: str, required: Decimal) -> None:
+    if await _spot_available(client, quote) >= required:
+        return
+    if quote != "USDT":
+        pytest.fail(
+            f"Insufficient Kraken spot {quote}; only USDT can be topped up from futures.",
+            pytrace=False,
+        )
+    amount = (required - await _spot_available(client, quote)).quantize(
+        Decimal("0.00000001"),
+        rounding=ROUND_UP,
+    )
+    if await _futures_cash_available(client, "usdt") >= amount:
+        source_wallet = "cash"
+    elif await _futures_flex_available(client) >= amount:
+        source_wallet = "flex"
+    else:
+        pytest.fail(
+            "Insufficient transferable Kraken USDT across spot and futures.",
+            pytrace=False,
+        )
+    _assert_futures_ok(
+        await client.withdraw_futures_to_spot_wallet(
+            amount=_fmt(amount),
+            currency=quote,
+            sourceWallet=source_wallet,
+        )
+    )
+    await asyncio.sleep(5)
+    if await _spot_available(client, quote) < required:
+        pytest.fail(
+            "Kraken spot quote remains insufficient after futures withdrawal.", pytrace=False
+        )
 
 
 async def _ensure_futures_margin(client: Client, required: Decimal = Decimal("0.5")) -> Decimal:
@@ -317,10 +354,7 @@ async def _cleanup_spot_btc(client: Client, initial_btc: Decimal) -> None:
         if buy_volume > 0:
             required_quote = buy_volume * ask * Decimal("1.02")
             if await _spot_available(client, quote) < required_quote:
-                pytest.fail(
-                    "Insufficient Kraken quote balance to top up BTC dust for cleanup.",
-                    pytrace=False,
-                )
+                await _ensure_spot_quote(client, quote, required_quote)
             _assert_spot_ok(
                 await client.place_spot_market_buy_order(product_symbol, _fmt(buy_volume))
             )
@@ -438,6 +472,40 @@ async def _withdraw_futures_to_spot_safely(
         )
 
 
+async def _withdraw_futures_to_spot_from_available_wallet(
+    client: Client,
+    *,
+    amount: Decimal,
+    currency: str,
+    restored_spot_floor: Decimal,
+) -> None:
+    remaining = amount
+    for source_wallet, available in (
+        ("cash", await _futures_cash_available(client, currency)),
+        ("flex", await _futures_flex_available(client)),
+    ):
+        transfer_amount = min(remaining, available).quantize(
+            Decimal("0.00000001"),
+            rounding=ROUND_DOWN,
+        )
+        if transfer_amount <= 0:
+            continue
+        await _withdraw_futures_to_spot_safely(
+            client,
+            amount=_fmt(transfer_amount),
+            currency=currency,
+            sourceWallet=source_wallet,
+            restored_spot_floor=restored_spot_floor,
+        )
+        if await _wait_for_spot_floor(client, currency, restored_spot_floor):
+            return
+        remaining -= transfer_amount
+    pytest.fail(
+        f"Kraken spot {currency} balance did not recover from futures cash/flex wallets.",
+        pytrace=False,
+    )
+
+
 async def test_wallet_transfer_round_trip(client):
     initial_spot = await _spot_available(client, "USDT")
     if initial_spot < SPOT_TRANSFER_AMOUNT:
@@ -458,21 +526,24 @@ async def test_wallet_transfer_round_trip(client):
         )
         transferred = True
         await asyncio.sleep(2)
+        try:
+            await _withdraw_futures_to_spot_from_available_wallet(
+                client,
+                amount=SPOT_TRANSFER_AMOUNT,
+                currency="USDT",
+                restored_spot_floor=initial_spot,
+            )
+        except FailedRequestError as exc:
+            if _is_kraken_service_unavailable(exc):
+                transferred = False
+            raise
         transferred = False
-        await _withdraw_futures_to_spot_safely(
-            client,
-            amount=_fmt(SPOT_TRANSFER_AMOUNT),
-            currency="USDT",
-            sourceWallet="flex",
-            restored_spot_floor=initial_spot,
-        )
     finally:
         if transferred:
-            await _withdraw_futures_to_spot_safely(
+            await _withdraw_futures_to_spot_from_available_wallet(
                 client,
-                amount=_fmt(SPOT_TRANSFER_AMOUNT),
+                amount=SPOT_TRANSFER_AMOUNT,
                 currency="USDT",
-                sourceWallet="flex",
                 restored_spot_floor=initial_spot,
             )
         await asyncio.sleep(2)
@@ -584,6 +655,7 @@ async def test_spot_market_round_trip_and_sell_wrappers(client):
             finally:
                 if txid is not None:
                     await _cancel_spot(client, txid)
+                    assert await _wait_for_spot_floor(client, "BTC", initial_btc + acquired)
 
         _assert_spot_ok(await client.place_spot_market_sell_order(product_symbol, _fmt(acquired)))
         acquired = Decimal("0")
@@ -599,7 +671,7 @@ async def test_spot_market_round_trip_and_sell_wrappers(client):
         )
         acquired = Decimal("0")
     finally:
-        await _cleanup_spot_btc(client, initial_btc)
+        await _cleanup_spot_state(client, initial_btc)
 
     _assert_spot_ok(await client.get_spot_closed_orders())
     _assert_spot_ok(await client.get_spot_trade_history())

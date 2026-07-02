@@ -1,5 +1,8 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
+import os
+import time
+
 import pytest
 
 from dcex.binance.client import Client
@@ -8,6 +11,11 @@ from dcex.binance.client import Client
 @pytest.fixture
 def client():
     return Client()
+
+
+@pytest.fixture(autouse=True)
+def _binance_public_rate_limit() -> None:
+    time.sleep(float(os.getenv("BINANCE_PUBLIC_TEST_DELAY_SECONDS", "2")))
 
 
 def test_get_spot_exchange_info(client):

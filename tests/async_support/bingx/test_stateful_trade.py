@@ -3,6 +3,8 @@
 import asyncio
 import logging
 import os
+import re
+import time
 import uuid
 from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
@@ -23,7 +25,8 @@ FUND_ACCOUNT = "fund"
 SPOT_ACCOUNT = "spot"
 SWAP_ACCOUNT = "USDTMPerp"
 LOGGER = logging.getLogger(__name__)
-SPOT_NOTIONAL_BUFFER = Decimal("1.15")
+SPOT_NOTIONAL_BUFFER = Decimal("1.01")
+SWAP_USDT_TOLERANCE = Decimal("0.0001")
 
 pytestmark = [
     pytest.mark.asyncio,
@@ -70,10 +73,15 @@ def _client_order_id() -> str:
     return f"dcex{uuid.uuid4().hex[:16]}"
 
 
-def _skip_if_rate_limited(exc: FailedRequestError) -> None:
+def _rate_limit_delay_seconds(exc: FailedRequestError) -> float | None:
     message = str(exc)
-    if "100410" in message or "endpoint trigger frequency limit" in message:
-        pytest.fail("BingX temporarily rate-limited this endpoint.", pytrace=False)
+    if "100410" not in message and "endpoint trigger frequency limit" not in message:
+        return None
+    match = re.search(r"unblocked after (\d+)", message)
+    if not match:
+        return 15
+    unblock_ms = int(match.group(1))
+    return max(1, unblock_ms / 1000 - time.time() + 1)
 
 
 async def _swap_available_usdt(client: Client) -> Decimal:
@@ -88,11 +96,17 @@ async def _swap_available_usdt(client: Client) -> Decimal:
 
 
 async def _spot_available(client: Client, asset: str) -> Decimal:
-    try:
-        balances = (await client.get_spot_account_balance()).get("data", {}).get("balances", [])
-    except FailedRequestError as exc:
-        _skip_if_rate_limited(exc)
-        raise
+    for _ in range(3):
+        try:
+            balances = (await client.get_spot_account_balance()).get("data", {}).get("balances", [])
+            break
+        except FailedRequestError as exc:
+            delay = _rate_limit_delay_seconds(exc)
+            if delay is None:
+                raise
+            await asyncio.sleep(delay)
+    else:
+        pytest.fail("BingX spot balance endpoint remained rate-limited.", pytrace=False)
     for item in balances:
         if item.get("asset") == asset:
             return _dec(item.get("free"))
@@ -174,18 +188,24 @@ async def _asset_transfer(
     await asyncio.sleep(2)
 
 
+def _has_required_usdt(account: str, available: Decimal, required: Decimal) -> bool:
+    if available >= required:
+        return True
+    return account == SWAP_ACCOUNT and required - available <= SWAP_USDT_TOLERANCE
+
+
 async def _ensure_usdt_for_account(
     client: Client,
     to_account: str,
     required: Decimal,
     current_available: Decimal,
 ) -> None:
-    if current_available >= required:
+    if _has_required_usdt(to_account, current_available, required):
         return
 
     for from_account in _transfer_sources(to_account):
         current_available = await _account_available_usdt(client, to_account)
-        if current_available >= required:
+        if _has_required_usdt(to_account, current_available, required):
             return
         amount = (required - current_available) * Decimal("1.01")
         try:
@@ -214,7 +234,11 @@ async def _ensure_usdt_for_account(
             )
             continue
 
-    if await _account_available_usdt(client, to_account) < required:
+    if not _has_required_usdt(
+        to_account,
+        await _account_available_usdt(client, to_account),
+        required,
+    ):
         pytest.fail(f"Insufficient transferable BingX USDT to transfer into {to_account}.")
 
 
@@ -314,7 +338,7 @@ async def _spot_market_quote_amount(client: Client) -> Decimal:
 async def _spot_fillable_limit_buy_params(client: Client) -> tuple[str, str]:
     tick, step, _ = _spot_details(client)
     _, best_ask = await _spot_orderbook_prices(client)
-    price = _round_to_step(best_ask + tick, tick, ROUND_UP)
+    price = _round_to_step(max(best_ask + tick, best_ask * Decimal("1.002")), tick, ROUND_UP)
     quantity = _round_to_step((await _spot_market_quote_amount(client)) / price, step, ROUND_UP)
     quantity = max(quantity, _spot_min_size(client))
     return _fmt(quantity), _fmt(price)
@@ -334,6 +358,15 @@ async def _spot_post_only_sell_price(client: Client) -> str:
 
 async def _spot_trade_delta(client: Client, before: Decimal, asset: str) -> Decimal:
     return max(await _spot_available(client, asset) - before, Decimal("0"))
+
+
+async def _wait_for_spot_delta(client: Client, before: Decimal, asset: str) -> Decimal:
+    for _ in range(10):
+        delta = await _spot_trade_delta(client, before, asset)
+        if delta > 0:
+            return delta
+        await asyncio.sleep(1)
+    return Decimal("0")
 
 
 async def _spot_sell_quantity(client: Client, quantity: Decimal) -> str:
@@ -422,7 +455,7 @@ async def _ensure_swap_usdt_for_quantity(client: Client, quantity: str) -> None:
         required=required,
         current_available=await _swap_available_usdt(client),
     )
-    if await _swap_available_usdt(client) < required:
+    if not _has_required_usdt(SWAP_ACCOUNT, await _swap_available_usdt(client), required):
         pytest.fail("BingX swap USDT remains insufficient after internal transfer.")
 
 
@@ -636,10 +669,10 @@ async def _exercise_spot_stateful_methods(client: Client) -> None:
             )
             is not None
         )
-        await asyncio.sleep(3)
-        bought = await _spot_trade_delta(client, before_btc, "BTC")
+        bought = await _wait_for_spot_delta(client, before_btc, "BTC")
         sell_quantity = await _spot_sell_quantity(client, bought)
-        assert Decimal(sell_quantity) > 0
+        if Decimal(sell_quantity) <= 0:
+            pytest.fail("BingX spot fillable limit buy did not fill before timeout.")
         assert (
             await client.place_spot_limit_sell_order(
                 SPOT_SYMBOL,

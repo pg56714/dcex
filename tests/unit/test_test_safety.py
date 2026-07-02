@@ -191,6 +191,15 @@ def test_kraken_ambiguous_withdrawal_is_not_retried(
     )
     client = SimpleNamespace(
         wallet_transfer_to_futures=Mock(return_value={"error": [], "result": {}}),
+        get_futures_accounts=Mock(
+            return_value={
+                "result": "success",
+                "accounts": {
+                    "cash": {"balances": {"usdt": {"available": "1"}}},
+                    "flex": {"availableMargin": "0"},
+                },
+            }
+        ),
         withdraw_futures_to_spot_wallet=withdraw,
     )
     balances = iter((Decimal("1"), *(Decimal("0") for _ in range(6))))
@@ -220,6 +229,15 @@ async def test_async_kraken_ambiguous_withdrawal_is_not_retried(
     )
     client = SimpleNamespace(
         wallet_transfer_to_futures=AsyncMock(return_value={"error": [], "result": {}}),
+        get_futures_accounts=AsyncMock(
+            return_value={
+                "result": "success",
+                "accounts": {
+                    "cash": {"balances": {"usdt": {"available": "1"}}},
+                    "flex": {"availableMargin": "0"},
+                },
+            }
+        ),
         withdraw_futures_to_spot_wallet=withdraw,
     )
     balances = iter((Decimal("1"), *(Decimal("0") for _ in range(6))))

@@ -4,14 +4,14 @@ use dcex::exchange::ValidatedResponse;
 use dcex::exchanges::binance::BinanceClient;
 
 use super::common::{
-    require_env, run_cases, run_private_cases, Case, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    require_env, run_cases_with_delay, run_private_cases, Case, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn binance_public_live_parity() -> dcex::Result<()> {
     let client = BinanceClient::public(Duration::from_secs(20))?;
-    run_cases(
+    run_cases_with_delay(
         vec![
             Case::new(
                 "get_spot_exchange_info",
@@ -95,6 +95,7 @@ async fn binance_public_live_parity() -> dcex::Result<()> {
                 ],
             ),
         ],
+        Duration::from_secs(2),
         |case| {
             let client = client.clone();
             async move { binance_public_case(&client, case).await }

@@ -6,10 +6,11 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, find_f64,
-    format_transfer_amount, format_transfer_amount_floor, insufficient_funds_error,
-    leveraged_margin_required, live_test_error, margin_target, minimum_order_quantity, params,
-    post_only_buy_price, require_env, require_live_trading, require_order_id,
-    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    first_bid_price, format_transfer_amount, format_transfer_amount_floor,
+    insufficient_funds_error, leveraged_margin_required, live_test_error, margin_target,
+    minimum_order_quantity, params, post_only_buy_price, require_env, require_live_trading,
+    require_order_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const GATEIO_CONTRACT_LEVERAGE_VALUE: f64 = 2.0;
@@ -38,6 +39,7 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
     )?;
 
     cleanup_gateio_spot_orders(&client).await?;
+    let initial_btc = gateio_spot_btc(&client).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -88,7 +90,10 @@ async fn gateio_direct_live_stateful_order() -> dcex::Result<()> {
         ]),
     )
     .await;
-    return_gateio_transfer(&client, &transfer).await?;
+    let cleanup_result = cleanup_gateio_spot_state(&client, initial_btc).await;
+    let transfer_result = return_gateio_transfer(&client, &transfer).await;
+    cleanup_result?;
+    transfer_result?;
     let cancel = cancel_result?;
     assert_success(&cancel);
     Ok(())
@@ -301,13 +306,24 @@ async fn return_gateio_transfer(
     if amount == "0" {
         return Ok(());
     }
-    gateio_transfer_formatted(
+    match gateio_transfer_formatted(
         client,
         transfer.from_account,
         transfer.to_account,
         amount.as_str(),
     )
     .await
+    {
+        Ok(()) => Ok(()),
+        Err(error)
+            if transfer.to_account == GATEIO_FUTURES_ACCOUNT
+                && gateio_unified_transfer_error(&error) =>
+        {
+            eprintln!("Gate.io unified account rejected transfer back to futures account");
+            Ok(())
+        }
+        Err(error) => Err(error),
+    }
 }
 
 async fn gateio_transfer(
@@ -358,6 +374,56 @@ async fn gateio_spot_open_orders(client: &GateioClient) -> dcex::Result<bool> {
     )
     .await?;
     Ok(contains_non_empty_array(&response.data, &[]))
+}
+
+async fn cleanup_gateio_spot_state(client: &GateioClient, initial_btc: f64) -> dcex::Result<()> {
+    cleanup_gateio_spot_orders(client).await?;
+    let current = gateio_spot_btc(client).await?;
+    if current <= initial_btc + 1e-8 {
+        return Ok(());
+    }
+
+    let orderbook = super::common::exchange_method_request(
+        client,
+        "get_spot_order_book",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
+    )
+    .await?;
+    let bid = first_bid_price(&orderbook.data)?;
+    let details = fetch_trading_details(Exchange::GateIo, "gateio", BTC_USDT_SPOT).await?;
+    let amount = format_transfer_amount_floor(current - initial_btc, 6);
+    if amount == "0" {
+        return Err(live_test_error(format!(
+            "Gate.io BTC spot excess is below sell precision after cleanup: current={current}, initial={initial_btc}",
+        )));
+    }
+    let notional = super::common::order_notional(bid, &amount, &details)?;
+    let min_notional = details.min_notional.parse::<f64>().unwrap_or(0.0);
+    if notional < min_notional {
+        return Err(live_test_error(format!(
+            "Gate.io BTC spot excess is below minimum sell notional after cleanup: notional={notional}, min_notional={min_notional}",
+        )));
+    }
+
+    let sell = super::common::exchange_method_request(
+        client,
+        "place_spot_market_sell_order",
+        params(&[
+            ("product_symbol", BTC_USDT_SPOT),
+            ("amount", amount.as_str()),
+        ]),
+    )
+    .await?;
+    assert_success(&sell);
+    sleep(Duration::from_secs(2)).await;
+
+    let remaining = gateio_spot_btc(client).await?;
+    if remaining > initial_btc + 1e-8 {
+        return Err(live_test_error(format!(
+            "Gate.io BTC spot excess remains after cleanup: current={remaining}, initial={initial_btc}",
+        )));
+    }
+    Ok(())
 }
 
 async fn cleanup_gateio_spot_orders(client: &GateioClient) -> dcex::Result<()> {
@@ -460,6 +526,16 @@ async fn gateio_spot_usdt(client: &GateioClient) -> dcex::Result<f64> {
     Ok(asset_amount(&response.data, "USDT", &["available"]))
 }
 
+async fn gateio_spot_btc(client: &GateioClient) -> dcex::Result<f64> {
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_spot_account",
+        params(&[("ccy", "BTC")]),
+    )
+    .await?;
+    Ok(asset_amount(&response.data, "BTC", &["available"]))
+}
+
 async fn gateio_futures_usdt(client: &GateioClient) -> dcex::Result<f64> {
     let response = client.get_futures_account().await?;
     Ok(find_f64(
@@ -472,6 +548,12 @@ async fn gateio_futures_usdt(client: &GateioClient) -> dcex::Result<f64> {
         ],
     )
     .unwrap_or(0.0))
+}
+
+fn gateio_unified_transfer_error(error: &dcex::DcexError) -> bool {
+    let message = error.to_string();
+    message.contains("PERPETUAL_CONTRACT_TRANSFER_USDT_EXCEPTION")
+        || message.contains("migrated to the Unified Account")
 }
 
 async fn gateio_contract_market_price(client: &GateioClient) -> dcex::Result<f64> {

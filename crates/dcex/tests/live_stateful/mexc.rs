@@ -6,12 +6,12 @@ use tokio::time::sleep;
 
 use super::common::{
     account_restriction, assert_success, asset_amount, contains_non_empty_array,
-    fetch_trading_details, find_f64, first_bid_price, format_transfer_amount,
+    fetch_trading_details, find_f64, first_bid_price, format_step_decimal, format_transfer_amount,
     format_transfer_amount_floor, insufficient_funds_error, leveraged_margin_required,
-    live_test_error, margin_target, minimum_order_quantity, params, post_only_buy_price_from_bid,
-    price_below_market, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    live_test_error, margin_target, minimum_order_quantity, params, parse_positive,
+    post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
+    require_order_id, round_down_to_step, sum_abs_values_for_symbols, unique_client_id,
+    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const MEXC_CONTRACT_LEVERAGE: &str = "50";
@@ -32,7 +32,8 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
         Some(keys[1].clone()),
         Duration::from_secs(20),
     )?;
-    cleanup_mexc_spot_orders(&client).await?;
+    cleanup_mexc_spot_state(&client, 0.0).await?;
+    let initial_btc = mexc_spot_btc(&client).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -66,6 +67,7 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
         ]),
     )
     .await;
+    let cleanup_result = cleanup_mexc_spot_state(&client, initial_btc).await;
     match cancel_result {
         Ok(cancel) => assert_success(&cancel),
         Err(error)
@@ -78,6 +80,7 @@ async fn mexc_direct_live_stateful_order() -> dcex::Result<()> {
         }
         Err(error) => return Err(error),
     }
+    cleanup_result?;
     Ok(())
 }
 
@@ -238,6 +241,60 @@ async fn cleanup_mexc_spot_orders(client: &MexcClient) -> dcex::Result<()> {
         return Err(live_test_error(
             "MEXC spot still has open BTC-USDT orders after cleanup",
         ));
+    }
+    Ok(())
+}
+
+async fn cleanup_mexc_spot_state(client: &MexcClient, initial_btc: f64) -> dcex::Result<()> {
+    cleanup_mexc_spot_orders(client).await?;
+    let current = mexc_spot_btc(client).await?;
+    if current <= initial_btc {
+        return Ok(());
+    }
+    let details = fetch_trading_details(Exchange::Mexc, "mexc", BTC_USDT_SPOT).await?;
+    let step = parse_positive(&details.size_precision, "size_precision")?;
+    let quantity = round_down_to_step(current - initial_btc, step);
+    if quantity <= 0.0 {
+        return Ok(());
+    }
+
+    let orderbook = super::common::exchange_method_request(
+        client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
+    )
+    .await?;
+    let bid = first_bid_price(&orderbook.data)?;
+    let min_size = details.min_size.parse::<f64>().unwrap_or(0.0);
+    let min_notional = details.min_notional.parse::<f64>().unwrap_or(0.0);
+    if quantity < min_size || quantity * bid < min_notional {
+        if current - initial_btc > step {
+            return Err(live_test_error(format!(
+                "MEXC BTC spot excess is below minimum sell size after cleanup: quantity={quantity}, min_size={min_size}, notional={}",
+                quantity * bid
+            )));
+        }
+        return Ok(());
+    }
+
+    let quantity = format_step_decimal(quantity, step)?;
+    let sell = super::common::exchange_method_request(
+        client,
+        "place_spot_market_sell_order",
+        params(&[
+            ("product_symbol", BTC_USDT_SPOT),
+            ("quantity", quantity.as_str()),
+        ]),
+    )
+    .await?;
+    assert_success(&sell);
+    sleep(Duration::from_secs(2)).await;
+
+    let remaining = mexc_spot_btc(client).await?;
+    if remaining > initial_btc + step {
+        return Err(live_test_error(format!(
+            "MEXC BTC spot excess remains after cleanup: current={remaining}, initial={initial_btc}",
+        )));
     }
     Ok(())
 }
@@ -407,6 +464,11 @@ async fn mexc_transfer_formatted(
 async fn mexc_spot_usdt(client: &MexcClient) -> dcex::Result<f64> {
     let response = client.get_spot_account().await?;
     Ok(asset_amount(&response.data, "USDT", &["free", "available"]))
+}
+
+async fn mexc_spot_btc(client: &MexcClient) -> dcex::Result<f64> {
+    let response = client.get_spot_account().await?;
+    Ok(asset_amount(&response.data, "BTC", &["free", "available"]))
 }
 
 async fn mexc_contract_usdt(client: &MexcClient) -> dcex::Result<f64> {

@@ -18,8 +18,11 @@ ASTER_USER_ADDRESS = os.getenv("ASTER_USER_ADDRESS")
 ASTER_SIGNER_ADDRESS = os.getenv("ASTER_SIGNER_ADDRESS")
 ASTER_PRIVATE_KEY = os.getenv("ASTER_PRIVATE_KEY")
 SPOT_SYMBOL = "USDCUSDT"
+SPOT_BASE_ASSET = "USDC"
+SPOT_QUOTE_ASSET = "USDT"
 FUTURES_SYMBOL = "ASTERUSDT"
-SPOT_USDT_BUFFER = Decimal("0.02")
+SPOT_NOTIONAL_BUFFER = Decimal("1.01")
+SPOT_DUST_TOLERANCE = Decimal("0.00000001")
 
 pytestmark = [
     pytest.mark.private,
@@ -104,18 +107,20 @@ def _round_to_step(value: Decimal, step: Decimal, rounding: str) -> Decimal:
     return (value / step).to_integral_value(rounding=rounding) * step
 
 
-async def _spot_order_params(client: Client) -> tuple[str, Decimal, Decimal]:
+async def _spot_order_params(client: Client) -> tuple[str, Decimal]:
     _, step, min_qty, min_notional = await _market_info(client)
     book = await client.get_spot_orderbook(SPOT_SYMBOL, limit=5)
     assert isinstance(book, dict)
-    bid = _dec(book["bids"][0][0])
+    ask = _dec(book["asks"][0][0])
     quantity = max(
-        _round_to_step(min_notional * Decimal("1.01") / bid, step, ROUND_UP),
+        _round_to_step(min_notional * SPOT_NOTIONAL_BUFFER / ask, step, ROUND_UP),
         min_qty,
     )
-    transfer_amount = quantity
-    buy_quote = min_notional * Decimal("1.01")
-    return format(quantity, "f"), transfer_amount, buy_quote
+    buy_quote = (quantity * ask * SPOT_NOTIONAL_BUFFER).quantize(
+        Decimal("0.00000001"),
+        rounding=ROUND_UP,
+    )
+    return format(quantity, "f"), buy_quote
 
 
 async def _safe_sell_price(client: Client) -> str:
@@ -125,6 +130,112 @@ async def _safe_sell_price(client: Client) -> str:
     ask = _dec(book["asks"][0][0])
     value = _round_to_step(ask + tick, tick, ROUND_UP)
     return format(value, "f")
+
+
+async def _wait_for_spot_delta(client: Client, asset: str, before: Decimal) -> Decimal:
+    for _ in range(10):
+        delta = (await _spot_balances(client)).get(asset, Decimal("0")) - before
+        if delta > 0:
+            return delta
+        await _sleep(1)
+    return Decimal("0")
+
+
+async def _spot_sell_quantity(client: Client, amount: Decimal) -> Decimal:
+    _, step, _, _ = await _market_info(client)
+    return _round_to_step(amount, step, ROUND_DOWN)
+
+
+async def _sell_spot_base_to_quote(client: Client, amount: Decimal) -> None:
+    quantity = await _spot_sell_quantity(client, amount)
+    if quantity <= 0:
+        return
+    assert isinstance(
+        await client.place_spot_order(
+            SPOT_SYMBOL,
+            side="SELL",
+            type_="MARKET",
+            quantity=format(quantity, "f"),
+        ),
+        dict,
+    )
+    await _sleep(2)
+
+
+async def _cleanup_spot_base(client: Client, initial_balances: dict[str, Decimal]) -> None:
+    _, step, min_qty, min_notional = await _market_info(client)
+    current = await _spot_balances(client)
+    delta = current.get(SPOT_BASE_ASSET, Decimal("0")) - initial_balances.get(
+        SPOT_BASE_ASSET,
+        Decimal("0"),
+    )
+    if delta <= SPOT_DUST_TOLERANCE:
+        return
+    book = await client.get_spot_orderbook(SPOT_SYMBOL, limit=5)
+    assert isinstance(book, dict)
+    bid = _dec(book["bids"][0][0])
+    ask = _dec(book["asks"][0][0])
+    sell_quantity = await _spot_sell_quantity(client, delta)
+    if sell_quantity < min_qty or sell_quantity * bid < min_notional:
+        target = _round_to_step(max(min_qty, min_notional / bid, delta), step, ROUND_UP)
+        top_up = target - delta + SPOT_DUST_TOLERANCE
+        if top_up > 0:
+            if await _futures_balance(client, SPOT_BASE_ASSET) >= top_up:
+                await _transfer(
+                    client,
+                    amount=top_up,
+                    asset=SPOT_BASE_ASSET,
+                    kind_type="FUTURE_SPOT",
+                    market="futures",
+                )
+            else:
+                quote_needed = max((top_up + step) * ask, min_notional) * SPOT_NOTIONAL_BUFFER
+                quote_needed = quote_needed.quantize(
+                    SPOT_DUST_TOLERANCE,
+                    rounding=ROUND_UP,
+                )
+                await _ensure_spot_quote(client, quote_needed)
+                assert isinstance(
+                    await client.place_spot_order(
+                        SPOT_SYMBOL,
+                        side="BUY",
+                        type_="MARKET",
+                        quoteOrderQty=format(quote_needed, "f"),
+                    ),
+                    dict,
+                )
+            await _sleep(2)
+            delta = (await _spot_balances(client)).get(
+                SPOT_BASE_ASSET,
+                Decimal("0"),
+            ) - initial_balances.get(SPOT_BASE_ASSET, Decimal("0"))
+            sell_quantity = await _spot_sell_quantity(client, delta)
+    if sell_quantity < min_qty or sell_quantity * bid < min_notional:
+        pytest.fail(f"Aster spot {SPOT_BASE_ASSET} is below minimum sell size.")
+    await _sell_spot_base_to_quote(client, delta)
+    remaining = (await _spot_balances(client)).get(
+        SPOT_BASE_ASSET, Decimal("0")
+    ) - initial_balances.get(
+        SPOT_BASE_ASSET,
+        Decimal("0"),
+    )
+    if remaining > SPOT_DUST_TOLERANCE:
+        await _transfer(
+            client,
+            amount=remaining,
+            asset=SPOT_BASE_ASSET,
+            kind_type="SPOT_FUTURE",
+            market="spot",
+        )
+        await _sleep(2)
+        remaining = (await _spot_balances(client)).get(
+            SPOT_BASE_ASSET, Decimal("0")
+        ) - initial_balances.get(
+            SPOT_BASE_ASSET,
+            Decimal("0"),
+        )
+    if remaining > SPOT_DUST_TOLERANCE:
+        pytest.fail(f"Aster spot {SPOT_BASE_ASSET} balance still exists after cleanup.")
 
 
 def _order_id(response: object) -> int:
@@ -308,28 +419,60 @@ async def _transfer(
     assert response["status"] == "SUCCESS"
 
 
+async def _ensure_spot_quote(client: Client, required: Decimal) -> None:
+    spot_quote = (await _spot_balances(client)).get(SPOT_QUOTE_ASSET, Decimal("0"))
+    if spot_quote >= required:
+        return
+    needed = required - spot_quote
+    if await _futures_balance(client, SPOT_QUOTE_ASSET) < needed:
+        pytest.fail("Aster account lacks transferable USDT for this spot test.")
+    await _transfer(
+        client,
+        amount=needed,
+        asset=SPOT_QUOTE_ASSET,
+        kind_type="FUTURE_SPOT",
+        market="futures",
+    )
+    await _sleep(2)
+    if (await _spot_balances(client)).get(SPOT_QUOTE_ASSET, Decimal("0")) < required:
+        pytest.fail("Aster spot USDT remains insufficient after transfer.")
+
+
 async def _return_test_funds(
     client: Client,
     initial_balances: dict[str, Decimal],
 ) -> None:
     with suppress(Exception):
         await client.cancel_all_spot_open_orders(SPOT_SYMBOL)
+    await _cleanup_spot_base(client, initial_balances)
     current = await _spot_balances(client)
-    for asset in ("USDC", "USDT"):
-        delta = current.get(asset, Decimal("0")) - initial_balances.get(asset, Decimal("0"))
-        if delta > 0:
-            await _transfer(
-                client,
-                amount=delta,
-                asset=asset,
-                kind_type="SPOT_FUTURE",
-                market="spot",
-            )
+    delta = current.get(SPOT_QUOTE_ASSET, Decimal("0")) - initial_balances.get(
+        SPOT_QUOTE_ASSET,
+        Decimal("0"),
+    )
+    if delta > 0:
+        await _transfer(
+            client,
+            amount=delta,
+            asset=SPOT_QUOTE_ASSET,
+            kind_type="SPOT_FUTURE",
+            market="spot",
+        )
 
 
 async def _cleanup_account(client: Client) -> None:
     if await client.get_spot_open_orders(SPOT_SYMBOL):
         await client.cancel_all_spot_open_orders(SPOT_SYMBOL)
+    await _cleanup_spot_base(client, {})
+    spot_quote = (await _spot_balances(client)).get(SPOT_QUOTE_ASSET, Decimal("0"))
+    if spot_quote > 0:
+        await _transfer(
+            client,
+            amount=spot_quote,
+            asset=SPOT_QUOTE_ASSET,
+            kind_type="SPOT_FUTURE",
+            market="spot",
+        )
     await _cleanup_futures(client)
     assert await client.get_spot_open_orders(SPOT_SYMBOL) == []
     assert await client.get_futures_open_orders(FUTURES_SYMBOL) == []
@@ -339,29 +482,26 @@ async def _cleanup_account(client: Client) -> None:
 @pytest.mark.asyncio
 async def test_spot_order_and_transfer_lifecycle(client):
     await _cleanup_account(client)
-    spot_quantity, spot_transfer_amount, spot_buy_quote = await _spot_order_params(client)
-    if await _futures_balance(client, "USDC") < spot_transfer_amount:
-        pytest.fail("Aster futures wallet lacks the minimum USDC for this spot test.")
-    if await _futures_balance(client, "USDT") < SPOT_USDT_BUFFER:
-        pytest.fail("Aster futures wallet requires at least 0.02 USDT.")
+    _spot_quantity, spot_buy_quote = await _spot_order_params(client)
 
     initial_balances = await _spot_balances(client)
     try:
-        await _transfer(
-            client,
-            amount=spot_transfer_amount,
-            asset="USDC",
-            kind_type="FUTURE_SPOT",
-            market="futures",
+        await _ensure_spot_quote(client, spot_buy_quote)
+
+        before_base = (await _spot_balances(client)).get(SPOT_BASE_ASSET, Decimal("0"))
+        assert isinstance(
+            await client.place_spot_order(
+                SPOT_SYMBOL,
+                side="BUY",
+                type_="MARKET",
+                quoteOrderQty=format(spot_buy_quote, "f"),
+            ),
+            dict,
         )
-        await _transfer(
-            client,
-            amount=SPOT_USDT_BUFFER,
-            asset="USDT",
-            kind_type="FUTURE_SPOT",
-            market="futures",
-        )
-        await _sleep(2)
+        acquired = await _wait_for_spot_delta(client, SPOT_BASE_ASSET, before_base)
+        sell_quantity = await _spot_sell_quantity(client, acquired)
+        if sell_quantity <= 0:
+            pytest.fail(f"Aster spot market buy did not produce sellable {SPOT_BASE_ASSET}.")
 
         price = await _safe_sell_price(client)
         first_id = _order_id(
@@ -369,7 +509,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
                 SPOT_SYMBOL,
                 side="SELL",
                 type_="LIMIT",
-                quantity=spot_quantity,
+                quantity=format(sell_quantity, "f"),
                 price=price,
                 timeInForce="GTC",
             )
@@ -392,7 +532,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
                 SPOT_SYMBOL,
                 side="SELL",
                 type_="LIMIT",
-                quantity=spot_quantity,
+                quantity=format(sell_quantity, "f"),
                 price=price,
                 timeInForce="GTC",
             )
@@ -410,22 +550,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
                 SPOT_SYMBOL,
                 side="SELL",
                 type_="MARKET",
-                quantity=spot_quantity,
-            ),
-            dict,
-        )
-        await _sleep(2)
-        gained_usdt = (await _spot_balances(client)).get(
-            "USDT", Decimal("0")
-        ) - initial_balances.get("USDT", Decimal("0"))
-        assert gained_usdt >= spot_buy_quote
-
-        assert isinstance(
-            await client.place_spot_order(
-                SPOT_SYMBOL,
-                side="BUY",
-                type_="MARKET",
-                quoteOrderQty=format(spot_buy_quote, "f"),
+                quantity=format(sell_quantity, "f"),
             ),
             dict,
         )

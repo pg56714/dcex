@@ -6,11 +6,11 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, asset_amount, contains_non_empty_array, fetch_trading_details, first_bid_price,
-    format_transfer_amount, format_transfer_amount_floor, insufficient_funds_error,
-    leveraged_margin_required, live_test_error, margin_target, minimum_order_quantity, params,
-    parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    format_step_decimal, format_transfer_amount, format_transfer_amount_floor,
+    insufficient_funds_error, leveraged_margin_required, live_test_error, margin_target,
+    minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
+    require_live_trading, require_order_id, round_down_to_step, sum_abs_values_for_symbols,
+    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
 const OKX_SWAP_LEVERAGE: &str = "50";
@@ -32,7 +32,8 @@ async fn okx_direct_live_stateful_order() -> dcex::Result<()> {
         "0".to_string(),
         Duration::from_secs(20),
     )?;
-    cleanup_okx_orders(&client, BTC_USDT_SPOT).await?;
+    cleanup_okx_spot_state(&client, 0.0).await?;
+    let initial_btc = okx_spot_btc(&client).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -83,7 +84,10 @@ async fn okx_direct_live_stateful_order() -> dcex::Result<()> {
         ]),
     )
     .await;
-    return_okx_transfer(&client, transferred).await?;
+    let cleanup_result = cleanup_okx_spot_state(&client, initial_btc).await;
+    let transfer_result = return_okx_transfer(&client, transferred).await;
+    cleanup_result?;
+    transfer_result?;
     let cancel = cancel_result?;
     assert_success(&cancel);
     Ok(())
@@ -331,6 +335,61 @@ async fn cleanup_okx_orders(client: &OkxClient, product_symbol: &str) -> dcex::R
     Ok(())
 }
 
+async fn cleanup_okx_spot_state(client: &OkxClient, initial_btc: f64) -> dcex::Result<()> {
+    cleanup_okx_orders(client, BTC_USDT_SPOT).await?;
+    let current = okx_spot_btc(client).await?;
+    if current <= initial_btc {
+        return Ok(());
+    }
+
+    let orderbook = super::common::exchange_method_request(
+        client,
+        "get_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("sz", "5")]),
+    )
+    .await?;
+    let bid = first_bid_price(&orderbook.data)?;
+    let details = fetch_trading_details(Exchange::Okx, "okx", BTC_USDT_SPOT).await?;
+    let step = parse_positive(&details.size_precision, "size_precision")?;
+    let quantity = round_down_to_step(current - initial_btc, step);
+    if quantity <= 0.0 {
+        return Ok(());
+    }
+    let min_size = details.min_size.parse::<f64>().unwrap_or(0.0);
+    let min_notional = details.min_notional.parse::<f64>().unwrap_or(0.0);
+    if quantity < min_size || quantity * bid < min_notional {
+        if current - initial_btc > step {
+            return Err(live_test_error(format!(
+                "OKX BTC spot excess is below minimum sell size after cleanup: quantity={quantity}, min_size={min_size}, notional={}",
+                quantity * bid
+            )));
+        }
+        return Ok(());
+    }
+
+    let quantity = format_step_decimal(quantity, step)?;
+    let sell = super::common::exchange_method_request(
+        client,
+        "place_market_sell_order",
+        params(&[
+            ("product_symbol", BTC_USDT_SPOT),
+            ("tdMode", "cash"),
+            ("sz", quantity.as_str()),
+        ]),
+    )
+    .await?;
+    assert_success(&sell);
+    sleep(Duration::from_secs(2)).await;
+
+    let remaining = okx_spot_btc(client).await?;
+    if remaining > initial_btc + step {
+        return Err(live_test_error(format!(
+            "OKX BTC spot excess remains after cleanup: current={remaining}, initial={initial_btc}",
+        )));
+    }
+    Ok(())
+}
+
 async fn cleanup_okx_swap_state(client: &OkxClient) -> dcex::Result<()> {
     cleanup_okx_orders(client, BTC_USDT_SWAP).await?;
     if okx_swap_position_abs(client).await? != 0.0 {
@@ -363,5 +422,19 @@ async fn okx_swap_position_abs(client: &OkxClient) -> dcex::Result<f64> {
         &["instId"],
         &[BTC_USDT_SWAP],
         &["pos"],
+    ))
+}
+
+async fn okx_spot_btc(client: &OkxClient) -> dcex::Result<f64> {
+    let response = super::common::exchange_method_request(
+        client,
+        "get_account_balance",
+        params(&[("ccy", "BTC")]),
+    )
+    .await?;
+    Ok(asset_amount(
+        &response.data,
+        "BTC",
+        &["availBal", "availEq", "cashBal"],
     ))
 }

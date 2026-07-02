@@ -74,10 +74,14 @@ pub(crate) fn require_env(names: &[&str]) -> Option<Vec<String>> {
     if missing.is_empty() {
         Some(values)
     } else {
-        eprintln!(
-            "skipping live stateful trading test; missing {}",
+        let message = format!(
+            "missing required live stateful trading environment variables: {}",
             missing.join(", ")
         );
+        if live_trading_enabled() {
+            panic!("{message}");
+        }
+        eprintln!("skipping live stateful trading test; {message}");
         None
     }
 }
@@ -438,15 +442,15 @@ fn first_book_price(data: &Value, array_keys: &[&str], object_side: Option<&str>
     })
 }
 
-fn round_down_to_step(value: f64, step: f64) -> f64 {
+pub(crate) fn round_down_to_step(value: f64, step: f64) -> f64 {
     (value / step).floor() * step
 }
 
-fn round_up_to_step(value: f64, step: f64) -> f64 {
+pub(crate) fn round_up_to_step(value: f64, step: f64) -> f64 {
     (value / step).ceil() * step
 }
 
-fn format_step_decimal(value: f64, step: f64) -> Result<String> {
+pub(crate) fn format_step_decimal(value: f64, step: f64) -> Result<String> {
     if !value.is_finite() || value <= 0.0 {
         return Err(DcexError::Decode(format!("invalid decimal value: {value}")));
     }

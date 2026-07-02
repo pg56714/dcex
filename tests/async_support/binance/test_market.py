@@ -1,5 +1,8 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
+import asyncio
+import os
+
 import pytest
 import pytest_asyncio
 
@@ -10,6 +13,11 @@ from dcex.async_support.binance.client import Client
 async def client():
     async with Client() as client_instance:
         yield client_instance
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def _binance_public_rate_limit() -> None:
+    await asyncio.sleep(float(os.getenv("BINANCE_PUBLIC_TEST_DELAY_SECONDS", "2")))
 
 
 @pytest.mark.asyncio

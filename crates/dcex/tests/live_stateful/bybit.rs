@@ -34,6 +34,7 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
         Duration::from_secs(20),
     )?;
     cleanup_bybit_orders(&client, BTC_USDT_SPOT).await?;
+    let initial_btc = bybit_spot_btc(&client).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -83,9 +84,27 @@ async fn bybit_direct_live_stateful_order() -> dcex::Result<()> {
         ]),
     )
     .await;
-    return_bybit_transfer(&client, transferred).await?;
-    let cancel = cancel_result?;
-    assert_success(&cancel);
+    let cleanup_result = cleanup_bybit_spot_state(&client, initial_btc).await;
+    let transfer_result = return_bybit_transfer(&client, transferred).await;
+    cleanup_result?;
+    transfer_result?;
+    match cancel_result {
+        Ok(cancel) => assert_success(&cancel),
+        Err(error)
+            if account_restriction(
+                &error,
+                &["170213", "order does not exist", "order not exists"],
+            ) =>
+        {
+            if bybit_open_spot_orders(&client).await?
+                || bybit_spot_btc(&client).await? > initial_btc + 1e-8
+            {
+                return Err(error);
+            }
+            eprintln!("Bybit spot post-only order was already absent before cancel");
+        }
+        Err(error) => return Err(error),
+    }
     Ok(())
 }
 
@@ -292,15 +311,23 @@ async fn return_bybit_transfer(client: &BybitClient, amount: f64) -> dcex::Resul
 }
 
 async fn account_usdt(client: &BybitClient, account_type: &str) -> dcex::Result<f64> {
+    account_coin_balance(client, account_type, "USDT").await
+}
+
+async fn account_coin_balance(
+    client: &BybitClient,
+    account_type: &str,
+    coin: &str,
+) -> dcex::Result<f64> {
     let response = super::common::exchange_method_request(
         &client,
         "get_coin_balance",
-        params(&[("accountType", account_type), ("coin", "USDT")]),
+        params(&[("accountType", account_type), ("coin", coin)]),
     )
     .await?;
     Ok(asset_amount(
         &response.data,
-        "USDT",
+        coin,
         &[
             "transferBalance",
             "walletBalance",
@@ -308,6 +335,56 @@ async fn account_usdt(client: &BybitClient, account_type: &str) -> dcex::Result<
             "availableBalance",
         ],
     ))
+}
+
+async fn cleanup_bybit_spot_state(client: &BybitClient, initial_btc: f64) -> dcex::Result<()> {
+    cleanup_bybit_orders(client, BTC_USDT_SPOT).await?;
+    let current = bybit_spot_btc(client).await?;
+    if current <= initial_btc + 1e-8 {
+        return Ok(());
+    }
+
+    let orderbook = super::common::exchange_method_request(
+        client,
+        "get_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "5")]),
+    )
+    .await?;
+    let bid = first_bid_price(&orderbook.data)?;
+    let details = fetch_trading_details(Exchange::Bybit, "bybit", BTC_USDT_SPOT).await?;
+    let quantity = format_transfer_amount_floor(current - initial_btc, 6);
+    if quantity == "0" {
+        return Err(live_test_error(format!(
+            "Bybit BTC spot excess is below sell precision after cleanup: current={current}, initial={initial_btc}",
+        )));
+    }
+    let notional = parse_positive(&quantity, "quantity")? * bid;
+    let min_notional = details.min_notional.parse::<f64>().unwrap_or(0.0);
+    if notional < min_notional {
+        return Err(live_test_error(format!(
+            "Bybit BTC spot excess is below minimum sell notional after cleanup: notional={notional}, min_notional={min_notional}",
+        )));
+    }
+
+    let sell = super::common::exchange_method_request(
+        client,
+        "place_market_sell_order",
+        params(&[
+            ("product_symbol", BTC_USDT_SPOT),
+            ("qty", quantity.as_str()),
+        ]),
+    )
+    .await?;
+    assert_success(&sell);
+    sleep(Duration::from_secs(2)).await;
+
+    let remaining = bybit_spot_btc(client).await?;
+    if remaining > initial_btc + 1e-8 {
+        return Err(live_test_error(format!(
+            "Bybit BTC spot excess remains after cleanup: current={remaining}, initial={initial_btc}",
+        )));
+    }
+    Ok(())
 }
 
 async fn cleanup_bybit_orders(client: &BybitClient, product_symbol: &str) -> dcex::Result<()> {
@@ -339,6 +416,16 @@ async fn cleanup_bybit_orders(client: &BybitClient, product_symbol: &str) -> dce
         )));
     }
     Ok(())
+}
+
+async fn bybit_open_spot_orders(client: &BybitClient) -> dcex::Result<bool> {
+    let response = super::common::exchange_method_request(
+        &client,
+        "get_open_orders",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("limit", "20")]),
+    )
+    .await?;
+    Ok(contains_non_empty_array(&response.data, &["list"]))
 }
 
 async fn cleanup_bybit_swap_state(client: &BybitClient) -> dcex::Result<()> {
@@ -381,6 +468,10 @@ async fn bybit_open_swap_orders(client: &BybitClient) -> dcex::Result<bool> {
     )
     .await?;
     Ok(contains_non_empty_array(&response.data, &["list"]))
+}
+
+async fn bybit_spot_btc(client: &BybitClient) -> dcex::Result<f64> {
+    account_coin_balance(client, "UNIFIED", "BTC").await
 }
 
 async fn bybit_swap_position_abs(client: &BybitClient) -> dcex::Result<f64> {

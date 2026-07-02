@@ -7,11 +7,11 @@ use tokio::time::sleep;
 
 use super::common::{
     assert_success, contains_non_empty_array, fetch_trading_details, find_f64, first_bid_price,
-    format_transfer_amount_ceil, format_transfer_amount_floor, leveraged_margin_required,
-    live_test_error, minimum_order_quantity, optional_env, params, parse_positive,
-    post_only_buy_price, require_env, require_live_trading, require_order_id,
-    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_non_empty_records,
-    wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
+    format_step_decimal, format_transfer_amount_ceil, format_transfer_amount_floor,
+    leveraged_margin_required, live_test_error, minimum_order_quantity, optional_env, params,
+    parse_positive, post_only_buy_price, require_env, require_live_trading, require_order_id,
+    round_down_to_step, round_up_to_step, sum_abs_values_for_symbols, wait_for_flat_position,
+    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USD_SWAP,
 };
 
 const KRAKEN_FUTURES_MARGIN_LEVERAGE_VALUE: f64 = 50.0;
@@ -39,7 +39,8 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
         futures_secret,
         Duration::from_secs(20),
     )?;
-    cleanup_kraken_spot_orders(&client).await?;
+    cleanup_kraken_spot_state(&client, 0.0).await?;
+    let initial_btc = kraken_spot_btc_balance(&client).await?;
 
     let orderbook = super::common::exchange_method_request(
         &client,
@@ -87,9 +88,29 @@ async fn kraken_direct_live_stateful_order() -> dcex::Result<()> {
         params(&[("txid", order_id.as_str())]),
     )
     .await;
-    return_kraken_spot_transfer(&client, &transfer).await?;
-    let cancel = cancel_result?;
-    assert_success(&cancel);
+    let cleanup_result = cleanup_kraken_spot_state(&client, initial_btc).await;
+    let transfer_result = return_kraken_spot_transfer(&client, &transfer).await;
+    cleanup_result?;
+    transfer_result?;
+    match cancel_result {
+        Ok(cancel) => assert_success(&cancel),
+        Err(error) if kraken_unknown_order(&error) => {
+            if kraken_spot_has_open_orders(
+                &super::common::exchange_method_request(
+                    &client,
+                    "get_spot_open_orders",
+                    params(&[]),
+                )
+                .await?
+                .data,
+            ) || kraken_spot_btc_balance(&client).await? > initial_btc + 1e-12
+            {
+                return Err(error);
+            }
+            eprintln!("Kraken spot post-only order was already absent before cancel");
+        }
+        Err(error) => return Err(error),
+    }
     Ok(())
 }
 
@@ -229,6 +250,97 @@ async fn cleanup_kraken_spot_orders(client: &KrakenClient) -> dcex::Result<()> {
     Ok(())
 }
 
+async fn cleanup_kraken_spot_state(client: &KrakenClient, initial_btc: f64) -> dcex::Result<()> {
+    cleanup_kraken_spot_orders(client).await?;
+    cleanup_kraken_spot_btc(client, initial_btc).await?;
+    cleanup_kraken_spot_orders(client).await?;
+    let remaining = kraken_spot_btc_balance(client).await?;
+    if remaining > initial_btc {
+        let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USDT_SPOT).await?;
+        let step = parse_positive(&details.size_precision, "size_precision")?;
+        if remaining - initial_btc > step {
+            return Err(live_test_error(format!(
+                "Kraken BTC spot balance still exists after cleanup: current={remaining}, initial={initial_btc}",
+            )));
+        }
+    }
+    Ok(())
+}
+
+async fn cleanup_kraken_spot_btc(client: &KrakenClient, initial_btc: f64) -> dcex::Result<()> {
+    let current = kraken_spot_btc_balance(client).await?;
+    if current <= initial_btc {
+        return Ok(());
+    }
+
+    let orderbook = super::common::exchange_method_request(
+        client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT), ("count", "5")]),
+    )
+    .await?;
+    let bid = first_bid_price(&orderbook.data)?;
+    let details = fetch_trading_details(Exchange::Kraken, "kraken", BTC_USDT_SPOT).await?;
+    let step = parse_positive(&details.size_precision, "size_precision")?;
+    let min_size = details.min_size.parse::<f64>().unwrap_or(step).max(step);
+    let min_notional = details.min_notional.parse::<f64>().unwrap_or(1.0).max(1.0);
+    let mut sellable = round_down_to_step(current - initial_btc, step);
+    let mut cleanup_transfer = None;
+    if sellable <= 0.0 {
+        return Ok(());
+    }
+
+    if sellable < min_size || sellable * bid < min_notional {
+        let ask = kraken_spot_ask(&orderbook.data)?;
+        let target_base = min_size.max(min_notional / bid);
+        let buy_volume = round_up_to_step((target_base - sellable + step).max(0.0), step);
+        if buy_volume > 0.0 {
+            let required_usdt = buy_volume * ask * 1.02;
+            let transfer = ensure_kraken_spot_usdt(client, required_usdt)
+                .await?
+                .ok_or_else(|| {
+                    live_test_error(
+                        "Kraken spot has insufficient transferable quote balance to top up BTC dust for cleanup",
+                    )
+                })?;
+            let buy_volume = format_step_decimal(buy_volume, step)?;
+            let buy = super::common::exchange_method_request(
+                client,
+                "place_spot_market_buy_order",
+                params(&[
+                    ("product_symbol", BTC_USDT_SPOT),
+                    ("volume", buy_volume.as_str()),
+                ]),
+            )
+            .await?;
+            assert_success(&buy);
+            sleep(Duration::from_secs(3)).await;
+            sellable =
+                round_down_to_step(kraken_spot_btc_balance(client).await? - initial_btc, step);
+            cleanup_transfer = Some(transfer);
+        }
+    }
+
+    if sellable > 0.0 {
+        let sellable = format_step_decimal(sellable, step)?;
+        let sell = super::common::exchange_method_request(
+            client,
+            "place_spot_market_sell_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SPOT),
+                ("volume", sellable.as_str()),
+            ]),
+        )
+        .await?;
+        assert_success(&sell);
+        sleep(Duration::from_secs(3)).await;
+    }
+    if let Some(transfer) = cleanup_transfer {
+        return_kraken_spot_transfer(client, &transfer).await?;
+    }
+    Ok(())
+}
+
 fn kraken_spot_has_open_orders(data: &Value) -> bool {
     data.get("result")
         .and_then(|result| result.get("open"))
@@ -342,6 +454,15 @@ async fn kraken_spot_balance(client: &KrakenClient, asset: &str) -> dcex::Result
     Ok(kraken_balance_amount(&response.data, asset))
 }
 
+async fn kraken_spot_btc_balance(client: &KrakenClient) -> dcex::Result<f64> {
+    let response = client.get_spot_account_balance().await?;
+    Ok(["XXBT", "XBT", "BTC"]
+        .iter()
+        .map(|asset| kraken_balance_amount(&response.data, asset))
+        .find(|amount| *amount > 0.0)
+        .unwrap_or(0.0))
+}
+
 fn kraken_balance_amount(data: &Value, asset: &str) -> f64 {
     match data {
         Value::Object(object) => object
@@ -369,6 +490,23 @@ fn kraken_value_as_f64(value: &Value) -> Option<f64> {
         Value::String(value) => value.parse().ok(),
         _ => None,
     }
+}
+
+fn kraken_spot_ask(data: &Value) -> dcex::Result<f64> {
+    data.get("result")
+        .and_then(Value::as_object)
+        .and_then(|result| result.values().next())
+        .and_then(|book| book.get("asks"))
+        .and_then(Value::as_array)
+        .and_then(|asks| asks.first())
+        .and_then(|level| level.as_array())
+        .and_then(|level| level.first())
+        .and_then(kraken_value_as_f64)
+        .ok_or_else(|| dcex::DcexError::Decode(format!("Kraken spot orderbook has no ask: {data}")))
+}
+
+fn kraken_unknown_order(error: &dcex::DcexError) -> bool {
+    error.to_string().contains("Unknown order")
 }
 
 async fn kraken_futures_open_orders(client: &KrakenClient) -> dcex::Result<bool> {

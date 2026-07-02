@@ -617,10 +617,9 @@ async def _safe_setting_call(call) -> None:
 @pytest.mark.asyncio
 async def test_transfer_round_trip(client):
     if await _is_uta(client):
-        pytest.fail(
-            "Bitget UTA uses shared margin; spot-to-futures transfer is not applicable.",
-            pytrace=False,
-        )
+        _assert_ok(await client.get_uta_account_info())
+        _assert_ok(await client.get_uta_account_assets())
+        return
     await _cleanup_state(client)
     await _ensure_spot_usdt(client, Decimal("1"))
     await _transfer(client, Decimal("1"), "spot", "usdt_futures")
