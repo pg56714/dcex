@@ -1,3 +1,10 @@
+## 0.26.3 (2026-07-02)
+
+### Fix
+
+- harden live private cleanup and throttling
+- harden live stateful cleanup
+
 ## 0.26.2 (2026-06-29)
 
 ### Fix
