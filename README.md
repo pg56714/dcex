@@ -218,32 +218,25 @@ network access, exchange credentials, or account state.
 ## Benchmarking
 
 Local CPU-bound benchmarks isolate Lighter signing and hashing hot paths. The
-recorded sample below compares older published artifacts and keeps the package
-source and version fixed so the result remains reproducible.
+recorded sample below compares an older native-Python baseline with current
+published Rust-backed artifacts and keeps package versions fixed so the result
+remains reproducible.
 
-Recorded sample (`uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.22.0 --rust-crate-version 0.1.0`, 2026-06-20):
+Recorded sample (`uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.26.3 --rust-crate-version 0.4.4`, 2026-07-02):
 
 Baseline: PyPI `dcex==0.21.2` native Python implementation = 1.00x.
-Rust-backed Python: PyPI `dcex==0.22.0`; Rust native: crates.io `dcex==0.1.0`.
+Rust-backed Python: PyPI `dcex==0.26.3`; Rust native: crates.io `dcex==0.4.4`.
 
 | Operation | Rust-backed Python | Rust native |
 | --------- | ------------------ | ----------- |
-| Cryptographic hash | 77.68x | 103.58x |
-| Schnorr signature | 532.71x | 695.91x |
-| Transaction payload signing | 319.56x | 556.76x |
-
-Public HTTP benchmarks install the same PyPI packages and compile a temporary
-Cargo benchmark against crates.io `dcex==0.1.0`. Treat those results as an
-end-to-end latency check, not as the primary evidence for CPU-bound signing
-speed, because exchange latency and local network conditions dominate the
-measurement.
+| Cryptographic hash | 82.18x | 75.51x |
+| Schnorr signature | 710.44x | 442.05x |
+| Transaction payload signing | 500.21x | 319.46x |
 
 | Layer | Command | Output |
 | ----- | ------- | ------ |
-| Local CPU-bound release artifacts | `uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.22.0 --rust-crate-version 0.1.0` | Speedup table |
-| Public HTTP release artifacts | `uv run python scripts/benchmark_public_http.py --iterations 20 --python-baseline-version 0.21.2 --pyo3-version 0.22.0 --rust-crate-version 0.1.0` | Markdown table |
+| Local CPU-bound release artifacts | `uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.26.3 --rust-crate-version 0.4.4` | Speedup table |
 | Optional local CPU-bound CSV output | `uv run python scripts/benchmark_core_local.py --csv benchmark_core.csv` | Ignored local CSV file |
-| Optional public HTTP CSV output | `uv run python scripts/benchmark_public_http.py --csv benchmark_public.csv` | Ignored local CSV file |
 
 The Python benchmark scripts install PyPI packages into temporary target
 directories with `uv pip install --target`, then compile the Rust benchmark
