@@ -219,23 +219,25 @@ network access, exchange credentials, or account state.
 
 Local CPU-bound benchmarks isolate Lighter signing and hashing hot paths. The
 recorded sample below compares an older native-Python baseline with current
-published Rust-backed artifacts and keeps package versions fixed so the result
-remains reproducible.
+published Rust-backed artifacts and keeps package versions fixed so the
+comparison is repeatable on the same machine. The benchmark auto-calibrates
+per-operation inner loops and aggregates multiple process runs to reduce timer,
+GC, and scheduler noise.
 
-Recorded sample (`uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.26.3 --rust-crate-version 0.4.4`, 2026-07-02):
+Recorded sample (`uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --target-batch-ms 100 --process-runs 3 --python-baseline-version 0.21.2 --pyo3-version 0.26.3 --rust-crate-version 0.4.4`, 2026-07-03):
 
 Baseline: PyPI `dcex==0.21.2` native Python implementation = 1.00x.
 Rust-backed Python: PyPI `dcex==0.26.3`; Rust native: crates.io `dcex==0.4.4`.
 
 | Operation | Rust-backed Python | Rust native |
 | --------- | ------------------ | ----------- |
-| Cryptographic hash | 82.18x | 75.51x |
-| Schnorr signature | 710.44x | 442.05x |
-| Transaction payload signing | 500.21x | 319.46x |
+| Cryptographic hash | 92.45x | 113.10x |
+| Schnorr signature | 607.72x | 596.91x |
+| Transaction payload signing | 491.29x | 514.83x |
 
 | Layer | Command | Output |
 | ----- | ------- | ------ |
-| Local CPU-bound release artifacts | `uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --python-baseline-version 0.21.2 --pyo3-version 0.26.3 --rust-crate-version 0.4.4` | Speedup table |
+| Local CPU-bound release artifacts | `uv run python scripts/benchmark_core_local.py --iterations 50 --warmup 5 --target-batch-ms 100 --process-runs 3 --python-baseline-version 0.21.2 --pyo3-version 0.26.3 --rust-crate-version 0.4.4` | Speedup table |
 | Optional local CPU-bound CSV output | `uv run python scripts/benchmark_core_local.py --csv benchmark_core.csv` | Ignored local CSV file |
 
 The Python benchmark scripts install PyPI packages into temporary target

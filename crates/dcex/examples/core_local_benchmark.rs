@@ -1,4 +1,5 @@
 use std::env;
+use std::hint::black_box;
 use std::time::Instant;
 
 use dcex::lighter;
@@ -58,6 +59,14 @@ fn env_nonnegative_usize(name: &str, default: usize) -> usize {
         .unwrap_or(default)
 }
 
+fn env_positive_f64(name: &str, default: f64) -> f64 {
+    env::var(name)
+        .ok()
+        .and_then(|value| value.parse::<f64>().ok())
+        .filter(|value| *value > 0.0)
+        .unwrap_or(default)
+}
+
 fn env_string(name: &str, default: &str) -> String {
     env::var(name).unwrap_or_else(|_| default.to_string())
 }
@@ -72,22 +81,64 @@ fn median(values: &mut [f64]) -> f64 {
     }
 }
 
-fn measure<F, T>(mut callback: F, iterations: usize, warmup: usize, inner_loops: usize) -> f64
+fn run_loops<F, T>(callback: &mut F, inner_loops: usize, context: &str)
 where
     F: FnMut() -> dcex::Result<T>,
 {
-    for _ in 0..warmup {
-        for _ in 0..inner_loops {
-            callback().expect("warmup callback");
+    for _ in 0..inner_loops {
+        black_box(callback().expect(context));
+    }
+}
+
+fn calibrate_inner_loops<F, T>(
+    callback: &mut F,
+    target_batch_ms: f64,
+    max_inner_loops: usize,
+) -> usize
+where
+    F: FnMut() -> dcex::Result<T>,
+{
+    let mut inner_loops = 1usize;
+    loop {
+        let start = Instant::now();
+        run_loops(callback, inner_loops, "calibration callback");
+        let elapsed_ms = start.elapsed().as_secs_f64() * 1_000.0;
+        if elapsed_ms >= target_batch_ms || inner_loops >= max_inner_loops {
+            return inner_loops;
         }
+
+        let scale = (target_batch_ms / elapsed_ms.max(0.000_001)).ceil() as usize;
+        inner_loops = inner_loops
+            .saturating_mul(scale.max(2))
+            .min(max_inner_loops);
+    }
+}
+
+fn measure<F, T>(
+    mut callback: F,
+    iterations: usize,
+    warmup: usize,
+    inner_loops: usize,
+    target_batch_ms: f64,
+    max_inner_loops: usize,
+) -> f64
+where
+    F: FnMut() -> dcex::Result<T>,
+{
+    let inner_loops = if inner_loops == 0 {
+        calibrate_inner_loops(&mut callback, target_batch_ms, max_inner_loops)
+    } else {
+        inner_loops
+    };
+
+    for _ in 0..warmup {
+        run_loops(&mut callback, inner_loops, "warmup callback");
     }
 
     let mut elapsed_ms = Vec::with_capacity(iterations);
     for _ in 0..iterations {
         let start = Instant::now();
-        for _ in 0..inner_loops {
-            callback().expect("benchmark callback");
-        }
+        run_loops(&mut callback, inner_loops, "benchmark callback");
         elapsed_ms.push(start.elapsed().as_secs_f64() * 1_000.0 / inner_loops as f64);
     }
     median(&mut elapsed_ms)
@@ -121,22 +172,45 @@ fn transaction_payload() -> dcex::Result<Vec<u8>> {
 fn main() {
     let iterations = env_positive_usize("DCEX_BENCH_ITERATIONS", 20);
     let warmup = env_nonnegative_usize("DCEX_BENCH_WARMUP", 3);
-    let inner_loops = env_positive_usize("DCEX_BENCH_INNER_LOOPS", 1);
+    let inner_loops = env_nonnegative_usize("DCEX_BENCH_INNER_LOOPS", 0);
+    let target_batch_ms = env_positive_f64("DCEX_BENCH_TARGET_BATCH_MS", 100.0);
+    let max_inner_loops = env_positive_usize("DCEX_BENCH_MAX_INNER_LOOPS", 1_000_000);
     let target = env_string("DCEX_BENCH_TARGET", "Rust native");
     let crate_version = env_string("DCEX_BENCH_CRATE_VERSION", env!("CARGO_PKG_VERSION"));
 
     let rows = vec![
         json!({
             "operation": "Cryptographic hash",
-            "rust_median_ms": measure(hash, iterations, warmup, inner_loops),
+            "rust_median_ms": measure(
+                hash,
+                iterations,
+                warmup,
+                inner_loops,
+                target_batch_ms,
+                max_inner_loops,
+            ),
         }),
         json!({
             "operation": "Schnorr signature",
-            "rust_median_ms": measure(signature, iterations, warmup, inner_loops),
+            "rust_median_ms": measure(
+                signature,
+                iterations,
+                warmup,
+                inner_loops,
+                target_batch_ms,
+                max_inner_loops,
+            ),
         }),
         json!({
             "operation": "Transaction payload signing",
-            "rust_median_ms": measure(transaction_payload, iterations, warmup, inner_loops),
+            "rust_median_ms": measure(
+                transaction_payload,
+                iterations,
+                warmup,
+                inner_loops,
+                target_batch_ms,
+                max_inner_loops,
+            ),
         }),
     ];
 

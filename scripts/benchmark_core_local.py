@@ -6,6 +6,7 @@ import argparse
 import csv
 import json
 import os
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -15,8 +16,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 RUST_CORE_EXAMPLE = ROOT / "crates" / "dcex" / "examples" / "core_local_benchmark.rs"
 DEFAULT_PYTHON_BASELINE_VERSION = "0.21.2"
-DEFAULT_PYO3_VERSION = "0.22.0"
-DEFAULT_RUST_CRATE_VERSION = "0.1.0"
+DEFAULT_PYO3_VERSION = "0.26.3"
+DEFAULT_RUST_CRATE_VERSION = "0.4.4"
 
 CSV_FIELDS = [
     "operation",
@@ -34,6 +35,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import gc
 import json
 import statistics
 import time
@@ -115,18 +117,53 @@ def _measure(
     iterations: int,
     warmup: int,
     inner_loops: int,
+    target_batch_ms: float,
+    max_inner_loops: int,
 ) -> float:
-    for _ in range(warmup):
-        for _ in range(inner_loops):
-            callback()
+    gc.collect()
+    gc_was_enabled = gc.isenabled()
+    gc.disable()
+    try:
+        if inner_loops == 0:
+            inner_loops = _calibrate_inner_loops(
+                callback,
+                target_batch_ms=target_batch_ms,
+                max_inner_loops=max_inner_loops,
+            )
 
-    elapsed_ms: list[float] = []
-    for _ in range(iterations):
+        for _ in range(warmup):
+            for _ in range(inner_loops):
+                callback()
+
+        elapsed_ms: list[float] = []
+        for _ in range(iterations):
+            start = time.perf_counter_ns()
+            for _ in range(inner_loops):
+                callback()
+            elapsed_ms.append((time.perf_counter_ns() - start) / inner_loops / 1_000_000)
+        return statistics.median(elapsed_ms)
+    finally:
+        if gc_was_enabled:
+            gc.enable()
+
+
+def _calibrate_inner_loops(
+    callback: Callable[[], object],
+    *,
+    target_batch_ms: float,
+    max_inner_loops: int,
+) -> int:
+    inner_loops = 1
+    while True:
         start = time.perf_counter_ns()
         for _ in range(inner_loops):
             callback()
-        elapsed_ms.append((time.perf_counter_ns() - start) / inner_loops / 1_000_000)
-    return statistics.median(elapsed_ms)
+        elapsed_ms = (time.perf_counter_ns() - start) / 1_000_000
+        if elapsed_ms >= target_batch_ms or inner_loops >= max_inner_loops:
+            return inner_loops
+
+        scale = max(2, int((target_batch_ms / max(elapsed_ms, 1e-9)) + 0.999999))
+        inner_loops = min(max_inner_loops, inner_loops * scale)
 
 
 def _python_hash() -> bytes:
@@ -152,6 +189,8 @@ def main() -> None:
     parser.add_argument("--iterations", type=int, required=True)
     parser.add_argument("--warmup", type=int, required=True)
     parser.add_argument("--inner-loops", type=int, required=True)
+    parser.add_argument("--target-batch-ms", type=float, required=True)
+    parser.add_argument("--max-inner-loops", type=int, required=True)
     args = parser.parse_args()
 
     rows = [
@@ -162,6 +201,8 @@ def main() -> None:
                 iterations=args.iterations,
                 warmup=args.warmup,
                 inner_loops=args.inner_loops,
+                target_batch_ms=args.target_batch_ms,
+                max_inner_loops=args.max_inner_loops,
             ),
         },
         {
@@ -171,6 +212,8 @@ def main() -> None:
                 iterations=args.iterations,
                 warmup=args.warmup,
                 inner_loops=args.inner_loops,
+                target_batch_ms=args.target_batch_ms,
+                max_inner_loops=args.max_inner_loops,
             ),
         },
         {
@@ -180,6 +223,8 @@ def main() -> None:
                 iterations=args.iterations,
                 warmup=args.warmup,
                 inner_loops=args.inner_loops,
+                target_batch_ms=args.target_batch_ms,
+                max_inner_loops=args.max_inner_loops,
             ),
         },
     ]
@@ -207,6 +252,7 @@ PYPI_PYO3_CORE_BENCHMARK = r"""
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import statistics
 import time
@@ -287,18 +333,53 @@ def _measure(
     iterations: int,
     warmup: int,
     inner_loops: int,
+    target_batch_ms: float,
+    max_inner_loops: int,
 ) -> float:
-    for _ in range(warmup):
-        for _ in range(inner_loops):
-            callback()
+    gc.collect()
+    gc_was_enabled = gc.isenabled()
+    gc.disable()
+    try:
+        if inner_loops == 0:
+            inner_loops = _calibrate_inner_loops(
+                callback,
+                target_batch_ms=target_batch_ms,
+                max_inner_loops=max_inner_loops,
+            )
 
-    elapsed_ms: list[float] = []
-    for _ in range(iterations):
+        for _ in range(warmup):
+            for _ in range(inner_loops):
+                callback()
+
+        elapsed_ms: list[float] = []
+        for _ in range(iterations):
+            start = time.perf_counter_ns()
+            for _ in range(inner_loops):
+                callback()
+            elapsed_ms.append((time.perf_counter_ns() - start) / inner_loops / 1_000_000)
+        return statistics.median(elapsed_ms)
+    finally:
+        if gc_was_enabled:
+            gc.enable()
+
+
+def _calibrate_inner_loops(
+    callback: Callable[[], object],
+    *,
+    target_batch_ms: float,
+    max_inner_loops: int,
+) -> int:
+    inner_loops = 1
+    while True:
         start = time.perf_counter_ns()
         for _ in range(inner_loops):
             callback()
-        elapsed_ms.append((time.perf_counter_ns() - start) / inner_loops / 1_000_000)
-    return statistics.median(elapsed_ms)
+        elapsed_ms = (time.perf_counter_ns() - start) / 1_000_000
+        if elapsed_ms >= target_batch_ms or inner_loops >= max_inner_loops:
+            return inner_loops
+
+        scale = max(2, int((target_batch_ms / max(elapsed_ms, 1e-9)) + 0.999999))
+        inner_loops = min(max_inner_loops, inner_loops * scale)
 
 
 def _pyo3_hash() -> bytes:
@@ -325,6 +406,8 @@ def main() -> None:
     parser.add_argument("--iterations", type=int, required=True)
     parser.add_argument("--warmup", type=int, required=True)
     parser.add_argument("--inner-loops", type=int, required=True)
+    parser.add_argument("--target-batch-ms", type=float, required=True)
+    parser.add_argument("--max-inner-loops", type=int, required=True)
     args = parser.parse_args()
 
     rows = [
@@ -335,6 +418,8 @@ def main() -> None:
                 iterations=args.iterations,
                 warmup=args.warmup,
                 inner_loops=args.inner_loops,
+                target_batch_ms=args.target_batch_ms,
+                max_inner_loops=args.max_inner_loops,
             ),
         },
         {
@@ -344,6 +429,8 @@ def main() -> None:
                 iterations=args.iterations,
                 warmup=args.warmup,
                 inner_loops=args.inner_loops,
+                target_batch_ms=args.target_batch_ms,
+                max_inner_loops=args.max_inner_loops,
             ),
         },
         {
@@ -353,6 +440,8 @@ def main() -> None:
                 iterations=args.iterations,
                 warmup=args.warmup,
                 inner_loops=args.inner_loops,
+                target_batch_ms=args.target_batch_ms,
+                max_inner_loops=args.max_inner_loops,
             ),
         },
     ]
@@ -428,6 +517,19 @@ def _install_pypi_package(version: str, target: Path) -> None:
         )
 
 
+def _median_metric_by_operation(
+    payloads: list[dict[str, Any]],
+    metric: str,
+) -> dict[str, float]:
+    values_by_operation: dict[str, list[float]] = {}
+    for payload in payloads:
+        for row in payload["rows"]:
+            values_by_operation.setdefault(str(row["operation"]), []).append(float(row[metric]))
+    return {
+        operation: statistics.median(values) for operation, values in values_by_operation.items()
+    }
+
+
 def _run_pypi_core_benchmark(
     *,
     version: str,
@@ -443,23 +545,32 @@ def _run_pypi_core_benchmark(
         env = os.environ.copy()
         env["PYTHONPATH"] = str(site_packages)
 
-        payload = _run_json_command(
-            [
-                sys.executable,
-                "-c",
-                script,
-                "--iterations",
-                str(args.iterations),
-                "--warmup",
-                str(args.warmup),
-                "--inner-loops",
-                str(args.inner_loops),
-            ],
-            cwd=temp_root,
-            env=env,
-            context=f"PyPI dcex=={version} core benchmark",
-        )
-    return {str(row["operation"]): float(row[metric]) for row in payload["rows"]}
+        payloads = [
+            _run_json_command(
+                [
+                    sys.executable,
+                    "-c",
+                    script,
+                    "--iterations",
+                    str(args.iterations),
+                    "--warmup",
+                    str(args.warmup),
+                    "--inner-loops",
+                    str(args.inner_loops),
+                    "--target-batch-ms",
+                    str(args.target_batch_ms),
+                    "--max-inner-loops",
+                    str(args.max_inner_loops),
+                ],
+                cwd=temp_root,
+                env=env,
+                context=(
+                    f"PyPI dcex=={version} core benchmark run {run_index + 1}/{args.process_runs}"
+                ),
+            )
+            for run_index in range(args.process_runs)
+        ]
+    return _median_metric_by_operation(payloads, metric)
 
 
 def _run_rust_benchmark(args: argparse.Namespace) -> dict[str, float]:
@@ -479,17 +590,25 @@ def _run_rust_benchmark(args: argparse.Namespace) -> dict[str, float]:
         env["DCEX_BENCH_ITERATIONS"] = str(args.iterations)
         env["DCEX_BENCH_WARMUP"] = str(args.warmup)
         env["DCEX_BENCH_INNER_LOOPS"] = str(args.inner_loops)
+        env["DCEX_BENCH_TARGET_BATCH_MS"] = str(args.target_batch_ms)
+        env["DCEX_BENCH_MAX_INNER_LOOPS"] = str(args.max_inner_loops)
         env["DCEX_BENCH_OUTPUT"] = "json"
         env["DCEX_BENCH_TARGET"] = f"dcex crate {args.rust_crate_version} Rust native"
         env["DCEX_BENCH_CRATE_VERSION"] = args.rust_crate_version
 
-        payload = _run_json_command(
-            ["cargo", "run", "-q", "--release"],
-            cwd=project,
-            env=env,
-            context=f"crates.io dcex=={args.rust_crate_version} core benchmark",
-        )
-    return {str(row["operation"]): float(row["rust_median_ms"]) for row in payload["rows"]}
+        payloads = [
+            _run_json_command(
+                ["cargo", "run", "-q", "--release"],
+                cwd=project,
+                env=env,
+                context=(
+                    f"crates.io dcex=={args.rust_crate_version} core benchmark "
+                    f"run {run_index + 1}/{args.process_runs}"
+                ),
+            )
+            for run_index in range(args.process_runs)
+        ]
+    return _median_metric_by_operation(payloads, "rust_median_ms")
 
 
 def _benchmark_operation(
@@ -546,7 +665,30 @@ def main() -> None:
     )
     parser.add_argument("--iterations", type=int, default=20)
     parser.add_argument("--warmup", type=int, default=3)
-    parser.add_argument("--inner-loops", type=int, default=1)
+    parser.add_argument(
+        "--inner-loops",
+        type=int,
+        default=0,
+        help="Fixed loops per timed sample. Use 0 to auto-calibrate per operation.",
+    )
+    parser.add_argument(
+        "--target-batch-ms",
+        type=float,
+        default=100.0,
+        help="Target elapsed milliseconds for each auto-calibrated timed sample.",
+    )
+    parser.add_argument(
+        "--max-inner-loops",
+        type=int,
+        default=1_000_000,
+        help="Upper bound for auto-calibrated loops per timed sample.",
+    )
+    parser.add_argument(
+        "--process-runs",
+        type=int,
+        default=3,
+        help="Benchmark process runs per artifact; operation medians are aggregated with median.",
+    )
     parser.add_argument(
         "--python-baseline-version",
         "--baseline-version",
@@ -570,8 +712,14 @@ def main() -> None:
         raise SystemExit("--iterations must be positive")
     if args.warmup < 0:
         raise SystemExit("--warmup cannot be negative")
-    if args.inner_loops <= 0:
-        raise SystemExit("--inner-loops must be positive")
+    if args.inner_loops < 0:
+        raise SystemExit("--inner-loops cannot be negative")
+    if args.target_batch_ms <= 0:
+        raise SystemExit("--target-batch-ms must be positive")
+    if args.max_inner_loops <= 0:
+        raise SystemExit("--max-inner-loops must be positive")
+    if args.process_runs <= 0:
+        raise SystemExit("--process-runs must be positive")
 
     python_rows = _run_pypi_core_benchmark(
         version=args.python_baseline_version,
