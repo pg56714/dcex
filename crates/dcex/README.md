@@ -97,7 +97,7 @@ async fn main() -> dcex::Result<()> {
 | **Lighter**     | Yes  | Yes       | Yes        |
 | **Backpack**    | Yes  | Yes       | Yes        |
 | **Aster**       | Yes  | Yes       | Yes        |
-| **Extended**    | Yes  | No        | No         |
+| **Extended**    | Yes  | Yes       | Yes        |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.

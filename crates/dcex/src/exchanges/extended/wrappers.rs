@@ -17,6 +17,7 @@ crate::exchanges::impl_exchange_method_wrappers!(
         get_account_details(),
         get_sub_accounts(),
         get_balance(),
+        get_asset_operations(),
         get_spot_balances(),
         get_positions(),
         get_positions_history(),
@@ -29,6 +30,15 @@ crate::exchanges::impl_exchange_method_wrappers!(
         get_funding_payments(),
         get_leverage(),
         get_fees(),
+        get_rebates(),
+        get_builder_dashboard(),
+        get_builder_trades(),
+        get_bridge_config(),
+        get_bridge_quote(
+            chain_in => "chainIn",
+            chain_out => "chainOut",
+            amount => "amount"
+        ),
         place_order(body => "body"),
         place_limit_order(
             market => "market",

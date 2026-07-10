@@ -133,6 +133,55 @@ async fn private_methods_use_documented_paths_and_params() {
     );
     assert_request_line(
         private_request(
+            "get_asset_operations",
+            vec![
+                ("type".to_string(), "TRANSFER".to_string()),
+                ("status".to_string(), "COMPLETED".to_string()),
+                ("cursor".to_string(), "123".to_string()),
+                ("limit".to_string(), "50".to_string()),
+            ],
+        )
+        .await,
+        "GET /api/v1/user/assetOperations?type=TRANSFER&status=COMPLETED&cursor=123&limit=50 HTTP/1.1",
+    );
+    assert_request_line(
+        private_request("get_rebates", vec![]).await,
+        "GET /api/v1/user/rebates/stats HTTP/1.1",
+    );
+    assert_request_line(
+        private_request("get_builder_dashboard", vec![]).await,
+        "GET /api/v1/info/builder/dashboard HTTP/1.1",
+    );
+    assert_request_line(
+        private_request(
+            "get_builder_trades",
+            vec![
+                ("cursor".to_string(), "123".to_string()),
+                ("limit".to_string(), "100".to_string()),
+            ],
+        )
+        .await,
+        "GET /api/v1/builder/trades?cursor=123&limit=100 HTTP/1.1",
+    );
+    assert_request_line(
+        private_request("get_bridge_config", vec![]).await,
+        "GET /api/v1/user/bridge/config HTTP/1.1",
+    );
+    assert_request_line(
+        private_request(
+            "get_bridge_quote",
+            vec![
+                ("chainIn".to_string(), "ARB".to_string()),
+                ("chainOut".to_string(), "STRK".to_string()),
+                ("amount".to_string(), "100".to_string()),
+                ("asset".to_string(), "USD".to_string()),
+            ],
+        )
+        .await,
+        "GET /api/v1/user/bridge/quote?chainIn=ARB&chainOut=STRK&amount=100&asset=USD HTTP/1.1",
+    );
+    assert_request_line(
+        private_request(
             "get_order_by_external_id",
             vec![("externalId".to_string(), "client-123".to_string())],
         )

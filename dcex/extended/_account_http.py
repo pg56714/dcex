@@ -17,6 +17,19 @@ class AccountHTTP(HTTPManager):
     def get_balance(self) -> Any:  # noqa: ANN401
         return self._native_private("get_balance", [])
 
+    def get_asset_operations(
+        self,
+        type: str | None = None,  # noqa: A002
+        status: str | None = None,
+        cursor: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Get deposit, withdrawal, and transfer history."""
+        return self._native_private(
+            "get_asset_operations",
+            self._native_params(type=type, status=status, cursor=cursor, limit=limit),
+        )
+
     def get_spot_balances(self, accountId: int | str | None = None) -> Any:  # noqa: N803, ANN401
         query = {} if accountId is None else {"accountId": accountId}
         return self._request("GET", "/api/v1/user/spot/balances", query, signed=True)
@@ -91,3 +104,44 @@ class AccountHTTP(HTTPManager):
             if value is not None
         }
         return self._request("GET", "/api/v1/user/fees", query, signed=True)
+
+    def get_rebates(self) -> Any:  # noqa: ANN401
+        """Get account rebate statistics."""
+        return self._native_private("get_rebates", [])
+
+    def get_builder_dashboard(self) -> Any:  # noqa: ANN401
+        """Get statistics for the authenticated builder."""
+        return self._native_private("get_builder_dashboard", [])
+
+    def get_builder_trades(
+        self,
+        cursor: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Get trade history for the authenticated builder."""
+        return self._native_private(
+            "get_builder_trades",
+            self._native_params(cursor=cursor, limit=limit),
+        )
+
+    def get_bridge_config(self) -> Any:  # noqa: ANN401
+        """Get chains supported by the Extended bridge."""
+        return self._native_private("get_bridge_config", [])
+
+    def get_bridge_quote(
+        self,
+        chainIn: str,  # noqa: N803
+        chainOut: str,  # noqa: N803
+        amount: str | int | float,
+        asset: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Get a non-binding bridge quote."""
+        return self._native_private(
+            "get_bridge_quote",
+            self._native_params(
+                chainIn=chainIn,
+                chainOut=chainOut,
+                amount=amount,
+                asset=asset,
+            ),
+        )

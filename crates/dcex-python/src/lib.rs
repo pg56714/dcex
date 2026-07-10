@@ -340,6 +340,8 @@ mod bybit_client;
 mod bybit_ws;
 #[path = "clients/extended.rs"]
 mod extended_client;
+#[path = "ws/extended.rs"]
+mod extended_ws;
 #[path = "clients/gateio.rs"]
 mod gateio_client;
 #[path = "ws/gateio.rs"]
@@ -389,6 +391,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     bybit_client::register(m)?;
     bybit_ws::register(m)?;
     extended_client::register(m)?;
+    extended_ws::register(m)?;
     gateio_client::register(m)?;
     gateio_ws::register(m)?;
     hyperliquid_client::register(m)?;
