@@ -15,20 +15,19 @@ const DOMAIN_SELECTOR: &str = "0x1ff2f602e42168014d405a94f75e8a93d640751d71d1631
 const ORDER_SELECTOR: &str = "0x36da8d51815527cabfaa9c982f564c80fa7429616739306036f1f9b608dd112";
 const SETTLEMENT_EXPIRATION_BUFFER_SECONDS: u64 = 14 * 24 * 60 * 60;
 const DEFAULT_ORDER_LIFETIME_MS: u64 = 60 * 60 * 1000;
-const DEFAULT_TAKER_FEE: &str = "0.0005";
 
 #[derive(Clone)]
 pub struct ExtendedSigningCredentials {
     pub stark_private_key: String,
     pub stark_public_key: String,
-    pub vault_number: u32,
+    pub vault_number: u64,
 }
 
 impl ExtendedSigningCredentials {
     pub fn new(
         stark_private_key: String,
         stark_public_key: String,
-        vault_number: u32,
+        vault_number: u64,
         _client_id: Option<String>,
     ) -> Self {
         Self {
@@ -275,6 +274,7 @@ pub(super) fn build_signed_order(
     params: &ExtendedParams,
     market: ExtendedMarket,
     credentials: &ExtendedSigningCredentials,
+    domain: StarknetDomain,
 ) -> Result<ExtendedSignedOrder> {
     let spec = ExtendedOrderSpec::from_params(params, market.name)?;
     spec.validate()?;
@@ -318,7 +318,7 @@ pub(super) fn build_signed_order(
         expiration: settlement_expiration,
         salt: spec.nonce,
         user_public_key: public_key,
-        domain: StarknetDomain::mainnet(),
+        domain,
     })?;
     let signature = sign_message(&private_key, &order_hash)?;
 
@@ -433,9 +433,7 @@ impl ExtendedOrderSpec {
         let side = OrderSide::parse(params.first_required(&["side"])?)?;
         let qty = params.first_required(&["qty", "quantity", "amount", "amount_of_synthetic"])?;
         let price = params.first_required(&["price"])?;
-        let taker_fee = params
-            .first(&["fee", "taker_fee", "takerFee"])
-            .unwrap_or(DEFAULT_TAKER_FEE);
+        let taker_fee = params.first_required(&["fee", "taker_fee", "takerFee"])?;
         let builder_fee = params
             .first(&["builder_fee", "builderFee"])
             .map(|value| ExactDecimal::parse(value, "builder_fee"))
@@ -504,7 +502,12 @@ impl ExtendedOrderSpec {
                 "Extended fee must be non-negative".to_string(),
             ));
         }
-        if !matches!(self.time_in_force.as_str(), "GTT" | "IOC" | "FOK") {
+        if self.builder_fee.is_some() != self.builder_id.is_some() {
+            return Err(DcexError::InvalidInput(
+                "Extended builder_fee and builder_id must be provided together".to_string(),
+            ));
+        }
+        if !matches!(self.time_in_force.as_str(), "GTT" | "IOC") {
             return Err(DcexError::InvalidInput(format!(
                 "unsupported Extended time_in_force: {}",
                 self.time_in_force
@@ -569,15 +572,15 @@ fn felt_short_string(value: &str) -> Result<Felt> {
 }
 
 #[derive(Clone, Copy)]
-struct StarknetDomain {
-    name: &'static str,
-    version: &'static str,
-    chain_id: &'static str,
-    revision: u32,
+pub(super) struct StarknetDomain {
+    pub(super) name: &'static str,
+    pub(super) version: &'static str,
+    pub(super) chain_id: &'static str,
+    pub(super) revision: u32,
 }
 
 impl StarknetDomain {
-    const fn mainnet() -> Self {
+    pub(super) const fn mainnet() -> Self {
         Self {
             name: "Perpetuals",
             version: "v0",
@@ -586,8 +589,7 @@ impl StarknetDomain {
         }
     }
 
-    #[cfg(test)]
-    const fn sepolia() -> Self {
+    pub(super) const fn sepolia() -> Self {
         Self {
             name: "Perpetuals",
             version: "v0",
@@ -608,7 +610,7 @@ impl StarknetDomain {
 }
 
 struct OrderHashInput {
-    position_id: u32,
+    position_id: u64,
     base_asset_id: Felt,
     base_amount: i64,
     quote_asset_id: Felt,
@@ -792,6 +794,7 @@ mod tests {
             ("side".to_string(), "BUY".to_string()),
             ("qty".to_string(), "0.001".to_string()),
             ("price".to_string(), "10000".to_string()),
+            ("fee".to_string(), "0".to_string()),
             ("post_only".to_string(), "true".to_string()),
             (
                 "expiry_epoch_millis".to_string(),
@@ -805,9 +808,10 @@ mod tests {
             &ExtendedSigningCredentials::new(
                 "0x1".to_string(),
                 "0x1ef15c18599971b7beced415a40f0c7deacfd9b0d1819e03d723d8bc943cfca".to_string(),
-                391345,
+                4_272_448_241_247_734_333,
                 None,
             ),
+            StarknetDomain::mainnet(),
         )
         .unwrap();
         assert_eq!(order.body["market"], "BTC-USD");
@@ -817,10 +821,42 @@ mod tests {
         assert_eq!(order.body["price"], "10000");
         assert_eq!(order.body["postOnly"], true);
         assert_eq!(order.body["timeInForce"], "GTT");
-        assert_eq!(order.body["settlement"]["collateralPosition"], "391345");
+        assert_eq!(
+            order.body["settlement"]["collateralPosition"],
+            "4272448241247734333"
+        );
+        assert_eq!(order.body["fee"], "0");
         assert!(order.body["settlement"]["signature"]["r"]
             .as_str()
             .unwrap()
             .starts_with("0x"));
+    }
+
+    #[test]
+    fn rejects_deprecated_fok_time_in_force() {
+        let params = ExtendedParams::from_pairs(vec![
+            ("side".to_string(), "BUY".to_string()),
+            ("qty".to_string(), "1".to_string()),
+            ("price".to_string(), "100".to_string()),
+            ("fee".to_string(), "0.00025".to_string()),
+            ("time_in_force".to_string(), "FOK".to_string()),
+        ]);
+
+        let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
+        assert!(spec.validate().is_err());
+    }
+
+    #[test]
+    fn requires_complete_builder_fee_parameters() {
+        let params = ExtendedParams::from_pairs(vec![
+            ("side".to_string(), "BUY".to_string()),
+            ("qty".to_string(), "1".to_string()),
+            ("price".to_string(), "100".to_string()),
+            ("fee".to_string(), "0.00025".to_string()),
+            ("builder_fee".to_string(), "0.0001".to_string()),
+        ]);
+
+        let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
+        assert!(spec.validate().is_err());
     }
 }

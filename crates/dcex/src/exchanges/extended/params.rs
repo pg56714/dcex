@@ -2,6 +2,7 @@ use serde_json::Value;
 
 use crate::{DcexError, Result};
 
+#[derive(Clone)]
 pub(super) struct ExtendedParams(Vec<(String, String)>);
 
 impl ExtendedParams {
@@ -37,6 +38,12 @@ impl ExtendedParams {
             .filter(|(key, _)| keys.contains(&key.as_str()))
             .cloned()
             .collect()
+    }
+
+    pub(super) fn with(&self, key: impl Into<String>, value: impl Into<String>) -> Self {
+        let mut pairs = self.0.clone();
+        pairs.push((key.into(), value.into()));
+        Self(pairs)
     }
 
     pub(super) fn body_required(&self) -> Result<Value> {

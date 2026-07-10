@@ -5,7 +5,20 @@ use std::{
     thread,
 };
 
+use super::client::signing_domain_for_base_url;
 use super::ExtendedClient;
+
+#[test]
+fn testnet_base_url_uses_sepolia_signing_domain() {
+    assert_eq!(
+        signing_domain_for_base_url("https://api.starknet.sepolia.extended.exchange").chain_id,
+        "SN_SEPOLIA"
+    );
+    assert_eq!(
+        signing_domain_for_base_url("https://api.starknet.extended.exchange").chain_id,
+        "SN_MAIN"
+    );
+}
 
 #[tokio::test]
 async fn market_methods_use_documented_paths() {

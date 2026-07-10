@@ -10,7 +10,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{BASE_URL, USER_AGENT};
-use super::signing::ExtendedSigningCredentials;
+use super::signing::{ExtendedSigningCredentials, StarknetDomain};
 
 #[derive(Clone)]
 pub struct ExtendedClient {
@@ -18,6 +18,7 @@ pub struct ExtendedClient {
     base_url: String,
     api_key: Option<String>,
     signing: Option<ExtendedSigningCredentials>,
+    signing_domain: StarknetDomain,
     user_agent: String,
     product_table: Option<Arc<ProductTable>>,
 }
@@ -42,11 +43,13 @@ impl ExtendedClient {
         base_url: String,
         user_agent: String,
     ) -> Result<Self> {
+        let signing_domain = signing_domain_for_base_url(&base_url);
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
             base_url,
             api_key,
             signing: None,
+            signing_domain,
             user_agent,
             product_table: None,
         })
@@ -56,12 +59,13 @@ impl ExtendedClient {
         api_key: Option<String>,
         stark_private_key: Option<String>,
         stark_public_key: Option<String>,
-        vault_number: Option<u32>,
+        vault_number: Option<u64>,
         client_id: Option<String>,
         timeout: Duration,
         base_url: String,
         user_agent: String,
     ) -> Result<Self> {
+        let signing_domain = signing_domain_for_base_url(&base_url);
         let signing = match (stark_private_key, stark_public_key, vault_number) {
             (Some(stark_private_key), Some(stark_public_key), Some(vault_number)) => {
                 Some(ExtendedSigningCredentials::new(
@@ -83,6 +87,7 @@ impl ExtendedClient {
             base_url,
             api_key,
             signing,
+            signing_domain,
             user_agent,
             product_table: None,
         })
@@ -257,6 +262,18 @@ impl ExtendedClient {
                 "Extended automatic order signing requires stark_private_key, stark_public_key, and vault_number.".to_string(),
             )
         })
+    }
+
+    pub(super) const fn signing_domain(&self) -> StarknetDomain {
+        self.signing_domain
+    }
+}
+
+pub(super) fn signing_domain_for_base_url(base_url: &str) -> StarknetDomain {
+    if base_url.contains("starknet.sepolia.extended.exchange") {
+        StarknetDomain::sepolia()
+    } else {
+        StarknetDomain::mainnet()
     }
 }
 

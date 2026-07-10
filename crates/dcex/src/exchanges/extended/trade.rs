@@ -1,5 +1,6 @@
 use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
+use serde_json::Value;
 
 use super::client::ExtendedClient;
 use super::endpoints::*;
@@ -121,6 +122,7 @@ impl ExtendedClient {
         &self,
         params: &ExtendedParams,
     ) -> Result<super::signing::ExtendedSignedOrder> {
+        let credentials = self.signing_credentials()?.clone();
         let market_name = self.signed_order_market(params)?;
         let market = match extract_market_from_param(params, &market_name)? {
             Some(market) => market,
@@ -131,7 +133,29 @@ impl ExtendedClient {
                 extract_market_from_response(&response.data, &market_name)?
             }
         };
-        build_signed_order(params, market, self.signing_credentials()?)
+        let params = self.with_order_fee(params, &market_name).await?;
+        build_signed_order(&params, market, &credentials, self.signing_domain())
+    }
+
+    async fn with_order_fee(
+        &self,
+        params: &ExtendedParams,
+        market: &str,
+    ) -> Result<ExtendedParams> {
+        if params.first(&["fee", "taker_fee", "takerFee"]).is_some() {
+            return Ok(params.clone());
+        }
+
+        let mut query = vec![("market".to_string(), market.to_string())];
+        if let Some(builder_id) = params.first(&["builder_id", "builderId"]) {
+            query.push(("builderId".to_string(), builder_id.to_string()));
+        }
+        let response = self.private_get(FEES, query).await?;
+        let post_only = matches!(
+            params.first(&["post_only", "postOnly"]),
+            Some("true" | "TRUE" | "1" | "yes" | "YES")
+        );
+        Ok(params.with("fee", fee_from_response(&response.data, market, post_only)?))
     }
 
     fn signed_order_market(&self, params: &ExtendedParams) -> Result<String> {
@@ -144,5 +168,57 @@ impl ExtendedClient {
         Err(DcexError::InvalidInput(
             "missing required parameter: market or product_symbol".to_string(),
         ))
+    }
+}
+
+fn fee_from_response(data: &Value, market: &str, post_only: bool) -> Result<String> {
+    let fees = data.get("data").and_then(Value::as_array).ok_or_else(|| {
+        DcexError::Decode("Extended get_fees response did not contain data".to_string())
+    })?;
+    let fee = fees
+        .iter()
+        .find(|entry| entry.get("market").and_then(Value::as_str) == Some(market))
+        .and_then(|entry| {
+            entry.get(if post_only {
+                "makerFeeRate"
+            } else {
+                "takerFeeRate"
+            })
+        })
+        .and_then(Value::as_str)
+        .filter(|value| !value.is_empty())
+        .ok_or_else(|| {
+            DcexError::Decode(format!(
+                "Extended get_fees response did not contain a fee rate for {market}"
+            ))
+        })?;
+    Ok(fee.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::fee_from_response;
+
+    #[test]
+    fn selects_maker_or_taker_rate_from_fee_response() {
+        let data = json!({
+            "status": "OK",
+            "data": [{
+                "market": "BTC-USD",
+                "makerFeeRate": "0.00000",
+                "takerFeeRate": "0.00025"
+            }]
+        });
+
+        assert_eq!(
+            fee_from_response(&data, "BTC-USD", true).unwrap(),
+            "0.00000"
+        );
+        assert_eq!(
+            fee_from_response(&data, "BTC-USD", false).unwrap(),
+            "0.00025"
+        );
     }
 }

@@ -22,7 +22,7 @@ impl PythonExtendedHttpClient {
         api_key: Option<String>,
         stark_private_key: Option<String>,
         stark_public_key: Option<String>,
-        vault_number: Option<u32>,
+        vault_number: Option<u64>,
         client_id: Option<String>,
         timeout: f64,
         base_url: Option<String>,
