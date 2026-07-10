@@ -40,6 +40,7 @@ def test_native_sync_http_client() -> None:
         "path": "/test?symbol=BTCUSDT",
         "header": "sync",
         "api_key": None,
+        "body": "",
     }
 
 
@@ -80,6 +81,7 @@ async def test_native_async_http_client() -> None:
         "path": "/test?symbol=ETHUSDT",
         "header": "async",
         "api_key": None,
+        "body": "",
     }
 
 
