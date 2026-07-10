@@ -15,6 +15,7 @@ EXCHANGES = (
     "bitmart",
     "bitmex",
     "bybit",
+    "extended",
     "gateio",
     "hyperliquid",
     "kraken",

@@ -92,6 +92,28 @@ def test_sync_hyperliquid_market_order_uses_ioc_limit_payload(
     }
 
 
+def test_sync_extended_place_limit_order_uses_native_signing_params() -> None:
+    client = _client_class("sync", "extended")(**_client_kwargs("extended"))
+    calls = _wire_sync(client)
+
+    result = client.place_limit_order(
+        market="BTC-USD",
+        side="BUY",
+        qty="0.001",
+        price="10000",
+        post_only=True,
+        type_="LIMIT",
+    )
+
+    assert result == {"ok": True}
+    assert calls[0]["method"] == "NATIVE_PRIVATE"
+    assert calls[0]["path"] == "place_limit_order"
+    params = dict(calls[0]["query"])
+    assert params["type"] == "LIMIT"
+    assert params["post_only"] == "true"
+    assert params["qty"] == "0.001"
+
+
 @pytest.mark.parametrize(
     ("exchange", "method_name", "kwargs"),
     [

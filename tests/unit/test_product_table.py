@@ -9,15 +9,16 @@ query logic can be refactored (e.g. shared between sync and async) safely.
 
 import asyncio
 import csv
+from pathlib import Path
 
 import pytest
 
+from dcex import _native
 from dcex.async_support.product_table import fetch as async_fetch
 from dcex.async_support.product_table import manager as async_manager
 from dcex.async_support.product_table.manager import (
     ProductTableManager as AsyncProductTableManager,
 )
-from dcex import _native
 from dcex.product_table import fetch as sync_fetch
 from dcex.product_table import manager as sync_manager
 from dcex.product_table.manager import ProductTableError, ProductTableManager
@@ -220,7 +221,7 @@ def test_indexed_lookup_preserves_ambiguous_results() -> None:
     )
 
 
-def test_native_product_table_supports_dataframe_free_helpers(tmp_path) -> None:
+def test_native_product_table_supports_dataframe_free_helpers(tmp_path: Path) -> None:
     rows = _native.ProductTable(_ROWS[:2])
 
     assert rows.height == 2
@@ -247,6 +248,7 @@ def test_all_product_fetches_match_the_registry() -> None:
         "bitmart",
         "bitmex",
         "bybit",
+        "extended",
         "gateio",
         "hyperliquid",
         "kucoin",

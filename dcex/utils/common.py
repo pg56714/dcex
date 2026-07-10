@@ -12,6 +12,7 @@ class Common(str, Enum):
     OKX = "okx"
     BITMART = "bitmart"
     GATEIO = "gateio"
+    EXTENDED = "extended"
     BINANCE = "binance"
     HYPERLIQUID = "hyperliquid"
     BINGX = "bingx"

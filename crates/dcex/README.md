@@ -97,9 +97,15 @@ async fn main() -> dcex::Result<()> {
 | **Lighter**     | Yes  | Yes       | Yes        |
 | **Backpack**    | Yes  | Yes       | Yes        |
 | **Aster**       | Yes  | Yes       | Yes        |
+| **Extended**    | Yes  | No        | No         |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.
+
+Extended private REST reads require `EXTENDED_API_KEY`. Rust-backed LIMIT order
+signing additionally requires `EXTENDED_STARK_PRIVATE_KEY`,
+`EXTENDED_STARK_PUBLIC_KEY`, and `EXTENDED_VAULT_NUMBER`; `EXTENDED_CLIENT_ID`
+is kept for reference but is not sent in normal order requests.
 
 ## Python Package Relationship
 

@@ -49,6 +49,11 @@ async def bybit() -> ProductTable:
     return await _fetch("bybit")
 
 
+async def extended() -> ProductTable:
+    """Fetch Extended product metadata."""
+    return await _fetch("extended")
+
+
 async def gateio() -> ProductTable:
     """Fetch Gate.io product metadata."""
     return await _fetch("gateio")

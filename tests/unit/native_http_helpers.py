@@ -85,7 +85,11 @@ def _http_server(
             for header in ("X-API-Key", "X-Signature", "X-Timestamp", "X-Window"):
                 if value := self.headers.get(header):
                     request[f"backpack_{header.lower()}"] = value
+            for header in ("X-Api-Key", "User-Agent"):
+                if value := self.headers.get(header):
+                    request[f"extended_{header.lower()}"] = value
             content_length = int(self.headers.get("Content-Length", "0"))
+            request["body"] = ""
             if content_length:
                 request["body"] = self.rfile.read(content_length).decode()
             received.put(request)

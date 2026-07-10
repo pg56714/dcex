@@ -1763,6 +1763,7 @@ pub mod bitget;
 pub mod bitmart;
 pub mod bitmex;
 pub mod bybit;
+pub mod extended;
 pub mod gateio;
 pub mod hyperliquid;
 pub mod kraken;

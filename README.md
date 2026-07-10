@@ -140,6 +140,7 @@ added with builder setters such as `.limit(100)` or `.param("key", value)`.
 | **Lighter**     | Yes       | Yes        | Yes       | Yes        |
 | **Backpack**    | Yes       | Yes        | Yes       | Yes        |
 | **Aster**       | Yes       | Yes        | Yes       | Yes        |
+| **Extended**    | Yes       | Yes        | No        | No         |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.

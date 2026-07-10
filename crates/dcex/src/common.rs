@@ -102,6 +102,8 @@ impl OrderSide {
             (Self::Sell, "backpack") => "Ask",
             (Self::Buy, "bybit" | "bitmex") => "Buy",
             (Self::Sell, "bybit" | "bitmex") => "Sell",
+            (Self::Buy, "extended") => "BUY",
+            (Self::Sell, "extended") => "SELL",
             (Self::Buy, "okx" | "bitget" | "bitmart" | "gateio" | "kucoin" | "kraken") => "buy",
             (Self::Sell, "okx" | "bitget" | "bitmart" | "gateio" | "kucoin" | "kraken") => "sell",
             _ => {

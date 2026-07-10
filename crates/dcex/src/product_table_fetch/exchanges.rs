@@ -11,6 +11,7 @@ use crate::exchanges::bitget::BitgetClient;
 use crate::exchanges::bitmart::BitmartClient;
 use crate::exchanges::bitmex::BitmexClient;
 use crate::exchanges::bybit::BybitClient;
+use crate::exchanges::extended::ExtendedClient;
 use crate::exchanges::gateio::GateioClient;
 use crate::exchanges::hyperliquid::HyperliquidClient;
 use crate::exchanges::kraken::KrakenClient;
@@ -475,6 +476,54 @@ async fn bybit_instruments(client: &BybitClient, category: &str) -> Result<Vec<V
         cursor = Some(next);
     }
     Ok(rows)
+}
+
+pub(super) async fn fetch_extended(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = ExtendedClient::public(timeout)?;
+    let response = client.public_request("get_markets", vec![]).await?;
+    let mut rows = Vec::new();
+    for market in response_array(&response, &["data"]) {
+        if market.get("active").and_then(Value::as_bool) == Some(false) {
+            continue;
+        }
+        let status = value_string(market, "status", "");
+        if status != "ACTIVE" {
+            continue;
+        }
+        rows.push(extended_market_info(market)?);
+    }
+    Ok(rows)
+}
+
+fn extended_market_info(market: &Value) -> Result<MarketInfo> {
+    let symbol = required_string(market, "name")?;
+    let market_type = value_string(market, "type", "PERPETUAL");
+    let base = required_string(market, "assetName")?;
+    let quote = required_string(market, "collateralAssetName")?;
+    let config = market.get("tradingConfig").unwrap_or(&Value::Null);
+    let product_type = if market_type == "SPOT" {
+        "spot"
+    } else {
+        "swap"
+    };
+    Ok(MarketInfo {
+        exchange: "extended".to_string(),
+        exchange_symbol: symbol,
+        product_symbol: if product_type == "spot" {
+            format!("{base}-{quote}-SPOT")
+        } else {
+            format!("{base}-{quote}-SWAP")
+        },
+        product_type: product_type.to_string(),
+        exchange_type: market_type,
+        price_precision: value_string(config, "minPriceChange", "0"),
+        size_precision: value_string(config, "minOrderSizeChange", "0"),
+        min_size: value_string(config, "minOrderSize", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".to_string(),
+        size_per_contract: "1".to_string(),
+    })
 }
 
 pub(super) async fn fetch_gateio(timeout: Duration) -> Result<Vec<MarketInfo>> {

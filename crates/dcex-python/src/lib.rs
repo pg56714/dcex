@@ -12,6 +12,7 @@ use dcex::exchanges::bitget::BitgetClient;
 use dcex::exchanges::bitmart::{BitmartClient, BitmartMarket};
 use dcex::exchanges::bitmex::BitmexClient;
 use dcex::exchanges::bybit::BybitClient;
+use dcex::exchanges::extended::ExtendedClient;
 use dcex::exchanges::gateio::GateioClient;
 use dcex::exchanges::hyperliquid::HyperliquidClient;
 use dcex::exchanges::kraken::{KrakenAuth, KrakenClient};
@@ -337,6 +338,8 @@ mod bitmex_ws;
 mod bybit_client;
 #[path = "ws/bybit.rs"]
 mod bybit_ws;
+#[path = "clients/extended.rs"]
+mod extended_client;
 #[path = "clients/gateio.rs"]
 mod gateio_client;
 #[path = "ws/gateio.rs"]
@@ -385,6 +388,7 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     bitmex_ws::register(m)?;
     bybit_client::register(m)?;
     bybit_ws::register(m)?;
+    extended_client::register(m)?;
     gateio_client::register(m)?;
     gateio_ws::register(m)?;
     hyperliquid_client::register(m)?;

@@ -19,6 +19,7 @@ _PRIVATE_ENV_VARS = {
     "bitmart": ("BITMART_API_KEY", "BITMART_API_SECRET", "BITMART_MEMO"),
     "bitmex": ("BITMEX_API_KEY", "BITMEX_API_SECRET"),
     "bybit": ("BYBIT_API_KEY", "BYBIT_API_SECRET"),
+    "extended": ("EXTENDED_API_KEY",),
     "gateio": ("GATEIO_API_KEY", "GATEIO_API_SECRET"),
     "kucoin": ("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
     "kraken": (
@@ -127,7 +128,15 @@ def _private_env_vars(item: pytest.Item, relative_path: Path | None) -> tuple[st
         return ()
     if relative_path is None or len(relative_path.parts) < 2:
         return ()
-    return _PRIVATE_ENV_VARS.get(relative_path.parts[1], ())
+    exchange = relative_path.parts[1]
+    if exchange == "extended" and _calls_stateful_client_method(item):
+        return (
+            "EXTENDED_API_KEY",
+            "EXTENDED_STARK_PRIVATE_KEY",
+            "EXTENDED_STARK_PUBLIC_KEY",
+            "EXTENDED_VAULT_NUMBER",
+        )
+    return _PRIVATE_ENV_VARS.get(exchange, ())
 
 
 def _stateful_tests_enabled() -> bool:

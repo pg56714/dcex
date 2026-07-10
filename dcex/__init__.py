@@ -15,6 +15,7 @@ from .bitget.client import Client as BitgetClient
 from .bitmart.client import Client as BitmartClient
 from .bitmex.client import Client as BitmexClient
 from .bybit.client import Client as BybitClient
+from .extended.client import Client as ExtendedClient
 from .gateio.client import Client as GateioClient
 from .hyperliquid.client import Client as HyperliquidClient
 from .kraken.client import Client as KrakenClient
@@ -68,6 +69,11 @@ def bybit(**kwargs: Any) -> BybitClient:  # noqa: ANN401
     return BybitClient(**kwargs)
 
 
+def extended(**kwargs: Any) -> ExtendedClient:  # noqa: ANN401
+    """Create an Extended client instance."""
+    return ExtendedClient(**kwargs)
+
+
 def gateio(**kwargs: Any) -> GateioClient:  # noqa: ANN401
     """Create a Gate.io client instance."""
     return GateioClient(**kwargs)
@@ -112,6 +118,7 @@ __all__ = [
     "bitmart",
     "bitmex",
     "bybit",
+    "extended",
     "gateio",
     "hyperliquid",
     "kucoin",

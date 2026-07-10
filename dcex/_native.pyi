@@ -485,6 +485,19 @@ class BybitPrivateWebSocketClient:
     def is_authenticated(self) -> bool: ...
     async def recv(self) -> bytes: ...
 
+class ExtendedHttpClient(_NativeExchangeClient):
+    def __init__(
+        self,
+        api_key: str | None = None,
+        stark_private_key: str | None = None,
+        stark_public_key: str | None = None,
+        vault_number: int | None = None,
+        client_id: str | None = None,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+        user_agent: str = "dcex-rust/0.1",
+    ) -> None: ...
+
 class GateioHttpClient(_NativeExchangeClient): ...
 
 class GateioPublicWebSocketClient:

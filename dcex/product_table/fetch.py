@@ -73,6 +73,11 @@ def bybit() -> ProductTable:
     return _fetch("bybit")
 
 
+def extended() -> ProductTable:
+    """Fetch Extended product metadata."""
+    return _fetch("extended")
+
+
 def gateio() -> ProductTable:
     """Fetch Gate.io product metadata."""
     return _fetch("gateio")
