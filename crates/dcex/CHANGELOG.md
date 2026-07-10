@@ -1,3 +1,15 @@
+## 0.5.0 (2026-07-10)
+
+### Feat
+
+- add Extended WebSocket streams
+- add Extended exchange support
+
+### Fix
+
+- align Extended order signing with API
+- stabilize core benchmark measurements
+
 ## 0.4.4 (2026-07-02)
 
 ### Fix
