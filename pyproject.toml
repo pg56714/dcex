@@ -7,15 +7,20 @@ authors = [
   {name = "pg56714"},
 ]
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: AsyncIO",
   "Intended Audience :: Developers",
   "Intended Audience :: Financial and Insurance Industry",
-  "Topic :: Office/Business :: Financial",
-  "Topic :: Software Development :: Libraries :: Python Modules",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Rust",
-  "Operating System :: OS Independent",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Office/Business :: Financial",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: System :: Networking",
 ]
 dependencies = []
 description = "Rust-backed Python bindings for low-latency cross-exchange crypto trading."
