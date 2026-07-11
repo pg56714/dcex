@@ -34,7 +34,6 @@ mod live_http_parity {
     mod bitmart;
     mod bitmex;
     mod bybit;
-    mod gateio;
     mod hyperliquid;
     mod kraken;
     mod kucoin;

@@ -1,6 +1,6 @@
 use dcex::exchanges::{
     bingx::BingxClient, bitget::BitgetClient, bitmart::BitmartClient, bitmex::BitmexClient,
-    bybit::BybitClient, gateio::GateioClient, hyperliquid::HyperliquidClient, kraken::KrakenClient,
+    bybit::BybitClient, hyperliquid::HyperliquidClient, kraken::KrakenClient,
     lighter::LighterClient, mexc::MexcClient, okx::OkxClient,
 };
 
@@ -34,10 +34,6 @@ impl WrapperSource for MexcClient {
 
 impl WrapperSource for BitmartClient {
     const SOURCE: &'static str = include_str!("../src/exchanges/bitmart/wrappers.rs");
-}
-
-impl WrapperSource for GateioClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/gateio/wrappers.rs");
 }
 
 impl WrapperSource for BitmexClient {
@@ -601,78 +597,6 @@ fn rust_direct_clients_expose_python_method_names() {
         place_spot_post_only_limit_sell_order,
         submit_leverage,
         transfer_contract,
-    );
-
-    assert_methods!(
-        GateioClient:
-        get_futures_fee_rates,
-        get_spot_fee_rates,
-        amend_futures_single_order,
-        amend_spot_single_order,
-        cancel_contract_all_order_matched,
-        cancel_contract_single_order,
-        cancel_spot_order,
-        cancel_spot_single_order,
-        future_dual_mode_switch,
-        get_all_delivery_contracts,
-        get_all_futures_contracts,
-        get_a_single_futures_contract,
-        get_contract_kline,
-        get_contract_list_tickers,
-        get_contract_order_book,
-        get_contract_order_list,
-        get_contract_single_order,
-        get_contract_single_positions,
-        get_delivery_account,
-        get_delivery_account_book,
-        get_delivery_all_positions,
-        get_delivery_position_close_history,
-        get_futures_account,
-        get_futures_account_book,
-        get_futures_all_positions,
-        get_futures_auto_deleveraging_history,
-        get_futures_contract_stats,
-        get_futures_funding_rate_history,
-        get_futures_position_close_history,
-        get_spot_account,
-        get_spot_account_book,
-        get_spot_all_currency_pairs,
-        get_spot_batch_fee,
-        get_spot_fee,
-        get_spot_kline,
-        get_spot_list_tickers,
-        get_spot_open_orders,
-        get_spot_order_book,
-        get_spot_order_list,
-        get_spot_single_order,
-        get_spot_trading_history,
-        get_total_balance,
-        get_trading_history,
-        get_unified_accounts,
-        place_contract_limit_buy_order,
-        place_contract_limit_order,
-        place_contract_limit_sell_order,
-        place_contract_market_buy_order,
-        place_contract_market_order,
-        place_contract_market_sell_order,
-        place_contract_order,
-        place_contract_post_only_limit_buy_order,
-        place_contract_post_only_limit_order,
-        place_contract_post_only_limit_sell_order,
-        place_futures_batch_order,
-        place_spot_limit_buy_order,
-        place_spot_limit_order,
-        place_spot_limit_sell_order,
-        place_spot_market_buy_order,
-        place_spot_market_order,
-        place_spot_market_sell_order,
-        place_spot_order,
-        place_spot_post_only_limit_buy_order,
-        place_spot_post_only_limit_order,
-        place_spot_post_only_limit_sell_order,
-        update_delivery_positions_leverage,
-        update_futures_positions_leverage,
-        wallet_transfer,
     );
 
     assert_methods!(

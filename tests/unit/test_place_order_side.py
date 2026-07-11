@@ -172,16 +172,6 @@ def test_bitmex_side_conversion() -> None:
     assert cap["side"] == "Buy"
 
 
-def test_gateio_spot_side_conversion() -> None:
-    from dcex.gateio._trade_http import TradeHTTP
-
-    m = TradeHTTP(preload_product_table=False)
-    cap = _wire_native(m)
-    m.place_spot_order(product_symbol="BTC-USDT-SPOT", side="sell", amount="1", price="100")
-    assert cap["method_name"] == "place_spot_order"
-    assert cap["side"] == "sell"
-
-
 @pytest.mark.asyncio
 async def test_async_binance_side_conversion() -> None:
     from dcex.async_support.binance._trade_http import TradeHTTP
@@ -253,17 +243,6 @@ async def test_async_bitmex_side_conversion() -> None:
     await m.place_order(product_symbol="XBT-USD-SWAP", side=OrderSide.BUY, ordType="Market")
     assert cap["method_name"] == "place_order"
     assert cap["side"] == "Buy"
-
-
-@pytest.mark.asyncio
-async def test_async_gateio_spot_side_conversion() -> None:
-    from dcex.async_support.gateio._trade_http import TradeHTTP
-
-    m = TradeHTTP(preload_product_table=False)
-    cap = _wire_native_async(m)
-    await m.place_spot_order(product_symbol="BTC-USDT-SPOT", side="sell", amount="1", price="100")
-    assert cap["method_name"] == "place_spot_order"
-    assert cap["side"] == "sell"
 
 
 @pytest.mark.parametrize("bad", ["", "hodl", "long"])

@@ -25,8 +25,6 @@ FEE_RATE_CASES = (
     ("bybit", "get_linear_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_inverse_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_option_fee_rates", {}, "NATIVE_PRIVATE"),
-    ("gateio", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
-    ("gateio", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
     ("hyperliquid", "get_spot_fee_rates", {"user": "0x0000000000000000000000000000000000000001"}, "NATIVE_PUBLIC"),
     ("hyperliquid", "get_futures_fee_rates", {"user": "0x0000000000000000000000000000000000000001"}, "NATIVE_PUBLIC"),
     ("kucoin", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),

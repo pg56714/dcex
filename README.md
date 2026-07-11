@@ -133,7 +133,6 @@ added with builder setters such as `.limit(100)` or `.param("key", value)`.
 | **MEXC**        | Yes       | Yes        | Yes       | Yes        |
 | **BitMart**     | Yes       | Yes        | Yes       | Yes        |
 | **BitMEX**      | Yes       | Yes        | Yes       | Yes        |
-| **Gate.io**     | Yes       | Yes        | Yes       | Yes        |
 | **BingX**       | Yes       | Yes        | Yes       | Yes        |
 | **KuCoin**      | Yes       | Yes        | Yes       | Yes        |
 | **Hyperliquid** | Yes       | Yes        | Yes       | Yes        |

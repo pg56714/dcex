@@ -80,13 +80,6 @@ UTA_CASES = (
     ),
     ("mexc", "cancel_contract_plan_orders", {"orders": "[]"}, "NATIVE_PRIVATE"),
     ("mexc", "cancel_all_contract_plan_orders", {}, "NATIVE_PRIVATE"),
-    ("gateio", "get_futures_insurance", {"ccy": "usdt"}, "NATIVE_PUBLIC"),
-    (
-        "gateio",
-        "get_futures_premium_index",
-        {"ccy": "usdt", "product_symbol": "BTC-USDT-SWAP"},
-        "NATIVE_PUBLIC",
-    ),
     ("kraken", "get_spot_system_status", {}, "NATIVE_PUBLIC"),
     ("kraken", "get_spot_assets", {}, "NATIVE_PUBLIC"),
     (

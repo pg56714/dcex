@@ -58,9 +58,6 @@ def _http_server(
             ):
                 if value := self.headers.get(header):
                     request[header] = value
-            for header in ("KEY", "Timestamp", "SIGN"):
-                if value := self.headers.get(header):
-                    request[f"gateio_{header.lower()}"] = value
             for header in (
                 "OK-ACCESS-KEY",
                 "OK-ACCESS-SIGN",

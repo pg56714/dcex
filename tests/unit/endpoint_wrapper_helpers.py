@@ -58,8 +58,6 @@ class FakePTM:
             return "BTC_USDC" if product_symbol and "SPOT" in product_symbol else "BTC_USDC_PERP"
         if exchange == Common.HYPERLIQUID or str(exchange) == Common.HYPERLIQUID.value:
             return '["BTC",0]'
-        if exchange == Common.GATEIO or str(exchange) == Common.GATEIO.value:
-            return "BTC_USDT"
         if exchange == Common.OKX or str(exchange) == Common.OKX.value:
             return product_symbol or "BTC-USDT-SWAP"
         if exchange == Common.BITMEX or str(exchange) == Common.BITMEX.value:
@@ -342,7 +340,7 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
             api_key=base64.b64encode(b"2" * 32).decode(),
             api_secret=base64.b64encode(b"1" * 32).decode(),
         )
-    elif exchange in {"binance", "bingx", "bitmex", "bybit", "gateio", "mexc"}:
+    elif exchange in {"binance", "bingx", "bitmex", "bybit", "mexc"}:
         kwargs.update(api_key="api-key", api_secret="api-secret")
     elif exchange == "bitmart":
         kwargs.update(api_key="api-key", api_secret="api-secret", memo="memo")
@@ -444,8 +442,6 @@ def _sample_order(exchange: str) -> dict[str, Any]:
             "quantity": "1",
             "price": "1",
         }
-    if exchange == "gateio":
-        return {"product_symbol": "BTC-USDT-SWAP", "size": 1, "price": "100"}
     if exchange == "kucoin":
         return {
             "symbol": "BTC-USDT-SPOT",

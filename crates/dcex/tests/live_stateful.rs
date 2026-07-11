@@ -9,7 +9,6 @@ mod live_stateful {
     mod bitmart;
     mod bitmex;
     mod bybit;
-    mod gateio;
     mod hyperliquid;
     mod kraken;
     mod kucoin;

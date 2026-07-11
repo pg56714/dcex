@@ -90,7 +90,6 @@ async fn main() -> dcex::Result<()> {
 | **MEXC**        | Yes  | Yes       | Yes        |
 | **BitMart**     | Yes  | Yes       | Yes        |
 | **BitMEX**      | Yes  | Yes       | Yes        |
-| **Gate.io**     | Yes  | Yes       | Yes        |
 | **BingX**       | Yes  | Yes       | Yes        |
 | **KuCoin**      | Yes  | Yes       | Yes        |
 | **Hyperliquid** | Yes  | Yes       | Yes        |

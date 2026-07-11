@@ -20,7 +20,6 @@ from dcex.ws import (
     bitmart,
     bitmex,
     bybit,
-    gateio,
     hyperliquid,
     kraken,
     kucoin,
@@ -152,11 +151,6 @@ PUBLIC_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
     ),
     WebSocketSpec(
-        name="gateio",
-        factory=lambda: gateio.public(timeout=LIVE_WS_TIMEOUT),
-        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
-    ),
-    WebSocketSpec(
         name="hyperliquid",
         factory=lambda: hyperliquid.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("BTC"),
@@ -272,16 +266,6 @@ PRIVATE_WS_SPECS = (
             timeout=LIVE_WS_TIMEOUT,
         ),
         subscribe=lambda ws: ws.subscribe_wallet(),
-    ),
-    WebSocketSpec(
-        name="gateio",
-        env=("GATEIO_API_KEY", "GATEIO_API_SECRET"),
-        factory=lambda: gateio.private(
-            api_key=os.environ["GATEIO_API_KEY"],
-            api_secret=os.environ["GATEIO_API_SECRET"],
-            timeout=LIVE_WS_TIMEOUT,
-        ),
-        subscribe=lambda ws: ws.subscribe_balances(),
     ),
     WebSocketSpec(
         name="hyperliquid",

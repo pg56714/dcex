@@ -249,7 +249,6 @@ def test_all_product_fetches_match_the_registry() -> None:
         "bitmex",
         "bybit",
         "extended",
-        "gateio",
         "hyperliquid",
         "kucoin",
         "kraken",
