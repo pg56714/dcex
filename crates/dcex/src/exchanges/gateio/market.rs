@@ -64,6 +64,15 @@ impl GateioClient {
                 self.normalize_contract_query(&mut params)?;
                 fill_settle(FUTURES_CONTRACT_STATS, &settle)
             }
+            "get_futures_insurance" => {
+                let settle = take_settle(&mut params);
+                fill_settle(FUTURES_INSURANCE, &settle)
+            }
+            "get_futures_premium_index" => {
+                let settle = take_settle(&mut params);
+                self.normalize_contract_query(&mut params)?;
+                fill_settle(FUTURES_PREMIUM_INDEX, &settle)
+            }
             "get_all_delivery_contracts" => {
                 let settle = take_settle(&mut params);
                 fill_settle(DELIVERY_CONTRACTS, &settle)

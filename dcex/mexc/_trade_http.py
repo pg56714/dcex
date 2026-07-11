@@ -765,6 +765,52 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    def place_contract_plan_order(
+        self,
+        product_symbol: str,
+        vol: str,
+        side: str,
+        openType: str,
+        triggerPrice: str,
+        triggerType: str,
+        executeCycle: str,
+        orderType: str,
+        trend: str,
+        price: str | None = None,
+        leverage: str | None = None,
+        externalOid: str | None = None,
+    ) -> dict[str, Any]:
+        """Create an MEXC contract trigger plan order."""
+        return self._native_private(
+            "place_contract_plan_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                vol=vol,
+                side=side,
+                openType=openType,
+                triggerPrice=triggerPrice,
+                triggerType=triggerType,
+                executeCycle=executeCycle,
+                orderType=orderType,
+                trend=trend,
+                price=price,
+                leverage=leverage,
+                externalOid=externalOid,
+            ),
+        )
+
+    def cancel_contract_plan_orders(self, orders: str) -> dict[str, Any]:
+        """Cancel one or more MEXC contract trigger plan orders."""
+        return self._native_private(
+            "cancel_contract_plan_orders", self._native_params(orders=orders)
+        )
+
+    def cancel_all_contract_plan_orders(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Cancel all MEXC contract trigger plan orders, optionally for one contract."""
+        return self._native_private(
+            "cancel_all_contract_plan_orders", self._native_params(product_symbol=product_symbol)
+        )
+
     def get_contract_stop_orders(
         self,
         product_symbol: str | None = None,

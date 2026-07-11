@@ -26,6 +26,8 @@ pub(super) const FUTURES_CANDLESTICKS: &str = "/futures/{settle}/candlesticks";
 pub(super) const FUTURES_TICKERS: &str = "/futures/{settle}/tickers";
 pub(super) const FUTURES_FUNDING_RATE: &str = "/futures/{settle}/funding_rate";
 pub(super) const FUTURES_CONTRACT_STATS: &str = "/futures/{settle}/contract_stats";
+pub(super) const FUTURES_INSURANCE: &str = "/futures/{settle}/insurance";
+pub(super) const FUTURES_PREMIUM_INDEX: &str = "/futures/{settle}/premium_index";
 
 pub(super) const DELIVERY_CONTRACTS: &str = "/delivery/{settle}/contracts";
 pub(super) const DELIVERY_ACCOUNT: &str = "/delivery/{settle}/accounts";

@@ -71,4 +71,7 @@ pub(super) const CONTRACT_ORDER_DEAL_DETAILS: &str =
     "/api/v1/private/order/deal_details/{order_id}";
 pub(super) const CONTRACT_ORDER_DEALS: &str = "/api/v1/private/order/list/order_deals";
 pub(super) const CONTRACT_PLAN_ORDERS: &str = "/api/v1/private/planorder/list/orders";
+pub(super) const CONTRACT_PLACE_PLAN_ORDER: &str = "/api/v1/private/planorder/place";
+pub(super) const CONTRACT_CANCEL_PLAN_ORDERS: &str = "/api/v1/private/planorder/cancel";
+pub(super) const CONTRACT_CANCEL_ALL_PLAN_ORDERS: &str = "/api/v1/private/planorder/cancel_all";
 pub(super) const CONTRACT_STOP_ORDERS: &str = "/api/v1/private/stoporder/list/orders";

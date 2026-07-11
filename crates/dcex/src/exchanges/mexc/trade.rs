@@ -271,6 +271,32 @@ impl MexcClient {
                 self.push_product_symbol(&mut query, params, "_")?;
                 self.contract_get(CONTRACT_PLAN_ORDERS, query).await
             }
+            "place_contract_plan_order" => {
+                let mut body = params.body(
+                    &["price", "externalOid"],
+                    &[
+                        "vol", "leverage", "side", "openType", "triggerPrice", "triggerType",
+                        "executeCycle", "orderType", "trend",
+                    ],
+                    &[],
+                );
+                self.insert_required_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_PLACE_PLAN_ORDER, Value::Object(body))
+                    .await
+            }
+            "cancel_contract_plan_orders" => {
+                self.contract_post_json(
+                    CONTRACT_CANCEL_PLAN_ORDERS,
+                    params.json_required("orders")?,
+                )
+                .await
+            }
+            "cancel_all_contract_plan_orders" => {
+                let mut body = Map::new();
+                self.insert_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_CANCEL_ALL_PLAN_ORDERS, Value::Object(body))
+                    .await
+            }
             "get_contract_stop_orders" => {
                 let mut query = params.only(&["states", "page_num", "page_size"]);
                 self.push_product_symbol(&mut query, params, "_")?;

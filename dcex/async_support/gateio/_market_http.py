@@ -38,6 +38,19 @@ class MarketHTTP(HTTPManager):
             self._native_params(settle=ccy, limit=limit, offset=offset),
         )
 
+    async def get_futures_insurance(self, ccy: str = "usdt") -> dict[str, Any]:
+        """Retrieve Gate.io futures insurance fund history."""
+        return await self._native_public("get_futures_insurance", self._native_params(ccy=ccy))
+
+    async def get_futures_premium_index(
+        self, product_symbol: str, ccy: str = "usdt"
+    ) -> dict[str, Any]:
+        """Retrieve Gate.io futures premium-index data."""
+        return await self._native_public(
+            "get_futures_premium_index",
+            self._native_params(ccy=ccy, product_symbol=product_symbol),
+        )
+
     async def get_a_single_futures_contract(
         self,
         product_symbol: str,

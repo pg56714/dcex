@@ -10,6 +10,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_contract_list_tickers(product_symbol => "product_symbol"),
         get_contract_order_book(product_symbol => "product_symbol"),
         get_futures_contract_stats(product_symbol => "product_symbol"),
+        get_futures_insurance(),
+        get_futures_premium_index(product_symbol => "product_symbol"),
         get_futures_funding_rate_history(product_symbol => "product_symbol"),
         get_spot_all_currency_pairs(),
         get_spot_kline(product_symbol => "product_symbol"),
