@@ -481,3 +481,34 @@ class TradeHTTP(HTTPManager):
     def get_status_and_leverage(self) -> dict[str, Any]:
         """Get spot margin trading status and leverage."""
         return self._native_private("get_status_and_leverage", [])
+
+    def pre_check_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        orderType: str,
+        qty: str,
+        **params: object,
+    ) -> dict[str, Any]:
+        """Preview UTA margin impact before submitting a Bybit order."""
+        return self._native_private(
+            "pre_check_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                orderType=orderType,
+                qty=qty,
+                **params,
+            ),
+        )
+
+    def set_disconnected_cancel_all(
+        self,
+        timeWindow: int,
+        product: str | None = None,
+    ) -> dict[str, Any]:
+        """Configure Bybit disconnect protection without placing an order."""
+        return self._native_private(
+            "set_disconnected_cancel_all",
+            self._native_params(timeWindow=timeWindow, product=product),
+        )

@@ -126,6 +126,47 @@ impl BitgetClient {
                 self.push_uta_symbol(&mut query, params)?;
                 self.get_private(UTA_POSITIONS, query).await
             }
+            "place_uta_strategy_order" => {
+                self.post_private(UTA_PLACE_STRATEGY_ORDER, Value::Object(params.body(&[
+                    "category", "symbol", "clientOid", "type", "tpslMode", "qty", "side",
+                    "posSide", "reduceOnly", "tpTriggerBy", "slTriggerBy", "takeProfit",
+                    "stopLoss", "tpOrderType", "slOrderType", "tpLimitPrice", "slLimitPrice",
+                    "triggerBy", "triggerPrice", "triggerOrderType", "triggerOrderPrice",
+                ])))
+                .await
+            }
+            "modify_uta_strategy_order" => {
+                self.post_private(UTA_MODIFY_STRATEGY_ORDER, Value::Object(params.body(&[
+                    "orderId", "clientOid", "qty", "tpTriggerBy", "slTriggerBy", "takeProfit",
+                    "stopLoss", "tpOrderType", "slOrderType", "tpLimitPrice", "slLimitPrice",
+                    "triggerBy", "triggerPrice", "triggerOrderType", "triggerOrderPrice",
+                ])))
+                .await
+            }
+            "cancel_uta_strategy_order" => {
+                require_one_identifier(params, &["orderId", "clientOid"])?;
+                self.post_private(
+                    UTA_CANCEL_STRATEGY_ORDER,
+                    Value::Object(params.body(&["orderId", "clientOid"])),
+                )
+                .await
+            }
+            "get_uta_unfilled_strategy_orders" => {
+                self.get_private(
+                    UTA_UNFILLED_STRATEGY_ORDERS,
+                    params.only(&["category", "type", "symbol", "idLessThan", "limit"]),
+                )
+                .await
+            }
+            "get_uta_history_strategy_orders" => {
+                self.get_private(
+                    UTA_HISTORY_STRATEGY_ORDERS,
+                    params.only(&[
+                        "category", "type", "symbol", "startTime", "endTime", "idLessThan", "limit",
+                    ]),
+                )
+                .await
+            }
             "place_futures_order" => self.place_futures_order_from_params(params).await,
             "place_futures_market_order" => {
                 self.place_futures_order_request(params, None, Some("market"), None)

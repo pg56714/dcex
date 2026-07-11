@@ -820,3 +820,71 @@ class TradeHTTP(HTTPManager):
                 limit=limit,
             ),
         )
+
+    async def place_uta_strategy_order(self, category: str, **params: object) -> dict[str, Any]:
+        """Place a Bitget UTA TP/SL or trigger strategy order."""
+        return await self._native_private(
+            "place_uta_strategy_order",
+            self._native_params(category=category, **params),
+        )
+
+    async def modify_uta_strategy_order(self, **params: object) -> dict[str, Any]:
+        """Modify a Bitget UTA strategy order."""
+        return await self._native_private(
+            "modify_uta_strategy_order", self._native_params(**params)
+        )
+
+    async def cancel_uta_strategy_order(
+        self,
+        orderId: str | None = None,
+        clientOid: str | None = None,
+    ) -> dict[str, Any]:
+        """Cancel a Bitget UTA strategy order."""
+        return await self._native_private(
+            "cancel_uta_strategy_order",
+            self._native_params(orderId=orderId, clientOid=clientOid),
+        )
+
+    async def get_uta_unfilled_strategy_orders(
+        self,
+        category: str,
+        type: str | None = None,
+        product_symbol: str | None = None,
+        idLessThan: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve pending Bitget UTA strategy orders."""
+        return await self._native_private(
+            "get_uta_unfilled_strategy_orders",
+            self._native_params(
+                category=category,
+                type=type,
+                product_symbol=product_symbol,
+                idLessThan=idLessThan,
+                limit=limit,
+            ),
+        )
+
+    async def get_uta_history_strategy_orders(
+        self,
+        category: str,
+        type: str | None = None,
+        product_symbol: str | None = None,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        idLessThan: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve historical Bitget UTA strategy orders."""
+        return await self._native_private(
+            "get_uta_history_strategy_orders",
+            self._native_params(
+                category=category,
+                type=type,
+                product_symbol=product_symbol,
+                startTime=startTime,
+                endTime=endTime,
+                idLessThan=idLessThan,
+                limit=limit,
+            ),
+        )

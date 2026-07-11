@@ -127,6 +127,13 @@ impl BitgetClient {
                 )
                 .await
             }
+            "get_uta_liquidations" => {
+                self.public_get(
+                    UTA_LIQUIDATIONS,
+                    self.normalize_symbol_params(params.into_inner())?,
+                )
+                .await
+            }
             _ => Err(DcexError::InvalidInput(format!(
                 "unsupported Bitget public method: {method_name}"
             ))),

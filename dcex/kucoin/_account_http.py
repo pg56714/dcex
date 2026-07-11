@@ -22,6 +22,17 @@ class AccountHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol),
         )
 
+    def get_uta_fee_rates(
+        self,
+        tradeType: str,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve KuCoin UTA actual fee rates for up to ten symbols."""
+        return self._native_private(
+            "get_uta_fee_rates",
+            self._native_params(tradeType=tradeType, symbol=symbol),
+        )
+
     def get_account_balance(
         self,
         currency: str | None = None,

@@ -81,6 +81,10 @@ impl KucoinClient {
                 self.normalize_symbol_query(&mut params, true)?;
                 (KucoinMarket::Spot, FUTURES_OPEN_INTEREST.to_string(), false)
             }
+            "get_uta_position_tiers" => {
+                self.normalize_symbol_query(&mut params, true)?;
+                (KucoinMarket::Spot, UTA_POSITION_TIERS.to_string(), false)
+            }
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported KuCoin public method: {method_name}"

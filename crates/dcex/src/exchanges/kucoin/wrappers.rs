@@ -7,6 +7,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_futures_contracts(),
         get_futures_kline(product_symbol => "product_symbol", timeframe => "timeframe"),
         get_futures_open_interest(product_symbol => "product_symbol"),
+        get_uta_position_tiers(),
         get_futures_orderbook(product_symbol => "product_symbol"),
         get_futures_public_trades(product_symbol => "product_symbol"),
         get_futures_ticker(product_symbol => "product_symbol"),
@@ -20,6 +21,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     private [
         get_futures_fee_rates(product_symbol => "product_symbol"),
         get_spot_fee_rates(product_symbol => "product_symbol"),
+        get_uta_fee_rates(trade_type => "tradeType"),
         cancel_futures_all_orders(),
         cancel_futures_order(order_id => "orderId"),
         cancel_futures_order_by_client_oid(client_oid => "clientOid"),

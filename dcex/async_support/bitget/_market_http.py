@@ -303,3 +303,23 @@ class MarketHTTP(HTTPManager):
                 productType=productType,
             ),
         )
+
+    async def get_uta_liquidations(
+        self,
+        product_symbol: str | None = None,
+        category: str | None = None,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA historical liquidation records."""
+        return await self._native_public(
+            "get_uta_liquidations",
+            self._params(
+                product_symbol=product_symbol,
+                category=category,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )

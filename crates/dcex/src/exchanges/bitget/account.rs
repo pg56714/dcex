@@ -106,6 +106,30 @@ impl BitgetClient {
             }
             "get_uta_account_assets" => self.get_private(UTA_ACCOUNT_ASSETS, Vec::new()).await,
             "get_uta_account_info" => self.get_private(UTA_ACCOUNT_INFO, Vec::new()).await,
+            "get_uta_all_fee_rates" => {
+                self.get_private(UTA_ALL_FEE_RATES, params.only(&["category"])).await
+            }
+            "get_uta_loan_data" => {
+                self.get_private(UTA_LOAN_DATA, params.only(&["coin"])).await
+            }
+            "get_uta_collateral_type" => {
+                self.get_private(UTA_COLLATERAL_TYPE, params.only(&["coin"])).await
+            }
+            "get_uta_custom_collateral_coins" => {
+                self.get_private(UTA_CUSTOM_COLLATERAL_COINS, Vec::new()).await
+            }
+            "get_uta_pre_set_leverage" => {
+                let mut query = params.only(&[
+                    "category",
+                    "coin",
+                    "marginMode",
+                    "leverage",
+                    "longLeverage",
+                    "shortLeverage",
+                ]);
+                self.push_uta_symbol(&mut query, params)?;
+                self.get_private(UTA_PRE_SET_LEVERAGE, query).await
+            }
             "set_uta_leverage" => {
                 let mut body = params.body(&[
                     "category",

@@ -15,6 +15,16 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "place_order" => self.place_order_from_params(params).await,
+            "pre_check_order" => self.pre_check_order_from_params(params).await,
+            "set_disconnected_cancel_all" => {
+                let mut body = Map::new();
+                insert_optional_string(&mut body, "product", params.get("product"));
+                body.insert(
+                    "timeWindow".to_string(),
+                    Value::String(params.required("timeWindow")?.to_string()),
+                );
+                self.post_request(DISCONNECTED_CANCEL_ALL, body).await
+            }
             "place_market_order" => {
                 let mut pairs = params.without(&["orderType"]);
                 pairs.push(("orderType".to_string(), "Market".to_string()));
@@ -126,6 +136,21 @@ impl BybitClient {
     }
 
     async fn place_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+        self.order_validation_request(params, PLACE_ORDER).await
+    }
+
+    async fn pre_check_order_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<ValidatedResponse> {
+        self.order_validation_request(params, ORDER_PRE_CHECK).await
+    }
+
+    async fn order_validation_request(
+        &self,
+        params: &BybitParams,
+        endpoint: &str,
+    ) -> Result<ValidatedResponse> {
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
         self.insert_symbol_category(&mut body, product_symbol)?;
@@ -170,7 +195,7 @@ impl BybitClient {
         ] {
             insert_optional_string(&mut body, key, params.get(key));
         }
-        self.post_request(PLACE_ORDER, body).await
+        self.post_request(endpoint, body).await
     }
 
     async fn amend_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {

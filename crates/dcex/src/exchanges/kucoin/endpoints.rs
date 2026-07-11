@@ -15,6 +15,8 @@ pub(super) const SPOT_ACCOUNT_BALANCE: &str = "/api/v1/accounts";
 pub(super) const SPOT_TRANSFER_QUOTAS: &str = "/api/v1/accounts/transferable";
 pub(super) const SPOT_FLEX_TRANSFER: &str = "/api/v3/accounts/universal-transfer";
 pub(super) const SPOT_TRADE_FEES: &str = "/api/v1/trade-fees";
+pub(super) const UTA_FEE_RATES: &str = "/api/ua/v1/user/fee-rate";
+pub(super) const UTA_POSITION_TIERS: &str = "/api/ua/v1/market/position-tiers";
 
 pub(super) const SPOT_PLACE_ORDER: &str = "/api/v1/hf/orders";
 pub(super) const SPOT_BATCH_ORDERS: &str = "/api/v1/hf/orders/multi";

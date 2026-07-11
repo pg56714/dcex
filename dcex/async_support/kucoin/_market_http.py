@@ -161,3 +161,25 @@ class MarketHTTP(HTTPManager):
                 pageSize=pageSize,
             ),
         )
+
+    async def get_uta_position_tiers(
+        self,
+        product_symbol: str | None = None,
+        tradeType: str = "FUTURES",
+        currency: str | None = None,
+        marginMode: str | None = None,
+        data: str = "RISK_LIMIT",
+        accountType: str = "UNIFIED",
+    ) -> dict[str, Any]:
+        """Retrieve KuCoin UTA futures position tiers and risk limits."""
+        return await self._native_public(
+            "get_uta_position_tiers",
+            self._params(
+                product_symbol=product_symbol,
+                tradeType=tradeType,
+                currency=currency,
+                marginMode=marginMode,
+                data=data,
+                accountType=accountType,
+            ),
+        )

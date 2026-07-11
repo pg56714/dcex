@@ -842,3 +842,36 @@ class TradeHTTP(HTTPManager):
             Dictionary containing account rate limit information.
         """
         return self._native_private("get_account_rate_limit", [])
+
+    def pre_check_order(
+        self,
+        product_symbol: str,
+        tdMode: str,
+        side: str,
+        ordType: str,
+        sz: str,
+        **params: object,
+    ) -> dict[str, Any]:
+        """Validate an OKX order before it reaches the matching engine."""
+        return self._native_private(
+            "pre_check_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                side=side,
+                ordType=ordType,
+                sz=sz,
+                **params,
+            ),
+        )
+
+    def set_cancel_all_after(
+        self,
+        timeOut: int | str,
+        tag: str | None = None,
+    ) -> dict[str, Any]:
+        """Configure OKX countdown cancellation for outstanding orders."""
+        return self._native_private(
+            "set_cancel_all_after",
+            self._native_params(timeOut=timeOut, tag=tag),
+        )

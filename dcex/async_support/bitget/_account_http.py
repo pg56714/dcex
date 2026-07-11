@@ -321,3 +321,45 @@ class AccountHTTP(HTTPManager):
                 marginCoin=marginCoin,
             ),
         )
+
+    async def get_uta_all_fee_rates(self, category: str) -> dict[str, Any]:
+        """Retrieve UTA fee rates for every pair in one product category."""
+        return await self._native_private(
+            "get_uta_all_fee_rates", self._native_params(category=category)
+        )
+
+    async def get_uta_loan_data(self, coin: str | None = None) -> dict[str, Any]:
+        """Retrieve current UTA borrowing and interest data."""
+        return await self._native_private("get_uta_loan_data", self._native_params(coin=coin))
+
+    async def get_uta_collateral_type(self, coin: str | None = None) -> dict[str, Any]:
+        """Retrieve the UTA collateral-type configuration."""
+        return await self._native_private("get_uta_collateral_type", self._native_params(coin=coin))
+
+    async def get_uta_custom_collateral_coins(self) -> dict[str, Any]:
+        """Retrieve coins supported as custom UTA collateral."""
+        return await self._native_private("get_uta_custom_collateral_coins", [])
+
+    async def get_uta_pre_set_leverage(
+        self,
+        category: str,
+        marginMode: str,
+        product_symbol: str | None = None,
+        coin: str | None = None,
+        leverage: str | int | None = None,
+        longLeverage: str | int | None = None,
+        shortLeverage: str | int | None = None,
+    ) -> dict[str, Any]:
+        """Preview UTA margin and maximum tradable size after a leverage change."""
+        return await self._native_private(
+            "get_uta_pre_set_leverage",
+            self._native_params(
+                category=category,
+                marginMode=marginMode,
+                product_symbol=product_symbol,
+                coin=coin,
+                leverage=leverage,
+                longLeverage=longLeverage,
+                shortLeverage=shortLeverage,
+            ),
+        )

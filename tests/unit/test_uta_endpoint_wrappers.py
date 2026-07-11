@@ -1,0 +1,130 @@
+"""Offline verification for newly added Bitget and KuCoin UTA endpoints."""
+
+from __future__ import annotations
+
+import pytest
+
+from tests.unit.endpoint_wrapper_helpers import (
+    _client_class,
+    _client_kwargs,
+    _patch_hyperliquid_market,
+    _wire_async,
+    _wire_sync,
+)
+
+
+UTA_CASES = (
+    ("bitget", "get_uta_all_fee_rates", {"category": "USDT-FUTURES"}, "NATIVE_PRIVATE"),
+    ("bitget", "get_uta_loan_data", {}, "NATIVE_PRIVATE"),
+    ("bitget", "get_uta_collateral_type", {}, "NATIVE_PRIVATE"),
+    ("bitget", "get_uta_custom_collateral_coins", {}, "NATIVE_PRIVATE"),
+    (
+        "bitget",
+        "get_uta_pre_set_leverage",
+        {"category": "USDT-FUTURES", "marginMode": "cross"},
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "bitget",
+        "get_uta_liquidations",
+        {"product_symbol": "BTC-USDT-SWAP"},
+        "NATIVE_PUBLIC",
+    ),
+    (
+        "kucoin",
+        "get_uta_fee_rates",
+        {"tradeType": "SPOT", "symbol": "BTC-USDT"},
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "kucoin",
+        "get_uta_position_tiers",
+        {
+            "product_symbol": "BTC-USDT-SWAP",
+            "tradeType": "FUTURES",
+            "data": "RISK_LIMIT",
+            "accountType": "UNIFIED",
+        },
+        "NATIVE_PUBLIC",
+    ),
+    (
+        "bybit",
+        "pre_check_order",
+        {
+            "product_symbol": "BTC-USDT-SWAP",
+            "side": "Buy",
+            "orderType": "Limit",
+            "qty": "1",
+        },
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "bybit",
+        "set_disconnected_cancel_all",
+        {"timeWindow": "10"},
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "okx",
+        "pre_check_order",
+        {
+            "product_symbol": "BTC-USDT-SWAP",
+            "tdMode": "cross",
+            "side": "buy",
+            "ordType": "limit",
+            "sz": "1",
+        },
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "okx",
+        "set_cancel_all_after",
+        {"timeOut": "10"},
+        "NATIVE_PRIVATE",
+    ),
+)
+
+
+@pytest.mark.parametrize(("exchange", "method_name", "kwargs", "request_type"), UTA_CASES)
+def test_sync_uta_wrappers_only_build_native_requests(
+    exchange: str,
+    method_name: str,
+    kwargs: dict[str, str],
+    request_type: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_hyperliquid_market(monkeypatch)
+    client = _client_class("sync", exchange)(**_client_kwargs(exchange))
+    calls = _wire_sync(client)
+
+    assert getattr(client, method_name)(**kwargs) == {"ok": True}
+    assert calls == [
+        {
+            "method": request_type,
+            "path": method_name,
+            "query": [(key, str(value)) for key, value in kwargs.items()],
+        }
+    ]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(("exchange", "method_name", "kwargs", "request_type"), UTA_CASES)
+async def test_async_uta_wrappers_only_build_native_requests(
+    exchange: str,
+    method_name: str,
+    kwargs: dict[str, str],
+    request_type: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_hyperliquid_market(monkeypatch)
+    client = _client_class("async", exchange)(**_client_kwargs(exchange))
+    calls = _wire_async(client)
+
+    assert await getattr(client, method_name)(**kwargs) == {"ok": True}
+    assert calls == [
+        {
+            "method": request_type,
+            "path": method_name,
+            "query": [(key, str(value)) for key, value in kwargs.items()],
+        }
+    ]

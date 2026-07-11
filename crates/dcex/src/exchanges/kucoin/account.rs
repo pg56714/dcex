@@ -34,6 +34,14 @@ impl KucoinClient {
                 )
                 .await
             }
+            "get_uta_fee_rates" => {
+                self.private_get(
+                    KucoinMarket::Spot,
+                    UTA_FEE_RATES,
+                    params.only(&["tradeType", "symbol"]),
+                )
+                .await
+            }
 
             "get_account_balance" => {
                 self.private_get(
