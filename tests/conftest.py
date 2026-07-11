@@ -20,7 +20,6 @@ _PRIVATE_ENV_VARS = {
     "bitmex": ("BITMEX_API_KEY", "BITMEX_API_SECRET"),
     "bybit": ("BYBIT_API_KEY", "BYBIT_API_SECRET"),
     "extended": ("EXTENDED_API_KEY",),
-    "gateio": ("GATEIO_API_KEY", "GATEIO_API_SECRET"),
     "kucoin": ("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
     "kraken": (
         "KRAKEN_SPOT_API_KEY",

@@ -12,7 +12,6 @@ use crate::exchanges::bitmart::BitmartClient;
 use crate::exchanges::bitmex::BitmexClient;
 use crate::exchanges::bybit::BybitClient;
 use crate::exchanges::extended::ExtendedClient;
-use crate::exchanges::gateio::GateioClient;
 use crate::exchanges::hyperliquid::HyperliquidClient;
 use crate::exchanges::kraken::KrakenClient;
 use crate::exchanges::kucoin::KucoinClient;
@@ -524,82 +523,6 @@ fn extended_market_info(market: &Value) -> Result<MarketInfo> {
         min_notional: "0".to_string(),
         size_per_contract: "1".to_string(),
     })
-}
-
-pub(super) async fn fetch_gateio(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = GateioClient::public(timeout)?;
-    let futures = client
-        .public_request("get_all_futures_contracts", vec![])
-        .await?;
-    let delivery = client
-        .public_request("get_all_delivery_contracts", vec![])
-        .await?;
-    let spot = client
-        .public_request("get_spot_all_currency_pairs", vec![])
-        .await?;
-    let mut rows = Vec::new();
-    rows.extend(parse_gateio_contracts(&futures.data, "swap", "futures")?);
-    rows.extend(parse_gateio_contracts(
-        &delivery.data,
-        "futures",
-        "delivery",
-    )?);
-    for market in value_array(Some(&spot.data)) {
-        let base = required_string(market, "base")?;
-        let quote = required_string(market, "quote")?;
-        rows.push(MarketInfo {
-            exchange: "gateio".to_string(),
-            exchange_symbol: required_string(market, "id")?,
-            product_symbol: format!("{base}-{quote}-SPOT"),
-            product_type: "spot".to_string(),
-            exchange_type: "spot".to_string(),
-            price_precision: decimal_precision(value_i32(market, "precision", 0)),
-            size_precision: decimal_precision(value_i32(market, "amount_precision", 0)),
-            min_size: value_string(market, "min_base_amount", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: value_string(market, "min_quote_amount", "0"),
-            size_per_contract: "1".to_string(),
-        });
-    }
-    Ok(rows)
-}
-
-fn parse_gateio_contracts(
-    data: &Value,
-    product_type: &str,
-    exchange_type: &str,
-) -> Result<Vec<MarketInfo>> {
-    let mut rows = Vec::new();
-    for market in value_array(Some(data)) {
-        let symbol = required_string(market, "name")?;
-        let parts = symbol.split('_').collect::<Vec<_>>();
-        if parts.len() < 2 || parts.len() > 3 {
-            continue;
-        }
-        let base = parts[0].to_string();
-        let quote = parts[1].to_string();
-        let product_symbol = if let Some(expiry) = parts.get(2) {
-            format!("{base}-{quote}-{expiry}-SWAP")
-        } else {
-            format!("{base}-{quote}-SWAP")
-        };
-        rows.push(MarketInfo {
-            exchange: "gateio".to_string(),
-            exchange_symbol: symbol,
-            product_symbol,
-            product_type: product_type.to_string(),
-            exchange_type: exchange_type.to_string(),
-            price_precision: value_string(market, "order_price_round", "0"),
-            size_precision: value_string(market, "order_size_min", "0"),
-            min_size: value_string(market, "order_size_min", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: "0".to_string(),
-            size_per_contract: value_string(market, "quanto_multiplier", "1"),
-        });
-    }
-    Ok(rows)
 }
 
 pub(super) async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInfo>> {

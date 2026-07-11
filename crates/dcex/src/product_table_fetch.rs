@@ -47,7 +47,6 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
         Exchange::BitMEX => self::exchanges::fetch_bitmex(timeout).await,
         Exchange::Bybit => self::exchanges::fetch_bybit(timeout).await,
         Exchange::Extended => self::exchanges::fetch_extended(timeout).await,
-        Exchange::GateIo => self::exchanges::fetch_gateio(timeout).await,
         Exchange::Hyperliquid => self::exchanges::fetch_hyperliquid(timeout).await,
         Exchange::KuCoin => self::exchanges::fetch_kucoin(timeout).await,
         Exchange::Kraken => self::exchanges::fetch_kraken(timeout).await,

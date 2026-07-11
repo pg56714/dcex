@@ -17,7 +17,6 @@ pub enum Exchange {
     BitMEX,
     Bybit,
     Extended,
-    GateIo,
     Hyperliquid,
     Kraken,
     KuCoin,
@@ -27,7 +26,7 @@ pub enum Exchange {
 }
 
 impl Exchange {
-    pub const ALL: [Self; 16] = [
+    pub const ALL: [Self; 15] = [
         Self::Aster,
         Self::Backpack,
         Self::Binance,
@@ -37,7 +36,6 @@ impl Exchange {
         Self::BitMEX,
         Self::Bybit,
         Self::Extended,
-        Self::GateIo,
         Self::Hyperliquid,
         Self::KuCoin,
         Self::Kraken,
@@ -57,7 +55,6 @@ impl Exchange {
             Self::BitMEX => "bitmex",
             Self::Bybit => "bybit",
             Self::Extended => "extended",
-            Self::GateIo => "gateio",
             Self::Hyperliquid => "hyperliquid",
             Self::Kraken => "kraken",
             Self::KuCoin => "kucoin",

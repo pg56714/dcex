@@ -104,8 +104,8 @@ impl OrderSide {
             (Self::Sell, "bybit" | "bitmex") => "Sell",
             (Self::Buy, "extended") => "BUY",
             (Self::Sell, "extended") => "SELL",
-            (Self::Buy, "okx" | "bitget" | "bitmart" | "gateio" | "kucoin" | "kraken") => "buy",
-            (Self::Sell, "okx" | "bitget" | "bitmart" | "gateio" | "kucoin" | "kraken") => "sell",
+            (Self::Buy, "okx" | "bitget" | "bitmart" | "kucoin" | "kraken") => "buy",
+            (Self::Sell, "okx" | "bitget" | "bitmart" | "kucoin" | "kraken") => "sell",
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "No OrderSide mapping for exchange: {exchange:?}"

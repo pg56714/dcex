@@ -54,11 +54,6 @@ async def extended() -> ProductTable:
     return await _fetch("extended")
 
 
-async def gateio() -> ProductTable:
-    """Fetch Gate.io product metadata."""
-    return await _fetch("gateio")
-
-
 async def hyperliquid() -> ProductTable:
     """Fetch Hyperliquid product metadata."""
     return await _fetch("hyperliquid")

@@ -1642,24 +1642,6 @@ mod tests {
     }
 
     #[test]
-    fn gateio_optional_setters_use_native_parameter_names() {
-        let client = DummyClient;
-        let request = ExchangeMethodRequest::private(&client, "wallet_transfer", Vec::new())
-            .currency_pair("BTC_USDT")
-            .from_("spot")
-            .settle("usdt");
-
-        assert_eq!(
-            request.params,
-            vec![
-                ("currency_pair".to_string(), "BTC_USDT".to_string()),
-                ("from".to_string(), "spot".to_string()),
-                ("settle".to_string(), "usdt".to_string())
-            ]
-        );
-    }
-
-    #[test]
     fn type_keyword_builders_use_native_type_parameter_name() {
         let client =
             crate::exchanges::aster::AsterClient::public(std::time::Duration::from_secs(1))
@@ -1764,7 +1746,6 @@ pub mod bitmart;
 pub mod bitmex;
 pub mod bybit;
 pub mod extended;
-pub mod gateio;
 pub mod hyperliquid;
 pub mod kraken;
 pub mod kucoin;

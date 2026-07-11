@@ -78,11 +78,6 @@ def extended() -> ProductTable:
     return _fetch("extended")
 
 
-def gateio() -> ProductTable:
-    """Fetch Gate.io product metadata."""
-    return _fetch("gateio")
-
-
 def hyperliquid() -> ProductTable:
     """Fetch Hyperliquid product metadata."""
     return _fetch("hyperliquid")
