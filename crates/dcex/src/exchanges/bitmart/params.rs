@@ -54,6 +54,13 @@ impl BitmartParams {
             })
             .collect()
     }
+
+    pub(super) fn body_all(&self) -> Map<String, Value> {
+        self.0
+            .iter()
+            .map(|(key, value)| (key.clone(), Value::String(value.clone())))
+            .collect()
+    }
 }
 
 pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {

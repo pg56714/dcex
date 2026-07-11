@@ -1,4 +1,5 @@
 """Kraken private trade async HTTP client."""
+# ruff: noqa: ASYNC109
 
 from typing import Any
 
@@ -323,6 +324,20 @@ class TradeHTTP(HTTPManager):
     async def cancel_spot_all_orders(self) -> dict[str, Any]:
         """Cancel all Kraken spot open orders."""
         return await self._native_private("cancel_spot_all_orders", [])
+
+    async def cancel_spot_all_orders_after(  # noqa: ASYNC109
+        self, timeout: str
+    ) -> dict[str, Any]:
+        """Set Kraken's spot cancel-all dead-man switch timeout in seconds."""
+        return await self._native_private(
+            "cancel_spot_all_orders_after", self._native_params(timeout=timeout)
+        )
+
+    async def get_spot_websocket_token(self, permissions: str | None = None) -> dict[str, Any]:
+        """Retrieve a Kraken authenticated WebSocket token."""
+        return await self._native_private(
+            "get_spot_websocket_token", self._native_params(permissions=permissions)
+        )
 
     async def place_futures_order(
         self,

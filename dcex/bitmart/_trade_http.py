@@ -8,6 +8,35 @@ from ._http_manager import HTTPManager
 class TradeHTTP(HTTPManager):
     """HTTP client for BitMart private trading APIs."""
 
+    def submit_spot_algo_order(self, product_symbol: str, **params: object) -> dict[str, Any]:
+        """Create a BitMart spot v4 algorithmic order."""
+        return self._native_private(
+            "submit_spot_algo_order",
+            self._native_params(product_symbol=product_symbol, **params),
+        )
+
+    def cancel_spot_algo_order(self, **params: object) -> dict[str, Any]:
+        """Cancel one BitMart spot v4 algorithmic order."""
+        return self._native_private("cancel_spot_algo_order", self._native_params(**params))
+
+    def cancel_all_spot_algo_orders(self, **params: object) -> dict[str, Any]:
+        """Cancel BitMart spot v4 algorithmic orders matching the supplied filters."""
+        return self._native_private("cancel_all_spot_algo_orders", self._native_params(**params))
+
+    def get_spot_algo_order(self, **params: object) -> dict[str, Any]:
+        """Retrieve a BitMart spot v4 algorithmic order by order ID."""
+        return self._native_private("get_spot_algo_order", self._native_params(**params))
+
+    def get_spot_algo_order_by_client_id(self, **params: object) -> dict[str, Any]:
+        """Retrieve a BitMart spot v4 algorithmic order by client order ID."""
+        return self._native_private(
+            "get_spot_algo_order_by_client_id", self._native_params(**params)
+        )
+
+    def get_spot_open_algo_orders(self, **params: object) -> dict[str, Any]:
+        """Retrieve current BitMart spot v4 algorithmic orders."""
+        return self._native_private("get_spot_open_algo_orders", self._native_params(**params))
+
     def place_spot_order(
         self,
         product_symbol: str,

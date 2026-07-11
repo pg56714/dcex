@@ -30,6 +30,22 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken spot server time."""
         return await self._native_public("get_server_time", [])
 
+    async def get_spot_system_status(self) -> dict[str, Any]:
+        """Retrieve Kraken spot system status."""
+        return await self._native_public("get_spot_system_status", [])
+
+    async def get_spot_assets(self, asset: str | None = None) -> dict[str, Any]:
+        """Retrieve Kraken spot asset metadata."""
+        return await self._native_public("get_spot_assets", self._native_params(asset=asset))
+
+    async def get_spot_spread(
+        self, product_symbol: str, since: str | None = None
+    ) -> dict[str, Any]:
+        """Retrieve recent Kraken spot bid/ask spreads."""
+        return await self._native_public(
+            "get_spot_spread", self._native_params(product_symbol=product_symbol, since=since)
+        )
+
     async def get_spot_asset_pairs(
         self,
         pair: str | None = None,

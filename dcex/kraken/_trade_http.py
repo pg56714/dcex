@@ -324,6 +324,18 @@ class TradeHTTP(HTTPManager):
         """Cancel all Kraken spot open orders."""
         return self._native_private("cancel_spot_all_orders", [])
 
+    def cancel_spot_all_orders_after(self, timeout: str) -> dict[str, Any]:
+        """Set Kraken's spot cancel-all dead-man switch timeout in seconds."""
+        return self._native_private(
+            "cancel_spot_all_orders_after", self._native_params(timeout=timeout)
+        )
+
+    def get_spot_websocket_token(self, permissions: str | None = None) -> dict[str, Any]:
+        """Retrieve a Kraken authenticated WebSocket token."""
+        return self._native_private(
+            "get_spot_websocket_token", self._native_params(permissions=permissions)
+        )
+
     def place_futures_order(
         self,
         product_symbol: str,

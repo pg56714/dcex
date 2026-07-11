@@ -282,6 +282,15 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    def set_cancel_all_after(
+        self, timeout: int, targetAccountId: int | None = None
+    ) -> dict[str, Any]:
+        """Set BitMEX's order cancel-all dead-man switch timeout in milliseconds."""
+        return self._native_private(
+            "set_cancel_all_after",
+            self._native_params(timeout=timeout, targetAccountId=targetAccountId),
+        )
+
     def get_order(
         self,
         product_symbol: str | None = None,

@@ -136,6 +136,24 @@ impl BitmartClient {
                 )
                 .await
             }
+            "submit_spot_algo_order" => {
+                self.spot_algo_request(SPOT_ALGO_SUBMIT_ORDER, params, true).await
+            }
+            "cancel_spot_algo_order" => {
+                self.spot_algo_request(SPOT_ALGO_CANCEL_ORDER, params, false).await
+            }
+            "cancel_all_spot_algo_orders" => {
+                self.spot_algo_request(SPOT_ALGO_CANCEL_ALL, params, false).await
+            }
+            "get_spot_algo_order" => {
+                self.spot_algo_request(SPOT_ALGO_ORDER, params, false).await
+            }
+            "get_spot_algo_order_by_client_id" => {
+                self.spot_algo_request(SPOT_ALGO_CLIENT_ORDER, params, false).await
+            }
+            "get_spot_open_algo_orders" => {
+                self.spot_algo_request(SPOT_ALGO_OPEN_ORDERS, params, false).await
+            }
             "place_contract_order" => {
                 self.contract_order_from_params(params, None, None, None)
                     .await
@@ -291,6 +309,23 @@ impl BitmartClient {
     ) -> Result<ValidatedResponse> {
         let body = self.spot_order_body_from_params(params, side_override, type_override)?;
         self.post_private(BitmartMarket::Spot, SPOT_SUBMIT_ORDER, Value::Object(body))
+            .await
+    }
+
+    async fn spot_algo_request(
+        &self,
+        path: &str,
+        params: &BitmartParams,
+        require_symbol: bool,
+    ) -> Result<ValidatedResponse> {
+        let mut body = params.body_all();
+        body.remove("product_symbol");
+        if require_symbol {
+            self.insert_required_symbol(&mut body, params, true)?;
+        } else {
+            self.insert_optional_symbol(&mut body, params, true)?;
+        }
+        self.post_private(BitmartMarket::Spot, path, Value::Object(body))
             .await
     }
 

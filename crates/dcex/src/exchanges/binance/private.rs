@@ -1,4 +1,5 @@
 use super::client::BinanceClient;
+use super::endpoints::*;
 use super::params::{
     BinanceAccountTradesParams, BinanceAlgoOrderLookupParams, BinanceAllFuturesAlgoOrdersParams,
     BinanceAllOpenOrdersParams, BinanceAllOrdersParams, BinanceFundingWalletParams,
@@ -8,9 +9,55 @@ use super::params::{
     BinanceWalletBalanceParams, PublicParams,
 };
 use crate::exchange::ValidatedResponse;
+use crate::http::HttpMethod;
 use crate::{DcexError, Result};
 
 impl BinanceClient {
+    pub fn create_oco_order(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "create_oco_order",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
+    }
+
+    pub fn create_oto_order(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "create_oto_order",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
+    }
+
+    pub fn create_otoco_order(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "create_otoco_order",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
+    }
+
+    pub fn get_prevented_matches(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_prevented_matches", Vec::new())
+    }
+
+    pub fn get_allocations(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_allocations", Vec::new())
+    }
+
+    pub fn get_order_rate_limit(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(self, "get_order_rate_limit", Vec::new())
+    }
+
     pub async fn private_request(
         &self,
         method_name: &str,
@@ -114,6 +161,30 @@ impl BinanceClient {
                     params.without(&["product_symbol", "side", "type_"]),
                 )
                 .await
+            }
+            "create_oco_order" => {
+                self.spot_signed_request(HttpMethod::Post, SPOT_ORDER_LIST_OCO, params, true)
+                    .await
+            }
+            "create_oto_order" => {
+                self.spot_signed_request(HttpMethod::Post, SPOT_ORDER_LIST_OTO, params, true)
+                    .await
+            }
+            "create_otoco_order" => {
+                self.spot_signed_request(HttpMethod::Post, SPOT_ORDER_LIST_OTOCO, params, true)
+                    .await
+            }
+            "get_prevented_matches" => {
+                self.spot_signed_request(HttpMethod::Get, SPOT_PREVENTED_MATCHES, params, false)
+                    .await
+            }
+            "get_allocations" => {
+                self.spot_signed_request(HttpMethod::Get, SPOT_ALLOCATIONS, params, false)
+                    .await
+            }
+            "get_order_rate_limit" => {
+                self.spot_signed_request(HttpMethod::Get, SPOT_ORDER_RATE_LIMIT, params, false)
+                    .await
             }
             "place_futures_algo_order" => {
                 self.send_place_futures_algo_order(
@@ -371,5 +442,27 @@ impl BinanceClient {
                 "unsupported Binance private method: {method_name}"
             ))),
         }
+    }
+
+    async fn spot_signed_request(
+        &self,
+        method: HttpMethod,
+        path: &str,
+        params: PublicParams,
+        require_symbol: bool,
+    ) -> Result<ValidatedResponse> {
+        let product_symbol = params.get("product_symbol");
+        if require_symbol && product_symbol.is_none() {
+            return Err(DcexError::InvalidInput(
+                "Binance product_symbol is required.".to_string(),
+            ));
+        }
+
+        let mut query = params.without(&["product_symbol"]);
+        if let Some(product_symbol) = product_symbol {
+            query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+        }
+        self.request(method, super::client::BinanceMarket::Spot, path, query, true)
+            .await
     }
 }

@@ -22,6 +22,7 @@ pub(super) const PLACE_ORDER: &str = "/api/v2/order";
 pub(super) const AMEND_ORDER: &str = "/api/v2/order";
 pub(super) const CANCEL_ORDER: &str = "/api/v2/order";
 pub(super) const CANCEL_ALL_ORDERS: &str = "/api/v2/order/all";
+pub(super) const CANCEL_ALL_AFTER: &str = "/api/v2/order/cancelAllAfter";
 pub(super) const QUERY_ORDER: &str = "/api/v1/order";
 
 pub(super) const GET_EXECUTIONS: &str = "/api/v1/execution";

@@ -15,7 +15,13 @@ impl KrakenClient {
         let mut params = KrakenParams::from_pairs(params).into_inner();
         let (auth, path) = match method_name {
             "get_server_time" => (KrakenAuth::Spot, SPOT_SERVER_TIME.to_string()),
+            "get_spot_system_status" => (KrakenAuth::Spot, SPOT_SYSTEM_STATUS.to_string()),
+            "get_spot_assets" => (KrakenAuth::Spot, SPOT_ASSETS.to_string()),
             "get_spot_asset_pairs" => (KrakenAuth::Spot, SPOT_ASSET_PAIRS.to_string()),
+            "get_spot_spread" => {
+                self.normalize_symbol_query(&mut params, "pair", "")?;
+                (KrakenAuth::Spot, SPOT_SPREAD.to_string())
+            }
             "get_spot_ticker" => {
                 self.normalize_symbol_query(&mut params, "pair", "")?;
                 (KrakenAuth::Spot, SPOT_TICKER.to_string())

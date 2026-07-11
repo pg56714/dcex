@@ -23,6 +23,12 @@ pub(super) const SPOT_OPEN_ORDERS: &str = "/spot/v4/query/open-orders";
 pub(super) const SPOT_ACCOUNT_ORDERS: &str = "/spot/v4/query/history-orders";
 pub(super) const SPOT_ACCOUNT_TRADE_LIST: &str = "/spot/v4/query/trades";
 pub(super) const SPOT_ORDER_TRADE_LIST: &str = "/spot/v4/query/order-trades";
+pub(super) const SPOT_ALGO_SUBMIT_ORDER: &str = "/spot/v4/algo/submit_order";
+pub(super) const SPOT_ALGO_CANCEL_ORDER: &str = "/spot/v4/algo/cancel_order";
+pub(super) const SPOT_ALGO_CANCEL_ALL: &str = "/spot/v4/algo/cancel_all";
+pub(super) const SPOT_ALGO_ORDER: &str = "/spot/v4/query/algo/order";
+pub(super) const SPOT_ALGO_CLIENT_ORDER: &str = "/spot/v4/query/algo/client-order";
+pub(super) const SPOT_ALGO_OPEN_ORDERS: &str = "/spot/v4/query/algo/open-orders";
 
 pub(super) const FUTURES_CONTRACT_DETAILS: &str = "/contract/public/details";
 pub(super) const FUTURES_DEPTH: &str = "/contract/public/depth";

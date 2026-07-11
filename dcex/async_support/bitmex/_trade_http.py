@@ -1,4 +1,5 @@
 """BitMEX async private order HTTP client backed by Rust."""
+# ruff: noqa: ASYNC109
 
 from typing import Any
 
@@ -280,6 +281,15 @@ class TradeHTTP(HTTPManager):
                 targetAccountIds=targetAccountIds,
                 text=text,
             ),
+        )
+
+    async def set_cancel_all_after(
+        self, timeout: int, targetAccountId: int | None = None
+    ) -> dict[str, Any]:  # noqa: ASYNC109
+        """Set BitMEX's order cancel-all dead-man switch timeout in milliseconds."""
+        return await self._native_private(
+            "set_cancel_all_after",
+            self._native_params(timeout=timeout, targetAccountId=targetAccountId),
         )
 
     async def get_order(

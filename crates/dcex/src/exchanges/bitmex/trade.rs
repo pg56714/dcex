@@ -142,6 +142,11 @@ impl BitmexClient {
             "cancel_all_orders" => {
                 let body = self.cancel_all_orders_body_from_params(params)?;
                 self.private_json(HttpMethod::Delete, CANCEL_ALL_ORDERS, Value::Object(body))
+                .await
+            }
+            "set_cancel_all_after" => {
+                let body = params.body(&[], &["timeout", "targetAccountId"], &[], &[]);
+                self.private_json(HttpMethod::Post, CANCEL_ALL_AFTER, Value::Object(body))
                     .await
             }
             "get_order" => {

@@ -7,6 +7,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_futures_fee_rates(),
         amend_order(),
         cancel_all_orders(),
+        set_cancel_all_after(timeout => "timeout"),
         cancel_order(),
         get_executions(),
         get_margin(),

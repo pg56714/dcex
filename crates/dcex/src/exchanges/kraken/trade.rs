@@ -106,6 +106,22 @@ impl KrakenClient {
                 self.private_post(KrakenAuth::Spot, SPOT_CANCEL_ALL, Vec::new())
                     .await
             }
+            "cancel_spot_all_orders_after" => {
+                self.private_post(
+                    KrakenAuth::Spot,
+                    SPOT_CANCEL_ALL_AFTER,
+                    params.only(&["timeout"]),
+                )
+                .await
+            }
+            "get_spot_websocket_token" => {
+                self.private_post(
+                    KrakenAuth::Spot,
+                    SPOT_WEBSOCKET_TOKEN,
+                    params.only(&["permissions"]),
+                )
+                .await
+            }
             "place_futures_order" => {
                 self.place_futures_order_request(params, None, None, None)
                     .await

@@ -203,6 +203,42 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    async def create_oco_order(self, product_symbol: str, **params: object) -> dict:
+        """Create a Binance spot one-cancels-the-other order list."""
+        return await self._native_private(
+            "create_oco_order", self._params(product_symbol=product_symbol, **params)
+        )
+
+    async def create_oto_order(self, product_symbol: str, **params: object) -> dict:
+        """Create a Binance spot one-triggers-the-other order list."""
+        return await self._native_private(
+            "create_oto_order", self._params(product_symbol=product_symbol, **params)
+        )
+
+    async def create_otoco_order(self, product_symbol: str, **params: object) -> dict:
+        """Create a Binance spot one-triggers-an-OCO order list."""
+        return await self._native_private(
+            "create_otoco_order", self._params(product_symbol=product_symbol, **params)
+        )
+
+    async def get_prevented_matches(
+        self, product_symbol: str | None = None, **params: object
+    ) -> dict:
+        """Retrieve spot self-trade-prevention match records."""
+        return await self._native_private(
+            "get_prevented_matches", self._params(product_symbol=product_symbol, **params)
+        )
+
+    async def get_allocations(self, product_symbol: str | None = None, **params: object) -> dict:
+        """Retrieve spot allocation records."""
+        return await self._native_private(
+            "get_allocations", self._params(product_symbol=product_symbol, **params)
+        )
+
+    async def get_order_rate_limit(self, **params: object) -> dict:
+        """Retrieve the account's current spot order-count limits."""
+        return await self._native_private("get_order_rate_limit", self._params(**params))
+
     async def place_futures_algo_order(
         self,
         product_symbol: str,
