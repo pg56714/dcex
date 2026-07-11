@@ -8,6 +8,20 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """Async HTTP client for Bitget private account operations."""
 
+    async def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current Bitget Spot maker and taker fee rates."""
+        return await self._native_private(
+            "get_spot_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
+    async def get_futures_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current Bitget Futures maker and taker fee rates."""
+        return await self._native_private(
+            "get_futures_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
     async def get_all_account_balance(self) -> dict[str, Any]:
         """Retrieve Bitget all-account balance overview."""
         return await self._native_private("get_all_account_balance", [])

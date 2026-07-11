@@ -466,38 +466,82 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
-    def get_fee_rates(
+    def _request_fee_rates(
         self,
-        instType: str,
+        method_name: str,
         ruleType: str | None = None,
         product_symbol: str | None = None,
         uly: str | None = None,
         instFamily: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Get fee rates information.
-
-        Args:
-            instType: Instrument type (SPOT, MARGIN, SWAP, FUTURES, OPTION)
-            ruleType: Trading rule types (normal: normal trading, pre_market:
-                pre-market trading). ruleType can not be passed through together
-                with product_symbol/instFamily/uly
-            product_symbol: Product symbol
-            uly: Underlying asset symbol
-            instFamily: Instrument family
-
-        Returns:
-            Dictionary containing fee rates information.
-        """
         return self._native_private(
-            "get_fee_rates",
+            method_name,
             self._native_params(
-                instType=instType,
                 ruleType=ruleType,
                 product_symbol=product_symbol,
                 uly=uly,
                 instFamily=instFamily,
             ),
+        )
+
+    def get_spot_fee_rates(
+        self,
+        ruleType: str | None = None,
+        product_symbol: str | None = None,
+        uly: str | None = None,
+        instFamily: str | None = None,
+    ) -> dict[str, Any]:
+        """Get OKX Spot trading fee rates."""
+        return self._request_fee_rates(
+            "get_spot_fee_rates", ruleType, product_symbol, uly, instFamily
+        )
+
+    def get_margin_fee_rates(
+        self,
+        ruleType: str | None = None,
+        product_symbol: str | None = None,
+        uly: str | None = None,
+        instFamily: str | None = None,
+    ) -> dict[str, Any]:
+        """Get OKX margin trading fee rates."""
+        return self._request_fee_rates(
+            "get_margin_fee_rates", ruleType, product_symbol, uly, instFamily
+        )
+
+    def get_swap_fee_rates(
+        self,
+        ruleType: str | None = None,
+        product_symbol: str | None = None,
+        uly: str | None = None,
+        instFamily: str | None = None,
+    ) -> dict[str, Any]:
+        """Get OKX perpetual-swap trading fee rates."""
+        return self._request_fee_rates(
+            "get_swap_fee_rates", ruleType, product_symbol, uly, instFamily
+        )
+
+    def get_futures_fee_rates(
+        self,
+        ruleType: str | None = None,
+        product_symbol: str | None = None,
+        uly: str | None = None,
+        instFamily: str | None = None,
+    ) -> dict[str, Any]:
+        """Get OKX delivery-futures trading fee rates."""
+        return self._request_fee_rates(
+            "get_futures_fee_rates", ruleType, product_symbol, uly, instFamily
+        )
+
+    def get_option_fee_rates(
+        self,
+        ruleType: str | None = None,
+        product_symbol: str | None = None,
+        uly: str | None = None,
+        instFamily: str | None = None,
+    ) -> dict[str, Any]:
+        """Get OKX option trading fee rates."""
+        return self._request_fee_rates(
+            "get_option_fee_rates", ruleType, product_symbol, uly, instFamily
         )
 
     def get_interest_accrued(

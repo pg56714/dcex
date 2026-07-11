@@ -4,6 +4,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
     BitmartClient;
     public [];
     private [
+        get_futures_fee_rates(product_symbol => "product_symbol"),
+        get_spot_fee_rates(product_symbol => "product_symbol"),
         cancel_all_contract_order(product_symbol => "product_symbol"),
         cancel_contract_order(product_symbol => "product_symbol"),
         cancel_spot_all_order(),

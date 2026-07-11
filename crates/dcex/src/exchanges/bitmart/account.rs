@@ -12,6 +12,25 @@ impl BitmartClient {
         params: &BitmartParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "get_spot_fee_rates" | "get_futures_fee_rates" => {
+                let (market, path, spot) = match method_name {
+                    "get_spot_fee_rates" => (BitmartMarket::Spot, SPOT_TRADE_FEE, true),
+                    "get_futures_fee_rates" => {
+                        (BitmartMarket::Futures, FUTURES_TRADE_FEE_RATE, false)
+                    }
+                    _ => unreachable!(),
+                };
+                let product_symbol = params.required("product_symbol")?;
+                self.get_private(
+                    market,
+                    path,
+                    vec![(
+                        "symbol".to_string(),
+                        self.exchange_symbol(product_symbol, spot)?,
+                    )],
+                )
+                .await
+            }
             "get_account_balance" => {
                 let mut query = Vec::new();
                 query.push((

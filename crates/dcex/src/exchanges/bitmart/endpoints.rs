@@ -11,6 +11,7 @@ pub(super) const SPOT_KLINE: &str = "/spot/quotation/v3/lite-klines";
 pub(super) const ACCOUNT_BALANCE: &str = "/account/v1/wallet";
 pub(super) const ACCOUNT_CURRENCIES: &str = "/account/v1/currencies";
 pub(super) const SPOT_WALLET: &str = "/spot/v1/wallet";
+pub(super) const SPOT_TRADE_FEE: &str = "/spot/v1/trade_fee";
 pub(super) const DEPOSIT_ADDRESS: &str = "/account/v1/deposit/address";
 
 pub(super) const SPOT_SUBMIT_ORDER: &str = "/spot/v2/submit_order";
@@ -33,6 +34,7 @@ pub(super) const FUTURES_MARK_PRICE_KLINE: &str = "/contract/public/markprice-kl
 pub(super) const FUTURES_LEVERAGE_BRACKET: &str = "/contract/public/leverage-bracket";
 
 pub(super) const FUTURES_CONTRACT_ASSETS: &str = "/contract/private/assets-detail";
+pub(super) const FUTURES_TRADE_FEE_RATE: &str = "/contract/private/trade-fee-rate";
 pub(super) const FUTURES_SUBMIT_ORDER: &str = "/contract/private/submit-order";
 pub(super) const FUTURES_MODIFY_LIMIT_ORDER: &str = "/contract/private/modify-limit-order";
 pub(super) const FUTURES_CANCEL_ORDER: &str = "/contract/private/cancel-order";

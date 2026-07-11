@@ -8,6 +8,20 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """Async HTTP client for BitMart private account APIs."""
 
+    async def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current BitMart Spot maker and taker fee rates."""
+        return await self._native_private(
+            "get_spot_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
+    async def get_futures_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current BitMart Futures maker and taker fee rates."""
+        return await self._native_private(
+            "get_futures_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
     async def get_account_balance(
         self,
         currency: str | None = None,

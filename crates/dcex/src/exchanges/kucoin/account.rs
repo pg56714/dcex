@@ -15,6 +15,26 @@ impl KucoinClient {
         params: &KucoinParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "get_spot_fee_rates" | "get_futures_fee_rates" => {
+                let product_symbol = params.required("product_symbol")?;
+                let (market, path, query_key, futures) = match method_name {
+                    "get_spot_fee_rates" => (KucoinMarket::Spot, SPOT_TRADE_FEES, "symbols", false),
+                    "get_futures_fee_rates" => {
+                        (KucoinMarket::Futures, FUTURES_TRADE_FEES, "symbol", true)
+                    }
+                    _ => unreachable!(),
+                };
+                self.private_get(
+                    market,
+                    path,
+                    vec![(
+                        query_key.to_string(),
+                        self.exchange_symbol(product_symbol, futures)?,
+                    )],
+                )
+                .await
+            }
+
             "get_account_balance" => {
                 self.private_get(
                     KucoinMarket::Spot,

@@ -17,6 +17,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_order_book(product_symbol => "product_symbol"),
     ];
     private [
+        get_futures_fee_rates(product_symbol => "product_symbol"),
+        get_spot_fee_rates(product_symbol => "product_symbol"),
         amend_futures_single_order(order_id => "order_id"),
         amend_spot_single_order(order_id => "order_id"),
         cancel_contract_all_order_matched(product_symbol => "product_symbol"),

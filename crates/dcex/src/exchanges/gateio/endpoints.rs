@@ -9,6 +9,7 @@ pub(super) const FUTURES_CONTRACTS: &str = "/futures/{settle}/contracts";
 pub(super) const FUTURES_CONTRACT: &str = "/futures/{settle}/contracts/{contract}";
 pub(super) const FUTURES_ACCOUNT: &str = "/futures/{settle}/accounts";
 pub(super) const FUTURES_ACCOUNT_BOOK: &str = "/futures/{settle}/account_book";
+pub(super) const FUTURES_FEE: &str = "/futures/{settle}/fee";
 pub(super) const FUTURES_POSITIONS: &str = "/futures/{settle}/positions";
 pub(super) const FUTURES_POSITION: &str = "/futures/{settle}/positions/{contract}";
 pub(super) const FUTURES_POSITION_LEVERAGE: &str =

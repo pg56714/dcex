@@ -13,6 +13,9 @@ impl HyperliquidClient {
         params: &HyperliquidParams,
     ) -> Result<Option<ValidatedResponse>> {
         let payload = match method_name {
+            "get_spot_fee_rates" | "get_futures_fee_rates" => {
+                json!({"type": "userFees", "user": params.required("user")?})
+            }
             "clearinghouse_state" => {
                 let mut payload = json!({
                     "type": "clearinghouseState",

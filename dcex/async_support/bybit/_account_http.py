@@ -52,16 +52,31 @@ class AccountHTTP(HTTPManager):
             self._native_params(coin=coin),
         )
 
-    async def get_fee_rates(
+    async def _request_fee_rates(
         self,
+        method_name: str,
         product_symbol: str | None = None,
-        category: str | None = None,
     ) -> dict[str, Any]:
-        """Get trading fee rates."""
         return await self._native_private(
-            "get_fee_rates",
-            self._native_params(product_symbol=product_symbol, category=category),
+            method_name,
+            self._native_params(product_symbol=product_symbol),
         )
+
+    async def get_spot_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Get Bybit Spot trading fee rates."""
+        return await self._request_fee_rates("get_spot_fee_rates", product_symbol)
+
+    async def get_linear_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Get Bybit linear-contract trading fee rates."""
+        return await self._request_fee_rates("get_linear_fee_rates", product_symbol)
+
+    async def get_inverse_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Get Bybit inverse-contract trading fee rates."""
+        return await self._request_fee_rates("get_inverse_fee_rates", product_symbol)
+
+    async def get_option_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Get Bybit option trading fee rates."""
+        return await self._request_fee_rates("get_option_fee_rates", product_symbol)
 
     async def get_account_info(self) -> dict[str, Any]:
         """Get account information."""

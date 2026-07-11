@@ -49,8 +49,8 @@ async def test_get_collateral_info(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
-async def test_get_fee_rates(client):
-    res = await client.get_fee_rates()
+async def test_get_spot_fee_rates(client):
+    res = await client.get_spot_fee_rates()
     assert res is not None
 
 

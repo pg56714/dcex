@@ -56,12 +56,38 @@ impl BybitClient {
                 self.get_request(GET_COLLATERAL_INFO, params.only(&["coin"]))
                     .await
             }
-            "get_fee_rates" => {
+            "get_spot_fee_rates"
+            | "get_linear_fee_rates"
+            | "get_inverse_fee_rates"
+            | "get_option_fee_rates" => {
                 let mut query = Vec::new();
                 if let Some(product_symbol) = params.get("product_symbol") {
-                    self.push_symbol_category(&mut query, product_symbol, true)?;
+                    let category = match method_name {
+                        "get_spot_fee_rates" => "spot",
+                        "get_linear_fee_rates" => "linear",
+                        "get_inverse_fee_rates" => "inverse",
+                        "get_option_fee_rates" => "option",
+                        _ => unreachable!(),
+                    };
+                    let product_category =
+                        self.category_for_product_symbol(product_symbol, category)?;
+                    if product_category != category {
+                        return Err(crate::DcexError::InvalidInput(format!(
+                            "{method_name} does not support product_symbol: {product_symbol}"
+                        )));
+                    }
+                    query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+                    query.push(("category".to_string(), category.to_string()));
+                } else {
+                    let category = match method_name {
+                        "get_spot_fee_rates" => "spot",
+                        "get_linear_fee_rates" => "linear",
+                        "get_inverse_fee_rates" => "inverse",
+                        "get_option_fee_rates" => "option",
+                        _ => unreachable!(),
+                    };
+                    query.push(("category".to_string(), category.to_string()));
                 }
-                push_optional(&mut query, "category", params.get("category"));
                 self.get_request(GET_FEE_RATE, query).await
             }
             "get_account_info" => self.get_request(GET_ACCOUNT_INFO, Vec::new()).await,

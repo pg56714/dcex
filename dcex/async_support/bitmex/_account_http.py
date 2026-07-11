@@ -8,6 +8,10 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """Async HTTP client for BitMEX account APIs."""
 
+    async def get_futures_fee_rates(self) -> list[dict[str, Any]]:
+        """Retrieve current BitMEX Futures maker and taker fee rates."""
+        return await self._native_private("get_futures_fee_rates", [])
+
     async def get_wallet_summary(
         self,
         currency: str = "all",

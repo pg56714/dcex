@@ -14,6 +14,7 @@ pub(super) const SPOT_KLINE: &str = "/api/v1/market/candles";
 pub(super) const SPOT_ACCOUNT_BALANCE: &str = "/api/v1/accounts";
 pub(super) const SPOT_TRANSFER_QUOTAS: &str = "/api/v1/accounts/transferable";
 pub(super) const SPOT_FLEX_TRANSFER: &str = "/api/v3/accounts/universal-transfer";
+pub(super) const SPOT_TRADE_FEES: &str = "/api/v1/trade-fees";
 
 pub(super) const SPOT_PLACE_ORDER: &str = "/api/v1/hf/orders";
 pub(super) const SPOT_BATCH_ORDERS: &str = "/api/v1/hf/orders/multi";
@@ -31,6 +32,7 @@ pub(super) const FUTURES_KLINE: &str = "/api/v1/kline/query";
 pub(super) const FUTURES_OPEN_INTEREST: &str = "/api/ua/v1/market/open-interest";
 
 pub(super) const FUTURES_ACCOUNT_OVERVIEW: &str = "/api/v1/account-overview";
+pub(super) const FUTURES_TRADE_FEES: &str = "/api/v1/trade-fees";
 pub(super) const FUTURES_POSITIONS: &str = "/api/v1/positions";
 pub(super) const FUTURES_POSITION: &str = "/api/v1/position";
 pub(super) const FUTURES_POSITION_MODE: &str = "/api/v2/position/getPositionMode";

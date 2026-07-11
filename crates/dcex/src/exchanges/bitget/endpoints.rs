@@ -21,6 +21,7 @@ pub(super) const FUTURES_OPEN_INTEREST: &str = "/api/v2/mix/market/open-interest
 
 pub(super) const COMMON_ALL_ACCOUNT_BALANCE: &str = "/api/v2/account/all-account-balance";
 pub(super) const COMMON_FUNDING_ASSETS: &str = "/api/v2/account/funding-assets";
+pub(super) const COMMON_TRADE_RATE: &str = "/api/v2/common/trade-rate";
 pub(super) const SPOT_ACCOUNT_INFO: &str = "/api/v2/spot/account/info";
 pub(super) const SPOT_ACCOUNT_ASSETS: &str = "/api/v2/spot/account/assets";
 pub(super) const SPOT_ACCOUNT_BILLS: &str = "/api/v2/spot/account/bills";

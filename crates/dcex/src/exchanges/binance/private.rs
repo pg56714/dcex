@@ -18,6 +18,14 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
         match method_name {
+            "get_spot_fee_rates" => {
+                self.get_spot_fee_rates(params.required("product_symbol")?)
+                    .await
+            }
+            "get_futures_fee_rates" => {
+                self.get_futures_fee_rates(params.required("product_symbol")?)
+                    .await
+            }
             "get_account_balance" => {
                 self.get_account_balance(params.get("market_type").unwrap_or("swap"))
                     .await

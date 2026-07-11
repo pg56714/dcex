@@ -42,8 +42,8 @@ def test_get_collateral_info(client):
 
 
 @pytest.mark.private
-def test_get_fee_rates(client):
-    res = client.get_fee_rates()
+def test_get_spot_fee_rates(client):
+    res = client.get_spot_fee_rates()
     assert res is not None
 
 

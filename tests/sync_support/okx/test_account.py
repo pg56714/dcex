@@ -139,8 +139,8 @@ def test_get_max_loan(client):
 
 
 @pytest.mark.private
-def test_get_fee_rates(client):
-    res = client.get_fee_rates(product_symbol="BTC-USDT-SPOT", instType="SPOT")
+def test_get_spot_fee_rates(client):
+    res = client.get_spot_fee_rates(product_symbol="BTC-USDT-SPOT")
     assert res is not None
 
 

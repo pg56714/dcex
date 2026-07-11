@@ -23,6 +23,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_tickers(),
     ];
     private [
+        get_futures_fee_rates(product_symbol => "product_symbol"),
+        get_spot_fee_rates(product_symbol => "product_symbol"),
         cancel_futures_batch_orders(product_symbol => "product_symbol"),
         cancel_futures_order(product_symbol => "product_symbol"),
         cancel_spot_batch_orders(order_list => "orderList"),

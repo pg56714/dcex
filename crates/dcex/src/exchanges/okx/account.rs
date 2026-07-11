@@ -135,11 +135,20 @@ impl OkxClient {
                 push_optional(&mut query, "mgnCcy", params.get("mgnCcy"));
                 self.get_request(ACCOUNT_MAX_LOAN, query).await
             }
-            "get_fee_rates" => {
-                let mut query = vec![(
-                    "instType".to_string(),
-                    params.required("instType")?.to_string(),
-                )];
+            "get_spot_fee_rates"
+            | "get_margin_fee_rates"
+            | "get_swap_fee_rates"
+            | "get_futures_fee_rates"
+            | "get_option_fee_rates" => {
+                let inst_type = match method_name {
+                    "get_spot_fee_rates" => "SPOT",
+                    "get_margin_fee_rates" => "MARGIN",
+                    "get_swap_fee_rates" => "SWAP",
+                    "get_futures_fee_rates" => "FUTURES",
+                    "get_option_fee_rates" => "OPTION",
+                    _ => unreachable!(),
+                };
+                let mut query = vec![("instType".to_string(), inst_type.to_string())];
                 push_optional(&mut query, "ruleType", params.get("ruleType"));
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 push_optional(&mut query, "uly", params.get("uly"));

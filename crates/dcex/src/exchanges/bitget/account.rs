@@ -14,6 +14,17 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "get_spot_fee_rates" | "get_futures_fee_rates" => {
+                let mut query = Vec::new();
+                self.push_required_product_symbol(&mut query, params)?;
+                let business_type = match method_name {
+                    "get_spot_fee_rates" => "spot",
+                    "get_futures_fee_rates" => "mix",
+                    _ => unreachable!(),
+                };
+                query.push(("businessType".to_string(), business_type.to_string()));
+                self.get_private(COMMON_TRADE_RATE, query).await
+            }
             "get_all_account_balance" => {
                 self.get_private(COMMON_ALL_ACCOUNT_BALANCE, Vec::new())
                     .await

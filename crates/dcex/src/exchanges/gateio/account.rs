@@ -14,6 +14,18 @@ impl GateioClient {
         params: &GateioParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "get_spot_fee_rates" => {
+                let mut query = Vec::new();
+                self.push_optional_currency_pair(&mut query, params)?;
+                self.private_get(SPOT_FEE, query).await
+            }
+            "get_futures_fee_rates" => {
+                let path = fill_settle(FUTURES_FEE, params.settle());
+                let mut query = Vec::new();
+                self.push_optional_contract(&mut query, params)?;
+                self.private_get(&path, query).await
+            }
+
             "get_total_balance" => {
                 self.private_get(WALLET_TOTAL_BALANCE, params.only(&["currency"]))
                     .await

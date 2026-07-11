@@ -8,6 +8,20 @@ from ._http_manager import HTTPManager
 class MarketHTTP(HTTPManager):
     """HTTP client for market-related operations on Hyperliquid exchange."""
 
+    def get_spot_fee_rates(self, user: str) -> dict[str, Any]:
+        """Retrieve effective Hyperliquid Spot maker and taker fee rates."""
+        return self._native_public(
+            "get_spot_fee_rates",
+            self._native_params(user=user),
+        )
+
+    def get_futures_fee_rates(self, user: str) -> dict[str, Any]:
+        """Retrieve effective Hyperliquid Futures maker and taker fee rates."""
+        return self._native_public(
+            "get_futures_fee_rates",
+            self._native_params(user=user),
+        )
+
     def get_meta(self, dex: str | None = None) -> dict[str, Any]:
         """Get market metadata."""
         return self._native_public("get_meta", self._native_params(dex=dex))

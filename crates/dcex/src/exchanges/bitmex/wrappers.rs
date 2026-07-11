@@ -4,6 +4,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     BitmexClient;
     public [];
     private [
+        get_futures_fee_rates(),
         amend_order(),
         cancel_all_orders(),
         cancel_order(),

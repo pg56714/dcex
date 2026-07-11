@@ -6,6 +6,20 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """Gate.io account HTTP client backed by Rust private dispatch."""
 
+    def get_spot_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Retrieve current Gate.io Spot maker and taker fee rates."""
+        return self._native_private(
+            "get_spot_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
+    def get_futures_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Retrieve current Gate.io Futures maker and taker fee rates."""
+        return self._native_private(
+            "get_futures_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
     def get_total_balance(self, currency: str | None = None) -> dict[str, Any]:
         return self._native_private(
             "get_total_balance",

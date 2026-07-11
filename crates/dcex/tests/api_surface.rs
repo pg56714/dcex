@@ -171,7 +171,10 @@ fn rust_direct_clients_expose_python_method_names() {
         get_delivery_price,
         get_deposit_records,
         get_execution_list,
-        get_fee_rates,
+        get_inverse_fee_rates,
+        get_linear_fee_rates,
+        get_option_fee_rates,
+        get_spot_fee_rates,
         get_funding_rate_history,
         get_historical_interest_rate,
         get_historical_volatility,
@@ -252,7 +255,11 @@ fn rust_direct_clients_expose_python_method_names() {
         get_deposit_history,
         get_deposit_withdraw_status,
         get_exchange_list,
-        get_fee_rates,
+        get_futures_fee_rates,
+        get_margin_fee_rates,
+        get_option_fee_rates,
+        get_spot_fee_rates,
+        get_swap_fee_rates,
         get_fills,
         get_fills_history,
         get_funding_rate,
@@ -305,6 +312,8 @@ fn rust_direct_clients_expose_python_method_names() {
 
     assert_methods!(
         BitgetClient:
+        get_futures_fee_rates,
+        get_spot_fee_rates,
         cancel_futures_batch_orders,
         cancel_futures_order,
         cancel_spot_batch_orders,
@@ -546,6 +555,8 @@ fn rust_direct_clients_expose_python_method_names() {
 
     assert_methods!(
         BitmartClient:
+        get_futures_fee_rates,
+        get_spot_fee_rates,
         cancel_all_contract_order,
         cancel_contract_order,
         cancel_spot_all_order,
@@ -594,6 +605,8 @@ fn rust_direct_clients_expose_python_method_names() {
 
     assert_methods!(
         GateioClient:
+        get_futures_fee_rates,
+        get_spot_fee_rates,
         amend_futures_single_order,
         amend_spot_single_order,
         cancel_contract_all_order_matched,
@@ -664,6 +677,7 @@ fn rust_direct_clients_expose_python_method_names() {
 
     assert_methods!(
         BitmexClient:
+        get_futures_fee_rates,
         amend_order,
         cancel_all_orders,
         cancel_order,
@@ -698,6 +712,8 @@ fn rust_direct_clients_expose_python_method_names() {
         clearinghouse_state,
         get_candle_snapshot,
         get_funding_rate_history,
+        get_futures_fee_rates,
+        get_spot_fee_rates,
         get_l2book,
         get_meta,
         get_meta_and_asset_ctxs,

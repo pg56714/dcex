@@ -54,6 +54,20 @@ class AccountHTTP(HTTPManager):
                 "Binance Spot user data streams are subscribed through the WebSocket API."
             )
 
+    async def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current Binance Spot maker and taker fee rates."""
+        return await self._native_private(
+            "get_spot_fee_rates",
+            self._params(product_symbol=product_symbol),
+        )
+
+    async def get_futures_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current Binance Futures maker and taker fee rates."""
+        return await self._native_private(
+            "get_futures_fee_rates",
+            self._params(product_symbol=product_symbol),
+        )
+
     async def get_account_balance(
         self,
         market_type: str,

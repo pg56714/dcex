@@ -8,6 +8,20 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """HTTP client for KuCoin account API operations."""
 
+    def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current KuCoin Spot maker and taker fee rates."""
+        return self._native_private(
+            "get_spot_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
+    def get_futures_fee_rates(self, product_symbol: str) -> dict[str, Any]:
+        """Retrieve current KuCoin Futures maker and taker fee rates."""
+        return self._native_private(
+            "get_futures_fee_rates",
+            self._native_params(product_symbol=product_symbol),
+        )
+
     def get_account_balance(
         self,
         currency: str | None = None,

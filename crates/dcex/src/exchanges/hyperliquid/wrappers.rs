@@ -3,6 +3,8 @@ use super::HyperliquidClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     HyperliquidClient;
     public [
+        get_futures_fee_rates(user => "user"),
+        get_spot_fee_rates(user => "user"),
         clearinghouse_state(user => "user"),
         get_candle_snapshot(product_symbol => "product_symbol", interval => "interval", start_time => "startTime"),
         get_funding_rate_history(product_symbol => "product_symbol", start_time => "startTime"),

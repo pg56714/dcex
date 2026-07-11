@@ -10,6 +10,27 @@ use crate::http::HttpMethod;
 use crate::Result;
 
 impl BinanceClient {
+    pub async fn get_spot_fee_rates(&self, product_symbol: &str) -> Result<ValidatedResponse> {
+        self.request(
+            HttpMethod::Get,
+            BinanceMarket::Spot,
+            SPOT_COMMISSION_RATE,
+            vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)],
+            true,
+        )
+        .await
+    }
+
+    pub async fn get_futures_fee_rates(&self, product_symbol: &str) -> Result<ValidatedResponse> {
+        self.request(
+            HttpMethod::Get,
+            BinanceMarket::Futures,
+            FUTURES_COMMISSION_RATE,
+            vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)],
+            true,
+        )
+        .await
+    }
     pub async fn get_account_balance(&self, market_type: &str) -> Result<ValidatedResponse> {
         let (market, path) = if market_type == "spot" {
             (BinanceMarket::Spot, SPOT_ACCOUNT_BALANCE)

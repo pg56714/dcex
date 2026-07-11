@@ -163,8 +163,8 @@ async def test_get_max_loan(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
-async def test_get_fee_rates(client):
-    res = await client.get_fee_rates(product_symbol="BTC-USDT-SPOT", instType="SPOT")
+async def test_get_spot_fee_rates(client):
+    res = await client.get_spot_fee_rates(product_symbol="BTC-USDT-SPOT")
     assert res is not None
 
 
