@@ -1,3 +1,12 @@
+## 0.6.0 (2026-07-11)
+
+### Feat
+
+- add plan order and market risk endpoints
+- expand advanced exchange endpoints
+- add unified trading endpoint wrappers
+- split exchange fee rate endpoints
+
 ## 0.5.0 (2026-07-10)
 
 ### Feat
