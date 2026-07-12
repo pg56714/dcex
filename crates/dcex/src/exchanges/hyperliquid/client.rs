@@ -215,12 +215,12 @@ impl HyperliquidClient {
                 .get("vaultAddress")
                 .and_then(Value::as_str)
                 .filter(|value| !value.is_empty());
-            let expire_after = query_object.get("expireAfter").and_then(Value::as_u64);
+            let expires_after = query_object.get("expiresAfter").and_then(Value::as_u64);
             let signature = hyperliquid_signature(
                 action_msgpack,
                 timestamp,
                 vault_address,
-                expire_after,
+                expires_after,
                 self.testnet,
                 self.private_key.as_ref().expect("checked private key"),
             )?;

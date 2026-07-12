@@ -39,9 +39,9 @@ const AMEND_NUMBER_KEYS: &[&str] = &[
 const CANCEL_STRING_KEYS: &[&str] = &["text"];
 const CANCEL_NUMBER_KEYS: &[&str] = &["targetAccountId"];
 const CANCEL_JSON_KEYS: &[&str] = &["orderID", "clOrdID"];
-const CANCEL_ALL_STRING_KEYS: &[&str] = &["filter", "text"];
+const CANCEL_ALL_STRING_KEYS: &[&str] = &["text"];
 const CANCEL_ALL_NUMBER_KEYS: &[&str] = &["targetAccountId"];
-const CANCEL_ALL_JSON_KEYS: &[&str] = &["targetAccountIds"];
+const CANCEL_ALL_JSON_KEYS: &[&str] = &["filter", "targetAccountIds"];
 const QUERY_ORDER_KEYS: &[&str] = &[
     "targetAccountId",
     "filter",
@@ -135,7 +135,7 @@ impl BitmexClient {
                     .await
             }
             "cancel_order" => {
-                let body = self.cancel_order_body_from_params(params);
+                let body = self.cancel_order_body_from_params(params)?;
                 self.private_json(HttpMethod::Delete, CANCEL_ORDER, Value::Object(body))
                     .await
             }
@@ -213,13 +213,18 @@ impl BitmexClient {
     pub(super) fn cancel_order_body_from_params(
         &self,
         params: &BitmexParams,
-    ) -> Map<String, Value> {
-        params.body(
+    ) -> Result<Map<String, Value>> {
+        if params.get("orderID").is_none() && params.get("clOrdID").is_none() {
+            return Err(DcexError::InvalidInput(
+                "Either orderID or clOrdID must be provided".to_string(),
+            ));
+        }
+        Ok(params.body(
             CANCEL_STRING_KEYS,
             CANCEL_NUMBER_KEYS,
             &[],
             CANCEL_JSON_KEYS,
-        )
+        ))
     }
 
     pub(super) fn cancel_all_orders_body_from_params(

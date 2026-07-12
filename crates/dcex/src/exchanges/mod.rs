@@ -510,7 +510,11 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
     }
 
     pub fn expire_after(self, value: impl ToString) -> Self {
-        self.param("expireAfter", value)
+        self.param("expiresAfter", value)
+    }
+
+    pub fn expires_after(self, value: impl ToString) -> Self {
+        self.param("expiresAfter", value)
     }
 
     pub fn expired(self, value: impl ToString) -> Self {

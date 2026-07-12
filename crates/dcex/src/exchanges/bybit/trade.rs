@@ -2,7 +2,7 @@ use serde_json::{Map, Value};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_string, push_optional, BybitParams};
+use super::params::{insert_optional_string, push_optional, require_one_identifier, BybitParams};
 use crate::common::OrderSide;
 use crate::exchange::ValidatedResponse;
 use crate::Result;
@@ -196,6 +196,7 @@ impl BybitClient {
     }
 
     async fn amend_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+        require_one_identifier(params, &["orderId", "orderLinkId"])?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
         self.insert_symbol_category(&mut body, product_symbol)?;
@@ -221,10 +222,13 @@ impl BybitClient {
     }
 
     async fn cancel_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+        require_one_identifier(params, &["orderId", "orderLinkId"])?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
         self.insert_symbol_category(&mut body, product_symbol)?;
-        insert_optional_string(&mut body, "orderId", params.get("orderId"));
+        for key in ["orderId", "orderLinkId", "orderFilter"] {
+            insert_optional_string(&mut body, key, params.get(key));
+        }
         self.post_request(CANCEL_ORDER, body).await
     }
 

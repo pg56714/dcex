@@ -265,17 +265,22 @@ def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> 
                 ("price", "100"),
                 ("size", "1"),
                 ("reduceOnly", "false"),
+                ("tif", "Gtc"),
                 ("builder_address", builder_address),
                 ("fee_ten_bp", "10"),
+                ("expiresAfter", "1700000001000"),
             ],
         )
 
     request = received.get_nowait()
-    action = json.loads(request["body"])["action"]
+    payload = json.loads(request["body"])
+    action = payload["action"]
     assert status == 200
     assert body == {"ok": True}
     assert action["builder"] == {"b": builder_address, "f": 10}
+    assert action["orders"][0]["t"] == {"limit": {"tif": "Gtc"}}
     assert "feeTenBp" not in action
+    assert payload["expiresAfter"] == 1700000001000
 
 
 def test_native_hyperliquid_market_order_uses_ioc_limit_payload() -> None:

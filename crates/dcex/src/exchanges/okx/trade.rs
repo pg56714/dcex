@@ -6,7 +6,9 @@ use crate::Result;
 
 use super::client::OkxClient;
 use super::endpoints::*;
-use super::params::{insert_optional_bool, insert_optional_string, push_optional, OkxParams};
+use super::params::{
+    insert_optional_bool, insert_optional_string, push_optional, require_one, OkxParams,
+};
 
 impl OkxClient {
     pub(super) async fn trade_private_request(
@@ -182,6 +184,7 @@ impl OkxClient {
     }
 
     async fn cancel_order_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+        require_one(params, &["ordId", "clOrdId"])?;
         let mut body = Map::new();
         self.insert_required_inst_id(&mut body, params)?;
         insert_optional_string(&mut body, "ordId", params.get("ordId"));
@@ -226,6 +229,8 @@ impl OkxClient {
     }
 
     async fn amend_order_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+        require_one(params, &["ordId", "clOrdId"])?;
+        require_one(params, &["newSz", "newPx", "newPxUsd", "newPxVol"])?;
         let mut body = Map::new();
         self.insert_required_inst_id(&mut body, params)?;
         for key in [
@@ -245,6 +250,7 @@ impl OkxClient {
     }
 
     async fn get_order_lookup(&self, path: &str, params: &OkxParams) -> Result<ValidatedResponse> {
+        require_one(params, &["ordId", "clOrdId"])?;
         let mut query = Vec::new();
         self.push_required_inst_id(&mut query, params)?;
         push_optional(&mut query, "ordId", params.get("ordId"));

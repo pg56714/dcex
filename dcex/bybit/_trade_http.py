@@ -317,11 +317,18 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         orderId: str | None = None,
+        orderLinkId: str | None = None,
+        orderFilter: str | None = None,
     ) -> dict[str, Any]:
         """Cancel an order."""
         return self._native_private(
             "cancel_order",
-            self._native_params(product_symbol=product_symbol, orderId=orderId),
+            self._native_params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                orderLinkId=orderLinkId,
+                orderFilter=orderFilter,
+            ),
         )
 
     def get_open_orders(

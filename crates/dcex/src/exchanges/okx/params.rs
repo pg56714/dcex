@@ -134,6 +134,16 @@ pub(super) fn insert_optional_string(
     }
 }
 
+pub(super) fn require_one(params: &OkxParams, keys: &[&str]) -> Result<()> {
+    if keys.iter().any(|key| params.get(key).is_some()) {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "one of {} is required",
+        keys.join(", ")
+    )))
+}
+
 pub(super) fn insert_optional_bool(
     body: &mut Map<String, Value>,
     key: &str,
@@ -183,4 +193,19 @@ pub(super) fn validate_deposit_withdraw_status(params: &OkxParams) -> Result<()>
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn conditional_parameters_require_one_value() {
+        let empty = OkxParams::from_pairs(Vec::new());
+        assert!(require_one(&empty, &["ordId", "clOrdId"]).is_err());
+
+        let identified =
+            OkxParams::from_pairs(vec![("clOrdId".to_string(), "client-order".to_string())]);
+        assert!(require_one(&identified, &["ordId", "clOrdId"]).is_ok());
+    }
 }

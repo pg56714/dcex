@@ -147,7 +147,7 @@ impl HyperliquidClient {
         let order = self.order_value_from_params(params, None, None)?;
         let action = object(vec![
             ("type", string("modify")),
-            ("oid", int(params.required_i64("oid")?)),
+            ("oid", order_identifier(params.required("oid")?)),
             ("order", order),
         ]);
         self.submit_action(action, params).await
@@ -302,6 +302,8 @@ impl HyperliquidClient {
                 object(vec![("limit", object(vec![("tif", string(tif))]))]),
             ));
         } else if params.get("isMarket").is_some() {
+            let trigger_price = params.required("triggerPx")?;
+            let tpsl = params.required("tpsl")?;
             fields.push((
                 "t",
                 object(vec![(
@@ -311,10 +313,14 @@ impl HyperliquidClient {
                             "isMarket",
                             bool_value(params.optional_bool("isMarket")?.unwrap_or(false)),
                         ),
-                        ("triggerPx", optional_string(params.get("triggerPx"))),
-                        ("tpsl", optional_string(params.get("tpsl"))),
+                        ("triggerPx", string(trigger_price)),
+                        ("tpsl", string(tpsl)),
                     ]),
                 )]),
+            ));
+        } else {
+            return Err(DcexError::InvalidInput(
+                "Hyperliquid orders require tif or trigger fields.".to_string(),
             ));
         }
 
@@ -338,10 +344,10 @@ impl HyperliquidClient {
                 Value::String(vault_address.to_string()),
             );
         }
-        if let Some(expire_after) = params.optional_u64("expireAfter")? {
+        if let Some(expires_after) = params.optional_u64("expiresAfter")? {
             payload.insert(
-                "expireAfter".to_string(),
-                Value::Number(Number::from(expire_after)),
+                "expiresAfter".to_string(),
+                Value::Number(Number::from(expires_after)),
             );
         }
         self.exchange_payload(Value::Object(payload), action_msgpack)
@@ -420,16 +426,16 @@ fn int(value: i64) -> OrderedValue {
     OrderedValue::Int(value)
 }
 
+fn order_identifier(value: &str) -> OrderedValue {
+    value.parse::<i64>().map_or_else(|_| string(value), int)
+}
+
 fn uint(value: u64) -> OrderedValue {
     OrderedValue::Uint(value)
 }
 
 fn bool_value(value: bool) -> OrderedValue {
     OrderedValue::Bool(value)
-}
-
-fn optional_string(value: Option<&str>) -> OrderedValue {
-    value.map_or(OrderedValue::Null, string)
 }
 
 fn parse_i64(value: &str, key: &str) -> Result<i64> {
@@ -455,4 +461,34 @@ fn format_market_order_price(value: f64, is_buy: bool) -> String {
         .trim_end_matches('0')
         .trim_end_matches('.')
         .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+
+    #[test]
+    fn order_requires_limit_or_trigger_type() {
+        let client = HyperliquidClient::public(false, Duration::from_secs(1)).expect("client");
+        let params = HyperliquidParams::from_pairs(vec![
+            ("product_symbol".to_string(), "BTC".to_string()),
+            ("isBuy".to_string(), "true".to_string()),
+            ("price".to_string(), "100".to_string()),
+            ("size".to_string(), "1".to_string()),
+            ("reduceOnly".to_string(), "false".to_string()),
+        ]);
+
+        assert!(client.order_value_from_params(&params, None, None).is_err());
+    }
+
+    #[test]
+    fn modify_identifier_preserves_cloid() {
+        assert_eq!(
+            order_identifier("0x1234567890abcdef1234567890abcdef"),
+            OrderedValue::String("0x1234567890abcdef1234567890abcdef".to_string())
+        );
+        assert_eq!(order_identifier("42"), OrderedValue::Int(42));
+    }
 }

@@ -24,7 +24,7 @@ class TradeHTTP(HTTPManager):
         builder_address: str | None = None,
         fee_ten_bp: int | None = None,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place an order on the exchange."""
         if (builder_address is None) != (fee_ten_bp is None):
@@ -39,7 +39,7 @@ class TradeHTTP(HTTPManager):
         triggerPx: str | None = None,
         tpsl: str | None = None,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place a future market order."""
         return self._native_private(
@@ -54,7 +54,7 @@ class TradeHTTP(HTTPManager):
         triggerPx: str | None = None,
         tpsl: str | None = None,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place a future market buy order."""
         return self._native_private(
@@ -69,7 +69,7 @@ class TradeHTTP(HTTPManager):
         triggerPx: str | None = None,
         tpsl: str | None = None,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place a future market sell order."""
         return self._native_private(
@@ -122,7 +122,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         oid: int,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Cancel an order by order ID."""
         return self._native_private("cancel_order", self._native_params(**locals()))
@@ -132,7 +132,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         cloid: str,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Cancel an order by client order ID."""
         return self._native_private(
@@ -144,14 +144,14 @@ class TradeHTTP(HTTPManager):
         self,
         time: int | None = None,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Schedule order cancellation."""
         return self._native_private("schedule_cancel", self._native_params(**locals()))
 
     def modify_order(
         self,
-        oid: int,
+        oid: int | str,
         product_symbol: str,
         isBuy: bool,
         price: str,
@@ -163,7 +163,7 @@ class TradeHTTP(HTTPManager):
         tpsl: str | None = None,
         cloid: str | None = None,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Modify an existing order."""
         return self._native_private("modify_order", self._native_params(**locals()))
@@ -172,7 +172,7 @@ class TradeHTTP(HTTPManager):
         self,
         modifies: list,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Modify multiple orders in batch."""
         return self._native_private(
@@ -186,7 +186,7 @@ class TradeHTTP(HTTPManager):
         isCross: bool,
         leverage: int,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Update leverage for a product."""
         return self._native_private("update_leverage", self._native_params(**locals()))
@@ -197,7 +197,7 @@ class TradeHTTP(HTTPManager):
         isBuy: bool,
         ntli: int,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Update isolated margin for a product."""
         return self._native_private(
@@ -214,7 +214,7 @@ class TradeHTTP(HTTPManager):
         minutes: int,
         randomize: bool,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place a TWAP order."""
         return self._native_private("place_twap_order", self._native_params(**locals()))
@@ -224,7 +224,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         twap_id: int,
         vaultAddress: str | None = None,
-        expireAfter: int | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Cancel a TWAP order."""
         return self._native_private("cancel_twap_order", self._native_params(**locals()))

@@ -102,7 +102,9 @@ fn cancel_order_accepts_array_identifiers() {
         ),
         ("text".to_string(), "cancel".to_string()),
     ]);
-    let body = client.cancel_order_body_from_params(&params);
+    let body = client
+        .cancel_order_body_from_params(&params)
+        .expect("identifier");
 
     assert_eq!(
         Value::Object(body),
@@ -111,4 +113,26 @@ fn cancel_order_accepts_array_identifiers() {
             "text": "cancel"
         })
     );
+}
+
+#[test]
+fn cancel_order_requires_an_identifier() {
+    let client = BitmexClient::public(Duration::from_secs(1)).expect("client");
+    let params = params::BitmexParams::from_pairs(Vec::new());
+
+    assert!(client.cancel_order_body_from_params(&params).is_err());
+}
+
+#[test]
+fn cancel_all_orders_preserves_filter_as_json_object() {
+    let client = BitmexClient::public(Duration::from_secs(1)).expect("client");
+    let params = params::BitmexParams::from_pairs(vec![(
+        "filter".to_string(),
+        r#"{"side":"Buy"}"#.to_string(),
+    )]);
+    let body = client
+        .cancel_all_orders_body_from_params(&params)
+        .expect("body");
+
+    assert_eq!(body["filter"], json!({"side": "Buy"}));
 }
