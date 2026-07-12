@@ -1,3 +1,10 @@
+## 0.6.2 (2026-07-12)
+
+### Fix
+
+- align order requests with exchange contracts
+- gate releases and validate Bitget strategy orders
+
 ## 0.6.1 (2026-07-12)
 
 ### Fix
