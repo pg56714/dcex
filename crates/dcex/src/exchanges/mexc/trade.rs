@@ -275,8 +275,15 @@ impl MexcClient {
                 let mut body = params.body(
                     &["price", "externalOid"],
                     &[
-                        "vol", "leverage", "side", "openType", "triggerPrice", "triggerType",
-                        "executeCycle", "orderType", "trend",
+                        "vol",
+                        "leverage",
+                        "side",
+                        "openType",
+                        "triggerPrice",
+                        "triggerType",
+                        "executeCycle",
+                        "orderType",
+                        "trend",
                     ],
                     &[],
                 );

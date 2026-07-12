@@ -127,20 +127,55 @@ impl BitgetClient {
                 self.get_private(UTA_POSITIONS, query).await
             }
             "place_uta_strategy_order" => {
-                self.post_private(UTA_PLACE_STRATEGY_ORDER, Value::Object(params.body(&[
-                    "category", "symbol", "clientOid", "type", "tpslMode", "qty", "side",
-                    "posSide", "reduceOnly", "tpTriggerBy", "slTriggerBy", "takeProfit",
-                    "stopLoss", "tpOrderType", "slOrderType", "tpLimitPrice", "slLimitPrice",
-                    "triggerBy", "triggerPrice", "triggerOrderType", "triggerOrderPrice",
-                ])))
+                self.post_private(
+                    UTA_PLACE_STRATEGY_ORDER,
+                    Value::Object(params.body(&[
+                        "category",
+                        "symbol",
+                        "clientOid",
+                        "type",
+                        "tpslMode",
+                        "qty",
+                        "side",
+                        "posSide",
+                        "reduceOnly",
+                        "tpTriggerBy",
+                        "slTriggerBy",
+                        "takeProfit",
+                        "stopLoss",
+                        "tpOrderType",
+                        "slOrderType",
+                        "tpLimitPrice",
+                        "slLimitPrice",
+                        "triggerBy",
+                        "triggerPrice",
+                        "triggerOrderType",
+                        "triggerOrderPrice",
+                    ])),
+                )
                 .await
             }
             "modify_uta_strategy_order" => {
-                self.post_private(UTA_MODIFY_STRATEGY_ORDER, Value::Object(params.body(&[
-                    "orderId", "clientOid", "qty", "tpTriggerBy", "slTriggerBy", "takeProfit",
-                    "stopLoss", "tpOrderType", "slOrderType", "tpLimitPrice", "slLimitPrice",
-                    "triggerBy", "triggerPrice", "triggerOrderType", "triggerOrderPrice",
-                ])))
+                self.post_private(
+                    UTA_MODIFY_STRATEGY_ORDER,
+                    Value::Object(params.body(&[
+                        "orderId",
+                        "clientOid",
+                        "qty",
+                        "tpTriggerBy",
+                        "slTriggerBy",
+                        "takeProfit",
+                        "stopLoss",
+                        "tpOrderType",
+                        "slOrderType",
+                        "tpLimitPrice",
+                        "slLimitPrice",
+                        "triggerBy",
+                        "triggerPrice",
+                        "triggerOrderType",
+                        "triggerOrderPrice",
+                    ])),
+                )
                 .await
             }
             "cancel_uta_strategy_order" => {
@@ -162,7 +197,13 @@ impl BitgetClient {
                 self.get_private(
                     UTA_HISTORY_STRATEGY_ORDERS,
                     params.only(&[
-                        "category", "type", "symbol", "startTime", "endTime", "idLessThan", "limit",
+                        "category",
+                        "type",
+                        "symbol",
+                        "startTime",
+                        "endTime",
+                        "idLessThan",
+                        "limit",
                     ]),
                 )
                 .await

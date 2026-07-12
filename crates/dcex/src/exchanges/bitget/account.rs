@@ -107,16 +107,20 @@ impl BitgetClient {
             "get_uta_account_assets" => self.get_private(UTA_ACCOUNT_ASSETS, Vec::new()).await,
             "get_uta_account_info" => self.get_private(UTA_ACCOUNT_INFO, Vec::new()).await,
             "get_uta_all_fee_rates" => {
-                self.get_private(UTA_ALL_FEE_RATES, params.only(&["category"])).await
+                self.get_private(UTA_ALL_FEE_RATES, params.only(&["category"]))
+                    .await
             }
             "get_uta_loan_data" => {
-                self.get_private(UTA_LOAN_DATA, params.only(&["coin"])).await
+                self.get_private(UTA_LOAN_DATA, params.only(&["coin"]))
+                    .await
             }
             "get_uta_collateral_type" => {
-                self.get_private(UTA_COLLATERAL_TYPE, params.only(&["coin"])).await
+                self.get_private(UTA_COLLATERAL_TYPE, params.only(&["coin"]))
+                    .await
             }
             "get_uta_custom_collateral_coins" => {
-                self.get_private(UTA_CUSTOM_COLLATERAL_COINS, Vec::new()).await
+                self.get_private(UTA_CUSTOM_COLLATERAL_COINS, Vec::new())
+                    .await
             }
             "get_uta_pre_set_leverage" => {
                 let mut query = params.only(&[

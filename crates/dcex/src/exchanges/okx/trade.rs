@@ -24,7 +24,8 @@ impl OkxClient {
                     Value::String(params.required("timeOut")?.to_string()),
                 );
                 insert_optional_string(&mut body, "tag", params.get("tag"));
-                self.post_request(TRADE_CANCEL_ALL_AFTER, Value::Object(body)).await
+                self.post_request(TRADE_CANCEL_ALL_AFTER, Value::Object(body))
+                    .await
             }
             "place_batch_orders" => {
                 self.post_request(TRADE_BATCH_ORDERS, params.json_required("orders")?)
@@ -141,7 +142,8 @@ impl OkxClient {
     }
 
     async fn pre_check_order_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
-        self.order_validation_request(params, TRADE_ORDER_PRECHECK).await
+        self.order_validation_request(params, TRADE_ORDER_PRECHECK)
+            .await
     }
 
     async fn order_validation_request(

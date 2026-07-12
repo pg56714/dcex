@@ -137,22 +137,25 @@ impl BitmartClient {
                 .await
             }
             "submit_spot_algo_order" => {
-                self.spot_algo_request(SPOT_ALGO_SUBMIT_ORDER, params, true).await
+                self.spot_algo_request(SPOT_ALGO_SUBMIT_ORDER, params, true)
+                    .await
             }
             "cancel_spot_algo_order" => {
-                self.spot_algo_request(SPOT_ALGO_CANCEL_ORDER, params, false).await
+                self.spot_algo_request(SPOT_ALGO_CANCEL_ORDER, params, false)
+                    .await
             }
             "cancel_all_spot_algo_orders" => {
-                self.spot_algo_request(SPOT_ALGO_CANCEL_ALL, params, false).await
+                self.spot_algo_request(SPOT_ALGO_CANCEL_ALL, params, false)
+                    .await
             }
-            "get_spot_algo_order" => {
-                self.spot_algo_request(SPOT_ALGO_ORDER, params, false).await
-            }
+            "get_spot_algo_order" => self.spot_algo_request(SPOT_ALGO_ORDER, params, false).await,
             "get_spot_algo_order_by_client_id" => {
-                self.spot_algo_request(SPOT_ALGO_CLIENT_ORDER, params, false).await
+                self.spot_algo_request(SPOT_ALGO_CLIENT_ORDER, params, false)
+                    .await
             }
             "get_spot_open_algo_orders" => {
-                self.spot_algo_request(SPOT_ALGO_OPEN_ORDERS, params, false).await
+                self.spot_algo_request(SPOT_ALGO_OPEN_ORDERS, params, false)
+                    .await
             }
             "place_contract_order" => {
                 self.contract_order_from_params(params, None, None, None)

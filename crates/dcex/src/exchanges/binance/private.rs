@@ -462,7 +462,13 @@ impl BinanceClient {
         if let Some(product_symbol) = product_symbol {
             query.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
         }
-        self.request(method, super::client::BinanceMarket::Spot, path, query, true)
-            .await
+        self.request(
+            method,
+            super::client::BinanceMarket::Spot,
+            path,
+            query,
+            true,
+        )
+        .await
     }
 }

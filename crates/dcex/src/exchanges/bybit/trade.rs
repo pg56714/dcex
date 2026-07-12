@@ -139,10 +139,7 @@ impl BybitClient {
         self.order_validation_request(params, PLACE_ORDER).await
     }
 
-    async fn pre_check_order_from_params(
-        &self,
-        params: &BybitParams,
-    ) -> Result<ValidatedResponse> {
+    async fn pre_check_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
         self.order_validation_request(params, ORDER_PRE_CHECK).await
     }
 
