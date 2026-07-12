@@ -3,6 +3,7 @@ use std::time::Duration;
 use crate::http::{HttpMethod, RequestBody};
 
 use super::client::BitgetClient;
+use super::params::BitgetParams;
 
 #[test]
 fn signed_batch_uses_exact_body() {
@@ -30,4 +31,47 @@ fn signed_batch_uses_exact_body() {
         Some("R/bWef7Dwp6wughM4S1AulQN6C10+sQmcP55rWFxRoc=")
     );
     assert_eq!(request.body, RequestBody::Raw(body));
+}
+
+fn private_client() -> BitgetClient {
+    BitgetClient::new(
+        Some("test_api_key_0000".to_string()),
+        Some("test_api_secret_0000".to_string()),
+        Some("test-passphrase".to_string()),
+        Duration::from_secs(1),
+    )
+    .expect("client")
+}
+
+#[tokio::test]
+async fn uta_strategy_order_requires_product_symbol() {
+    let params =
+        BitgetParams::from_pairs(vec![("category".to_string(), "USDT-FUTURES".to_string())]);
+    let error = private_client()
+        .trade_private_request("place_uta_strategy_order", &params)
+        .await
+        .expect_err("missing product symbol must fail before sending a request");
+
+    assert!(error
+        .to_string()
+        .contains("missing required parameter: product_symbol"));
+}
+
+#[tokio::test]
+async fn uta_strategy_modification_requires_quantity_and_identifier() {
+    let empty = BitgetParams::from_pairs(Vec::new());
+    let error = private_client()
+        .trade_private_request("modify_uta_strategy_order", &empty)
+        .await
+        .expect_err("missing quantity must fail before sending a request");
+    assert!(error
+        .to_string()
+        .contains("missing required parameter: qty"));
+
+    let qty_only = BitgetParams::from_pairs(vec![("qty".to_string(), "1".to_string())]);
+    let error = private_client()
+        .trade_private_request("modify_uta_strategy_order", &qty_only)
+        .await
+        .expect_err("missing identifier must fail before sending a request");
+    assert!(error.to_string().contains("Specify orderId or clientOid."));
 }

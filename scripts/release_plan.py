@@ -33,6 +33,7 @@ class Commit:
     subject: str
     body: str
     paths: tuple[str, ...]
+    deleted_paths: tuple[str, ...] = ()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -89,6 +90,12 @@ CHANGELOG_GROUPS = (
     ("fix", "Fix"),
     ("refactor", "Refactor"),
     ("perf", "Perf"),
+)
+
+
+EXCHANGE_REMOVAL_PATTERNS = (
+    re.compile(r"^dcex/(?P<exchange>[^/]+)/__init__\.py$"),
+    re.compile(r"^crates/dcex/src/exchanges/(?P<exchange>[^/]+)/mod\.rs$"),
 )
 
 
@@ -249,22 +256,29 @@ def commits_since(tag: str | None) -> list[Commit]:
         records.append((sha, subject, body))
 
     paths_by_sha = paths_for_commits([sha for sha, _, _ in records])
+    deleted_paths_by_sha = paths_for_commits([sha for sha, _, _ in records], diff_filter="D")
     commits: list[Commit] = []
     for sha, subject, body in records:
         commits.append(
-            Commit(sha=sha, subject=subject, body=body, paths=tuple(paths_by_sha.get(sha, ())))
+            Commit(
+                sha=sha,
+                subject=subject,
+                body=body,
+                paths=tuple(paths_by_sha.get(sha, ())),
+                deleted_paths=tuple(deleted_paths_by_sha.get(sha, ())),
+            )
         )
     return commits
 
 
-def paths_for_commits(shas: list[str]) -> dict[str, list[str]]:
+def paths_for_commits(shas: list[str], diff_filter: str | None = None) -> dict[str, list[str]]:
     if not shas:
         return {}
 
-    raw = run_git_with_input(
-        ["diff-tree", "--stdin", "--name-only", "-r"],
-        "\n".join(shas) + "\n",
-    )
+    args = ["diff-tree", "--stdin", "--name-only", "-r"]
+    if diff_filter:
+        args.append(f"--diff-filter={diff_filter}")
+    raw = run_git_with_input(args, "\n".join(shas) + "\n")
     paths_by_sha: dict[str, list[str]] = {}
     current_sha: str | None = None
     sha_pattern = re.compile(r"^[0-9a-f]{40}$")
@@ -313,6 +327,32 @@ def parse_conventional_commit(commit: Commit) -> ParsedCommit | None:
         bump=bump,
         breaking=breaking,
     )
+
+
+def removed_exchanges(commit: Commit) -> tuple[str, ...]:
+    exchanges = {
+        match.group("exchange")
+        for path in commit.deleted_paths
+        for pattern in EXCHANGE_REMOVAL_PATTERNS
+        if (match := pattern.match(normalize_path(path)))
+    }
+    return tuple(sorted(exchanges))
+
+
+def validate_breaking_exchange_removals(commits: list[Commit]) -> None:
+    for commit in commits:
+        exchanges = removed_exchanges(commit)
+        if not exchanges:
+            continue
+        parsed = parse_conventional_commit(commit)
+        if parsed is not None and parsed.breaking:
+            continue
+        names = ", ".join(exchanges)
+        raise ValueError(
+            f"commit {commit.sha[:12]} removes exchange support ({names}) without a "
+            "breaking-change marker; use type(scope)!: subject or add a "
+            "BREAKING CHANGE: footer"
+        )
 
 
 def strongest_bump(parsed_commits: list[ParsedCommit]) -> str | None:
@@ -369,6 +409,7 @@ def plan_component(name: str, body_dir: Path) -> dict[str, Any]:
     relevant_commits = [
         commit for commit in commits if any(path_matches(config, path) for path in commit.paths)
     ]
+    validate_breaking_exchange_removals(relevant_commits)
     parsed_commits = [
         parsed
         for commit in relevant_commits

@@ -127,35 +127,35 @@ impl BitgetClient {
                 self.get_private(UTA_POSITIONS, query).await
             }
             "place_uta_strategy_order" => {
-                self.post_private(
-                    UTA_PLACE_STRATEGY_ORDER,
-                    Value::Object(params.body(&[
-                        "category",
-                        "symbol",
-                        "clientOid",
-                        "type",
-                        "tpslMode",
-                        "qty",
-                        "side",
-                        "posSide",
-                        "reduceOnly",
-                        "tpTriggerBy",
-                        "slTriggerBy",
-                        "takeProfit",
-                        "stopLoss",
-                        "tpOrderType",
-                        "slOrderType",
-                        "tpLimitPrice",
-                        "slLimitPrice",
-                        "triggerBy",
-                        "triggerPrice",
-                        "triggerOrderType",
-                        "triggerOrderPrice",
-                    ])),
-                )
-                .await
+                let mut body = params.body(&[
+                    "category",
+                    "clientOid",
+                    "type",
+                    "tpslMode",
+                    "qty",
+                    "side",
+                    "posSide",
+                    "reduceOnly",
+                    "tpTriggerBy",
+                    "slTriggerBy",
+                    "takeProfit",
+                    "stopLoss",
+                    "tpOrderType",
+                    "slOrderType",
+                    "tpLimitPrice",
+                    "slLimitPrice",
+                    "triggerBy",
+                    "triggerPrice",
+                    "triggerOrderType",
+                    "triggerOrderPrice",
+                ]);
+                self.insert_required_product_symbol(&mut body, params)?;
+                self.post_private(UTA_PLACE_STRATEGY_ORDER, Value::Object(body))
+                    .await
             }
             "modify_uta_strategy_order" => {
+                params.required("qty")?;
+                require_one_identifier(params, &["orderId", "clientOid"])?;
                 self.post_private(
                     UTA_MODIFY_STRATEGY_ORDER,
                     Value::Object(params.body(&[

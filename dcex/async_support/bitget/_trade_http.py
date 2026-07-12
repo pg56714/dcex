@@ -821,17 +821,26 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def place_uta_strategy_order(self, category: str, **params: object) -> dict[str, Any]:
+    async def place_uta_strategy_order(
+        self, category: str, product_symbol: str, **params: object
+    ) -> dict[str, Any]:
         """Place a Bitget UTA TP/SL or trigger strategy order."""
         return await self._native_private(
             "place_uta_strategy_order",
-            self._native_params(category=category, **params),
+            self._native_params(category=category, product_symbol=product_symbol, **params),
         )
 
-    async def modify_uta_strategy_order(self, **params: object) -> dict[str, Any]:
+    async def modify_uta_strategy_order(
+        self,
+        qty: str,
+        orderId: str | None = None,
+        clientOid: str | None = None,
+        **params: object,
+    ) -> dict[str, Any]:
         """Modify a Bitget UTA strategy order."""
         return await self._native_private(
-            "modify_uta_strategy_order", self._native_params(**params)
+            "modify_uta_strategy_order",
+            self._native_params(qty=qty, orderId=orderId, clientOid=clientOid, **params),
         )
 
     async def cancel_uta_strategy_order(

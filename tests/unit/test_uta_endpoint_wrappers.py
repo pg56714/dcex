@@ -96,6 +96,18 @@ UTA_CASES = (
         "NATIVE_PUBLIC",
     ),
     (
+        "bitget",
+        "place_uta_strategy_order",
+        {"category": "USDT-FUTURES", "product_symbol": "BTC-USDT-SWAP"},
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "bitget",
+        "modify_uta_strategy_order",
+        {"qty": "1", "orderId": "123"},
+        "NATIVE_PRIVATE",
+    ),
+    (
         "kucoin",
         "get_uta_fee_rates",
         {"tradeType": "SPOT", "symbol": "BTC-USDT"},
