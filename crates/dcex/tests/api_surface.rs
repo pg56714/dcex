@@ -1,7 +1,7 @@
 use dcex::exchanges::{
-    bingx::BingxClient, bitget::BitgetClient, bitmex::BitmexClient,
-    bybit::BybitClient, hyperliquid::HyperliquidClient, kraken::KrakenClient,
-    lighter::LighterClient, mexc::MexcClient, okx::OkxClient,
+    bingx::BingxClient, bitget::BitgetClient, bitmex::BitmexClient, bybit::BybitClient,
+    hyperliquid::HyperliquidClient, kraken::KrakenClient, lighter::LighterClient, mexc::MexcClient,
+    okx::OkxClient,
 };
 
 trait WrapperSource {

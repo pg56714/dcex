@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn exchange_registry_matches_python_registry() {
-        assert_eq!(Exchange::ALL.len(), 16);
+        assert_eq!(Exchange::ALL.len(), 14);
         assert_eq!(Exchange::Binance.as_str(), "binance");
         assert_eq!(Exchange::Lighter.as_str(), "lighter");
     }

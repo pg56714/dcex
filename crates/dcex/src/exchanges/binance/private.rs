@@ -46,12 +46,26 @@ impl BinanceClient {
         )
     }
 
-    pub fn get_prevented_matches(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(self, "get_prevented_matches", Vec::new())
+    pub fn get_prevented_matches(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_prevented_matches",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
-    pub fn get_allocations(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(self, "get_allocations", Vec::new())
+    pub fn get_allocations(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "get_allocations",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
     }
 
     pub fn get_order_rate_limit(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
@@ -175,11 +189,11 @@ impl BinanceClient {
                     .await
             }
             "get_prevented_matches" => {
-                self.spot_signed_request(HttpMethod::Get, SPOT_PREVENTED_MATCHES, params, false)
+                self.spot_signed_request(HttpMethod::Get, SPOT_PREVENTED_MATCHES, params, true)
                     .await
             }
             "get_allocations" => {
-                self.spot_signed_request(HttpMethod::Get, SPOT_ALLOCATIONS, params, false)
+                self.spot_signed_request(HttpMethod::Get, SPOT_ALLOCATIONS, params, true)
                     .await
             }
             "get_order_rate_limit" => {

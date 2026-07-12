@@ -221,13 +221,13 @@ class TradeHTTP(HTTPManager):
             "create_otoco_order", self._params(product_symbol=product_symbol, **params)
         )
 
-    def get_prevented_matches(self, product_symbol: str | None = None, **params: object) -> dict:
+    def get_prevented_matches(self, product_symbol: str, **params: object) -> dict:
         """Retrieve spot self-trade-prevention match records."""
         return self._native_private(
             "get_prevented_matches", self._params(product_symbol=product_symbol, **params)
         )
 
-    def get_allocations(self, product_symbol: str | None = None, **params: object) -> dict:
+    def get_allocations(self, product_symbol: str, **params: object) -> dict:
         """Retrieve spot allocation records."""
         return self._native_private(
             "get_allocations", self._params(product_symbol=product_symbol, **params)

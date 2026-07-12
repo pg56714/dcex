@@ -252,3 +252,17 @@ fn futures_algo_lookup_requires_an_identifier_before_requesting() {
         DcexError::InvalidInput("Either algoId or clientAlgoId is required.".to_string())
     );
 }
+
+#[test]
+fn spot_account_queries_require_a_product_symbol() {
+    for method_name in ["get_prevented_matches", "get_allocations"] {
+        let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+        let error = block_on(async move { client.private_request(method_name, Vec::new()).await })
+            .expect_err("missing product symbol must fail");
+
+        assert_eq!(
+            error,
+            DcexError::InvalidInput("Binance product_symbol is required.".to_string())
+        );
+    }
+}
