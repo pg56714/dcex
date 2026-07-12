@@ -1,3 +1,9 @@
+## 0.6.1 (2026-07-12)
+
+### Fix
+
+- enforce Binance account query symbols
+
 ## 0.6.0 (2026-07-11)
 
 ### Feat
