@@ -10,7 +10,6 @@ class Common(str, Enum):
     BACKPACK = "backpack"
     BYBIT = "bybit"
     OKX = "okx"
-    BITMART = "bitmart"
     EXTENDED = "extended"
     BINANCE = "binance"
     HYPERLIQUID = "hyperliquid"

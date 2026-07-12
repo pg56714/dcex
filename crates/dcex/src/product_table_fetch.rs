@@ -43,7 +43,6 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
         Exchange::Binance => self::exchanges::fetch_binance(timeout).await,
         Exchange::BingX => self::exchanges::fetch_bingx(timeout).await,
         Exchange::Bitget => self::exchanges::fetch_bitget(timeout).await,
-        Exchange::BitMart => self::exchanges::fetch_bitmart(timeout).await,
         Exchange::BitMEX => self::exchanges::fetch_bitmex(timeout).await,
         Exchange::Bybit => self::exchanges::fetch_bybit(timeout).await,
         Exchange::Extended => self::exchanges::fetch_extended(timeout).await,

@@ -1,5 +1,5 @@
 use dcex::exchanges::{
-    bingx::BingxClient, bitget::BitgetClient, bitmart::BitmartClient, bitmex::BitmexClient,
+    bingx::BingxClient, bitget::BitgetClient, bitmex::BitmexClient,
     bybit::BybitClient, hyperliquid::HyperliquidClient, kraken::KrakenClient,
     lighter::LighterClient, mexc::MexcClient, okx::OkxClient,
 };
@@ -30,10 +30,6 @@ impl WrapperSource for KrakenClient {
 
 impl WrapperSource for MexcClient {
     const SOURCE: &'static str = include_str!("../src/exchanges/mexc/wrappers.rs");
-}
-
-impl WrapperSource for BitmartClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/bitmart/wrappers.rs");
 }
 
 impl WrapperSource for BitmexClient {
@@ -547,56 +543,6 @@ fn rust_direct_clients_expose_python_method_names() {
         set_spot_mx_deduct,
         test_spot_order,
         user_universal_transfer,
-    );
-
-    assert_methods!(
-        BitmartClient:
-        get_futures_fee_rates,
-        get_spot_fee_rates,
-        cancel_all_contract_order,
-        cancel_contract_order,
-        cancel_spot_all_order,
-        cancel_spot_order,
-        get_account_balance,
-        get_account_currencies,
-        get_contract_assets,
-        get_contract_open_order,
-        get_contract_order_detail,
-        get_contract_order_history,
-        get_contract_position,
-        get_contract_trade,
-        get_contract_transaction_history,
-        get_contract_transfer_list,
-        get_deposit_address,
-        get_spot_account_orders,
-        get_spot_account_trade_list,
-        get_spot_open_orders,
-        get_spot_order_by_order_client_id,
-        get_spot_order_by_order_id,
-        get_spot_order_trade_list,
-        get_spot_wallet,
-        modify_limit_order,
-        place_contract_limit_order,
-        place_contract_market_buy_order,
-        place_contract_market_order,
-        place_contract_market_sell_order,
-        place_contract_order,
-        place_contract_post_only_buy_order,
-        place_contract_post_only_order,
-        place_contract_post_only_sell_order,
-        place_post_only_limit_sell_order,
-        place_spot_limit_buy_order,
-        place_spot_limit_order,
-        place_spot_limit_sell_order,
-        place_spot_market_buy_order,
-        place_spot_market_order,
-        place_spot_market_sell_order,
-        place_spot_order,
-        place_spot_post_only_limit_buy_order,
-        place_spot_post_only_limit_order,
-        place_spot_post_only_limit_sell_order,
-        submit_leverage,
-        transfer_contract,
     );
 
     assert_methods!(

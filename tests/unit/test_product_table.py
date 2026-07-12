@@ -245,7 +245,6 @@ def test_all_product_fetches_match_the_registry() -> None:
         "binance",
         "bingx",
         "bitget",
-        "bitmart",
         "bitmex",
         "bybit",
         "extended",

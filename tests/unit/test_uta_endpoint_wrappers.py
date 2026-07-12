@@ -45,22 +45,6 @@ UTA_CASES = (
         "NATIVE_PRIVATE",
     ),
     ("binance", "get_order_rate_limit", {}, "NATIVE_PRIVATE"),
-    (
-        "bitmart",
-        "submit_spot_algo_order",
-        {"product_symbol": "BTCUSDT-SPOT", "side": "buy", "orderMode": "trigger"},
-        "NATIVE_PRIVATE",
-    ),
-    ("bitmart", "cancel_spot_algo_order", {"orderId": "1"}, "NATIVE_PRIVATE"),
-    ("bitmart", "cancel_all_spot_algo_orders", {}, "NATIVE_PRIVATE"),
-    ("bitmart", "get_spot_algo_order", {"orderId": "1"}, "NATIVE_PRIVATE"),
-    (
-        "bitmart",
-        "get_spot_algo_order_by_client_id",
-        {"clientOrderId": "algo-1"},
-        "NATIVE_PRIVATE",
-    ),
-    ("bitmart", "get_spot_open_algo_orders", {}, "NATIVE_PRIVATE"),
     ("bitmex", "set_cancel_all_after", {"timeout": 60000}, "NATIVE_PRIVATE"),
     (
         "mexc",

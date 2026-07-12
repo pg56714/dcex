@@ -12,7 +12,6 @@ EXCHANGES = (
     "binance",
     "bingx",
     "bitget",
-    "bitmart",
     "bitmex",
     "bybit",
     "extended",

@@ -140,11 +140,6 @@ fn bybit_convert_timeframe(timeframe: &str) -> PyResult<String> {
 }
 
 #[pyfunction]
-fn bitmart_convert_timeframe(timeframe: &str) -> PyResult<u32> {
-    common::bitmart_convert_timeframe(timeframe).map_err(to_py_value_error)
-}
-
-#[pyfunction]
 fn kucoin_convert_timeframe(timeframe: &str) -> PyResult<String> {
     common::kucoin_convert_timeframe(timeframe)
         .map(str::to_string)
@@ -188,7 +183,6 @@ pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_decimal_places, m)?)?;
     m.add_function(wrap_pyfunction!(reverse_decimal_places, m)?)?;
     m.add_function(wrap_pyfunction!(bybit_convert_timeframe, m)?)?;
-    m.add_function(wrap_pyfunction!(bitmart_convert_timeframe, m)?)?;
     m.add_function(wrap_pyfunction!(kucoin_convert_timeframe, m)?)?;
     m.add_function(wrap_pyfunction!(address_to_bytes, m)?)?;
     m.add_function(wrap_pyfunction!(sanitize_url, m)?)?;

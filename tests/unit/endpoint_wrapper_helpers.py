@@ -342,8 +342,6 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
         )
     elif exchange in {"binance", "bingx", "bitmex", "bybit", "mexc"}:
         kwargs.update(api_key="api-key", api_secret="api-secret")
-    elif exchange == "bitmart":
-        kwargs.update(api_key="api-key", api_secret="api-secret", memo="memo")
     elif exchange in {"bitget", "okx", "kucoin"}:
         kwargs.update(api_key="api-key", api_secret="api-secret", passphrase="passphrase")
     elif exchange == "kraken":
@@ -500,8 +498,6 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
             return "BUY"
         if case.exchange == "backpack":
             return "Bid"
-        if case.exchange == "bitmart" and "contract" in method_name:
-            return 1
         if case.exchange == "mexc" and "contract" in method_name:
             return 1
         if case.exchange in {"bybit", "bitmex"}:
@@ -795,23 +791,9 @@ def _sample_okx_orders() -> dict[str, list[dict[str, str]]]:
     }
 
 
-def _sample_bitmart_positions() -> list[dict[str, int | str]]:
-    return [
-        {"position_type": 1, "current_amount": "1"},
-        {"position_type": 2, "current_amount": "1"},
-    ]
-
-
 def _patch_sync_case(client: Any, case: EndpointCase) -> None:
     if case.exchange == "okx" and case.method_name == "cancel_all_orders":
         client.get_order_list = lambda *args, **kwargs: _sample_okx_orders()
-    if case.exchange == "bitmart" and case.method_name in {
-        "place_contract_post_only_buy_order",
-        "place_contract_post_only_sell_order",
-    }:
-        client.get_contract_position = lambda *args, **kwargs: _sample_bitmart_positions()
-
-
 def _patch_async_case(client: Any, case: EndpointCase) -> None:
     if case.exchange == "okx" and case.method_name == "cancel_all_orders":
 
@@ -821,19 +803,6 @@ def _patch_async_case(client: Any, case: EndpointCase) -> None:
             return _sample_okx_orders()
 
         client.get_order_list = fake_get_order_list
-
-    if case.exchange == "bitmart" and case.method_name in {
-        "place_contract_post_only_buy_order",
-        "place_contract_post_only_sell_order",
-    }:
-
-        async def fake_get_contract_position(
-            *args: object, **kwargs: object
-        ) -> list[dict[str, int | str]]:
-            return _sample_bitmart_positions()
-
-        client.get_contract_position = fake_get_contract_position
-
 
 def _patch_hyperliquid_market(monkeypatch: pytest.MonkeyPatch) -> None:
     sync_trade = import_module("dcex.hyperliquid._trade_http")

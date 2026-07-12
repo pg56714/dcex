@@ -12,7 +12,6 @@ from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
 from .bingx.client import Client as BingXClient
 from .bitget.client import Client as BitgetClient
-from .bitmart.client import Client as BitmartClient
 from .bitmex.client import Client as BitmexClient
 from .bybit.client import Client as BybitClient
 from .extended.client import Client as ExtendedClient
@@ -51,11 +50,6 @@ def bingx(**kwargs: Any) -> BingXClient:  # noqa: ANN401
 def bitget(**kwargs: Any) -> BitgetClient:  # noqa: ANN401
     """Create a Bitget client instance."""
     return BitgetClient(**kwargs)
-
-
-def bitmart(**kwargs: Any) -> BitmartClient:  # noqa: ANN401
-    """Create a BitMart client instance."""
-    return BitmartClient(**kwargs)
 
 
 def bitmex(**kwargs: Any) -> BitmexClient:  # noqa: ANN401
@@ -109,7 +103,6 @@ __all__ = [
     "binance",
     "bingx",
     "bitget",
-    "bitmart",
     "bitmex",
     "bybit",
     "extended",

@@ -9,7 +9,6 @@ use dcex::exchanges::backpack::{BackpackClient, SignaturePayload};
 use dcex::exchanges::binance::{BinanceClient, BinanceMarket};
 use dcex::exchanges::bingx::BingxClient;
 use dcex::exchanges::bitget::BitgetClient;
-use dcex::exchanges::bitmart::{BitmartClient, BitmartMarket};
 use dcex::exchanges::bitmex::BitmexClient;
 use dcex::exchanges::bybit::BybitClient;
 use dcex::exchanges::extended::ExtendedClient;
@@ -252,16 +251,6 @@ fn mexc_api(api: &str) -> PyResult<MexcApi> {
     }
 }
 
-fn bitmart_market(market: &str) -> PyResult<BitmartMarket> {
-    match market.to_ascii_lowercase().as_str() {
-        "contract" | "futures" | "swap" => Ok(BitmartMarket::Futures),
-        "spot" | "wallet" => Ok(BitmartMarket::Spot),
-        _ => Err(PyValueError::new_err(format!(
-            "unsupported BitMart market: {market}"
-        ))),
-    }
-}
-
 fn kucoin_market(market: &str) -> PyResult<KucoinMarket> {
     match market.to_ascii_lowercase().as_str() {
         "contract" | "futures" | "swap" => Ok(KucoinMarket::Futures),
@@ -325,10 +314,6 @@ mod bingx_ws;
 mod bitget_client;
 #[path = "ws/bitget.rs"]
 mod bitget_ws;
-#[path = "clients/bitmart.rs"]
-mod bitmart_client;
-#[path = "ws/bitmart.rs"]
-mod bitmart_ws;
 #[path = "clients/bitmex.rs"]
 mod bitmex_client;
 #[path = "ws/bitmex.rs"]
@@ -379,8 +364,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     bingx_ws::register(m)?;
     bitget_client::register(m)?;
     bitget_ws::register(m)?;
-    bitmart_client::register(m)?;
-    bitmart_ws::register(m)?;
     bitmex_client::register(m)?;
     bitmex_ws::register(m)?;
     bybit_client::register(m)?;

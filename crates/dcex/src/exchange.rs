@@ -13,7 +13,6 @@ pub enum Exchange {
     Binance,
     BingX,
     Bitget,
-    BitMart,
     BitMEX,
     Bybit,
     Extended,
@@ -26,13 +25,12 @@ pub enum Exchange {
 }
 
 impl Exchange {
-    pub const ALL: [Self; 15] = [
+    pub const ALL: [Self; 14] = [
         Self::Aster,
         Self::Backpack,
         Self::Binance,
         Self::BingX,
         Self::Bitget,
-        Self::BitMart,
         Self::BitMEX,
         Self::Bybit,
         Self::Extended,
@@ -51,7 +49,6 @@ impl Exchange {
             Self::Binance => "binance",
             Self::BingX => "bingx",
             Self::Bitget => "bitget",
-            Self::BitMart => "bitmart",
             Self::BitMEX => "bitmex",
             Self::Bybit => "bybit",
             Self::Extended => "extended",

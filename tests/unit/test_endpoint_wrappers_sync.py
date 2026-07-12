@@ -191,26 +191,6 @@ def test_sync_bybit_post_only_forwards_position_idx() -> None:
     assert dict(calls[0]["query"])["positionIdx"] == "1"
 
 
-def test_sync_bitmart_modify_limit_order_uses_documented_payload_types() -> None:
-    client = _client_class("sync", "bitmart")(**_client_kwargs("bitmart"))
-    calls = _wire_sync(client)
-
-    result = client.modify_limit_order(
-        product_symbol="BTC-USDT-SWAP",
-        order_id="123456",
-        price="100.1",
-        size=1,
-    )
-
-    query = dict(calls[0]["query"])
-    assert result == {"ok": True}
-    assert calls[0]["method"] == "NATIVE_PRIVATE"
-    assert calls[0]["path"] == "modify_limit_order"
-    assert query["order_id"] == "123456"
-    assert query["price"] == "100.1"
-    assert query["size"] == "1"
-
-
 @pytest.mark.parametrize(
     "kwargs, message",
     [

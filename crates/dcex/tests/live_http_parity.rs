@@ -31,7 +31,6 @@ mod live_http_parity {
     mod binance;
     mod bingx;
     mod bitget;
-    mod bitmart;
     mod bitmex;
     mod bybit;
     mod hyperliquid;

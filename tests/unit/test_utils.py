@@ -7,7 +7,6 @@ import pytest
 
 from dcex.utils.decimal_utils import get_decimal_places, reverse_decimal_places
 from dcex.utils.timeframe_utils import (
-    bitmart_convert_timeframe,
     bybit_convert_timeframe,
     kucoin_convert_timeframe,
 )
@@ -31,21 +30,6 @@ def test_bybit_convert_timeframe(timeframe: str, expected: str) -> None:
 @pytest.mark.parametrize(
     ("timeframe", "expected"),
     [
-        ("1m", 1),
-        ("5m", 5),
-        ("1h", 60),
-        ("1d", 1440),
-        ("1w", 10080),
-        ("1M", 43200),
-    ],
-)
-def test_bitmart_convert_timeframe(timeframe: str, expected: int) -> None:
-    assert bitmart_convert_timeframe(timeframe) == expected
-
-
-@pytest.mark.parametrize(
-    ("timeframe", "expected"),
-    [
         ("1m", "1min"),
         ("5m", "5min"),
         ("1h", "1hour"),
@@ -59,7 +43,7 @@ def test_kucoin_convert_timeframe(timeframe: str, expected: str) -> None:
 
 @pytest.mark.parametrize(
     "converter",
-    [bybit_convert_timeframe, bitmart_convert_timeframe, kucoin_convert_timeframe],
+    [bybit_convert_timeframe, kucoin_convert_timeframe],
 )
 def test_timeframe_converters_reject_unknown_values(
     converter: Callable[[str], str | int],

@@ -17,7 +17,6 @@ from dcex.ws import (
     binance,
     bingx,
     bitget,
-    bitmart,
     bitmex,
     bybit,
     hyperliquid,
@@ -136,11 +135,6 @@ PUBLIC_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
     ),
     WebSocketSpec(
-        name="bitmart",
-        factory=lambda: bitmart.public(timeout=LIVE_WS_TIMEOUT),
-        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
-    ),
-    WebSocketSpec(
         name="bitmex",
         factory=lambda: bitmex.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("XBTUSD"),
@@ -235,17 +229,6 @@ PRIVATE_WS_SPECS = (
             timeout=LIVE_WS_TIMEOUT,
         ),
         subscribe=lambda ws: ws.subscribe_account(),
-    ),
-    WebSocketSpec(
-        name="bitmart",
-        env=("BITMART_API_KEY", "BITMART_API_SECRET", "BITMART_MEMO"),
-        factory=lambda: bitmart.private(
-            api_key=os.environ["BITMART_API_KEY"],
-            api_secret=os.environ["BITMART_API_SECRET"],
-            memo=os.environ["BITMART_MEMO"],
-            timeout=LIVE_WS_TIMEOUT,
-        ),
-        subscribe=lambda ws: ws.subscribe_balance(),
     ),
     WebSocketSpec(
         name="bitmex",

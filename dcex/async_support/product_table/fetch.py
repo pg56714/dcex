@@ -34,11 +34,6 @@ async def bitget() -> ProductTable:
     return await _fetch("bitget")
 
 
-async def bitmart() -> ProductTable:
-    """Fetch BitMart product metadata."""
-    return await _fetch("bitmart")
-
-
 async def bitmex() -> ProductTable:
     """Fetch BitMEX product metadata."""
     return await _fetch("bitmex")

@@ -104,8 +104,8 @@ impl OrderSide {
             (Self::Sell, "bybit" | "bitmex") => "Sell",
             (Self::Buy, "extended") => "BUY",
             (Self::Sell, "extended") => "SELL",
-            (Self::Buy, "okx" | "bitget" | "bitmart" | "kucoin" | "kraken") => "buy",
-            (Self::Sell, "okx" | "bitget" | "bitmart" | "kucoin" | "kraken") => "sell",
+            (Self::Buy, "okx" | "bitget" | "kucoin" | "kraken") => "buy",
+            (Self::Sell, "okx" | "bitget" | "kucoin" | "kraken") => "sell",
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "No OrderSide mapping for exchange: {exchange:?}"
@@ -184,22 +184,6 @@ pub fn bybit_convert_timeframe(timeframe: &str) -> Result<&'static str> {
         "1d" => Ok("D"),
         "1w" => Ok("W"),
         "1M" => Ok("M"),
-        _ => Err(unsupported_timeframe()),
-    }
-}
-
-pub fn bitmart_convert_timeframe(timeframe: &str) -> Result<u32> {
-    match timeframe {
-        "1m" => Ok(1),
-        "5m" => Ok(5),
-        "15m" => Ok(15),
-        "30m" => Ok(30),
-        "1h" => Ok(60),
-        "2h" => Ok(120),
-        "4h" => Ok(240),
-        "1d" => Ok(1440),
-        "1w" => Ok(10080),
-        "1M" => Ok(43200),
         _ => Err(unsupported_timeframe()),
     }
 }

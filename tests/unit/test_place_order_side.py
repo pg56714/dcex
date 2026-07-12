@@ -6,9 +6,6 @@ stubbed _request, then the side that would be sent in the payload is asserted.
 Covers backward compatibility (legacy strings / hard-coded wrappers) and the
 OrderSide enum, with no network and no API keys.
 
-Also guards a known trap: BitMart *contract* orders use an integer side
-(1=buy_open_long ... 4=sell_open_short), which must NOT be run through
-OrderSide conversion.
 """
 
 from typing import Any
@@ -141,27 +138,6 @@ def test_okx_side_conversion() -> None:
     assert cap["side"] == "BUY"
 
 
-def test_bitmart_spot_side_conversion() -> None:
-    from dcex.bitmart._trade_http import TradeHTTP
-
-    m = TradeHTTP(preload_product_table=False)
-    cap = _wire_native(m)
-    m.place_spot_order(product_symbol="BTC-USDT-SPOT", side="BUY", type="limit", size="1")
-    assert cap["method_name"] == "place_spot_order"
-    assert cap["side"] == "BUY"
-
-
-def test_bitmart_contract_int_side_is_untouched() -> None:
-    """Contract orders use an integer side code; it must pass through as-is."""
-    from dcex.bitmart._trade_http import TradeHTTP
-
-    m = TradeHTTP(preload_product_table=False)
-    cap = _wire_native(m)
-    m.place_contract_order(product_symbol="BTC-USDT-SWAP", side=4, size=1)
-    assert cap["method_name"] == "place_contract_order"
-    assert cap["side"] == "4"
-
-
 def test_bitmex_side_conversion() -> None:
     from dcex.bitmex._trade_http import TradeHTTP
 
@@ -210,28 +186,6 @@ async def test_async_okx_side_conversion() -> None:
     )
     assert cap["method_name"] == "place_order"
     assert cap["side"] == "SELL"
-
-
-@pytest.mark.asyncio
-async def test_async_bitmart_spot_side_conversion() -> None:
-    from dcex.async_support.bitmart._trade_http import TradeHTTP
-
-    m = TradeHTTP(preload_product_table=False)
-    cap = _wire_native_async(m)
-    await m.place_spot_order(product_symbol="BTC-USDT-SPOT", side="BUY", type="limit", size="1")
-    assert cap["method_name"] == "place_spot_order"
-    assert cap["side"] == "BUY"
-
-
-@pytest.mark.asyncio
-async def test_async_bitmart_contract_int_side_is_untouched() -> None:
-    from dcex.async_support.bitmart._trade_http import TradeHTTP
-
-    m = TradeHTTP(preload_product_table=False)
-    cap = _wire_native_async(m)
-    await m.place_contract_order(product_symbol="BTC-USDT-SWAP", side=4, size=1)
-    assert cap["method_name"] == "place_contract_order"
-    assert cap["side"] == "4"
 
 
 @pytest.mark.asyncio

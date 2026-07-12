@@ -8,7 +8,6 @@ use crate::exchanges::backpack::BackpackClient;
 use crate::exchanges::binance::BinanceClient;
 use crate::exchanges::bingx::BingxClient;
 use crate::exchanges::bitget::BitgetClient;
-use crate::exchanges::bitmart::BitmartClient;
 use crate::exchanges::bitmex::BitmexClient;
 use crate::exchanges::bybit::BybitClient;
 use crate::exchanges::extended::ExtendedClient;
@@ -304,54 +303,6 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
             quote_currency: quote,
             min_notional: value_string(market, "minTradeUSDT", "0"),
             size_per_contract: value_string(market, "sizeMultiplier", "1"),
-        });
-    }
-    Ok(rows)
-}
-
-pub(super) async fn fetch_bitmart(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BitmartClient::public(timeout)?;
-    let swap = client
-        .public_request("get_contracts_details", vec![])
-        .await?;
-    let spot = client
-        .public_request("get_trading_pairs_details", vec![])
-        .await?;
-    let mut rows = Vec::new();
-    for market in response_array(&swap, &["data", "symbols"]) {
-        let base = required_string(market, "base_currency")?;
-        let quote = required_string(market, "quote_currency")?;
-        rows.push(MarketInfo {
-            exchange: "bitmart".to_string(),
-            exchange_symbol: required_string(market, "symbol")?,
-            product_symbol: format!("{base}-{quote}-SWAP"),
-            product_type: "swap".to_string(),
-            exchange_type: "swap".to_string(),
-            price_precision: value_string(market, "price_precision", "0"),
-            size_precision: value_string(market, "vol_precision", "0"),
-            min_size: value_string(market, "min_volume", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: "0".to_string(),
-            size_per_contract: value_string(market, "contract_size", "1"),
-        });
-    }
-    for market in response_array(&spot, &["data", "symbols"]) {
-        let base = required_string(market, "base_currency")?;
-        let quote = required_string(market, "quote_currency")?;
-        rows.push(MarketInfo {
-            exchange: "bitmart".to_string(),
-            exchange_symbol: required_string(market, "symbol")?,
-            product_symbol: format!("{base}-{quote}-SPOT"),
-            product_type: "spot".to_string(),
-            exchange_type: "spot".to_string(),
-            price_precision: decimal_precision(value_i32(market, "price_max_precision", 0)),
-            size_precision: value_string(market, "quote_increment", "0"),
-            min_size: value_string(market, "base_min_size", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: value_string(market, "min_buy_amount", "0"),
-            size_per_contract: "1".to_string(),
         });
     }
     Ok(rows)

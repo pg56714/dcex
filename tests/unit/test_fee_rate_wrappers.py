@@ -18,8 +18,6 @@ FEE_RATE_CASES = (
     ("binance", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
     ("bitget", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
     ("bitget", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
-    ("bitmart", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
-    ("bitmart", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
     ("bitmex", "get_futures_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_spot_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_linear_fee_rates", {}, "NATIVE_PRIVATE"),
