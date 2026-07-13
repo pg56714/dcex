@@ -1,3 +1,9 @@
+## 0.6.3 (2026-07-13)
+
+### Fix
+
+- align binance and bybit private requests
+
 ## 0.6.2 (2026-07-12)
 
 ### Fix
