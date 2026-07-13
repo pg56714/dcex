@@ -258,6 +258,14 @@ impl BybitClient {
         &self,
         params: &BybitParams,
     ) -> Result<ValidatedResponse> {
+        let body = self.cancel_all_orders_body_from_params(params)?;
+        self.post_request(CANCEL_ALL_ORDERS, body).await
+    }
+
+    fn cancel_all_orders_body_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<Map<String, Value>> {
         let mut body = Map::new();
         body.insert(
             "category".to_string(),
@@ -266,7 +274,26 @@ impl BybitClient {
         if let Some(product_symbol) = params.get("product_symbol") {
             self.insert_symbol_category(&mut body, product_symbol)?;
         }
-        self.post_request(CANCEL_ALL_ORDERS, body).await
+        for key in ["baseCoin", "settleCoin", "orderFilter"] {
+            insert_optional_string(&mut body, key, params.get(key));
+        }
+        let category = body
+            .get("category")
+            .and_then(Value::as_str)
+            .unwrap_or("linear");
+        if ["linear", "inverse"]
+            .iter()
+            .any(|candidate| category.eq_ignore_ascii_case(candidate))
+            && !["symbol", "baseCoin", "settleCoin"]
+                .iter()
+                .any(|key| body.contains_key(*key))
+        {
+            return Err(crate::DcexError::InvalidInput(
+                "one of product_symbol, baseCoin, settleCoin is required for Bybit linear or inverse cancel-all"
+                    .to_string(),
+            ));
+        }
+        Ok(body)
     }
 
     async fn get_order_history_from_params(
@@ -316,5 +343,71 @@ impl BybitClient {
         );
         body.insert("request".to_string(), params.json_required("request")?);
         self.post_request(path, body).await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+    use crate::DcexError;
+
+    fn client() -> BybitClient {
+        BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client")
+    }
+
+    #[test]
+    fn linear_cancel_all_requires_a_scope() {
+        let error = client()
+            .cancel_all_orders_body_from_params(&BybitParams::from_pairs(Vec::new()))
+            .expect_err("missing scope must fail");
+
+        assert_eq!(
+            error,
+            DcexError::InvalidInput(
+                "one of product_symbol, baseCoin, settleCoin is required for Bybit linear or inverse cancel-all"
+                    .to_string()
+            )
+        );
+    }
+
+    #[test]
+    fn cancel_all_forwards_official_scope_and_filter_fields() {
+        let body = client()
+            .cancel_all_orders_body_from_params(&BybitParams::from_pairs(vec![
+                ("category".to_string(), "linear".to_string()),
+                ("settleCoin".to_string(), "USDT".to_string()),
+                ("orderFilter".to_string(), "Order".to_string()),
+            ]))
+            .expect("body");
+
+        assert_eq!(
+            body.get("settleCoin"),
+            Some(&Value::String("USDT".to_string()))
+        );
+        assert_eq!(
+            body.get("orderFilter"),
+            Some(&Value::String("Order".to_string()))
+        );
+    }
+
+    #[test]
+    fn cancel_all_infers_inverse_category_from_symbol() {
+        let body = client()
+            .cancel_all_orders_body_from_params(&BybitParams::from_pairs(vec![(
+                "product_symbol".to_string(),
+                "BTC-USD-SWAP".to_string(),
+            )]))
+            .expect("body");
+
+        assert_eq!(
+            body.get("category"),
+            Some(&Value::String("inverse".to_string()))
+        );
+        assert_eq!(
+            body.get("symbol"),
+            Some(&Value::String("BTCUSD".to_string()))
+        );
     }
 }

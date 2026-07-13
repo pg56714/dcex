@@ -789,6 +789,11 @@ impl BinanceClient {
         product_symbol: &str,
         request: BinanceOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
+        if request.order_id.is_none() && request.orig_client_order_id.is_none() {
+            return Err(DcexError::InvalidInput(
+                "Either orderId or origClientOrderId is required.".to_string(),
+            ));
+        }
         let market = self.market_for_product_symbol(product_symbol)?;
         let path = if market == BinanceMarket::Spot {
             SPOT_ORDER

@@ -42,11 +42,17 @@ class PositionHTTP(HTTPManager):
         mode: int,
         product_symbol: str | None = None,
         coin: str | None = None,
+        category: str = "linear",
     ) -> dict[str, Any]:
         """Switch position mode."""
         return self._native_private(
             "switch_position_mode",
-            self._native_params(mode=mode, product_symbol=product_symbol, coin=coin),
+            self._native_params(
+                mode=mode,
+                product_symbol=product_symbol,
+                coin=coin,
+                category=category,
+            ),
         )
 
     def get_closed_pnl(

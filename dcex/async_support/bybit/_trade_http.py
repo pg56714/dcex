@@ -366,11 +366,20 @@ class TradeHTTP(HTTPManager):
         self,
         category: str = "linear",
         product_symbol: str | None = None,
+        baseCoin: str | None = None,
+        settleCoin: str | None = None,
+        orderFilter: str | None = None,
     ) -> dict[str, Any]:
         """Cancel all orders."""
         return await self._native_private(
             "cancel_all_orders",
-            self._native_params(category=category, product_symbol=product_symbol),
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                baseCoin=baseCoin,
+                settleCoin=settleCoin,
+                orderFilter=orderFilter,
+            ),
         )
 
     async def get_order_history(

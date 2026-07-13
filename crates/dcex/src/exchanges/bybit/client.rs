@@ -176,10 +176,14 @@ impl BybitClient {
     ) -> Result<()> {
         params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
         if include_category {
-            params.push((
-                "category".to_string(),
-                self.category_for_product_symbol(product_symbol, "linear")?,
-            ));
+            let default_category = params
+                .iter()
+                .find(|(key, _)| key == "category")
+                .map(|(_, value)| value.clone())
+                .unwrap_or_else(|| "linear".to_string());
+            let category = self.category_for_product_symbol(product_symbol, &default_category)?;
+            params.retain(|(key, _)| key != "category");
+            params.push(("category".to_string(), category));
         }
         Ok(())
     }
@@ -189,9 +193,14 @@ impl BybitClient {
         body: &mut Map<String, Value>,
         product_symbol: &str,
     ) -> Result<()> {
+        let default_category = body
+            .get("category")
+            .and_then(Value::as_str)
+            .unwrap_or("linear")
+            .to_string();
         body.insert(
             "category".to_string(),
-            Value::String(self.category_for_product_symbol(product_symbol, "linear")?),
+            Value::String(self.category_for_product_symbol(product_symbol, &default_category)?),
         );
         body.insert(
             "symbol".to_string(),
@@ -357,6 +366,41 @@ mod tests {
                 &serde_json::json!({"result": {"timeNano": "1700000000000000000"}})
             ),
             Some(1_700_000_000_000)
+        );
+    }
+
+    #[test]
+    fn symbol_category_replaces_existing_query_category() {
+        let client = BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client");
+        let mut params = vec![("category".to_string(), "linear".to_string())];
+
+        client
+            .push_symbol_category(&mut params, "BTC-USD-SWAP", true)
+            .expect("symbol category");
+
+        assert_eq!(
+            params
+                .iter()
+                .filter(|(key, _)| key == "category")
+                .collect::<Vec<_>>(),
+            vec![&("category".to_string(), "inverse".to_string())]
+        );
+        assert!(params.contains(&("symbol".to_string(), "BTCUSD".to_string())));
+    }
+
+    #[test]
+    fn raw_symbol_preserves_explicit_category() {
+        let client = BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client");
+        let mut params = vec![("category".to_string(), "spot".to_string())];
+
+        client
+            .push_symbol_category(&mut params, "BTCUSDT", true)
+            .expect("symbol category");
+
+        assert!(params.contains(&("category".to_string(), "spot".to_string())));
+        assert_eq!(
+            params.iter().filter(|(key, _)| key == "category").count(),
+            1
         );
     }
 }
