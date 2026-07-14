@@ -73,34 +73,6 @@ fn gunzip(payload: &[u8]) -> Result<String> {
     })
 }
 
-pub(super) fn normalize_symbol(product_symbol: &str) -> Result<String> {
-    let product_symbol = product_symbol.trim();
-    if product_symbol.is_empty() {
-        return Err(DcexError::InvalidInput(
-            "BingX WebSocket symbol must not be empty.".to_string(),
-        ));
-    }
-    if product_symbol.contains('-') {
-        let parts = product_symbol.split('-').collect::<Vec<_>>();
-        if parts.len() >= 2 && !parts[0].is_empty() && !parts[1].is_empty() {
-            return Ok(format!(
-                "{}-{}",
-                parts[0].to_ascii_uppercase(),
-                parts[1].to_ascii_uppercase()
-            ));
-        }
-    }
-    if !product_symbol
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '-')
-    {
-        return Err(DcexError::InvalidInput(format!(
-            "unsupported BingX WebSocket symbol: {product_symbol}"
-        )));
-    }
-    Ok(product_symbol.to_ascii_uppercase())
-}
-
 pub(super) fn normalize_data_type(data_type: &str) -> Result<String> {
     let data_type = data_type.trim();
     if data_type.is_empty() {
@@ -161,11 +133,6 @@ mod tests {
 
     #[test]
     fn normalizes_symbols_and_data_types() {
-        assert_eq!(
-            normalize_symbol("BTC-USDT-SPOT").expect("canonical"),
-            "BTC-USDT"
-        );
-        assert_eq!(normalize_symbol("eth-usdt").expect("raw"), "ETH-USDT");
         assert!(normalize_data_type("BTC-USDT@kline_1m").is_ok());
         assert!(normalize_data_type("BTC USDT@trade").is_err());
     }

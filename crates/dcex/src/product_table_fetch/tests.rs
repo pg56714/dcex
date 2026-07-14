@@ -38,6 +38,8 @@ fn canonical_symbols_cover_exchange_specific_formats() {
         binance_product_symbol("BTC", "USDT", "BTCUSDT_260626", false),
         "BTC-USDT-260626-SWAP"
     );
+    assert_eq!(binance_product_type("PERPETUAL"), "swap");
+    assert_eq!(binance_product_type("CURRENT_QUARTER"), "futures");
     assert_eq!(
         bitmex_product_symbol("FFCCSX", "XBTUSDZ26", "XBT", "USD"),
         "XBT-USD-Z26-SWAP"
@@ -54,6 +56,13 @@ fn canonical_symbols_cover_exchange_specific_formats() {
         ),
         "BTC-USD-27MAR26-SWAP"
     );
+
+    let mut inverse_base = "BTC".to_string();
+    assert_eq!(
+        bybit_product_symbol("inverse", &mut inverse_base, "USD", "BTCUSDH23", &[]),
+        "BTC-USD-H23-SWAP"
+    );
+    assert_eq!(bybit_product_type("inverse", "InverseFutures"), "futures");
     assert_eq!(normalize_kucoin_currency("XBT"), "BTC");
     assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
 }

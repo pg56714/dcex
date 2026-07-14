@@ -159,7 +159,7 @@ mod tests {
         let body = client()
             .switch_position_mode_body_from_params(&BybitParams::from_pairs(vec![
                 ("mode".to_string(), "0".to_string()),
-                ("product_symbol".to_string(), "BTC-USD-20261225".to_string()),
+                ("product_symbol".to_string(), "BTC-USD-H23-SWAP".to_string()),
             ]))
             .expect("body");
 
@@ -169,7 +169,7 @@ mod tests {
         );
         assert_eq!(
             body.get("symbol"),
-            Some(&Value::String("BTCUSD".to_string()))
+            Some(&Value::String("BTCUSDH23".to_string()))
         );
     }
 }

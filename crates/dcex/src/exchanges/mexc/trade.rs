@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 
 use super::client::MexcClient;
 use super::endpoints::*;
-use super::params::MexcParams;
+use super::params::{require_one_identifier, MexcParams};
 use super::signing::json_value_string;
 
 const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
@@ -118,6 +118,7 @@ impl MexcClient {
             }
             "place_spot_batch_orders" => self.place_spot_batch_orders_from_params(params).await,
             "cancel_spot_order" => {
+                require_one_identifier(&params, &["orderId", "origClientOrderId"])?;
                 let mut query = params.only(&["orderId", "origClientOrderId", "recvWindow"]);
                 self.push_required_product_symbol(&mut query, params, "")?;
                 self.spot_private(HttpMethod::Delete, SPOT_ORDER, query)

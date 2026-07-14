@@ -173,6 +173,7 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
         let quote = required_string(market, "quoteAsset")?;
         let symbol = required_string(market, "symbol")?;
         let product_symbol = binance_product_symbol(&base, &quote, &symbol, false);
+        let contract_type = value_string(market, "contractType", "");
         let filters = value_array(market.get("filters"));
         let price = find_filter(filters, &["PRICE_FILTER"]);
         let lot = find_filter(filters, &["LOT_SIZE"]);
@@ -181,8 +182,8 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
             exchange: "binance".to_string(),
             exchange_symbol: symbol,
             product_symbol,
-            product_type: "swap".to_string(),
-            exchange_type: value_string(market, "contractType", ""),
+            product_type: binance_product_type(&contract_type).to_string(),
+            exchange_type: contract_type,
             price_precision: value_string(price, "tickSize", "0"),
             size_precision: value_string(lot, "stepSize", "0"),
             min_size: value_string(lot, "minQty", "0"),
@@ -364,13 +365,8 @@ pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
             let symbol = required_string(&market, "symbol")?;
             let parts = symbol.split('-').collect::<Vec<_>>();
             let product_symbol = bybit_product_symbol(category, &mut base, &quote, &symbol, &parts);
-            let product_type = if category == "spot" {
-                "spot"
-            } else if value_string(&market, "contractType", "") == "LinearFutures" {
-                "futures"
-            } else {
-                "swap"
-            };
+            let contract_type = value_string(&market, "contractType", "");
+            let product_type = bybit_product_type(category, &contract_type);
             let price = market.get("priceFilter").unwrap_or(&Value::Null);
             let lot = market.get("lotSizeFilter").unwrap_or(&Value::Null);
             rows.push(MarketInfo {

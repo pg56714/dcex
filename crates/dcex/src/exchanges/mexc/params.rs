@@ -84,6 +84,20 @@ pub(super) fn insert_number(body: &mut Map<String, Value>, key: &str, value: i64
     body.insert(key.to_string(), Value::Number(Number::from(value)));
 }
 
+pub(super) fn require_one_identifier(params: &MexcParams, keys: &[&str]) -> Result<()> {
+    if keys.iter().any(|key| {
+        params
+            .get(key)
+            .is_some_and(|value| !value.trim().is_empty())
+    }) {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "one of {} is required",
+        keys.join(", ")
+    )))
+}
+
 pub(super) fn body_value(value: &str, number: bool, boolean: bool) -> Value {
     if boolean {
         return match value {
@@ -103,4 +117,21 @@ pub(super) fn body_value(value: &str, number: bool, boolean: bool) -> Value {
         }
     }
     Value::String(value.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn requires_one_cancel_identifier() {
+        let empty = MexcParams::from_pairs(Vec::new());
+        assert!(require_one_identifier(&empty, &["orderId", "origClientOrderId"]).is_err());
+
+        let order_id = MexcParams::from_pairs(vec![("orderId".to_string(), "1".to_string())]);
+        assert!(require_one_identifier(&order_id, &["orderId", "origClientOrderId"]).is_ok());
+
+        let blank = MexcParams::from_pairs(vec![("orderId".to_string(), " ".to_string())]);
+        assert!(require_one_identifier(&blank, &["orderId", "origClientOrderId"]).is_err());
+    }
 }

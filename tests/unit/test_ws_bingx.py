@@ -31,10 +31,12 @@ class _FakeNativeBingxPublicWebSocketClient:
         return "unsub-1"
 
     async def subscribe_ticker(self, product_symbol: str) -> str:
-        return await self.subscribe(f"{product_symbol}@ticker")
+        symbol = product_symbol.removesuffix("-SPOT")
+        return await self.subscribe(f"{symbol}@ticker")
 
     async def subscribe_trades(self, product_symbol: str) -> str:
-        return await self.subscribe(f"{product_symbol}@trade")
+        symbol = product_symbol.removesuffix("-SPOT")
+        return await self.subscribe(f"{symbol}@trade")
 
     async def subscribe_orderbook(
         self,
@@ -42,10 +44,14 @@ class _FakeNativeBingxPublicWebSocketClient:
         depth: int = 5,
         speed: str = "500ms",
     ) -> str:
-        return await self.subscribe(f"{product_symbol}@depth{depth}@{speed}")
+        _ = speed
+        symbol = product_symbol.removesuffix("-SPOT")
+        return await self.subscribe(f"{symbol}@depth{depth}")
 
     async def subscribe_klines(self, product_symbol: str, interval: str) -> str:
-        return await self.subscribe(f"{product_symbol}@kline_{interval}")
+        symbol = product_symbol.removesuffix("-SPOT")
+        interval = {"1m": "1min", "3m": "3min", "5m": "5min"}.get(interval, interval)
+        return await self.subscribe(f"{symbol}@kline_{interval}")
 
     async def recv(self) -> bytes:
         return b'{"code":0,"dataType":"BTC-USDT@trade","data":[]}'
@@ -137,10 +143,10 @@ async def test_bingx_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
         event = await ws.recv()
 
     assert native_client.subscriptions == [
-        "BTC-USDT-SPOT@trade",
-        "BTC-USDT-SPOT@ticker",
-        "BTC-USDT-SPOT@depth5@500ms",
-        "BTC-USDT-SPOT@kline_1m",
+        "BTC-USDT@trade",
+        "BTC-USDT@ticker",
+        "BTC-USDT@depth5",
+        "BTC-USDT@kline_1min",
     ]
     assert native_client.ping_count == 1
     assert event == {"code": 0, "dataType": "BTC-USDT@trade", "data": []}

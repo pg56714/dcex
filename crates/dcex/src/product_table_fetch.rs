@@ -189,6 +189,14 @@ fn binance_product_symbol(base: &str, quote: &str, symbol: &str, spot: bool) -> 
     )
 }
 
+fn binance_product_type(contract_type: &str) -> &'static str {
+    if contract_type == "PERPETUAL" || contract_type == "TRADIFI_PERPETUAL" {
+        "swap"
+    } else {
+        "futures"
+    }
+}
+
 fn bitmex_product_symbol(typ: &str, symbol: &str, base: &str, quote: &str) -> String {
     match typ {
         "IFXXXP" => format!("{base}-{quote}-SPOT"),
@@ -221,8 +229,25 @@ fn bybit_product_symbol(
         }
         format!("{base}-{quote}-{expiry}-SWAP")
     } else {
-        let _ = symbol;
+        let pair = format!("{base}{quote}");
+        if category == "inverse" {
+            if let Some(expiry) = symbol.strip_prefix(&pair) {
+                if !expiry.is_empty() {
+                    return format!("{base}-{quote}-{expiry}-SWAP");
+                }
+            }
+        }
         format!("{base}-{quote}-SWAP")
+    }
+}
+
+fn bybit_product_type(category: &str, contract_type: &str) -> &'static str {
+    if category == "spot" {
+        "spot"
+    } else if contract_type.ends_with("Futures") {
+        "futures"
+    } else {
+        "swap"
     }
 }
 

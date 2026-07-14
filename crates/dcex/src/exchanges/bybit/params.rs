@@ -56,9 +56,20 @@ impl BybitParams {
 }
 
 pub(super) fn exchange_symbol_fallback(product_symbol: &str) -> String {
-    let mut parts = product_symbol.split('-');
-    match (parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(_kind)) => format!("{base}{quote}"),
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    match parts.as_slice() {
+        [base, quote, kind]
+            if kind.eq_ignore_ascii_case("SPOT") || kind.eq_ignore_ascii_case("SWAP") =>
+        {
+            format!("{base}{quote}")
+        }
+        [base, quote, expiry, kind] if kind.eq_ignore_ascii_case("SWAP") => {
+            if quote.eq_ignore_ascii_case("USD") {
+                format!("{base}{quote}{expiry}")
+            } else {
+                format!("{base}{quote}-{expiry}")
+            }
+        }
         _ => product_symbol.to_string(),
     }
 }
@@ -166,5 +177,15 @@ mod tests {
             "client-order".to_string(),
         )]);
         assert!(require_one_identifier(&linked, &["orderId", "orderLinkId"]).is_ok());
+    }
+
+    #[test]
+    fn exchange_symbol_fallback_preserves_dated_futures() {
+        assert_eq!(exchange_symbol_fallback("BTC-USDT-SWAP"), "BTCUSDT");
+        assert_eq!(
+            exchange_symbol_fallback("BTC-USDT-21FEB25-SWAP"),
+            "BTCUSDT-21FEB25"
+        );
+        assert_eq!(exchange_symbol_fallback("BTC-USD-H23-SWAP"), "BTCUSDH23");
     }
 }
