@@ -441,6 +441,20 @@ def test_sync_extended_market_methods_use_documented_paths() -> None:
     )
 
 
+def test_sync_extended_candles_require_limit() -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.extended.client import Client
+
+    client = Client(
+        base_url="http://127.0.0.1:1",
+        preload_product_table=False,
+        user_agent="dcex-test",
+    )
+    with pytest.raises(ValueError, match="limit is required for Extended candles"):
+        client.get_candles("BTC-USD", "1m")
+    client.close()
+
+
 def test_sync_extended_get_order_uses_plural_order_path() -> None:
     pytest.importorskip("dcex._native")
     from dcex.extended.client import Client

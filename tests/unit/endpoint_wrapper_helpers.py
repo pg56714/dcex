@@ -776,6 +776,8 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         kwargs["orderId"] = "test-order-id"
     if case.exchange == "extended" and case.method_name == "place_order":
         kwargs["body"] = {"id": "signed-order", "market": "BTC-USD"}
+    if case.exchange == "extended" and case.method_name == "get_candles":
+        kwargs["limit"] = 50
     return kwargs
 
 

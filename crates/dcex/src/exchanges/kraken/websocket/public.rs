@@ -128,20 +128,7 @@ impl KrakenPublicWebSocket {
             .map(|symbol| normalize_symbol(&symbol))
             .collect::<Result<Vec<_>>>()?;
         let request_id = self.next_request_id();
-        let mut params = serde_json::Map::new();
-        params.insert("channel".to_string(), Value::String(channel));
-        params.insert(
-            "symbol".to_string(),
-            Value::Array(symbols.into_iter().map(Value::String).collect()),
-        );
-        params.insert("req_id".to_string(), Value::from(request_id));
-        if let Some(extra_params) = extra_params {
-            params.extend(extra_params);
-        }
-        let payload = json!({
-            "method": method,
-            "params": params,
-        });
+        let payload = subscription_payload(method, channel, symbols, extra_params);
         self.connection.send_json(&payload).await?;
         Ok(request_id)
     }
@@ -151,6 +138,27 @@ impl KrakenPublicWebSocket {
         self.next_request_id = self.next_request_id.saturating_add(1).max(1);
         id
     }
+}
+
+fn subscription_payload(
+    method: &str,
+    channel: String,
+    symbols: Vec<String>,
+    extra_params: Option<serde_json::Map<String, Value>>,
+) -> Value {
+    let mut params = serde_json::Map::new();
+    params.insert("channel".to_string(), Value::String(channel));
+    params.insert(
+        "symbol".to_string(),
+        Value::Array(symbols.into_iter().map(Value::String).collect()),
+    );
+    if let Some(extra_params) = extra_params {
+        params.extend(extra_params);
+    }
+    json!({
+        "method": method,
+        "params": params,
+    })
 }
 
 fn normalize_method(method: &str) -> Result<&'static str> {
@@ -253,5 +261,19 @@ mod tests {
         assert!(normalize_depth(50).is_err());
         assert_eq!(normalize_interval(5).expect("interval"), 5);
         assert!(normalize_interval(2).is_err());
+    }
+
+    #[test]
+    fn subscription_payload_omits_req_id() {
+        let payload = subscription_payload(
+            "subscribe",
+            "trade".to_string(),
+            vec!["BTC/USD".to_string()],
+            None,
+        );
+
+        assert_eq!(payload["method"], "subscribe");
+        assert_eq!(payload["params"]["channel"], "trade");
+        assert!(payload["params"].get("req_id").is_none());
     }
 }

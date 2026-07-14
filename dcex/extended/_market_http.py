@@ -58,6 +58,8 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         endTime: int | None = None,  # noqa: N803
     ) -> Any:  # noqa: ANN401
+        if limit is None:
+            raise ValueError("limit is required for Extended candles.")
         return self._native_public(
             "get_candles",
             self._native_params(

@@ -48,9 +48,18 @@ impl ExtendedClient {
                     .get("candleType")
                     .or_else(|| params.get("candle_type"))
                     .unwrap_or("trades");
+                let interval = params.required("interval")?;
+                let limit = params.required("limit")?;
+                let mut query = vec![
+                    ("interval".to_string(), interval.to_string()),
+                    ("limit".to_string(), limit.to_string()),
+                ];
+                if let Some(end_time) = params.get("endTime") {
+                    query.push(("endTime".to_string(), end_time.to_string()));
+                }
                 self.public_get(
                     &format!("/api/v1/info/candles/{market}/{candle_type}"),
-                    params.only(&["interval", "limit", "endTime"]),
+                    query,
                 )
                 .await
             }

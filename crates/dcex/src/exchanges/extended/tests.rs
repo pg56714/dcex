@@ -102,6 +102,45 @@ async fn market_methods_use_documented_paths() {
 }
 
 #[tokio::test]
+async fn get_candles_requires_interval_and_limit() {
+    let client = ExtendedClient::with_base_url(
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:1".to_string(),
+        "dcex-test".to_string(),
+    )
+    .expect("client");
+
+    let missing_interval = client
+        .public_request(
+            "get_candles",
+            vec![
+                ("market".to_string(), "BTC-USD".to_string()),
+                ("limit".to_string(), "50".to_string()),
+            ],
+        )
+        .await
+        .expect_err("interval must be required");
+    assert!(missing_interval
+        .to_string()
+        .contains("missing required parameter: interval"));
+
+    let missing_limit = client
+        .public_request(
+            "get_candles",
+            vec![
+                ("market".to_string(), "BTC-USD".to_string()),
+                ("interval".to_string(), "1m".to_string()),
+            ],
+        )
+        .await
+        .expect_err("limit must be required");
+    assert!(missing_limit
+        .to_string()
+        .contains("missing required parameter: limit"));
+}
+
+#[tokio::test]
 async fn get_order_uses_plural_order_path() {
     let request = private_request("get_order", vec![("id".to_string(), "123".to_string())]).await;
     assert_request_line(request.as_str(), "GET /api/v1/user/orders/123 HTTP/1.1");
