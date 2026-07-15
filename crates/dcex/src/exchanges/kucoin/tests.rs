@@ -62,12 +62,12 @@ fn futures_symbol_fallback_matches_kucoin_contract_format() {
 }
 
 #[tokio::test]
-async fn public_spot_orderbook_is_signed() {
+async fn public_spot_orderbook_uses_public_endpoint() {
     let (base_url, handle) = server();
     let client = KucoinClient::with_base_urls(
-        Some("api-key".to_string()),
-        Some("secret".to_string()),
-        Some("passphrase".to_string()),
+        None,
+        None,
+        None,
         Duration::from_secs(2),
         base_url,
         "http://127.0.0.1:9".to_string(),
@@ -84,12 +84,12 @@ async fn public_spot_orderbook_is_signed() {
 
     assert_eq!(response.data["code"], "200000");
     let request = handle.join().expect("server");
-    assert!(request.starts_with("GET /api/v3/market/orderbook/level2?symbol=BTC-USDT HTTP/1.1"));
+    assert!(request.starts_with("GET /api/v1/market/orderbook/level2_20?symbol=BTC-USDT HTTP/1.1"));
     let request = request.to_ascii_lowercase();
-    assert!(request.contains("kc-api-key: api-key"));
-    assert!(request.contains("kc-api-sign: "));
-    assert!(request.contains("kc-api-timestamp: "));
-    assert!(request.contains("kc-api-passphrase: "));
+    assert!(!request.contains("kc-api-key:"));
+    assert!(!request.contains("kc-api-sign:"));
+    assert!(!request.contains("kc-api-timestamp:"));
+    assert!(!request.contains("kc-api-passphrase:"));
 }
 
 fn server() -> (String, thread::JoinHandle<String>) {

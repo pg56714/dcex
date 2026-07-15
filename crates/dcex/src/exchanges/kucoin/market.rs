@@ -23,7 +23,7 @@ impl KucoinClient {
             "get_spot_all_tickers" => (KucoinMarket::Spot, SPOT_ALL_TICKERS.to_string(), false),
             "get_spot_orderbook" => {
                 self.normalize_symbol_query(&mut params, false)?;
-                (KucoinMarket::Spot, SPOT_ORDERBOOK.to_string(), true)
+                (KucoinMarket::Spot, SPOT_ORDERBOOK.to_string(), false)
             }
             "get_spot_public_trades" => {
                 self.normalize_symbol_query(&mut params, false)?;

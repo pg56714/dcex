@@ -31,6 +31,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         change_margin_type(product_symbol => "product_symbol", margin_type => "marginType"),
         close_swap_all_positions(product_symbol => "product_symbol"),
         close_swap_position(position_id => "positionId"),
+        close_listen_key(listen_key => "listen_key"),
         get_account_balance(),
         get_account_uid(),
         get_all_account_balance(),

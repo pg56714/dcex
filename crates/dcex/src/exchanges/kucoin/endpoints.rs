@@ -7,7 +7,7 @@ pub(super) const SPOT_WS_PRIVATE_TOKEN: &str = "/api/v1/bullet-private";
 pub(super) const SPOT_INSTRUMENT_INFO: &str = "/api/v2/symbols";
 pub(super) const SPOT_TICKER: &str = "/api/v1/market/orderbook/level1";
 pub(super) const SPOT_ALL_TICKERS: &str = "/api/v1/market/allTickers";
-pub(super) const SPOT_ORDERBOOK: &str = "/api/v3/market/orderbook/level2";
+pub(super) const SPOT_ORDERBOOK: &str = "/api/v1/market/orderbook/level2_20";
 pub(super) const SPOT_PUBLIC_TRADES: &str = "/api/v1/market/histories";
 pub(super) const SPOT_KLINE: &str = "/api/v1/market/candles";
 

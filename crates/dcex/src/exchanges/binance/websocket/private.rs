@@ -9,7 +9,7 @@ use crate::{DcexError, Result};
 use super::super::client::BinanceClient;
 use super::super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL};
 
-const FUTURES_PRIVATE_WS_BASE_URL: &str = "wss://fstream.binance.com/private";
+const FUTURES_PRIVATE_WS_BASE_URL: &str = "wss://fstream.binance.com";
 
 pub struct BinancePrivateWebSocket {
     http_client: BinanceClient,
@@ -229,8 +229,8 @@ mod tests {
     #[test]
     fn builds_private_stream_url() {
         assert_eq!(
-            private_stream_url("wss://fstream.binance.com/private/", "listen-key"),
-            "wss://fstream.binance.com/private/ws/listen-key"
+            private_stream_url("wss://fstream.binance.com/", "listen-key"),
+            "wss://fstream.binance.com/ws/listen-key"
         );
     }
 

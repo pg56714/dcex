@@ -104,7 +104,7 @@ impl BybitPublicWebSocket {
         product_symbol: &str,
         depth: u32,
     ) -> Result<String> {
-        validate_orderbook_depth(depth)?;
+        validate_orderbook_depth(&self.category, depth)?;
         let topic = format!(
             "orderbook.{depth}.{}",
             self.exchange_symbol(product_symbol)?
@@ -233,13 +233,19 @@ fn normalize_topic(topic: &str) -> Result<String> {
     Ok(topic.to_string())
 }
 
-fn validate_orderbook_depth(depth: u32) -> Result<()> {
-    if depth == 0 {
-        return Err(DcexError::InvalidInput(
-            "Bybit orderbook depth must be greater than zero.".to_string(),
-        ));
+fn validate_orderbook_depth(category: &str, depth: u32) -> Result<()> {
+    let is_supported = match category {
+        "spot" | "linear" | "inverse" => matches!(depth, 1 | 50 | 200 | 1_000),
+        "option" => matches!(depth, 25 | 100),
+        _ => false,
+    };
+    if is_supported {
+        Ok(())
+    } else {
+        Err(DcexError::InvalidInput(format!(
+            "unsupported Bybit orderbook depth {depth} for {category} WebSocket category."
+        )))
     }
-    Ok(())
 }
 
 #[cfg(test)]
@@ -265,5 +271,13 @@ mod tests {
     fn rejects_invalid_symbol_and_topic() {
         assert!(normalize_symbol("BTC-USDT").is_err());
         assert!(normalize_topic("publicTrade/BTCUSDT").is_err());
+    }
+
+    #[test]
+    fn validates_orderbook_depths_by_category() {
+        assert!(validate_orderbook_depth("spot", 1_000).is_ok());
+        assert!(validate_orderbook_depth("linear", 25).is_err());
+        assert!(validate_orderbook_depth("option", 25).is_ok());
+        assert!(validate_orderbook_depth("option", 200).is_err());
     }
 }

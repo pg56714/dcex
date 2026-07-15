@@ -99,6 +99,16 @@ impl BingxClient {
                 )
                 .await
             }
+            "close_listen_key" => {
+                self.private_delete(
+                    SWAP_LISTEN_KEY,
+                    vec![(
+                        "listenKey".to_string(),
+                        params.required("listen_key")?.to_string(),
+                    )],
+                )
+                .await
+            }
             _ => return Ok(None),
         };
         Ok(Some(result?))

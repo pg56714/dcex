@@ -109,6 +109,7 @@ pub(crate) fn l2_book_subscription(
     n_sig_figs: Option<u64>,
     mantissa: Option<u64>,
 ) -> Result<Value> {
+    validate_l2_book_precision(n_sig_figs, mantissa)?;
     let mut subscription = coin_subscription("l2Book", coin)?
         .as_object()
         .expect("coin subscription object")
@@ -126,6 +127,29 @@ pub(crate) fn l2_book_subscription(
         );
     }
     Ok(Value::Object(subscription))
+}
+
+fn validate_l2_book_precision(n_sig_figs: Option<u64>, mantissa: Option<u64>) -> Result<()> {
+    if let Some(n_sig_figs) = n_sig_figs {
+        if !matches!(n_sig_figs, 2 | 3 | 4 | 5) {
+            return Err(DcexError::InvalidInput(format!(
+                "Hyperliquid l2Book nSigFigs must be one of 2, 3, 4, or 5; got {n_sig_figs}."
+            )));
+        }
+    }
+    if let Some(mantissa) = mantissa {
+        if n_sig_figs != Some(5) {
+            return Err(DcexError::InvalidInput(
+                "Hyperliquid l2Book mantissa requires nSigFigs to be 5.".to_string(),
+            ));
+        }
+        if !matches!(mantissa, 1 | 2 | 5) {
+            return Err(DcexError::InvalidInput(format!(
+                "Hyperliquid l2Book mantissa must be one of 1, 2, or 5; got {mantissa}."
+            )));
+        }
+    }
+    Ok(())
 }
 
 pub(crate) fn normalize_coin(product_symbol: &str) -> Result<String> {
@@ -264,5 +288,13 @@ mod tests {
         let user = normalize_user("0x000000000000000000000000000000000000000A").expect("user");
         assert_eq!(user, "0x000000000000000000000000000000000000000a");
         assert!(normalize_user("not-an-address").is_err());
+    }
+
+    #[test]
+    fn validates_l2_book_precision() {
+        assert!(l2_book_subscription("BTC".to_string(), Some(5), Some(2)).is_ok());
+        assert!(l2_book_subscription("BTC".to_string(), Some(1), None).is_err());
+        assert!(l2_book_subscription("BTC".to_string(), Some(4), Some(2)).is_err());
+        assert!(l2_book_subscription("BTC".to_string(), Some(5), Some(3)).is_err());
     }
 }

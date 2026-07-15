@@ -168,12 +168,12 @@ impl LighterPrivateWebSocket {
     }
 
     pub async fn subscribe_account_all_trades(&mut self) -> Result<()> {
-        self.subscribe(&account_channel("account_all_trades", self.account_index)?)
+        self.subscribe_authenticated(&account_channel("account_all_trades", self.account_index)?)
             .await
     }
 
     pub async fn subscribe_account_all_positions(&mut self) -> Result<()> {
-        self.subscribe(&account_channel(
+        self.subscribe_authenticated(&account_channel(
             "account_all_positions",
             self.account_index,
         )?)

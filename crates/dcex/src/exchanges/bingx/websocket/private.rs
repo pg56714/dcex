@@ -113,13 +113,27 @@ impl BingxPrivateWebSocket {
         Ok(listen_key.to_string())
     }
 
-    pub async fn close(&mut self) -> Result<()> {
-        if let Some(connection) = &mut self.connection {
-            connection.close().await?;
+    pub async fn close_listen_key(&mut self) -> Result<()> {
+        if let Some(listen_key) = self.listen_key.take() {
+            self.http_client
+                .private_request(
+                    "close_listen_key",
+                    vec![("listen_key".to_string(), listen_key)],
+                )
+                .await?;
         }
-        self.connection = None;
-        self.listen_key = None;
         Ok(())
+    }
+
+    pub async fn close(&mut self) -> Result<()> {
+        let close_connection_result = if let Some(connection) = &mut self.connection {
+            connection.close().await
+        } else {
+            Ok(())
+        };
+        self.connection = None;
+        let close_listen_key_result = self.close_listen_key().await;
+        close_connection_result.and(close_listen_key_result)
     }
 
     pub async fn ping(&mut self) -> Result<()> {
