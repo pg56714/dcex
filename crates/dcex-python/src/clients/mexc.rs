@@ -29,8 +29,8 @@ impl PythonMexcHttpClient {
                 api_key,
                 api_secret,
                 timeout,
-                base_url.clone(),
-                contract_base_url.unwrap_or(base_url),
+                base_url,
+                contract_base_url.unwrap_or_else(|| "https://contract.mexc.com".to_string()),
             )
             .map_err(to_py_runtime_error)?,
         })

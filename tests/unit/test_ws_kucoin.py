@@ -9,10 +9,12 @@ class _FakeNativeKucoinPublicWebSocketClient:
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         futures_http_base_url: str | None = None,
+        market: str = "spot",
     ) -> None:
         self.timeout = timeout
         self.spot_http_base_url = spot_http_base_url
         self.futures_http_base_url = futures_http_base_url
+        self.market = market
         self.connected = False
         self.closed = False
         self.ping_count = 0
@@ -38,16 +40,24 @@ class _FakeNativeKucoinPublicWebSocketClient:
         return "unsub-1"
 
     async def subscribe_ticker(self, product_symbol: str) -> str:
-        return await self.subscribe(f"/market/ticker:{product_symbol}")
+        topic = (
+            f"/contractMarket/tickerV2:{product_symbol}"
+            if self.market == "futures"
+            else f"/market/ticker:{product_symbol}"
+        )
+        return await self.subscribe(topic)
 
     async def subscribe_trades(self, product_symbol: str) -> str:
-        return await self.subscribe(f"/market/match:{product_symbol}")
+        prefix = "/contractMarket/execution" if self.market == "futures" else "/market/match"
+        return await self.subscribe(f"{prefix}:{product_symbol}")
 
     async def subscribe_orderbook(self, product_symbol: str) -> str:
-        return await self.subscribe(f"/market/level2:{product_symbol}")
+        prefix = "/contractMarket/level2" if self.market == "futures" else "/market/level2"
+        return await self.subscribe(f"{prefix}:{product_symbol}")
 
     async def subscribe_klines(self, product_symbol: str, interval: str) -> str:
-        return await self.subscribe(f"/market/candles:{product_symbol}_{interval}")
+        prefix = "/contractMarket/limitCandle" if self.market == "futures" else "/market/candles"
+        return await self.subscribe(f"{prefix}:{product_symbol}_{interval}")
 
     async def recv(self) -> bytes:
         return b'{"type":"message","topic":"/market/match:BTC-USDT","data":{}}'
@@ -62,6 +72,7 @@ class _FakeNativeKucoinPrivateWebSocketClient:
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         futures_http_base_url: str | None = None,
+        market: str = "spot",
     ) -> None:
         self.api_key = api_key
         self.api_secret = api_secret
@@ -71,6 +82,7 @@ class _FakeNativeKucoinPrivateWebSocketClient:
         self.futures_http_base_url = futures_http_base_url
         self.connected = False
         self.closed = False
+        self.market = market
         self.ping_count = 0
         self.subscriptions: list[str] = []
         self.unsubscriptions: list[str] = []
@@ -94,10 +106,14 @@ class _FakeNativeKucoinPrivateWebSocketClient:
         return "unsub-1"
 
     async def subscribe_orders(self) -> str:
-        return await self.subscribe("/spotMarket/tradeOrders")
+        topic = (
+            "/contractMarket/tradeOrders" if self.market == "futures" else "/spotMarket/tradeOrders"
+        )
+        return await self.subscribe(topic)
 
     async def subscribe_balances(self) -> str:
-        return await self.subscribe("/account/balance")
+        topic = "/contractAccount/wallet" if self.market == "futures" else "/account/balance"
+        return await self.subscribe(topic)
 
     async def recv(self) -> bytes:
         return b'{"type":"message","topic":"/spotMarket/tradeOrders","data":{}}'
@@ -146,6 +162,47 @@ async def test_kucoin_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None
         "data": {},
     }
     assert native_client.closed is True
+
+
+@pytest.mark.asyncio
+async def test_kucoin_futures_ws_routes_official_topics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import kucoin
+
+    monkeypatch.setattr(kucoin, "_native", _FakeNative)
+
+    async with kucoin.public(market="futures") as public_ws:
+        public_native = public_ws._native_client
+        assert public_native.market == "futures"
+        await public_ws.subscribe_ticker("XBTUSDTM")
+        await public_ws.subscribe_trades("XBTUSDTM")
+        await public_ws.subscribe_orderbook("XBTUSDTM")
+        await public_ws.subscribe_klines("XBTUSDTM", "1min")
+
+    assert public_native.subscriptions == [
+        "/contractMarket/tickerV2:XBTUSDTM",
+        "/contractMarket/execution:XBTUSDTM",
+        "/contractMarket/level2:XBTUSDTM",
+        "/contractMarket/limitCandle:XBTUSDTM_1min",
+    ]
+
+    async with kucoin.private(
+        api_key="api-key",
+        api_secret="api-secret",
+        passphrase="passphrase",
+        market="futures",
+    ) as private_ws:
+        private_native = private_ws._native_client
+        assert private_native.market == "futures"
+        await private_ws.subscribe_orders()
+        await private_ws.subscribe_balances()
+
+    assert private_native.subscriptions == [
+        "/contractMarket/tradeOrders",
+        "/contractAccount/wallet",
+    ]
 
 
 @pytest.mark.asyncio

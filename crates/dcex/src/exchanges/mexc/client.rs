@@ -9,7 +9,7 @@ use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpRespon
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
-use super::endpoints::BASE_URL;
+use super::endpoints::{BASE_URL, CONTRACT_BASE_URL};
 use super::params::{
     exchange_symbol_fallback, insert_optional_string, is_canonical_product_symbol, MexcParams,
 };
@@ -42,7 +42,7 @@ impl MexcClient {
             api_secret,
             timeout,
             BASE_URL.to_string(),
-            BASE_URL.to_string(),
+            CONTRACT_BASE_URL.to_string(),
         )
     }
 

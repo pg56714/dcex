@@ -7,11 +7,12 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
 use super::super::client::{KucoinClient, KucoinMarket};
-use super::super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL, SPOT_WS_PUBLIC_TOKEN};
+use super::super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL, WS_PUBLIC_TOKEN};
 use super::{extract_bullet_token, normalize_symbol, normalize_topic, websocket_url};
 
 pub struct KucoinPublicWebSocket {
     http_client: KucoinClient,
+    market: KucoinMarket,
     timeout: Duration,
     connection: Option<WebSocketConnection>,
     next_request_id: u64,
@@ -19,10 +20,20 @@ pub struct KucoinPublicWebSocket {
 
 impl KucoinPublicWebSocket {
     pub fn new(timeout: Duration) -> Result<Self> {
-        Self::with_base_urls(
+        Self::with_market_base_urls(
             timeout,
             SPOT_BASE_URL.to_string(),
             FUTURES_BASE_URL.to_string(),
+            KucoinMarket::Spot,
+        )
+    }
+
+    pub fn new_futures(timeout: Duration) -> Result<Self> {
+        Self::with_market_base_urls(
+            timeout,
+            SPOT_BASE_URL.to_string(),
+            FUTURES_BASE_URL.to_string(),
+            KucoinMarket::Futures,
         )
     }
 
@@ -30,6 +41,20 @@ impl KucoinPublicWebSocket {
         timeout: Duration,
         spot_http_base_url: String,
         futures_http_base_url: String,
+    ) -> Result<Self> {
+        Self::with_market_base_urls(
+            timeout,
+            spot_http_base_url,
+            futures_http_base_url,
+            KucoinMarket::Spot,
+        )
+    }
+
+    pub fn with_market_base_urls(
+        timeout: Duration,
+        spot_http_base_url: String,
+        futures_http_base_url: String,
+        market: KucoinMarket,
     ) -> Result<Self> {
         Ok(Self {
             http_client: KucoinClient::with_base_urls(
@@ -40,6 +65,7 @@ impl KucoinPublicWebSocket {
                 spot_http_base_url,
                 futures_http_base_url,
             )?,
+            market,
             timeout,
             connection: None,
             next_request_id: 1,
@@ -70,8 +96,8 @@ impl KucoinPublicWebSocket {
             .http_client
             .request(
                 HttpMethod::Post,
-                KucoinMarket::Spot,
-                SPOT_WS_PUBLIC_TOKEN,
+                self.market,
+                WS_PUBLIC_TOKEN,
                 Vec::new(),
                 None,
                 false,
@@ -108,18 +134,36 @@ impl KucoinPublicWebSocket {
     }
 
     pub async fn subscribe_ticker(&mut self, product_symbol: &str) -> Result<String> {
-        let symbol = normalize_symbol(product_symbol, false)?;
-        self.subscribe(&format!("/market/ticker:{symbol}")).await
+        let futures = matches!(self.market, KucoinMarket::Futures);
+        let symbol = normalize_symbol(product_symbol, futures)?;
+        let topic = if futures {
+            format!("/contractMarket/tickerV2:{symbol}")
+        } else {
+            format!("/market/ticker:{symbol}")
+        };
+        self.subscribe(&topic).await
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<String> {
-        let symbol = normalize_symbol(product_symbol, false)?;
-        self.subscribe(&format!("/market/match:{symbol}")).await
+        let futures = matches!(self.market, KucoinMarket::Futures);
+        let symbol = normalize_symbol(product_symbol, futures)?;
+        let topic = if futures {
+            format!("/contractMarket/execution:{symbol}")
+        } else {
+            format!("/market/match:{symbol}")
+        };
+        self.subscribe(&topic).await
     }
 
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str) -> Result<String> {
-        let symbol = normalize_symbol(product_symbol, false)?;
-        self.subscribe(&format!("/market/level2:{symbol}")).await
+        let futures = matches!(self.market, KucoinMarket::Futures);
+        let symbol = normalize_symbol(product_symbol, futures)?;
+        let topic = if futures {
+            format!("/contractMarket/level2:{symbol}")
+        } else {
+            format!("/market/level2:{symbol}")
+        };
+        self.subscribe(&topic).await
     }
 
     pub async fn subscribe_klines(
@@ -127,10 +171,15 @@ impl KucoinPublicWebSocket {
         product_symbol: &str,
         interval: &str,
     ) -> Result<String> {
-        let symbol = normalize_symbol(product_symbol, false)?;
+        let futures = matches!(self.market, KucoinMarket::Futures);
+        let symbol = normalize_symbol(product_symbol, futures)?;
         let interval = normalize_interval(interval)?;
-        self.subscribe(&format!("/market/candles:{symbol}_{interval}"))
-            .await
+        let topic = if futures {
+            format!("/contractMarket/limitCandle:{symbol}_{interval}")
+        } else {
+            format!("/market/candles:{symbol}_{interval}")
+        };
+        self.subscribe(&topic).await
     }
 
     pub async fn recv(&mut self) -> Result<Value> {

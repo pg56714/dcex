@@ -10,7 +10,7 @@ _native = load_native()
 
 
 class PublicClient(AsyncWebSocketMixin):
-    """Async Kraken public market WebSocket client."""
+    """Async Kraken Spot public market WebSocket client."""
 
     def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
         """Create a Kraken public WebSocket client."""
@@ -135,7 +135,7 @@ class PrivateClient(AsyncWebSocketMixin):
 
 
 def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
-    """Create an async Kraken public market WebSocket client."""
+    """Create an async Kraken Spot public market WebSocket client."""
     return PublicClient(timeout=timeout, base_url=base_url)
 
 

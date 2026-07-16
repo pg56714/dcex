@@ -19,6 +19,7 @@ from dcex.ws import (
     bitget,
     bitmex,
     bybit,
+    extended,
     hyperliquid,
     kraken,
     kucoin,
@@ -145,6 +146,11 @@ PUBLIC_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
     ),
     WebSocketSpec(
+        name="extended",
+        factory=lambda: extended.public(timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USD"),
+    ),
+    WebSocketSpec(
         name="hyperliquid",
         factory=lambda: hyperliquid.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("BTC"),
@@ -158,6 +164,11 @@ PUBLIC_WS_SPECS = (
         name="kucoin",
         factory=lambda: kucoin.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
+    ),
+    WebSocketSpec(
+        name="kucoin-futures",
+        factory=lambda: kucoin.public(market="futures", timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SWAP"),
     ),
     WebSocketSpec(
         name="lighter",
@@ -251,6 +262,15 @@ PRIVATE_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_wallet(),
     ),
     WebSocketSpec(
+        name="extended",
+        env=("EXTENDED_API_KEY",),
+        factory=lambda: extended.private(
+            api_key=os.environ["EXTENDED_API_KEY"],
+            timeout=LIVE_WS_TIMEOUT,
+        ),
+        subscribe=lambda ws: ws.subscribe_account(),
+    ),
+    WebSocketSpec(
         name="hyperliquid",
         env=("HYPERLIQUID_WALLET_ADDRESS",),
         factory=lambda: hyperliquid.private(
@@ -279,6 +299,18 @@ PRIVATE_WS_SPECS = (
             timeout=LIVE_WS_TIMEOUT,
         ),
         subscribe=lambda ws: ws.subscribe_orders(),
+    ),
+    WebSocketSpec(
+        name="kucoin-futures",
+        env=("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),
+        factory=lambda: kucoin.private(
+            api_key=os.environ["KUCOIN_API_KEY"],
+            api_secret=os.environ["KUCOIN_API_SECRET"],
+            passphrase=os.environ["KUCOIN_API_PASSPHRASE"],
+            market="futures",
+            timeout=LIVE_WS_TIMEOUT,
+        ),
+        subscribe=lambda ws: ws.subscribe_balances(),
     ),
     WebSocketSpec(
         name="lighter",

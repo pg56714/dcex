@@ -7,11 +7,12 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
 use super::super::client::{KucoinClient, KucoinMarket};
-use super::super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL, SPOT_WS_PRIVATE_TOKEN};
+use super::super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL, WS_PRIVATE_TOKEN};
 use super::{extract_bullet_token, normalize_topic, validate_credential, websocket_url};
 
 pub struct KucoinPrivateWebSocket {
     http_client: KucoinClient,
+    market: KucoinMarket,
     timeout: Duration,
     connection: Option<WebSocketConnection>,
     next_request_id: u64,
@@ -24,13 +25,31 @@ impl KucoinPrivateWebSocket {
         passphrase: String,
         timeout: Duration,
     ) -> Result<Self> {
-        Self::with_base_urls(
+        Self::with_market_base_urls(
             api_key,
             api_secret,
             passphrase,
             timeout,
             SPOT_BASE_URL.to_string(),
             FUTURES_BASE_URL.to_string(),
+            KucoinMarket::Spot,
+        )
+    }
+
+    pub fn new_futures(
+        api_key: String,
+        api_secret: String,
+        passphrase: String,
+        timeout: Duration,
+    ) -> Result<Self> {
+        Self::with_market_base_urls(
+            api_key,
+            api_secret,
+            passphrase,
+            timeout,
+            SPOT_BASE_URL.to_string(),
+            FUTURES_BASE_URL.to_string(),
+            KucoinMarket::Futures,
         )
     }
 
@@ -41,6 +60,27 @@ impl KucoinPrivateWebSocket {
         timeout: Duration,
         spot_http_base_url: String,
         futures_http_base_url: String,
+    ) -> Result<Self> {
+        Self::with_market_base_urls(
+            api_key,
+            api_secret,
+            passphrase,
+            timeout,
+            spot_http_base_url,
+            futures_http_base_url,
+            KucoinMarket::Spot,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn with_market_base_urls(
+        api_key: String,
+        api_secret: String,
+        passphrase: String,
+        timeout: Duration,
+        spot_http_base_url: String,
+        futures_http_base_url: String,
+        market: KucoinMarket,
     ) -> Result<Self> {
         validate_credential("KuCoin API key", &api_key)?;
         validate_credential("KuCoin API secret", &api_secret)?;
@@ -54,6 +94,7 @@ impl KucoinPrivateWebSocket {
                 spot_http_base_url,
                 futures_http_base_url,
             )?,
+            market,
             timeout,
             connection: None,
             next_request_id: 1,
@@ -84,8 +125,8 @@ impl KucoinPrivateWebSocket {
             .http_client
             .request(
                 HttpMethod::Post,
-                KucoinMarket::Spot,
-                SPOT_WS_PRIVATE_TOKEN,
+                self.market,
+                WS_PRIVATE_TOKEN,
                 Vec::new(),
                 None,
                 true,
@@ -122,11 +163,19 @@ impl KucoinPrivateWebSocket {
     }
 
     pub async fn subscribe_orders(&mut self) -> Result<String> {
-        self.subscribe("/spotMarket/tradeOrders").await
+        let topic = match self.market {
+            KucoinMarket::Futures => "/contractMarket/tradeOrders",
+            KucoinMarket::Spot => "/spotMarket/tradeOrders",
+        };
+        self.subscribe(topic).await
     }
 
     pub async fn subscribe_balances(&mut self) -> Result<String> {
-        self.subscribe("/account/balance").await
+        let topic = match self.market {
+            KucoinMarket::Futures => "/contractAccount/wallet",
+            KucoinMarket::Spot => "/account/balance",
+        };
+        self.subscribe(topic).await
     }
 
     pub async fn recv(&mut self) -> Result<Value> {

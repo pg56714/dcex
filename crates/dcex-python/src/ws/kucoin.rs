@@ -18,22 +18,26 @@ struct PythonKucoinPrivateWebSocketClient {
 #[pymethods]
 impl PythonKucoinPublicWebSocketClient {
     #[new]
-    #[pyo3(signature = (timeout=10.0, spot_http_base_url=None, futures_http_base_url=None))]
+    #[pyo3(signature = (
+        timeout=10.0,
+        spot_http_base_url=None,
+        futures_http_base_url=None,
+        market=None
+    ))]
     fn new(
         timeout: f64,
         spot_http_base_url: Option<String>,
         futures_http_base_url: Option<String>,
+        market: Option<String>,
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
-        let client = match (spot_http_base_url, futures_http_base_url) {
-            (None, None) => KucoinPublicWebSocket::new(timeout),
-            (spot_http_base_url, futures_http_base_url) => KucoinPublicWebSocket::with_base_urls(
-                timeout,
-                spot_http_base_url.unwrap_or_else(|| "https://api.kucoin.com".to_string()),
-                futures_http_base_url
-                    .unwrap_or_else(|| "https://api-futures.kucoin.com".to_string()),
-            ),
-        }
+        let market = kucoin_market(market.as_deref().unwrap_or("spot"))?;
+        let client = KucoinPublicWebSocket::with_market_base_urls(
+            timeout,
+            spot_http_base_url.unwrap_or_else(|| "https://api.kucoin.com".to_string()),
+            futures_http_base_url.unwrap_or_else(|| "https://api-futures.kucoin.com".to_string()),
+            market,
+        )
         .map_err(to_py_runtime_error)?;
         Ok(Self {
             client: Arc::new(Mutex::new(client)),
@@ -188,7 +192,8 @@ impl PythonKucoinPrivateWebSocketClient {
         passphrase,
         timeout=10.0,
         spot_http_base_url=None,
-        futures_http_base_url=None
+        futures_http_base_url=None,
+        market=None
     ))]
     fn new(
         api_key: String,
@@ -197,20 +202,19 @@ impl PythonKucoinPrivateWebSocketClient {
         timeout: f64,
         spot_http_base_url: Option<String>,
         futures_http_base_url: Option<String>,
+        market: Option<String>,
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
-        let client = match (spot_http_base_url, futures_http_base_url) {
-            (None, None) => KucoinPrivateWebSocket::new(api_key, api_secret, passphrase, timeout),
-            (spot_http_base_url, futures_http_base_url) => KucoinPrivateWebSocket::with_base_urls(
-                api_key,
-                api_secret,
-                passphrase,
-                timeout,
-                spot_http_base_url.unwrap_or_else(|| "https://api.kucoin.com".to_string()),
-                futures_http_base_url
-                    .unwrap_or_else(|| "https://api-futures.kucoin.com".to_string()),
-            ),
-        }
+        let market = kucoin_market(market.as_deref().unwrap_or("spot"))?;
+        let client = KucoinPrivateWebSocket::with_market_base_urls(
+            api_key,
+            api_secret,
+            passphrase,
+            timeout,
+            spot_http_base_url.unwrap_or_else(|| "https://api.kucoin.com".to_string()),
+            futures_http_base_url.unwrap_or_else(|| "https://api-futures.kucoin.com".to_string()),
+            market,
+        )
         .map_err(to_py_runtime_error)?;
         Ok(Self {
             client: Arc::new(Mutex::new(client)),

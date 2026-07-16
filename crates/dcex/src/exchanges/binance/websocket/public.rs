@@ -7,7 +7,9 @@ use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::super::params::{exchange_symbol_fallback, is_canonical_product_symbol};
+use super::super::params::{
+    exchange_symbol_fallback, is_canonical_product_symbol, is_spot_product_symbol,
+};
 
 const SPOT_PUBLIC_WS_URL: &str = "wss://stream.binance.com:9443/ws";
 
@@ -94,6 +96,12 @@ impl BinancePublicWebSocket {
     }
 
     fn stream_symbol(&self, product_symbol: &str) -> Result<String> {
+        if is_canonical_product_symbol(product_symbol) && !is_spot_product_symbol(product_symbol) {
+            return Err(DcexError::InvalidInput(format!(
+                "Binance Spot WebSocket does not support non-Spot product: {product_symbol}"
+            )));
+        }
+
         let symbol = if let Some(table) = &self.product_table {
             if is_canonical_product_symbol(product_symbol) {
                 table.get_exchange_symbol("binance", product_symbol)?
@@ -211,6 +219,7 @@ mod tests {
             "btcusdt"
         );
         assert_eq!(client.stream_symbol("ETHUSDT").expect("symbol"), "ethusdt");
+        assert!(client.stream_symbol("BTC-USDT-SWAP").is_err());
     }
 
     #[test]

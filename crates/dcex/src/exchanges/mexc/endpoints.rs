@@ -1,4 +1,5 @@
 pub(super) const BASE_URL: &str = "https://api.mexc.com";
+pub(super) const CONTRACT_BASE_URL: &str = "https://contract.mexc.com";
 
 pub(super) const SPOT_PING: &str = "/api/v3/ping";
 pub(super) const SPOT_TIME: &str = "/api/v3/time";

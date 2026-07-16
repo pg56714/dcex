@@ -54,7 +54,7 @@ class HTTPManager(BaseHTTPManager):
     EXCHANGE = Common.MEXC
 
     base_url: str = field(default="https://api.mexc.com")
-    contract_base_url: str | None = field(default=None)
+    contract_base_url: str | None = field(default="https://contract.mexc.com")
     api_key: str | None = field(default=None, repr=False)
     api_secret: str | None = field(default=None, repr=False)
     timeout: int = field(default=10)
@@ -147,7 +147,11 @@ class HTTPManager(BaseHTTPManager):
         """Make an HTTP request to MEXC REST APIs."""
         request_path = str(path)
         filtered_query = _filtered_query(query)
-        base_url = (self.contract_base_url or self.base_url) if api == "contract" else self.base_url
+        base_url = (
+            (self.contract_base_url or "https://contract.mexc.com")
+            if api == "contract"
+            else self.base_url
+        )
         url = f"{base_url}{request_path}"
 
         try:

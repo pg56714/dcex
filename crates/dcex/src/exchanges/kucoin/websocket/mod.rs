@@ -59,19 +59,40 @@ pub(super) fn normalize_symbol(product_symbol: &str, futures: bool) -> Result<St
     }
     if product_symbol.contains('-') {
         let parts = product_symbol.split('-').collect::<Vec<_>>();
-        if futures && parts.len() >= 3 && !parts[0].is_empty() && !parts[1].is_empty() {
-            return Ok(format!(
-                "{}{}M",
-                parts[0].to_ascii_uppercase(),
-                parts[1].to_ascii_uppercase()
-            ));
+        let valid_pair = parts.len() >= 2 && !parts[0].is_empty() && !parts[1].is_empty();
+        if !valid_pair {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported KuCoin WebSocket symbol: {product_symbol}"
+            )));
         }
-        if parts.len() >= 2 && !parts[0].is_empty() && !parts[1].is_empty() {
-            return Ok(format!(
-                "{}-{}",
-                parts[0].to_ascii_uppercase(),
-                parts[1].to_ascii_uppercase()
-            ));
+        match parts.as_slice() {
+            [base, quote] if !futures => {
+                return Ok(format!(
+                    "{}-{}",
+                    base.to_ascii_uppercase(),
+                    quote.to_ascii_uppercase()
+                ));
+            }
+            [base, quote, kind, ..] if futures && !kind.eq_ignore_ascii_case("SPOT") => {
+                return Ok(format!(
+                    "{}{}M",
+                    kucoin_contract_asset(base).to_ascii_uppercase(),
+                    quote.to_ascii_uppercase()
+                ));
+            }
+            [base, quote, kind, ..] if !futures && kind.eq_ignore_ascii_case("SPOT") => {
+                return Ok(format!(
+                    "{}-{}",
+                    base.to_ascii_uppercase(),
+                    quote.to_ascii_uppercase()
+                ));
+            }
+            _ => {
+                let market = if futures { "Futures" } else { "Spot" };
+                return Err(DcexError::InvalidInput(format!(
+                    "KuCoin {market} WebSocket does not support product: {product_symbol}"
+                )));
+            }
         }
     }
     if !product_symbol
@@ -83,6 +104,13 @@ pub(super) fn normalize_symbol(product_symbol: &str, futures: bool) -> Result<St
         )));
     }
     Ok(product_symbol.to_ascii_uppercase())
+}
+
+fn kucoin_contract_asset(asset: &str) -> &str {
+    match asset {
+        "BTC" | "btc" => "XBT",
+        other => other,
+    }
 }
 
 pub(super) fn normalize_topic(topic: &str) -> Result<String> {
@@ -154,8 +182,10 @@ mod tests {
         );
         assert_eq!(
             normalize_symbol("BTC-USDT-SWAP", true).expect("futures"),
-            "BTCUSDTM"
+            "XBTUSDTM"
         );
+        assert!(normalize_symbol("BTC-USDT-SPOT", true).is_err());
+        assert!(normalize_symbol("BTC-USDT-SWAP", false).is_err());
         assert!(normalize_topic("/market/ticker:BTC-USDT").is_ok());
         assert!(normalize_topic("/market ticker:BTC-USDT").is_err());
         assert_eq!(

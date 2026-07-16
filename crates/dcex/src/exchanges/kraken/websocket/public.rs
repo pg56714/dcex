@@ -201,7 +201,12 @@ fn normalize_symbol(symbol: &str) -> Result<String> {
     }
     let mut parts = symbol.split('-');
     match (parts.next(), parts.next(), parts.next(), parts.next()) {
-        (Some(base), Some(quote), Some(_kind), None) => {
+        (Some(base), Some(quote), Some(kind), None) => {
+            if !kind.eq_ignore_ascii_case("SPOT") {
+                return Err(DcexError::InvalidInput(format!(
+                    "Kraken Spot WebSocket does not support non-Spot product: {symbol}"
+                )));
+            }
             let normalized = format!(
                 "{}/{}",
                 base.to_ascii_uppercase(),
@@ -253,6 +258,7 @@ mod tests {
         assert_eq!(normalize_symbol("BTC-USD-SPOT").expect("symbol"), "BTC/USD");
         assert_eq!(normalize_symbol("eth/usd").expect("symbol"), "ETH/USD");
         assert!(normalize_symbol("bad symbol").is_err());
+        assert!(normalize_symbol("BTC-USD-SWAP").is_err());
     }
 
     #[test]

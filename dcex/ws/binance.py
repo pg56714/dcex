@@ -10,7 +10,7 @@ _native = load_native()
 
 
 class PublicClient(AsyncWebSocketMixin):
-    """Async Binance public market WebSocket client."""
+    """Async Binance Spot public market WebSocket client."""
 
     def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
         """Create a Binance public WebSocket client."""
@@ -117,7 +117,7 @@ class PrivateClient(AsyncWebSocketMixin):
 
 
 def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
-    """Create an async Binance public market WebSocket client."""
+    """Create an async Binance Spot public market WebSocket client."""
     return PublicClient(timeout=timeout, base_url=base_url)
 
 

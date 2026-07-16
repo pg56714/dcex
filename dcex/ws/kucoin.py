@@ -17,19 +17,21 @@ def _decode_event(body: bytes | bytearray | memoryview) -> dict[str, Any] | list
 
 
 class PublicClient(AsyncWebSocketMixin):
-    """Async KuCoin public market WebSocket client."""
+    """Async KuCoin Spot or Futures public market WebSocket client."""
 
     def __init__(
         self,
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         futures_http_base_url: str | None = None,
+        market: str = "spot",
     ) -> None:
         """Create a KuCoin public WebSocket client."""
         self._native_client = _native.KucoinPublicWebSocketClient(
             timeout=timeout,
             spot_http_base_url=spot_http_base_url,
             futures_http_base_url=futures_http_base_url,
+            market=market,
         )
 
     async def connect(self) -> None:
@@ -74,7 +76,7 @@ class PublicClient(AsyncWebSocketMixin):
 
 
 class PrivateClient(AsyncWebSocketMixin):
-    """Async KuCoin private WebSocket client."""
+    """Async KuCoin Spot or Futures private WebSocket client."""
 
     def __init__(
         self,
@@ -84,6 +86,7 @@ class PrivateClient(AsyncWebSocketMixin):
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         futures_http_base_url: str | None = None,
+        market: str = "spot",
     ) -> None:
         """Create a KuCoin private WebSocket client."""
         self._native_client = _native.KucoinPrivateWebSocketClient(
@@ -93,6 +96,7 @@ class PrivateClient(AsyncWebSocketMixin):
             timeout=timeout,
             spot_http_base_url=spot_http_base_url,
             futures_http_base_url=futures_http_base_url,
+            market=market,
         )
 
     async def connect(self) -> None:
@@ -132,12 +136,14 @@ def public(
     timeout: float = 10.0,
     spot_http_base_url: str | None = None,
     futures_http_base_url: str | None = None,
+    market: str = "spot",
 ) -> PublicClient:
-    """Create an async KuCoin public market WebSocket client."""
+    """Create an async KuCoin Spot or Futures public market WebSocket client."""
     return PublicClient(
         timeout=timeout,
         spot_http_base_url=spot_http_base_url,
         futures_http_base_url=futures_http_base_url,
+        market=market,
     )
 
 
@@ -148,8 +154,9 @@ def private(
     timeout: float = 10.0,
     spot_http_base_url: str | None = None,
     futures_http_base_url: str | None = None,
+    market: str = "spot",
 ) -> PrivateClient:
-    """Create an async KuCoin private WebSocket client."""
+    """Create an async KuCoin Spot or Futures private WebSocket client."""
     return PrivateClient(
         api_key=api_key,
         api_secret=api_secret,
@@ -157,6 +164,7 @@ def private(
         timeout=timeout,
         spot_http_base_url=spot_http_base_url,
         futures_http_base_url=futures_http_base_url,
+        market=market,
     )
 
 
