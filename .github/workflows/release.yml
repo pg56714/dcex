@@ -4,16 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      rust_tag:
-        description: Existing Rust release tag to publish
-        required: true
-        type: string
-      rust_version:
-        description: Rust crate version to publish
-        required: true
-        type: string
 
 permissions:
   contents: write
@@ -24,7 +14,6 @@ concurrency:
 
 jobs:
   plan:
-    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     outputs:
       any_release: ${{ steps.plan.outputs.any_release }}
@@ -282,107 +271,5 @@ jobs:
           body_path: ${{ needs.apply.outputs.rust_body_path }}
           tag_name: ${{ needs.apply.outputs.rust_tag }}
           name: Rust ${{ needs.apply.outputs.rust_version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish_rust_manual:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          ref: ${{ inputs.rust_tag }}
-
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Rust builds
-        uses: Swatinem/rust-cache@v2
-
-      - name: Validate Rust release
-        env:
-          RUST_TAG: ${{ inputs.rust_tag }}
-          RUST_VERSION: ${{ inputs.rust_version }}
-        run: |
-          VERSION="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "dcex") | .version')"
-          EXPECTED_TAG="rust-v${VERSION}"
-          echo "Crate version: ${VERSION}"
-          echo "Expected tag: ${EXPECTED_TAG}"
-          echo "Requested tag: ${RUST_TAG}"
-          echo "Requested version: ${RUST_VERSION}"
-          if [ "${RUST_TAG}" != "${EXPECTED_TAG}" ] || [ "${RUST_VERSION}" != "${VERSION}" ]; then
-            echo "Requested tag and version must match crates/dcex/Cargo.toml."
-            exit 1
-          fi
-
-      - name: Write Rust release body
-        env:
-          RUST_VERSION: ${{ inputs.rust_version }}
-        run: |
-          python - <<'PY'
-          import os
-          import re
-          from pathlib import Path
-
-          version = os.environ["RUST_VERSION"]
-          changelog = Path("crates/dcex/CHANGELOG.md").read_text(encoding="utf-8")
-          pattern = re.compile(
-              rf"^## {re.escape(version)}(?:\s|\().*?(?=^## |\Z)",
-              re.MULTILINE | re.DOTALL,
-          )
-          match = pattern.search(changelog)
-          if match is None:
-              raise SystemExit(f"Cannot find Rust CHANGELOG section for {version}.")
-
-          Path(".release").mkdir(exist_ok=True)
-          Path(".release/rust-body.md").write_text(
-              match.group(0).strip() + "\n",
-              encoding="utf-8",
-          )
-          PY
-
-      - name: Check crates.io publication status
-        id: publication
-        env:
-          RUST_VERSION: ${{ inputs.rust_version }}
-        run: |
-          STATUS="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
-            --user-agent 'dcex-release-workflow/1.0' \
-            "https://crates.io/api/v1/crates/dcex/${RUST_VERSION}")"
-          case "${STATUS}" in
-            200)
-              echo "published=true" >> "$GITHUB_OUTPUT"
-              ;;
-            404)
-              echo "published=false" >> "$GITHUB_OUTPUT"
-              ;;
-            *)
-              echo "Unexpected crates.io response: HTTP ${STATUS}"
-              exit 1
-              ;;
-          esac
-
-      - name: Authenticate to crates.io
-        if: ${{ steps.publication.outputs.published != 'true' }}
-        id: auth
-        uses: rust-lang/crates-io-auth-action@v1
-
-      - name: Publish dcex to crates.io
-        if: ${{ steps.publication.outputs.published != 'true' }}
-        run: cargo publish -p dcex --locked
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
-
-      - name: Create Rust GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          body_path: .release/rust-body.md
-          tag_name: ${{ inputs.rust_tag }}
-          name: Rust ${{ inputs.rust_version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
