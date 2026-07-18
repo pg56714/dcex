@@ -23,7 +23,7 @@ pub(super) const SPOT_BATCH_ORDERS: &str = "/api/v1/hf/orders/multi";
 pub(super) const SPOT_CANCEL_ORDER: &str = "/api/v1/hf/orders/{orderId}";
 pub(super) const SPOT_CANCEL_ALL_ORDERS_BY_SYMBOL: &str = "/api/v1/hf/orders";
 pub(super) const SPOT_CANCEL_ALL_ORDERS: &str = "/api/v1/hf/orders/cancelAll";
-pub(super) const SPOT_OPEN_ORDERS: &str = "/api/v1/hf/orders/active";
+pub(super) const SPOT_OPEN_ORDERS: &str = "/api/v1/hf/orders/active/page";
 pub(super) const SPOT_TRADE_HISTORY: &str = "/api/v1/hf/fills";
 
 pub(super) const FUTURES_CONTRACTS: &str = "/api/v1/contracts/active";
@@ -36,7 +36,7 @@ pub(super) const FUTURES_OPEN_INTEREST: &str = "/api/ua/v1/market/open-interest"
 pub(super) const FUTURES_ACCOUNT_OVERVIEW: &str = "/api/v1/account-overview";
 pub(super) const FUTURES_TRADE_FEES: &str = "/api/v1/trade-fees";
 pub(super) const FUTURES_POSITIONS: &str = "/api/v1/positions";
-pub(super) const FUTURES_POSITION: &str = "/api/v1/position";
+pub(super) const FUTURES_POSITION: &str = "/api/v2/position";
 pub(super) const FUTURES_POSITION_MODE: &str = "/api/v2/position/getPositionMode";
 pub(super) const FUTURES_CROSS_MARGIN_LEVERAGE: &str = "/api/v2/getCrossUserLeverage";
 pub(super) const FUTURES_MODIFY_CROSS_MARGIN_LEVERAGE: &str = "/api/v2/changeCrossUserLeverage";

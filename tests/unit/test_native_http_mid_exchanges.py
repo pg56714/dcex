@@ -156,6 +156,8 @@ async def test_async_bingx_manager_uses_native_transport() -> None:
     assert result == {"ok": True}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/test?symbol=ETHUSDT"
+
+
 def test_sync_bingx_public_wrapper_uses_native_dispatcher() -> None:
     from dcex.bingx.client import Client
 
@@ -286,6 +288,7 @@ def test_native_mexc_spot_signed_request() -> None:
             True,
         )
 
+    time_request = received.get_nowait()
     request = received.get_nowait()
     pairs = parse_qsl(urlsplit(request["path"]).query)
     payload = "&".join(f"{key}={value}" for key, value in pairs[:-1])
@@ -297,6 +300,7 @@ def test_native_mexc_spot_signed_request() -> None:
 
     assert status == 200
     assert body == {"ok": True}
+    assert time_request["path"] == "/api/v3/time"
     assert request["X-MEXC-APIKEY"] == "api-key"
     assert pairs[-1] == ("signature", expected_signature)
 
@@ -439,11 +443,13 @@ def test_native_mexc_private_spot_batch_order_converts_product_symbols() -> None
             ],
         )
 
+    time_request = received.get_nowait()
     request = received.get_nowait()
     query = dict(parse_qsl(urlsplit(request["path"]).query))
     batch_orders = json.loads(query["batchOrders"])
     assert status == 200
     assert body == {"ok": True}
+    assert time_request["path"] == "/api/v3/time"
     assert urlsplit(request["path"]).path == "/api/v3/batchOrders"
     assert batch_orders[0]["symbol"] == "BTCUSDT"
     assert "product_symbol" not in batch_orders[0]

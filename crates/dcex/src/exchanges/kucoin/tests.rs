@@ -92,6 +92,62 @@ async fn public_spot_orderbook_uses_public_endpoint() {
     assert!(!request.contains("kc-api-passphrase:"));
 }
 
+#[tokio::test]
+async fn spot_open_orders_uses_current_paginated_endpoint() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    client
+        .private_request(
+            "get_spot_open_orders",
+            vec![
+                ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                ("pageNum".to_string(), "2".to_string()),
+                ("pageSize".to_string(), "50".to_string()),
+            ],
+        )
+        .await
+        .expect("response");
+
+    let request = handle.join().expect("server");
+    assert!(request.starts_with(
+        "GET /api/v1/hf/orders/active/page?pageNum=2&pageSize=50&symbol=BTC-USDT HTTP/1.1"
+    ));
+}
+
+#[tokio::test]
+async fn futures_position_uses_v2_endpoint() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        base_url,
+    )
+    .expect("client");
+
+    client
+        .private_request(
+            "get_futures_position",
+            vec![("product_symbol".to_string(), "BTC-USDT-SWAP".to_string())],
+        )
+        .await
+        .expect("response");
+
+    let request = handle.join().expect("server");
+    assert!(request.starts_with("GET /api/v2/position?symbol=XBTUSDTM HTTP/1.1"));
+}
+
 fn server() -> (String, thread::JoinHandle<String>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
     let address = listener.local_addr().expect("address");

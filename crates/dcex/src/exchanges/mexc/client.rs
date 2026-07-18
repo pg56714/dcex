@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use serde_json::{Map, Value};
@@ -9,7 +9,7 @@ use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpRespon
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
-use super::endpoints::{BASE_URL, CONTRACT_BASE_URL};
+use super::endpoints::{BASE_URL, CONTRACT_BASE_URL, SPOT_TIME};
 use super::params::{
     exchange_symbol_fallback, insert_optional_string, is_canonical_product_symbol, MexcParams,
 };
@@ -28,6 +28,7 @@ pub struct MexcClient {
     contract_base_url: String,
     api_key: Option<String>,
     api_secret: Option<String>,
+    timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
     product_table: Option<Arc<ProductTable>>,
 }
 
@@ -63,6 +64,7 @@ impl MexcClient {
             contract_base_url,
             api_key,
             api_secret,
+            timestamp_offset_ms: Arc::new(Mutex::new(None)),
             product_table: None,
         })
     }
@@ -105,9 +107,62 @@ impl MexcClient {
         body: Option<Vec<u8>>,
         signed: bool,
     ) -> Result<HttpResponse> {
-        let timestamp_ms = unix_timestamp_ms()?;
+        let timestamp_ms = self.timestamp(api, signed).await?;
         let request = self.build_request(method, api, path, params, body, signed, timestamp_ms)?;
         self.transport.execute(request).await
+    }
+
+    async fn timestamp(&self, api: MexcApi, signed: bool) -> Result<u64> {
+        if !signed || api != MexcApi::Spot {
+            return unix_timestamp_ms();
+        }
+        self.sync_spot_server_time().await?;
+        self.adjust_spot_timestamp(unix_timestamp_ms()?)
+    }
+
+    async fn sync_spot_server_time(&self) -> Result<()> {
+        {
+            let offset = self.timestamp_offset_ms.lock().map_err(|error| {
+                DcexError::Runtime(format!("MEXC timestamp offset lock poisoned: {error}"))
+            })?;
+            if offset.is_some() {
+                return Ok(());
+            }
+        }
+
+        let local_start = unix_timestamp_ms()?;
+        let response = self
+            .transport
+            .execute(HttpRequest::new(HttpMethod::Get, &self.base_url, SPOT_TIME))
+            .await?;
+        let local_end = unix_timestamp_ms()?;
+        let data = response.json()?;
+        let server_time = data
+            .get("serverTime")
+            .and_then(|value| {
+                value
+                    .as_u64()
+                    .or_else(|| value.as_str().and_then(|value| value.parse().ok()))
+            })
+            .ok_or_else(|| {
+                DcexError::Decode(format!(
+                    "MEXC server time response did not include serverTime: {data}"
+                ))
+            })?;
+        let midpoint = local_start.saturating_add(local_end) / 2;
+        let mut offset = self.timestamp_offset_ms.lock().map_err(|error| {
+            DcexError::Runtime(format!("MEXC timestamp offset lock poisoned: {error}"))
+        })?;
+        *offset = Some(server_time as i64 - midpoint as i64);
+        Ok(())
+    }
+
+    fn adjust_spot_timestamp(&self, timestamp_ms: u64) -> Result<u64> {
+        let offset = self.timestamp_offset_ms.lock().map_err(|error| {
+            DcexError::Runtime(format!("MEXC timestamp offset lock poisoned: {error}"))
+        })?;
+        let adjusted = timestamp_ms as i64 + offset.unwrap_or(0);
+        u64::try_from(adjusted).map_err(|error| DcexError::Runtime(error.to_string()))
     }
 
     pub fn request_raw_blocking(

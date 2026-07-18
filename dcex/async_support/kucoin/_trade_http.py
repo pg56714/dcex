@@ -272,11 +272,20 @@ class TradeHTTP(HTTPManager):
         """Cancel all KuCoin spot open orders."""
         return await self._native_private("cancel_spot_all_orders", [])
 
-    async def get_spot_open_orders(self, product_symbol: str | None = None) -> dict[str, Any]:
-        """Retrieve KuCoin spot open orders."""
+    async def get_spot_open_orders(
+        self,
+        product_symbol: str | None = None,
+        pageNum: int | None = None,
+        pageSize: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve a page of KuCoin spot open orders."""
         return await self._native_private(
             "get_spot_open_orders",
-            self._native_params(product_symbol=product_symbol),
+            self._native_params(
+                product_symbol=product_symbol,
+                pageNum=pageNum,
+                pageSize=pageSize,
+            ),
         )
 
     async def get_spot_trade_history(

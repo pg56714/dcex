@@ -135,7 +135,7 @@ impl KucoinClient {
                     .await
             }
             "get_spot_open_orders" => {
-                let mut query = Vec::new();
+                let mut query = params.only(&["pageNum", "pageSize"]);
                 self.push_optional_symbol(&mut query, params, false)?;
                 self.private_get(KucoinMarket::Spot, SPOT_OPEN_ORDERS, query)
                     .await

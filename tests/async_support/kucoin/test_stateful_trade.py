@@ -96,6 +96,11 @@ async def _futures_available_usdt(client: Client) -> Decimal:
 
 async def _futures_position_size(client: Client) -> Decimal:
     data = (await client.get_futures_position(product_symbol=FUTURES_SYMBOL)).get("data")
+    if isinstance(data, list):
+        data = next(
+            (position for position in data if position.get("symbol") == "XBTUSDTM"),
+            None,
+        )
     if not isinstance(data, dict):
         return Decimal("0")
     for key in ("currentQty", "size", "posQty", "quantity"):
