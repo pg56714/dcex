@@ -1,3 +1,13 @@
+## 0.28.4 (2026-07-18)
+
+### Fix
+
+- update KuCoin endpoints and MEXC time sync
+- align exchange integrations with official APIs
+- align exchange integrations with official APIs
+- validate Kraken subscriptions and Extended candles
+- align exchange product and websocket contracts
+
 ## 0.28.3 (2026-07-13)
 
 ### Fix
