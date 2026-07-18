@@ -80,7 +80,11 @@ impl AsterPublicWebSocket {
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<u64> {
-        let stream = format!("{}@trade", self.stream_symbol(product_symbol)?);
+        let stream = format!(
+            "{}{}",
+            self.stream_symbol(product_symbol)?,
+            trade_stream_suffix(self.market)
+        );
         self.subscribe(vec![stream]).await
     }
 
@@ -163,6 +167,13 @@ fn public_ws_url(market: AsterMarket) -> &'static str {
     match market {
         AsterMarket::Futures => FUTURES_PUBLIC_WS_URL,
         AsterMarket::Spot => SPOT_PUBLIC_WS_URL,
+    }
+}
+
+fn trade_stream_suffix(market: AsterMarket) -> &'static str {
+    match market {
+        AsterMarket::Futures => "@aggTrade",
+        AsterMarket::Spot => "@trade",
     }
 }
 
@@ -277,5 +288,11 @@ mod tests {
         let client =
             AsterPublicWebSocket::new(AsterMarket::Spot, Duration::from_secs(1)).expect("client");
         assert!(client.ensure_futures("mark price streams").is_err());
+    }
+
+    #[test]
+    fn generic_trade_stream_uses_market_specific_suffix() {
+        assert_eq!(trade_stream_suffix(AsterMarket::Spot), "@trade");
+        assert_eq!(trade_stream_suffix(AsterMarket::Futures), "@aggTrade");
     }
 }

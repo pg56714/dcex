@@ -436,6 +436,12 @@ impl BitgetClient {
             "reduceOnly",
         ]);
         self.insert_required_product_symbol(&mut body, params)?;
+        body.entry("productType".to_string())
+            .or_insert_with(|| Value::String("USDT-FUTURES".to_string()));
+        body.entry("marginMode".to_string())
+            .or_insert_with(|| Value::String("crossed".to_string()));
+        body.entry("marginCoin".to_string())
+            .or_insert_with(|| Value::String("USDT".to_string()));
         if let Some(side) = side {
             body.insert("side".to_string(), Value::String(side.to_string()));
         }

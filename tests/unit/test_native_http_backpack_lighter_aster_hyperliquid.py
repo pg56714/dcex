@@ -286,7 +286,10 @@ def test_native_hyperliquid_private_order_builder_fee_payload_matches_docs() -> 
 def test_native_hyperliquid_market_order_uses_ioc_limit_payload() -> None:
     native = pytest.importorskip("dcex._native")
 
-    with _http_server([{}, [{"midPx": "100.0"}]]) as (base_url, received):
+    with _http_server([{"universe": [{"name": "BTC", "szDecimals": 5}]}, [{"midPx": "100.0"}]]) as (
+        base_url,
+        received,
+    ):
         client = native.HyperliquidHttpClient(
             wallet_address="0x" + "22" * 20,
             private_key="0x" + "11" * 32,
@@ -416,7 +419,7 @@ def test_sync_extended_market_methods_use_documented_paths() -> None:
         client.get_market_statistics("BTC-USD")
         client.get_order_book("BTC-USD")
         client.get_trades("BTC-USD")
-        client.get_candles("BTC-USD", "1m", candleType="mark", limit=50, endTime=123)
+        client.get_candles("BTC-USD", "1m", candleType="mark-prices", limit=50, endTime=123)
         client.get_funding("BTC-USD", startTime=100, endTime=200, limit=10)
         client.get_open_interest("BTC-USD", "1h", startTime=100, endTime=200, limit=10)
 
@@ -429,7 +432,7 @@ def test_sync_extended_market_methods_use_documented_paths() -> None:
     assert received.get_nowait()["path"] == "/api/v1/info/markets/BTC-USD/trades"
     assert (
         received.get_nowait()["path"]
-        == "/api/v1/info/candles/BTC-USD/mark?interval=1m&limit=50&endTime=123"
+        == "/api/v1/info/candles/BTC-USD/mark-prices?interval=1m&limit=50&endTime=123"
     )
     assert (
         received.get_nowait()["path"]

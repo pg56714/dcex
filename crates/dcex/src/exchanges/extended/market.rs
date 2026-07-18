@@ -48,6 +48,11 @@ impl ExtendedClient {
                     .get("candleType")
                     .or_else(|| params.get("candle_type"))
                     .unwrap_or("trades");
+                if !matches!(candle_type, "trades" | "mark-prices" | "index-prices") {
+                    return Err(DcexError::InvalidInput(format!(
+                        "unsupported Extended candle type: {candle_type}"
+                    )));
+                }
                 let interval = params.required("interval")?;
                 let limit = params.required("limit")?;
                 let mut query = vec![

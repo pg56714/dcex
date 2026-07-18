@@ -73,9 +73,11 @@ impl HyperliquidClient {
             Some(value) => value,
             None => params.required_bool("isBuy")?,
         };
-        let mid_price = self.mid_price(product_symbol).await?;
+        let (mid_price, sz_decimals) = self.mid_price(product_symbol).await?;
         let slippage_multiplier = if is_buy { 1.03 } else { 0.97 };
-        let price = format_market_order_price(mid_price * slippage_multiplier, is_buy);
+        let max_price_decimals = 6_u32.saturating_sub(sz_decimals);
+        let price =
+            format_market_order_price(mid_price * slippage_multiplier, is_buy, max_price_decimals);
         let mut params = params.with_overrides(vec![
             ("price".to_string(), price),
             ("isBuy".to_string(), is_buy.to_string()),
@@ -354,24 +356,35 @@ impl HyperliquidClient {
             .await
     }
 
-    async fn mid_price(&self, product_symbol: &str) -> Result<f64> {
+    async fn mid_price(&self, product_symbol: &str) -> Result<(f64, u32)> {
         let asset_id = self.asset_id(product_symbol)? as usize;
         let response = self.get_meta_and_asset_ctxs_raw().await?;
-        let contexts = response
-            .data
-            .as_array()
-            .and_then(|values| values.get(1))
+        let values = response.data.as_array().ok_or_else(|| {
+            DcexError::Decode("Hyperliquid metaAndAssetCtxs response is invalid".to_string())
+        })?;
+        let sz_decimals = values
+            .first()
+            .and_then(|meta| meta.get("universe"))
             .and_then(Value::as_array)
+            .and_then(|universe| universe.get(asset_id))
+            .and_then(|asset| asset.get("szDecimals"))
+            .and_then(Value::as_u64)
             .ok_or_else(|| {
-                DcexError::Decode("Hyperliquid metaAndAssetCtxs response is invalid".to_string())
+                DcexError::Decode("Hyperliquid asset metadata missing szDecimals".to_string())
             })?;
+        let sz_decimals = u32::try_from(sz_decimals).map_err(|error| {
+            DcexError::Decode(format!("invalid Hyperliquid szDecimals: {error}"))
+        })?;
+        let contexts = values.get(1).and_then(Value::as_array).ok_or_else(|| {
+            DcexError::Decode("Hyperliquid metaAndAssetCtxs response is invalid".to_string())
+        })?;
         let context = contexts.get(asset_id).ok_or_else(|| {
             DcexError::InvalidInput(format!("Hyperliquid asset id out of range: {asset_id}"))
         })?;
         let mid_price = context.get("midPx").ok_or_else(|| {
             DcexError::Decode("Hyperliquid asset context missing midPx".to_string())
         })?;
-        match mid_price {
+        let mid_price = match mid_price {
             Value::String(value) => value
                 .parse::<f64>()
                 .map_err(|error| DcexError::Decode(error.to_string())),
@@ -381,7 +394,8 @@ impl HyperliquidClient {
             _ => Err(DcexError::Decode(
                 "invalid Hyperliquid midPx type".to_string(),
             )),
-        }
+        }?;
+        Ok((mid_price, sz_decimals))
     }
 }
 
@@ -444,12 +458,14 @@ fn parse_i64(value: &str, key: &str) -> Result<i64> {
     })
 }
 
-fn format_market_order_price(value: f64, is_buy: bool) -> String {
+fn format_market_order_price(value: f64, is_buy: bool, max_decimals: u32) -> String {
     if value <= 0.0 || !value.is_finite() {
         return "0".to_string();
     }
     let adjusted = value.log10().floor() as i32;
-    let step = 10_f64.powi(adjusted - 4);
+    let significant_step = 10_f64.powi(adjusted - 4);
+    let decimal_step = 10_f64.powi(-(max_decimals as i32));
+    let step = significant_step.max(decimal_step);
     let units = value / step;
     let rounded = if is_buy {
         units.ceil() * step
@@ -490,5 +506,12 @@ mod tests {
             OrderedValue::String("0x1234567890abcdef1234567890abcdef".to_string())
         );
         assert_eq!(order_identifier("42"), OrderedValue::Int(42));
+    }
+
+    #[test]
+    fn market_price_respects_significant_figures_and_asset_decimals() {
+        assert_eq!(format_market_order_price(0.090527, true, 5), "0.09053");
+        assert_eq!(format_market_order_price(0.090527, false, 5), "0.09052");
+        assert_eq!(format_market_order_price(103.0, true, 1), "103");
     }
 }

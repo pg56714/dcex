@@ -63,14 +63,14 @@ async fn market_methods_use_documented_paths() {
             "get_candles",
             vec![
                 ("market".to_string(), "BTC-USD".to_string()),
-                ("candleType".to_string(), "mark".to_string()),
+                ("candleType".to_string(), "mark-prices".to_string()),
                 ("interval".to_string(), "1m".to_string()),
                 ("limit".to_string(), "50".to_string()),
                 ("endTime".to_string(), "123".to_string()),
             ],
         )
         .await,
-        "GET /api/v1/info/candles/BTC-USD/mark?interval=1m&limit=50&endTime=123 HTTP/1.1",
+        "GET /api/v1/info/candles/BTC-USD/mark-prices?interval=1m&limit=50&endTime=123 HTTP/1.1",
     );
     assert_request_line(
         public_request(

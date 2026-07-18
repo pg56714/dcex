@@ -137,13 +137,13 @@ class TradeHTTP(HTTPManager):
 
     async def cancel_open_orders(
         self,
-        product_symbol: str | None = None,
-        marketType: str | None = None,
+        product_symbol: str,
+        orderType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Cancel Backpack open orders."""
         return await self._native_private(
             "cancel_open_orders",
-            self._native_params(product_symbol=product_symbol, marketType=marketType),
+            self._native_params(product_symbol=product_symbol, orderType=orderType),
         )
 
     async def get_fill_history(

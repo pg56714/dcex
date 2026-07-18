@@ -102,8 +102,8 @@ impl BackpackClient {
             }
             "cancel_open_orders" => {
                 let mut body = Map::new();
-                self.insert_optional_symbol(&mut body, params)?;
-                insert_optional_string(&mut body, "marketType", params.get("marketType"));
+                self.insert_required_symbol(&mut body, params)?;
+                insert_optional_string(&mut body, "orderType", params.get("orderType"));
                 self.private_delete_value(ORDERS, Value::Object(body), "orderCancelAll")
                     .await
             }
@@ -201,20 +201,6 @@ impl BackpackClient {
             "symbol".to_string(),
             Value::String(self.exchange_symbol(symbol)?),
         );
-        Ok(())
-    }
-
-    fn insert_optional_symbol(
-        &self,
-        body: &mut Map<String, Value>,
-        params: &BackpackParams,
-    ) -> Result<()> {
-        if let Some(symbol) = params.get_any(&["product_symbol", "symbol"]) {
-            body.insert(
-                "symbol".to_string(),
-                Value::String(self.exchange_symbol(symbol)?),
-            );
-        }
         Ok(())
     }
 }

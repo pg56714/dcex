@@ -53,6 +53,19 @@ impl BinanceClient {
         order_type: &str,
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if self.market_for_product_symbol(product_symbol)? == BinanceMarket::Futures
+            && is_futures_conditional_order(order_type)
+        {
+            return self
+                .send_place_futures_algo_order(
+                    product_symbol,
+                    side,
+                    order_type,
+                    "CONDITIONAL",
+                    futures_algo_params(extra_params),
+                )
+                .await;
+        }
         self.order_request(
             HttpMethod::Post,
             product_symbol,
@@ -88,6 +101,14 @@ impl BinanceClient {
         order_type: &str,
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if self.market_for_product_symbol(product_symbol)? == BinanceMarket::Futures
+            && is_futures_conditional_order(order_type)
+        {
+            return Err(DcexError::InvalidInput(
+                "Binance does not provide a test endpoint for USD-M futures conditional algo orders."
+                    .to_string(),
+            ));
+        }
         self.order_request(
             HttpMethod::Post,
             product_symbol,
@@ -809,4 +830,26 @@ impl BinanceClient {
         );
         self.request(method, market, path, params, true).await
     }
+}
+
+fn is_futures_conditional_order(order_type: &str) -> bool {
+    matches!(
+        order_type.to_ascii_uppercase().as_str(),
+        "STOP" | "STOP_MARKET" | "TAKE_PROFIT" | "TAKE_PROFIT_MARKET" | "TRAILING_STOP_MARKET"
+    )
+}
+
+fn futures_algo_params(params: Vec<(String, String)>) -> Vec<(String, String)> {
+    params
+        .into_iter()
+        .map(|(key, value)| {
+            let key = match key.as_str() {
+                "stopPrice" => "triggerPrice".to_string(),
+                "activationPrice" => "activatePrice".to_string(),
+                "newClientOrderId" => "clientAlgoId".to_string(),
+                _ => key,
+            };
+            (key, value)
+        })
+        .collect()
 }
