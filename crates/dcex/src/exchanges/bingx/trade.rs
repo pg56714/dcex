@@ -13,7 +13,8 @@ const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "quantity",
     "quoteOrderQty",
     "price",
-    "clientOrderId",
+    "stopPrice",
+    "newClientOrderId",
     "recvWindow",
 ];
 
@@ -95,14 +96,22 @@ impl BingxClient {
                     .await
             }
             "place_spot_batch_order" => {
-                let query = vec![(
+                let mut query = vec![(
                     "data".to_string(),
                     batch_orders_query(params.required("data")?)?,
                 )];
+                push_optional(&mut query, "sync", params.get("sync"));
+                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
                 self.private_post(SPOT_PLACE_BATCH_ORDER, query).await
             }
             "cancel_spot_order" => {
-                let mut query = params.only(&["orderId", "clientOrderId", "recvWindow"]);
+                let mut query = params.only(&[
+                    "orderId",
+                    "clientOrderID",
+                    "cancelRestrictions",
+                    "recvWindow",
+                ]);
+                push_parameter_alias(&mut query, params, "clientOrderID", "clientOrderId");
                 self.push_required_symbol(&mut query, params)?;
                 self.private_post(SPOT_CANCEL_ORDER, query).await
             }
@@ -114,6 +123,9 @@ impl BingxClient {
                     comma_list(params.required("orderIds")?),
                 ));
                 push_optional(&mut query, "process", params.get("process"));
+                if let Some(value) = params.get("clientOrderIDs") {
+                    query.push(("clientOrderIDs".to_string(), comma_list(value)));
+                }
                 push_optional(&mut query, "recvWindow", params.get("recvWindow"));
                 self.private_post(SPOT_CANCEL_BATCH_ORDERS, query).await
             }
@@ -123,13 +135,14 @@ impl BingxClient {
                 self.private_post(SPOT_CANCEL_OPEN_ORDERS, query).await
             }
             "get_spot_order" => {
-                let mut query = params.only(&["orderId", "clientOrderId", "recvWindow"]);
+                let mut query = params.only(&["orderId", "clientOrderID", "recvWindow"]);
+                push_parameter_alias(&mut query, params, "clientOrderID", "clientOrderId");
                 self.push_required_symbol(&mut query, params)?;
                 self.private_get(SPOT_QUERY_ORDER, query).await
             }
             "get_spot_open_orders" => {
                 let mut query = params.only(&["recvWindow"]);
-                self.push_required_symbol(&mut query, params)?;
+                self.push_optional_symbol(&mut query, params)?;
                 self.private_get(SPOT_QUERY_OPEN_ORDERS, query).await
             }
             "get_spot_order_history" => {
@@ -139,9 +152,12 @@ impl BingxClient {
                     "endTime",
                     "pageIndex",
                     "pageSize",
+                    "status",
+                    "type",
                     "recvWindow",
                 ]);
-                self.push_required_symbol(&mut query, params)?;
+                push_parameter_alias(&mut query, params, "type", "type_");
+                self.push_optional_symbol(&mut query, params)?;
                 if !query.iter().any(|(key, _)| key == "pageIndex") {
                     query.push(("pageIndex".to_string(), "1".to_string()));
                 }
@@ -151,8 +167,14 @@ impl BingxClient {
                 self.private_get(SPOT_QUERY_ORDER_HISTORY, query).await
             }
             "get_spot_my_trades" => {
-                let mut query =
-                    params.only(&["orderId", "startTime", "endTime", "limit", "recvWindow"]);
+                let mut query = params.only(&[
+                    "orderId",
+                    "startTime",
+                    "endTime",
+                    "fromId",
+                    "limit",
+                    "recvWindow",
+                ]);
                 self.push_required_symbol(&mut query, params)?;
                 self.private_get(SPOT_QUERY_MY_TRADES, query).await
             }
@@ -391,6 +413,7 @@ impl BingxClient {
         time_in_force_override: Option<&str>,
     ) -> Result<ValidatedResponse> {
         let mut query = params.only(SPOT_ORDER_OPTIONAL_KEYS);
+        push_parameter_alias(&mut query, params, "newClientOrderId", "clientOrderId");
         self.push_required_symbol(&mut query, params)?;
         let side = match side_override {
             Some(side) => side.to_string(),
@@ -494,5 +517,53 @@ fn normalize_bool_fields(query: &mut [(String, String)]) {
         ) {
             *value = bool_or_string(value);
         }
+    }
+}
+
+fn push_parameter_alias(
+    query: &mut Vec<(String, String)>,
+    params: &BingxParams,
+    official_key: &str,
+    legacy_key: &str,
+) {
+    if query.iter().any(|(key, _)| key == official_key) {
+        return;
+    }
+    push_optional(query, official_key, params.get(legacy_key));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preserves_spot_trigger_and_official_client_id() {
+        let params = BingxParams::from_pairs(vec![
+            ("stopPrice".to_string(), "90".to_string()),
+            ("newClientOrderId".to_string(), "new-id".to_string()),
+        ]);
+        let query = params.only(SPOT_ORDER_OPTIONAL_KEYS);
+        assert!(query.contains(&("stopPrice".to_string(), "90".to_string())));
+        assert!(query.contains(&("newClientOrderId".to_string(), "new-id".to_string())));
+    }
+
+    #[test]
+    fn maps_legacy_client_id_to_official_key() {
+        let params =
+            BingxParams::from_pairs(vec![("clientOrderId".to_string(), "legacy-id".to_string())]);
+        let mut query = Vec::new();
+        push_parameter_alias(&mut query, &params, "clientOrderID", "clientOrderId");
+        assert_eq!(
+            query,
+            vec![("clientOrderID".to_string(), "legacy-id".to_string())]
+        );
+    }
+
+    #[test]
+    fn maps_python_order_type_alias_to_official_key() {
+        let params = BingxParams::from_pairs(vec![("type_".to_string(), "LIMIT".to_string())]);
+        let mut query = Vec::new();
+        push_parameter_alias(&mut query, &params, "type", "type_");
+        assert_eq!(query, vec![("type".to_string(), "LIMIT".to_string())]);
     }
 }

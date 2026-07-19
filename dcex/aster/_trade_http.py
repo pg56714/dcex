@@ -177,6 +177,8 @@ class TradeHTTP(HTTPManager):
         workingType: str | None = None,
         priceProtect: bool | None = None,
         newOrderRespType: str | None = None,
+        pegPriceType: str | None = None,
+        pegOffset: str | None = None,
         stpMode: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place an Aster futures order."""
@@ -199,6 +201,8 @@ class TradeHTTP(HTTPManager):
                 workingType=workingType,
                 priceProtect=priceProtect,
                 newOrderRespType=newOrderRespType,
+                pegPriceType=pegPriceType,
+                pegOffset=pegOffset,
                 stpMode=stpMode,
             ),
         )

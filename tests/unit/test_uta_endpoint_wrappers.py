@@ -1,5 +1,7 @@
 """Offline verification for newly added Bitget and KuCoin UTA endpoints."""
 
+# ruff: noqa: D103
+
 from __future__ import annotations
 
 import pytest
@@ -11,7 +13,6 @@ from tests.unit.endpoint_wrapper_helpers import (
     _wire_async,
     _wire_sync,
 )
-
 
 UTA_CASES = (
     (
@@ -59,6 +60,7 @@ UTA_CASES = (
             "executeCycle": "1",
             "orderType": "1",
             "trend": "1",
+            "leverage": "2",
         },
         "NATIVE_PRIVATE",
     ),

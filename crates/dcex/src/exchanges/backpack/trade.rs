@@ -17,6 +17,17 @@ const ORDER_STRING_KEYS: &[&str] = &[
     "quoteQuantity",
     "timeInForce",
     "selfTradePrevention",
+    "stopLossLimitPrice",
+    "stopLossTriggerBy",
+    "stopLossTriggerPrice",
+    "takeProfitLimitPrice",
+    "takeProfitTriggerBy",
+    "takeProfitTriggerPrice",
+    "triggerBy",
+    "triggerPrice",
+    "triggerQuantity",
+    "slippageTolerance",
+    "slippageToleranceType",
 ];
 const ORDER_INTEGER_KEYS: &[&str] = &["clientId"];
 const ORDER_BOOL_KEYS: &[&str] = &[
@@ -202,5 +213,25 @@ impl BackpackClient {
             Value::String(self.exchange_symbol(symbol)?),
         );
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preserves_trigger_protection_and_slippage_fields() {
+        let params = BackpackParams::from_pairs(vec![
+            ("stopLossTriggerPrice".to_string(), "90".to_string()),
+            ("takeProfitLimitPrice".to_string(), "110".to_string()),
+            ("triggerQuantity".to_string(), "1".to_string()),
+            ("slippageTolerance".to_string(), "0.5".to_string()),
+        ]);
+        let body = params.body(ORDER_STRING_KEYS, ORDER_INTEGER_KEYS, ORDER_BOOL_KEYS);
+        assert!(body.contains_key("stopLossTriggerPrice"));
+        assert!(body.contains_key("takeProfitLimitPrice"));
+        assert!(body.contains_key("triggerQuantity"));
+        assert!(body.contains_key("slippageTolerance"));
     }
 }

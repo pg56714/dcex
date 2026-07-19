@@ -21,6 +21,8 @@ class TradeHTTP(HTTPManager):
         quantity: float | str | None = None,
         quoteOrderQty: float | str | None = None,
         price: float | str | None = None,
+        stopPrice: float | str | None = None,
+        newClientOrderId: str | None = None,
         clientOrderId: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any]:
@@ -125,7 +127,12 @@ class TradeHTTP(HTTPManager):
             self._native_call_params(locals()),
         )
 
-    async def place_spot_batch_order(self, data: list[dict]) -> dict[str, Any]:
+    async def place_spot_batch_order(
+        self,
+        data: list[dict],
+        sync: bool | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
         return await self._native_private(
             "place_spot_batch_order",
             self._native_call_params(locals()),
@@ -135,7 +142,9 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         orderId: int | str | None = None,
+        clientOrderID: str | None = None,
         clientOrderId: str | None = None,
+        cancelRestrictions: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private("cancel_spot_order", self._native_call_params(locals()))
@@ -144,6 +153,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         orderIds: list[int | str] | str,
+        clientOrderIDs: list[str] | str | None = None,
         process: int | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any]:
@@ -166,6 +176,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         orderId: int | str | None = None,
+        clientOrderID: str | None = None,
         clientOrderId: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any]:
@@ -173,7 +184,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_spot_open_orders(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
@@ -183,12 +194,14 @@ class TradeHTTP(HTTPManager):
 
     async def get_spot_order_history(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         orderId: int | str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
         pageIndex: int = 1,
         pageSize: int = 100,
+        status: str | None = None,
+        type_: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
@@ -202,6 +215,7 @@ class TradeHTTP(HTTPManager):
         orderId: int | str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
+        fromId: int | None = None,
         limit: int | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any]:

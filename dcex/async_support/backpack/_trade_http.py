@@ -49,6 +49,17 @@ class TradeHTTP(HTTPManager):
         autoBorrowRepay: bool | None = None,
         autoLend: bool | None = None,
         autoLendRedeem: bool | None = None,
+        stopLossLimitPrice: str | None = None,
+        stopLossTriggerBy: str | None = None,
+        stopLossTriggerPrice: str | None = None,
+        takeProfitLimitPrice: str | None = None,
+        takeProfitTriggerBy: str | None = None,
+        takeProfitTriggerPrice: str | None = None,
+        triggerBy: str | None = None,
+        triggerPrice: str | None = None,
+        triggerQuantity: str | None = None,
+        slippageTolerance: str | None = None,
+        slippageToleranceType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place a Backpack order."""
         return await self._native_private(

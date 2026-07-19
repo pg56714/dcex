@@ -8,6 +8,26 @@ use super::client::{AsterClient, AsterMarket};
 use super::endpoints::*;
 use super::params::AsterParams;
 
+const FUTURES_ORDER_KEYS: &[&str] = &[
+    "positionSide",
+    "type",
+    "timeInForce",
+    "quantity",
+    "reduceOnly",
+    "price",
+    "newClientOrderId",
+    "stopPrice",
+    "closePosition",
+    "activationPrice",
+    "callbackRate",
+    "workingType",
+    "priceProtect",
+    "newOrderRespType",
+    "pegPriceType",
+    "pegOffset",
+    "stpMode",
+];
+
 impl AsterClient {
     pub async fn private_request(
         &self,
@@ -99,23 +119,7 @@ impl AsterClient {
                     .await
             }
             "place_futures_order" => {
-                let mut query = params.only(&[
-                    "positionSide",
-                    "type",
-                    "timeInForce",
-                    "quantity",
-                    "reduceOnly",
-                    "price",
-                    "newClientOrderId",
-                    "stopPrice",
-                    "closePosition",
-                    "activationPrice",
-                    "callbackRate",
-                    "workingType",
-                    "priceProtect",
-                    "newOrderRespType",
-                    "stpMode",
-                ]);
+                let mut query = params.only(FUTURES_ORDER_KEYS);
                 self.push_required_symbol(&mut query, params)?;
                 self.push_required_side(&mut query, params)?;
                 self.signed(HttpMethod::Post, AsterMarket::Futures, FUTURES_ORDER, query)
@@ -398,4 +402,20 @@ fn ensure_order_lookup(params: &AsterParams) -> Result<()> {
         ));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preserves_bbo_peg_fields() {
+        let params = AsterParams::from_pairs(vec![
+            ("pegPriceType".to_string(), "QUEUE_1".to_string()),
+            ("pegOffset".to_string(), "-0.5".to_string()),
+        ]);
+        let query = params.only(FUTURES_ORDER_KEYS);
+        assert!(query.contains(&("pegPriceType".to_string(), "QUEUE_1".to_string())));
+        assert!(query.contains(&("pegOffset".to_string(), "-0.5".to_string())));
+    }
 }

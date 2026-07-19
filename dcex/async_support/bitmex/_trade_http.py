@@ -29,6 +29,8 @@ class TradeHTTP(HTTPManager):
         timeInForce: str | None = None,
         text: str | None = None,
         targetAccountId: int | None = None,
+        expiryTime: str | None = None,
+        maxSlippagePct: float | None = None,
     ) -> dict[str, Any]:
         """Place a new BitMEX order."""
         return await self._native_private(
@@ -50,6 +52,8 @@ class TradeHTTP(HTTPManager):
                 timeInForce=timeInForce,
                 text=text,
                 targetAccountId=targetAccountId,
+                expiryTime=expiryTime,
+                maxSlippagePct=maxSlippagePct,
             ),
         )
 

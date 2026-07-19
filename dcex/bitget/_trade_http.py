@@ -329,6 +329,14 @@ class TradeHTTP(HTTPManager):
         reduceOnly: str | None = None,
         stpMode: str | None = None,
         marginMode: str | None = None,
+        tpTriggerBy: str | None = None,
+        slTriggerBy: str | None = None,
+        takeProfit: str | None = None,
+        stopLoss: str | None = None,
+        tpOrderType: str | None = None,
+        slOrderType: str | None = None,
+        tpLimitPrice: str | None = None,
+        slLimitPrice: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget UTA order."""
         return self._native_private(
@@ -346,6 +354,14 @@ class TradeHTTP(HTTPManager):
                 reduceOnly=reduceOnly,
                 stpMode=stpMode,
                 marginMode=marginMode,
+                tpTriggerBy=tpTriggerBy,
+                slTriggerBy=slTriggerBy,
+                takeProfit=takeProfit,
+                stopLoss=stopLoss,
+                tpOrderType=tpOrderType,
+                slOrderType=slOrderType,
+                tpLimitPrice=tpLimitPrice,
+                slLimitPrice=slLimitPrice,
             ),
         )
 
@@ -488,6 +504,11 @@ class TradeHTTP(HTTPManager):
         force: str | None = None,
         clientOid: str | None = None,
         reduceOnly: str | None = None,
+        presetStopSurplusPrice: str | None = None,
+        presetStopLossPrice: str | None = None,
+        presetStopSurplusExecutePrice: str | None = None,
+        presetStopLossExecutePrice: str | None = None,
+        stpMode: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget futures order."""
         return self._native_private(
@@ -505,6 +526,11 @@ class TradeHTTP(HTTPManager):
                 force=force,
                 clientOid=clientOid,
                 reduceOnly=reduceOnly,
+                presetStopSurplusPrice=presetStopSurplusPrice,
+                presetStopLossPrice=presetStopLossPrice,
+                presetStopSurplusExecutePrice=presetStopSurplusExecutePrice,
+                presetStopLossExecutePrice=presetStopLossExecutePrice,
+                stpMode=stpMode,
             ),
         )
 

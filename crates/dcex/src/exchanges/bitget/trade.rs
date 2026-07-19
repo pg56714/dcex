@@ -7,6 +7,47 @@ use super::client::BitgetClient;
 use super::endpoints::*;
 use super::params::{insert_optional_value, require_one_identifier, BitgetParams};
 
+const UTA_ORDER_KEYS: &[&str] = &[
+    "category",
+    "side",
+    "orderType",
+    "qty",
+    "price",
+    "timeInForce",
+    "posSide",
+    "clientOid",
+    "reduceOnly",
+    "stpMode",
+    "marginMode",
+    "tpTriggerBy",
+    "slTriggerBy",
+    "takeProfit",
+    "stopLoss",
+    "tpOrderType",
+    "slOrderType",
+    "tpLimitPrice",
+    "slLimitPrice",
+];
+
+const FUTURES_ORDER_KEYS: &[&str] = &[
+    "productType",
+    "marginMode",
+    "marginCoin",
+    "size",
+    "price",
+    "side",
+    "tradeSide",
+    "orderType",
+    "force",
+    "clientOid",
+    "reduceOnly",
+    "presetStopSurplusPrice",
+    "presetStopLossPrice",
+    "presetStopSurplusExecutePrice",
+    "presetStopLossExecutePrice",
+    "stpMode",
+];
+
 impl BitgetClient {
     pub(super) async fn trade_private_request(
         &self,
@@ -377,19 +418,7 @@ impl BitgetClient {
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
-        let mut body = params.body(&[
-            "category",
-            "side",
-            "orderType",
-            "qty",
-            "price",
-            "timeInForce",
-            "posSide",
-            "clientOid",
-            "reduceOnly",
-            "stpMode",
-            "marginMode",
-        ]);
+        let mut body = params.body(UTA_ORDER_KEYS);
         self.insert_uta_symbol(&mut body, params)?;
         self.post_private(UTA_PLACE_ORDER, Value::Object(body))
             .await
@@ -422,19 +451,7 @@ impl BitgetClient {
         order_type: Option<&str>,
         force: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        let mut body = params.body(&[
-            "productType",
-            "marginMode",
-            "marginCoin",
-            "size",
-            "price",
-            "side",
-            "tradeSide",
-            "orderType",
-            "force",
-            "clientOid",
-            "reduceOnly",
-        ]);
+        let mut body = params.body(FUTURES_ORDER_KEYS);
         self.insert_required_product_symbol(&mut body, params)?;
         body.entry("productType".to_string())
             .or_insert_with(|| Value::String("USDT-FUTURES".to_string()));
@@ -494,5 +511,38 @@ impl BitgetClient {
         );
         self.post_private(FUTURES_BATCH_CANCEL_ORDERS, Value::Object(body))
             .await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preserves_uta_protection_fields() {
+        let params = BitgetParams::from_pairs(vec![
+            ("takeProfit".to_string(), "110".to_string()),
+            ("stopLoss".to_string(), "90".to_string()),
+            ("tpOrderType".to_string(), "limit".to_string()),
+            ("slLimitPrice".to_string(), "89".to_string()),
+        ]);
+        let body = params.body(UTA_ORDER_KEYS);
+        assert!(body.contains_key("takeProfit"));
+        assert!(body.contains_key("stopLoss"));
+        assert!(body.contains_key("tpOrderType"));
+        assert!(body.contains_key("slLimitPrice"));
+    }
+
+    #[test]
+    fn preserves_classic_futures_protection_fields() {
+        let params = BitgetParams::from_pairs(vec![
+            ("presetStopSurplusPrice".to_string(), "110".to_string()),
+            ("presetStopLossExecutePrice".to_string(), "89".to_string()),
+            ("stpMode".to_string(), "cancel_taker".to_string()),
+        ]);
+        let body = params.body(FUTURES_ORDER_KEYS);
+        assert!(body.contains_key("presetStopSurplusPrice"));
+        assert!(body.contains_key("presetStopLossExecutePrice"));
+        assert!(body.contains_key("stpMode"));
     }
 }

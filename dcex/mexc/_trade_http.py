@@ -371,10 +371,18 @@ class TradeHTTP(HTTPManager):
         price: str | None = None,
         leverage: int | None = None,
         externalOid: str | None = None,
+        positionId: int | None = None,
         positionMode: int | None = None,
         reduceOnly: bool | None = None,
         stopLossPrice: str | None = None,
         takeProfitPrice: str | None = None,
+        lossTrend: int | None = None,
+        profitTrend: int | None = None,
+        priceProtect: int | None = None,
+        marketCeiling: bool | None = None,
+        flashClose: bool | None = None,
+        bboTypeNum: int | None = None,
+        stpMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Contract order."""
         return self._native_private(
@@ -388,10 +396,18 @@ class TradeHTTP(HTTPManager):
                 price=price,
                 leverage=leverage,
                 externalOid=externalOid,
+                positionId=positionId,
                 positionMode=positionMode,
                 reduceOnly=reduceOnly,
                 stopLossPrice=stopLossPrice,
                 takeProfitPrice=takeProfitPrice,
+                lossTrend=lossTrend,
+                profitTrend=profitTrend,
+                priceProtect=priceProtect,
+                marketCeiling=marketCeiling,
+                flashClose=flashClose,
+                bboTypeNum=bboTypeNum,
+                stpMode=stpMode,
             ),
         )
 
@@ -654,7 +670,7 @@ class TradeHTTP(HTTPManager):
 
     def get_contract_open_orders(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         page_num: int | None = None,
         page_size: int | None = None,
     ) -> dict[str, Any] | list[Any]:
@@ -673,6 +689,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str | None = None,
         states: str | None = None,
         category: int | None = None,
+        orderId: str | int | None = None,
         start_time: int | None = None,
         end_time: int | None = None,
         page_num: int | None = None,
@@ -685,6 +702,7 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 states=states,
                 category=category,
+                orderId=orderId,
                 start_time=start_time,
                 end_time=end_time,
                 page_num=page_num,
@@ -749,10 +767,13 @@ class TradeHTTP(HTTPManager):
 
     def get_contract_plan_orders(
         self,
+        start_time: int,
+        end_time: int,
         product_symbol: str | None = None,
         states: str | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        side: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract trigger orders."""
         return self._native_private(
@@ -760,6 +781,9 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 states=states,
+                side=side,
+                start_time=start_time,
+                end_time=end_time,
                 page_num=page_num,
                 page_size=page_size,
             ),
@@ -769,6 +793,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         vol: str,
+        leverage: str,
         side: str,
         openType: str,
         triggerPrice: str,
@@ -777,8 +802,14 @@ class TradeHTTP(HTTPManager):
         orderType: str,
         trend: str,
         price: str | None = None,
-        leverage: str | None = None,
         externalOid: str | None = None,
+        priceProtect: int | None = None,
+        positionMode: int | None = None,
+        lossTrend: int | None = None,
+        profitTrend: int | None = None,
+        stopLossPrice: str | None = None,
+        takeProfitPrice: str | None = None,
+        reduceOnly: bool | None = None,
     ) -> dict[str, Any]:
         """Create an MEXC contract trigger plan order."""
         return self._native_private(
@@ -796,6 +827,13 @@ class TradeHTTP(HTTPManager):
                 price=price,
                 leverage=leverage,
                 externalOid=externalOid,
+                priceProtect=priceProtect,
+                positionMode=positionMode,
+                lossTrend=lossTrend,
+                profitTrend=profitTrend,
+                stopLossPrice=stopLossPrice,
+                takeProfitPrice=takeProfitPrice,
+                reduceOnly=reduceOnly,
             ),
         )
 

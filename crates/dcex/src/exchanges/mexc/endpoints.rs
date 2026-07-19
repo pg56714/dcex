@@ -62,7 +62,7 @@ pub(super) const CONTRACT_CANCEL_ORDERS: &str = "/api/v1/private/order/cancel";
 pub(super) const CONTRACT_CANCEL_ORDER_WITH_EXTERNAL_ID: &str =
     "/api/v1/private/order/cancel_with_external";
 pub(super) const CONTRACT_CANCEL_ALL_ORDERS: &str = "/api/v1/private/order/cancel_all";
-pub(super) const CONTRACT_OPEN_ORDERS: &str = "/api/v1/private/order/list/open_orders/{symbol}";
+pub(super) const CONTRACT_OPEN_ORDERS: &str = "/api/v1/private/order/list/open_orders";
 pub(super) const CONTRACT_HISTORY_ORDERS: &str = "/api/v1/private/order/list/history_orders";
 pub(super) const CONTRACT_EXTERNAL_ORDER: &str =
     "/api/v1/private/order/external/{symbol}/{external_oid}";
@@ -72,7 +72,7 @@ pub(super) const CONTRACT_ORDER_DEAL_DETAILS: &str =
     "/api/v1/private/order/deal_details/{order_id}";
 pub(super) const CONTRACT_ORDER_DEALS: &str = "/api/v1/private/order/list/order_deals";
 pub(super) const CONTRACT_PLAN_ORDERS: &str = "/api/v1/private/planorder/list/orders";
-pub(super) const CONTRACT_PLACE_PLAN_ORDER: &str = "/api/v1/private/planorder/place";
+pub(super) const CONTRACT_PLACE_PLAN_ORDER: &str = "/api/v1/private/planorder/place/v2";
 pub(super) const CONTRACT_CANCEL_PLAN_ORDERS: &str = "/api/v1/private/planorder/cancel";
 pub(super) const CONTRACT_CANCEL_ALL_PLAN_ORDERS: &str = "/api/v1/private/planorder/cancel_all";
 pub(super) const CONTRACT_STOP_ORDERS: &str = "/api/v1/private/stoporder/list/orders";

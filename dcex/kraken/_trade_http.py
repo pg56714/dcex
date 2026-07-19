@@ -16,15 +16,24 @@ class TradeHTTP(HTTPManager):
         volume: str,
         price: str | None = None,
         price2: str | None = None,
+        displayvol: str | None = None,
         leverage: str | None = None,
         oflags: str | None = None,
         timeinforce: str | None = None,
         expiretm: str | None = None,
         starttm: str | None = None,
+        asset_class: str | None = None,
+        trigger: str | None = None,
+        stptype: str | None = None,
         reduce_only: bool | None = None,
         userref: int | None = None,
         cl_ord_id: str | None = None,
         validate: bool | None = None,
+        deadline: str | None = None,
+        broker: str | None = None,
+        close_ordertype: str | None = None,
+        close_price: str | None = None,
+        close_price2: str | None = None,
     ) -> dict[str, Any]:
         """Place a Kraken spot order."""
         return self._native_private(
@@ -36,15 +45,26 @@ class TradeHTTP(HTTPManager):
                 volume=volume,
                 price=price,
                 price2=price2,
+                displayvol=displayvol,
                 leverage=leverage,
                 oflags=oflags,
                 timeinforce=timeinforce,
                 expiretm=expiretm,
                 starttm=starttm,
+                asset_class=asset_class,
+                trigger=trigger,
+                stptype=stptype,
                 reduce_only=reduce_only,
                 userref=userref,
                 cl_ord_id=cl_ord_id,
                 validate=validate,
+                deadline=deadline,
+                broker=broker,
+                **{
+                    "close[ordertype]": close_ordertype,
+                    "close[price]": close_price,
+                    "close[price2]": close_price2,
+                },
             ),
         )
 
@@ -347,6 +367,12 @@ class TradeHTTP(HTTPManager):
         cliOrdId: str | None = None,
         triggerSignal: str | None = None,
         reduceOnly: bool | None = None,
+        processBefore: str | None = None,
+        trailingStopMaxDeviation: str | None = None,
+        trailingStopDeviationUnit: str | None = None,
+        limitPriceOffsetValue: str | None = None,
+        limitPriceOffsetUnit: str | None = None,
+        broker: str | None = None,
     ) -> dict[str, Any]:
         """Place a Kraken Futures order."""
         return self._native_private(
@@ -361,6 +387,12 @@ class TradeHTTP(HTTPManager):
                 cliOrdId=cliOrdId,
                 triggerSignal=triggerSignal,
                 reduceOnly=reduceOnly,
+                processBefore=processBefore,
+                trailingStopMaxDeviation=trailingStopMaxDeviation,
+                trailingStopDeviationUnit=trailingStopDeviationUnit,
+                limitPriceOffsetValue=limitPriceOffsetValue,
+                limitPriceOffsetUnit=limitPriceOffsetUnit,
+                broker=broker,
             ),
         )
 

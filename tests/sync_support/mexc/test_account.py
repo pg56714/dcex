@@ -1,6 +1,7 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
 import os
+import time
 
 import pytest
 from dotenv import load_dotenv
@@ -137,6 +138,8 @@ def test_contract_account_read_endpoints(client):
 
 
 def test_private_trade_read_endpoints(client):
+    end_time = int(time.time() * 1000)
+    start_time = end_time - 86_400_000
     _assert_response(client.get_spot_open_orders("BTC-USDT-SPOT"))
     _assert_response(client.get_spot_all_orders("BTC-USDT-SPOT", limit=10))
     _assert_response(client.get_spot_my_trades("BTC-USDT-SPOT", limit=10))
@@ -150,7 +153,13 @@ def test_private_trade_read_endpoints(client):
         client.get_contract_order_deals("BTC-USDT-SWAP", page_num=1, page_size=10)
     )
     _assert_contract_success(
-        client.get_contract_plan_orders("BTC-USDT-SWAP", page_num=1, page_size=10)
+        client.get_contract_plan_orders(
+            start_time=start_time,
+            end_time=end_time,
+            product_symbol="BTC-USDT-SWAP",
+            page_num=1,
+            page_size=10,
+        )
     )
     _assert_contract_success(
         client.get_contract_stop_orders("BTC-USDT-SWAP", page_num=1, page_size=10)

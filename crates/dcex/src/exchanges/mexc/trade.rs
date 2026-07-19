@@ -26,10 +26,18 @@ const CONTRACT_ORDER_KEYS: &[&str] = &[
     "price",
     "leverage",
     "externalOid",
+    "positionId",
     "positionMode",
     "reduceOnly",
     "stopLossPrice",
     "takeProfitPrice",
+    "lossTrend",
+    "profitTrend",
+    "priceProtect",
+    "marketCeiling",
+    "flashClose",
+    "bboTypeNum",
+    "stpMode",
 ];
 
 const CONTRACT_ORDER_NUMBER_KEYS: &[&str] = &[
@@ -38,7 +46,13 @@ const CONTRACT_ORDER_NUMBER_KEYS: &[&str] = &[
     "openType",
     "vol",
     "leverage",
+    "positionId",
     "positionMode",
+    "lossTrend",
+    "profitTrend",
+    "priceProtect",
+    "bboTypeNum",
+    "stpMode",
 ];
 
 impl MexcClient {
@@ -213,10 +227,9 @@ impl MexcClient {
                     .await
             }
             "get_contract_open_orders" => {
-                let symbol = self.required_contract_symbol(params)?;
-                let path = CONTRACT_OPEN_ORDERS.replace("{symbol}", &symbol);
-                self.contract_get(&path, params.only(&["page_num", "page_size"]))
-                    .await
+                let mut query = params.only(&["page_num", "page_size"]);
+                add_pagination_defaults(&mut query);
+                self.contract_get(CONTRACT_OPEN_ORDERS, query).await
             }
             "get_contract_history_orders" => {
                 let mut query = params.only(&[
@@ -226,6 +239,7 @@ impl MexcClient {
                     "end_time",
                     "page_num",
                     "page_size",
+                    "orderId",
                 ]);
                 self.push_product_symbol(&mut query, params, "_")?;
                 self.contract_get(CONTRACT_HISTORY_ORDERS, query).await
@@ -268,13 +282,24 @@ impl MexcClient {
                 self.contract_get(CONTRACT_ORDER_DEALS, query).await
             }
             "get_contract_plan_orders" => {
-                let mut query = params.only(&["states", "page_num", "page_size"]);
+                let mut query = vec![
+                    (
+                        "start_time".to_string(),
+                        params.required("start_time")?.to_string(),
+                    ),
+                    (
+                        "end_time".to_string(),
+                        params.required("end_time")?.to_string(),
+                    ),
+                ];
+                query.extend(params.only(&["states", "side", "page_num", "page_size"]));
                 self.push_product_symbol(&mut query, params, "_")?;
+                add_pagination_defaults(&mut query);
                 self.contract_get(CONTRACT_PLAN_ORDERS, query).await
             }
             "place_contract_plan_order" => {
                 let mut body = params.body(
-                    &["price", "externalOid"],
+                    &["price", "externalOid", "stopLossPrice", "takeProfitPrice"],
                     &[
                         "vol",
                         "leverage",
@@ -285,8 +310,12 @@ impl MexcClient {
                         "executeCycle",
                         "orderType",
                         "trend",
+                        "priceProtect",
+                        "positionMode",
+                        "lossTrend",
+                        "profitTrend",
                     ],
-                    &[],
+                    &["reduceOnly"],
                 );
                 self.insert_required_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_PLACE_PLAN_ORDER, Value::Object(body))
@@ -380,7 +409,7 @@ impl MexcClient {
         let mut body = params.body(
             CONTRACT_ORDER_KEYS,
             CONTRACT_ORDER_NUMBER_KEYS,
-            &["reduceOnly"],
+            &["reduceOnly", "marketCeiling", "flashClose"],
         );
         self.insert_required_product_symbol(&mut body, params, "_")?;
         if let Some(side) = side_override {
@@ -431,4 +460,64 @@ fn joined_order_ids(value: &str) -> Result<String> {
             .join(","));
     }
     Ok(value.to_string())
+}
+
+fn add_pagination_defaults(query: &mut Vec<(String, String)>) {
+    if !query.iter().any(|(key, _)| key == "page_num") {
+        query.push(("page_num".to_string(), "1".to_string()));
+    }
+    if !query.iter().any(|(key, _)| key == "page_size") {
+        query.push(("page_size".to_string(), "20".to_string()));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preserves_current_contract_order_fields() {
+        let params = MexcParams::from_pairs(vec![
+            ("positionId".to_string(), "7".to_string()),
+            ("lossTrend".to_string(), "2".to_string()),
+            ("marketCeiling".to_string(), "true".to_string()),
+            ("bboTypeNum".to_string(), "1".to_string()),
+            ("stpMode".to_string(), "3".to_string()),
+        ]);
+        let body = params.body(
+            CONTRACT_ORDER_KEYS,
+            CONTRACT_ORDER_NUMBER_KEYS,
+            &["reduceOnly", "marketCeiling", "flashClose"],
+        );
+        assert_eq!(body.get("positionId"), Some(&Value::from(7)));
+        assert_eq!(body.get("marketCeiling"), Some(&Value::Bool(true)));
+        assert!(body.contains_key("lossTrend"));
+        assert!(body.contains_key("bboTypeNum"));
+        assert!(body.contains_key("stpMode"));
+    }
+
+    #[test]
+    fn uses_current_futures_order_paths() {
+        assert_eq!(
+            CONTRACT_OPEN_ORDERS,
+            "/api/v1/private/order/list/open_orders"
+        );
+        assert_eq!(
+            CONTRACT_PLACE_PLAN_ORDER,
+            "/api/v1/private/planorder/place/v2"
+        );
+    }
+
+    #[test]
+    fn supplies_required_pagination_defaults() {
+        let mut query = Vec::new();
+        add_pagination_defaults(&mut query);
+        assert_eq!(
+            query,
+            vec![
+                ("page_num".to_string(), "1".to_string()),
+                ("page_size".to_string(), "20".to_string()),
+            ]
+        );
+    }
 }

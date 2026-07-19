@@ -209,15 +209,28 @@ impl KrakenClient {
         push_required_param(&mut query, params, "volume")?;
         push_optional(&mut query, "price", params.get("price"));
         push_optional(&mut query, "price2", params.get("price2"));
+        push_optional(&mut query, "displayvol", params.get("displayvol"));
         push_optional(&mut query, "leverage", params.get("leverage"));
         push_optional(&mut query, "oflags", params.get("oflags").or(oflags));
         push_optional(&mut query, "timeinforce", params.get("timeinforce"));
         push_optional(&mut query, "expiretm", params.get("expiretm"));
         push_optional(&mut query, "starttm", params.get("starttm"));
+        push_optional(&mut query, "asset_class", params.get("asset_class"));
+        push_optional(&mut query, "trigger", params.get("trigger"));
+        push_optional(&mut query, "stptype", params.get("stptype"));
         push_optional(&mut query, "reduce_only", params.get("reduce_only"));
         push_optional(&mut query, "userref", params.get("userref"));
         push_optional(&mut query, "cl_ord_id", params.get("cl_ord_id"));
         push_optional(&mut query, "validate", params.get("validate"));
+        push_optional(&mut query, "deadline", params.get("deadline"));
+        push_optional(&mut query, "broker", params.get("broker"));
+        push_optional(
+            &mut query,
+            "close[ordertype]",
+            params.get("close[ordertype]"),
+        );
+        push_optional(&mut query, "close[price]", params.get("close[price]"));
+        push_optional(&mut query, "close[price2]", params.get("close[price2]"));
 
         self.private_post(KrakenAuth::Spot, SPOT_ADD_ORDER, query)
             .await
@@ -244,6 +257,28 @@ impl KrakenClient {
         push_optional(&mut query, "cliOrdId", params.get("cliOrdId"));
         push_optional(&mut query, "triggerSignal", params.get("triggerSignal"));
         push_optional(&mut query, "reduceOnly", params.get("reduceOnly"));
+        push_optional(&mut query, "processBefore", params.get("processBefore"));
+        push_optional(
+            &mut query,
+            "trailingStopMaxDeviation",
+            params.get("trailingStopMaxDeviation"),
+        );
+        push_optional(
+            &mut query,
+            "trailingStopDeviationUnit",
+            params.get("trailingStopDeviationUnit"),
+        );
+        push_optional(
+            &mut query,
+            "limitPriceOffsetValue",
+            params.get("limitPriceOffsetValue"),
+        );
+        push_optional(
+            &mut query,
+            "limitPriceOffsetUnit",
+            params.get("limitPriceOffsetUnit"),
+        );
+        push_optional(&mut query, "broker", params.get("broker"));
 
         self.private_post(KrakenAuth::Futures, FUTURES_SEND_ORDER, query)
             .await

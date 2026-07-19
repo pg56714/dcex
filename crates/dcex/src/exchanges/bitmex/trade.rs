@@ -18,6 +18,7 @@ const ORDER_STRING_KEYS: &[&str] = &[
     "pegPriceType",
     "timeInForce",
     "text",
+    "expiryTime",
 ];
 const ORDER_NUMBER_KEYS: &[&str] = &[
     "orderQty",
@@ -26,8 +27,9 @@ const ORDER_NUMBER_KEYS: &[&str] = &[
     "displayQty",
     "pegOffsetValue",
     "targetAccountId",
+    "maxSlippagePct",
 ];
-const AMEND_STRING_KEYS: &[&str] = &["orderID", "origClOrdID", "clOrdID", "text"];
+const AMEND_STRING_KEYS: &[&str] = &["orderID", "origClOrdID", "clOrdID", "text", "expiryTime"];
 const AMEND_NUMBER_KEYS: &[&str] = &[
     "leavesQty",
     "orderQty",
@@ -35,6 +37,7 @@ const AMEND_NUMBER_KEYS: &[&str] = &[
     "stopPx",
     "pegOffsetValue",
     "targetAccountId",
+    "maxSlippagePct",
 ];
 const CANCEL_STRING_KEYS: &[&str] = &["text"];
 const CANCEL_NUMBER_KEYS: &[&str] = &["targetAccountId"];
@@ -239,5 +242,24 @@ impl BitmexClient {
         );
         self.insert_product_symbol(&mut body, params)?;
         Ok(body)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preserves_v2_order_expiry_and_slippage_fields() {
+        let params = BitmexParams::from_pairs(vec![
+            (
+                "expiryTime".to_string(),
+                "2026-11-05T00:00:00.555Z".to_string(),
+            ),
+            ("maxSlippagePct".to_string(), "1.5".to_string()),
+        ]);
+        let body = params.body(ORDER_STRING_KEYS, ORDER_NUMBER_KEYS, &[], &[]);
+        assert!(body.contains_key("expiryTime"));
+        assert_eq!(body.get("maxSlippagePct"), Some(&Value::from(1.5)));
     }
 }
