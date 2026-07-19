@@ -8,6 +8,7 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
 use super::super::params::{exchange_symbol_fallback, is_canonical_product_symbol};
+use super::is_business_channel;
 
 const PUBLIC_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/public";
 const BUSINESS_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/business";
@@ -264,7 +265,7 @@ impl OkxPublicWebSocket {
 fn subscription_route(args: &[OkxWebSocketArg]) -> Result<OkxWebSocketRoute> {
     let mut route = None;
     for arg in args {
-        let candidate = if arg.channel.starts_with("candle") {
+        let candidate = if is_business_channel(&arg.channel) {
             OkxWebSocketRoute::Business
         } else {
             OkxWebSocketRoute::Public
@@ -391,13 +392,19 @@ mod tests {
     }
 
     #[test]
-    fn routes_candles_to_the_business_websocket() {
+    fn routes_official_business_channels_to_the_business_websocket() {
         let candle = OkxWebSocketArg::new("candle1m").expect("candle");
+        let mark_price_candle =
+            OkxWebSocketArg::new("mark-price-candle1m").expect("mark price candle");
+        let index_candle = OkxWebSocketArg::new("index-candle1m").expect("index candle");
+        let all_trades = OkxWebSocketArg::new("trades-all").expect("all trades");
         let trades = OkxWebSocketArg::new("trades").expect("trades");
-        assert_eq!(
-            subscription_route(&[candle.clone()]).expect("route"),
-            OkxWebSocketRoute::Business
-        );
+        for business_channel in [candle.clone(), mark_price_candle, index_candle, all_trades] {
+            assert_eq!(
+                subscription_route(&[business_channel]).expect("route"),
+                OkxWebSocketRoute::Business
+            );
+        }
         assert_eq!(
             subscription_route(&[trades.clone()]).expect("route"),
             OkxWebSocketRoute::Public

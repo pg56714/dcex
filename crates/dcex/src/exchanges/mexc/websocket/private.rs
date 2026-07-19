@@ -2,29 +2,22 @@ use std::time::Duration;
 
 use serde_json::{json, Value};
 
-use crate::crypto::hmac_sha256_hex;
-use crate::exchange::unix_timestamp_ms;
 use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest};
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::super::signing::encode_params;
-
 const SPOT_HTTP_BASE_URL: &str = "https://api.mexc.com";
 const WS_BASE_URL: &str = "wss://wbs-api.mexc.com/ws";
-const SPOT_TIME_PATH: &str = "/api/v3/time";
 const LISTEN_KEY_PATH: &str = "/api/v3/userDataStream";
 
 pub struct MexcPrivateWebSocket {
     connection: WebSocketConnection,
     transport: AsyncHttpClient,
     api_key: String,
-    api_secret: Option<String>,
     spot_http_base_url: String,
     ws_base_url: String,
     timeout: Duration,
     listen_key: Option<String>,
-    timestamp_offset_ms: Option<i64>,
 }
 
 impl MexcPrivateWebSocket {
@@ -77,12 +70,10 @@ impl MexcPrivateWebSocket {
             )?),
             transport: AsyncHttpClient::new(timeout)?,
             api_key,
-            api_secret,
             spot_http_base_url,
             ws_base_url,
             timeout,
             listen_key: None,
-            timestamp_offset_ms: None,
         })
     }
 
@@ -105,7 +96,7 @@ impl MexcPrivateWebSocket {
     }
 
     pub async fn create_listen_key(&mut self) -> Result<String> {
-        let request = self.listen_key_request(HttpMethod::Post, None).await?;
+        let request = self.listen_key_request(HttpMethod::Post, None)?;
         let response = self.transport.execute(request).await?;
         response.ensure_success()?;
         let data = response.json()?;
@@ -119,9 +110,7 @@ impl MexcPrivateWebSocket {
             .listen_key
             .clone()
             .ok_or_else(|| DcexError::InvalidInput("MEXC listen key is missing.".to_string()))?;
-        let request = self
-            .listen_key_request(HttpMethod::Put, Some(&listen_key))
-            .await?;
+        let request = self.listen_key_request(HttpMethod::Put, Some(&listen_key))?;
         let response = self.transport.execute(request).await?;
         response.ensure_success()?;
         let data = response.json()?;
@@ -130,9 +119,7 @@ impl MexcPrivateWebSocket {
 
     pub async fn close_listen_key(&mut self) -> Result<()> {
         if let Some(listen_key) = self.listen_key.take() {
-            let request = self
-                .listen_key_request(HttpMethod::Delete, Some(&listen_key))
-                .await?;
+            let request = self.listen_key_request(HttpMethod::Delete, Some(&listen_key))?;
             let response = self.transport.execute(request).await?;
             response.ensure_success()?;
         }
@@ -202,24 +189,18 @@ impl MexcPrivateWebSocket {
         self.connection.send_json(&payload).await
     }
 
-    async fn listen_key_request(
-        &mut self,
+    fn listen_key_request(
+        &self,
         method: HttpMethod,
         listen_key: Option<&str>,
     ) -> Result<HttpRequest> {
-        let timestamp = if self.api_secret.is_some() {
-            Some(self.synchronized_timestamp().await?)
-        } else {
-            None
-        };
-        self.build_listen_key_request(method, listen_key, timestamp)
+        self.build_listen_key_request(method, listen_key)
     }
 
     fn build_listen_key_request(
         &self,
         method: HttpMethod,
         listen_key: Option<&str>,
-        timestamp: Option<u64>,
     ) -> Result<HttpRequest> {
         let mut request = HttpRequest::new(method, &self.spot_http_base_url, LISTEN_KEY_PATH)
             .header("X-MEXC-APIKEY", self.api_key.clone());
@@ -227,49 +208,8 @@ impl MexcPrivateWebSocket {
         if let Some(listen_key) = listen_key {
             query.push(("listenKey".to_string(), listen_key.to_string()));
         }
-        if let Some(api_secret) = self.api_secret.as_deref() {
-            let timestamp = timestamp.ok_or_else(|| {
-                DcexError::Runtime("MEXC synchronized timestamp is missing.".to_string())
-            })?;
-            query.push(("timestamp".to_string(), timestamp.to_string()));
-            let signature =
-                hmac_sha256_hex(api_secret.as_bytes(), encode_params(&query).as_bytes())?;
-            query.push(("signature".to_string(), signature));
-        }
         request.query = query;
         Ok(request)
-    }
-
-    async fn synchronized_timestamp(&mut self) -> Result<u64> {
-        if self.timestamp_offset_ms.is_none() {
-            let local_start = unix_timestamp_ms()?;
-            let response = self
-                .transport
-                .execute(HttpRequest::new(
-                    HttpMethod::Get,
-                    &self.spot_http_base_url,
-                    SPOT_TIME_PATH,
-                ))
-                .await?;
-            let local_end = unix_timestamp_ms()?;
-            let data = response.json()?;
-            let server_time = data
-                .get("serverTime")
-                .and_then(|value| {
-                    value
-                        .as_u64()
-                        .or_else(|| value.as_str().and_then(|value| value.parse().ok()))
-                })
-                .ok_or_else(|| {
-                    DcexError::Decode(format!(
-                        "MEXC server time response did not include serverTime: {data}"
-                    ))
-                })?;
-            let midpoint = local_start.saturating_add(local_end) / 2;
-            self.timestamp_offset_ms = Some(server_time as i64 - midpoint as i64);
-        }
-        let adjusted = unix_timestamp_ms()? as i64 + self.timestamp_offset_ms.unwrap_or(0);
-        u64::try_from(adjusted).map_err(|error| DcexError::Runtime(error.to_string()))
     }
 }
 
@@ -342,7 +282,7 @@ mod tests {
     }
 
     #[test]
-    fn signs_listen_key_request_when_secret_is_available() {
+    fn listen_key_request_uses_only_official_parameters() {
         let ws = MexcPrivateWebSocket::with_urls_and_secret(
             "key".to_string(),
             Some("secret".to_string()),
@@ -352,20 +292,17 @@ mod tests {
         )
         .expect("ws");
         let request = ws
-            .build_listen_key_request(HttpMethod::Put, Some("listen-key"), Some(1_700_000_000_000))
+            .build_listen_key_request(HttpMethod::Put, Some("listen-key"))
             .expect("request");
 
-        assert!(request
-            .query
-            .iter()
-            .any(|(key, value)| { key == "listenKey" && value == "listen-key" }));
-        assert!(request
-            .query
-            .iter()
-            .any(|(key, value)| { key == "timestamp" && value == "1700000000000" }));
-        assert!(request
-            .query
-            .iter()
-            .any(|(key, value)| { key == "signature" && !value.is_empty() }));
+        assert_eq!(
+            request.query,
+            vec![("listenKey".to_string(), "listen-key".to_string())]
+        );
+
+        let create_request = ws
+            .build_listen_key_request(HttpMethod::Post, None)
+            .expect("create request");
+        assert!(create_request.query.is_empty());
     }
 }

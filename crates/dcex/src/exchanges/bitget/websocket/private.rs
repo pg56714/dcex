@@ -55,11 +55,23 @@ impl BitgetPrivateWebSocketArg {
         inst_id: Option<String>,
         coin: Option<String>,
     ) -> Result<Self> {
+        let inst_type = normalize_inst_type(&inst_type.into())?;
+        let channel = normalize_channel(&channel.into())?;
+        let inst_id = inst_id.map(|value| normalize_inst_id(&value)).transpose()?;
+        let coin = coin.map(|value| normalize_coin(&value)).transpose()?;
+        if channel == "positions"
+            && (inst_type == "SPOT" || inst_id.as_deref() != Some("default") || coin.is_some())
+        {
+            return Err(DcexError::InvalidInput(
+                "Bitget futures positions channel requires instId=default and does not support a coin filter."
+                    .to_string(),
+            ));
+        }
         Ok(Self {
-            inst_type: normalize_inst_type(&inst_type.into())?,
-            channel: normalize_channel(&channel.into())?,
-            inst_id: inst_id.map(|value| normalize_inst_id(&value)).transpose()?,
-            coin: coin.map(|value| normalize_coin(&value)).transpose()?,
+            inst_type,
+            channel,
+            inst_id,
+            coin,
         })
     }
 
@@ -491,6 +503,22 @@ mod tests {
         assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "account").is_ok());
         assert!(BitgetPrivateWebSocketArg::new("bad", "orders").is_err());
         assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "orders/").is_err());
+        assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "positions").is_err());
+        assert!(
+            BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "positions", "BTCUSDT")
+                .is_err()
+        );
+        assert!(BitgetPrivateWebSocketArg::with_inst_id("SPOT", "positions", "default").is_err());
+        assert!(
+            BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "positions", "default").is_ok()
+        );
+        assert!(BitgetPrivateWebSocketArg::with_inst_id_and_coin(
+            "USDT-FUTURES",
+            "positions",
+            "default",
+            "USDT"
+        )
+        .is_err());
     }
 
     #[test]

@@ -83,7 +83,7 @@ impl HyperliquidPublicWebSocket {
         product_symbol: &str,
         mantissa: u64,
     ) -> Result<()> {
-        self.subscribe_l2_book_with_optional_precision(product_symbol, None, Some(mantissa))
+        self.subscribe_l2_book_with_precision(product_symbol, 5, mantissa)
             .await
     }
 

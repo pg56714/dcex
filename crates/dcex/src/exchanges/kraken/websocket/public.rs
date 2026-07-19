@@ -128,7 +128,7 @@ impl KrakenPublicWebSocket {
             .map(|symbol| normalize_symbol(&symbol))
             .collect::<Result<Vec<_>>>()?;
         let request_id = self.next_request_id();
-        let payload = subscription_payload(method, channel, symbols, extra_params);
+        let payload = subscription_payload(method, channel, symbols, extra_params, request_id);
         self.connection.send_json(&payload).await?;
         Ok(request_id)
     }
@@ -145,6 +145,7 @@ fn subscription_payload(
     channel: String,
     symbols: Vec<String>,
     extra_params: Option<serde_json::Map<String, Value>>,
+    request_id: u64,
 ) -> Value {
     let mut params = serde_json::Map::new();
     params.insert("channel".to_string(), Value::String(channel));
@@ -155,6 +156,7 @@ fn subscription_payload(
     if let Some(extra_params) = extra_params {
         params.extend(extra_params);
     }
+    params.insert("req_id".to_string(), Value::from(request_id));
     json!({
         "method": method,
         "params": params,
@@ -270,16 +272,17 @@ mod tests {
     }
 
     #[test]
-    fn subscription_payload_omits_req_id() {
+    fn subscription_payload_includes_req_id() {
         let payload = subscription_payload(
             "subscribe",
             "trade".to_string(),
             vec!["BTC/USD".to_string()],
             None,
+            42,
         );
 
         assert_eq!(payload["method"], "subscribe");
         assert_eq!(payload["params"]["channel"], "trade");
-        assert!(payload["params"].get("req_id").is_none());
+        assert_eq!(payload["params"]["req_id"], 42);
     }
 }

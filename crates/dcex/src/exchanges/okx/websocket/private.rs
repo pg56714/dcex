@@ -7,9 +7,27 @@ use crate::exchange::unix_timestamp_ms;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
+use super::is_business_channel;
+
 const PRIVATE_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/private";
+const BUSINESS_WS_URL: &str = "wss://ws.okx.com:8443/ws/v5/business";
 const LOGIN_METHOD: &str = "GET";
 const LOGIN_PATH: &str = "/users/self/verify";
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum OkxAuthenticatedWebSocketRoute {
+    Private,
+    Business,
+}
+
+impl OkxAuthenticatedWebSocketRoute {
+    fn url(self) -> &'static str {
+        match self {
+            Self::Private => PRIVATE_WS_URL,
+            Self::Business => BUSINESS_WS_URL,
+        }
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct OkxPrivateWebSocketArg {
@@ -117,6 +135,9 @@ pub struct OkxPrivateWebSocket {
     api_secret: String,
     passphrase: String,
     logged_in: bool,
+    timeout: Duration,
+    managed_route: Option<OkxAuthenticatedWebSocketRoute>,
+    subscription_count: usize,
 }
 
 impl OkxPrivateWebSocket {
@@ -126,11 +147,11 @@ impl OkxPrivateWebSocket {
         passphrase: String,
         timeout: Duration,
     ) -> Result<Self> {
-        Self::with_url(
+        Self::with_managed_route(
             api_key,
             api_secret,
             passphrase,
-            PRIVATE_WS_URL.to_string(),
+            OkxAuthenticatedWebSocketRoute::Private,
             timeout,
         )
     }
@@ -151,7 +172,22 @@ impl OkxPrivateWebSocket {
             api_secret,
             passphrase,
             logged_in: false,
+            timeout,
+            managed_route: None,
+            subscription_count: 0,
         })
+    }
+
+    fn with_managed_route(
+        api_key: String,
+        api_secret: String,
+        passphrase: String,
+        route: OkxAuthenticatedWebSocketRoute,
+        timeout: Duration,
+    ) -> Result<Self> {
+        let mut client = Self::with_url(api_key, api_secret, passphrase, route.url(), timeout)?;
+        client.managed_route = Some(route);
+        Ok(client)
     }
 
     pub fn is_connected(&self) -> bool {
@@ -189,15 +225,24 @@ impl OkxPrivateWebSocket {
 
     pub async fn close(&mut self) -> Result<()> {
         self.logged_in = false;
+        self.subscription_count = 0;
         self.connection.close().await
     }
 
     pub async fn subscribe(&mut self, args: Vec<OkxPrivateWebSocketArg>) -> Result<()> {
-        self.send_subscription("subscribe", args).await
+        self.prepare_subscription_route(&args).await?;
+        let subscription_count = args.len();
+        self.send_subscription("subscribe", args).await?;
+        self.subscription_count = self.subscription_count.saturating_add(subscription_count);
+        Ok(())
     }
 
     pub async fn unsubscribe(&mut self, args: Vec<OkxPrivateWebSocketArg>) -> Result<()> {
-        self.send_subscription("unsubscribe", args).await
+        self.validate_subscription_route(&args)?;
+        let subscription_count = args.len();
+        self.send_subscription("unsubscribe", args).await?;
+        self.subscription_count = self.subscription_count.saturating_sub(subscription_count);
+        Ok(())
     }
 
     pub async fn subscribe_orders(&mut self) -> Result<()> {
@@ -278,6 +323,71 @@ impl OkxPrivateWebSocket {
         });
         self.connection.send_json(&payload).await
     }
+
+    async fn prepare_subscription_route(&mut self, args: &[OkxPrivateWebSocketArg]) -> Result<()> {
+        let target_route = authenticated_subscription_route(args)?;
+        let Some(current_route) = self.managed_route else {
+            return Ok(());
+        };
+        if current_route == target_route {
+            return Ok(());
+        }
+        if self.subscription_count > 0 {
+            return Err(DcexError::InvalidInput(
+                "OKX private and authenticated business channels require separate WebSocket connections."
+                    .to_string(),
+            ));
+        }
+        let was_connected = self.connection.is_connected();
+        if was_connected {
+            self.connection.close().await?;
+            self.logged_in = false;
+        }
+        self.connection =
+            WebSocketConnection::new(WebSocketConfig::new(target_route.url(), self.timeout)?);
+        self.managed_route = Some(target_route);
+        if was_connected {
+            self.connect().await?;
+        }
+        Ok(())
+    }
+
+    fn validate_subscription_route(&self, args: &[OkxPrivateWebSocketArg]) -> Result<()> {
+        if let Some(current_route) = self.managed_route {
+            let target_route = authenticated_subscription_route(args)?;
+            if current_route != target_route {
+                return Err(DcexError::InvalidInput(
+                    "OKX private and authenticated business channels require separate WebSocket connections."
+                        .to_string(),
+                ));
+            }
+        }
+        Ok(())
+    }
+}
+
+fn authenticated_subscription_route(
+    args: &[OkxPrivateWebSocketArg],
+) -> Result<OkxAuthenticatedWebSocketRoute> {
+    let mut route = None;
+    for arg in args {
+        let candidate = if is_business_channel(&arg.channel) {
+            OkxAuthenticatedWebSocketRoute::Business
+        } else {
+            OkxAuthenticatedWebSocketRoute::Private
+        };
+        if let Some(existing) = route {
+            if existing != candidate {
+                return Err(DcexError::InvalidInput(
+                    "OKX private and authenticated business channels require separate WebSocket connections."
+                        .to_string(),
+                ));
+            }
+        } else {
+            route = Some(candidate);
+        }
+    }
+    Ok(route.unwrap_or(OkxAuthenticatedWebSocketRoute::Private))
 }
 
 fn login_signature(api_secret: &str, timestamp: &str) -> Result<String> {
@@ -416,5 +526,20 @@ mod tests {
         assert!(validate_login_ack(&json!({"event": "login", "code": "0"})).is_ok());
         assert!(validate_login_ack(&json!({"event": "login", "code": "60012"})).is_err());
         assert!(validate_login_ack(&json!({"event": "subscribe", "code": "0"})).is_err());
+    }
+
+    #[test]
+    fn routes_authenticated_business_channels_to_the_business_websocket() {
+        let orders = OkxPrivateWebSocketArg::new("orders").expect("orders");
+        let algo_orders = OkxPrivateWebSocketArg::new("orders-algo").expect("algo orders");
+        assert_eq!(
+            authenticated_subscription_route(&[orders.clone()]).expect("private route"),
+            OkxAuthenticatedWebSocketRoute::Private
+        );
+        assert_eq!(
+            authenticated_subscription_route(&[algo_orders.clone()]).expect("business route"),
+            OkxAuthenticatedWebSocketRoute::Business
+        );
+        assert!(authenticated_subscription_route(&[orders, algo_orders]).is_err());
     }
 }
