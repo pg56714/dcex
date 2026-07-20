@@ -1,3 +1,10 @@
+## 0.6.5 (2026-07-20)
+
+### Fix
+
+- align exchange order APIs with current specs
+- align websocket integrations with exchange specs
+
 ## 0.6.4 (2026-07-18)
 
 ### Fix

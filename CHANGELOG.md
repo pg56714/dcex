@@ -1,3 +1,9 @@
+## 0.28.5 (2026-07-20)
+
+### Fix
+
+- align exchange order APIs with current specs
+
 ## 0.28.4 (2026-07-18)
 
 ### Fix
