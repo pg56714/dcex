@@ -34,11 +34,6 @@ def _http_server(
             ):
                 if value := self.headers.get(header):
                     request[header] = value
-            if value := self.headers.get("api-key"):
-                request["bitmex_api_key"] = value
-            for header in ("api-signature", "api-expires"):
-                if value := self.headers.get(header):
-                    request[header] = value
             for header in ("X-BM-KEY", "X-BM-SIGN", "X-BM-TIMESTAMP", "X-BM-MEMO"):
                 if value := self.headers.get(header):
                     request[header] = value

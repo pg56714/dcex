@@ -12,9 +12,6 @@ use tokio::time::{sleep, Duration};
 pub(crate) const BTC_USDT_SPOT: &str = "BTC-USDT-SPOT";
 pub(crate) const BTC_USDT_SWAP: &str = "BTC-USDT-SWAP";
 pub(crate) const BTC_USD_SWAP: &str = "BTC-USD-SWAP";
-pub(crate) const DOGE_USDT_SPOT: &str = "DOGE-USDT-SPOT";
-pub(crate) const DOGE_USDT_SWAP: &str = "DOGE-USDT-SWAP";
-pub(crate) const XBT_USDT_SWAP: &str = "XBT-USDT-SWAP";
 
 pub(crate) type Params = Vec<(String, String)>;
 

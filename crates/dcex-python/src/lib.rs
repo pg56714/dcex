@@ -9,7 +9,6 @@ use dcex::exchanges::backpack::{BackpackClient, SignaturePayload};
 use dcex::exchanges::binance::{BinanceClient, BinanceMarket};
 use dcex::exchanges::bingx::BingxClient;
 use dcex::exchanges::bitget::BitgetClient;
-use dcex::exchanges::bitmex::BitmexClient;
 use dcex::exchanges::bybit::BybitClient;
 use dcex::exchanges::extended::ExtendedClient;
 use dcex::exchanges::hyperliquid::HyperliquidClient;
@@ -314,10 +313,6 @@ mod bingx_ws;
 mod bitget_client;
 #[path = "ws/bitget.rs"]
 mod bitget_ws;
-#[path = "clients/bitmex.rs"]
-mod bitmex_client;
-#[path = "ws/bitmex.rs"]
-mod bitmex_ws;
 #[path = "clients/bybit.rs"]
 mod bybit_client;
 #[path = "ws/bybit.rs"]
@@ -364,8 +359,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     bingx_ws::register(m)?;
     bitget_client::register(m)?;
     bitget_ws::register(m)?;
-    bitmex_client::register(m)?;
-    bitmex_ws::register(m)?;
     bybit_client::register(m)?;
     bybit_ws::register(m)?;
     extended_client::register(m)?;

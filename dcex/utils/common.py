@@ -16,7 +16,6 @@ class Common(str, Enum):
     BINGX = "bingx"
     BITGET = "bitget"
     KUCOIN = "kucoin"
-    BITMEX = "bitmex"
     KRAKEN = "kraken"
     LIGHTER = "lighter"
     MEXC = "mexc"

@@ -1,7 +1,6 @@
 use dcex::exchanges::{
-    bingx::BingxClient, bitget::BitgetClient, bitmex::BitmexClient, bybit::BybitClient,
-    hyperliquid::HyperliquidClient, kraken::KrakenClient, lighter::LighterClient, mexc::MexcClient,
-    okx::OkxClient,
+    bingx::BingxClient, bitget::BitgetClient, bybit::BybitClient, hyperliquid::HyperliquidClient,
+    kraken::KrakenClient, lighter::LighterClient, mexc::MexcClient, okx::OkxClient,
 };
 
 trait WrapperSource {
@@ -30,10 +29,6 @@ impl WrapperSource for KrakenClient {
 
 impl WrapperSource for MexcClient {
     const SOURCE: &'static str = include_str!("../src/exchanges/mexc/wrappers.rs");
-}
-
-impl WrapperSource for BitmexClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/bitmex/wrappers.rs");
 }
 
 impl WrapperSource for HyperliquidClient {
@@ -543,35 +538,6 @@ fn rust_direct_clients_expose_python_method_names() {
         set_spot_mx_deduct,
         test_spot_order,
         user_universal_transfer,
-    );
-
-    assert_methods!(
-        BitmexClient:
-        get_futures_fee_rates,
-        amend_order,
-        cancel_all_orders,
-        cancel_order,
-        get_executions,
-        get_margin,
-        get_margining_mode,
-        get_order,
-        get_positions,
-        get_trade_history,
-        get_trading_volume,
-        get_wallet_summary,
-        place_limit_buy_order,
-        place_limit_order,
-        place_limit_sell_order,
-        place_market_buy_order,
-        place_market_order,
-        place_market_sell_order,
-        place_order,
-        place_post_only_buy_order,
-        place_post_only_order,
-        place_post_only_sell_order,
-        set_leverage,
-        set_margining_mode,
-        switch_mode,
     );
 
     assert_methods!(

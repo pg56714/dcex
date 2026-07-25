@@ -12,19 +12,27 @@ from tests.unit.endpoint_wrapper_helpers import (
     _wire_sync,
 )
 
-
 FEE_RATE_CASES = (
     ("binance", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
     ("binance", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
     ("bitget", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
     ("bitget", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
-    ("bitmex", "get_futures_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_spot_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_linear_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_inverse_fee_rates", {}, "NATIVE_PRIVATE"),
     ("bybit", "get_option_fee_rates", {}, "NATIVE_PRIVATE"),
-    ("hyperliquid", "get_spot_fee_rates", {"user": "0x0000000000000000000000000000000000000001"}, "NATIVE_PUBLIC"),
-    ("hyperliquid", "get_futures_fee_rates", {"user": "0x0000000000000000000000000000000000000001"}, "NATIVE_PUBLIC"),
+    (
+        "hyperliquid",
+        "get_spot_fee_rates",
+        {"user": "0x0000000000000000000000000000000000000001"},
+        "NATIVE_PUBLIC",
+    ),
+    (
+        "hyperliquid",
+        "get_futures_fee_rates",
+        {"user": "0x0000000000000000000000000000000000000001"},
+        "NATIVE_PUBLIC",
+    ),
     ("kucoin", "get_spot_fee_rates", {"product_symbol": "BTC-USDT-SPOT"}, "NATIVE_PRIVATE"),
     ("kucoin", "get_futures_fee_rates", {"product_symbol": "BTC-USDT-SWAP"}, "NATIVE_PRIVATE"),
     ("okx", "get_spot_fee_rates", {}, "NATIVE_PRIVATE"),
@@ -43,6 +51,7 @@ def test_sync_fee_rate_wrappers_use_native_fee_endpoint(
     request_type: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Verify synchronous fee wrappers dispatch through the native endpoint."""
     _patch_hyperliquid_market(monkeypatch)
     client = _client_class("sync", exchange)(**_client_kwargs(exchange))
     calls = _wire_sync(client)
@@ -52,10 +61,10 @@ def test_sync_fee_rate_wrappers_use_native_fee_endpoint(
         {
             "method": request_type,
             "path": method_name,
-            "query": list(
+            "query": [
                 (key, str(value).lower() if isinstance(value, bool) else str(value))
                 for key, value in kwargs.items()
-            ),
+            ],
         }
     ]
 
@@ -69,6 +78,7 @@ async def test_async_fee_rate_wrappers_use_native_fee_endpoint(
     request_type: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Verify asynchronous fee wrappers dispatch through the native endpoint."""
     _patch_hyperliquid_market(monkeypatch)
     client = _client_class("async", exchange)(**_client_kwargs(exchange))
     calls = _wire_async(client)
@@ -78,9 +88,9 @@ async def test_async_fee_rate_wrappers_use_native_fee_endpoint(
         {
             "method": request_type,
             "path": method_name,
-            "query": list(
+            "query": [
                 (key, str(value).lower() if isinstance(value, bool) else str(value))
                 for key, value in kwargs.items()
-            ),
+            ],
         }
     ]

@@ -40,11 +40,6 @@ fn canonical_symbols_cover_exchange_specific_formats() {
     );
     assert_eq!(binance_product_type("PERPETUAL"), "swap");
     assert_eq!(binance_product_type("CURRENT_QUARTER"), "futures");
-    assert_eq!(
-        bitmex_product_symbol("FFCCSX", "XBTUSDZ26", "XBT", "USD"),
-        "XBT-USD-Z26-SWAP"
-    );
-
     let mut inverse_base = "BTC".to_string();
     assert_eq!(
         bybit_product_symbol(

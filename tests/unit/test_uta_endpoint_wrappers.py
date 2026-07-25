@@ -46,7 +46,6 @@ UTA_CASES = (
         "NATIVE_PRIVATE",
     ),
     ("binance", "get_order_rate_limit", {}, "NATIVE_PRIVATE"),
-    ("bitmex", "set_cancel_all_after", {"timeout": 60000}, "NATIVE_PRIVATE"),
     (
         "mexc",
         "place_contract_plan_order",

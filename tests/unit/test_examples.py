@@ -14,7 +14,6 @@ MIGRATED_EXCHANGES = (
     "binance",
     "bingx",
     "bitget",
-    "bitmex",
     "bybit",
     "hyperliquid",
     "kraken",

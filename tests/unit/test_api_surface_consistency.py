@@ -12,7 +12,6 @@ EXCHANGES = (
     "binance",
     "bingx",
     "bitget",
-    "bitmex",
     "bybit",
     "extended",
     "hyperliquid",

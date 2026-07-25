@@ -13,7 +13,6 @@ from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
 from .bingx.client import Client as BingXClient
 from .bitget.client import Client as BitgetClient
-from .bitmex.client import Client as BitmexClient
 from .bybit.client import Client as BybitClient
 from .extended.client import Client as ExtendedClient
 from .hyperliquid.client import Client as HyperliquidClient
@@ -57,13 +56,6 @@ async def bitget(
 ) -> BitgetClient:
     """Create and initialize a Bitget client instance."""
     return cast(BitgetClient, await BitgetClient(**kwargs).async_init())
-
-
-async def bitmex(
-    **kwargs: Any,  # noqa: ANN401
-) -> BitmexClient:
-    """Create and initialize a BitMEX client instance."""
-    return cast(BitmexClient, await BitmexClient(**kwargs).async_init())
 
 
 async def bybit(
@@ -128,7 +120,6 @@ __all__ = [
     "binance",
     "bingx",
     "bitget",
-    "bitmex",
     "bybit",
     "extended",
     "hyperliquid",

@@ -58,11 +58,6 @@ def bitget() -> ProductTable:
     return _fetch("bitget")
 
 
-def bitmex() -> ProductTable:
-    """Fetch BitMEX product metadata."""
-    return _fetch("bitmex")
-
-
 def bybit() -> ProductTable:
     """Fetch Bybit product metadata."""
     return _fetch("bybit")

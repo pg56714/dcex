@@ -6,7 +6,6 @@ mod live_stateful {
     mod binance;
     mod bingx;
     mod bitget;
-    mod bitmex;
     mod bybit;
     mod hyperliquid;
     mod kraken;

@@ -8,7 +8,6 @@ use crate::exchanges::backpack::BackpackClient;
 use crate::exchanges::binance::BinanceClient;
 use crate::exchanges::bingx::BingxClient;
 use crate::exchanges::bitget::BitgetClient;
-use crate::exchanges::bitmex::BitmexClient;
 use crate::exchanges::bybit::BybitClient;
 use crate::exchanges::extended::ExtendedClient;
 use crate::exchanges::hyperliquid::HyperliquidClient;
@@ -304,51 +303,6 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
             quote_currency: quote,
             min_notional: value_string(market, "minTradeUSDT", "0"),
             size_per_contract: value_string(market, "sizeMultiplier", "1"),
-        });
-    }
-    Ok(rows)
-}
-
-pub(super) async fn fetch_bitmex(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = BitmexClient::public(timeout)?;
-    let response = client
-        .public_request(
-            "get_instrument_info",
-            vec![
-                (
-                    "filter".to_string(),
-                    r#"{"typ":["FFWCSX","FFCCSX","IFXXXP"]}"#.to_string(),
-                ),
-                ("count".to_string(), "500".to_string()),
-            ],
-        )
-        .await?;
-    let mut rows = Vec::new();
-    for market in value_array(Some(&response.data)) {
-        let typ = value_string(market, "typ", "");
-        let product_type = match typ.as_str() {
-            "FFWCSX" => "swap",
-            "FFCCSX" => "futures",
-            "IFXXXP" => "spot",
-            _ => continue,
-        };
-        let symbol = required_string(market, "symbol")?;
-        let base = value_string(market, "underlying", "");
-        let quote = required_string(market, "quoteCurrency")?;
-        let product_symbol = bitmex_product_symbol(&typ, &symbol, &base, &quote);
-        rows.push(MarketInfo {
-            exchange: "bitmex".to_string(),
-            exchange_symbol: symbol,
-            product_symbol,
-            product_type: product_type.to_string(),
-            exchange_type: typ,
-            price_precision: value_string(market, "tickSize", "0"),
-            size_precision: value_string(market, "lotSize", "0"),
-            min_size: value_string(market, "lotSize", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: "0".to_string(),
-            size_per_contract: value_string(market, "multiplier", "1"),
         });
     }
     Ok(rows)

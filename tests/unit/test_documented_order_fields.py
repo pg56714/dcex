@@ -183,17 +183,6 @@ ORDER_FIELD_CASES: tuple[tuple[str, str, dict[str, Any], set[str]], ...] = (
         {"bboTypeNum", "stpMode", "marketCeiling"},
     ),
     (
-        "bitmex",
-        "place_order",
-        {
-            "product_symbol": "BTC-USDT-SWAP",
-            "side": "buy",
-            "expiryTime": "2026-11-05T00:00:00.555Z",
-            "maxSlippagePct": 1.5,
-        },
-        {"expiryTime", "maxSlippagePct"},
-    ),
-    (
         "bingx",
         "place_spot_order",
         {

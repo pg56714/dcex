@@ -60,8 +60,6 @@ class FakePTM:
             return '["BTC",0]'
         if exchange == Common.OKX or str(exchange) == Common.OKX.value:
             return product_symbol or "BTC-USDT-SWAP"
-        if exchange == Common.BITMEX or str(exchange) == Common.BITMEX.value:
-            return "XBTUSDT"
         if exchange == Common.KRAKEN or str(exchange) == Common.KRAKEN.value:
             return "XBTUSDT" if product_symbol and "SPOT" in product_symbol else "PF_XBTUSD"
         if exchange == Common.LIGHTER or str(exchange) == Common.LIGHTER.value:
@@ -340,7 +338,7 @@ def _client_kwargs(exchange: str) -> dict[str, Any]:
             api_key=base64.b64encode(b"2" * 32).decode(),
             api_secret=base64.b64encode(b"1" * 32).decode(),
         )
-    elif exchange in {"binance", "bingx", "bitmex", "bybit", "mexc"}:
+    elif exchange in {"binance", "bingx", "bybit", "mexc"}:
         kwargs.update(api_key="api-key", api_secret="api-secret")
     elif exchange in {"bitget", "okx", "kucoin"}:
         kwargs.update(api_key="api-key", api_secret="api-secret", passphrase="passphrase")
@@ -418,8 +416,6 @@ def _wire_async(client: Any) -> list[dict[str, Any]]:
 
 
 def _product_symbol(exchange: str, method_name: str) -> str:
-    if exchange == "bitmex":
-        return "XBT-USDT-SWAP"
     if exchange == "hyperliquid":
         return "BTC-USD-SWAP"
     if exchange == "kraken":
@@ -500,7 +496,7 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
             return "Bid"
         if case.exchange == "mexc" and "contract" in method_name:
             return 1
-        if case.exchange in {"bybit", "bitmex"}:
+        if case.exchange == "bybit":
             return "Buy"
         return "buy"
     if name in {"isBuy", "reduceOnly", "isCross", "randomize", "dual_mode"}:
@@ -546,7 +542,7 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     if name in {"symbol"}:
         if case.exchange == "backpack":
             return "USDC" if "borrow" in method_name or "withdrawal" in method_name else "BTC_USDC"
-        return "XBT-USDT-SWAP" if case.exchange == "bitmex" else "BTCUSDT"
+        return "BTCUSDT"
     if name in {"blockchain"}:
         return "Solana"
     if name in {"country"}:
@@ -745,8 +741,6 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         "modify_futures_order",
     }:
         kwargs["orderId"] = 1
-    if case.exchange == "bitmex" and case.method_name in {"amend_order", "cancel_order"}:
-        kwargs["orderID"] = "test-order-id"
     if case.exchange == "binance" and case.method_name in {
         "cancel_futures_algo_order",
         "get_futures_algo_order",
@@ -796,6 +790,8 @@ def _sample_okx_orders() -> dict[str, list[dict[str, str]]]:
 def _patch_sync_case(client: Any, case: EndpointCase) -> None:
     if case.exchange == "okx" and case.method_name == "cancel_all_orders":
         client.get_order_list = lambda *args, **kwargs: _sample_okx_orders()
+
+
 def _patch_async_case(client: Any, case: EndpointCase) -> None:
     if case.exchange == "okx" and case.method_name == "cancel_all_orders":
 
@@ -805,6 +801,7 @@ def _patch_async_case(client: Any, case: EndpointCase) -> None:
             return _sample_okx_orders()
 
         client.get_order_list = fake_get_order_list
+
 
 def _patch_hyperliquid_market(monkeypatch: pytest.MonkeyPatch) -> None:
     sync_trade = import_module("dcex.hyperliquid._trade_http")

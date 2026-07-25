@@ -1746,7 +1746,6 @@ pub mod backpack;
 pub mod binance;
 pub mod bingx;
 pub mod bitget;
-pub mod bitmex;
 pub mod bybit;
 pub mod extended;
 pub mod hyperliquid;

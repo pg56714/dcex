@@ -16,7 +16,6 @@ _PRIVATE_ENV_VARS = {
     "binance": ("BINANCE_API_KEY", "BINANCE_API_SECRET"),
     "bingx": ("BINGX_API_KEY", "BINGX_API_SECRET"),
     "bitget": ("BITGET_API_KEY", "BITGET_API_SECRET", "BITGET_PASSPHRASE"),
-    "bitmex": ("BITMEX_API_KEY", "BITMEX_API_SECRET"),
     "bybit": ("BYBIT_API_KEY", "BYBIT_API_SECRET"),
     "extended": ("EXTENDED_API_KEY",),
     "kucoin": ("KUCOIN_API_KEY", "KUCOIN_API_SECRET", "KUCOIN_API_PASSPHRASE"),

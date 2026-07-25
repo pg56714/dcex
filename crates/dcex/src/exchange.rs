@@ -13,7 +13,6 @@ pub enum Exchange {
     Binance,
     BingX,
     Bitget,
-    BitMEX,
     Bybit,
     Extended,
     Hyperliquid,
@@ -25,13 +24,12 @@ pub enum Exchange {
 }
 
 impl Exchange {
-    pub const ALL: [Self; 14] = [
+    pub const ALL: [Self; 13] = [
         Self::Aster,
         Self::Backpack,
         Self::Binance,
         Self::BingX,
         Self::Bitget,
-        Self::BitMEX,
         Self::Bybit,
         Self::Extended,
         Self::Hyperliquid,
@@ -49,7 +47,6 @@ impl Exchange {
             Self::Binance => "binance",
             Self::BingX => "bingx",
             Self::Bitget => "bitget",
-            Self::BitMEX => "bitmex",
             Self::Bybit => "bybit",
             Self::Extended => "extended",
             Self::Hyperliquid => "hyperliquid",
@@ -151,7 +148,7 @@ mod tests {
 
     #[test]
     fn exchange_registry_matches_python_registry() {
-        assert_eq!(Exchange::ALL.len(), 14);
+        assert_eq!(Exchange::ALL.len(), 13);
         assert_eq!(Exchange::Binance.as_str(), "binance");
         assert_eq!(Exchange::Lighter.as_str(), "lighter");
     }

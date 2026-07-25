@@ -43,7 +43,6 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
         Exchange::Binance => self::exchanges::fetch_binance(timeout).await,
         Exchange::BingX => self::exchanges::fetch_bingx(timeout).await,
         Exchange::Bitget => self::exchanges::fetch_bitget(timeout).await,
-        Exchange::BitMEX => self::exchanges::fetch_bitmex(timeout).await,
         Exchange::Bybit => self::exchanges::fetch_bybit(timeout).await,
         Exchange::Extended => self::exchanges::fetch_extended(timeout).await,
         Exchange::Hyperliquid => self::exchanges::fetch_hyperliquid(timeout).await,
@@ -194,22 +193,6 @@ fn binance_product_type(contract_type: &str) -> &'static str {
         "swap"
     } else {
         "futures"
-    }
-}
-
-fn bitmex_product_symbol(typ: &str, symbol: &str, base: &str, quote: &str) -> String {
-    match typ {
-        "IFXXXP" => format!("{base}-{quote}-SPOT"),
-        "FFWCSX" => format!("{base}-{quote}-SWAP"),
-        "FFCCSX" => {
-            let pair = format!("{base}{quote}");
-            let expiry = symbol
-                .strip_prefix(&pair)
-                .or_else(|| symbol.strip_prefix(base))
-                .unwrap_or(symbol);
-            format!("{base}-{quote}-{expiry}-SWAP")
-        }
-        _ => symbol.to_string(),
     }
 }
 

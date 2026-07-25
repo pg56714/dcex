@@ -3,8 +3,8 @@
 import pytest
 
 from dcex.enums import (
-    OrderSide,
     _BOOL_SIDE_EXCHANGES,
+    OrderSide,
     _exchanges_needing_string_side,
 )
 from dcex.registry import EXCHANGES
@@ -24,7 +24,6 @@ def test_to_exchange_native_values() -> None:
     assert OrderSide.SELL.to_exchange("binance") == "SELL"
     assert OrderSide.BUY.to_exchange("bybit") == "Buy"
     assert OrderSide.BUY.to_exchange("okx") == "buy"
-    assert OrderSide.SELL.to_exchange("bitmex") == "Sell"
     # case-insensitive exchange name
     assert OrderSide.BUY.to_exchange("BINANCE") == "BUY"
 
