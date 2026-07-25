@@ -28,6 +28,21 @@ impl BinanceClient {
         &self,
         request: BinanceSymbolListParams<'_>,
     ) -> Result<ValidatedResponse> {
+        let has_symbol_filter =
+            request.product_symbol.is_some() || request.product_symbols.is_some();
+        if has_symbol_filter && request.permissions.is_some() {
+            return Err(DcexError::InvalidInput(
+                "Binance permissions cannot be combined with product_symbol or product_symbols."
+                    .to_string(),
+            ));
+        }
+        if has_symbol_filter && request.symbol_status.is_some() {
+            return Err(DcexError::InvalidInput(
+                "Binance symbolStatus cannot be combined with product_symbol or product_symbols."
+                    .to_string(),
+            ));
+        }
+
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
             params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
@@ -140,6 +155,12 @@ impl BinanceClient {
         &self,
         request: BinanceSymbolListParams<'_>,
     ) -> Result<ValidatedResponse> {
+        if request.product_symbol.is_some() && request.product_symbols.is_some() {
+            return Err(DcexError::InvalidInput(
+                "Binance product_symbol and product_symbols cannot be combined.".to_string(),
+            ));
+        }
+
         let mut params = Vec::new();
         if let Some(product_symbol) = request.product_symbol {
             params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));

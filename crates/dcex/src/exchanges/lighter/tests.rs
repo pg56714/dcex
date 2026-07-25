@@ -1,10 +1,50 @@
 use std::collections::BTreeMap;
-use std::time::Duration;
+use std::io::{ErrorKind, Read, Write};
+use std::net::TcpListener;
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant};
 
-use crate::http::{HttpMethod, RequestBody};
+use crate::http::{block_on, HttpMethod, RequestBody};
 use crate::product_table::{MarketInfo, ProductTable};
 
 use super::*;
+
+fn recording_server() -> (String, JoinHandle<Option<String>>) {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    listener.set_nonblocking(true).expect("nonblocking");
+    let address = listener.local_addr().expect("address");
+    let handle = thread::spawn(move || {
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match listener.accept() {
+                Ok((mut stream, _)) => {
+                    stream.set_nonblocking(false).expect("blocking stream");
+                    stream
+                        .set_read_timeout(Some(Duration::from_secs(2)))
+                        .expect("read timeout");
+                    let mut buffer = [0u8; 4096];
+                    let size = stream.read(&mut buffer).expect("read");
+                    let request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+                    stream
+                        .write_all(
+                            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
+Content-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
+                        )
+                        .expect("write");
+                    return request.lines().next().map(str::to_string);
+                }
+                Err(error) if error.kind() == ErrorKind::WouldBlock => {
+                    if Instant::now() >= deadline {
+                        return None;
+                    }
+                    thread::sleep(Duration::from_millis(10));
+                }
+                Err(error) => panic!("accept failed: {error}"),
+            }
+        }
+    });
+    (format!("http://{address}"), handle)
+}
 
 #[test]
 fn request_matches_python_encoding() {
@@ -52,6 +92,49 @@ fn product_table_resolves_canonical_symbol_to_market_id() {
         .with_product_table(table);
 
     assert_eq!(client.market_id("BTC-USDC-SWAP").expect("market id"), "42");
+}
+
+#[test]
+fn export_sends_resolved_market_id_without_account_index() {
+    let (base_url, handle) = recording_server();
+    let table = ProductTable::new(vec![MarketInfo {
+        exchange: "lighter".to_string(),
+        exchange_symbol: "42".to_string(),
+        product_symbol: "BTC-USDC-SWAP".to_string(),
+        product_type: "swap".to_string(),
+        exchange_type: "swap".to_string(),
+        price_precision: "0.01".to_string(),
+        size_precision: "0.001".to_string(),
+        min_size: "0.001".to_string(),
+        base_currency: "BTC".to_string(),
+        quote_currency: "USDC".to_string(),
+        min_notional: "1".to_string(),
+        size_per_contract: "1".to_string(),
+    }]);
+    let client = LighterClient::with_base_url(Duration::from_secs(1), base_url)
+        .expect("client")
+        .with_product_table(table);
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_export",
+                vec![
+                    ("product_symbol".to_string(), "BTC-USDC-SWAP".to_string()),
+                    ("type_".to_string(), "trade".to_string()),
+                    ("authorization".to_string(), "token".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("export request");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /api/v1/export?"));
+    assert!(request_line.contains("market_id=42"));
+    assert!(request_line.contains("type=trade"));
+    assert!(!request_line.contains("account_index="));
+    assert!(!request_line.contains("product_symbol="));
 }
 
 #[test]

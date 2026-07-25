@@ -359,6 +359,54 @@ fn current_spot_exchange_info_fields_reach_the_wire() {
 }
 
 #[test]
+fn spot_exchange_info_rejects_documented_filter_conflicts() {
+    for conflicting_filter in [("permissions", "SPOT"), ("symbolStatus", "TRADING")] {
+        let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+        let error = block_on(async move {
+            client
+                .public_request(
+                    "get_spot_exchange_info",
+                    vec![
+                        ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                        (
+                            conflicting_filter.0.to_string(),
+                            conflicting_filter.1.to_string(),
+                        ),
+                    ],
+                )
+                .await
+        })
+        .expect_err("documented filter conflict must fail");
+
+        assert!(matches!(error, DcexError::InvalidInput(_)));
+    }
+}
+
+#[test]
+fn spot_price_rejects_symbol_and_symbols_together() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .public_request(
+                "get_spot_price",
+                vec![
+                    ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                    ("product_symbols".to_string(), "ETH-USDT-SPOT".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("symbol and symbols must be mutually exclusive");
+
+    assert_eq!(
+        error,
+        DcexError::InvalidInput(
+            "Binance product_symbol and product_symbols cannot be combined.".to_string()
+        )
+    );
+}
+
+#[test]
 fn current_spot_kline_fields_reach_the_wire() {
     let (spot_base_url, handle) = recording_server();
     let client = BinanceClient::with_base_urls(

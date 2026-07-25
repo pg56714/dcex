@@ -56,7 +56,7 @@ impl LighterClient {
             ),
             "get_export" => (
                 EXPORT,
-                self.account_query_renamed(
+                self.market_query_renamed(
                     &params,
                     &[
                         ("account_index", "account_index"),
@@ -348,7 +348,6 @@ impl LighterClient {
                     "trade_type",
                     "authorization",
                 ])?;
-                self.validate_private_account(params)?;
                 validate_market_selector(params, false)?;
                 params.required_one_of("type_", &["funding", "trade"])?;
                 params.optional_one_of("side", &["all", "long", "short"])?;
@@ -538,4 +537,24 @@ fn validate_optional_nonempty(params: &LighterParams, keys: &[&str]) -> Result<(
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+
+    #[test]
+    fn export_accepts_authorization_without_account_index() {
+        let client = LighterClient::new(Duration::from_secs(1)).expect("client");
+        let params = LighterParams::from_pairs(vec![
+            ("type_".to_string(), "trade".to_string()),
+            ("authorization".to_string(), "token".to_string()),
+        ]);
+
+        client
+            .validate_private_params("get_export", &params)
+            .expect("account_index is optional for export");
+    }
 }
