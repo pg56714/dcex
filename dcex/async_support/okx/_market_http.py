@@ -53,6 +53,7 @@ class MarketHTTP(HTTPManager):
         after: str | None = None,
         before: str | None = None,
         limit: str | None = None,
+        adjust: str | None = None,
     ) -> dict[str, Any]:
         """Get candlestick data."""
         return await self._native_public(
@@ -63,6 +64,7 @@ class MarketHTTP(HTTPManager):
                 after=after,
                 before=before,
                 limit=limit,
+                adjust=adjust,
             ),
         )
 
@@ -80,13 +82,12 @@ class MarketHTTP(HTTPManager):
     async def get_tickers(
         self,
         instType: str,
-        uly: str | None = None,
         instFamily: str | None = None,
     ) -> dict[str, Any]:
         """Get ticker data."""
         return await self._native_public(
             "get_tickers",
-            self._params(instType=instType, uly=uly, instFamily=instFamily),
+            self._params(instType=instType, instFamily=instFamily),
         )
 
     async def get_public_trades(

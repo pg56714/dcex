@@ -37,6 +37,8 @@ class MarketHTTP(HTTPManager):
             if isinstance(value, list):
                 params.extend((key, str(item)) for item in value)
             else:
+                if isinstance(value, bool):
+                    value = str(value).lower()
                 params.append((key, str(value)))
         return params
 
@@ -51,6 +53,8 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         product_symbols: list[str] | None = None,
+        permissions: list[str] | None = None,
+        showPermissionSets: bool | None = None,
         symbolStatus: str | None = None,
     ) -> dict:
         """Get spot exchange information."""
@@ -59,6 +63,8 @@ class MarketHTTP(HTTPManager):
             self._params(
                 product_symbol=product_symbol,
                 product_symbols=product_symbols,
+                permissions=permissions,
+                showPermissionSets=showPermissionSets,
                 symbolStatus=symbolStatus,
             ),
         )
@@ -67,22 +73,32 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         limit: int | None = None,
+        symbolStatus: str | None = None,
     ) -> dict:
         """Get spot order book data."""
         return await self._native_public(
             "get_spot_orderbook",
-            self._params(product_symbol=product_symbol, limit=limit),
+            self._params(
+                product_symbol=product_symbol,
+                limit=limit,
+                symbolStatus=symbolStatus,
+            ),
         )
 
     async def get_spot_trades(
         self,
         product_symbol: str,
         limit: int | None = None,
+        symbolStatus: str | None = None,
     ) -> dict:
         """Get recent spot trades."""
         return await self._native_public(
             "get_spot_trades",
-            self._params(product_symbol=product_symbol, limit=limit),
+            self._params(
+                product_symbol=product_symbol,
+                limit=limit,
+                symbolStatus=symbolStatus,
+            ),
         )
 
     async def get_spot_price(
@@ -106,6 +122,8 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
         interval: str,
         start_time: int | None = None,
+        end_time: int | None = None,
+        time_zone: str | None = None,
         limit: int | None = None,
     ) -> dict:
         """Get kline/candlestick data."""
@@ -115,6 +133,8 @@ class MarketHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 interval=interval,
                 start_time=start_time,
+                end_time=end_time,
+                time_zone=time_zone,
                 limit=limit,
             ),
         )

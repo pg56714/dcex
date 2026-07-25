@@ -25,7 +25,7 @@ class AccountHTTP(HTTPManager):
     async def get_uta_fee_rates(
         self,
         tradeType: str,
-        symbol: str | None = None,
+        symbol: str,
     ) -> dict[str, Any]:
         """Retrieve KuCoin UTA actual fee rates for up to ten symbols."""
         return await self._native_private(
@@ -66,6 +66,8 @@ class AccountHTTP(HTTPManager):
         transfer_type: str = "INTERNAL",
         fromUserId: str | None = None,
         toUserId: str | None = None,
+        fromAccountTag: str | None = None,
+        toAccountTag: str | None = None,
     ) -> dict[str, Any]:
         """Transfer funds between KuCoin account types."""
         return await self._native_private(
@@ -79,6 +81,8 @@ class AccountHTTP(HTTPManager):
                 transfer_type=transfer_type,
                 fromUserId=fromUserId,
                 toUserId=toUserId,
+                fromAccountTag=fromAccountTag,
+                toAccountTag=toAccountTag,
             ),
         )
 

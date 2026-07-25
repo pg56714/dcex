@@ -168,8 +168,8 @@ class HTTPManager(BaseHTTPManager):
         for key, value in kwargs.items():
             if key == "self" or value is None:
                 continue
-            if key == "from_":
-                key = "from"
+            if key in {"from_", "type_"}:
+                key = key.removesuffix("_")
             enum_value = getattr(value, "value", None)
             if enum_value is not None:
                 value = enum_value
@@ -181,7 +181,9 @@ class HTTPManager(BaseHTTPManager):
                 if key == "orders":
                     params.append((key, _json_body(value)))
                 else:
-                    params.extend((key, _format_value(item)) for item in value)
+                    params.extend(
+                        (key, _format_value(getattr(item, "value", item))) for item in value
+                    )
             else:
                 params.append((key, _format_value(value)))
         return params

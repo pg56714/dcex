@@ -27,8 +27,8 @@ class _FakeNativeMexcPublicWebSocketClient:
     async def unsubscribe(self, channels: list[str]) -> None:
         self.subscriptions = [channel for channel in self.subscriptions if channel not in channels]
 
-    async def subscribe_trades(self, product_symbol: str) -> None:
-        self.subscriptions.append(f"trades:{product_symbol}")
+    async def subscribe_trades(self, product_symbol: str, speed: str = "100ms") -> None:
+        self.subscriptions.append(f"trades:{speed}:{product_symbol}")
 
     async def subscribe_orderbook(self, product_symbol: str, speed: str = "100ms") -> None:
         self.subscriptions.append(f"depth:{speed}:{product_symbol}")
@@ -40,8 +40,8 @@ class _FakeNativeMexcPublicWebSocketClient:
     ) -> None:
         self.subscriptions.append(f"partial:{levels}:{product_symbol}")
 
-    async def subscribe_book_ticker(self, product_symbol: str) -> None:
-        self.subscriptions.append(f"bookTicker:{product_symbol}")
+    async def subscribe_book_ticker(self, product_symbol: str, speed: str = "100ms") -> None:
+        self.subscriptions.append(f"bookTicker:{speed}:{product_symbol}")
 
     async def subscribe_klines(self, product_symbol: str, interval: str) -> None:
         self.subscriptions.append(f"kline:{interval}:{product_symbol}")
@@ -127,19 +127,19 @@ async def test_mexc_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
         assert native_client.timeout == 2
         assert native_client.base_url == "wss://example.test/ws"
 
-        await ws.subscribe_trades("BTC-USDT-SPOT")
+        await ws.subscribe_trades("BTC-USDT-SPOT", speed="10ms")
         await ws.subscribe_orderbook("BTC-USDT-SPOT", speed="10ms")
         await ws.subscribe_partial_orderbook("BTC-USDT-SPOT", levels=20)
-        await ws.subscribe_book_ticker("BTC-USDT-SPOT")
+        await ws.subscribe_book_ticker("BTC-USDT-SPOT", speed="10ms")
         await ws.subscribe_klines("BTC-USDT-SPOT", "Min1")
         await ws.ping()
         event = await ws.recv()
 
     assert native_client.subscriptions == [
-        "trades:BTC-USDT-SPOT",
+        "trades:10ms:BTC-USDT-SPOT",
         "depth:10ms:BTC-USDT-SPOT",
         "partial:20:BTC-USDT-SPOT",
-        "bookTicker:BTC-USDT-SPOT",
+        "bookTicker:10ms:BTC-USDT-SPOT",
         "kline:Min1:BTC-USDT-SPOT",
     ]
     assert native_client.ping_count == 1

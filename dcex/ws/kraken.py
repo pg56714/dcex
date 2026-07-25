@@ -39,21 +39,32 @@ class PublicClient(AsyncWebSocketMixin):
         """Unsubscribe from a Kraken public channel."""
         return int(await self._native_client.unsubscribe_channel(channel, product_symbols))
 
-    async def subscribe_ticker(self, product_symbol: str) -> int:
+    async def subscribe_ticker(
+        self,
+        product_symbol: str,
+        event_trigger: str = "trades",
+        snapshot: bool = True,
+    ) -> int:
         """Subscribe to ticker events for a product."""
-        return int(await self._native_client.subscribe_ticker(product_symbol))
+        return int(
+            await self._native_client.subscribe_ticker(product_symbol, event_trigger, snapshot)
+        )
 
-    async def subscribe_trades(self, product_symbol: str) -> int:
+    async def subscribe_trades(self, product_symbol: str, snapshot: bool = False) -> int:
         """Subscribe to trade events for a product."""
-        return int(await self._native_client.subscribe_trades(product_symbol))
+        return int(await self._native_client.subscribe_trades(product_symbol, snapshot))
 
-    async def subscribe_orderbook(self, product_symbol: str, depth: int = 10) -> int:
+    async def subscribe_orderbook(
+        self, product_symbol: str, depth: int = 10, snapshot: bool = True
+    ) -> int:
         """Subscribe to order book events for a product."""
-        return int(await self._native_client.subscribe_orderbook(product_symbol, depth))
+        return int(await self._native_client.subscribe_orderbook(product_symbol, depth, snapshot))
 
-    async def subscribe_klines(self, product_symbol: str, interval: int = 1) -> int:
+    async def subscribe_klines(
+        self, product_symbol: str, interval: int = 1, snapshot: bool = True
+    ) -> int:
         """Subscribe to OHLC candle events for a product."""
-        return int(await self._native_client.subscribe_klines(product_symbol, interval))
+        return int(await self._native_client.subscribe_klines(product_symbol, interval, snapshot))
 
     async def recv(self) -> dict[str, Any] | list[Any]:
         """Receive and decode one WebSocket event."""
@@ -100,9 +111,14 @@ class PrivateClient(AsyncWebSocketMixin):
         """Send an application-level ping."""
         return int(await self._native_client.ping())
 
-    async def subscribe_balances(self) -> int:
+    async def subscribe_balances(
+        self,
+        snapshot: bool = True,
+        rebased: bool = True,
+        users: str | None = None,
+    ) -> int:
         """Subscribe to balance update events."""
-        return int(await self._native_client.subscribe_balances())
+        return int(await self._native_client.subscribe_balances(snapshot, rebased, users))
 
     async def unsubscribe_balances(self) -> int:
         """Unsubscribe from balance update events."""
@@ -112,9 +128,22 @@ class PrivateClient(AsyncWebSocketMixin):
         self,
         snap_orders: bool = True,
         snap_trades: bool = False,
+        order_status: bool = True,
+        rebased: bool = True,
+        ratecounter: bool = False,
+        users: str | None = None,
     ) -> int:
         """Subscribe to order status and execution events."""
-        return int(await self._native_client.subscribe_executions(snap_orders, snap_trades))
+        return int(
+            await self._native_client.subscribe_executions(
+                snap_orders,
+                snap_trades,
+                order_status,
+                rebased,
+                ratecounter,
+                users,
+            )
+        )
 
     async def unsubscribe_executions(self) -> int:
         """Unsubscribe from order status and execution events."""

@@ -83,7 +83,7 @@ def _futures_balance(client: Client, asset: str) -> Decimal:
 
 
 def _market_info(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
-    response = client.get_spot_exchange_info(SPOT_SYMBOL)
+    response = client.get_spot_exchange_info()
     assert isinstance(response, dict)
     market = next(
         item

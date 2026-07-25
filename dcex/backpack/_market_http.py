@@ -46,9 +46,12 @@ class MarketHTTP(HTTPManager):
         """Retrieve Backpack borrow/lend APY rates."""
         return self._native_public("get_borrow_lend_apy", self._native_params(tierId=tierId))
 
-    def get_markets(self) -> dict[str, Any] | list[Any] | str:
+    def get_markets(
+        self,
+        marketType: list[str] | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack markets."""
-        return self._native_public("get_markets", [])
+        return self._native_public("get_markets", self._native_params(marketType=marketType))
 
     def get_market(self, product_symbol: str) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack market."""
@@ -116,6 +119,7 @@ class MarketHTTP(HTTPManager):
         startTime: int,
         endTime: int | None = None,
         priceType: str | None = None,
+        source: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack candlesticks."""
         return self._native_public(
@@ -126,6 +130,7 @@ class MarketHTTP(HTTPManager):
                 startTime=startTime,
                 endTime=endTime,
                 priceType=priceType,
+                source=source,
             ),
         )
 
@@ -133,16 +138,28 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         interval: str | None = None,
+        source: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack ticker."""
         return self._native_public(
             "get_ticker",
-            self._native_params(product_symbol=product_symbol, interval=interval),
+            self._native_params(
+                product_symbol=product_symbol,
+                interval=interval,
+                source=source,
+            ),
         )
 
-    def get_tickers(self, interval: str | None = None) -> dict[str, Any] | list[Any] | str:
+    def get_tickers(
+        self,
+        interval: str | None = None,
+        source: str | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack tickers."""
-        return self._native_public("get_tickers", self._native_params(interval=interval))
+        return self._native_public(
+            "get_tickers",
+            self._native_params(interval=interval, source=source),
+        )
 
     def get_status(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack system status."""

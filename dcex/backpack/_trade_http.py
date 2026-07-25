@@ -21,8 +21,8 @@ class TradeHTTP(HTTPManager):
         clientId: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack open order."""
-        if orderId is None and clientId is None:
-            raise ValueError("Specify orderId or clientId.")
+        if (orderId is None) == (clientId is None):
+            raise ValueError("Specify exactly one of orderId or clientId.")
         return self._native_private(
             "get_open_order",
             self._native_params(
@@ -60,6 +60,8 @@ class TradeHTTP(HTTPManager):
         triggerQuantity: str | None = None,
         slippageTolerance: str | None = None,
         slippageToleranceType: str | None = None,
+        brokerId: int | None = None,
+        brokerKey: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place a Backpack order."""
         return self._native_private(
@@ -74,11 +76,26 @@ class TradeHTTP(HTTPManager):
         quantity: str | None = None,
         quoteQuantity: str | None = None,
         clientId: int | None = None,
+        timeInForce: str | None = None,
         reduceOnly: bool | None = None,
+        selfTradePrevention: str | None = None,
         autoBorrow: bool | None = None,
         autoBorrowRepay: bool | None = None,
         autoLend: bool | None = None,
         autoLendRedeem: bool | None = None,
+        stopLossLimitPrice: str | None = None,
+        stopLossTriggerBy: str | None = None,
+        stopLossTriggerPrice: str | None = None,
+        takeProfitLimitPrice: str | None = None,
+        takeProfitTriggerBy: str | None = None,
+        takeProfitTriggerPrice: str | None = None,
+        triggerBy: str | None = None,
+        triggerPrice: str | None = None,
+        triggerQuantity: str | None = None,
+        slippageTolerance: str | None = None,
+        slippageToleranceType: str | None = None,
+        brokerId: int | None = None,
+        brokerKey: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place a Backpack market order."""
         return self._native_private(
@@ -96,10 +113,24 @@ class TradeHTTP(HTTPManager):
         clientId: int | None = None,
         postOnly: bool | None = None,
         reduceOnly: bool | None = None,
+        selfTradePrevention: str | None = None,
         autoBorrow: bool | None = None,
         autoBorrowRepay: bool | None = None,
         autoLend: bool | None = None,
         autoLendRedeem: bool | None = None,
+        stopLossLimitPrice: str | None = None,
+        stopLossTriggerBy: str | None = None,
+        stopLossTriggerPrice: str | None = None,
+        takeProfitLimitPrice: str | None = None,
+        takeProfitTriggerBy: str | None = None,
+        takeProfitTriggerPrice: str | None = None,
+        triggerBy: str | None = None,
+        triggerPrice: str | None = None,
+        triggerQuantity: str | None = None,
+        slippageTolerance: str | None = None,
+        slippageToleranceType: str | None = None,
+        brokerId: int | None = None,
+        brokerKey: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place a Backpack limit order."""
         return self._native_private(
@@ -114,8 +145,8 @@ class TradeHTTP(HTTPManager):
         clientId: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Cancel one Backpack open order."""
-        if orderId is None and clientId is None:
-            raise ValueError("Specify orderId or clientId.")
+        if (orderId is None) == (clientId is None):
+            raise ValueError("Specify exactly one of orderId or clientId.")
         return self._native_private(
             "cancel_order",
             self._native_params(
@@ -128,11 +159,12 @@ class TradeHTTP(HTTPManager):
     def place_batch_orders(
         self,
         orders: list[dict[str, Any]],
+        brokerId: int | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Place Backpack batch orders."""
         return self._native_private(
             "place_batch_orders",
-            self._native_params(orders=orders),
+            self._native_params(orders=orders, brokerId=brokerId),
         )
 
     def get_open_orders(
@@ -161,9 +193,14 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         orderId: str | None = None,
+        strategyId: str | None = None,
+        from_: int | None = None,
+        to: int | None = None,
         limit: int | None = None,
         offset: int | None = None,
+        fillType: str | None = None,
         marketType: list[str] | None = None,
+        assetClass: str | None = None,
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack fill history."""
@@ -176,6 +213,7 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         orderId: str | None = None,
+        strategyId: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
         marketType: list[str] | None = None,
@@ -190,11 +228,12 @@ class TradeHTTP(HTTPManager):
     def get_open_positions(
         self,
         product_symbol: str | None = None,
+        marketType: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack open positions."""
         return self._native_private(
             "get_open_positions",
-            self._native_params(product_symbol=product_symbol),
+            self._native_params(product_symbol=product_symbol, marketType=marketType),
         )
 
     def get_funding_payments(

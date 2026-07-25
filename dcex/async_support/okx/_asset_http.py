@@ -66,7 +66,9 @@ class AssetHTTP(HTTPManager):
         to_account: str,
         type: str | None = None,
         subAcct: str | None = None,
-        loanTrans: str | None = None,
+        loanTrans: bool | str | None = None,
+        omitPosRisk: bool | str | None = None,
+        clientId: str | None = None,
     ) -> dict[str, Any]:
         """
         Transfer funds between accounts.
@@ -93,6 +95,8 @@ class AssetHTTP(HTTPManager):
                 type=type,
                 subAcct=subAcct,
                 loanTrans=loanTrans,
+                omitPosRisk=omitPosRisk,
+                clientId=clientId,
             ),
         )
 
@@ -120,7 +124,9 @@ class AssetHTTP(HTTPManager):
 
     async def get_bills(
         self,
+        ccy: str | None = None,
         type: str | None = None,
+        thirdPartyType: str | None = None,
         clientId: str | None = None,
         after: str | None = None,
         before: str | None = None,
@@ -142,7 +148,13 @@ class AssetHTTP(HTTPManager):
         return await self._native_private(
             "get_bills",
             self._native_params(
-                type=type, clientId=clientId, after=after, before=before, limit=limit
+                ccy=ccy,
+                type=type,
+                thirdPartyType=thirdPartyType,
+                clientId=clientId,
+                after=after,
+                before=before,
+                limit=limit,
             ),
         )
 

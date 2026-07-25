@@ -28,10 +28,10 @@ impl AsterClient {
             }
             "transfer_spot_futures" => {
                 let market = params.get("market").unwrap_or("spot").to_ascii_lowercase();
-                let (market, path) = if market == "spot" {
-                    (AsterMarket::Spot, SPOT_TRANSFER)
-                } else {
-                    (AsterMarket::Futures, FUTURES_TRANSFER)
+                let (market, path) = match market.as_str() {
+                    "spot" => (AsterMarket::Spot, SPOT_TRANSFER),
+                    "futures" => (AsterMarket::Futures, FUTURES_TRANSFER),
+                    _ => unreachable!("validated Aster transfer market"),
                 };
                 self.signed(
                     HttpMethod::Post,
@@ -232,7 +232,7 @@ impl AsterClient {
             }
             "get_futures_mmp" => {
                 let mut query = Vec::new();
-                self.push_required_symbol(&mut query, params)?;
+                self.push_optional_symbol(&mut query, params)?;
                 self.signed(HttpMethod::Get, AsterMarket::Futures, FUTURES_MMP, query)
                     .await
             }

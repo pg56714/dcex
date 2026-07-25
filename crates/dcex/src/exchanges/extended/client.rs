@@ -10,7 +10,7 @@ use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{BASE_URL, USER_AGENT};
-use super::signing::{ExtendedSigningCredentials, StarknetDomain};
+use super::signing::{parse_felt_hex, ExtendedSigningCredentials, StarknetDomain};
 
 #[derive(Clone)]
 pub struct ExtendedClient {
@@ -43,6 +43,8 @@ impl ExtendedClient {
         base_url: String,
         user_agent: String,
     ) -> Result<Self> {
+        let (api_key, base_url, user_agent) =
+            validate_client_config(api_key, base_url, user_agent)?;
         let signing_domain = signing_domain_for_base_url(&base_url);
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
@@ -65,9 +67,21 @@ impl ExtendedClient {
         base_url: String,
         user_agent: String,
     ) -> Result<Self> {
+        let (api_key, base_url, user_agent) =
+            validate_client_config(api_key, base_url, user_agent)?;
         let signing_domain = signing_domain_for_base_url(&base_url);
         let signing = match (stark_private_key, stark_public_key, vault_number) {
             (Some(stark_private_key), Some(stark_public_key), Some(vault_number)) => {
+                let private_key = parse_felt_hex(&stark_private_key, "stark_private_key")?;
+                let public_key = parse_felt_hex(&stark_public_key, "stark_public_key")?;
+                if private_key == starknet_crypto::Felt::ZERO
+                    || public_key == starknet_crypto::Felt::ZERO
+                    || vault_number == 0
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Extended Stark keys and vault_number must be non-zero".to_string(),
+                    ));
+                }
                 Some(ExtendedSigningCredentials::new(
                     stark_private_key,
                     stark_public_key,
@@ -280,8 +294,40 @@ pub(super) fn signing_domain_for_base_url(base_url: &str) -> StarknetDomain {
 fn exchange_symbol_fallback(product_symbol: &str) -> String {
     let parts = product_symbol.split('-').collect::<Vec<_>>();
     match parts.as_slice() {
-        [base, quote, "SPOT"] => format!("{base}-{quote}"),
+        [base, _, "SPOT"] => format!("{base}SPOT"),
         [base, quote, ..] => format!("{base}-{quote}"),
         _ => product_symbol.to_string(),
     }
+}
+
+fn validate_client_config(
+    api_key: Option<String>,
+    base_url: String,
+    user_agent: String,
+) -> Result<(Option<String>, String, String)> {
+    let api_key = api_key
+        .map(|value| {
+            let value = value.trim().to_string();
+            if value.is_empty() {
+                return Err(DcexError::InvalidInput(
+                    "Extended API key must not be empty".to_string(),
+                ));
+            }
+            Ok(value)
+        })
+        .transpose()?;
+    let base_url = base_url.trim().trim_end_matches('/').to_string();
+    if base_url.is_empty() || !(base_url.starts_with("https://") || base_url.starts_with("http://"))
+    {
+        return Err(DcexError::InvalidInput(
+            "Extended REST base URL must use http:// or https://".to_string(),
+        ));
+    }
+    let user_agent = user_agent.trim().to_string();
+    if user_agent.is_empty() {
+        return Err(DcexError::InvalidInput(
+            "Extended User-Agent must not be empty".to_string(),
+        ));
+    }
+    Ok((api_key, base_url, user_agent))
 }

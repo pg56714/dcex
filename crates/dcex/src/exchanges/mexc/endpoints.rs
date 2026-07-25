@@ -35,9 +35,8 @@ pub(super) const SPOT_ALL_ORDERS: &str = "/api/v3/allOrders";
 pub(super) const SPOT_MY_TRADES: &str = "/api/v3/myTrades";
 
 pub(super) const CONTRACT_PING: &str = "/api/v1/contract/ping";
-pub(super) const CONTRACT_DETAIL: &str = "/api/v1/contract/detail";
+pub(super) const CONTRACT_DETAIL: &str = "/api/v1/contract/detail/country";
 pub(super) const CONTRACT_TICKER: &str = "/api/v1/contract/ticker";
-pub(super) const CONTRACT_RISK_REVERSE: &str = "/api/v1/contract/risk_reverse";
 pub(super) const CONTRACT_RISK_REVERSE_HISTORY: &str = "/api/v1/contract/risk_reverse/history";
 pub(super) const CONTRACT_FUNDING_RATE_HISTORY: &str = "/api/v1/contract/funding_rate/history";
 
@@ -49,7 +48,7 @@ pub(super) const CONTRACT_HISTORY_POSITIONS: &str =
 pub(super) const CONTRACT_OPEN_POSITIONS: &str = "/api/v1/private/position/open_positions";
 pub(super) const CONTRACT_FUNDING_RECORDS: &str = "/api/v1/private/position/funding_records";
 pub(super) const CONTRACT_RISK_LIMITS: &str = "/api/v1/private/account/risk_limit";
-pub(super) const CONTRACT_TRADING_FEE_RATE: &str = "/api/v1/private/account/tiered_fee_rate";
+pub(super) const CONTRACT_TRADING_FEE_RATE: &str = "/api/v1/private/account/tiered_fee_rate/v2";
 pub(super) const CONTRACT_LEVERAGE: &str = "/api/v1/private/position/leverage";
 pub(super) const CONTRACT_CHANGE_MARGIN: &str = "/api/v1/private/position/change_margin";
 pub(super) const CONTRACT_CHANGE_LEVERAGE: &str = "/api/v1/private/position/change_leverage";
@@ -70,7 +69,7 @@ pub(super) const CONTRACT_ORDER: &str = "/api/v1/private/order/get/{order_id}";
 pub(super) const CONTRACT_BATCH_QUERY: &str = "/api/v1/private/order/batch_query";
 pub(super) const CONTRACT_ORDER_DEAL_DETAILS: &str =
     "/api/v1/private/order/deal_details/{order_id}";
-pub(super) const CONTRACT_ORDER_DEALS: &str = "/api/v1/private/order/list/order_deals";
+pub(super) const CONTRACT_ORDER_DEALS: &str = "/api/v1/private/order/list/order_deals/v3";
 pub(super) const CONTRACT_PLAN_ORDERS: &str = "/api/v1/private/planorder/list/orders";
 pub(super) const CONTRACT_PLACE_PLAN_ORDER: &str = "/api/v1/private/planorder/place/v2";
 pub(super) const CONTRACT_CANCEL_PLAN_ORDERS: &str = "/api/v1/private/planorder/cancel";

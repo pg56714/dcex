@@ -42,6 +42,9 @@ class TradeHTTP(HTTPManager):
         for key, value in kwargs.items():
             if value is None:
                 continue
+            if isinstance(value, list):
+                params.extend((key, str(item)) for item in value)
+                continue
             if isinstance(value, bool):
                 value = str(value).lower()
             params.append((key, str(value)))
@@ -90,6 +93,13 @@ class TradeHTTP(HTTPManager):
         priceProtect: str | None = None,
         newClientOrderId: str | None = None,
         newOrderRespType: str | None = None,
+        strategyId: int | None = None,
+        strategyType: int | None = None,
+        trailingDelta: int | None = None,
+        icebergQty: str | None = None,
+        pegPriceType: str | None = None,
+        pegOffsetValue: int | None = None,
+        pegOffsetType: str | None = None,
         priceMatch: str | None = None,
         selfTradePreventionMode: str | None = None,
         goodTillDate: int | None = None,
@@ -142,6 +152,13 @@ class TradeHTTP(HTTPManager):
                 priceProtect=priceProtect,
                 newClientOrderId=newClientOrderId,
                 newOrderRespType=newOrderRespType,
+                strategyId=strategyId,
+                strategyType=strategyType,
+                trailingDelta=trailingDelta,
+                icebergQty=icebergQty,
+                pegPriceType=pegPriceType,
+                pegOffsetValue=pegOffsetValue,
+                pegOffsetType=pegOffsetType,
                 priceMatch=priceMatch,
                 selfTradePreventionMode=selfTradePreventionMode,
                 goodTillDate=goodTillDate,
@@ -167,6 +184,14 @@ class TradeHTTP(HTTPManager):
         priceProtect: str | None = None,
         newClientOrderId: str | None = None,
         newOrderRespType: str | None = None,
+        strategyId: int | None = None,
+        strategyType: int | None = None,
+        trailingDelta: int | None = None,
+        icebergQty: str | None = None,
+        pegPriceType: str | None = None,
+        pegOffsetValue: int | None = None,
+        pegOffsetType: str | None = None,
+        computeCommissionRates: bool | None = None,
         priceMatch: str | None = None,
         selfTradePreventionMode: str | None = None,
         goodTillDate: int | None = None,
@@ -197,6 +222,14 @@ class TradeHTTP(HTTPManager):
                 priceProtect=priceProtect,
                 newClientOrderId=newClientOrderId,
                 newOrderRespType=newOrderRespType,
+                strategyId=strategyId,
+                strategyType=strategyType,
+                trailingDelta=trailingDelta,
+                icebergQty=icebergQty,
+                pegPriceType=pegPriceType,
+                pegOffsetValue=pegOffsetValue,
+                pegOffsetType=pegOffsetType,
+                computeCommissionRates=computeCommissionRates,
                 priceMatch=priceMatch,
                 selfTradePreventionMode=selfTradePreventionMode,
                 goodTillDate=goodTillDate,
@@ -607,6 +640,8 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         orderId: int | None = None,
         origClientOrderId: str | None = None,
+        newClientOrderId: str | None = None,
+        cancelRestrictions: str | None = None,
     ) -> dict:
         """
         Cancel an order.
@@ -625,6 +660,8 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 orderId=orderId,
                 origClientOrderId=origClientOrderId,
+                newClientOrderId=newClientOrderId,
+                cancelRestrictions=cancelRestrictions,
             ),
         )
 
@@ -820,7 +857,7 @@ class TradeHTTP(HTTPManager):
 
     def get_future_position(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
     ) -> dict:
         """
         Get futures position information.

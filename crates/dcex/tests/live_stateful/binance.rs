@@ -331,7 +331,7 @@ async fn return_binance_transfer(
 }
 
 async fn spot_usdt(client: &BinanceClient) -> dcex::Result<f64> {
-    let response = client.get_account_balance("spot").await?;
+    let response = client.get_account_balance("spot", None).await?;
     Ok(asset_amount(&response.data, "USDT", &["free", "available"]))
 }
 
@@ -345,7 +345,7 @@ async fn funding_usdt(client: &BinanceClient) -> dcex::Result<f64> {
 }
 
 async fn futures_usdt(client: &BinanceClient) -> dcex::Result<f64> {
-    let response = client.get_account_balance("swap").await?;
+    let response = client.get_account_balance("swap", None).await?;
     Ok(asset_amount(
         &response.data,
         "USDT",

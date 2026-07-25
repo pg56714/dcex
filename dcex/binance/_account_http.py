@@ -42,6 +42,9 @@ class AccountHTTP(HTTPManager):
         for key, value in kwargs.items():
             if value is None:
                 continue
+            if isinstance(value, list):
+                params.extend((key, str(item)) for item in value)
+                continue
             if isinstance(value, bool):
                 value = str(value).lower()
             params.append((key, str(value)))
@@ -71,6 +74,7 @@ class AccountHTTP(HTTPManager):
     def get_account_balance(
         self,
         market_type: str,
+        omitZeroBalances: bool | None = None,
     ) -> dict:
         """
         Get account balance.
@@ -83,7 +87,10 @@ class AccountHTTP(HTTPManager):
         """
         return self._native_private(
             "get_account_balance",
-            self._params(market_type=str(market_type)),
+            self._params(
+                market_type=str(market_type),
+                omitZeroBalances=omitZeroBalances,
+            ),
         )
 
     def get_income_history(

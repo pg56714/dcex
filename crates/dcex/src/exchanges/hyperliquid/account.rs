@@ -1,7 +1,7 @@
 use serde_json::{json, Value};
 
 use crate::exchange::ValidatedResponse;
-use crate::Result;
+use crate::{DcexError, Result};
 
 use super::client::HyperliquidClient;
 use super::params::HyperliquidParams;
@@ -14,63 +14,72 @@ impl HyperliquidClient {
     ) -> Result<Option<ValidatedResponse>> {
         let payload = match method_name {
             "get_spot_fee_rates" | "get_futures_fee_rates" => {
-                json!({"type": "userFees", "user": params.required("user")?})
+                params.ensure_allowed(&["user"])?;
+                json!({"type": "userFees", "user": params.address("user")?})
             }
             "clearinghouse_state" => {
+                params.ensure_allowed(&["user", "dex"])?;
                 let mut payload = json!({
                     "type": "clearinghouseState",
-                    "user": params.required("user")?,
+                    "user": params.address("user")?,
                 });
-                insert_optional_string(&mut payload, "dex", params.get("dex"));
+                insert_optional_string(
+                    &mut payload,
+                    "dex",
+                    params
+                        .get("dex")
+                        .map(|_| params.required("dex"))
+                        .transpose()?,
+                );
                 payload
             }
-            "spot_clearinghouse_state" => json!({
-                "type": "spotClearinghouseState",
-                "user": params.required("user")?,
-            }),
+            "spot_clearinghouse_state" => {
+                params.ensure_allowed(&["user"])?;
+                json!({
+                    "type": "spotClearinghouseState",
+                    "user": params.address("user")?,
+                })
+            }
             "open_orders" => {
+                params.ensure_allowed(&["user", "dex"])?;
                 let mut payload = json!({
                     "type": "openOrders",
-                    "user": params.required("user")?,
+                    "user": params.address("user")?,
                 });
-                insert_optional_string(&mut payload, "dex", params.get("dex"));
+                insert_optional_string(
+                    &mut payload,
+                    "dex",
+                    params
+                        .get("dex")
+                        .map(|_| params.required("dex"))
+                        .transpose()?,
+                );
                 payload
             }
             "user_fills" => {
+                params.ensure_allowed(&["user", "aggregateByTime"])?;
                 let mut payload = json!({
                     "type": "userFills",
-                    "user": params.required("user")?,
+                    "user": params.address("user")?,
                 });
                 if params.optional_bool("aggregateByTime")?.unwrap_or(false) {
                     insert_optional_bool(&mut payload, "aggregateByTime", Some(true));
                 }
                 payload
             }
-            "user_rate_limit" => json!({
-                "type": "userRateLimit",
-                "user": params.required("user")?,
-            }),
-            "order_status" => json!({
-                "type": "orderStatus",
-                "user": params.required("user")?,
-                "oid": order_id_value(params.required("oid")?),
-            }),
-            "historical_orders" => json!({
-                "type": "historicalOrders",
-                "user": params.required("user")?,
-            }),
-            "subaccounts" => json!({
-                "type": "subAccounts",
-                "user": params.required("user")?,
-            }),
-            "user_role" => json!({
-                "type": "userRole",
-                "user": params.required("user")?,
-            }),
-            "portfolio" => json!({
-                "type": "portfolio",
-                "user": params.required("user")?,
-            }),
+            "user_rate_limit" => user_payload(params, "userRateLimit")?,
+            "order_status" => {
+                params.ensure_allowed(&["user", "oid"])?;
+                json!({
+                    "type": "orderStatus",
+                    "user": params.address("user")?,
+                    "oid": order_id_value(params.required("oid")?)?,
+                })
+            }
+            "historical_orders" => user_payload(params, "historicalOrders")?,
+            "subaccounts" => user_payload(params, "subAccounts")?,
+            "user_role" => user_payload(params, "userRole")?,
+            "portfolio" => user_payload(params, "portfolio")?,
             _ => return Ok(None),
         };
         let mut response = self.info_payload(payload).await?;
@@ -81,14 +90,26 @@ impl HyperliquidClient {
     }
 }
 
-fn order_id_value(value: &str) -> Value {
+fn user_payload(params: &HyperliquidParams, request_type: &str) -> Result<Value> {
+    params.ensure_allowed(&["user"])?;
+    Ok(json!({
+        "type": request_type,
+        "user": params.address("user")?,
+    }))
+}
+
+fn order_id_value(value: &str) -> Result<Value> {
     if value.starts_with("0x") || value.starts_with("0X") {
-        return Value::String(value.to_string());
+        return Ok(Value::String(super::params::normalize_cloid(value, "oid")?));
     }
     value
-        .parse::<i64>()
+        .parse::<u64>()
         .map(|value| Value::Number(value.into()))
-        .unwrap_or_else(|_| Value::String(value.to_string()))
+        .map_err(|error| {
+            DcexError::InvalidInput(format!(
+                "Hyperliquid oid must be an unsigned integer or client order id: {error}"
+            ))
+        })
 }
 
 fn insert_optional_string(payload: &mut Value, key: &str, value: Option<&str>) {

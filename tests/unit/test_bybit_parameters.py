@@ -158,3 +158,115 @@ def test_sync_bybit_post_only_order_forces_post_only() -> None:
         ("qty", "0.001"),
         ("price", "100"),
     ]
+
+
+@pytest.mark.parametrize(
+    ("method_name", "expected_fields"),
+    [
+        (
+            "place_order",
+            {
+                "rpiTakerAccess",
+                "slippageToleranceType",
+                "slippageTolerance",
+                "orderLinkId",
+                "smpType",
+                "mmp",
+                "bboSideType",
+                "bboLevel",
+            },
+        ),
+        (
+            "get_open_orders",
+            {"orderId", "orderLinkId", "openOnly", "orderFilter", "cursor"},
+        ),
+        (
+            "get_order_history",
+            {
+                "baseCoin",
+                "settleCoin",
+                "orderLinkId",
+                "orderFilter",
+                "orderStatus",
+                "endTime",
+                "cursor",
+            },
+        ),
+        (
+            "get_execution_list",
+            {
+                "orderId",
+                "orderLinkId",
+                "baseCoin",
+                "settleCoin",
+                "endTime",
+                "execType",
+                "cursor",
+            },
+        ),
+    ],
+)
+def test_bybit_trade_methods_expose_current_official_fields(
+    method_name: str, expected_fields: set[str]
+) -> None:
+    from dcex.async_support.bybit._trade_http import TradeHTTP as AsyncTradeHTTP
+    from dcex.bybit._trade_http import TradeHTTP
+
+    sync_fields = set(inspect.signature(getattr(TradeHTTP, method_name)).parameters)
+    async_fields = set(inspect.signature(getattr(AsyncTradeHTTP, method_name)).parameters)
+
+    assert expected_fields <= sync_fields
+    assert sync_fields == async_fields
+
+
+def test_sync_bybit_place_order_serializes_boolean_params_lowercase() -> None:
+    from dcex.bybit._trade_http import TradeHTTP
+
+    manager = TradeHTTP(preload_product_table=False)
+    captured = _capture_sync_private_request(manager)
+    manager.place_order(
+        "BTC-USDT-SWAP",
+        "Buy",
+        "Market",
+        "1",
+        reduceOnly=True,
+        closeOnTrigger=False,
+        rpiTakerAccess=True,
+        mmp=False,
+        orderLinkId="client-order",
+        bboLevel=3,
+    )
+
+    params = dict(captured["params"])
+    assert params["reduceOnly"] == "true"
+    assert params["closeOnTrigger"] == "false"
+    assert params["rpiTakerAccess"] == "true"
+    assert params["mmp"] == "false"
+    assert params["orderLinkId"] == "client-order"
+    assert params["bboLevel"] == "3"
+
+
+def test_sync_bybit_current_market_and_asset_fields_are_forwarded() -> None:
+    from dcex.bybit._asset_http import AssetHTTP
+    from dcex.bybit._market_http import MarketHTTP
+
+    market = MarketHTTP(preload_product_table=False)
+    market_capture = _capture_sync_public_request(market)
+    market.get_kline("BTC-USDT-SPOT", "1m", startTime=100, endTime=200)
+    assert dict(market_capture["params"])["endTime"] == "200"
+
+    asset = AssetHTTP(preload_product_table=False)
+    asset_capture = _capture_sync_private_request(asset)
+    asset.get_internal_transfer_records(
+        transferId="transfer-id",
+        status="SUCCESS",
+        endTime=200,
+        cursor="next-page",
+    )
+    assert dict(asset_capture["params"]) == {
+        "transferId": "transfer-id",
+        "status": "SUCCESS",
+        "endTime": "200",
+        "limit": "20",
+        "cursor": "next-page",
+    }

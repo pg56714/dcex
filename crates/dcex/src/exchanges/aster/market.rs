@@ -5,10 +5,14 @@ use crate::{DcexError, Result};
 use super::client::{AsterClient, AsterMarket};
 use super::endpoints::*;
 use super::params::{
-    push_optional_display, AsterAggTradesParams, AsterExchangeInfoParams, AsterFundingRateParams,
+    push_optional_display, AsterAggTradesParams, AsterFundingRateParams,
     AsterHistoricalTradesParams, AsterIndexPriceKlinesParams, AsterKlinesParams, AsterLimitParams,
     AsterOptionalSymbolParams, AsterParams,
 };
+
+const KLINE_INTERVALS: &[&str] = &[
+    "1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "8h", "12h", "1d", "3d", "1w", "1M",
+];
 
 impl AsterClient {
     pub async fn ping_spot(&self) -> Result<ValidatedResponse> {
@@ -55,30 +59,12 @@ impl AsterClient {
         .await
     }
 
-    pub fn get_spot_exchange_info(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::public(self, "get_spot_exchange_info", Vec::new())
-    }
-
-    pub(super) async fn send_get_spot_exchange_info(
-        &self,
-        request: AsterExchangeInfoParams<'_>,
-    ) -> Result<ValidatedResponse> {
-        let mut params = Vec::new();
-        if let Some(product_symbol) = request.product_symbol {
-            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
-        }
-        if let Some(symbols) = request.symbols {
-            params.push((
-                "symbols".to_string(),
-                serde_json::to_string(&symbols)
-                    .map_err(|error| DcexError::Decode(error.to_string()))?,
-            ));
-        }
+    pub async fn get_spot_exchange_info(&self) -> Result<ValidatedResponse> {
         self.request(
             HttpMethod::Get,
             AsterMarket::Spot,
             SPOT_EXCHANGE_INFO,
-            params,
+            Vec::new(),
             false,
         )
         .await
@@ -581,18 +567,13 @@ impl AsterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = AsterParams::from_pairs(params);
+        validate_public_params(method_name, &params)?;
         match method_name {
             "ping_spot" => self.ping_spot().await,
             "ping_futures" => self.ping_futures().await,
             "get_spot_server_time" => self.get_spot_server_time().await,
             "get_futures_server_time" => self.get_futures_server_time().await,
-            "get_spot_exchange_info" => {
-                self.send_get_spot_exchange_info(AsterExchangeInfoParams {
-                    product_symbol: params.get("product_symbol"),
-                    symbols: params.values("symbols"),
-                })
-                .await
-            }
+            "get_spot_exchange_info" => self.get_spot_exchange_info().await,
             "get_futures_exchange_info" => self.get_futures_exchange_info().await,
             "get_spot_orderbook" => {
                 self.send_get_spot_orderbook(
@@ -867,5 +848,124 @@ impl AsterClient {
         push_optional_display(&mut params, "limit", request.limit);
         self.request(HttpMethod::Get, market, path, params, false)
             .await
+    }
+}
+
+fn validate_public_params(method_name: &str, params: &AsterParams) -> Result<()> {
+    match method_name {
+        "ping_spot"
+        | "ping_futures"
+        | "get_spot_server_time"
+        | "get_futures_server_time"
+        | "get_spot_exchange_info"
+        | "get_futures_exchange_info" => params.ensure_allowed(&[], &[]),
+        "get_spot_orderbook" | "get_futures_orderbook" => {
+            params.ensure_allowed(&["product_symbol", "limit"], &[])?;
+            params.required("product_symbol")?;
+            if let Some(limit) = params.u64("limit")? {
+                if !matches!(limit, 5 | 10 | 20 | 50 | 100 | 500 | 1000) {
+                    return Err(DcexError::InvalidInput(
+                        "Aster depth limit must be one of 5, 10, 20, 50, 100, 500, 1000"
+                            .to_string(),
+                    ));
+                }
+            }
+            Ok(())
+        }
+        "get_spot_recent_trades"
+        | "get_futures_recent_trades"
+        | "get_spot_historical_trades"
+        | "get_futures_historical_trades" => {
+            let mut allowed = vec!["product_symbol", "limit"];
+            if method_name.contains("historical") {
+                allowed.push("fromId");
+            }
+            params.ensure_allowed(&allowed, &[])?;
+            params.required("product_symbol")?;
+            params.optional_u64_range("limit", 1, 1000)?;
+            params.u64("fromId")?;
+            Ok(())
+        }
+        "get_spot_agg_trades" | "get_futures_agg_trades" => {
+            params.ensure_allowed(
+                &["product_symbol", "fromId", "startTime", "endTime", "limit"],
+                &[],
+            )?;
+            params.required("product_symbol")?;
+            params.u64("fromId")?;
+            params.optional_u64_range("limit", 1, 1000)?;
+            params.ensure_max_time_span("startTime", "endTime", 60 * 60 * 1000)
+        }
+        "get_spot_klines" | "get_futures_klines" | "get_futures_mark_price_klines" => {
+            params.ensure_allowed(
+                &[
+                    "product_symbol",
+                    "interval",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                ],
+                &[],
+            )?;
+            params.required("product_symbol")?;
+            params.required_one_of("interval", KLINE_INTERVALS)?;
+            params.optional_u64_range("limit", 1, 1500)?;
+            params.ensure_time_order("startTime", "endTime")
+        }
+        "get_futures_index_price_klines" => {
+            params.ensure_allowed(&["pair", "interval", "startTime", "endTime", "limit"], &[])?;
+            params.required("pair")?;
+            params.required_one_of("interval", KLINE_INTERVALS)?;
+            params.optional_u64_range("limit", 1, 1500)?;
+            params.ensure_time_order("startTime", "endTime")
+        }
+        "get_spot_ticker_24hr"
+        | "get_futures_ticker_24hr"
+        | "get_spot_ticker_price"
+        | "get_futures_ticker_price"
+        | "get_spot_book_ticker"
+        | "get_futures_book_ticker"
+        | "get_futures_premium_index"
+        | "get_futures_funding_info" => params.ensure_allowed(&["product_symbol"], &[]),
+        "get_spot_withdraw_fee" => {
+            params.ensure_allowed(&["chainId", "asset"], &[])?;
+            params.required_one_of("chainId", &["1", "56", "42161"])?;
+            params.required("asset")?;
+            Ok(())
+        }
+        "get_futures_funding_rate" => {
+            params.ensure_allowed(&["product_symbol", "startTime", "endTime", "limit"], &[])?;
+            params.optional_u64_range("limit", 1, 1000)?;
+            params.ensure_time_order("startTime", "endTime")
+        }
+        "get_futures_index_references" => {
+            params.ensure_allowed(&["product_symbol"], &[])?;
+            params.required("product_symbol")?;
+            Ok(())
+        }
+        _ => Ok(()),
+    }
+}
+
+#[cfg(test)]
+mod validation_tests {
+    use super::*;
+
+    #[test]
+    fn spot_exchange_info_rejects_undocumented_filters() {
+        let params = AsterParams::from_pairs(vec![(
+            "product_symbol".to_string(),
+            "BTC-USDT-SPOT".to_string(),
+        )]);
+        assert!(validate_public_params("get_spot_exchange_info", &params).is_err());
+    }
+
+    #[test]
+    fn depth_limit_matches_documented_values() {
+        let params = AsterParams::from_pairs(vec![
+            ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+            ("limit".to_string(), "25".to_string()),
+        ]);
+        assert!(validate_public_params("get_spot_orderbook", &params).is_err());
     }
 }

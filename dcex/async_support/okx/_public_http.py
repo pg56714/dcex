@@ -49,7 +49,7 @@ class PublicHTTP(HTTPManager):
     async def get_public_instruments(
         self,
         instType: str,
-        uly: str | None = None,
+        seriesId: str | None = None,
         instFamily: str | None = None,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
@@ -57,7 +57,12 @@ class PublicHTTP(HTTPManager):
         inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
         return await self._native_public(
             "get_public_instruments",
-            self._params(instType=instType, uly=uly, instFamily=instFamily, instId=inst_id),
+            self._params(
+                instType=instType,
+                seriesId=seriesId,
+                instFamily=instFamily,
+                instId=inst_id,
+            ),
         )
 
     async def get_funding_rate(self, product_symbol: str) -> dict[str, Any]:
@@ -88,7 +93,6 @@ class PublicHTTP(HTTPManager):
     async def get_open_interest(
         self,
         instType: str = "SWAP",
-        uly: str | None = None,
         instFamily: str | None = None,
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
@@ -96,7 +100,7 @@ class PublicHTTP(HTTPManager):
         inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
         return await self._native_public(
             "get_open_interest",
-            self._params(instType=instType, uly=uly, instFamily=instFamily, instId=inst_id),
+            self._params(instType=instType, instFamily=instFamily, instId=inst_id),
         )
 
     async def get_position_tiers(
@@ -104,14 +108,17 @@ class PublicHTTP(HTTPManager):
         instType: str = "SWAP",
         tdMode: str = "isolated",
         instFamily: str | None = None,
-        uly: str | None = None,
         product_symbol: str | None = None,
         ccy: str | None = None,
         tier: str | None = None,
     ) -> dict[str, Any]:
         """Get position tiers information."""
         inst_id = self._exchange_symbol(product_symbol) if product_symbol is not None else None
-        if inst_id is not None and instFamily is None and uly is None:
+        if (
+            inst_id is not None
+            and instFamily is None
+            and instType.upper() in {"SWAP", "FUTURES", "OPTION"}
+        ):
             symbol_parts = inst_id.split("-")
             if len(symbol_parts) >= 2:
                 instFamily = "-".join(symbol_parts[:2])
@@ -121,7 +128,6 @@ class PublicHTTP(HTTPManager):
                 instType=instType,
                 tdMode=tdMode,
                 instFamily=instFamily,
-                uly=uly,
                 instId=inst_id,
                 ccy=ccy,
                 tier=tier,
@@ -152,6 +158,8 @@ class PublicHTTP(HTTPManager):
         period: str = "5m",
         begin: int | None = None,
         end: int | None = None,
+        unit: str | None = None,
+        limit: str | None = None,
     ) -> dict[str, Any]:
         """Get contract taker volume history."""
         return await self._native_public(
@@ -161,6 +169,8 @@ class PublicHTTP(HTTPManager):
                 period=period,
                 begin=begin,
                 end=end,
+                unit=unit,
+                limit=limit,
             ),
         )
 
@@ -183,6 +193,7 @@ class PublicHTTP(HTTPManager):
         period: str = "5m",
         begin: int | None = None,
         end: int | None = None,
+        limit: str | None = None,
     ) -> dict[str, Any]:
         """Get contract long and short account ratio."""
         return await self._native_public(
@@ -192,6 +203,7 @@ class PublicHTTP(HTTPManager):
                 period=period,
                 begin=begin,
                 end=end,
+                limit=limit,
             ),
         )
 
@@ -201,6 +213,7 @@ class PublicHTTP(HTTPManager):
         period: str = "5m",
         begin: int | None = None,
         end: int | None = None,
+        limit: str | None = None,
     ) -> dict[str, Any]:
         """Get top trader contract long and short account ratio."""
         return await self._native_public(
@@ -210,6 +223,7 @@ class PublicHTTP(HTTPManager):
                 period=period,
                 begin=begin,
                 end=end,
+                limit=limit,
             ),
         )
 
@@ -219,6 +233,7 @@ class PublicHTTP(HTTPManager):
         period: str = "5m",
         begin: int | None = None,
         end: int | None = None,
+        limit: str | None = None,
     ) -> dict[str, Any]:
         """Get top trader contract long and short position ratio."""
         return await self._native_public(
@@ -228,6 +243,7 @@ class PublicHTTP(HTTPManager):
                 period=period,
                 begin=begin,
                 end=end,
+                limit=limit,
             ),
         )
 
@@ -250,6 +266,7 @@ class PublicHTTP(HTTPManager):
         period: str = "5m",
         begin: int | None = None,
         end: int | None = None,
+        limit: str | None = None,
     ) -> dict[str, Any]:
         """Get contract open interest history."""
         return await self._native_public(
@@ -259,5 +276,6 @@ class PublicHTTP(HTTPManager):
                 period=period,
                 begin=begin,
                 end=end,
+                limit=limit,
             ),
         )

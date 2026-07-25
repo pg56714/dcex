@@ -31,13 +31,21 @@ impl BinanceClient {
         )
         .await
     }
-    pub async fn get_account_balance(&self, market_type: &str) -> Result<ValidatedResponse> {
+    pub async fn get_account_balance(
+        &self,
+        market_type: &str,
+        omit_zero_balances: Option<&str>,
+    ) -> Result<ValidatedResponse> {
         let (market, path) = if market_type == "spot" {
             (BinanceMarket::Spot, SPOT_ACCOUNT_BALANCE)
         } else {
             (BinanceMarket::Futures, FUTURES_ACCOUNT_BALANCE)
         };
-        self.request(HttpMethod::Get, market, path, Vec::new(), true)
+        let mut params = Vec::new();
+        if market == BinanceMarket::Spot {
+            push_optional(&mut params, "omitZeroBalances", omit_zero_balances);
+        }
+        self.request(HttpMethod::Get, market, path, params, true)
             .await
     }
 

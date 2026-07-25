@@ -9,7 +9,7 @@ pub(super) const KLINE: &str = "/api/v1/trade/bucketed";
 pub(super) const FUNDING: &str = "/api/v1/funding";
 pub(super) const LIQUIDATION: &str = "/api/v1/liquidation";
 
-pub(super) const ACCOUNT_INFO: &str = "/api/v1/user/wallet";
+pub(super) const WALLET_SUMMARY: &str = "/api/v1/user/walletSummary";
 pub(super) const USER_COMMISSION: &str = "/api/v1/user/commission";
 
 pub(super) const GET_POSITIONS: &str = "/api/v1/position";

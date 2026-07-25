@@ -56,6 +56,15 @@ impl MexcParams {
             DcexError::InvalidInput(format!("invalid JSON parameter {key}: {error}"))
         })
     }
+
+    pub(super) fn ensure_allowed(&self, keys: &[&str]) -> Result<()> {
+        if let Some((key, _)) = self.0.iter().find(|(key, _)| !keys.contains(&key.as_str())) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported MEXC parameter: {key}"
+            )));
+        }
+        Ok(())
+    }
 }
 
 pub(super) fn is_canonical_product_symbol(product_symbol: &str) -> bool {
@@ -96,6 +105,56 @@ pub(super) fn require_one_identifier(params: &MexcParams, keys: &[&str]) -> Resu
         "one of {} is required",
         keys.join(", ")
     )))
+}
+
+pub(super) fn require_paired(params: &MexcParams, first: &str, second: &str) -> Result<()> {
+    if params.get(first).is_some() == params.get(second).is_some() {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "MEXC parameters {first} and {second} must be provided together"
+    )))
+}
+
+pub(super) fn validate_u64_range(
+    params: &MexcParams,
+    key: &str,
+    minimum: u64,
+    maximum: u64,
+) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    let parsed = value
+        .parse::<u64>()
+        .map_err(|_| DcexError::InvalidInput(format!("MEXC parameter {key} must be an integer")))?;
+    if !(minimum..=maximum).contains(&parsed) {
+        return Err(DcexError::InvalidInput(format!(
+            "MEXC parameter {key} must be between {minimum} and {maximum}"
+        )));
+    }
+    Ok(())
+}
+
+pub(super) fn validate_enum(params: &MexcParams, key: &str, allowed: &[&str]) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    if allowed.contains(&value) {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "unsupported MEXC {key}: {value}"
+    )))
+}
+
+pub(super) fn add_pagination_defaults(query: &mut Vec<(String, String)>) {
+    if !query.iter().any(|(key, _)| key == "page_num") {
+        query.push(("page_num".to_string(), "1".to_string()));
+    }
+    if !query.iter().any(|(key, _)| key == "page_size") {
+        query.push(("page_size".to_string(), "20".to_string()));
+    }
 }
 
 pub(super) fn body_value(value: &str, number: bool, boolean: bool) -> Value {

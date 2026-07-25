@@ -36,6 +36,8 @@ class TradeHTTP(HTTPManager):
         close_price2: str | None = None,
     ) -> dict[str, Any]:
         """Place a Kraken spot order."""
+        if userref is not None and cl_ord_id is not None:
+            raise ValueError("userref and cl_ord_id are mutually exclusive.")
         return self._native_private(
             "place_spot_order",
             self._native_params(
@@ -261,21 +263,31 @@ class TradeHTTP(HTTPManager):
         trades: bool | None = None,
         userref: int | None = None,
         cl_ord_id: str | None = None,
+        rebase_multiplier: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot open orders."""
         return self._native_private(
             "get_spot_open_orders",
-            self._native_params(trades=trades, userref=userref, cl_ord_id=cl_ord_id),
+            self._native_params(
+                trades=trades,
+                userref=userref,
+                cl_ord_id=cl_ord_id,
+                rebase_multiplier=rebase_multiplier,
+            ),
         )
 
     def get_spot_closed_orders(
         self,
         trades: bool | None = None,
         userref: int | None = None,
+        cl_ord_id: str | None = None,
         start: int | str | None = None,
         end: int | str | None = None,
         ofs: int | None = None,
         closetime: str | None = None,
+        consolidate_taker: bool | None = None,
+        without_count: bool | None = None,
+        rebase_multiplier: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot closed orders."""
         return self._native_private(
@@ -283,10 +295,14 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 trades=trades,
                 userref=userref,
+                cl_ord_id=cl_ord_id,
                 start=start,
                 end=end,
                 ofs=ofs,
                 closetime=closetime,
+                consolidate_taker=consolidate_taker,
+                without_count=without_count,
+                rebase_multiplier=rebase_multiplier,
             ),
         )
 
@@ -295,11 +311,19 @@ class TradeHTTP(HTTPManager):
         txid: str,
         trades: bool | None = None,
         userref: int | None = None,
+        consolidate_taker: bool | None = None,
+        rebase_multiplier: str | None = None,
     ) -> dict[str, Any]:
         """Query Kraken spot order info by transaction id."""
         return self._native_private(
             "get_spot_orders",
-            self._native_params(txid=txid, trades=trades, userref=userref),
+            self._native_params(
+                txid=txid,
+                trades=trades,
+                userref=userref,
+                consolidate_taker=consolidate_taker,
+                rebase_multiplier=rebase_multiplier,
+            ),
         )
 
     def get_spot_trade_history(
@@ -311,6 +335,8 @@ class TradeHTTP(HTTPManager):
         ofs: int | None = None,
         without_count: bool | None = None,
         consolidate_taker: bool | None = None,
+        ledgers: bool | None = None,
+        rebase_multiplier: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot trades/fills history."""
         return self._native_private(
@@ -323,6 +349,8 @@ class TradeHTTP(HTTPManager):
                 ofs=ofs,
                 without_count=without_count,
                 consolidate_taker=consolidate_taker,
+                ledgers=ledgers,
+                rebase_multiplier=rebase_multiplier,
             ),
         )
 
@@ -333,8 +361,8 @@ class TradeHTTP(HTTPManager):
         cl_ord_id: str | None = None,
     ) -> dict[str, Any]:
         """Cancel a Kraken spot order."""
-        if txid is None and userref is None and cl_ord_id is None:
-            raise ValueError("Specify txid, userref, or cl_ord_id.")
+        if sum(value is not None for value in (txid, userref, cl_ord_id)) != 1:
+            raise ValueError("Specify exactly one of txid, userref, or cl_ord_id.")
         return self._native_private(
             "cancel_spot_order",
             self._native_params(txid=txid, userref=userref, cl_ord_id=cl_ord_id),
@@ -350,11 +378,9 @@ class TradeHTTP(HTTPManager):
             "cancel_spot_all_orders_after", self._native_params(timeout=timeout)
         )
 
-    def get_spot_websocket_token(self, permissions: str | None = None) -> dict[str, Any]:
+    def get_spot_websocket_token(self) -> dict[str, Any]:
         """Retrieve a Kraken authenticated WebSocket token."""
-        return self._native_private(
-            "get_spot_websocket_token", self._native_params(permissions=permissions)
-        )
+        return self._native_private("get_spot_websocket_token", [])
 
     def place_futures_order(
         self,
@@ -595,13 +621,18 @@ class TradeHTTP(HTTPManager):
         self,
         order_id: str | None = None,
         cliOrdId: str | None = None,
+        processBefore: str | None = None,
     ) -> dict[str, Any]:
         """Cancel a Kraken Futures order."""
-        if order_id is None and cliOrdId is None:
-            raise ValueError("Specify order_id or cliOrdId.")
+        if sum(value is not None for value in (order_id, cliOrdId)) != 1:
+            raise ValueError("Specify exactly one of order_id or cliOrdId.")
         return self._native_private(
             "cancel_futures_order",
-            self._native_params(order_id=order_id, cliOrdId=cliOrdId),
+            self._native_params(
+                order_id=order_id,
+                cliOrdId=cliOrdId,
+                processBefore=processBefore,
+            ),
         )
 
     def cancel_futures_all_orders(

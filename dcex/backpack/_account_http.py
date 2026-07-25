@@ -53,8 +53,10 @@ class AccountHTTP(HTTPManager):
 
     def get_borrow_history(
         self,
+        type_: str | None = None,
+        sources: str | None = None,
+        positionId: str | None = None,
         symbol: str | None = None,
-        side: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
         sortDirection: str | None = None,
@@ -67,9 +69,12 @@ class AccountHTTP(HTTPManager):
 
     def get_interest_history(
         self,
+        asset: str | None = None,
         symbol: str | None = None,
+        positionId: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
+        source: str | None = None,
         sortDirection: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend interest history."""

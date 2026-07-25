@@ -42,14 +42,23 @@ impl LighterClient {
     ) -> Result<Option<ValidatedResponse>> {
         match method_name {
             "send_tx" => {
+                params.ensure_allowed(&["tx_type", "tx_info", "price_protection"])?;
+                params.required_u64_range("tx_type", 0, u8::MAX.into())?;
+                params.required("tx_info")?;
+                params.optional_bool("price_protection")?;
                 let mut body = params.query(&["tx_type", "tx_info", "price_protection"]);
                 body.retain(|(_, value)| !value.is_empty());
                 Ok(Some(self.post_form(SEND_TX, body).await?))
             }
-            "send_tx_batch" => Ok(Some(
-                self.post_form(SEND_TX_BATCH, params.query(&["tx_types", "tx_infos"]))
-                    .await?,
-            )),
+            "send_tx_batch" => {
+                params.ensure_allowed(&["tx_types", "tx_infos"])?;
+                params.required("tx_types")?;
+                params.required("tx_infos")?;
+                Ok(Some(
+                    self.post_form(SEND_TX_BATCH, params.query(&["tx_types", "tx_infos"]))
+                        .await?,
+                ))
+            }
             "create_order" | "place_order" => Ok(Some(
                 self.submit_signed_tx(
                     self.sign_create_order_from_params(params).await?,
@@ -118,24 +127,58 @@ impl LighterClient {
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
-        let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
-        let nonce = self
-            .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
-            .await?;
+        params.ensure_allowed(&[
+            "market_index",
+            "product_symbol",
+            "client_order_index",
+            "base_amount",
+            "price",
+            "is_ask",
+            "order_type",
+            "time_in_force",
+            "reduce_only",
+            "trigger_price",
+            "order_expiry",
+            "integrator_account_index",
+            "integrator_taker_fee",
+            "integrator_maker_fee",
+            "self_trade_behavior_mode",
+            "self_trade_equality_mode",
+            "skip_nonce",
+            "nonce",
+            "api_key_index",
+            "price_protection",
+        ])?;
+        params.optional_bool("price_protection")?;
+        let api_key_index = self.signing_api_key_index(params)?;
+        let explicit_nonce = validate_nonce(params)?;
+        let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let order_expiry = match params.optional_i64("order_expiry")? {
             Some(-1) | None => order_expiry_ms()? as i64,
             Some(value) => value,
         };
         let market_index = self.market_index(params)?;
-        let client_order_index = params.required_i64("client_order_index")?;
-        let base_amount = params.required_i64("base_amount")?;
-        let price = params.required_i64("price")?;
+        validate_order_market_index(market_index)?;
+        let client_order_index =
+            required_i64_range(params, "client_order_index", 0, (1_i64 << 48) - 1)?;
+        let base_amount = required_i64_range(params, "base_amount", 0, (1_i64 << 48) - 1)?;
+        let price = required_i64_range(params, "price", 1, u32::MAX.into())?;
         let is_ask = params.required_bool("is_ask")?;
-        let order_type = params.required_i64("order_type")?;
-        let time_in_force = params.required_i64("time_in_force")?;
+        let order_type = required_i64_range(params, "order_type", 0, 6)?;
+        let time_in_force = required_i64_range(params, "time_in_force", 0, 2)?;
         let reduce_only = params.optional_bool("reduce_only")?.unwrap_or(false);
-        let trigger_price = params.optional_i64("trigger_price")?.unwrap_or(0);
+        let trigger_price =
+            optional_i64_range(params, "trigger_price", 0, u32::MAX.into())?.unwrap_or(0);
+        validate_create_order(
+            market_index,
+            base_amount,
+            order_type,
+            time_in_force,
+            reduce_only,
+            trigger_price,
+            order_expiry,
+        )?;
         let attrs = attributes(
             params
                 .optional_u64("integrator_account_index")?
@@ -144,7 +187,13 @@ impl LighterClient {
             params.optional_u64("integrator_maker_fee")?.unwrap_or(0),
             params.optional_u64("skip_nonce")?.unwrap_or(0),
             255,
-        );
+            params
+                .optional_u64("self_trade_behavior_mode")?
+                .unwrap_or(0),
+            params
+                .optional_u64("self_trade_equality_mode")?
+                .unwrap_or(0),
+        )?;
         let payload = json!({
             "AccountIndex": self.private_account_index(None)?,
             "ApiKeyIndex": api_key_index,
@@ -186,20 +235,32 @@ impl LighterClient {
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
-        let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
-        let nonce = self
-            .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
-            .await?;
+        params.ensure_allowed(&[
+            "market_index",
+            "product_symbol",
+            "order_index",
+            "skip_nonce",
+            "nonce",
+            "api_key_index",
+            "price_protection",
+        ])?;
+        params.optional_bool("price_protection")?;
+        let api_key_index = self.signing_api_key_index(params)?;
+        let explicit_nonce = validate_nonce(params)?;
+        let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
-        let order_index = params.required_i64("order_index")?;
+        validate_order_market_index(market_index)?;
+        let order_index = required_i64_range(params, "order_index", 1, (1_i64 << 60) - 1)?;
         let attrs = attributes(
             0,
             0,
             0,
             params.optional_u64("skip_nonce")?.unwrap_or(0),
             255,
-        );
+            0,
+            0,
+        )?;
         let payload = json!({
             "AccountIndex": self.private_account_index(None)?,
             "ApiKeyIndex": api_key_index,
@@ -225,16 +286,35 @@ impl LighterClient {
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
-        let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
-        let nonce = self
-            .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
-            .await?;
+        params.ensure_allowed(&[
+            "market_index",
+            "product_symbol",
+            "order_index",
+            "base_amount",
+            "price",
+            "trigger_price",
+            "integrator_account_index",
+            "integrator_taker_fee",
+            "integrator_maker_fee",
+            "self_trade_behavior_mode",
+            "self_trade_equality_mode",
+            "skip_nonce",
+            "nonce",
+            "api_key_index",
+            "price_protection",
+        ])?;
+        params.optional_bool("price_protection")?;
+        let api_key_index = self.signing_api_key_index(params)?;
+        let explicit_nonce = validate_nonce(params)?;
+        let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
-        let order_index = params.required_i64("order_index")?;
-        let base_amount = params.required_i64("base_amount")?;
-        let price = params.required_i64("price")?;
-        let trigger_price = params.optional_i64("trigger_price")?.unwrap_or(0);
+        validate_order_market_index(market_index)?;
+        let order_index = required_i64_range(params, "order_index", 1, (1_i64 << 60) - 1)?;
+        let base_amount = required_i64_range(params, "base_amount", 0, (1_i64 << 48) - 1)?;
+        let price = required_i64_range(params, "price", 1, u32::MAX.into())?;
+        let trigger_price =
+            optional_i64_range(params, "trigger_price", 0, u32::MAX.into())?.unwrap_or(0);
         let attrs = attributes(
             params
                 .optional_u64("integrator_account_index")?
@@ -243,7 +323,13 @@ impl LighterClient {
             params.optional_u64("integrator_maker_fee")?.unwrap_or(0),
             params.optional_u64("skip_nonce")?.unwrap_or(0),
             255,
-        );
+            params
+                .optional_u64("self_trade_behavior_mode")?
+                .unwrap_or(0),
+            params
+                .optional_u64("self_trade_equality_mode")?
+                .unwrap_or(0),
+        )?;
         let payload = json!({
             "AccountIndex": self.private_account_index(None)?,
             "ApiKeyIndex": api_key_index,
@@ -275,20 +361,35 @@ impl LighterClient {
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
-        let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
-        let nonce = self
-            .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
-            .await?;
+        params.ensure_allowed(&[
+            "time_in_force",
+            "timestamp_ms",
+            "cancel_all_market_index",
+            "skip_nonce",
+            "nonce",
+            "api_key_index",
+            "price_protection",
+        ])?;
+        params.optional_bool("price_protection")?;
+        let api_key_index = self.signing_api_key_index(params)?;
+        let explicit_nonce = validate_nonce(params)?;
+        let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
-        let time_in_force = params.required_i64("time_in_force")?;
+        let time_in_force = required_i64_range(params, "time_in_force", 0, 2)?;
         let timestamp_ms = params.required_i64("timestamp_ms")?;
+        let cancel_all_market_index = params
+            .optional_u64("cancel_all_market_index")?
+            .unwrap_or(255);
+        validate_cancel_all(time_in_force, timestamp_ms, cancel_all_market_index)?;
         let attrs = attributes(
             0,
             0,
             0,
             params.optional_u64("skip_nonce")?.unwrap_or(0),
-            255,
-        );
+            cancel_all_market_index,
+            0,
+            0,
+        )?;
         let payload = json!({
             "AccountIndex": self.private_account_index(None)?,
             "ApiKeyIndex": api_key_index,
@@ -314,21 +415,34 @@ impl LighterClient {
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
-        let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
-        let nonce = self
-            .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
-            .await?;
+        params.ensure_allowed(&[
+            "market_index",
+            "product_symbol",
+            "fraction",
+            "margin_mode",
+            "skip_nonce",
+            "nonce",
+            "api_key_index",
+            "price_protection",
+        ])?;
+        params.optional_bool("price_protection")?;
+        let api_key_index = self.signing_api_key_index(params)?;
+        let explicit_nonce = validate_nonce(params)?;
+        let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
-        let fraction = params.required_i64("fraction")?;
-        let margin_mode = params.required_i64("margin_mode")?;
+        validate_perps_market_index(market_index)?;
+        let fraction = required_i64_range(params, "fraction", 1, 10_000)?;
+        let margin_mode = required_i64_range(params, "margin_mode", 0, 1)?;
         let attrs = attributes(
             0,
             0,
             0,
             params.optional_u64("skip_nonce")?.unwrap_or(0),
             255,
-        );
+            0,
+            0,
+        )?;
         let payload = json!({
             "AccountIndex": self.private_account_index(None)?,
             "ApiKeyIndex": api_key_index,
@@ -356,21 +470,43 @@ impl LighterClient {
         &self,
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
-        let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
-        let nonce = self
-            .next_nonce(params.optional_i64("nonce")?, Some(api_key_index))
-            .await?;
+        params.ensure_allowed(&[
+            "market_index",
+            "product_symbol",
+            "usdc_amount",
+            "direction",
+            "skip_nonce",
+            "nonce",
+            "api_key_index",
+            "price_protection",
+        ])?;
+        params.optional_bool("price_protection")?;
+        let api_key_index = self.signing_api_key_index(params)?;
+        let explicit_nonce = validate_nonce(params)?;
+        let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
+        validate_perps_market_index(market_index)?;
         let usdc_amount = params.required_i64("usdc_amount")?;
-        let direction = params.required_i64("direction")?;
+        let amount_magnitude = usdc_amount.checked_abs().ok_or_else(|| {
+            DcexError::InvalidInput("Lighter usdc_amount is outside the valid range".to_string())
+        })?;
+        if !(1..=(1_i64 << 60) - 1).contains(&amount_magnitude) {
+            return Err(DcexError::InvalidInput(
+                "Lighter usdc_amount magnitude must be between 1 and 1152921504606846975"
+                    .to_string(),
+            ));
+        }
+        let direction = required_i64_range(params, "direction", 0, 1)?;
         let attrs = attributes(
             0,
             0,
             0,
             params.optional_u64("skip_nonce")?.unwrap_or(0),
             255,
-        );
+            0,
+            0,
+        )?;
         let payload = json!({
             "AccountIndex": self.private_account_index(None)?,
             "ApiKeyIndex": api_key_index,
@@ -415,7 +551,13 @@ impl LighterClient {
     }
 
     fn market_index(&self, params: &LighterParams) -> Result<i64> {
+        if params.get("product_symbol").is_some() && params.get("market_index").is_some() {
+            return Err(DcexError::InvalidInput(
+                "Lighter accepts either market_index or product_symbol, not both".to_string(),
+            ));
+        }
         if let Some(product_symbol) = params.get("product_symbol") {
+            params.required("product_symbol")?;
             return self
                 .market_id(product_symbol)?
                 .parse::<i64>()
@@ -425,4 +567,150 @@ impl LighterClient {
         }
         params.required_i64("market_index")
     }
+
+    fn signing_api_key_index(&self, params: &LighterParams) -> Result<u64> {
+        let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
+        if api_key_index > 254 {
+            return Err(DcexError::InvalidInput(
+                "Lighter signing api_key_index must be between 0 and 254".to_string(),
+            ));
+        }
+        let account_index = self.private_account_index(None)?;
+        if account_index > (1 << 48) - 2 {
+            return Err(DcexError::InvalidInput(
+                "Lighter account_index is outside the valid range".to_string(),
+            ));
+        }
+        self.private_key(api_key_index)?;
+        Ok(api_key_index)
+    }
+}
+
+fn validate_nonce(params: &LighterParams) -> Result<Option<i64>> {
+    let nonce = params.optional_i64("nonce")?;
+    if matches!(nonce, Some(value) if value < 0) {
+        return Err(DcexError::InvalidInput(
+            "Lighter nonce must be non-negative".to_string(),
+        ));
+    }
+    Ok(nonce)
+}
+
+fn required_i64_range(params: &LighterParams, key: &str, min: i64, max: i64) -> Result<i64> {
+    let value = params.required_i64(key)?;
+    if value < min || value > max {
+        return Err(DcexError::InvalidInput(format!(
+            "Lighter parameter {key} must be between {min} and {max}"
+        )));
+    }
+    Ok(value)
+}
+
+fn optional_i64_range(
+    params: &LighterParams,
+    key: &str,
+    min: i64,
+    max: i64,
+) -> Result<Option<i64>> {
+    let value = params.optional_i64(key)?;
+    if matches!(value, Some(value) if value < min || value > max) {
+        return Err(DcexError::InvalidInput(format!(
+            "Lighter parameter {key} must be between {min} and {max}"
+        )));
+    }
+    Ok(value)
+}
+
+fn validate_order_market_index(market_index: i64) -> Result<()> {
+    if (0..=254).contains(&market_index) || (2048..=4094).contains(&market_index) {
+        Ok(())
+    } else {
+        Err(DcexError::InvalidInput(
+            "Lighter order market_index must identify a perpetual or spot market".to_string(),
+        ))
+    }
+}
+
+fn validate_perps_market_index(market_index: i64) -> Result<()> {
+    if (0..=254).contains(&market_index) {
+        Ok(())
+    } else {
+        Err(DcexError::InvalidInput(
+            "Lighter margin market_index must be between 0 and 254".to_string(),
+        ))
+    }
+}
+
+fn validate_create_order(
+    market_index: i64,
+    base_amount: i64,
+    order_type: i64,
+    time_in_force: i64,
+    reduce_only: bool,
+    trigger_price: i64,
+    order_expiry: i64,
+) -> Result<()> {
+    let is_spot = (2048..=4094).contains(&market_index);
+    if !reduce_only && base_amount == 0 {
+        return Err(DcexError::InvalidInput(
+            "Lighter base_amount must be positive unless reduce_only is true".to_string(),
+        ));
+    }
+    if is_spot && reduce_only {
+        return Err(DcexError::InvalidInput(
+            "Lighter spot orders cannot be reduce-only".to_string(),
+        ));
+    }
+    if order_expiry < 0 {
+        return Err(DcexError::InvalidInput(
+            "Lighter order_expiry is outside the valid range".to_string(),
+        ));
+    }
+    let valid = match order_type {
+        0 => {
+            trigger_price == 0
+                && ((time_in_force == 0 && order_expiry == 0)
+                    || (time_in_force != 0 && order_expiry != 0))
+        }
+        1 => time_in_force == 0 && order_expiry == 0 && trigger_price == 0,
+        2 | 4 => !is_spot && time_in_force == 0 && trigger_price != 0 && order_expiry != 0,
+        3 | 5 => !is_spot && trigger_price != 0 && order_expiry != 0,
+        6 => time_in_force == 1 && trigger_price == 0 && order_expiry != 0,
+        _ => false,
+    };
+    if !valid {
+        return Err(DcexError::InvalidInput(
+            "Lighter order type, time-in-force, trigger price, and expiry combination is invalid"
+                .to_string(),
+        ));
+    }
+    Ok(())
+}
+
+fn validate_cancel_all(
+    time_in_force: i64,
+    timestamp_ms: i64,
+    cancel_all_market_index: u64,
+) -> Result<()> {
+    if cancel_all_market_index > 255 {
+        return Err(DcexError::InvalidInput(
+            "Lighter cancel_all_market_index must be between 0 and 255".to_string(),
+        ));
+    }
+    if cancel_all_market_index != 255 && time_in_force != 0 {
+        return Err(DcexError::InvalidInput(
+            "Lighter market-specific cancel-all must use immediate time-in-force".to_string(),
+        ));
+    }
+    let valid = match time_in_force {
+        0 | 2 => timestamp_ms == 0,
+        1 => timestamp_ms > 0,
+        _ => false,
+    };
+    if !valid {
+        return Err(DcexError::InvalidInput(
+            "Lighter cancel-all timestamp does not match time_in_force".to_string(),
+        ));
+    }
+    Ok(())
 }

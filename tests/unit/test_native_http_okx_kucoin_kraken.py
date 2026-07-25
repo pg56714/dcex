@@ -112,7 +112,7 @@ def test_native_kucoin_signed_request() -> None:
 
     request = received.get_nowait()
     timestamp = request["KC-API-TIMESTAMP"]
-    canonical = f"{timestamp}GET/api/v1/accounts?currency=BTC+USDT&type=trade"
+    canonical = f"{timestamp}GET/api/v1/accounts?currency=BTC USDT&type=trade"
     expected_signature = base64.b64encode(
         hmac.new(b"secret", canonical.encode(), hashlib.sha256).digest()
     ).decode()
@@ -126,6 +126,7 @@ def test_native_kucoin_signed_request() -> None:
     assert request["KC-API-SIGN"] == expected_signature
     assert request["KC-API-PASSPHRASE"] == expected_passphrase
     assert request["KC-API-KEY-VERSION"] == "2"
+    assert request["path"] == "/api/v1/accounts?currency=BTC+USDT&type=trade"
 
 
 def test_sync_kucoin_manager_uses_native_transport() -> None:

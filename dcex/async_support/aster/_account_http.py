@@ -242,9 +242,9 @@ class AccountHTTP(HTTPManager):
         product_symbol: str,
         windowTimeInMilliseconds: int,
         frozenTimeInMilliseconds: int,
-        qtyLimit: str | None = None,
-        valueLimit: str | None = None,
-        deltaLimit: str | None = None,
+        qtyLimit: int | None = None,
+        valueLimit: int | None = None,
+        deltaLimit: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Configure Aster futures market-maker protection."""
         return await self._native_private(
@@ -261,7 +261,7 @@ class AccountHTTP(HTTPManager):
 
     async def get_futures_mmp(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Aster futures market-maker protection settings."""
         return await self._native_private(

@@ -1,5 +1,7 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
+import time
+
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
@@ -34,7 +36,12 @@ async def test_position_trade_and_fee_read_endpoints(client):
     _assert_response(await client.get_positions())
     _assert_response(await client.get_positions_history(limit=20))
     _assert_response(await client.get_trades_history(limit=20))
-    _assert_response(await client.get_funding_payments(limit=20))
+    _assert_response(
+        await client.get_funding_payments(
+            startTime=int(time.time() * 1000) - 30 * 24 * 60 * 60 * 1000,
+            limit=20,
+        )
+    )
     _assert_response(await client.get_leverage())
     _assert_response(await client.get_fees())
     _assert_response(await client.get_rebates())

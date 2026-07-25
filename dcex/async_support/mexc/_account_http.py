@@ -16,8 +16,7 @@ class AccountHTTP(HTTPManager):
         )
 
     async def get_spot_self_symbols(
-        self,
-        recvWindow: int | None = None,
+        self, recvWindow: int | None = None
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Spot symbols enabled for the API key."""
         return await self._native_private(
@@ -55,25 +54,20 @@ class AccountHTTP(HTTPManager):
 
     async def get_spot_symbol_commission(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Retrieve MEXC Spot commission for a symbol or all symbols."""
+        """Retrieve MEXC Spot commission for a symbol."""
         return await self._native_private(
             "get_spot_symbol_commission",
             self._native_params(product_symbol=product_symbol, recvWindow=recvWindow),
         )
 
-    async def get_currency_info(
-        self,
-        coin: str | None = None,
-        network: str | None = None,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
+    async def get_currency_info(self, recvWindow: int | None = None) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC currency information."""
         return await self._native_private(
             "get_currency_info",
-            self._native_params(coin=coin, network=network, recvWindow=recvWindow),
+            self._native_params(recvWindow=recvWindow),
         )
 
     async def get_deposit_history(
@@ -190,7 +184,6 @@ class AccountHTTP(HTTPManager):
     async def get_internal_transfer_history(
         self,
         tranId: str | None = None,
-        clientTranId: str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
         page: int | None = None,
@@ -202,7 +195,6 @@ class AccountHTTP(HTTPManager):
             "get_internal_transfer_history",
             self._native_params(
                 tranId=tranId,
-                clientTranId=clientTranId,
                 startTime=startTime,
                 endTime=endTime,
                 page=page,
@@ -226,8 +218,9 @@ class AccountHTTP(HTTPManager):
         self,
         currency: str | None = None,
         state: str | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        type_: str | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract asset transfer records."""
         return await self._native_private(
@@ -235,6 +228,7 @@ class AccountHTTP(HTTPManager):
             self._native_params(
                 currency=currency,
                 state=state,
+                type_=type_,
                 page_num=page_num,
                 page_size=page_size,
             ),
@@ -244,8 +238,11 @@ class AccountHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         type_: int | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        position_type: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract historical positions."""
         return await self._native_private(
@@ -253,6 +250,9 @@ class AccountHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 type_=type_,
+                start_time=start_time,
+                end_time=end_time,
+                position_type=position_type,
                 page_num=page_num,
                 page_size=page_size,
             ),
@@ -261,19 +261,23 @@ class AccountHTTP(HTTPManager):
     async def get_contract_open_positions(
         self,
         product_symbol: str | None = None,
+        positionId: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract current open positions."""
         return await self._native_private(
             "get_contract_open_positions",
-            self._native_params(product_symbol=product_symbol),
+            self._native_params(product_symbol=product_symbol, positionId=positionId),
         )
 
     async def get_contract_funding_records(
         self,
         product_symbol: str | None = None,
         position_id: str | int | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        position_type: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract user funding records."""
         return await self._native_private(
@@ -281,12 +285,17 @@ class AccountHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol,
                 position_id=position_id,
+                position_type=position_type,
+                start_time=start_time,
+                end_time=end_time,
                 page_num=page_num,
                 page_size=page_size,
             ),
         )
 
-    async def get_contract_risk_limits(self, product_symbol: str) -> dict[str, Any] | list[Any]:
+    async def get_contract_risk_limits(
+        self, product_symbol: str | None = None
+    ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract risk limits."""
         return await self._native_private(
             "get_contract_risk_limits",
@@ -295,7 +304,7 @@ class AccountHTTP(HTTPManager):
 
     async def get_contract_trading_fee_rate(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract trading fee rate."""
         return await self._native_private(
@@ -329,6 +338,9 @@ class AccountHTTP(HTTPManager):
         openType: int | None = None,
         product_symbol: str | None = None,
         positionType: int | None = None,
+        leverageMode: int | None = None,
+        marginSelected: bool | None = None,
+        leverageSelected: bool | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Change MEXC Contract leverage."""
         return await self._native_private(
@@ -339,6 +351,9 @@ class AccountHTTP(HTTPManager):
                 openType=openType,
                 product_symbol=product_symbol,
                 positionType=positionType,
+                leverageMode=leverageMode,
+                marginSelected=marginSelected,
+                leverageSelected=leverageSelected,
             ),
         )
 

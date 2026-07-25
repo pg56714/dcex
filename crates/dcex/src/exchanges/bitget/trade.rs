@@ -7,6 +7,24 @@ use super::client::BitgetClient;
 use super::endpoints::*;
 use super::params::{insert_optional_value, require_one_identifier, BitgetParams};
 
+const SPOT_ORDER_KEYS: &[&str] = &[
+    "side",
+    "orderType",
+    "size",
+    "price",
+    "force",
+    "clientOid",
+    "triggerPrice",
+    "tpslType",
+    "requestTime",
+    "receiveWindow",
+    "stpMode",
+    "presetTakeProfitPrice",
+    "executeTakeProfitPrice",
+    "presetStopLossPrice",
+    "executeStopLossPrice",
+];
+
 const UTA_ORDER_KEYS: &[&str] = &[
     "category",
     "side",
@@ -102,16 +120,37 @@ impl BitgetClient {
             "cancel_spot_batch_orders" => self.cancel_spot_batch_orders_from_params(params).await,
             "get_spot_order" => {
                 require_one_identifier(params, &["orderId", "clientOid"])?;
-                self.get_private(SPOT_ORDER_INFO, params.only(&["orderId", "clientOid"]))
-                    .await
+                self.get_private(
+                    SPOT_ORDER_INFO,
+                    params.only(&["orderId", "clientOid", "requestTime", "receiveWindow"]),
+                )
+                .await
             }
             "get_spot_open_orders" => {
-                let mut query = params.only(&["limit", "idLessThan", "startTime", "endTime"]);
+                let mut query = params.only(&[
+                    "limit",
+                    "idLessThan",
+                    "startTime",
+                    "endTime",
+                    "orderId",
+                    "tpslType",
+                    "requestTime",
+                    "receiveWindow",
+                ]);
                 self.push_product_symbol(&mut query, params)?;
                 self.get_private(SPOT_UNFILLED_ORDERS, query).await
             }
             "get_spot_history_orders" => {
-                let mut query = params.only(&["limit", "idLessThan", "startTime", "endTime"]);
+                let mut query = params.only(&[
+                    "limit",
+                    "idLessThan",
+                    "startTime",
+                    "endTime",
+                    "orderId",
+                    "tpslType",
+                    "requestTime",
+                    "receiveWindow",
+                ]);
                 self.push_product_symbol(&mut query, params)?;
                 self.get_private(SPOT_HISTORY_ORDERS, query).await
             }
@@ -143,6 +182,7 @@ impl BitgetClient {
                 self.get_private(UTA_PENDING_ORDERS, query).await
             }
             "get_uta_history_orders" => {
+                params.required("category")?;
                 let mut query =
                     params.only(&["category", "startTime", "endTime", "limit", "cursor"]);
                 self.push_uta_symbol(&mut query, params)?;
@@ -163,11 +203,14 @@ impl BitgetClient {
                 .await
             }
             "get_uta_positions" => {
+                params.required("category")?;
                 let mut query = params.only(&["category", "posSide"]);
                 self.push_uta_symbol(&mut query, params)?;
                 self.get_private(UTA_POSITIONS, query).await
             }
             "place_uta_strategy_order" => {
+                params.required("category")?;
+                require_uta_symbol(params)?;
                 let mut body = params.body(&[
                     "category",
                     "clientOid",
@@ -195,8 +238,8 @@ impl BitgetClient {
                     .await
             }
             "modify_uta_strategy_order" => {
+                params.required("orderId")?;
                 params.required("qty")?;
-                require_one_identifier(params, &["orderId", "clientOid"])?;
                 self.post_private(
                     UTA_MODIFY_STRATEGY_ORDER,
                     Value::Object(params.body(&[
@@ -220,7 +263,7 @@ impl BitgetClient {
                 .await
             }
             "cancel_uta_strategy_order" => {
-                require_one_identifier(params, &["orderId", "clientOid"])?;
+                params.required("orderId")?;
                 self.post_private(
                     UTA_CANCEL_STRATEGY_ORDER,
                     Value::Object(params.body(&["orderId", "clientOid"])),
@@ -228,23 +271,24 @@ impl BitgetClient {
                 .await
             }
             "get_uta_unfilled_strategy_orders" => {
+                params.required("category")?;
                 self.get_private(
                     UTA_UNFILLED_STRATEGY_ORDERS,
-                    params.only(&["category", "type", "symbol", "idLessThan", "limit"]),
+                    params.only(&["category", "type"]),
                 )
                 .await
             }
             "get_uta_history_strategy_orders" => {
+                params.required("category")?;
                 self.get_private(
                     UTA_HISTORY_STRATEGY_ORDERS,
                     params.only(&[
                         "category",
                         "type",
-                        "symbol",
                         "startTime",
                         "endTime",
-                        "idLessThan",
                         "limit",
+                        "cursor",
                     ]),
                 )
                 .await
@@ -304,24 +348,44 @@ impl BitgetClient {
                 self.cancel_futures_batch_orders_from_params(params).await
             }
             "get_futures_order" => {
+                params.required("productType")?;
                 require_one_identifier(params, &["orderId", "clientOid"])?;
                 let mut query = params.only(&["productType", "orderId", "clientOid"]);
                 self.push_required_product_symbol(&mut query, params)?;
                 self.get_private(FUTURES_ORDER_DETAIL, query).await
             }
             "get_futures_open_orders" => {
-                let mut query =
-                    params.only(&["productType", "orderId", "clientOid", "idLessThan", "limit"]);
+                params.required("productType")?;
+                let mut query = params.only(&[
+                    "productType",
+                    "orderId",
+                    "clientOid",
+                    "status",
+                    "idLessThan",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                ]);
                 self.push_product_symbol(&mut query, params)?;
                 self.get_private(FUTURES_PENDING_ORDERS, query).await
             }
             "get_futures_history_orders" => {
-                let mut query =
-                    params.only(&["productType", "startTime", "endTime", "idLessThan", "limit"]);
+                params.required("productType")?;
+                let mut query = params.only(&[
+                    "productType",
+                    "orderId",
+                    "clientOid",
+                    "idLessThan",
+                    "orderSource",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                ]);
                 self.push_product_symbol(&mut query, params)?;
                 self.get_private(FUTURES_HISTORY_ORDERS, query).await
             }
             "get_futures_fills" => {
+                params.required("productType")?;
                 let mut query = params.only(&[
                     "orderId",
                     "productType",
@@ -353,16 +417,8 @@ impl BitgetClient {
         order_type: Option<&str>,
         force: Option<&str>,
     ) -> Result<ValidatedResponse> {
-        let mut body = params.body(&[
-            "side",
-            "orderType",
-            "size",
-            "price",
-            "force",
-            "clientOid",
-            "tpslType",
-            "stpMode",
-        ]);
+        params.required("size")?;
+        let mut body = params.body(SPOT_ORDER_KEYS);
         self.insert_required_product_symbol(&mut body, params)?;
         if let Some(side) = side {
             body.insert("side".to_string(), Value::String(side.to_string()));
@@ -372,6 +428,25 @@ impl BitgetClient {
                 "orderType".to_string(),
                 Value::String(order_type.to_string()),
             );
+        }
+        let effective_order_type =
+            body.get("orderType")
+                .and_then(Value::as_str)
+                .ok_or_else(|| {
+                    crate::DcexError::InvalidInput(
+                        "missing required parameter: orderType".to_string(),
+                    )
+                })?;
+        if effective_order_type != "market" && force.is_none() && params.get("force").is_none() {
+            return Err(crate::DcexError::InvalidInput(
+                "missing required parameter: force".to_string(),
+            ));
+        }
+        if side.is_none() {
+            params.required("side")?;
+        }
+        if order_type.is_none() {
+            params.required("orderType")?;
         }
         if let Some(force) = force {
             body.entry("force".to_string())
@@ -387,7 +462,11 @@ impl BitgetClient {
     ) -> Result<ValidatedResponse> {
         let mut body = params.body(&["batchMode"]);
         self.insert_product_symbol(&mut body, params)?;
-        insert_optional_value(&mut body, "orderList", params.json_optional("orderList")?);
+        insert_optional_value(
+            &mut body,
+            "orderList",
+            Some(params.json_required("orderList")?),
+        );
         self.post_private(SPOT_BATCH_PLACE_ORDER, Value::Object(body))
             .await
     }
@@ -409,7 +488,11 @@ impl BitgetClient {
     ) -> Result<ValidatedResponse> {
         let mut body = params.body(&["batchMode"]);
         self.insert_product_symbol(&mut body, params)?;
-        insert_optional_value(&mut body, "orderList", params.json_optional("orderList")?);
+        insert_optional_value(
+            &mut body,
+            "orderList",
+            Some(params.json_required("orderList")?),
+        );
         self.post_private(SPOT_BATCH_CANCEL_ORDER, Value::Object(body))
             .await
     }
@@ -419,6 +502,10 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
         let mut body = params.body(UTA_ORDER_KEYS);
+        for key in ["category", "side", "orderType", "qty"] {
+            params.required(key)?;
+        }
+        require_uta_symbol(params)?;
         self.insert_uta_symbol(&mut body, params)?;
         self.post_private(UTA_PLACE_ORDER, Value::Object(body))
             .await
@@ -452,6 +539,7 @@ impl BitgetClient {
         force: Option<&str>,
     ) -> Result<ValidatedResponse> {
         let mut body = params.body(FUTURES_ORDER_KEYS);
+        params.required("size")?;
         self.insert_required_product_symbol(&mut body, params)?;
         body.entry("productType".to_string())
             .or_insert_with(|| Value::String("USDT-FUTURES".to_string()));
@@ -468,6 +556,9 @@ impl BitgetClient {
                 Value::String(order_type.to_string()),
             );
         }
+        if side.is_none() {
+            params.required("side")?;
+        }
         if let Some(force) = force {
             body.entry("force".to_string())
                 .or_insert_with(|| Value::String(force.to_string()));
@@ -481,8 +572,15 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
         let mut body = params.body(&["productType", "marginMode", "marginCoin"]);
-        self.insert_product_symbol(&mut body, params)?;
-        insert_optional_value(&mut body, "orderList", params.json_optional("orderList")?);
+        for key in ["productType", "marginMode", "marginCoin"] {
+            params.required(key)?;
+        }
+        self.insert_required_product_symbol(&mut body, params)?;
+        insert_optional_value(
+            &mut body,
+            "orderList",
+            Some(params.json_required("orderList")?),
+        );
         self.post_private(FUTURES_BATCH_PLACE_ORDER, Value::Object(body))
             .await
     }
@@ -492,6 +590,7 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
         require_one_identifier(params, &["orderId", "clientOid"])?;
+        params.required("productType")?;
         let mut body = params.body(&["productType", "marginCoin", "orderId", "clientOid"]);
         self.insert_required_product_symbol(&mut body, params)?;
         self.post_private(FUTURES_CANCEL_ORDER, Value::Object(body))
@@ -503,7 +602,8 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
         let mut body = params.body(&["productType", "marginCoin"]);
-        self.insert_required_product_symbol(&mut body, params)?;
+        params.required("productType")?;
+        self.insert_product_symbol(&mut body, params)?;
         insert_optional_value(
             &mut body,
             "orderIdList",
@@ -512,6 +612,10 @@ impl BitgetClient {
         self.post_private(FUTURES_BATCH_CANCEL_ORDERS, Value::Object(body))
             .await
     }
+}
+
+fn require_uta_symbol(params: &BitgetParams) -> Result<()> {
+    require_one_identifier(params, &["product_symbol", "symbol"])
 }
 
 #[cfg(test)]

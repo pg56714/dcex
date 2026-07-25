@@ -9,9 +9,22 @@ crate::exchanges::impl_exchange_method_wrappers!(
         get_market_statistics(market => "market"),
         get_order_book(market => "market"),
         get_trades(market => "market"),
-        get_candles(market => "market"),
-        get_funding(market => "market"),
-        get_open_interest(market => "market")
+        get_candles(
+            market => "market",
+            interval => "interval",
+            limit => "limit"
+        ),
+        get_funding(
+            market => "market",
+            start_time => "startTime",
+            end_time => "endTime"
+        ),
+        get_open_interest(
+            market => "market",
+            interval => "interval",
+            start_time => "startTime",
+            end_time => "endTime"
+        )
     ];
     private [
         get_account_details(),
@@ -27,7 +40,7 @@ crate::exchanges::impl_exchange_method_wrappers!(
         get_order_by_external_id(external_id => "externalId"),
         get_orders_by_external_id(external_id => "externalId"),
         get_trades_history(),
-        get_funding_payments(),
+        get_funding_payments(start_time => "startTime"),
         get_leverage(),
         get_fees(),
         get_rebates(),

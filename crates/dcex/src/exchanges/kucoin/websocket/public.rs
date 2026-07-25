@@ -173,7 +173,7 @@ impl KucoinPublicWebSocket {
     ) -> Result<String> {
         let futures = matches!(self.market, KucoinMarket::Futures);
         let symbol = normalize_symbol(product_symbol, futures)?;
-        let interval = normalize_interval(interval)?;
+        let interval = normalize_interval(interval, futures)?;
         let topic = if futures {
             format!("/contractMarket/limitCandle:{symbol}_{interval}")
         } else {
@@ -231,17 +231,43 @@ impl KucoinPublicWebSocket {
     }
 }
 
-fn normalize_interval(interval: &str) -> Result<String> {
+fn normalize_interval(interval: &str, futures: bool) -> Result<String> {
     let interval = interval.trim();
-    if interval.is_empty() {
-        return Err(DcexError::InvalidInput(
-            "KuCoin kline interval must not be empty.".to_string(),
-        ));
-    }
-    if !interval
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric())
-    {
+    let supported = if futures {
+        matches!(
+            interval,
+            "1min"
+                | "3min"
+                | "5min"
+                | "15min"
+                | "30min"
+                | "1hour"
+                | "2hour"
+                | "4hour"
+                | "8hour"
+                | "12hour"
+                | "1day"
+                | "1week"
+                | "1month"
+        )
+    } else {
+        matches!(
+            interval,
+            "1min"
+                | "3min"
+                | "15min"
+                | "30min"
+                | "1hour"
+                | "2hour"
+                | "4hour"
+                | "6hour"
+                | "8hour"
+                | "12hour"
+                | "1day"
+                | "1week"
+        )
+    };
+    if !supported {
         return Err(DcexError::InvalidInput(format!(
             "unsupported KuCoin kline interval: {interval}"
         )));
@@ -255,7 +281,13 @@ mod tests {
 
     #[test]
     fn validates_interval() {
-        assert_eq!(normalize_interval("1min").expect("interval"), "1min");
-        assert!(normalize_interval("1 min").is_err());
+        assert_eq!(normalize_interval("1min", false).expect("interval"), "1min");
+        assert!(normalize_interval("5min", false).is_err());
+        assert_eq!(
+            normalize_interval("5min", true).expect("futures interval"),
+            "5min"
+        );
+        assert!(normalize_interval("6hour", true).is_err());
+        assert!(normalize_interval("1 min", false).is_err());
     }
 }

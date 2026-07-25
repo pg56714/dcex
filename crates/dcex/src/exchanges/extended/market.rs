@@ -14,6 +14,7 @@ impl ExtendedClient {
         let params = ExtendedParams::from_pairs(params);
         let response = match method_name {
             "get_markets" => {
+                params.ensure_allowed(&["market", "product_symbol"], &["market"])?;
                 let mut query = params.only(&["market"]);
                 if let Some(product_symbol) = params.get("product_symbol") {
                     query.push(("market".to_string(), self.exchange_symbol(product_symbol)?));
@@ -21,15 +22,20 @@ impl ExtendedClient {
                 self.public_get(MARKETS, query).await
             }
             "get_assets" => {
+                params.ensure_allowed(&["asset", "type", "collateral"], &["asset"])?;
+                params.optional_one_of("type", &["SPOT", "PERPETUAL"])?;
+                params.optional_bool("collateral")?;
                 self.public_get(ASSETS, params.only(&["asset", "type", "collateral"]))
                     .await
             }
             "get_market_stats" | "get_market_statistics" => {
+                self.validate_market_params(&params, &[])?;
                 let market = self.required_market(&params)?;
                 self.public_get(&format!("/api/v1/info/markets/{market}/stats"), Vec::new())
                     .await
             }
             "get_order_book" | "get_orderbook" => {
+                self.validate_market_params(&params, &[])?;
                 let market = self.required_market(&params)?;
                 self.public_get(
                     &format!("/api/v1/info/markets/{market}/orderbook"),
@@ -38,11 +44,17 @@ impl ExtendedClient {
                 .await
             }
             "get_trades" => {
+                self.validate_market_params(&params, &[])?;
                 let market = self.required_market(&params)?;
                 self.public_get(&format!("/api/v1/info/markets/{market}/trades"), Vec::new())
                     .await
             }
             "get_candles" => {
+                self.validate_market_params(
+                    &params,
+                    &["candleType", "candle_type", "interval", "limit", "endTime"],
+                )?;
+                params.ensure_at_most_one(&["candleType", "candle_type"])?;
                 let market = self.required_market(&params)?;
                 let candle_type = params
                     .get("candleType")
@@ -54,6 +66,16 @@ impl ExtendedClient {
                     )));
                 }
                 let interval = params.required("interval")?;
+                if !matches!(
+                    interval,
+                    "PT1M" | "PT5M" | "PT15M" | "PT30M" | "PT1H" | "PT2H" | "PT4H" | "P1D"
+                ) {
+                    return Err(DcexError::InvalidInput(format!(
+                        "unsupported Extended candle interval: {interval}"
+                    )));
+                }
+                params.required_u64_range("limit", 1, 10_000)?;
+                params.u64("endTime")?;
                 let limit = params.required("limit")?;
                 let mut query = vec![
                     ("interval".to_string(), interval.to_string()),
@@ -69,6 +91,12 @@ impl ExtendedClient {
                 .await
             }
             "get_funding" => {
+                self.validate_market_params(&params, &["startTime", "endTime", "cursor", "limit"])?;
+                params.required_u64_range("startTime", 0, u64::MAX)?;
+                params.required_u64_range("endTime", 0, u64::MAX)?;
+                params.ensure_time_order("startTime", "endTime")?;
+                params.optional_u64_range("cursor", 0, u64::MAX)?;
+                params.optional_u64_range("limit", 1, 10_000)?;
                 let market = self.required_market(&params)?;
                 self.public_get(
                     &format!("/api/v1/info/{market}/funding"),
@@ -77,6 +105,15 @@ impl ExtendedClient {
                 .await
             }
             "get_open_interest" => {
+                self.validate_market_params(
+                    &params,
+                    &["interval", "startTime", "endTime", "limit"],
+                )?;
+                params.required_one_of("interval", &["P1H", "P1D"])?;
+                params.required_u64_range("startTime", 0, u64::MAX)?;
+                params.required_u64_range("endTime", 0, u64::MAX)?;
+                params.ensure_time_order("startTime", "endTime")?;
+                params.optional_u64_range("limit", 1, 300)?;
                 let market = self.required_market(&params)?;
                 self.public_get(
                     &format!("/api/v1/info/{market}/open-interests"),
@@ -85,7 +122,8 @@ impl ExtendedClient {
                 .await
             }
             "get_asset_index_price" => {
-                let asset = params.required("asset")?;
+                params.ensure_allowed(&["asset"], &[])?;
+                let asset = params.path_segment("asset")?;
                 self.public_get(&format!("/api/v1/info/assets/{asset}/price"), Vec::new())
                     .await
             }
@@ -100,8 +138,36 @@ impl ExtendedClient {
 
     fn required_market(&self, params: &ExtendedParams) -> Result<String> {
         if let Some(product_symbol) = params.get("product_symbol") {
-            return self.exchange_symbol(product_symbol);
+            let market = self.exchange_symbol(product_symbol)?;
+            validate_market_path(&market)?;
+            return Ok(market);
         }
-        self.exchange_symbol(params.required("market")?)
+        let market = params.required("market")?;
+        let market = self.exchange_symbol(market)?;
+        validate_market_path(&market)?;
+        Ok(market)
     }
+
+    fn validate_market_params(&self, params: &ExtendedParams, extra: &[&str]) -> Result<()> {
+        let mut allowed = vec!["market", "product_symbol"];
+        allowed.extend_from_slice(extra);
+        params.ensure_allowed(&allowed, &[])?;
+        params.ensure_exactly_one(&["market", "product_symbol"])
+    }
+}
+
+fn validate_market_path(market: &str) -> Result<()> {
+    if market.trim().is_empty()
+        || !market.chars().all(|character| {
+            character.is_ascii_alphanumeric()
+                || character == '-'
+                || character == '_'
+                || character == '.'
+        })
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "invalid Extended market path: {market}"
+        )));
+    }
+    Ok(())
 }

@@ -17,8 +17,15 @@ class TradeHTTP(HTTPManager):
         price: str | None = None,
         force: str | None = None,
         clientOid: str | None = None,
+        triggerPrice: str | None = None,
         tpslType: str | None = None,
+        requestTime: int | str | None = None,
+        receiveWindow: int | str | None = None,
         stpMode: str | None = None,
+        presetTakeProfitPrice: str | None = None,
+        executeTakeProfitPrice: str | None = None,
+        presetStopLossPrice: str | None = None,
+        executeStopLossPrice: str | None = None,
     ) -> dict[str, Any]:
         """Place a Bitget spot order."""
         return await self._native_private(
@@ -31,8 +38,15 @@ class TradeHTTP(HTTPManager):
                 price=price,
                 force=force,
                 clientOid=clientOid,
+                triggerPrice=triggerPrice,
                 tpslType=tpslType,
+                requestTime=requestTime,
+                receiveWindow=receiveWindow,
                 stpMode=stpMode,
+                presetTakeProfitPrice=presetTakeProfitPrice,
+                executeTakeProfitPrice=executeTakeProfitPrice,
+                presetStopLossPrice=presetStopLossPrice,
+                executeStopLossPrice=executeStopLossPrice,
             ),
         )
 
@@ -246,11 +260,18 @@ class TradeHTTP(HTTPManager):
         self,
         orderId: str | None = None,
         clientOid: str | None = None,
+        requestTime: int | str | None = None,
+        receiveWindow: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve one Bitget spot order."""
         return await self._native_private(
             "get_spot_order",
-            self._native_params(orderId=orderId, clientOid=clientOid),
+            self._native_params(
+                orderId=orderId,
+                clientOid=clientOid,
+                requestTime=requestTime,
+                receiveWindow=receiveWindow,
+            ),
         )
 
     async def get_spot_open_orders(
@@ -260,6 +281,10 @@ class TradeHTTP(HTTPManager):
         idLessThan: str | None = None,
         startTime: int | str | None = None,
         endTime: int | str | None = None,
+        orderId: str | None = None,
+        tpslType: str | None = None,
+        requestTime: int | str | None = None,
+        receiveWindow: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot open orders."""
         return await self._native_private(
@@ -270,6 +295,10 @@ class TradeHTTP(HTTPManager):
                 idLessThan=idLessThan,
                 startTime=startTime,
                 endTime=endTime,
+                orderId=orderId,
+                tpslType=tpslType,
+                requestTime=requestTime,
+                receiveWindow=receiveWindow,
             ),
         )
 
@@ -280,6 +309,10 @@ class TradeHTTP(HTTPManager):
         idLessThan: str | None = None,
         startTime: int | str | None = None,
         endTime: int | str | None = None,
+        orderId: str | None = None,
+        tpslType: str | None = None,
+        requestTime: int | str | None = None,
+        receiveWindow: int | str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget spot historical orders."""
         return await self._native_private(
@@ -290,6 +323,10 @@ class TradeHTTP(HTTPManager):
                 idLessThan=idLessThan,
                 startTime=startTime,
                 endTime=endTime,
+                orderId=orderId,
+                tpslType=tpslType,
+                requestTime=requestTime,
+                receiveWindow=receiveWindow,
             ),
         )
 
@@ -706,7 +743,7 @@ class TradeHTTP(HTTPManager):
     async def place_futures_batch_orders(
         self,
         orderList: list[dict[str, Any]],
-        product_symbol: str | None = None,
+        product_symbol: str,
         productType: str = "USDT-FUTURES",
         marginMode: str = "crossed",
         marginCoin: str = "USDT",
@@ -745,7 +782,7 @@ class TradeHTTP(HTTPManager):
 
     async def cancel_futures_batch_orders(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         orderIdList: list[dict[str, Any]] | None = None,
         productType: str = "USDT-FUTURES",
         marginCoin: str = "USDT",
@@ -786,6 +823,9 @@ class TradeHTTP(HTTPManager):
         orderId: str | None = None,
         clientOid: str | None = None,
         idLessThan: str | None = None,
+        status: str | None = None,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures open orders."""
@@ -797,6 +837,9 @@ class TradeHTTP(HTTPManager):
                 orderId=orderId,
                 clientOid=clientOid,
                 idLessThan=idLessThan,
+                status=status,
+                startTime=startTime,
+                endTime=endTime,
                 limit=limit,
             ),
         )
@@ -808,6 +851,9 @@ class TradeHTTP(HTTPManager):
         startTime: int | str | None = None,
         endTime: int | str | None = None,
         idLessThan: str | None = None,
+        orderId: str | None = None,
+        clientOid: str | None = None,
+        orderSource: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures historical orders."""
@@ -819,6 +865,9 @@ class TradeHTTP(HTTPManager):
                 startTime=startTime,
                 endTime=endTime,
                 idLessThan=idLessThan,
+                orderId=orderId,
+                clientOid=clientOid,
+                orderSource=orderSource,
                 limit=limit,
             ),
         )
@@ -858,8 +907,8 @@ class TradeHTTP(HTTPManager):
 
     async def modify_uta_strategy_order(
         self,
+        orderId: str,
         qty: str,
-        orderId: str | None = None,
         clientOid: str | None = None,
         **params: object,
     ) -> dict[str, Any]:
@@ -871,7 +920,7 @@ class TradeHTTP(HTTPManager):
 
     async def cancel_uta_strategy_order(
         self,
-        orderId: str | None = None,
+        orderId: str,
         clientOid: str | None = None,
     ) -> dict[str, Any]:
         """Cancel a Bitget UTA strategy order."""
@@ -884,9 +933,6 @@ class TradeHTTP(HTTPManager):
         self,
         category: str,
         type: str | None = None,
-        product_symbol: str | None = None,
-        idLessThan: str | None = None,
-        limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve pending Bitget UTA strategy orders."""
         return await self._native_private(
@@ -894,9 +940,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 category=category,
                 type=type,
-                product_symbol=product_symbol,
-                idLessThan=idLessThan,
-                limit=limit,
             ),
         )
 
@@ -904,11 +947,10 @@ class TradeHTTP(HTTPManager):
         self,
         category: str,
         type: str | None = None,
-        product_symbol: str | None = None,
         startTime: int | str | None = None,
         endTime: int | str | None = None,
-        idLessThan: str | None = None,
         limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve historical Bitget UTA strategy orders."""
         return await self._native_private(
@@ -916,10 +958,9 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 category=category,
                 type=type,
-                product_symbol=product_symbol,
                 startTime=startTime,
                 endTime=endTime,
-                idLessThan=idLessThan,
                 limit=limit,
+                cursor=cursor,
             ),
         )

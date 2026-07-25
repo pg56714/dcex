@@ -8,11 +8,17 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """Async HTTP client for BingX account-related API endpoints backed by Rust."""
 
-    async def get_account_balance(self) -> dict[str, Any]:
-        return await self._native_private("get_account_balance", [])
+    async def get_account_balance(self, recvWindow: int | None = None) -> dict[str, Any]:
+        return await self._native_private(
+            "get_account_balance",
+            self._native_params(recvWindow=recvWindow),
+        )
 
-    async def get_swap_account_balance(self) -> dict[str, Any]:
-        return await self._native_private("get_swap_account_balance", [])
+    async def get_swap_account_balance(self, recvWindow: int | None = None) -> dict[str, Any]:
+        return await self._native_private(
+            "get_swap_account_balance",
+            self._native_params(recvWindow=recvWindow),
+        )
 
     async def get_spot_account_balance(
         self,
@@ -101,6 +107,7 @@ class AccountHTTP(HTTPManager):
         self,
         fromAccount: str | None = None,
         toAccount: str | None = None,
+        transferId: int | str | None = None,
         tranId: int | str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
@@ -113,6 +120,7 @@ class AccountHTTP(HTTPManager):
             self._native_params(
                 fromAccount=fromAccount,
                 toAccount=toAccount,
+                transferId=transferId,
                 tranId=tranId,
                 startTime=startTime,
                 endTime=endTime,
@@ -125,10 +133,11 @@ class AccountHTTP(HTTPManager):
     async def get_open_positions(
         self,
         product_symbol: str | None = None,
+        recvWindow: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "get_open_positions",
-            self._native_params(product_symbol=product_symbol),
+            self._native_params(product_symbol=product_symbol, recvWindow=recvWindow),
         )
 
     async def get_fund_flow(
@@ -138,6 +147,7 @@ class AccountHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
+        recvWindow: int | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             "get_fund_flow",
@@ -147,6 +157,7 @@ class AccountHTTP(HTTPManager):
                 start_time=start_time,
                 end_time=end_time,
                 limit=limit,
+                recvWindow=recvWindow,
             ),
         )
 
@@ -159,5 +170,11 @@ class AccountHTTP(HTTPManager):
     async def keep_alive_listen_key(self, listen_key: str) -> dict[str, Any]:
         return await self._native_private(
             "keep_alive_listen_key",
+            self._native_params(listen_key=listen_key),
+        )
+
+    async def close_listen_key(self, listen_key: str) -> dict[str, Any]:
+        return await self._native_private(
+            "close_listen_key",
             self._native_params(listen_key=listen_key),
         )

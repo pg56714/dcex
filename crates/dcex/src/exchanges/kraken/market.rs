@@ -20,6 +20,7 @@ impl KrakenClient {
             "get_spot_asset_pairs" => (KrakenAuth::Spot, SPOT_ASSET_PAIRS.to_string()),
             "get_spot_spread" => {
                 self.normalize_symbol_query(&mut params, "pair", "")?;
+                require_query_param(&params, "pair")?;
                 (KrakenAuth::Spot, SPOT_SPREAD.to_string())
             }
             "get_spot_ticker" => {
@@ -28,14 +29,17 @@ impl KrakenClient {
             }
             "get_spot_orderbook" => {
                 self.normalize_symbol_query(&mut params, "pair", "")?;
+                require_query_param(&params, "pair")?;
                 (KrakenAuth::Spot, SPOT_ORDERBOOK.to_string())
             }
             "get_spot_public_trades" => {
                 self.normalize_symbol_query(&mut params, "pair", "")?;
+                require_query_param(&params, "pair")?;
                 (KrakenAuth::Spot, SPOT_PUBLIC_TRADES.to_string())
             }
             "get_spot_kline" => {
                 self.normalize_symbol_query(&mut params, "pair", "")?;
+                require_query_param(&params, "pair")?;
                 (KrakenAuth::Spot, SPOT_OHLC.to_string())
             }
             "get_futures_instruments" => (KrakenAuth::Futures, FUTURES_INSTRUMENTS.to_string()),
@@ -45,10 +49,12 @@ impl KrakenClient {
             }
             "get_futures_orderbook" => {
                 self.normalize_symbol_query(&mut params, "symbol", "PF_")?;
+                require_query_param(&params, "symbol")?;
                 (KrakenAuth::Futures, FUTURES_ORDERBOOK.to_string())
             }
             "get_futures_public_trades" => {
                 self.normalize_symbol_query(&mut params, "symbol", "PF_")?;
+                require_query_param(&params, "symbol")?;
                 (KrakenAuth::Futures, FUTURES_PUBLIC_TRADES.to_string())
             }
             "get_futures_kline" => {
@@ -57,6 +63,7 @@ impl KrakenClient {
                 let symbol = self.take_symbol(&mut params, "PF_")?;
                 let resolution = take_param(&mut params, "timeframe")
                     .ok_or_else(|| DcexError::InvalidInput("timeframe is required.".to_string()))?;
+                validate_candle_path(&tick_type, &resolution)?;
                 (
                     KrakenAuth::Futures,
                     format!("{FUTURES_CANDLES}/{tick_type}/{symbol}/{resolution}"),
@@ -68,6 +75,37 @@ impl KrakenClient {
                 )));
             }
         };
+
+        let allowed_params: &[&str] = match method_name {
+            "get_server_time" | "get_spot_system_status" => &[],
+            "get_spot_assets" => &["asset", "aclass", "assetVersion"],
+            "get_spot_asset_pairs" => &[
+                "assetVersion",
+                "pair",
+                "aclass_base",
+                "info",
+                "country_code",
+                "execution_venue",
+            ],
+            "get_spot_spread" => &["pair", "assetVersion", "since", "asset_class"],
+            "get_spot_ticker" => &["pair", "assetVersion", "asset_class"],
+            "get_spot_orderbook" => &["pair", "assetVersion", "count", "asset_class"],
+            "get_spot_public_trades" => &["pair", "assetVersion", "since", "count", "asset_class"],
+            "get_spot_kline" => &["pair", "assetVersion", "interval", "since", "asset_class"],
+            "get_futures_instruments" => &["contractType", "expired"],
+            "get_futures_tickers" => &["contractType", "symbol"],
+            "get_futures_orderbook" => &["symbol"],
+            "get_futures_public_trades" => &["symbol", "lastTime"],
+            "get_futures_kline" => &["from", "from_", "to", "count"],
+            _ => unreachable!("method was validated above"),
+        };
+        params.retain(|(key, _)| allowed_params.contains(&key.as_str()));
+        for (key, _) in &mut params {
+            if key == "from_" {
+                *key = "from".to_string();
+            }
+        }
+        validate_public_params(method_name, &params)?;
 
         self.request(HttpMethod::Get, auth, path, params, None, false)
             .await
@@ -105,4 +143,106 @@ impl KrakenClient {
         }
         Ok(())
     }
+}
+
+fn require_query_param(params: &[(String, String)], key: &str) -> Result<()> {
+    if params.iter().any(|(candidate, _)| candidate == key) {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "missing required parameter: {key}"
+    )))
+}
+
+fn validate_candle_path(tick_type: &str, resolution: &str) -> Result<()> {
+    if !matches!(tick_type, "spot" | "mark" | "trade") {
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported Kraken Futures candle tick type: {tick_type}"
+        )));
+    }
+    if !matches!(
+        resolution,
+        "1m" | "5m" | "15m" | "30m" | "1h" | "4h" | "12h" | "1d" | "1w"
+    ) {
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported Kraken Futures candle resolution: {resolution}"
+        )));
+    }
+    Ok(())
+}
+
+fn validate_public_params(method_name: &str, params: &[(String, String)]) -> Result<()> {
+    validate_optional_values(params, "assetVersion", &["1"])?;
+    match method_name {
+        "get_spot_assets" => {
+            validate_optional_values(params, "aclass", &["currency", "tokenized_asset"])?;
+        }
+        "get_spot_asset_pairs" => {
+            validate_optional_values(params, "aclass_base", &["currency", "tokenized_asset"])?;
+            validate_optional_values(params, "info", &["info", "leverage", "fees", "margin"])?;
+            validate_optional_values(
+                params,
+                "execution_venue",
+                &["international", "bitnomial_exchange"],
+            )?;
+        }
+        "get_spot_ticker" => {
+            validate_optional_values(params, "asset_class", &["forex", "tokenized_asset"])?;
+        }
+        "get_spot_orderbook" => {
+            validate_optional_values(params, "asset_class", &["tokenized_asset"])?;
+            validate_optional_range(params, "count", 1, 500)?;
+        }
+        "get_spot_public_trades" => {
+            validate_optional_values(params, "asset_class", &["tokenized_asset"])?;
+            validate_optional_range(params, "count", 1, 1_000)?;
+        }
+        "get_spot_kline" => {
+            validate_optional_values(params, "asset_class", &["tokenized_asset"])?;
+            validate_optional_values(
+                params,
+                "interval",
+                &["1", "5", "15", "30", "60", "240", "1440", "10080", "21600"],
+            )?;
+        }
+        "get_spot_spread" => {
+            validate_optional_values(params, "asset_class", &["tokenized_asset"])?;
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+fn validate_optional_values(
+    params: &[(String, String)],
+    key: &str,
+    allowed: &[&str],
+) -> Result<()> {
+    for (_, value) in params.iter().filter(|(candidate, _)| candidate == key) {
+        if !allowed.contains(&value.as_str()) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported Kraken {key}: {value}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn validate_optional_range(
+    params: &[(String, String)],
+    key: &str,
+    minimum: u32,
+    maximum: u32,
+) -> Result<()> {
+    for (_, value) in params.iter().filter(|(candidate, _)| candidate == key) {
+        let value = value.parse::<u32>().map_err(|_| {
+            DcexError::InvalidInput(format!("Kraken {key} must be an integer: {value}"))
+        })?;
+        if !(minimum..=maximum).contains(&value) {
+            return Err(DcexError::InvalidInput(format!(
+                "Kraken {key} must be between {minimum} and {maximum}."
+            )));
+        }
+    }
+    Ok(())
 }

@@ -83,7 +83,7 @@ async def _futures_balance(client: Client, asset: str) -> Decimal:
 
 
 async def _market_info(client: Client) -> tuple[Decimal, Decimal, Decimal, Decimal]:
-    response = await client.get_spot_exchange_info(SPOT_SYMBOL)
+    response = await client.get_spot_exchange_info()
     assert isinstance(response, dict)
     market = next(
         item

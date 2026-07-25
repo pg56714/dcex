@@ -115,6 +115,11 @@ class HTTPManager(BaseHTTPManager):
             enum_value = getattr(value, "value", None)
             if enum_value is not None:
                 value = enum_value
+            if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
+                for item in value:
+                    item_value = getattr(item, "value", item)
+                    params.append((key, _format_value(item_value)))
+                continue
             params.append((key, _format_value(value)))
         return params
 

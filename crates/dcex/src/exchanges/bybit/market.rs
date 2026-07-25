@@ -39,7 +39,11 @@ impl BybitClient {
                 ORDER_PRICE_LIMIT,
                 self.normalize_symbol_params(params, true)?,
             ),
-            "get_adl_alert" => (ADL_ALERT, self.normalize_symbol_params(params, true)?),
+            "get_adl_alert" => {
+                let mut params = self.normalize_symbol_params(params, false)?;
+                params.retain(|(key, _)| key != "category");
+                (ADL_ALERT, params)
+            }
             "get_risk_limit" => (RISK_LIMIT, self.normalize_symbol_params(params, false)?),
             _ => {
                 return Err(DcexError::InvalidInput(format!(
@@ -101,10 +105,41 @@ impl BybitClient {
                     Ok((key, bybit_timeframe(&value)?.to_string()))
                 } else if key == "startTime" {
                     Ok(("start".to_string(), value))
+                } else if key == "endTime" {
+                    Ok(("end".to_string(), value))
                 } else {
                     Ok((key, value))
                 }
             })
             .collect()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+
+    fn client() -> BybitClient {
+        BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client")
+    }
+
+    #[test]
+    fn kline_maps_official_start_and_end_names() {
+        let params = client()
+            .normalize_kline_params(vec![
+                ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                ("interval".to_string(), "1m".to_string()),
+                ("startTime".to_string(), "100".to_string()),
+                ("endTime".to_string(), "200".to_string()),
+            ])
+            .expect("params");
+
+        assert!(params.contains(&("start".to_string(), "100".to_string())));
+        assert!(params.contains(&("end".to_string(), "200".to_string())));
+        assert!(!params
+            .iter()
+            .any(|(key, _)| key == "startTime" || key == "endTime"));
     }
 }

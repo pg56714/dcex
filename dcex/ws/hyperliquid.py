@@ -4,6 +4,8 @@ import json
 from typing import Any
 
 from .._native_http import load_native
+from ..product_table.manager import ProductTableManager
+from ..utils.common import Common
 from ._base import AsyncWebSocketMixin
 
 _native = load_native()
@@ -21,6 +23,7 @@ class PublicClient(AsyncWebSocketMixin):
         testnet: bool = False,
         timeout: float = 10.0,
         base_url: str | None = None,
+        preload_product_table: bool = False,
     ) -> None:
         """Create a Hyperliquid public WebSocket client."""
         self._native_client = _native.HyperliquidPublicWebSocketClient(
@@ -28,6 +31,9 @@ class PublicClient(AsyncWebSocketMixin):
             timeout=timeout,
             base_url=base_url,
         )
+        if preload_product_table:
+            table = ProductTableManager.get_instance(Common.HYPERLIQUID)
+            self._native_client.set_product_table(table._native_table)
 
     async def connect(self) -> None:
         """Open the WebSocket connection."""
@@ -210,9 +216,15 @@ def public(
     testnet: bool = False,
     timeout: float = 10.0,
     base_url: str | None = None,
+    preload_product_table: bool = False,
 ) -> PublicClient:
     """Create an async Hyperliquid public market WebSocket client."""
-    return PublicClient(testnet=testnet, timeout=timeout, base_url=base_url)
+    return PublicClient(
+        testnet=testnet,
+        timeout=timeout,
+        base_url=base_url,
+        preload_product_table=preload_product_table,
+    )
 
 
 def private(

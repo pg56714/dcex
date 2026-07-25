@@ -27,16 +27,32 @@ pub struct BingxPublicWebSocket {
 
 impl BingxPublicWebSocket {
     pub fn new(timeout: Duration) -> Result<Self> {
-        Self::with_url(SPOT_WS_URL.to_string(), timeout)
+        Self::with_spot_url(SPOT_WS_URL.to_string(), timeout)
     }
 
     pub fn new_swap(timeout: Duration) -> Result<Self> {
-        Self::with_url(SWAP_WS_URL.to_string(), timeout)
+        Self::with_swap_url(SWAP_WS_URL.to_string(), timeout)
     }
 
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
         let url = url.into();
         let market = market_for_url(&url);
+        Self::with_url_and_market(url, timeout, market)
+    }
+
+    pub fn with_spot_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
+        Self::with_url_and_market(url.into(), timeout, BingxPublicMarket::Spot)
+    }
+
+    pub fn with_swap_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
+        Self::with_url_and_market(url.into(), timeout, BingxPublicMarket::Swap)
+    }
+
+    fn with_url_and_market(
+        url: String,
+        timeout: Duration,
+        market: BingxPublicMarket,
+    ) -> Result<Self> {
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             next_request_id: 1,
@@ -92,6 +108,12 @@ impl BingxPublicWebSocket {
             BingxPublicMarket::Spot => self.subscribe(&format!("{symbol}@depth{depth}")).await,
             BingxPublicMarket::Swap => {
                 let speed = normalize_orderbook_speed(speed)?;
+                if speed == "200ms" && !matches!(symbol.as_str(), "BTC-USDT" | "ETH-USDT") {
+                    return Err(DcexError::InvalidInput(
+                        "BingX 200ms swap depth is only available for BTC-USDT and ETH-USDT"
+                            .to_string(),
+                    ));
+                }
                 self.subscribe(&format!("{symbol}@depth{depth}@{speed}"))
                     .await
             }
@@ -208,10 +230,19 @@ fn normalize_interval(interval: &str, market: BingxPublicMarket) -> Result<Strin
         (BingxPublicMarket::Spot, "30m") => "30min".to_string(),
         _ => interval.to_string(),
     };
-    if !normalized
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric())
-    {
+    let supported = match market {
+        BingxPublicMarket::Spot => [
+            "1min", "3min", "5min", "15min", "30min", "1h", "2h", "4h", "6h", "8h", "12h", "1d",
+            "3d", "1w", "1M",
+        ]
+        .contains(&normalized.as_str()),
+        BingxPublicMarket::Swap => [
+            "1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "8h", "12h", "1d", "3d", "1w",
+            "1M",
+        ]
+        .contains(&normalized.as_str()),
+    };
+    if !supported {
         return Err(DcexError::InvalidInput(format!(
             "unsupported BingX kline interval: {interval}"
         )));
@@ -226,33 +257,44 @@ fn normalize_product_symbol(product_symbol: &str) -> Result<(String, Option<Bing
             "BingX WebSocket symbol must not be empty.".to_string(),
         ));
     }
-    if product_symbol.contains('-') {
-        let parts = product_symbol.split('-').collect::<Vec<_>>();
-        if parts.len() >= 2 && !parts[0].is_empty() && !parts[1].is_empty() {
-            let market = match parts.get(2).map(|value| value.to_ascii_uppercase()) {
-                Some(kind) if kind == "SPOT" => Some(BingxPublicMarket::Spot),
-                Some(kind) if kind == "SWAP" => Some(BingxPublicMarket::Swap),
-                _ => None,
-            };
-            return Ok((
-                format!(
-                    "{}-{}",
-                    parts[0].to_ascii_uppercase(),
-                    parts[1].to_ascii_uppercase()
-                ),
-                market,
-            ));
+    let parts = product_symbol.split('-').collect::<Vec<_>>();
+    let market = match parts.as_slice() {
+        [base, quote] if !base.is_empty() && !quote.is_empty() => None,
+        [base, quote, kind]
+            if !base.is_empty() && !quote.is_empty() && kind.eq_ignore_ascii_case("SPOT") =>
+        {
+            Some(BingxPublicMarket::Spot)
         }
-    }
-    if !product_symbol
+        [base, quote, kind]
+            if !base.is_empty() && !quote.is_empty() && kind.eq_ignore_ascii_case("SWAP") =>
+        {
+            Some(BingxPublicMarket::Swap)
+        }
+        _ => {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported BingX WebSocket symbol: {product_symbol}"
+            )));
+        }
+    };
+    if !parts[0]
         .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '-')
+        .all(|character| character.is_ascii_alphanumeric())
+        || !parts[1]
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric())
     {
         return Err(DcexError::InvalidInput(format!(
             "unsupported BingX WebSocket symbol: {product_symbol}"
         )));
     }
-    Ok((product_symbol.to_ascii_uppercase(), None))
+    Ok((
+        format!(
+            "{}-{}",
+            parts[0].to_ascii_uppercase(),
+            parts[1].to_ascii_uppercase()
+        ),
+        market,
+    ))
 }
 
 fn market_for_url(url: &str) -> BingxPublicMarket {
@@ -265,6 +307,8 @@ fn market_for_url(url: &str) -> BingxPublicMarket {
 
 #[cfg(test)]
 mod tests {
+    use crate::http::block_on;
+
     use super::*;
 
     #[test]
@@ -283,9 +327,30 @@ mod tests {
             "1m"
         );
         assert!(normalize_interval("1 m", BingxPublicMarket::Spot).is_err());
+        assert!(normalize_interval("2m", BingxPublicMarket::Swap).is_err());
+        assert!(normalize_product_symbol("BTCUSDT").is_err());
         assert_eq!(
             normalize_product_symbol("BTC-USDT-SWAP").expect("symbol"),
             ("BTC-USDT".to_string(), Some(BingxPublicMarket::Swap))
+        );
+    }
+
+    #[test]
+    fn explicit_swap_market_survives_custom_url() {
+        let mut websocket = BingxPublicWebSocket::with_swap_url(
+            "wss://proxy.example.test/ws",
+            Duration::from_secs(1),
+        )
+        .expect("client");
+        let error = block_on(async move {
+            websocket
+                .subscribe_orderbook("SOL-USDT-SWAP", 20, "200ms")
+                .await
+        })
+        .expect_err("SOL swap should reject the BTC/ETH-only 200ms speed");
+        assert_eq!(
+            error.to_string(),
+            "BingX 200ms swap depth is only available for BTC-USDT and ETH-USDT"
         );
     }
 }

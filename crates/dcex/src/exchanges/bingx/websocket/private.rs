@@ -13,7 +13,14 @@ use super::{
     normalize_data_type, validate_credential,
 };
 
-const WS_URL: &str = "wss://open-api-ws.bingx.com/market";
+const SPOT_WS_URL: &str = "wss://open-api-ws.bingx.com/market";
+const SWAP_WS_URL: &str = "wss://open-api-swap.bingx.com/swap-market";
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum BingxPrivateMarket {
+    Spot,
+    Swap,
+}
 
 pub struct BingxPrivateWebSocket {
     http_client: BingxClient,
@@ -22,16 +29,27 @@ pub struct BingxPrivateWebSocket {
     connection: Option<WebSocketConnection>,
     listen_key: Option<String>,
     next_request_id: u64,
+    market: BingxPrivateMarket,
 }
 
 impl BingxPrivateWebSocket {
     pub fn new(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
-        Self::with_urls(
+        Self::with_spot_urls(
             api_key,
             api_secret,
             timeout,
             BASE_URL.to_string(),
-            WS_URL.to_string(),
+            SPOT_WS_URL.to_string(),
+        )
+    }
+
+    pub fn new_swap(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
+        Self::with_swap_urls(
+            api_key,
+            api_secret,
+            timeout,
+            BASE_URL.to_string(),
+            SWAP_WS_URL.to_string(),
         )
     }
 
@@ -42,17 +60,72 @@ impl BingxPrivateWebSocket {
         http_base_url: String,
         websocket_base_url: String,
     ) -> Result<Self> {
+        let market = market_for_url(&websocket_base_url);
+        Self::with_urls_and_market(
+            api_key,
+            api_secret,
+            timeout,
+            http_base_url,
+            websocket_base_url,
+            market,
+        )
+    }
+
+    pub fn with_spot_urls(
+        api_key: String,
+        api_secret: String,
+        timeout: Duration,
+        http_base_url: String,
+        websocket_base_url: String,
+    ) -> Result<Self> {
+        Self::with_urls_and_market(
+            api_key,
+            api_secret,
+            timeout,
+            http_base_url,
+            websocket_base_url,
+            BingxPrivateMarket::Spot,
+        )
+    }
+
+    pub fn with_swap_urls(
+        api_key: String,
+        api_secret: String,
+        timeout: Duration,
+        http_base_url: String,
+        websocket_base_url: String,
+    ) -> Result<Self> {
+        Self::with_urls_and_market(
+            api_key,
+            api_secret,
+            timeout,
+            http_base_url,
+            websocket_base_url,
+            BingxPrivateMarket::Swap,
+        )
+    }
+
+    fn with_urls_and_market(
+        api_key: String,
+        api_secret: String,
+        timeout: Duration,
+        http_base_url: String,
+        websocket_base_url: String,
+        market: BingxPrivateMarket,
+    ) -> Result<Self> {
         validate_credential("BingX API key", &api_key)?;
         validate_credential("BingX API secret", &api_secret)?;
         let http_client =
             BingxClient::with_base_url(Some(api_key), Some(api_secret), timeout, http_base_url)?;
+        let websocket_base_url = normalize_base_url(&websocket_base_url)?;
         Ok(Self {
             http_client,
-            websocket_base_url: normalize_base_url(&websocket_base_url)?,
+            websocket_base_url,
             timeout,
             connection: None,
             listen_key: None,
             next_request_id: 1,
+            market,
         })
     }
 
@@ -141,10 +214,12 @@ impl BingxPrivateWebSocket {
     }
 
     pub async fn subscribe(&mut self, data_type: &str) -> Result<String> {
+        self.ensure_spot_subscription()?;
         self.send_subscription("sub", data_type).await
     }
 
     pub async fn unsubscribe(&mut self, data_type: &str) -> Result<String> {
+        self.ensure_spot_subscription()?;
         self.send_subscription("unsub", data_type).await
     }
 
@@ -210,6 +285,16 @@ impl BingxPrivateWebSocket {
         self.next_request_id = self.next_request_id.saturating_add(1).max(1);
         format!("dcex-{id}")
     }
+
+    fn ensure_spot_subscription(&self) -> Result<()> {
+        if self.market == BingxPrivateMarket::Spot {
+            return Ok(());
+        }
+        Err(DcexError::InvalidInput(
+            "BingX swap private streams are pushed automatically and do not accept subscriptions"
+                .to_string(),
+        ))
+    }
 }
 
 fn extract_listen_key(response: &ValidatedResponse) -> Result<String> {
@@ -264,11 +349,21 @@ fn validate_listen_key(listen_key: &str) -> Result<String> {
     Ok(listen_key.to_string())
 }
 
+fn market_for_url(url: &str) -> BingxPrivateMarket {
+    if url.contains("swap-market") {
+        BingxPrivateMarket::Swap
+    } else {
+        BingxPrivateMarket::Spot
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeMap;
 
     use serde_json::json;
+
+    use crate::http::block_on;
 
     use super::*;
 
@@ -300,5 +395,29 @@ mod tests {
     fn rejects_invalid_listen_key() {
         assert!(validate_listen_key("").is_err());
         assert!(validate_listen_key("bad/key").is_err());
+    }
+
+    #[test]
+    fn identifies_private_market_from_url() {
+        assert_eq!(market_for_url(SPOT_WS_URL), BingxPrivateMarket::Spot);
+        assert_eq!(market_for_url(SWAP_WS_URL), BingxPrivateMarket::Swap);
+    }
+
+    #[test]
+    fn explicit_swap_market_survives_custom_url() {
+        let mut websocket = BingxPrivateWebSocket::with_swap_urls(
+            "api-key".to_string(),
+            "api-secret".to_string(),
+            Duration::from_secs(1),
+            "https://proxy.example.test".to_string(),
+            "wss://proxy.example.test/ws".to_string(),
+        )
+        .expect("client");
+        let error = block_on(async move { websocket.subscribe_orders().await })
+            .expect_err("swap account streams must reject explicit subscriptions");
+        assert_eq!(
+            error.to_string(),
+            "BingX swap private streams are pushed automatically and do not accept subscriptions"
+        );
     }
 }

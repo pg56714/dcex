@@ -1,9 +1,11 @@
+use std::sync::Arc;
 use std::time::Duration;
 
 use serde_json::Value;
 
+use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
-use crate::Result;
+use crate::{DcexError, Result};
 
 use super::{
     all_mids_subscription, candle_subscription, coin_subscription, l2_book_subscription,
@@ -12,6 +14,7 @@ use super::{
 
 pub struct HyperliquidPublicWebSocket {
     connection: WebSocketConnection,
+    product_table: Option<Arc<ProductTable>>,
 }
 
 impl HyperliquidPublicWebSocket {
@@ -22,7 +25,12 @@ impl HyperliquidPublicWebSocket {
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
+            product_table: None,
         })
+    }
+
+    pub fn set_product_table(&mut self, product_table: ProductTable) {
+        self.product_table = Some(Arc::new(product_table));
     }
 
     pub fn is_connected(&self) -> bool {
@@ -56,7 +64,7 @@ impl HyperliquidPublicWebSocket {
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe(coin_subscription("trades", product_symbol.to_string())?)
+        self.subscribe(coin_subscription("trades", self.coin(product_symbol)?)?)
             .await
     }
 
@@ -108,7 +116,7 @@ impl HyperliquidPublicWebSocket {
         mantissa: Option<u64>,
     ) -> Result<()> {
         self.subscribe(l2_book_subscription(
-            product_symbol.to_string(),
+            self.coin(product_symbol)?,
             n_sig_figs,
             mantissa,
         )?)
@@ -116,19 +124,19 @@ impl HyperliquidPublicWebSocket {
     }
 
     pub async fn subscribe_bbo(&mut self, product_symbol: &str) -> Result<()> {
-        self.subscribe(coin_subscription("bbo", product_symbol.to_string())?)
+        self.subscribe(coin_subscription("bbo", self.coin(product_symbol)?)?)
             .await
     }
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, interval: &str) -> Result<()> {
-        self.subscribe(candle_subscription(product_symbol.to_string(), interval)?)
+        self.subscribe(candle_subscription(self.coin(product_symbol)?, interval)?)
             .await
     }
 
     pub async fn subscribe_active_asset_ctx(&mut self, product_symbol: &str) -> Result<()> {
         self.subscribe(coin_subscription(
             "activeAssetCtx",
-            product_symbol.to_string(),
+            self.coin(product_symbol)?,
         )?)
         .await
     }
@@ -139,5 +147,27 @@ impl HyperliquidPublicWebSocket {
 
     pub async fn recv_bytes(&mut self) -> Result<Vec<u8>> {
         self.connection.recv_bytes().await
+    }
+
+    fn coin(&self, product_symbol: &str) -> Result<String> {
+        if super::is_canonical_product_symbol(product_symbol) {
+            if let Some(table) = &self.product_table {
+                let exchange_symbol = table.get_exchange_symbol("hyperliquid", product_symbol)?;
+                let value: Value = serde_json::from_str(&exchange_symbol).map_err(|error| {
+                    DcexError::InvalidInput(format!("invalid Hyperliquid exchange symbol: {error}"))
+                })?;
+                return value
+                    .as_array()
+                    .and_then(|values| values.first())
+                    .and_then(Value::as_str)
+                    .map(str::to_string)
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput(
+                            "Hyperliquid exchange symbol must contain a coin".to_string(),
+                        )
+                    });
+            }
+        }
+        Ok(product_symbol.to_string())
     }
 }

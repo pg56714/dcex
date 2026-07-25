@@ -78,11 +78,15 @@ impl BybitClient {
         ];
         if let Some(product_symbol) = params.get("product_symbol") {
             self.push_symbol_category(&mut query, product_symbol, true)?;
-        } else if let Some(settle_coin) = params.get("settleCoin") {
-            query.push(("settleCoin".to_string(), settle_coin.to_string()));
-        } else if category.eq_ignore_ascii_case("linear") {
-            query.push(("settleCoin".to_string(), "USDT".to_string()));
+        } else {
+            push_optional(&mut query, "baseCoin", params.get("baseCoin"));
+            if let Some(settle_coin) = params.get("settleCoin") {
+                query.push(("settleCoin".to_string(), settle_coin.to_string()));
+            } else if category.eq_ignore_ascii_case("linear") && params.get("baseCoin").is_none() {
+                query.push(("settleCoin".to_string(), "USDT".to_string()));
+            }
         }
+        push_optional(&mut query, "cursor", params.get("cursor"));
         Ok(query)
     }
 
@@ -101,6 +105,8 @@ impl BybitClient {
             self.push_symbol_category(&mut query, product_symbol, true)?;
         }
         push_optional(&mut query, "startTime", params.get("startTime"));
+        push_optional(&mut query, "endTime", params.get("endTime"));
+        push_optional(&mut query, "cursor", params.get("cursor"));
         self.get_request(GET_CLOSED_PNL, query).await
     }
 }

@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -17,6 +18,7 @@ pub struct BinancePublicWebSocket {
     connection: WebSocketConnection,
     next_request_id: u64,
     product_table: Option<Arc<ProductTable>>,
+    subscriptions: HashSet<String>,
 }
 
 impl BinancePublicWebSocket {
@@ -29,6 +31,7 @@ impl BinancePublicWebSocket {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             next_request_id: 1,
             product_table: None,
+            subscriptions: HashSet::new(),
         })
     }
 
@@ -46,7 +49,9 @@ impl BinancePublicWebSocket {
     }
 
     pub async fn connect(&mut self) -> Result<()> {
-        self.connection.connect().await
+        self.connection.connect().await?;
+        self.subscriptions.clear();
+        Ok(())
     }
 
     pub async fn close(&mut self) -> Result<()> {
@@ -120,9 +125,26 @@ impl BinancePublicWebSocket {
                 "at least one stream is required.".to_string(),
             ));
         }
+        let streams = normalize_streams(streams)?;
+        if method == "SUBSCRIBE" {
+            let mut subscriptions = self.subscriptions.clone();
+            subscriptions.extend(streams.iter().cloned());
+            if subscriptions.len() > 1_024 {
+                return Err(DcexError::InvalidInput(
+                    "Binance Spot WebSocket connections support at most 1024 streams.".to_string(),
+                ));
+            }
+        }
         let id = self.next_id();
-        let payload = subscription_payload(method, streams, id)?;
+        let payload = subscription_payload(method, &streams, id)?;
         self.connection.send_json(&payload).await?;
+        if method == "SUBSCRIBE" {
+            self.subscriptions.extend(streams);
+        } else {
+            for stream in streams {
+                self.subscriptions.remove(&stream);
+            }
+        }
         Ok(id)
     }
 
@@ -133,7 +155,7 @@ impl BinancePublicWebSocket {
     }
 }
 
-fn subscription_payload(method: &str, streams: Vec<String>, id: u64) -> Result<Value> {
+fn subscription_payload(method: &str, streams: &[String], id: u64) -> Result<Value> {
     let method = match method {
         "SUBSCRIBE" | "UNSUBSCRIBE" => method,
         _ => {
@@ -142,7 +164,15 @@ fn subscription_payload(method: &str, streams: Vec<String>, id: u64) -> Result<V
             )));
         }
     };
-    let normalized_streams = streams
+    Ok(json!({
+        "method": method,
+        "params": streams,
+        "id": id,
+    }))
+}
+
+fn normalize_streams(streams: Vec<String>) -> Result<Vec<String>> {
+    streams
         .into_iter()
         .map(|stream| {
             let stream = stream.trim();
@@ -153,12 +183,7 @@ fn subscription_payload(method: &str, streams: Vec<String>, id: u64) -> Result<V
             }
             Ok(stream.to_string())
         })
-        .collect::<Result<Vec<_>>>()?;
-    Ok(json!({
-        "method": method,
-        "params": normalized_streams,
-        "id": id,
-    }))
+        .collect()
 }
 
 fn normalize_stream_symbol(symbol: &str) -> Result<String> {
@@ -224,8 +249,8 @@ mod tests {
 
     #[test]
     fn builds_subscription_payload() {
-        let payload = subscription_payload("SUBSCRIBE", vec!["btcusdt@aggTrade".to_string()], 7)
-            .expect("json");
+        let streams = vec!["btcusdt@aggTrade".to_string()];
+        let payload = subscription_payload("SUBSCRIBE", &streams, 7).expect("json");
         assert_eq!(payload["method"], "SUBSCRIBE");
         assert_eq!(payload["params"][0], "btcusdt@aggTrade");
         assert_eq!(payload["id"], 7);
@@ -235,5 +260,15 @@ mod tests {
     fn rejects_invalid_stream_symbol() {
         let client = BinancePublicWebSocket::new(Duration::from_secs(1)).expect("client");
         assert!(client.stream_symbol("BTC/USDT").is_err());
+    }
+
+    #[tokio::test]
+    async fn rejects_more_than_1024_streams_before_transport() {
+        let mut client = BinancePublicWebSocket::new(Duration::from_secs(1)).expect("client");
+        client.subscriptions = (0..1_024).map(|index| format!("stream{index}")).collect();
+        assert!(client
+            .subscribe(vec!["stream1024".to_string()])
+            .await
+            .is_err());
     }
 }

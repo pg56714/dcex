@@ -141,6 +141,10 @@ impl ExactDecimal {
         self.numerator < BigInt::zero()
     }
 
+    fn is_greater_than_one(&self) -> bool {
+        self.numerator > pow10(self.scale)
+    }
+
     fn add(&self, other: &Self) -> Self {
         let scale = self.scale.max(other.scale);
         let left = &self.numerator * pow10(scale - self.scale);
@@ -277,7 +281,7 @@ pub(super) fn build_signed_order(
     domain: StarknetDomain,
 ) -> Result<ExtendedSignedOrder> {
     let spec = ExtendedOrderSpec::from_params(params, market.name)?;
-    spec.validate()?;
+    spec.validate(domain)?;
 
     let private_key = parse_felt_hex(&credentials.stark_private_key, "stark_private_key")?;
     let public_key = parse_felt_hex(&credentials.stark_public_key, "stark_public_key")?;
@@ -481,7 +485,7 @@ impl ExtendedOrderSpec {
         })
     }
 
-    fn validate(&self) -> Result<()> {
+    fn validate(&self, domain: StarknetDomain) -> Result<()> {
         if self.order_type != "LIMIT" {
             return Err(DcexError::InvalidInput(
                 "Extended automatic order signing currently supports LIMIT orders only".to_string(),
@@ -492,14 +496,23 @@ impl ExtendedOrderSpec {
                 "Extended qty must be positive".to_string(),
             ));
         }
-        if self.price.is_negative() {
+        if !self.price.is_positive() {
             return Err(DcexError::InvalidInput(
-                "Extended price must be non-negative".to_string(),
+                "Extended price must be positive".to_string(),
             ));
         }
-        if self.taker_fee.is_negative() {
+        if self.taker_fee.is_negative() || self.taker_fee.is_greater_than_one() {
             return Err(DcexError::InvalidInput(
-                "Extended fee must be non-negative".to_string(),
+                "Extended fee must be between zero and one".to_string(),
+            ));
+        }
+        if self
+            .builder_fee
+            .as_ref()
+            .is_some_and(|fee| fee.is_negative() || fee.is_greater_than_one())
+        {
+            return Err(DcexError::InvalidInput(
+                "Extended builder_fee must be between zero and one".to_string(),
             ));
         }
         if self.builder_fee.is_some() != self.builder_id.is_some() {
@@ -522,6 +535,23 @@ impl ExtendedOrderSpec {
                 self.self_trade_protection_level
             )));
         }
+        if !(1..=(1u64 << 31)).contains(&self.nonce) {
+            return Err(DcexError::InvalidInput(
+                "Extended nonce must be between 1 and 2147483648".to_string(),
+            ));
+        }
+        let now = now_ms()?;
+        let max_lifetime_ms = if domain.chain_id == "SN_SEPOLIA" {
+            28 * 24 * 60 * 60 * 1_000
+        } else {
+            90 * 24 * 60 * 60 * 1_000
+        };
+        if self.expiry_epoch_millis <= now || self.expiry_epoch_millis - now > max_lifetime_ms {
+            return Err(DcexError::InvalidInput(format!(
+                "Extended expiry_epoch_millis must be in the future and no more than {} days away",
+                max_lifetime_ms / (24 * 60 * 60 * 1_000)
+            )));
+        }
         Ok(())
     }
 }
@@ -536,7 +566,8 @@ fn now_ms() -> Result<u64> {
 fn random_nonce() -> Result<u64> {
     let mut bytes = [0u8; 4];
     getrandom::getrandom(&mut bytes).map_err(|error| DcexError::Runtime(error.to_string()))?;
-    Ok(u32::from_be_bytes(bytes).into())
+    let nonce = u32::from_be_bytes(bytes) & 0x7fff_ffff;
+    Ok(u64::from(nonce.max(1)))
 }
 
 fn parse_bool(value: &str) -> Result<bool> {
@@ -555,7 +586,7 @@ fn parse_u64(value: &str, field: &str) -> Result<u64> {
         .map_err(|error| DcexError::InvalidInput(format!("invalid {field}: {error}")))
 }
 
-fn parse_felt_hex(value: &str, field: &str) -> Result<Felt> {
+pub(super) fn parse_felt_hex(value: &str, field: &str) -> Result<Felt> {
     Felt::from_hex(value)
         .map_err(|error| DcexError::InvalidInput(format!("invalid {field}: {error}")))
 }
@@ -798,7 +829,7 @@ mod tests {
             ("post_only".to_string(), "true".to_string()),
             (
                 "expiry_epoch_millis".to_string(),
-                "1800000000000".to_string(),
+                (now_ms().unwrap() + DEFAULT_ORDER_LIFETIME_MS).to_string(),
             ),
             ("nonce".to_string(), "123456".to_string()),
         ]);
@@ -843,7 +874,7 @@ mod tests {
         ]);
 
         let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
-        assert!(spec.validate().is_err());
+        assert!(spec.validate(StarknetDomain::mainnet()).is_err());
     }
 
     #[test]
@@ -857,6 +888,6 @@ mod tests {
         ]);
 
         let spec = ExtendedOrderSpec::from_params(&params, "BTC-USD".to_string()).unwrap();
-        assert!(spec.validate().is_err());
+        assert!(spec.validate(StarknetDomain::mainnet()).is_err());
     }
 }

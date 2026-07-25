@@ -6,6 +6,7 @@ use crate::exchange::ValidatedResponse;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
+use super::super::client::validate_wallet_address;
 use super::super::{AsterClient, AsterMarket};
 
 const FUTURES_PRIVATE_WS_BASE_URL: &str = "wss://fstream.asterdex.com";
@@ -51,10 +52,16 @@ impl AsterPrivateWebSocket {
         futures_http_base_url: String,
         websocket_base_url: String,
     ) -> Result<Self> {
-        validate_credential("Aster signer address", &signer_address)?;
+        validate_wallet_address("signer_address", &signer_address)?;
         validate_credential("Aster private key", &private_key)?;
         if market == AsterMarket::Futures {
-            validate_optional_credential("Aster user address", user_address.as_deref())?;
+            let user_address = user_address.as_deref().ok_or_else(|| {
+                DcexError::InvalidInput(
+                    "Aster user address is required for futures private WebSocket streams."
+                        .to_string(),
+                )
+            })?;
+            validate_wallet_address("user_address", user_address)?;
         }
         let http_client = AsterClient::with_base_urls(
             user_address,
@@ -224,15 +231,6 @@ fn validate_credential(label: &str, value: &str) -> Result<()> {
         )));
     }
     Ok(())
-}
-
-fn validate_optional_credential(label: &str, value: Option<&str>) -> Result<()> {
-    match value {
-        Some(value) => validate_credential(label, value),
-        None => Err(DcexError::InvalidInput(format!(
-            "{label} is required for Aster futures private WebSocket streams."
-        ))),
-    }
 }
 
 fn validate_listen_key(listen_key: &str) -> Result<String> {

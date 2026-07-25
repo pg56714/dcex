@@ -139,7 +139,7 @@ class AccountHTTP(HTTPManager):
         self,
         account_index: int | None = None,
         cursor: str | None = None,
-        type_: str | None = None,
+        type_: str | list[str] | tuple[str, ...] | None = None,
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter transfer history."""

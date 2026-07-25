@@ -41,16 +41,14 @@ class MarketHTTP(HTTPManager):
     def get_spot_exchange_info(
         self,
         product_symbol: str | None = None,
-        status: str | int | None = None,
-        tradeSideType: int | None = None,
+        symbols: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Spot exchange information."""
         return self._native_public(
             "get_spot_exchange_info",
             self._native_params(
                 product_symbol=product_symbol,
-                status=status,
-                tradeSideType=tradeSideType,
+                symbols=symbols,
             ),
         )
 
@@ -79,7 +77,6 @@ class MarketHTTP(HTTPManager):
     def get_spot_agg_trades(
         self,
         product_symbol: str,
-        fromId: str | int | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
         limit: int | None = None,
@@ -89,7 +86,6 @@ class MarketHTTP(HTTPManager):
             "get_spot_agg_trades",
             self._native_params(
                 product_symbol=product_symbol,
-                fromId=fromId,
                 startTime=startTime,
                 endTime=endTime,
                 limit=limit,
@@ -99,7 +95,7 @@ class MarketHTTP(HTTPManager):
     def get_spot_klines(
         self,
         product_symbol: str,
-        interval: str,
+        interval: str = "1m",
         startTime: int | None = None,
         endTime: int | None = None,
         limit: int | None = None,
@@ -223,7 +219,7 @@ class MarketHTTP(HTTPManager):
     def get_contract_kline(
         self,
         product_symbol: str,
-        interval: str,
+        interval: str = "Min1",
         start: int | None = None,
         end: int | None = None,
     ) -> dict[str, Any] | list[Any]:
@@ -241,7 +237,7 @@ class MarketHTTP(HTTPManager):
     def get_contract_index_price_kline(
         self,
         product_symbol: str,
-        interval: str,
+        interval: str = "Min1",
         start: int | None = None,
         end: int | None = None,
     ) -> dict[str, Any] | list[Any]:
@@ -259,7 +255,7 @@ class MarketHTTP(HTTPManager):
     def get_contract_fair_price_kline(
         self,
         product_symbol: str,
-        interval: str,
+        interval: str = "Min1",
         start: int | None = None,
         end: int | None = None,
     ) -> dict[str, Any] | list[Any]:
@@ -285,15 +281,18 @@ class MarketHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol, limit=limit),
         )
 
-    def get_contract_risk_reverse(self) -> dict[str, Any] | list[Any]:
-        """Retrieve all MEXC Contract risk fund balances."""
-        return self._native_public("get_contract_risk_reverse", [])
+    def get_contract_risk_reverse(self, product_symbol: str) -> dict[str, Any] | list[Any]:
+        """Retrieve a MEXC Contract risk fund balance."""
+        return self._native_public(
+            "get_contract_risk_reverse",
+            self._native_params(product_symbol=product_symbol),
+        )
 
     def get_contract_risk_reverse_history(
         self,
         product_symbol: str,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract risk fund balance history."""
         return self._native_public(
@@ -308,8 +307,8 @@ class MarketHTTP(HTTPManager):
     def get_contract_funding_rate_history(
         self,
         product_symbol: str,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract historical funding rates."""
         return self._native_public(

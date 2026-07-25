@@ -13,10 +13,10 @@ pub(super) struct BingxSigner {
 
 impl RequestSigner for BingxSigner {
     fn sign(&self, request: &mut HttpRequest, timestamp_ms: u64) -> Result<()> {
-        request.query.sort_by(|left, right| left.0.cmp(&right.0));
         request
             .query
             .push(("timestamp".to_string(), timestamp_ms.to_string()));
+        request.query.sort_by(|left, right| left.0.cmp(&right.0));
         let payload = request
             .query
             .iter()

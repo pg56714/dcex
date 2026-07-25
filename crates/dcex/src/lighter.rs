@@ -806,4 +806,33 @@ mod tests {
         let attributed = transaction_hash(&[304, 15, -1], &[(4, 1)]);
         assert_ne!(plain, attributed);
     }
+
+    #[test]
+    fn transaction_hash_matches_current_official_self_trade_vector() {
+        let hash = transaction_hash(
+            &[
+                304,
+                14,
+                7,
+                1_784_816_819_860,
+                12,
+                3,
+                0,
+                1,
+                10,
+                100,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1_700_000_000_000,
+            ],
+            &[(6, 2), (7, 1)],
+        );
+        assert_eq!(
+            hex::encode(hash),
+            "6ad7ee4cc24af46dd9e3194f45e76793a063fea6ebb435dd8b0413f78c0cbebc5d984ac2a92c3061"
+        );
+    }
 }

@@ -13,9 +13,9 @@ class TradeHTTP(HTTPManager):
     def place_order(
         self,
         product_symbol: str,
-        side: OrderSide | str,
+        side: OrderSide | str | None = None,
         orderQty: int | None = None,
-        ordType: str = "Limit",
+        ordType: str | None = None,
         price: float | None = None,
         stopPx: float | None = None,
         clOrdID: str | None = None,
@@ -30,13 +30,19 @@ class TradeHTTP(HTTPManager):
         targetAccountId: int | None = None,
         expiryTime: str | None = None,
         maxSlippagePct: float | None = None,
+        pool: str | None = None,
+        strategy: str | None = None,
     ) -> dict[str, Any]:
         """Place a new BitMEX order."""
         return self._native_private(
             "place_order",
             self._native_params(
                 product_symbol=product_symbol,
-                side=OrderSide.from_any(side).to_exchange(Common.BITMEX),
+                side=(
+                    OrderSide.from_any(side).to_exchange(Common.BITMEX)
+                    if side is not None
+                    else None
+                ),
                 orderQty=orderQty,
                 ordType=ordType,
                 price=price,
@@ -53,6 +59,8 @@ class TradeHTTP(HTTPManager):
                 targetAccountId=targetAccountId,
                 expiryTime=expiryTime,
                 maxSlippagePct=maxSlippagePct,
+                pool=pool,
+                strategy=strategy,
             ),
         )
 
@@ -227,6 +235,8 @@ class TradeHTTP(HTTPManager):
         pegOffsetValue: float | None = None,
         text: str | None = None,
         targetAccountId: int | None = None,
+        expiryTime: str | None = None,
+        maxSlippagePct: float | None = None,
     ) -> dict[str, Any]:
         """Amend a BitMEX order."""
         if orderID is None and origClOrdID is None:
@@ -245,6 +255,8 @@ class TradeHTTP(HTTPManager):
                 pegOffsetValue=pegOffsetValue,
                 text=text,
                 targetAccountId=targetAccountId,
+                expiryTime=expiryTime,
+                maxSlippagePct=maxSlippagePct,
             ),
         )
 
@@ -256,6 +268,8 @@ class TradeHTTP(HTTPManager):
         text: str | None = None,
     ) -> dict[str, Any]:
         """Cancel one or more BitMEX orders."""
+        if orderID is None and clOrdID is None:
+            raise ValueError("Either orderID or clOrdID must be provided")
         return self._native_private(
             "cancel_order",
             self._native_params(
@@ -299,8 +313,9 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         targetAccountId: int | None = None,
-        filter: str | None = None,
-        columns: str | None = None,
+        pool: str | None = None,
+        filter: dict[str, Any] | str | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = 100,
         start: int | None = 0,
         reverse: bool | None = False,
@@ -313,6 +328,7 @@ class TradeHTTP(HTTPManager):
         params = self._native_params(
             product_symbol=product_symbol,
             targetAccountId=targetAccountId,
+            pool=pool,
             filter=filter,
             columns=columns,
             count=count,
@@ -323,10 +339,7 @@ class TradeHTTP(HTTPManager):
             targetAccountIds=targetAccountIds,
         )
         if targetAccountIds_array is not None:
-            params.append(
-                (
-                    "targetAccountIds[]",
-                    self._native_params(targetAccountIds_array=targetAccountIds_array)[0][1],
-                )
+            params.extend(
+                ("targetAccountIds[]", str(account_id)) for account_id in targetAccountIds_array
             )
         return self._native_private("get_order", params)

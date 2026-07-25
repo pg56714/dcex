@@ -179,13 +179,17 @@ impl PythonBackpackPublicWebSocketClient {
         })
     }
 
-    fn subscribe_liquidation<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn subscribe_liquidation<'py>(
+        &self,
+        py: Python<'py>,
+        product_symbol: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_liquidation()
+                .subscribe_liquidation(&product_symbol)
                 .await
                 .map_err(to_py_runtime_error)
         })

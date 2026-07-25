@@ -8,9 +8,9 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """HTTP client for Bybit account operations."""
 
-    def get_wallet_balance(self) -> dict[str, Any]:
+    def get_wallet_balance(self, coin: str | None = None) -> dict[str, Any]:
         """Get wallet balance for UNIFIED account."""
-        return self._native_private("get_wallet_balance", [])
+        return self._native_private("get_wallet_balance", self._native_params(coin=coin))
 
     def get_transferable_amount(
         self,
@@ -34,49 +34,66 @@ class AccountHTTP(HTTPManager):
         self,
         coin: str | None = None,
         startTime: int | None = None,
+        endTime: int | None = None,
         limit: int = 20,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get borrow history."""
         return self._native_private(
             "get_borrow_history",
-            self._native_params(coin=coin, startTime=startTime, limit=limit),
+            self._native_params(
+                coin=coin,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+                cursor=cursor,
+            ),
         )
 
     def get_collateral_info(
         self,
-        coin: str | None = None,
+        currency: str | None = None,
     ) -> dict[str, Any]:
         """Get collateral information."""
         return self._native_private(
             "get_collateral_info",
-            self._native_params(coin=coin),
+            self._native_params(currency=currency),
         )
 
     def _request_fee_rates(
         self,
         method_name: str,
         product_symbol: str | None = None,
+        baseCoin: str | None = None,
     ) -> dict[str, Any]:
         return self._native_private(
             method_name,
-            self._native_params(product_symbol=product_symbol),
+            self._native_params(product_symbol=product_symbol, baseCoin=baseCoin),
         )
 
-    def get_spot_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+    def get_spot_fee_rates(
+        self, product_symbol: str | None = None, baseCoin: str | None = None
+    ) -> dict[str, Any]:
         """Get Bybit Spot trading fee rates."""
-        return self._request_fee_rates("get_spot_fee_rates", product_symbol)
+        return self._request_fee_rates("get_spot_fee_rates", product_symbol, baseCoin)
 
-    def get_linear_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+    def get_linear_fee_rates(
+        self, product_symbol: str | None = None, baseCoin: str | None = None
+    ) -> dict[str, Any]:
         """Get Bybit linear-contract trading fee rates."""
-        return self._request_fee_rates("get_linear_fee_rates", product_symbol)
+        return self._request_fee_rates("get_linear_fee_rates", product_symbol, baseCoin)
 
-    def get_inverse_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+    def get_inverse_fee_rates(
+        self, product_symbol: str | None = None, baseCoin: str | None = None
+    ) -> dict[str, Any]:
         """Get Bybit inverse-contract trading fee rates."""
-        return self._request_fee_rates("get_inverse_fee_rates", product_symbol)
+        return self._request_fee_rates("get_inverse_fee_rates", product_symbol, baseCoin)
 
-    def get_option_fee_rates(self, product_symbol: str | None = None) -> dict[str, Any]:
+    def get_option_fee_rates(
+        self, product_symbol: str | None = None, baseCoin: str | None = None
+    ) -> dict[str, Any]:
         """Get Bybit option trading fee rates."""
-        return self._request_fee_rates("get_option_fee_rates", product_symbol)
+        return self._request_fee_rates("get_option_fee_rates", product_symbol, baseCoin)
 
     def get_account_info(self) -> dict[str, Any]:
         """Get account information."""
@@ -84,15 +101,32 @@ class AccountHTTP(HTTPManager):
 
     def get_transaction_log(
         self,
+        accountType: str | None = None,
         category: str | None = None,
         coin: str | None = None,
+        baseCoin: str | None = None,
+        type_: str | None = None,
+        transSubType: str | None = None,
         startTime: int | None = None,
+        endTime: int | None = None,
         limit: int = 20,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get transaction log."""
         return self._native_private(
             "get_transaction_log",
-            self._native_params(category=category, coin=coin, startTime=startTime, limit=limit),
+            self._native_params(
+                accountType=accountType,
+                category=category,
+                coin=coin,
+                baseCoin=baseCoin,
+                type=type_,
+                transSubType=transSubType,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+                cursor=cursor,
+            ),
         )
 
     def set_margin_mode(

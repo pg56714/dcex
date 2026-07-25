@@ -21,7 +21,7 @@ impl OkxClient {
                 )];
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 push_optional(&mut query, "instFamily", params.get("instFamily"));
-                push_optional(&mut query, "uly", params.get("uly"));
+                push_optional(&mut query, "seriesId", params.get("seriesId"));
                 self.get_request(ACCOUNT_INSTRUMENTS, query).await
             }
             "get_account_balance" => {
@@ -32,12 +32,14 @@ impl OkxClient {
             "get_positions" => {
                 let mut query = Vec::new();
                 push_optional(&mut query, "instType", params.get("instType"));
+                push_optional(&mut query, "posId", params.get("posId"));
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 self.get_request(ACCOUNT_POSITIONS, query).await
             }
             "get_positions_history" => {
-                let mut query =
-                    params.only(&["instType", "mgnMode", "type", "after", "before", "limit"]);
+                let mut query = params.only(&[
+                    "instType", "posId", "mgnMode", "type", "after", "before", "limit",
+                ]);
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 self.get_request(ACCOUNT_POSITIONS_HISTORY, query).await
             }
@@ -47,33 +49,30 @@ impl OkxClient {
             }
             "get_account_bills" => {
                 let mut query = params.only(&[
-                    "instType", "ccy", "mgnMode", "ctType", "type", "subType", "begin", "end",
-                    "limit",
+                    "instType", "ccy", "mgnMode", "ctType", "type", "subType", "after", "before",
+                    "begin", "end", "limit",
                 ]);
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 self.get_request(ACCOUNT_BILLS, query).await
             }
             "get_account_bills_archive" => {
                 let mut query = params.only(&[
-                    "instType", "ccy", "mgnMode", "ctType", "type", "subType", "begin", "end",
-                    "limit",
+                    "instType", "ccy", "mgnMode", "ctType", "type", "subType", "after", "before",
+                    "begin", "end", "limit",
                 ]);
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 self.get_request(ACCOUNT_BILLS_ARCHIVE, query).await
             }
             "get_account_bills_history_archive" => {
-                self.get_request(
-                    ACCOUNT_BILLS_HISTORY_ARCHIVE,
-                    params.required_only(&["year", "quarter"])?,
-                )
-                .await
+                let mut query = params.required_only(&["year", "quarter"])?;
+                push_optional(&mut query, "type", params.get("type"));
+                self.get_request(ACCOUNT_BILLS_HISTORY_ARCHIVE, query).await
             }
             "post_account_bills_history_archive" => {
-                self.post_request(
-                    ACCOUNT_BILLS_HISTORY_ARCHIVE,
-                    Value::Object(params.required_body(&["year", "quarter"])?),
-                )
-                .await
+                let mut body = params.required_body(&["year", "quarter"])?;
+                insert_optional_string(&mut body, "type", params.get("type"));
+                self.post_request(ACCOUNT_BILLS_HISTORY_ARCHIVE, Value::Object(body))
+                    .await
             }
             "get_account_config" => self.get_request(ACCOUNT_CONFIG, Vec::new()).await,
             "set_position_mode" => {
@@ -98,6 +97,8 @@ impl OkxClient {
                 push_optional(&mut query, "ccy", params.get("ccy"));
                 push_optional(&mut query, "px", params.get("px"));
                 push_optional(&mut query, "leverage", params.get("leverage"));
+                push_optional(&mut query, "tradeQuoteCcy", params.get("tradeQuoteCcy"));
+                push_optional(&mut query, "outcome", params.get("outcome"));
                 self.get_request(ACCOUNT_MAX_SIZE, query).await
             }
             "get_max_avail_size" => {
@@ -107,6 +108,7 @@ impl OkxClient {
                 push_optional(&mut query, "ccy", params.get("ccy"));
                 push_optional(&mut query, "reduceOnly", params.get("reduceOnly"));
                 push_optional(&mut query, "px", params.get("px"));
+                push_optional(&mut query, "tradeQuoteCcy", params.get("tradeQuoteCcy"));
                 self.get_request(ACCOUNT_MAX_AVAIL_SIZE, query).await
             }
             "get_leverage" => {
@@ -133,6 +135,7 @@ impl OkxClient {
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 push_optional(&mut query, "ccy", params.get("ccy"));
                 push_optional(&mut query, "mgnCcy", params.get("mgnCcy"));
+                push_optional(&mut query, "tradeQuoteCcy", params.get("tradeQuoteCcy"));
                 self.get_request(ACCOUNT_MAX_LOAN, query).await
             }
             "get_spot_fee_rates"
@@ -149,14 +152,14 @@ impl OkxClient {
                     _ => unreachable!(),
                 };
                 let mut query = vec![("instType".to_string(), inst_type.to_string())];
-                push_optional(&mut query, "ruleType", params.get("ruleType"));
                 self.push_inst_id(&mut query, params, "product_symbol")?;
-                push_optional(&mut query, "uly", params.get("uly"));
                 push_optional(&mut query, "instFamily", params.get("instFamily"));
+                push_optional(&mut query, "groupId", params.get("groupId"));
                 self.get_request(ACCOUNT_TRADE_FEE, query).await
             }
             "get_interest_accrued" => {
-                let mut query = params.only(&["ccy", "mgnMode", "after", "before", "limit"]);
+                let mut query =
+                    params.only(&["type", "ccy", "mgnMode", "after", "before", "limit"]);
                 self.push_inst_id(&mut query, params, "product_symbol")?;
                 self.get_request(ACCOUNT_INTEREST_ACCRUED, query).await
             }
@@ -177,7 +180,7 @@ impl OkxClient {
                 self.get_request(ACCOUNT_MAX_WITHDRAWAL, query).await
             }
             "get_interest_limits" => {
-                self.get_request(ACCOUNT_INTEREST_LIMITS, params.only(&["ccy"]))
+                self.get_request(ACCOUNT_INTEREST_LIMITS, params.only(&["type", "ccy"]))
                     .await
             }
             _ => return Ok(None),

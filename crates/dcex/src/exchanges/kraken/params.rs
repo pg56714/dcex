@@ -69,11 +69,12 @@ pub(super) fn push_optional(params: &mut Vec<(String, String)>, key: &str, value
 }
 
 pub(super) fn require_one_identifier(params: &KrakenParams, keys: &[&str]) -> Result<()> {
-    if keys.iter().any(|key| params.get(key).is_some()) {
+    let count = keys.iter().filter(|key| params.get(key).is_some()).count();
+    if count == 1 {
         return Ok(());
     }
     Err(DcexError::InvalidInput(format!(
-        "Specify {}.",
-        keys.join(", ")
+        "Specify exactly one of {}.",
+        keys.join(", "),
     )))
 }

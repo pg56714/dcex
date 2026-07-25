@@ -9,10 +9,6 @@ impl BitgetParams {
         Self(params)
     }
 
-    pub(super) fn into_inner(self) -> Vec<(String, String)> {
-        self.0
-    }
-
     pub(super) fn get(&self, key: &str) -> Option<&str> {
         self.0
             .iter()

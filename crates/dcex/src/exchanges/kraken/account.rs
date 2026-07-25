@@ -24,7 +24,7 @@ impl KrakenClient {
                 self.private_post(
                     KrakenAuth::Spot,
                     SPOT_TRADE_BALANCE,
-                    params.only(&["asset"]),
+                    params.only(&["asset", "rebase_multiplier"]),
                 )
                 .await
             }
@@ -37,8 +37,15 @@ impl KrakenClient {
                 .await
             }
             "get_spot_ledgers" => {
-                let mut query =
-                    params.only(&["asset", "aclass", "start", "end", "ofs", "without_count"]);
+                let mut query = params.only(&[
+                    "asset",
+                    "aclass",
+                    "start",
+                    "end",
+                    "ofs",
+                    "without_count",
+                    "rebase_multiplier",
+                ]);
                 push_optional(
                     &mut query,
                     "type",
@@ -48,7 +55,7 @@ impl KrakenClient {
                     .await
             }
             "get_spot_trade_volume" => {
-                let mut query = params.only(&["pair"]);
+                let mut query = params.only(&["pair", "fee_schedule", "rebase_multiplier"]);
                 push_optional(
                     &mut query,
                     "fee-info",
@@ -58,6 +65,14 @@ impl KrakenClient {
                     .await
             }
             "wallet_transfer_to_futures" => {
+                params.required("asset")?;
+                params.required("amount")?;
+                params.required("to")?;
+                if params.get("from").or_else(|| params.get("from_")).is_none() {
+                    return Err(crate::DcexError::InvalidInput(
+                        "missing required parameter: from".to_string(),
+                    ));
+                }
                 let mut query = params.only(&["asset", "to", "amount"]);
                 push_optional(
                     &mut query,
@@ -84,12 +99,17 @@ impl KrakenClient {
                 .await
             }
             "futures_wallet_transfer" => {
+                for key in ["amount", "fromAccount", "toAccount", "unit"] {
+                    params.required(key)?;
+                }
                 let mut query = params.only(&["amount", "fromAccount", "toAccount"]);
                 push_lowercase(&mut query, "unit", params.get("unit"));
                 self.private_post(KrakenAuth::Futures, FUTURES_TRANSFER, query)
                     .await
             }
             "withdraw_futures_to_spot_wallet" => {
+                params.required("amount")?;
+                params.required("currency")?;
                 let mut query = params.only(&["amount", "sourceWallet"]);
                 push_lowercase(&mut query, "currency", params.get("currency"));
                 self.private_post(KrakenAuth::Futures, FUTURES_WITHDRAWAL, query)

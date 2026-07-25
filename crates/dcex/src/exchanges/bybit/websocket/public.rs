@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -21,6 +22,7 @@ pub struct BybitPublicWebSocket {
     category: String,
     next_request_id: u64,
     product_table: Option<Arc<ProductTable>>,
+    subscriptions: HashSet<String>,
 }
 
 impl BybitPublicWebSocket {
@@ -43,6 +45,7 @@ impl BybitPublicWebSocket {
             category: normalize_category(&category.into())?,
             next_request_id: 1,
             product_table: None,
+            subscriptions: HashSet::new(),
         })
     }
 
@@ -64,7 +67,9 @@ impl BybitPublicWebSocket {
     }
 
     pub async fn connect(&mut self) -> Result<()> {
-        self.connection.connect().await
+        self.connection.connect().await?;
+        self.subscriptions.clear();
+        Ok(())
     }
 
     pub async fn close(&mut self) -> Result<()> {
@@ -90,7 +95,7 @@ impl BybitPublicWebSocket {
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<String> {
-        let topic = format!("publicTrade.{}", self.exchange_symbol(product_symbol)?);
+        let topic = format!("publicTrade.{}", self.trade_topic_symbol(product_symbol)?);
         self.subscribe(vec![topic]).await
     }
 
@@ -139,7 +144,21 @@ impl BybitPublicWebSocket {
                 return table.get_exchange_symbol("bybit", product_symbol);
             }
         }
-        normalize_symbol(&exchange_symbol_fallback(product_symbol))
+        let symbol = exchange_symbol_fallback(product_symbol);
+        if self.category == "option" {
+            normalize_option_symbol(&symbol)
+        } else {
+            normalize_symbol(&symbol)
+        }
+    }
+
+    fn trade_topic_symbol(&self, product_symbol: &str) -> Result<String> {
+        let symbol = self.exchange_symbol(product_symbol)?;
+        if self.category == "option" {
+            normalize_symbol(symbol.split('-').next().unwrap_or(&symbol))
+        } else {
+            Ok(symbol)
+        }
     }
 
     async fn send_topics(&mut self, op: &str, topics: Vec<String>) -> Result<String> {
@@ -160,13 +179,39 @@ impl BybitPublicWebSocket {
             .into_iter()
             .map(|topic| normalize_topic(&topic))
             .collect::<Result<Vec<_>>>()?;
+        if json!(&topics).to_string().len() > 21_000 {
+            return Err(DcexError::InvalidInput(
+                "Bybit WebSocket subscription args must not exceed 21,000 characters.".to_string(),
+            ));
+        }
+        if op == "subscribe" && self.category == "spot" && topics.len() > 10 {
+            return Err(DcexError::InvalidInput(
+                "Bybit Spot WebSocket subscription requests support at most 10 topics.".to_string(),
+            ));
+        }
+        if op == "subscribe" && self.category == "option" {
+            let mut subscriptions = self.subscriptions.clone();
+            subscriptions.extend(topics.iter().cloned());
+            if subscriptions.len() > 2_000 {
+                return Err(DcexError::InvalidInput(
+                    "Bybit Options WebSocket connections support at most 2000 topics.".to_string(),
+                ));
+            }
+        }
         let request_id = self.next_request_id();
         let payload = json!({
             "req_id": request_id,
             "op": op,
-            "args": topics,
+            "args": &topics,
         });
         self.connection.send_json(&payload).await?;
+        if op == "subscribe" {
+            self.subscriptions.extend(topics);
+        } else {
+            for topic in topics {
+                self.subscriptions.remove(&topic);
+            }
+        }
         Ok(request_id)
     }
 
@@ -215,6 +260,20 @@ fn normalize_symbol(symbol: &str) -> Result<String> {
     Ok(symbol.to_ascii_uppercase())
 }
 
+fn normalize_option_symbol(symbol: &str) -> Result<String> {
+    let symbol = symbol.trim();
+    if symbol.is_empty()
+        || !symbol
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || character == '-')
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported Bybit option symbol: {symbol}"
+        )));
+    }
+    Ok(symbol.to_ascii_uppercase())
+}
+
 fn normalize_topic(topic: &str) -> Result<String> {
     let topic = topic.trim();
     if topic.is_empty() {
@@ -224,7 +283,7 @@ fn normalize_topic(topic: &str) -> Result<String> {
     }
     if !topic
         .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '.')
+        .all(|character| character.is_ascii_alphanumeric() || character == '.' || character == '-')
     {
         return Err(DcexError::InvalidInput(format!(
             "unsupported Bybit WebSocket topic: {topic}"
@@ -271,6 +330,24 @@ mod tests {
     fn rejects_invalid_symbol_and_topic() {
         assert!(normalize_symbol("BTC-USDT").is_err());
         assert!(normalize_topic("publicTrade/BTCUSDT").is_err());
+        assert!(normalize_topic("tickers.BTC-22JAN23-17500-C").is_ok());
+    }
+
+    #[test]
+    fn option_topics_use_official_symbol_shapes() {
+        let client = BybitPublicWebSocket::new("option", Duration::from_secs(1)).expect("client");
+        assert_eq!(
+            client
+                .exchange_symbol("BTC-22JAN23-17500-C")
+                .expect("symbol"),
+            "BTC-22JAN23-17500-C"
+        );
+        assert_eq!(
+            client
+                .trade_topic_symbol("BTC-22JAN23-17500-C")
+                .expect("trade symbol"),
+            "BTC"
+        );
     }
 
     #[test]
@@ -279,5 +356,24 @@ mod tests {
         assert!(validate_orderbook_depth("linear", 25).is_err());
         assert!(validate_orderbook_depth("option", 25).is_ok());
         assert!(validate_orderbook_depth("option", 200).is_err());
+    }
+
+    #[tokio::test]
+    async fn validates_public_subscription_argument_limits_before_transport() {
+        let mut spot = BybitPublicWebSocket::new("spot", Duration::from_secs(1)).expect("spot");
+        let topics = (0..11)
+            .map(|index| format!("tickers.SYMBOL{index}"))
+            .collect();
+        assert!(spot.subscribe(topics).await.is_err());
+
+        let mut option =
+            BybitPublicWebSocket::new("option", Duration::from_secs(1)).expect("option");
+        option.subscriptions = (0..2_000)
+            .map(|index| format!("tickers.OPTION{index}"))
+            .collect();
+        assert!(option
+            .subscribe(vec!["tickers.OPTION2000".to_string()])
+            .await
+            .is_err());
     }
 }

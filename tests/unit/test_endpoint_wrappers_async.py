@@ -94,6 +94,9 @@ async def test_async_hyperliquid_market_order_uses_ioc_limit_payload(
     assert dict(calls[0]["query"]) == {
         "product_symbol": "BTC-USD-SWAP",
         "size": "1",
+        "reduceOnly": "false",
+        "slippage": "0.05",
+        "grouping": "na",
     }
 
 

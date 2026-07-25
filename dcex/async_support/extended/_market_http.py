@@ -1,5 +1,6 @@
 """Extended async market HTTP client backed by Rust."""
 
+from collections.abc import Sequence
 from typing import Any
 
 from ._http_manager import HTTPManager
@@ -8,7 +9,10 @@ from ._http_manager import HTTPManager
 class MarketHTTP(HTTPManager):
     """Async HTTP client for Extended market endpoints."""
 
-    async def get_markets(self, market: str | None = None) -> Any:  # noqa: ANN401
+    async def get_markets(
+        self,
+        market: str | Sequence[str] | None = None,
+    ) -> Any:  # noqa: ANN401
         return await self._native_public(
             "get_markets",
             self._native_params(market=market),
@@ -16,20 +20,13 @@ class MarketHTTP(HTTPManager):
 
     async def get_assets(
         self,
-        asset: str | None = None,
+        asset: str | Sequence[str] | None = None,
         type: str | None = None,  # noqa: A002
         collateral: bool | None = None,
     ) -> Any:  # noqa: ANN401
-        query = {
-            key: value
-            for key, value in {"asset": asset, "type": type, "collateral": collateral}.items()
-            if value is not None
-        }
-        return await self._request(
-            "GET",
-            "/api/v1/info/assets",
-            query,
-            signed=False,
+        return await self._native_public(
+            "get_assets",
+            self._native_params(asset=asset, type=type, collateral=collateral),
         )
 
     async def get_asset_index_price(self, asset: str) -> Any:  # noqa: ANN401

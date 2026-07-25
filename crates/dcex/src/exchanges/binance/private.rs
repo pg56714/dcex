@@ -88,8 +88,11 @@ impl BinanceClient {
                     .await
             }
             "get_account_balance" => {
-                self.get_account_balance(params.get("market_type").unwrap_or("swap"))
-                    .await
+                self.get_account_balance(
+                    params.get("market_type").unwrap_or("swap"),
+                    params.get("omitZeroBalances"),
+                )
+                .await
             }
             "get_income_history" => {
                 self.send_get_income_history(BinanceIncomeHistoryParams {
@@ -375,6 +378,8 @@ impl BinanceClient {
                     BinanceOrderLookupParams {
                         order_id: params.get("orderId"),
                         orig_client_order_id: params.get("origClientOrderId"),
+                        new_client_order_id: params.get("newClientOrderId"),
+                        cancel_restrictions: params.get("cancelRestrictions"),
                     },
                 )
                 .await
@@ -386,6 +391,8 @@ impl BinanceClient {
                     BinanceOrderLookupParams {
                         order_id: params.get("orderId"),
                         orig_client_order_id: params.get("origClientOrderId"),
+                        new_client_order_id: None,
+                        cancel_restrictions: None,
                     },
                 )
                 .await
@@ -396,6 +403,8 @@ impl BinanceClient {
                     BinanceOrderLookupParams {
                         order_id: params.get("orderId"),
                         orig_client_order_id: params.get("origClientOrderId"),
+                        new_client_order_id: None,
+                        cancel_restrictions: None,
                     },
                 )
                 .await
@@ -449,7 +458,7 @@ impl BinanceClient {
                 .await
             }
             "get_future_position" => {
-                self.get_future_position(params.required("product_symbol")?)
+                self.send_get_future_position(params.get("product_symbol"))
                     .await
             }
             _ => Err(DcexError::InvalidInput(format!(

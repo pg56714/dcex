@@ -59,9 +59,9 @@ class PublicClient(AsyncWebSocketMixin):
         """Subscribe to kline updates for a product."""
         await self._native_client.subscribe_klines(product_symbol, interval)
 
-    async def subscribe_liquidation(self) -> None:
-        """Subscribe to liquidation updates."""
-        await self._native_client.subscribe_liquidation()
+    async def subscribe_liquidation(self, product_symbol: str) -> None:
+        """Subscribe to liquidation updates for a product."""
+        await self._native_client.subscribe_liquidation(product_symbol)
 
     async def subscribe_mark_price(self, product_symbol: str) -> None:
         """Subscribe to mark price updates for a product."""

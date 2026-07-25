@@ -6,8 +6,8 @@ use crate::Result;
 use super::client::OkxClient;
 use super::endpoints::*;
 use super::params::{
-    insert_optional_string, okx_account_id, push_optional_owned, validate_deposit_withdraw_status,
-    OkxParams,
+    insert_optional_bool, insert_optional_string, okx_account_id, push_optional_owned,
+    validate_deposit_withdraw_status, OkxParams,
 };
 
 impl OkxClient {
@@ -42,9 +42,11 @@ impl OkxClient {
                     "to".to_string(),
                     Value::String(okx_account_id(params.required("to_account")?).to_string()),
                 );
-                for key in ["type", "subAcct", "loanTrans"] {
+                for key in ["type", "subAcct", "clientId"] {
                     insert_optional_string(&mut body, key, params.get(key));
                 }
+                insert_optional_bool(&mut body, "loanTrans", params.get("loanTrans"))?;
+                insert_optional_bool(&mut body, "omitPosRisk", params.get("omitPosRisk"))?;
                 self.post_request(ASSET_TRANSFER, Value::Object(body)).await
             }
             "get_transfer_state" => {
@@ -57,7 +59,15 @@ impl OkxClient {
             "get_bills" => {
                 self.get_request(
                     ASSET_BILLS,
-                    params.only(&["type", "clientId", "after", "before", "limit"]),
+                    params.only(&[
+                        "ccy",
+                        "type",
+                        "thirdPartyType",
+                        "clientId",
+                        "after",
+                        "before",
+                        "limit",
+                    ]),
                 )
                 .await
             }

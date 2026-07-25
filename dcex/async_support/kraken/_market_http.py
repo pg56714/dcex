@@ -34,62 +34,114 @@ class MarketHTTP(HTTPManager):
         """Retrieve Kraken spot system status."""
         return await self._native_public("get_spot_system_status", [])
 
-    async def get_spot_assets(self, asset: str | None = None) -> dict[str, Any]:
+    async def get_spot_assets(
+        self,
+        asset: str | None = None,
+        aclass: str | None = None,
+        assetVersion: int | None = None,
+    ) -> dict[str, Any]:
         """Retrieve Kraken spot asset metadata."""
-        return await self._native_public("get_spot_assets", self._native_params(asset=asset))
+        return await self._native_public(
+            "get_spot_assets",
+            self._native_params(asset=asset, aclass=aclass, assetVersion=assetVersion),
+        )
 
     async def get_spot_spread(
-        self, product_symbol: str, since: str | None = None
+        self,
+        product_symbol: str,
+        since: str | None = None,
+        assetVersion: int | None = None,
+        asset_class: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve recent Kraken spot bid/ask spreads."""
         return await self._native_public(
-            "get_spot_spread", self._native_params(product_symbol=product_symbol, since=since)
+            "get_spot_spread",
+            self._native_params(
+                product_symbol=product_symbol,
+                since=since,
+                assetVersion=assetVersion,
+                asset_class=asset_class,
+            ),
         )
 
     async def get_spot_asset_pairs(
         self,
         pair: str | None = None,
         info: str = "info",
+        assetVersion: int | None = None,
+        aclass_base: str | None = None,
+        country_code: str | None = None,
+        execution_venue: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot tradable asset pairs."""
         return await self._native_public(
             "get_spot_asset_pairs",
-            self._native_params(pair=pair, info=info),
+            self._native_params(
+                pair=pair,
+                info=info,
+                assetVersion=assetVersion,
+                aclass_base=aclass_base,
+                country_code=country_code,
+                execution_venue=execution_venue,
+            ),
         )
 
     async def get_spot_ticker(
         self,
         product_symbol: str | None = None,
         pair: str | None = None,
+        assetVersion: int | None = None,
+        asset_class: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot ticker data for one pair or all pairs."""
         if product_symbol is not None and pair is not None:
             raise ValueError("Specify either product_symbol or pair, not both.")
         return await self._native_public(
             "get_spot_ticker",
-            self._native_params(product_symbol=product_symbol, pair=pair),
+            self._native_params(
+                product_symbol=product_symbol,
+                pair=pair,
+                assetVersion=assetVersion,
+                asset_class=asset_class,
+            ),
         )
 
     async def get_spot_orderbook(
         self,
         product_symbol: str,
         count: int | None = None,
+        assetVersion: int | None = None,
+        asset_class: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot orderbook data."""
         return await self._native_public(
             "get_spot_orderbook",
-            self._native_params(product_symbol=product_symbol, count=count),
+            self._native_params(
+                product_symbol=product_symbol,
+                count=count,
+                assetVersion=assetVersion,
+                asset_class=asset_class,
+            ),
         )
 
     async def get_spot_public_trades(
         self,
         product_symbol: str,
-        since: int | None = None,
+        since: str | None = None,
+        count: int | None = None,
+        assetVersion: int | None = None,
+        asset_class: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot public trades."""
         return await self._native_public(
             "get_spot_public_trades",
-            self._native_params(product_symbol=product_symbol, since=since),
+            self._native_params(
+                product_symbol=product_symbol,
+                since=since,
+                count=count,
+                assetVersion=assetVersion,
+                asset_class=asset_class,
+            ),
         )
 
     async def get_spot_kline(
@@ -97,11 +149,19 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
         interval: int = 1,
         since: int | None = None,
+        assetVersion: int | None = None,
+        asset_class: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot OHLC candles."""
         return await self._native_public(
             "get_spot_kline",
-            self._native_params(product_symbol=product_symbol, interval=interval, since=since),
+            self._native_params(
+                product_symbol=product_symbol,
+                interval=interval,
+                since=since,
+                assetVersion=assetVersion,
+                asset_class=asset_class,
+            ),
         )
 
     async def get_futures_instruments(

@@ -191,15 +191,35 @@ impl KucoinClient {
         let path = path.into();
         let query = if matches!(method, HttpMethod::Get | HttpMethod::Delete) {
             url::form_urlencoded::Serializer::new(String::new())
-                .extend_pairs(params)
+                .extend_pairs(
+                    params
+                        .iter()
+                        .map(|(key, value)| (key.as_str(), value.as_str())),
+                )
                 .finish()
         } else {
             String::new()
         };
+        // KuCoin requires the transmitted URL to be percent-encoded, but the
+        // signature prehash must contain the original, unencoded query values.
+        let signing_query = if matches!(method, HttpMethod::Get | HttpMethod::Delete) {
+            params
+                .iter()
+                .map(|(key, value)| format!("{key}={value}"))
+                .collect::<Vec<_>>()
+                .join("&")
+        } else {
+            String::new()
+        };
         let request_path = if query.is_empty() {
-            path
+            path.clone()
         } else {
             format!("{path}?{query}")
+        };
+        let signing_path = if signing_query.is_empty() {
+            path
+        } else {
+            format!("{path}?{signing_query}")
         };
         let body = if matches!(method, HttpMethod::Post | HttpMethod::Put) {
             body.unwrap_or_default()
@@ -218,7 +238,7 @@ impl KucoinClient {
 
         if signed {
             let (api_key, api_secret, encrypted_passphrase) = self.credentials()?;
-            let signature = request_signature(api_secret, timestamp, method, &request_path, &body)?;
+            let signature = request_signature(api_secret, timestamp, method, &signing_path, &body)?;
             request
                 .headers
                 .insert("KC-API-KEY".to_string(), api_key.to_string());

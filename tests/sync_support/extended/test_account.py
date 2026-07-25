@@ -1,5 +1,7 @@
 # ruff: noqa: ANN001, ANN201, D100, D103
 
+import time
+
 import pytest
 from dotenv import load_dotenv
 
@@ -36,7 +38,11 @@ def test_position_and_trade_history_read_endpoints(client):
     _assert_response(client.get_positions())
     _assert_response(client.get_positions_history(limit=20))
     _assert_response(client.get_trades_history(limit=20))
-    _assert_response(client.get_funding_payments(limit=20))
+    _assert_response(
+        client.get_funding_payments(
+            startTime=int(time.time() * 1000) - 30 * 24 * 60 * 60 * 1000, limit=20
+        )
+    )
 
 
 def test_fees_and_account_configuration_read_endpoints(client):

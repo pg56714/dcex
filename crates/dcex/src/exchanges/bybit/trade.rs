@@ -2,7 +2,10 @@ use serde_json::{Map, Value};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_string, push_optional, require_one_identifier, BybitParams};
+use super::params::{
+    insert_optional_bool, insert_optional_i64, insert_optional_string, push_optional,
+    require_one_identifier, BybitParams,
+};
 use crate::common::OrderSide;
 use crate::exchange::ValidatedResponse;
 use crate::Result;
@@ -21,7 +24,7 @@ impl BybitClient {
                 insert_optional_string(&mut body, "product", params.get("product"));
                 body.insert(
                     "timeWindow".to_string(),
-                    Value::String(params.required("timeWindow")?.to_string()),
+                    Value::Number(params.i64_required("timeWindow")?.into()),
                 );
                 self.post_request(DISCONNECTED_CANCEL_ALL, body).await
             }
@@ -148,6 +151,11 @@ impl BybitClient {
         params: &BybitParams,
         endpoint: &str,
     ) -> Result<ValidatedResponse> {
+        let body = self.order_body_from_params(params)?;
+        self.post_request(endpoint, body).await
+    }
+
+    fn order_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
         self.insert_symbol_category(&mut body, product_symbol)?;
@@ -169,9 +177,9 @@ impl BybitClient {
         );
         for key in [
             "price",
-            "isLeverage",
             "marketUnit",
-            "triggerDirection",
+            "slippageToleranceType",
+            "slippageTolerance",
             "orderFilter",
             "triggerPrice",
             "triggerBy",
@@ -181,18 +189,24 @@ impl BybitClient {
             "stopLoss",
             "tpTriggerBy",
             "slTriggerBy",
-            "reduceOnly",
-            "closeOnTrigger",
             "tpslMode",
             "tpLimitPrice",
             "slLimitPrice",
             "tpOrderType",
             "slOrderType",
-            "positionIdx",
+            "orderLinkId",
+            "smpType",
+            "bboSideType",
         ] {
             insert_optional_string(&mut body, key, params.get(key));
         }
-        self.post_request(endpoint, body).await
+        for key in ["isLeverage", "triggerDirection", "positionIdx", "bboLevel"] {
+            insert_optional_i64(&mut body, key, params.get(key))?;
+        }
+        for key in ["rpiTakerAccess", "reduceOnly", "closeOnTrigger", "mmp"] {
+            insert_optional_bool(&mut body, key, params.get(key))?;
+        }
+        Ok(body)
     }
 
     async fn amend_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
@@ -251,6 +265,15 @@ impl BybitClient {
                 query.push(("settleCoin".to_string(), "USDT".to_string()));
             }
         }
+        for key in [
+            "orderId",
+            "orderLinkId",
+            "openOnly",
+            "orderFilter",
+            "cursor",
+        ] {
+            push_optional(&mut query, key, params.get(key));
+        }
         self.get_request(GET_OPEN_ORDERS, query).await
     }
 
@@ -274,7 +297,7 @@ impl BybitClient {
         if let Some(product_symbol) = params.get("product_symbol") {
             self.insert_symbol_category(&mut body, product_symbol)?;
         }
-        for key in ["baseCoin", "settleCoin", "orderFilter"] {
+        for key in ["baseCoin", "settleCoin", "orderFilter", "stopOrderType"] {
             insert_optional_string(&mut body, key, params.get(key));
         }
         let category = body
@@ -307,10 +330,20 @@ impl BybitClient {
         if let Some(product_symbol) = params.get("product_symbol") {
             self.push_symbol_category(&mut query, product_symbol, true)?;
         }
-        push_optional(&mut query, "orderId", params.get("orderId"));
-        push_optional(&mut query, "startTime", params.get("startTime"));
-        push_optional(&mut query, "cursor", params.get("cursor"));
-        push_optional(&mut query, "limit", params.get("limit"));
+        for key in [
+            "baseCoin",
+            "settleCoin",
+            "orderId",
+            "orderLinkId",
+            "orderFilter",
+            "orderStatus",
+            "startTime",
+            "endTime",
+            "cursor",
+            "limit",
+        ] {
+            push_optional(&mut query, key, params.get(key));
+        }
         self.get_request(GET_ORDER_HISTORY, query).await
     }
 
@@ -331,7 +364,18 @@ impl BybitClient {
         if let Some(product_symbol) = params.get("product_symbol") {
             self.push_symbol_category(&mut query, product_symbol, true)?;
         }
-        push_optional(&mut query, "startTime", params.get("startTime"));
+        for key in [
+            "orderId",
+            "orderLinkId",
+            "baseCoin",
+            "settleCoin",
+            "startTime",
+            "endTime",
+            "execType",
+            "cursor",
+        ] {
+            push_optional(&mut query, key, params.get(key));
+        }
         self.get_request(GET_EXECUTION_LIST, query).await
     }
 
@@ -408,6 +452,46 @@ mod tests {
         assert_eq!(
             body.get("symbol"),
             Some(&Value::String("BTCUSD".to_string()))
+        );
+    }
+
+    #[test]
+    fn order_body_preserves_official_json_types_and_current_fields() {
+        let body = client()
+            .order_body_from_params(&BybitParams::from_pairs(vec![
+                ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+                ("side".to_string(), "Buy".to_string()),
+                ("orderType".to_string(), "Market".to_string()),
+                ("qty".to_string(), "1".to_string()),
+                ("isLeverage".to_string(), "1".to_string()),
+                ("positionIdx".to_string(), "2".to_string()),
+                ("bboLevel".to_string(), "3".to_string()),
+                ("reduceOnly".to_string(), "true".to_string()),
+                ("closeOnTrigger".to_string(), "false".to_string()),
+                ("rpiTakerAccess".to_string(), "true".to_string()),
+                ("mmp".to_string(), "false".to_string()),
+                ("orderLinkId".to_string(), "client-order".to_string()),
+                ("smpType".to_string(), "CancelMaker".to_string()),
+                ("slippageToleranceType".to_string(), "Percent".to_string()),
+                ("slippageTolerance".to_string(), "0.5".to_string()),
+                ("bboSideType".to_string(), "Queue".to_string()),
+            ]))
+            .expect("body");
+
+        assert_eq!(body.get("isLeverage"), Some(&Value::Number(1.into())));
+        assert_eq!(body.get("positionIdx"), Some(&Value::Number(2.into())));
+        assert_eq!(body.get("bboLevel"), Some(&Value::Number(3.into())));
+        assert_eq!(body.get("reduceOnly"), Some(&Value::Bool(true)));
+        assert_eq!(body.get("closeOnTrigger"), Some(&Value::Bool(false)));
+        assert_eq!(body.get("rpiTakerAccess"), Some(&Value::Bool(true)));
+        assert_eq!(body.get("mmp"), Some(&Value::Bool(false)));
+        assert_eq!(
+            body.get("orderLinkId"),
+            Some(&Value::String("client-order".to_string()))
+        );
+        assert_eq!(
+            body.get("slippageToleranceType"),
+            Some(&Value::String("Percent".to_string()))
         );
     }
 }

@@ -98,8 +98,7 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         granularity: str,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
+        endTime: int | str,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget historical spot candles."""
@@ -108,7 +107,6 @@ class MarketHTTP(HTTPManager):
             self._params(
                 product_symbol=product_symbol,
                 granularity=granularity,
-                startTime=startTime,
                 endTime=endTime,
                 limit=limit,
             ),
@@ -205,6 +203,7 @@ class MarketHTTP(HTTPManager):
         productType: str = "USDT-FUTURES",
         startTime: int | str | None = None,
         endTime: int | str | None = None,
+        kLineType: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures candles."""
@@ -216,6 +215,7 @@ class MarketHTTP(HTTPManager):
                 granularity=granularity,
                 startTime=startTime,
                 endTime=endTime,
+                kLineType=kLineType,
                 limit=limit,
             ),
         )
@@ -306,11 +306,10 @@ class MarketHTTP(HTTPManager):
 
     def get_uta_liquidations(
         self,
+        category: str,
         product_symbol: str | None = None,
-        category: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
         limit: int | None = None,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget UTA historical liquidation records."""
         return self._native_public(
@@ -318,8 +317,7 @@ class MarketHTTP(HTTPManager):
             self._params(
                 product_symbol=product_symbol,
                 category=category,
-                startTime=startTime,
-                endTime=endTime,
                 limit=limit,
+                cursor=cursor,
             ),
         )

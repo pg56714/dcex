@@ -42,6 +42,8 @@ class MarketHTTP(HTTPManager):
         for key, value in kwargs.items():
             if value is None:
                 continue
+            if isinstance(value, (list, dict)):
+                value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))
         return params
 
@@ -49,8 +51,13 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         filter: dict[str, Any] | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = None,
-    ) -> dict[str, Any]:
+        start: int | None = None,
+        reverse: bool | None = None,
+        startTime: str | None = None,
+        endTime: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get instrument information for trading pairs."""
         return await self._native_public(
             "get_instrument_info",
@@ -58,8 +65,13 @@ class MarketHTTP(HTTPManager):
                 product_symbol=(
                     self._exchange_symbol(product_symbol) if product_symbol is not None else None
                 ),
-                filter=json.dumps(filter, separators=(",", ":")) if filter is not None else None,
+                filter=filter,
+                columns=columns,
                 count=count,
+                start=start,
+                reverse=reverse,
+                startTime=startTime,
+                endTime=endTime,
             ),
         )
 
@@ -67,7 +79,7 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         depth: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> list[dict[str, Any]]:
         """Get orderbook data for a specific trading pair."""
         return await self._native_public(
             "get_orderbook",
@@ -78,13 +90,14 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         filter: dict[str, Any] | None = None,
-        columns: str | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = None,
         start: int | None = None,
         reverse: bool | None = None,
         startTime: str | None = None,
         endTime: str | None = None,
-    ) -> dict[str, Any]:
+        pool: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get recent trade data."""
         return await self._native_public(
             "get_trades",
@@ -92,13 +105,14 @@ class MarketHTTP(HTTPManager):
                 product_symbol=(
                     self._exchange_symbol(product_symbol) if product_symbol is not None else None
                 ),
-                filter=str(filter) if filter is not None else None,
+                filter=filter,
                 columns=columns,
                 count=count,
                 start=start,
                 reverse=reverse,
                 startTime=startTime,
                 endTime=endTime,
+                pool=pool,
             ),
         )
 
@@ -108,13 +122,14 @@ class MarketHTTP(HTTPManager):
         partial: bool | None = None,
         symbol: str | None = None,
         filter: dict[str, Any] | None = None,
-        columns: str | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = None,
         start: int | None = None,
         reverse: bool | None = None,
         startTime: str | None = None,
         endTime: str | None = None,
-    ) -> dict[str, Any]:
+        pool: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get ticker data for trading pairs."""
         return await self._native_public(
             "get_ticker",
@@ -122,13 +137,14 @@ class MarketHTTP(HTTPManager):
                 binSize=binSize,
                 partial=partial,
                 symbol=self._exchange_symbol(symbol) if symbol is not None else None,
-                filter=str(filter) if filter is not None else None,
+                filter=filter,
                 columns=columns,
                 count=count,
                 start=start,
                 reverse=reverse,
                 startTime=startTime,
                 endTime=endTime,
+                pool=pool,
             ),
         )
 
@@ -138,13 +154,14 @@ class MarketHTTP(HTTPManager):
         partial: bool | None = None,
         symbol: str | None = None,
         filter: dict[str, Any] | None = None,
-        columns: str | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = None,
         start: int | None = None,
         reverse: bool | None = None,
         startTime: str | None = None,
         endTime: str | None = None,
-    ) -> dict[str, Any]:
+        pool: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get kline/candlestick data for trading pairs."""
         return await self._native_public(
             "get_kline",
@@ -152,13 +169,14 @@ class MarketHTTP(HTTPManager):
                 binSize=binSize,
                 partial=partial,
                 symbol=self._exchange_symbol(symbol) if symbol is not None else None,
-                filter=str(filter) if filter is not None else None,
+                filter=filter,
                 columns=columns,
                 count=count,
                 start=start,
                 reverse=reverse,
                 startTime=startTime,
                 endTime=endTime,
+                pool=pool,
             ),
         )
 
@@ -166,13 +184,13 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         filter: dict[str, Any] | None = None,
-        columns: str | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = None,
         start: int | None = None,
         reverse: bool | None = None,
         startTime: str | None = None,
         endTime: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> list[dict[str, Any]]:
         """Get funding rate data for perpetual contracts."""
         return await self._native_public(
             "get_funding",
@@ -180,7 +198,7 @@ class MarketHTTP(HTTPManager):
                 product_symbol=(
                     self._exchange_symbol(product_symbol) if product_symbol is not None else None
                 ),
-                filter=str(filter) if filter is not None else None,
+                filter=filter,
                 columns=columns,
                 count=count,
                 start=start,
@@ -194,13 +212,11 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str | None = None,
         filter: dict[str, Any] | None = None,
-        columns: str | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = None,
         start: int | None = None,
         reverse: bool | None = None,
-        startTime: str | None = None,
-        endTime: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> list[dict[str, Any]]:
         """Get liquidation orders."""
         return await self._native_public(
             "get_liquidations",
@@ -208,12 +224,10 @@ class MarketHTTP(HTTPManager):
                 product_symbol=(
                     self._exchange_symbol(product_symbol) if product_symbol is not None else None
                 ),
-                filter=json.dumps(filter, separators=(",", ":")) if filter is not None else None,
+                filter=filter,
                 columns=columns,
                 count=count,
                 start=start,
                 reverse=reverse,
-                startTime=startTime,
-                endTime=endTime,
             ),
         )

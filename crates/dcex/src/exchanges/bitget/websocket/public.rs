@@ -24,9 +24,16 @@ impl BitgetWebSocketArg {
         channel: impl Into<String>,
         inst_id: impl Into<String>,
     ) -> Result<Self> {
+        let inst_type = normalize_inst_type(&inst_type.into())?;
+        let channel = normalize_channel(&channel.into())?;
+        if channel == "auction" && inst_type != "SPOT" {
+            return Err(DcexError::InvalidInput(
+                "Bitget auction channel only supports SPOT.".to_string(),
+            ));
+        }
         Ok(Self {
-            inst_type: normalize_inst_type(&inst_type.into())?,
-            channel: normalize_channel(&channel.into())?,
+            inst_type,
+            channel,
             inst_id: normalize_inst_id(&inst_id.into())?,
         })
     }
@@ -209,20 +216,20 @@ fn normalize_inst_type(inst_type: &str) -> Result<String> {
 
 fn normalize_channel(channel: &str) -> Result<String> {
     let channel = channel.trim();
-    if channel.is_empty() {
-        return Err(DcexError::InvalidInput(
-            "Bitget WebSocket channel must not be empty.".to_string(),
-        ));
-    }
-    if !channel
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '_')
-    {
-        return Err(DcexError::InvalidInput(format!(
+    match channel {
+        "ticker" | "trade" | "books" | "books1" | "books5" | "books15" | "auction" => {
+            Ok(channel.to_string())
+        }
+        _ if channel
+            .strip_prefix("candle")
+            .is_some_and(|interval| normalize_interval(interval).is_ok()) =>
+        {
+            Ok(channel.to_string())
+        }
+        _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget WebSocket channel: {channel}"
-        )));
+        ))),
     }
-    Ok(channel.to_string())
 }
 
 fn normalize_inst_id(inst_id: &str) -> Result<String> {
@@ -257,20 +264,13 @@ fn orderbook_channel(depth: u32) -> Result<&'static str> {
 
 fn normalize_interval(interval: &str) -> Result<String> {
     let interval = interval.trim();
-    if interval.is_empty() {
-        return Err(DcexError::InvalidInput(
-            "Bitget kline interval must not be empty.".to_string(),
-        ));
-    }
-    if !interval
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric())
-    {
-        return Err(DcexError::InvalidInput(format!(
+    match interval {
+        "1m" | "5m" | "15m" | "30m" | "1H" | "4H" | "6H" | "12H" | "1D" | "3D" | "1W" | "1M"
+        | "6Hutc" | "12Hutc" | "1Dutc" | "3Dutc" | "1Wutc" | "1Mutc" => Ok(interval.to_string()),
+        _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget kline interval: {interval}"
-        )));
+        ))),
     }
-    Ok(interval.to_string())
 }
 
 #[cfg(test)]
@@ -294,6 +294,8 @@ mod tests {
         assert_eq!(arg.channel, "trade");
         assert_eq!(arg.inst_id, "BTCUSDT");
         assert_eq!(arg.to_json()["instType"], "SPOT");
+        assert!(BitgetWebSocketArg::new("spot", "bad", "btcusdt").is_err());
+        assert!(BitgetWebSocketArg::new("USDT-FUTURES", "auction", "btcusdt").is_err());
     }
 
     #[test]

@@ -1,5 +1,6 @@
 """KuCoin Spot and Futures Market async HTTP client backed by Rust."""
 
+import json
 from typing import Any
 
 from ..._native_http import request_native_json_async
@@ -35,12 +36,17 @@ class MarketHTTP(HTTPManager):
                 continue
             if key == "from_":
                 key = "from"
+            if isinstance(value, list):
+                value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))
         return params
 
-    async def get_spot_instrument_info(self) -> dict[str, Any]:
+    async def get_spot_instrument_info(self, market: str | None = None) -> dict[str, Any]:
         """Retrieve trading instrument information."""
-        return await self._native_public("get_spot_instrument_info", [])
+        return await self._native_public(
+            "get_spot_instrument_info",
+            self._params(market=market),
+        )
 
     async def get_spot_ticker(self, product_symbol: str) -> dict[str, Any]:
         """Retrieve single ticker information for a specific trading pair."""
@@ -105,7 +111,7 @@ class MarketHTTP(HTTPManager):
 
     async def get_futures_orderbook(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         depth: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve KuCoin futures orderbook."""
@@ -144,8 +150,8 @@ class MarketHTTP(HTTPManager):
 
     async def get_futures_open_interest(
         self,
-        product_symbol: str,
-        interval: str = "5min",
+        product_symbol: str | list[str] | None = None,
+        interval: str | None = None,
         startAt: int | None = None,
         endAt: int | None = None,
         pageSize: int | None = None,
@@ -167,7 +173,7 @@ class MarketHTTP(HTTPManager):
         product_symbol: str | None = None,
         tradeType: str = "FUTURES",
         currency: str | None = None,
-        marginMode: str | None = None,
+        marginMode: str = "CROSS",
         data: str = "RISK_LIMIT",
         accountType: str = "UNIFIED",
     ) -> dict[str, Any]:

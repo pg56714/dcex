@@ -6,15 +6,17 @@ use crate::{DcexError, Result};
 
 use super::client::MexcClient;
 use super::endpoints::*;
-use super::params::{require_one_identifier, MexcParams};
+use super::params::{
+    add_pagination_defaults, require_one_identifier, validate_enum, validate_u64_range, MexcParams,
+};
 use super::signing::json_value_string;
 
 const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "quantity",
     "quoteOrderQty",
     "price",
-    "timeInForce",
     "newClientOrderId",
+    "stpMode",
     "recvWindow",
 ];
 
@@ -54,6 +56,22 @@ const CONTRACT_ORDER_NUMBER_KEYS: &[&str] = &[
     "bboTypeNum",
     "stpMode",
 ];
+
+fn required_batch_string<'a>(
+    order: &'a Map<String, Value>,
+    index: usize,
+    key: &str,
+) -> Result<&'a str> {
+    order
+        .get(key)
+        .and_then(Value::as_str)
+        .filter(|value| !value.is_empty())
+        .ok_or_else(|| {
+            DcexError::InvalidInput(format!(
+                "MEXC Spot batch order at index {index} requires string parameter {key}"
+            ))
+        })
+}
 
 impl MexcClient {
     pub(super) async fn trade_private_request(
@@ -132,37 +150,78 @@ impl MexcClient {
             }
             "place_spot_batch_orders" => self.place_spot_batch_orders_from_params(params).await,
             "cancel_spot_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "orderId",
+                    "origClientOrderId",
+                    "newClientOrderId",
+                    "recvWindow",
+                ])?;
                 require_one_identifier(&params, &["orderId", "origClientOrderId"])?;
-                let mut query = params.only(&["orderId", "origClientOrderId", "recvWindow"]);
+                let mut query = params.only(&[
+                    "orderId",
+                    "origClientOrderId",
+                    "newClientOrderId",
+                    "recvWindow",
+                ]);
                 self.push_required_product_symbol(&mut query, params, "")?;
                 self.spot_private(HttpMethod::Delete, SPOT_ORDER, query)
                     .await
             }
             "cancel_spot_open_orders" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "recvWindow"])?;
                 let mut query = params.only(&["recvWindow"]);
                 self.push_required_product_symbol(&mut query, params, "")?;
                 self.spot_private(HttpMethod::Delete, SPOT_OPEN_ORDERS, query)
                     .await
             }
             "get_spot_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "orderId",
+                    "origClientOrderId",
+                    "recvWindow",
+                ])?;
+                require_one_identifier(&params, &["orderId", "origClientOrderId"])?;
                 let mut query = params.only(&["orderId", "origClientOrderId", "recvWindow"]);
-                self.push_required_product_symbol(&mut query, params, "")?;
+                self.push_product_symbol(&mut query, params, "")?;
                 self.spot_private(HttpMethod::Get, SPOT_ORDER, query).await
             }
             "get_spot_open_orders" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "recvWindow"])?;
                 let mut query = params.only(&["recvWindow"]);
-                self.push_required_product_symbol(&mut query, params, "")?;
+                self.push_product_symbol(&mut query, params, "")?;
                 self.spot_private(HttpMethod::Get, SPOT_OPEN_ORDERS, query)
                     .await
             }
             "get_spot_all_orders" => {
-                let mut query =
-                    params.only(&["orderId", "startTime", "endTime", "limit", "recvWindow"]);
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "recvWindow",
+                ])?;
+                validate_u64_range(params, "limit", 1, 1_000)?;
+                let mut query = params.only(&["startTime", "endTime", "limit", "recvWindow"]);
                 self.push_required_product_symbol(&mut query, params, "")?;
                 self.spot_private(HttpMethod::Get, SPOT_ALL_ORDERS, query)
                     .await
             }
             "get_spot_my_trades" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "orderId",
+                    "startTime",
+                    "endTime",
+                    "limit",
+                    "recvWindow",
+                ])?;
+                validate_u64_range(params, "limit", 1, 100)?;
                 let mut query =
                     params.only(&["orderId", "startTime", "endTime", "limit", "recvWindow"]);
                 self.push_required_product_symbol(&mut query, params, "")?;
@@ -205,6 +264,7 @@ impl MexcClient {
             }
             "cancel_contract_orders" => self.cancel_contract_orders_from_params(params).await,
             "cancel_contract_order" => {
+                params.ensure_allowed(&["order_id", "orderId"])?;
                 let order_id = params
                     .required("order_id")
                     .or_else(|_| params.required("orderId"))?;
@@ -215,23 +275,48 @@ impl MexcClient {
                 .await
             }
             "cancel_contract_order_with_external_id" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "externalOid"])?;
                 let mut body = params.body(&["externalOid"], &[], &[]);
+                params.required("externalOid")?;
                 self.insert_required_product_symbol(&mut body, params, "_")?;
-                self.contract_post_json(CONTRACT_CANCEL_ORDER_WITH_EXTERNAL_ID, Value::Object(body))
-                    .await
+                self.contract_post_json(
+                    CONTRACT_CANCEL_ORDER_WITH_EXTERNAL_ID,
+                    Value::Array(vec![Value::Object(body)]),
+                )
+                .await
             }
             "cancel_all_contract_orders" => {
+                params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut body = Map::new();
-                self.insert_required_product_symbol(&mut body, params, "_")?;
+                self.insert_product_symbol(&mut body, params, "_")?;
+                if !body.contains_key("symbol") {
+                    body.insert("symbol".to_string(), Value::String(String::new()));
+                }
                 self.contract_post_json(CONTRACT_CANCEL_ALL_ORDERS, Value::Object(body))
                     .await
             }
             "get_contract_open_orders" => {
+                params.ensure_allowed(&["page_num", "page_size"])?;
+                validate_u64_range(params, "page_num", 1, u64::MAX)?;
+                validate_u64_range(params, "page_size", 1, 100)?;
                 let mut query = params.only(&["page_num", "page_size"]);
                 add_pagination_defaults(&mut query);
                 self.contract_get(CONTRACT_OPEN_ORDERS, query).await
             }
             "get_contract_history_orders" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "states",
+                    "category",
+                    "start_time",
+                    "end_time",
+                    "page_num",
+                    "page_size",
+                    "orderId",
+                ])?;
+                validate_u64_range(params, "page_num", 1, u64::MAX)?;
+                validate_u64_range(params, "page_size", 1, 100)?;
                 let mut query = params.only(&[
                     "states",
                     "category",
@@ -242,9 +327,16 @@ impl MexcClient {
                     "orderId",
                 ]);
                 self.push_product_symbol(&mut query, params, "_")?;
+                add_pagination_defaults(&mut query);
                 self.contract_get(CONTRACT_HISTORY_ORDERS, query).await
             }
             "get_contract_order_by_external_id" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "external_oid",
+                    "externalOid",
+                ])?;
                 let symbol = self.required_contract_symbol(params)?;
                 let external_oid = params
                     .required("external_oid")
@@ -255,6 +347,7 @@ impl MexcClient {
                 self.contract_get(&path, Vec::new()).await
             }
             "get_contract_order" => {
+                params.ensure_allowed(&["order_id", "orderId"])?;
                 let order_id = params
                     .required("order_id")
                     .or_else(|_| params.required("orderId"))?;
@@ -262,7 +355,13 @@ impl MexcClient {
                 self.contract_get(&path, Vec::new()).await
             }
             "get_contract_orders" => {
+                params.ensure_allowed(&["order_ids"])?;
                 let order_ids = joined_order_ids(params.required("order_ids")?)?;
+                if order_ids.split(',').count() > 50 {
+                    return Err(DcexError::InvalidInput(
+                        "MEXC batch order query supports at most 50 order IDs".to_string(),
+                    ));
+                }
                 self.contract_get(
                     CONTRACT_BATCH_QUERY,
                     vec![("order_ids".to_string(), order_ids)],
@@ -270,6 +369,7 @@ impl MexcClient {
                 .await
             }
             "get_contract_order_deal_details" => {
+                params.ensure_allowed(&["order_id", "orderId"])?;
                 let order_id = params
                     .required("order_id")
                     .or_else(|_| params.required("orderId"))?;
@@ -277,11 +377,32 @@ impl MexcClient {
                 self.contract_get(&path, Vec::new()).await
             }
             "get_contract_order_deals" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "start_time",
+                    "end_time",
+                    "page_num",
+                    "page_size",
+                ])?;
+                validate_u64_range(params, "page_num", 1, u64::MAX)?;
+                validate_u64_range(params, "page_size", 1, 1_000)?;
                 let mut query = params.only(&["start_time", "end_time", "page_num", "page_size"]);
-                self.push_product_symbol(&mut query, params, "_")?;
+                self.push_required_product_symbol(&mut query, params, "_")?;
+                add_pagination_defaults(&mut query);
                 self.contract_get(CONTRACT_ORDER_DEALS, query).await
             }
             "get_contract_plan_orders" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "states",
+                    "side",
+                    "start_time",
+                    "end_time",
+                    "page_num",
+                    "page_size",
+                ])?;
                 let mut query = vec![
                     (
                         "start_time".to_string(),
@@ -298,8 +419,49 @@ impl MexcClient {
                 self.contract_get(CONTRACT_PLAN_ORDERS, query).await
             }
             "place_contract_plan_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "price",
+                    "vol",
+                    "leverage",
+                    "side",
+                    "openType",
+                    "triggerPrice",
+                    "triggerType",
+                    "executeCycle",
+                    "orderType",
+                    "trend",
+                    "externalOid",
+                    "priceProtect",
+                    "positionMode",
+                    "lossTrend",
+                    "profitTrend",
+                    "stopLossPrice",
+                    "takeProfitPrice",
+                    "reduceOnly",
+                ])?;
                 let mut body = params.body(
-                    &["price", "externalOid", "stopLossPrice", "takeProfitPrice"],
+                    &[
+                        "price",
+                        "vol",
+                        "leverage",
+                        "side",
+                        "openType",
+                        "triggerPrice",
+                        "triggerType",
+                        "executeCycle",
+                        "orderType",
+                        "trend",
+                        "externalOid",
+                        "priceProtect",
+                        "positionMode",
+                        "lossTrend",
+                        "profitTrend",
+                        "stopLossPrice",
+                        "takeProfitPrice",
+                        "reduceOnly",
+                    ],
                     &[
                         "vol",
                         "leverage",
@@ -317,26 +479,74 @@ impl MexcClient {
                     ],
                     &["reduceOnly"],
                 );
+                for key in [
+                    "vol",
+                    "leverage",
+                    "side",
+                    "openType",
+                    "triggerPrice",
+                    "triggerType",
+                    "executeCycle",
+                    "orderType",
+                    "trend",
+                ] {
+                    params.required(key)?;
+                }
                 self.insert_required_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_PLACE_PLAN_ORDER, Value::Object(body))
                     .await
             }
             "cancel_contract_plan_orders" => {
-                self.contract_post_json(
-                    CONTRACT_CANCEL_PLAN_ORDERS,
-                    params.json_required("orders")?,
-                )
-                .await
+                params.ensure_allowed(&["orders"])?;
+                let orders = params.json_required("orders")?;
+                let Value::Array(ref values) = orders else {
+                    return Err(DcexError::InvalidInput(
+                        "MEXC plan orders must be a JSON array".to_string(),
+                    ));
+                };
+                if values.is_empty() || values.len() > 50 {
+                    return Err(DcexError::InvalidInput(
+                        "MEXC plan order cancellation requires 1 to 50 orders".to_string(),
+                    ));
+                }
+                self.contract_post_json(CONTRACT_CANCEL_PLAN_ORDERS, orders)
+                    .await
             }
             "cancel_all_contract_plan_orders" => {
+                params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut body = Map::new();
                 self.insert_product_symbol(&mut body, params, "_")?;
                 self.contract_post_json(CONTRACT_CANCEL_ALL_PLAN_ORDERS, Value::Object(body))
                     .await
             }
             "get_contract_stop_orders" => {
-                let mut query = params.only(&["states", "page_num", "page_size"]);
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "is_finished",
+                    "state",
+                    "type",
+                    "start_time",
+                    "end_time",
+                    "page_num",
+                    "page_size",
+                ])?;
+                validate_enum(params, "is_finished", &["0", "1"])?;
+                validate_enum(params, "state", &["1", "2", "3", "4", "5"])?;
+                validate_enum(params, "type", &["1", "2"])?;
+                validate_u64_range(params, "page_num", 1, u64::MAX)?;
+                validate_u64_range(params, "page_size", 1, 100)?;
+                let mut query = params.only(&[
+                    "is_finished",
+                    "state",
+                    "type",
+                    "start_time",
+                    "end_time",
+                    "page_num",
+                    "page_size",
+                ]);
                 self.push_product_symbol(&mut query, params, "_")?;
+                add_pagination_defaults(&mut query);
                 self.contract_get(CONTRACT_STOP_ORDERS, query).await
             }
             _ => return Ok(None),
@@ -350,8 +560,20 @@ impl MexcClient {
         params: &MexcParams,
         side_override: Option<&str>,
         type_override: Option<&str>,
-        default_time_in_force: Option<&str>,
+        _default_time_in_force: Option<&str>,
     ) -> Result<ValidatedResponse> {
+        params.ensure_allowed(&[
+            "product_symbol",
+            "symbol",
+            "side",
+            "type",
+            "quantity",
+            "quoteOrderQty",
+            "price",
+            "newClientOrderId",
+            "stpMode",
+            "recvWindow",
+        ])?;
         let mut query = Vec::new();
         self.push_required_product_symbol(&mut query, params, "")?;
         let side = match side_override {
@@ -362,14 +584,41 @@ impl MexcClient {
             Some(order_type) => order_type,
             None => params.required("type")?,
         };
+        if !matches!(side, "BUY" | "SELL") {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported MEXC Spot order side: {side}"
+            )));
+        }
+        if !matches!(
+            order_type,
+            "LIMIT" | "MARKET" | "LIMIT_MAKER" | "IMMEDIATE_OR_CANCEL" | "FILL_OR_KILL"
+        ) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported MEXC Spot order type: {order_type}"
+            )));
+        }
+        match order_type {
+            "MARKET" => {
+                if params.get("quantity").is_none() && params.get("quoteOrderQty").is_none() {
+                    return Err(DcexError::InvalidInput(
+                        "MEXC Spot MARKET orders require quantity or quoteOrderQty".to_string(),
+                    ));
+                }
+            }
+            _ => {
+                params.required("quantity")?;
+                params.required("price")?;
+            }
+        }
+        validate_enum(
+            params,
+            "stpMode",
+            &["", "CANCEL_MAKER", "CANCEL_TAKER", "CANCEL_BOTH"],
+        )?;
+        validate_u64_range(params, "recvWindow", 1, 60_000)?;
         query.push(("side".to_string(), side.to_string()));
         query.push(("type".to_string(), order_type.to_string()));
         query.extend(params.only(SPOT_ORDER_OPTIONAL_KEYS));
-        if let Some(time_in_force) = default_time_in_force {
-            if !query.iter().any(|(key, _)| key == "timeInForce") {
-                query.push(("timeInForce".to_string(), time_in_force.to_string()));
-            }
-        }
         self.spot_private(HttpMethod::Post, endpoint, query).await
     }
 
@@ -377,17 +626,106 @@ impl MexcClient {
         &self,
         params: &MexcParams,
     ) -> Result<ValidatedResponse> {
+        params.ensure_allowed(&["batchOrders", "recvWindow"])?;
+        validate_u64_range(params, "recvWindow", 1, 60_000)?;
         let orders = params.json_required("batchOrders")?;
         let Value::Array(mut orders) = orders else {
             return Err(DcexError::InvalidInput(
                 "batchOrders must be a JSON array.".to_string(),
             ));
         };
-        for order in &mut orders {
-            if let Value::Object(order) = order {
-                if let Some(product_symbol) = order.remove("product_symbol") {
-                    let symbol = self.exchange_symbol(&json_value_string(&product_symbol), "")?;
-                    order.insert("symbol".to_string(), Value::String(symbol));
+        if orders.is_empty() || orders.len() > 20 {
+            return Err(DcexError::InvalidInput(
+                "MEXC Spot batch orders require 1 to 20 orders".to_string(),
+            ));
+        }
+        let mut batch_symbol: Option<String> = None;
+        for (index, order) in orders.iter_mut().enumerate() {
+            let Value::Object(order) = order else {
+                return Err(DcexError::InvalidInput(format!(
+                    "MEXC Spot batch order at index {index} must be a JSON object"
+                )));
+            };
+            const ALLOWED_KEYS: &[&str] = &[
+                "product_symbol",
+                "symbol",
+                "side",
+                "type",
+                "quantity",
+                "quoteOrderQty",
+                "price",
+                "newClientOrderId",
+                "stpMode",
+            ];
+            if let Some(key) = order
+                .keys()
+                .find(|key| !ALLOWED_KEYS.contains(&key.as_str()))
+            {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported MEXC Spot batch order parameter: {key}"
+                )));
+            }
+            if order.contains_key("product_symbol") && order.contains_key("symbol") {
+                return Err(DcexError::InvalidInput(format!(
+                    "MEXC Spot batch order at index {index} cannot include both product_symbol and symbol"
+                )));
+            }
+            if let Some(product_symbol) = order.remove("product_symbol") {
+                let symbol = self.exchange_symbol(&json_value_string(&product_symbol), "")?;
+                order.insert("symbol".to_string(), Value::String(symbol));
+            }
+            let symbol = required_batch_string(order, index, "symbol")?;
+            if batch_symbol
+                .as_ref()
+                .is_some_and(|expected| expected != symbol)
+            {
+                return Err(DcexError::InvalidInput(
+                    "MEXC Spot batch orders must use the same symbol".to_string(),
+                ));
+            }
+            batch_symbol.get_or_insert_with(|| symbol.to_string());
+
+            let side = required_batch_string(order, index, "side")?;
+            if !matches!(side, "BUY" | "SELL") {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported MEXC Spot batch order side: {side}"
+                )));
+            }
+            let order_type = required_batch_string(order, index, "type")?;
+            if !matches!(
+                order_type,
+                "LIMIT" | "MARKET" | "LIMIT_MAKER" | "IMMEDIATE_OR_CANCEL" | "FILL_OR_KILL"
+            ) {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported MEXC Spot batch order type: {order_type}"
+                )));
+            }
+            match order_type {
+                "MARKET" => {
+                    if !order.contains_key("quantity") && !order.contains_key("quoteOrderQty") {
+                        return Err(DcexError::InvalidInput(format!(
+                            "MEXC Spot MARKET batch order at index {index} requires quantity or quoteOrderQty"
+                        )));
+                    }
+                }
+                _ => {
+                    for key in ["quantity", "price"] {
+                        if !order.contains_key(key) {
+                            return Err(DcexError::InvalidInput(format!(
+                                "MEXC Spot batch order at index {index} requires {key}"
+                            )));
+                        }
+                    }
+                }
+            }
+            if let Some(stp_mode) = order.get("stpMode").map(json_value_string) {
+                if !matches!(
+                    stp_mode.as_str(),
+                    "CANCEL_MAKER" | "CANCEL_TAKER" | "CANCEL_BOTH"
+                ) {
+                    return Err(DcexError::InvalidInput(format!(
+                        "unsupported MEXC Spot batch order stpMode: {stp_mode}"
+                    )));
                 }
             }
         }
@@ -406,6 +744,67 @@ impl MexcClient {
         side_override: Option<i64>,
         type_override: Option<i64>,
     ) -> Result<ValidatedResponse> {
+        params.ensure_allowed(&[
+            "product_symbol",
+            "symbol",
+            "side",
+            "type",
+            "openType",
+            "vol",
+            "price",
+            "leverage",
+            "externalOid",
+            "positionId",
+            "positionMode",
+            "reduceOnly",
+            "stopLossPrice",
+            "takeProfitPrice",
+            "lossTrend",
+            "profitTrend",
+            "priceProtect",
+            "marketCeiling",
+            "flashClose",
+            "bboTypeNum",
+            "stpMode",
+        ])?;
+        for key in ["openType", "vol"] {
+            params.required(key)?;
+        }
+        let side = side_override
+            .map(|value| value.to_string())
+            .or_else(|| params.get("side").map(ToString::to_string))
+            .ok_or_else(|| {
+                DcexError::InvalidInput("missing required parameter: side".to_string())
+            })?;
+        let order_type = type_override
+            .map(|value| value.to_string())
+            .or_else(|| params.get("type").map(ToString::to_string))
+            .ok_or_else(|| {
+                DcexError::InvalidInput("missing required parameter: type".to_string())
+            })?;
+        if !["1", "2", "3", "4"].contains(&side.as_str()) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported MEXC Contract order side: {side}"
+            )));
+        }
+        if !["1", "2", "3", "4", "5"].contains(&order_type.as_str()) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported MEXC Contract order type: {order_type}"
+            )));
+        }
+        validate_enum(params, "openType", &["1", "2"])?;
+        validate_enum(params, "positionMode", &["1", "2"])?;
+        validate_enum(params, "lossTrend", &["1", "2", "3"])?;
+        validate_enum(params, "profitTrend", &["1", "2", "3"])?;
+        validate_enum(params, "priceProtect", &["0", "1"])?;
+        validate_enum(params, "bboTypeNum", &["0", "1", "2", "3", "4"])?;
+        validate_enum(params, "stpMode", &["0", "1", "2", "3"])?;
+        if matches!(side.as_str(), "1" | "3") {
+            params.required("leverage")?;
+        }
+        if order_type != "5" {
+            params.required("price")?;
+        }
         let mut body = params.body(
             CONTRACT_ORDER_KEYS,
             CONTRACT_ORDER_NUMBER_KEYS,
@@ -418,6 +817,9 @@ impl MexcClient {
         if let Some(order_type) = type_override {
             body.insert("type".to_string(), Value::Number(Number::from(order_type)));
         }
+        if order_type == "5" && !body.contains_key("price") {
+            body.insert("price".to_string(), Value::String("0".to_string()));
+        }
         self.contract_post_json(CONTRACT_CREATE_ORDER, Value::Object(body))
             .await
     }
@@ -426,19 +828,38 @@ impl MexcClient {
         &self,
         params: &MexcParams,
     ) -> Result<ValidatedResponse> {
+        params.ensure_allowed(&["orders"])?;
         let orders = params.json_required("orders")?;
         let Value::Array(orders) = orders else {
             return Err(DcexError::InvalidInput(
                 "orders must be a JSON array.".to_string(),
             ));
         };
-        let order_ids = orders
-            .into_iter()
-            .map(|order| match order {
-                Value::Object(mut object) => object.remove("orderId").unwrap_or(Value::Null),
-                value => value,
-            })
-            .collect();
+        if orders.is_empty() || orders.len() > 50 {
+            return Err(DcexError::InvalidInput(
+                "MEXC Contract cancellation requires 1 to 50 order IDs".to_string(),
+            ));
+        }
+        let mut order_ids = Vec::with_capacity(orders.len());
+        for (index, order) in orders.into_iter().enumerate() {
+            let order_id = match order {
+                Value::Object(mut object) => {
+                    if object.len() != 1 || !object.contains_key("orderId") {
+                        return Err(DcexError::InvalidInput(format!(
+                            "MEXC Contract cancellation object at index {index} must contain only orderId"
+                        )));
+                    }
+                    object.remove("orderId").expect("validated")
+                }
+                Value::String(_) | Value::Number(_) => order,
+                _ => {
+                    return Err(DcexError::InvalidInput(format!(
+                        "MEXC Contract cancellation order ID at index {index} must be a string or integer"
+                    )));
+                }
+            };
+            order_ids.push(order_id);
+        }
         self.contract_post_json(CONTRACT_CANCEL_ORDERS, Value::Array(order_ids))
             .await
     }
@@ -460,15 +881,6 @@ fn joined_order_ids(value: &str) -> Result<String> {
             .join(","));
     }
     Ok(value.to_string())
-}
-
-fn add_pagination_defaults(query: &mut Vec<(String, String)>) {
-    if !query.iter().any(|(key, _)| key == "page_num") {
-        query.push(("page_num".to_string(), "1".to_string()));
-    }
-    if !query.iter().any(|(key, _)| key == "page_size") {
-        query.push(("page_size".to_string(), "20".to_string()));
-    }
 }
 
 #[cfg(test)]

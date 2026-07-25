@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::time::Duration;
 
 use serde_json::{json, Value};
@@ -18,6 +19,7 @@ pub struct MexcPrivateWebSocket {
     ws_base_url: String,
     timeout: Duration,
     listen_key: Option<String>,
+    subscriptions: HashSet<String>,
 }
 
 impl MexcPrivateWebSocket {
@@ -74,6 +76,7 @@ impl MexcPrivateWebSocket {
             ws_base_url,
             timeout,
             listen_key: None,
+            subscriptions: HashSet::new(),
         })
     }
 
@@ -92,6 +95,7 @@ impl MexcPrivateWebSocket {
             self.timeout,
         )?);
         self.connection.connect().await?;
+        self.subscriptions.clear();
         Ok(listen_key)
     }
 
@@ -182,11 +186,28 @@ impl MexcPrivateWebSocket {
             .into_iter()
             .map(|channel| normalize_channel(&channel))
             .collect::<Result<Vec<_>>>()?;
+        if method == "SUBSCRIPTION" {
+            let mut subscriptions = self.subscriptions.clone();
+            subscriptions.extend(channels.iter().cloned());
+            if subscriptions.len() > 30 {
+                return Err(DcexError::InvalidInput(
+                    "MEXC WebSocket connections support at most 30 subscriptions.".to_string(),
+                ));
+            }
+        }
         let payload = json!({
             "method": method,
-            "params": channels,
+            "params": &channels,
         });
-        self.connection.send_json(&payload).await
+        self.connection.send_json(&payload).await?;
+        if method == "SUBSCRIPTION" {
+            self.subscriptions.extend(channels);
+        } else {
+            for channel in channels {
+                self.subscriptions.remove(&channel);
+            }
+        }
+        Ok(())
     }
 
     fn listen_key_request(
@@ -304,5 +325,16 @@ mod tests {
             .build_listen_key_request(HttpMethod::Post, None)
             .expect("create request");
         assert!(create_request.query.is_empty());
+    }
+
+    #[tokio::test]
+    async fn rejects_more_than_30_subscriptions_before_transport() {
+        let mut client =
+            MexcPrivateWebSocket::new("key".to_string(), Duration::from_secs(1)).expect("client");
+        client.subscriptions = (0..30).map(|index| format!("channel{index}")).collect();
+        assert!(client
+            .subscribe(vec!["channel30".to_string()])
+            .await
+            .is_err());
     }
 }

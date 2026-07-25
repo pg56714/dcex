@@ -12,10 +12,16 @@ const DEFAULT_TX_EXPIRY_MS: u64 = 590_000;
 const DEFAULT_ORDER_EXPIRY_MS: u64 = 28 * 24 * 60 * 60 * 1000;
 
 pub(super) fn chain_id(base_url: &str) -> u64 {
-    if base_url.contains("mainnet") || base_url.contains("api") {
+    if base_url.contains("mainnet.zklighter") {
         304
-    } else {
+    } else if base_url.contains("testnet.zklighter") {
         300
+    } else if base_url.contains("api.rh.lighter") {
+        466_324
+    } else if base_url.contains("api.rh-testnet.lighter") {
+        300
+    } else {
+        304
     }
 }
 
@@ -95,7 +101,59 @@ pub(super) fn attributes(
     integrator_maker_fee: u64,
     skip_nonce: u64,
     cancel_all_market_index: u64,
-) -> Vec<(u64, u64)> {
+    self_trade_behavior_mode: u64,
+    self_trade_equality_mode: u64,
+) -> Result<Vec<(u64, u64)>> {
+    const MAX_ACCOUNT_INDEX: u64 = (1 << 48) - 2;
+    const FEE_TICK: u64 = 1_000_000;
+    if integrator_account_index > MAX_ACCOUNT_INDEX {
+        return Err(DcexError::InvalidInput(
+            "Lighter integrator_account_index is outside the valid range".to_string(),
+        ));
+    }
+    if integrator_taker_fee > FEE_TICK || integrator_maker_fee > FEE_TICK {
+        return Err(DcexError::InvalidInput(
+            "Lighter integrator fees must be between 0 and 1000000".to_string(),
+        ));
+    }
+    if (integrator_taker_fee != 0 || integrator_maker_fee != 0) && integrator_account_index == 0 {
+        return Err(DcexError::InvalidInput(
+            "Lighter integrator_account_index is required for non-zero integrator fees".to_string(),
+        ));
+    }
+    if skip_nonce > 1 {
+        return Err(DcexError::InvalidInput(
+            "Lighter skip_nonce must be 0 or 1".to_string(),
+        ));
+    }
+    if cancel_all_market_index > 255 {
+        return Err(DcexError::InvalidInput(
+            "Lighter cancel_all_market_index must be between 0 and 255".to_string(),
+        ));
+    }
+    if self_trade_behavior_mode > 3 {
+        return Err(DcexError::InvalidInput(
+            "Lighter self_trade_behavior_mode must be between 0 and 3".to_string(),
+        ));
+    }
+    if self_trade_equality_mode > 1 {
+        return Err(DcexError::InvalidInput(
+            "Lighter self_trade_equality_mode must be 0 or 1".to_string(),
+        ));
+    }
+    let has_self_trade_spec = self_trade_behavior_mode != 0 || self_trade_equality_mode != 0;
+    let has_fees = integrator_taker_fee != 0 || integrator_maker_fee != 0;
+    if has_self_trade_spec && has_fees {
+        return Err(DcexError::InvalidInput(
+            "Lighter self-trade settings cannot be combined with non-zero integrator fees"
+                .to_string(),
+        ));
+    }
+    if self_trade_behavior_mode == 3 && self_trade_equality_mode == 1 {
+        return Err(DcexError::InvalidInput(
+            "Lighter self-trade reduce mode cannot use master-account equality".to_string(),
+        ));
+    }
     let mut result = Vec::new();
     if integrator_account_index != 0 {
         result.push((1, integrator_account_index));
@@ -112,7 +170,13 @@ pub(super) fn attributes(
     if cancel_all_market_index != 255 {
         result.push((5, cancel_all_market_index));
     }
-    result
+    if self_trade_behavior_mode != 0 {
+        result.push((6, self_trade_behavior_mode));
+    }
+    if self_trade_equality_mode != 0 {
+        result.push((7, self_trade_equality_mode));
+    }
+    Ok(result)
 }
 
 pub(super) fn sign_payload(
@@ -188,4 +252,32 @@ fn unix_timestamp_secs() -> Result<u64> {
         .duration_since(UNIX_EPOCH)
         .map_err(|error| DcexError::Runtime(error.to_string()))?;
     Ok(duration.as_secs())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn maps_current_official_chain_ids() {
+        assert_eq!(chain_id("https://mainnet.zklighter.elliot.ai"), 304);
+        assert_eq!(chain_id("https://testnet.zklighter.elliot.ai"), 300);
+        assert_eq!(chain_id("https://api.rh.lighter.xyz"), 466_324);
+        assert_eq!(chain_id("https://api.rh-testnet.lighter.xyz"), 300);
+        assert_eq!(chain_id("http://localhost:8000"), 304);
+    }
+
+    #[test]
+    fn encodes_current_transaction_attributes() {
+        assert_eq!(
+            attributes(12, 0, 0, 1, 255, 2, 1).expect("attributes"),
+            vec![(1, 12), (4, 1), (6, 2), (7, 1)]
+        );
+        assert_eq!(
+            attributes(0, 0, 0, 1, 42, 0, 0).expect("cancel attributes"),
+            vec![(4, 1), (5, 42)]
+        );
+        assert!(attributes(12, 1, 0, 0, 255, 2, 0).is_err());
+        assert!(attributes(0, 0, 0, 0, 255, 3, 1).is_err());
+    }
 }

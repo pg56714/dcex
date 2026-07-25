@@ -6,7 +6,12 @@ use crate::{DcexError, Result};
 pub struct BitmexInstrumentInfoParams<'a> {
     pub product_symbol: Option<&'a str>,
     pub filter: Option<&'a str>,
+    pub columns: Option<&'a str>,
     pub count: Option<&'a str>,
+    pub start: Option<&'a str>,
+    pub reverse: Option<&'a str>,
+    pub start_time: Option<&'a str>,
+    pub end_time: Option<&'a str>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -25,6 +30,7 @@ pub struct BitmexTableParams<'a> {
     pub reverse: Option<&'a str>,
     pub start_time: Option<&'a str>,
     pub end_time: Option<&'a str>,
+    pub pool: Option<&'a str>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -39,6 +45,7 @@ pub struct BitmexBucketParams<'a> {
     pub reverse: Option<&'a str>,
     pub start_time: Option<&'a str>,
     pub end_time: Option<&'a str>,
+    pub pool: Option<&'a str>,
 }
 
 pub(super) struct BitmexParams(Vec<(String, String)>);
@@ -57,6 +64,7 @@ impl BitmexParams {
 
     pub(super) fn required(&self, key: &str) -> Result<&str> {
         self.get(key)
+            .filter(|value| !value.trim().is_empty())
             .ok_or_else(|| DcexError::InvalidInput(format!("missing required parameter: {key}")))
     }
 
@@ -66,6 +74,15 @@ impl BitmexParams {
             .filter(|(key, _)| keys.contains(&key.as_str()))
             .cloned()
             .collect()
+    }
+
+    pub(super) fn ensure_allowed(&self, keys: &[&str]) -> Result<()> {
+        if let Some((key, _)) = self.0.iter().find(|(key, _)| !keys.contains(&key.as_str())) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported BitMEX parameter: {key}"
+            )));
+        }
+        Ok(())
     }
 
     pub(super) fn body(
@@ -164,4 +181,116 @@ pub(super) fn bool_or_string(value: &str) -> Value {
 
 pub(super) fn json_or_string(value: &str) -> Value {
     serde_json::from_str(value).unwrap_or_else(|_| Value::String(value.to_string()))
+}
+
+pub(super) fn validate_enum(params: &BitmexParams, key: &str, allowed: &[&str]) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    if allowed.contains(&value) {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "unsupported BitMEX {key}: {value}"
+    )))
+}
+
+pub(super) fn validate_comma_separated_enum(
+    params: &BitmexParams,
+    key: &str,
+    allowed: &[&str],
+) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    if !value.trim().is_empty()
+        && value
+            .split(',')
+            .map(str::trim)
+            .all(|item| allowed.contains(&item))
+    {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "unsupported BitMEX {key}: {value}"
+    )))
+}
+
+pub(super) fn validate_u64_range(
+    params: &BitmexParams,
+    key: &str,
+    minimum: u64,
+    maximum: u64,
+) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    let parsed = value.parse::<u64>().map_err(|_| {
+        DcexError::InvalidInput(format!("BitMEX parameter {key} must be an integer"))
+    })?;
+    if !(minimum..=maximum).contains(&parsed) {
+        return Err(DcexError::InvalidInput(format!(
+            "BitMEX parameter {key} must be between {minimum} and {maximum}"
+        )));
+    }
+    Ok(())
+}
+
+pub(super) fn validate_number(params: &BitmexParams, key: &str) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    if value.parse::<f64>().is_ok_and(|number| number.is_finite()) {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "BitMEX parameter {key} must be a finite number"
+    )))
+}
+
+pub(super) fn validate_i64(params: &BitmexParams, key: &str) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    if value.parse::<i64>().is_ok() {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "BitMEX parameter {key} must be an integer"
+    )))
+}
+
+pub(super) fn validate_bool(params: &BitmexParams, key: &str) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    if matches!(value, "true" | "True" | "false" | "False") {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "BitMEX parameter {key} must be true or false"
+    )))
+}
+
+pub(super) fn validate_json_object(params: &BitmexParams, key: &str) -> Result<()> {
+    let Some(value) = params.get(key) else {
+        return Ok(());
+    };
+    if serde_json::from_str::<Value>(value).is_ok_and(|value| value.is_object()) {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "BitMEX parameter {key} must be a JSON object"
+    )))
+}
+
+pub(super) fn require_at_most_one(params: &BitmexParams, keys: &[&str]) -> Result<()> {
+    let supplied = keys.iter().filter(|key| params.get(key).is_some()).count();
+    if supplied <= 1 {
+        return Ok(());
+    }
+    Err(DcexError::InvalidInput(format!(
+        "BitMEX parameters {} are mutually exclusive",
+        keys.join(", ")
+    )))
 }

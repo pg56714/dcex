@@ -16,8 +16,8 @@ class TradeHTTP(HTTPManager):
         quantity: str | None = None,
         quoteOrderQty: str | None = None,
         price: str | None = None,
-        timeInForce: str | None = None,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Validate a MEXC Spot order without placing it."""
@@ -30,8 +30,8 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 quoteOrderQty=quoteOrderQty,
                 price=price,
-                timeInForce=timeInForce,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -44,8 +44,8 @@ class TradeHTTP(HTTPManager):
         quantity: str | None = None,
         quoteOrderQty: str | None = None,
         price: str | None = None,
-        timeInForce: str | None = None,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot order."""
@@ -58,8 +58,8 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 quoteOrderQty=quoteOrderQty,
                 price=price,
-                timeInForce=timeInForce,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -70,8 +70,8 @@ class TradeHTTP(HTTPManager):
         side: str,
         quantity: str,
         price: str,
-        timeInForce: str = "GTC",
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot limit order."""
@@ -82,8 +82,8 @@ class TradeHTTP(HTTPManager):
                 side=side,
                 quantity=quantity,
                 price=price,
-                timeInForce=timeInForce,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -94,6 +94,7 @@ class TradeHTTP(HTTPManager):
         quantity: str,
         price: str,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot limit buy order."""
@@ -104,6 +105,7 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 price=price,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -114,6 +116,7 @@ class TradeHTTP(HTTPManager):
         quantity: str,
         price: str,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot limit sell order."""
@@ -124,6 +127,7 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 price=price,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -135,6 +139,7 @@ class TradeHTTP(HTTPManager):
         quantity: str,
         price: str,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot post-only limit order."""
@@ -146,6 +151,7 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 price=price,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -156,6 +162,7 @@ class TradeHTTP(HTTPManager):
         quantity: str,
         price: str,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot post-only limit buy order."""
@@ -166,6 +173,7 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 price=price,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -176,6 +184,7 @@ class TradeHTTP(HTTPManager):
         quantity: str,
         price: str,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot post-only limit sell order."""
@@ -186,6 +195,7 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 price=price,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -197,6 +207,7 @@ class TradeHTTP(HTTPManager):
         quantity: str | None = None,
         quoteOrderQty: str | None = None,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot market order."""
@@ -208,6 +219,7 @@ class TradeHTTP(HTTPManager):
                 quantity=quantity,
                 quoteOrderQty=quoteOrderQty,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -217,6 +229,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         quoteOrderQty: str,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot market buy order by quote quantity."""
@@ -226,6 +239,7 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 quoteOrderQty=quoteOrderQty,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -235,6 +249,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         quantity: str,
         newClientOrderId: str | None = None,
+        stpMode: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place a MEXC Spot market sell order by base quantity."""
@@ -244,6 +259,7 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 quantity=quantity,
                 newClientOrderId=newClientOrderId,
+                stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
         )
@@ -264,6 +280,7 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         orderId: str | int | None = None,
         origClientOrderId: str | None = None,
+        newClientOrderId: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Cancel a MEXC Spot order."""
@@ -273,6 +290,7 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 orderId=orderId,
                 origClientOrderId=origClientOrderId,
+                newClientOrderId=newClientOrderId,
                 recvWindow=recvWindow,
             ),
         )
@@ -290,7 +308,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_spot_order(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         orderId: str | int | None = None,
         origClientOrderId: str | None = None,
         recvWindow: int | None = None,
@@ -308,7 +326,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_spot_open_orders(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         recvWindow: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Spot open orders."""
@@ -320,7 +338,6 @@ class TradeHTTP(HTTPManager):
     async def get_spot_all_orders(
         self,
         product_symbol: str,
-        orderId: str | int | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
         limit: int | None = None,
@@ -331,7 +348,6 @@ class TradeHTTP(HTTPManager):
             "get_spot_all_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                orderId=orderId,
                 startTime=startTime,
                 endTime=endTime,
                 limit=limit,
@@ -661,7 +677,9 @@ class TradeHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol, externalOid=externalOid),
         )
 
-    async def cancel_all_contract_orders(self, product_symbol: str) -> dict[str, Any] | list[Any]:
+    async def cancel_all_contract_orders(
+        self, product_symbol: str | None = None
+    ) -> dict[str, Any] | list[Any]:
         """Cancel all MEXC Contract orders for a symbol."""
         return await self._native_private(
             "cancel_all_contract_orders",
@@ -670,15 +688,13 @@ class TradeHTTP(HTTPManager):
 
     async def get_contract_open_orders(
         self,
-        product_symbol: str | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract open orders."""
         return await self._native_private(
             "get_contract_open_orders",
             self._native_params(
-                product_symbol=product_symbol,
                 page_num=page_num,
                 page_size=page_size,
             ),
@@ -692,8 +708,8 @@ class TradeHTTP(HTTPManager):
         orderId: str | int | None = None,
         start_time: int | None = None,
         end_time: int | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract historical orders."""
         return await self._native_private(
@@ -750,11 +766,11 @@ class TradeHTTP(HTTPManager):
 
     async def get_contract_order_deals(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         start_time: int | None = None,
         end_time: int | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract order deals."""
         return await self._native_private(
@@ -840,7 +856,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def cancel_contract_plan_orders(self, orders: str) -> dict[str, Any]:
+    async def cancel_contract_plan_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
         """Cancel one or more MEXC contract trigger plan orders."""
         return await self._native_private(
             "cancel_contract_plan_orders", self._native_params(orders=orders)
@@ -857,16 +873,24 @@ class TradeHTTP(HTTPManager):
     async def get_contract_stop_orders(
         self,
         product_symbol: str | None = None,
-        states: str | None = None,
-        page_num: int | None = None,
-        page_size: int | None = None,
+        is_finished: int | None = None,
+        state: int | None = None,
+        type_: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page_num: int = 1,
+        page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve MEXC Contract Stop-Limit orders."""
         return await self._native_private(
             "get_contract_stop_orders",
             self._native_params(
                 product_symbol=product_symbol,
-                states=states,
+                is_finished=is_finished,
+                state=state,
+                type_=type_,
+                start_time=start_time,
+                end_time=end_time,
                 page_num=page_num,
                 page_size=page_size,
             ),

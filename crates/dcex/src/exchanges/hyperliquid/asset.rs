@@ -13,10 +13,13 @@ impl HyperliquidClient {
         params: &HyperliquidParams,
     ) -> Result<Option<ValidatedResponse>> {
         let payload = match method_name {
-            "user_vault_equities" => json!({
-                "type": "userVaultEquities",
-                "user": params.required("user")?,
-            }),
+            "user_vault_equities" => {
+                params.ensure_allowed(&["user"])?;
+                json!({
+                    "type": "userVaultEquities",
+                    "user": params.address("user")?,
+                })
+            }
             _ => return Ok(None),
         };
         Ok(Some(self.info_payload(payload).await?))

@@ -43,6 +43,18 @@ impl BinanceClient {
                     .map_err(|error| DcexError::Decode(error.to_string()))?,
             ));
         }
+        if let Some(permissions) = request.permissions {
+            params.push((
+                "permissions".to_string(),
+                serde_json::to_string(&permissions)
+                    .map_err(|error| DcexError::Decode(error.to_string()))?,
+            ));
+        }
+        push_optional(
+            &mut params,
+            "showPermissionSets",
+            request.show_permission_sets,
+        );
         push_optional(&mut params, "symbolStatus", request.symbol_status);
         self.request(
             HttpMethod::Get,
@@ -72,6 +84,11 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
         push_optional_display(&mut params, "limit", request.limit);
+        push_optional(
+            &mut params,
+            "symbolStatus",
+            request.symbol_status.as_deref(),
+        );
         self.request(
             HttpMethod::Get,
             BinanceMarket::Spot,
@@ -100,6 +117,11 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
         push_optional_display(&mut params, "limit", request.limit);
+        push_optional(
+            &mut params,
+            "symbolStatus",
+            request.symbol_status.as_deref(),
+        );
         self.request(
             HttpMethod::Get,
             BinanceMarket::Spot,
@@ -170,8 +192,12 @@ impl BinanceClient {
             ("interval".to_string(), interval.to_string()),
         ];
         push_optional_display(&mut params, "startTime", request.start_time);
+        push_optional_display(&mut params, "endTime", request.end_time);
         push_optional_display(&mut params, "limit", request.limit);
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Spot {
+            push_optional(&mut params, "timeZone", request.time_zone.as_deref());
+        }
         let path = if market == BinanceMarket::Spot {
             SPOT_KLINES
         } else {
@@ -513,6 +539,8 @@ impl BinanceClient {
                 self.send_get_spot_exchange_info(BinanceSymbolListParams {
                     product_symbol: params.get("product_symbol"),
                     product_symbols: params.values("product_symbols"),
+                    permissions: params.values("permissions"),
+                    show_permission_sets: params.get("showPermissionSets"),
                     symbol_status: params.get("symbolStatus"),
                 })
                 .await
@@ -522,6 +550,7 @@ impl BinanceClient {
                     params.required("product_symbol")?,
                     BinanceLimitParams {
                         limit: params.u64("limit")?,
+                        symbol_status: params.get("symbolStatus").map(str::to_string),
                     },
                 )
                 .await
@@ -531,6 +560,7 @@ impl BinanceClient {
                     params.required("product_symbol")?,
                     BinanceLimitParams {
                         limit: params.u64("limit")?,
+                        symbol_status: params.get("symbolStatus").map(str::to_string),
                     },
                 )
                 .await
@@ -539,6 +569,8 @@ impl BinanceClient {
                 self.send_get_spot_price(BinanceSymbolListParams {
                     product_symbol: params.get("product_symbol"),
                     product_symbols: params.values("product_symbols"),
+                    permissions: None,
+                    show_permission_sets: None,
                     symbol_status: params.get("symbolStatus"),
                 })
                 .await
@@ -549,6 +581,8 @@ impl BinanceClient {
                     params.required("interval")?,
                     BinanceKlinesParams {
                         start_time: params.u64("start_time")?,
+                        end_time: params.u64("end_time")?,
+                        time_zone: params.get("time_zone").map(str::to_string),
                         limit: params.u64("limit")?,
                     },
                 )

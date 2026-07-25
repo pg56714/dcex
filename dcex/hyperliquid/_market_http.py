@@ -30,19 +30,28 @@ class MarketHTTP(HTTPManager):
         """Get spot market metadata."""
         return self._native_public("get_spot_meta", [])
 
-    def get_meta_and_asset_ctxs(self) -> dict[str, Any]:
+    def get_meta_and_asset_ctxs(self, dex: str | None = None) -> dict[str, Any]:
         """Get market metadata and asset contexts."""
-        return self._native_public("get_meta_and_asset_ctxs", [])
+        return self._native_public("get_meta_and_asset_ctxs", self._native_params(dex=dex))
 
     def get_spot_meta_and_asset_ctxs(self) -> dict[str, Any]:
         """Get spot market metadata and asset contexts."""
         return self._native_public("get_spot_meta_and_asset_ctxs", [])
 
-    def get_l2book(self, product_symbol: str) -> dict[str, Any]:
+    def get_l2book(
+        self,
+        product_symbol: str,
+        nSigFigs: int | None = None,
+        mantissa: int | None = None,
+    ) -> dict[str, Any]:
         """Get L2 order book for a product."""
         return self._native_public(
             "get_l2book",
-            self._native_params(product_symbol=product_symbol),
+            self._native_params(
+                product_symbol=product_symbol,
+                nSigFigs=nSigFigs,
+                mantissa=mantissa,
+            ),
         )
 
     def get_candle_snapshot(
@@ -50,7 +59,7 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
         interval: str,
         startTime: int,
-        endTime: int | None = None,
+        endTime: int,
     ) -> dict[str, Any]:
         """Get candlestick data for a product."""
         return self._native_public(

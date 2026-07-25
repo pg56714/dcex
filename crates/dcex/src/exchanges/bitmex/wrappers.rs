@@ -23,7 +23,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_market_buy_order(product_symbol => "product_symbol", order_qty => "orderQty"),
         place_market_order(product_symbol => "product_symbol", side => "side", order_qty => "orderQty"),
         place_market_sell_order(product_symbol => "product_symbol", order_qty => "orderQty"),
-        place_order(product_symbol => "product_symbol", side => "side"),
+        place_order(product_symbol => "product_symbol"),
         place_post_only_buy_order(product_symbol => "product_symbol", order_qty => "orderQty", price => "price"),
         place_post_only_order(product_symbol => "product_symbol", side => "side", order_qty => "orderQty", price => "price"),
         place_post_only_sell_order(product_symbol => "product_symbol", order_qty => "orderQty", price => "price"),

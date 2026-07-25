@@ -12,8 +12,10 @@ class PositionHTTP(HTTPManager):
         self,
         category: str = "linear",
         product_symbol: str | None = None,
+        baseCoin: str | None = None,
         settleCoin: str | None = None,
         limit: int = 20,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get positions list."""
         return await self._native_private(
@@ -21,8 +23,10 @@ class PositionHTTP(HTTPManager):
             self._native_params(
                 category=category,
                 product_symbol=product_symbol,
+                baseCoin=baseCoin,
                 settleCoin=settleCoin,
                 limit=limit,
+                cursor=cursor,
             ),
         )
 
@@ -60,7 +64,9 @@ class PositionHTTP(HTTPManager):
         category: str = "linear",
         product_symbol: str | None = None,
         startTime: int | None = None,
+        endTime: int | None = None,
         limit: int = 20,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get closed PnL history."""
         return await self._native_private(
@@ -69,6 +75,8 @@ class PositionHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 startTime=startTime,
+                endTime=endTime,
                 limit=limit,
+                cursor=cursor,
             ),
         )

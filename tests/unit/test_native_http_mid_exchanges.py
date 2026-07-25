@@ -24,7 +24,7 @@ def test_native_bingx_signed_request() -> None:
         status, _headers, body = client.request_raw_json(
             "GET",
             "/test",
-            [("symbol", "BTC USDT"), ("limit", "10")],
+            [("symbol", "BTC USDT"), ("limit", "10"), ("type", "LIMIT")],
             True,
         )
 
@@ -45,6 +45,7 @@ def test_native_bingx_signed_request() -> None:
     assert signed_pairs[0] == ("limit", "10")
     assert signed_pairs[1] == ("symbol", "BTC USDT")
     assert signed_pairs[2][0] == "timestamp"
+    assert signed_pairs[3] == ("type", "LIMIT")
     assert pairs[-1][0] == "signature"
     assert signature == expected_signature
 
@@ -188,7 +189,7 @@ async def test_async_bingx_public_wrapper_uses_native_dispatcher() -> None:
     assert result == {"code": 0, "data": []}
     assert client.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == (
-        "/openApi/spot/v2/market/depth?depth=10&symbol=ETH-USDT&type=step1"
+        "/openApi/spot/v2/market/depth?depth=10&symbol=ETH_USDT&type=step1"
     )
 
 
@@ -555,6 +556,33 @@ def test_sync_bitmex_private_wrapper_requires_credentials() -> None:
     with pytest.raises(ValueError, match="Signed request requires API Key and Secret"):
         client.get_wallet_summary()
     client.close()
+
+
+def test_sync_bitmex_wallet_summary_uses_current_endpoint_and_fields() -> None:
+    from dcex.bitmex.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(
+            api_key="api-key",
+            api_secret="secret",
+            base_url=base_url,
+            preload_product_table=False,
+        )
+        result = client.get_wallet_summary(
+            currency="XBt",
+            start_time="2026-01-01T00:00:00Z",
+            end_time="2026-01-02T00:00:00Z",
+        )
+
+    client.close()
+    request = received.get_nowait()
+    assert result == {"ok": True}
+    assert urlsplit(request["path"]).path == "/api/v1/user/walletSummary"
+    assert parse_qsl(urlsplit(request["path"]).query) == [
+        ("currency", "XBt"),
+        ("startTime", "2026-01-01T00:00:00Z"),
+        ("endTime", "2026-01-02T00:00:00Z"),
+    ]
 
 
 @pytest.mark.asyncio

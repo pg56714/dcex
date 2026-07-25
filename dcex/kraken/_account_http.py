@@ -21,11 +21,12 @@ class AccountHTTP(HTTPManager):
     def get_spot_trade_balance(
         self,
         asset: str | None = None,
+        rebase_multiplier: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot trade balance."""
         return self._native_private(
             "get_spot_trade_balance",
-            self._native_params(asset=asset),
+            self._native_params(asset=asset, rebase_multiplier=rebase_multiplier),
         )
 
     def get_spot_open_positions(
@@ -55,6 +56,7 @@ class AccountHTTP(HTTPManager):
         end: int | str | None = None,
         ofs: int | None = None,
         without_count: bool | None = None,
+        rebase_multiplier: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot ledger entries."""
         return self._native_private(
@@ -67,6 +69,7 @@ class AccountHTTP(HTTPManager):
                 end=end,
                 ofs=ofs,
                 without_count=without_count,
+                rebase_multiplier=rebase_multiplier,
             ),
         )
 
@@ -74,11 +77,18 @@ class AccountHTTP(HTTPManager):
         self,
         pair: str | None = None,
         fee_info: bool | None = None,
+        fee_schedule: bool | None = None,
+        rebase_multiplier: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve Kraken spot trade volume and optional fee info."""
         return self._native_private(
             "get_spot_trade_volume",
-            self._native_params(pair=pair, fee_info=fee_info),
+            self._native_params(
+                pair=pair,
+                fee_info=fee_info,
+                fee_schedule=fee_schedule,
+                rebase_multiplier=rebase_multiplier,
+            ),
         )
 
     def wallet_transfer_to_futures(

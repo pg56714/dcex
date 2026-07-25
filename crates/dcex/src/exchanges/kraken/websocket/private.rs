@@ -100,8 +100,17 @@ impl KrakenPrivateWebSocket {
         Ok(request_id)
     }
 
-    pub async fn subscribe_balances(&mut self) -> Result<u64> {
-        self.send_private_subscription("subscribe", "balances", None)
+    pub async fn subscribe_balances(
+        &mut self,
+        snapshot: bool,
+        rebased: bool,
+        users: Option<String>,
+    ) -> Result<u64> {
+        let mut extra = serde_json::Map::new();
+        extra.insert("snapshot".to_string(), Value::Bool(snapshot));
+        extra.insert("rebased".to_string(), Value::Bool(rebased));
+        insert_users(&mut extra, users)?;
+        self.send_private_subscription("subscribe", "balances", Some(extra))
             .await
     }
 
@@ -114,10 +123,18 @@ impl KrakenPrivateWebSocket {
         &mut self,
         snap_orders: bool,
         snap_trades: bool,
+        order_status: bool,
+        rebased: bool,
+        ratecounter: bool,
+        users: Option<String>,
     ) -> Result<u64> {
         let mut extra = serde_json::Map::new();
         extra.insert("snap_orders".to_string(), Value::Bool(snap_orders));
         extra.insert("snap_trades".to_string(), Value::Bool(snap_trades));
+        extra.insert("order_status".to_string(), Value::Bool(order_status));
+        extra.insert("rebased".to_string(), Value::Bool(rebased));
+        extra.insert("ratecounter".to_string(), Value::Bool(ratecounter));
+        insert_users(&mut extra, users)?;
         self.send_private_subscription("subscribe", "executions", Some(extra))
             .await
     }
@@ -154,13 +171,13 @@ impl KrakenPrivateWebSocket {
         let mut params = serde_json::Map::new();
         params.insert("channel".to_string(), Value::String(channel));
         params.insert("token".to_string(), Value::String(token));
-        params.insert("req_id".to_string(), Value::from(request_id));
         if let Some(extra_params) = extra_params {
             params.extend(extra_params);
         }
         let payload = json!({
             "method": method,
             "params": params,
+            "req_id": request_id,
         });
         self.connection.send_json(&payload).await?;
         Ok(request_id)
@@ -193,21 +210,24 @@ fn normalize_method(method: &str) -> Result<&'static str> {
 }
 
 fn normalize_channel(channel: &str) -> Result<String> {
-    let channel = channel.trim();
-    if channel.is_empty() {
-        return Err(DcexError::InvalidInput(
-            "Kraken private WebSocket channel must not be empty.".to_string(),
-        ));
-    }
-    if !channel
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '_')
-    {
-        return Err(DcexError::InvalidInput(format!(
+    match channel.trim() {
+        channel @ ("balances" | "executions") => Ok(channel.to_string()),
+        channel => Err(DcexError::InvalidInput(format!(
             "unsupported Kraken private WebSocket channel: {channel}"
-        )));
+        ))),
     }
-    Ok(channel.to_string())
+}
+
+fn insert_users(params: &mut serde_json::Map<String, Value>, users: Option<String>) -> Result<()> {
+    if let Some(users) = users {
+        if users != "all" {
+            return Err(DcexError::InvalidInput(
+                "Kraken WebSocket users must be 'all'.".to_string(),
+            ));
+        }
+        params.insert("users".to_string(), Value::String(users));
+    }
+    Ok(())
 }
 
 fn validate_credential(label: &str, value: &str) -> Result<()> {

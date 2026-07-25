@@ -47,9 +47,15 @@ class MarketHTTP(HTTPManager):
             self._native_params(tierId=tierId),
         )
 
-    async def get_markets(self) -> dict[str, Any] | list[Any] | str:
+    async def get_markets(
+        self,
+        marketType: list[str] | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack markets."""
-        return await self._native_public("get_markets", [])
+        return await self._native_public(
+            "get_markets",
+            self._native_params(marketType=marketType),
+        )
 
     async def get_market(self, product_symbol: str) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack market."""
@@ -117,6 +123,7 @@ class MarketHTTP(HTTPManager):
         startTime: int,
         endTime: int | None = None,
         priceType: str | None = None,
+        source: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack candlesticks."""
         return await self._native_public(
@@ -127,6 +134,7 @@ class MarketHTTP(HTTPManager):
                 startTime=startTime,
                 endTime=endTime,
                 priceType=priceType,
+                source=source,
             ),
         )
 
@@ -134,16 +142,28 @@ class MarketHTTP(HTTPManager):
         self,
         product_symbol: str,
         interval: str | None = None,
+        source: str | None = None,
     ) -> dict[str, Any] | list[Any] | str:
         """Retrieve one Backpack ticker."""
         return await self._native_public(
             "get_ticker",
-            self._native_params(product_symbol=product_symbol, interval=interval),
+            self._native_params(
+                product_symbol=product_symbol,
+                interval=interval,
+                source=source,
+            ),
         )
 
-    async def get_tickers(self, interval: str | None = None) -> dict[str, Any] | list[Any] | str:
+    async def get_tickers(
+        self,
+        interval: str | None = None,
+        source: str | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack tickers."""
-        return await self._native_public("get_tickers", self._native_params(interval=interval))
+        return await self._native_public(
+            "get_tickers",
+            self._native_params(interval=interval, source=source),
+        )
 
     async def get_status(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack system status."""

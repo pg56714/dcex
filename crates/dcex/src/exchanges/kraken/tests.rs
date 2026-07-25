@@ -1,4 +1,4 @@
-use super::signing::{futures_signature, spot_signature};
+use super::signing::{encode_params, futures_signature, spot_signature};
 
 const SECRET: &str = "c2VjcmV0";
 const NONCE: &str = "1700000000000000000";
@@ -28,5 +28,13 @@ fn futures_signature_matches_python_vector() {
         )
         .expect("signature"),
         "W2YL8mj+KExVX/X6fTAPvwlPPo6EP14ISry2Bv5BfJsBu4tDy6PUc1nVNu3OKXcJXrliaG19axFphls37F14zQ=="
+    );
+}
+
+#[test]
+fn query_encoding_uses_uri_percent_encoding() {
+    assert_eq!(
+        encode_params(&[("greeting".to_string(), "hello world".to_string())]),
+        "greeting=hello%20world"
     );
 }

@@ -70,6 +70,7 @@ pub(super) fn encode_params(params: &[(String, String)]) -> String {
                 .map(|(key, value)| (key.as_str(), value.as_str())),
         )
         .finish()
+        .replace('+', "%20")
 }
 
 fn decode_secret(api_secret: &str) -> Result<Vec<u8>> {

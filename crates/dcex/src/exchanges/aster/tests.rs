@@ -190,15 +190,14 @@ fn batch_orders_resolve_product_symbol_and_side() {
                 "product_symbol": "ASTER-USDT-SWAP",
                 "side": "buy",
                 "type": "LIMIT",
+                "timeInForce": "GTC",
                 "quantity": "1",
                 "price": "1"
             }
         ])
         .to_string(),
     )]);
-    let body = client
-        .resolve_order_array(&params, "batchOrders")
-        .expect("batch orders");
+    let body = client.resolve_batch_orders(&params).expect("batch orders");
     let Value::Array(items) = serde_json::from_str(&body).expect("json") else {
         panic!("expected array");
     };
@@ -211,4 +210,22 @@ fn batch_orders_resolve_product_symbol_and_side() {
         Some(&Value::String("BUY".to_string()))
     );
     assert!(items[0].get("product_symbol").is_none());
+}
+
+#[test]
+fn credentials_must_be_paired_and_addresses_are_validated() {
+    assert!(AsterClient::new(
+        None,
+        Some("0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a".to_string()),
+        None,
+        Duration::from_secs(1),
+    )
+    .is_err());
+    assert!(AsterClient::new(
+        Some("not-an-address".to_string()),
+        None,
+        None,
+        Duration::from_secs(1),
+    )
+    .is_err());
 }

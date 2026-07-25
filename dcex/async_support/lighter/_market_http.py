@@ -69,7 +69,6 @@ class MarketHTTP(HTTPManager):
         aggregate: bool | None = None,
         skip_ask_order_id: str | None = None,
         skip_bid_order_id: str | None = None,
-        auth: str | None = None,
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Retrieve auth-gated Lighter trades."""

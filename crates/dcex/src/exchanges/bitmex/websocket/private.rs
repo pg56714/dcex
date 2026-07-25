@@ -9,7 +9,7 @@ use crate::{DcexError, Result};
 
 use super::{normalize_subscription_arg, subscription_arg, validate_credential};
 
-const WS_URL: &str = "wss://www.bitmex.com/realtime";
+const WS_URL: &str = "wss://ws.bitmex.com/realtime";
 const AUTH_METHOD: &str = "GET";
 const AUTH_PATH: &str = "/realtime";
 
@@ -77,7 +77,7 @@ impl BitmexPrivateWebSocket {
     }
 
     pub async fn ping(&mut self) -> Result<()> {
-        self.connection.send_json(&json!({"op": "ping"})).await
+        self.connection.send_ping(Vec::new()).await
     }
 
     pub async fn subscribe(&mut self, args: Vec<String>) -> Result<()> {

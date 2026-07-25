@@ -53,6 +53,38 @@ Content-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
     (format!("http://{address}"), handle)
 }
 
+fn recording_server_after_time_sync() -> (String, JoinHandle<Option<String>>) {
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let address = listener.local_addr().expect("address");
+    let handle = thread::spawn(move || {
+        let mut signed_request_line = None;
+        for request_index in 0..2 {
+            let (mut stream, _) = listener.accept().expect("accept");
+            stream
+                .set_read_timeout(Some(Duration::from_secs(2)))
+                .expect("read timeout");
+            let mut buffer = [0u8; 4096];
+            let size = stream.read(&mut buffer).expect("read");
+            let request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+            let body = if request_index == 0 {
+                r#"{"serverTime":1700000000000}"#
+            } else {
+                signed_request_line = request.lines().next().map(str::to_string);
+                r#"{"ok":true}"#
+            };
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
+                 Content-Length: {}\r\nConnection: close\r\n\r\n{}",
+                body.len(),
+                body
+            );
+            stream.write_all(response.as_bytes()).expect("write");
+        }
+        signed_request_line
+    });
+    (format!("http://{address}"), handle)
+}
+
 #[test]
 fn signer_matches_python_implementation() {
     let signer = BinanceSigner {
@@ -291,4 +323,185 @@ fn spot_account_queries_require_a_product_symbol() {
             DcexError::InvalidInput("Binance product_symbol is required.".to_string())
         );
     }
+}
+
+#[test]
+fn current_spot_exchange_info_fields_reach_the_wire() {
+    let (spot_base_url, handle) = recording_server();
+    let client = BinanceClient::with_base_urls(
+        None,
+        None,
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .public_request(
+                "get_spot_exchange_info",
+                vec![
+                    ("permissions".to_string(), "SPOT".to_string()),
+                    ("permissions".to_string(), "MARGIN".to_string()),
+                    ("showPermissionSets".to_string(), "false".to_string()),
+                    ("symbolStatus".to_string(), "TRADING".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("permissions=%5B%22SPOT%22%2C%22MARGIN%22%5D"));
+    assert!(request_line.contains("showPermissionSets=false"));
+    assert!(request_line.contains("symbolStatus=TRADING"));
+}
+
+#[test]
+fn current_spot_kline_fields_reach_the_wire() {
+    let (spot_base_url, handle) = recording_server();
+    let client = BinanceClient::with_base_urls(
+        None,
+        None,
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .public_request(
+                "get_klines",
+                vec![
+                    ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                    ("interval".to_string(), "1m".to_string()),
+                    ("start_time".to_string(), "1".to_string()),
+                    ("end_time".to_string(), "2".to_string()),
+                    ("time_zone".to_string(), "8".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("startTime=1"));
+    assert!(request_line.contains("endTime=2"));
+    assert!(request_line.contains("timeZone=8"));
+}
+
+#[test]
+fn spot_account_omit_zero_balances_reaches_the_wire() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_account_balance",
+                vec![
+                    ("market_type".to_string(), "spot".to_string()),
+                    ("omitZeroBalances".to_string(), "true".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("omitZeroBalances=true"));
+}
+
+#[test]
+fn spot_cancel_fields_reach_the_wire() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "cancel_order",
+                vec![
+                    ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                    ("orderId".to_string(), "1".to_string()),
+                    ("newClientOrderId".to_string(), "cancel-1".to_string()),
+                    ("cancelRestrictions".to_string(), "ONLY_NEW".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("newClientOrderId=cancel-1"));
+    assert!(request_line.contains("cancelRestrictions=ONLY_NEW"));
+}
+
+#[test]
+fn futures_account_trade_order_id_reaches_the_wire() {
+    let (futures_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_account_trades",
+                vec![
+                    ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
+                    ("orderId".to_string(), "2".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("/fapi/v1/userTrades?symbol=BTCUSDT&orderId=2"));
+}
+
+#[test]
+fn futures_positions_can_be_queried_without_a_symbol() {
+    let (futures_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request("get_future_position", Vec::new())
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("/fapi/v3/positionRisk?timestamp="));
+    assert!(!request_line.contains("symbol="));
 }

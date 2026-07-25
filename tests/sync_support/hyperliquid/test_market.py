@@ -37,6 +37,7 @@ def test_get_candle_snapshot(client):
         product_symbol="BTC-USD-SWAP",
         interval="1m",
         startTime=1696128000000,
+        endTime=1696131600000,
     )
     assert res is not None
 

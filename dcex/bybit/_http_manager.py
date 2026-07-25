@@ -132,7 +132,7 @@ class HTTPManager(BaseHTTPManager):
             if enum_value is not None:
                 value = enum_value
             if isinstance(value, bool):
-                value = str(value)
+                value = str(value).lower()
             elif isinstance(value, (list, dict)):
                 value = json.dumps(value, separators=(",", ":"))
             params.append((key, str(value)))

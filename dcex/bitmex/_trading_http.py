@@ -11,8 +11,9 @@ class TradingHTTP(HTTPManager):
     def get_executions(
         self,
         product_symbol: str | None = None,
-        filter: str | None = None,
-        columns: str | None = None,
+        pool: str | None = None,
+        filter: dict[str, Any] | str | None = None,
+        columns: list[str] | str | None = None,
         count: int = 100,
         start: int = 0,
         reverse: bool = False,
@@ -25,6 +26,7 @@ class TradingHTTP(HTTPManager):
         """Get BitMEX execution history."""
         params = self._history_params(
             product_symbol=product_symbol,
+            pool=pool,
             filter=filter,
             columns=columns,
             count=count,
@@ -41,8 +43,9 @@ class TradingHTTP(HTTPManager):
     def get_trade_history(
         self,
         product_symbol: str | None = None,
-        filter: str | None = None,
-        columns: str | None = None,
+        pool: str | None = None,
+        filter: dict[str, Any] | str | None = None,
+        columns: list[str] | str | None = None,
         count: int = 100,
         start: int = 0,
         reverse: bool = False,
@@ -55,6 +58,7 @@ class TradingHTTP(HTTPManager):
         """Get BitMEX trade history."""
         params = self._history_params(
             product_symbol=product_symbol,
+            pool=pool,
             filter=filter,
             columns=columns,
             count=count,
@@ -76,8 +80,9 @@ class TradingHTTP(HTTPManager):
         self,
         *,
         product_symbol: str | None,
-        filter: str | None,
-        columns: str | None,
+        pool: str | None,
+        filter: dict[str, Any] | str | None,
+        columns: list[str] | str | None,
         count: int,
         start: int,
         reverse: bool,
@@ -89,6 +94,7 @@ class TradingHTTP(HTTPManager):
     ) -> list[tuple[str, str]]:
         params = self._native_params(
             product_symbol=product_symbol,
+            pool=pool,
             filter=filter,
             columns=columns,
             count=count,
@@ -100,10 +106,7 @@ class TradingHTTP(HTTPManager):
             targetAccountIds=targetAccountIds,
         )
         if targetAccountIds_array is not None:
-            params.append(
-                (
-                    "targetAccountIds[]",
-                    self._native_params(targetAccountIds_array=targetAccountIds_array)[0][1],
-                )
+            params.extend(
+                ("targetAccountIds[]", str(account_id)) for account_id in targetAccountIds_array
             )
         return params

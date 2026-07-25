@@ -83,11 +83,17 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
         limit: int | None = None,
         type_: str = "step0",
+        depth: int | None = None,
     ) -> dict:
         """Get spot v2 order book data."""
         return self._native_public(
             "get_spot_orderbook_v2",
-            self._params(product_symbol=product_symbol, limit=limit, type_=type_),
+            self._params(
+                product_symbol=product_symbol,
+                limit=limit,
+                type_=type_,
+                depth=depth,
+            ),
         )
 
     def get_public_trades(
@@ -104,11 +110,12 @@ class MarketHTTP(HTTPManager):
     def get_spot_public_trades(
         self,
         product_symbol: str,
+        limit: int | None = None,
     ) -> dict:
         """Get spot public trade data."""
         return self._native_public(
             "get_spot_public_trades",
-            self._params(product_symbol=product_symbol),
+            self._params(product_symbol=product_symbol, limit=limit),
         )
 
     def get_kline(
@@ -210,7 +217,7 @@ class MarketHTTP(HTTPManager):
 
     def get_spot_ticker(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
     ) -> dict:
         """Get spot 24hr ticker statistics."""
         return self._native_public(

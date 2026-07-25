@@ -10,23 +10,21 @@ class PositionHTTP(HTTPManager):
 
     async def get_positions(
         self,
-        filter: str | None = None,
-        columns: str | None = None,
+        filter: dict[str, Any] | str | None = None,
+        columns: list[str] | str | None = None,
         count: int | None = None,
         target_account_id: int | None = None,
-        target_account_ids: list[str] | str | None = None,
-    ) -> dict[str, Any]:
+        target_account_ids: list[str | int] | str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get current BitMEX positions."""
-        return await self._native_private(
-            "get_positions",
-            self._native_params(
-                filter=filter,
-                columns=columns,
-                count=count,
-                targetAccountId=target_account_id,
-                targetAccountIds=target_account_ids,
-            ),
+        params = self._native_params(
+            filter=filter,
+            columns=columns,
+            count=count,
+            targetAccountId=target_account_id,
         )
+        self._append_target_account_ids(params, target_account_ids)
+        return await self._native_private("get_positions", params)
 
     async def switch_mode(
         self,
@@ -69,29 +67,32 @@ class PositionHTTP(HTTPManager):
     async def get_margining_mode(
         self,
         target_account_id: int | None = None,
-        target_account_ids: list[str] | str | None = None,
-    ) -> dict[str, Any]:
+        target_account_ids: list[str | int] | str | None = None,
+    ) -> list[dict[str, Any]]:
         """Get BitMEX margining mode."""
-        return await self._native_private(
-            "get_margining_mode",
-            self._native_params(
-                targetAccountId=target_account_id,
-                targetAccountIds=target_account_ids,
-            ),
-        )
+        params = self._native_params(targetAccountId=target_account_id)
+        self._append_target_account_ids(params, target_account_ids)
+        return await self._native_private("get_margining_mode", params)
 
     async def get_margin(
         self,
-        currency: str = "all",
+        currency: str = "XBt",
         target_account_id: int | None = None,
-        target_account_ids: list[str] | str | None = None,
-    ) -> dict[str, Any]:
+        target_account_ids: list[str | int] | str | None = None,
+    ) -> dict[str, Any] | list[dict[str, Any]]:
         """Get BitMEX margin information."""
-        return await self._native_private(
-            "get_margin",
-            self._native_params(
-                currency=currency,
-                targetAccountId=target_account_id,
-                targetAccountIds=target_account_ids,
-            ),
-        )
+        params = self._native_params(currency=currency, targetAccountId=target_account_id)
+        self._append_target_account_ids(params, target_account_ids)
+        return await self._native_private("get_margin", params)
+
+    @staticmethod
+    def _append_target_account_ids(
+        params: list[tuple[str, str]],
+        target_account_ids: list[str | int] | str | None,
+    ) -> None:
+        if isinstance(target_account_ids, list):
+            params.extend(
+                ("targetAccountIds[]", str(account_id)) for account_id in target_account_ids
+            )
+        elif isinstance(target_account_ids, str):
+            params.append(("targetAccountIds", target_account_ids))

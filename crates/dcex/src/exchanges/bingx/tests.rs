@@ -16,6 +16,7 @@ fn signer_uses_unescaped_sorted_payload() {
     request.query = vec![
         ("symbol".to_string(), "BTC USDT".to_string()),
         ("limit".to_string(), "10".to_string()),
+        ("type".to_string(), "LIMIT".to_string()),
     ];
 
     signer
@@ -28,9 +29,10 @@ fn signer_uses_unescaped_sorted_payload() {
             ("limit".to_string(), "10".to_string()),
             ("symbol".to_string(), "BTC USDT".to_string()),
             ("timestamp".to_string(), "1700000000000".to_string()),
+            ("type".to_string(), "LIMIT".to_string()),
             (
                 "signature".to_string(),
-                "19a79f275d914021036bb65476f48319ed590bc5f26de3e0f8e6b3aa6bb31e1f".to_string(),
+                "e75f90a175ff72fbeb9ebc5a4e482bb0f16d7fa4f7cd4f1ac6ffb435249defa6".to_string(),
             ),
         ]
     );

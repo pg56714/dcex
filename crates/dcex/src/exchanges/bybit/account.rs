@@ -14,11 +14,9 @@ impl BybitClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "get_wallet_balance" => {
-                self.get_request(
-                    GET_WALLET_BALANCE,
-                    vec![("accountType".to_string(), "UNIFIED".to_string())],
-                )
-                .await
+                let mut query = vec![("accountType".to_string(), "UNIFIED".to_string())];
+                push_optional(&mut query, "coin", params.get("coin"));
+                self.get_request(GET_WALLET_BALANCE, query).await
             }
             "get_transferable_amount" => {
                 let coins = params.required("coins")?;
@@ -50,11 +48,18 @@ impl BybitClient {
                 )];
                 push_optional(&mut query, "currency", params.get("coin"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
+                push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_BORROW_HISTORY, query).await
             }
             "get_collateral_info" => {
-                self.get_request(GET_COLLATERAL_INFO, params.only(&["coin"]))
-                    .await
+                let mut query = Vec::new();
+                push_optional(
+                    &mut query,
+                    "currency",
+                    params.get("currency").or_else(|| params.get("coin")),
+                );
+                self.get_request(GET_COLLATERAL_INFO, query).await
             }
             "get_spot_fee_rates"
             | "get_linear_fee_rates"
@@ -88,6 +93,7 @@ impl BybitClient {
                     };
                     query.push(("category".to_string(), category.to_string()));
                 }
+                push_optional(&mut query, "baseCoin", params.get("baseCoin"));
                 self.get_request(GET_FEE_RATE, query).await
             }
             "get_account_info" => self.get_request(GET_ACCOUNT_INFO, Vec::new()).await,
@@ -96,9 +102,15 @@ impl BybitClient {
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
                 )];
+                push_optional(&mut query, "accountType", params.get("accountType"));
                 push_optional(&mut query, "category", params.get("category"));
                 push_optional(&mut query, "currency", params.get("coin"));
+                push_optional(&mut query, "baseCoin", params.get("baseCoin"));
+                push_optional(&mut query, "type", params.get("type"));
+                push_optional(&mut query, "transSubType", params.get("transSubType"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
+                push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_TRANSACTION_LOG, query).await
             }
             "set_margin_mode" => {

@@ -18,12 +18,17 @@ class TradeHTTP(HTTPManager):
         px: str | None = None,
         pxUsd: str | None = None,
         pxVol: str | None = None,
-        reduceOnly: str | None = None,
+        reduceOnly: bool | str | None = None,
         tgtCcy: str | None = None,
-        banAmend: str | None = None,
-        quickMgnType: str | None = None,
-        stpId: str | None = None,
+        banAmend: bool | str | None = None,
+        speedBump: str | None = None,
+        outcome: str | None = None,
+        pxAmendType: str | None = None,
+        tradeQuoteCcy: str | None = None,
+        slippagePct: str | None = None,
         stpMode: str | None = None,
+        isElpTakerAccess: bool | str | None = None,
+        attachAlgoOrds: list[dict[str, Any]] | None = None,
         tag: str | None = None,
     ) -> dict[str, Any]:
         """
@@ -44,8 +49,6 @@ class TradeHTTP(HTTPManager):
             reduceOnly: Whether to reduce position only
             tgtCcy: Target currency
             banAmend: Whether to ban order amendment
-            quickMgnType: Quick margin type
-            stpId: Stop loss/take profit order ID
             stpMode: Stop loss/take profit mode
             tag: broker tag
 
@@ -69,9 +72,14 @@ class TradeHTTP(HTTPManager):
                 reduceOnly=reduceOnly,
                 tgtCcy=tgtCcy,
                 banAmend=banAmend,
-                quickMgnType=quickMgnType,
-                stpId=stpId,
+                speedBump=speedBump,
+                outcome=outcome,
+                pxAmendType=pxAmendType,
+                tradeQuoteCcy=tradeQuoteCcy,
+                slippagePct=slippagePct,
                 stpMode=stpMode,
+                isElpTakerAccess=isElpTakerAccess,
+                attachAlgoOrds=attachAlgoOrds,
                 tag=tag,
             ),
         )
@@ -504,8 +512,11 @@ class TradeHTTP(HTTPManager):
         newPx: str | None = None,
         newPxUsd: str | None = None,
         newPxVol: str | None = None,
-        cxlOnFail: str | None = None,
+        cxlOnFail: bool | str | None = None,
         reqId: str | None = None,
+        speedBump: str | None = None,
+        pxAmendType: str | None = None,
+        attachAlgoOrds: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """
         Amend an order.
@@ -536,6 +547,9 @@ class TradeHTTP(HTTPManager):
                 newPxVol=newPxVol,
                 cxlOnFail=cxlOnFail,
                 reqId=reqId,
+                speedBump=speedBump,
+                pxAmendType=pxAmendType,
+                attachAlgoOrds=attachAlgoOrds,
             ),
         )
 
@@ -565,6 +579,7 @@ class TradeHTTP(HTTPManager):
         autoCxl: bool | None = None,
         ccy: str | None = None,
         tag: str | None = None,
+        clOrdId: str | None = None,
     ) -> dict[str, Any]:
         """
         Close positions.
@@ -589,6 +604,7 @@ class TradeHTTP(HTTPManager):
                 autoCxl=autoCxl,
                 ccy=ccy,
                 tag=tag,
+                clOrdId=clOrdId,
             ),
         )
 
@@ -617,11 +633,12 @@ class TradeHTTP(HTTPManager):
     async def get_order_list(
         self,
         instType: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
         product_symbol: str | None = None,
         ordType: str | None = None,
         state: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
         limit: str | None = None,
     ) -> dict[str, Any]:
         """
@@ -629,7 +646,6 @@ class TradeHTTP(HTTPManager):
 
         Args:
             instType: Instrument type (SPOT, MARGIN, SWAP, FUTURES, OPTION)
-            uly: Underlying asset
             instFamily: Instrument family
             product_symbol: Trading pair symbol
             ordType: Order type
@@ -643,11 +659,12 @@ class TradeHTTP(HTTPManager):
             "get_order_list",
             self._native_params(
                 instType=instType,
-                uly=uly,
                 instFamily=instFamily,
                 product_symbol=product_symbol,
                 ordType=ordType,
                 state=state,
+                after=after,
+                before=before,
                 limit=limit,
             ),
         )
@@ -655,12 +672,13 @@ class TradeHTTP(HTTPManager):
     async def get_orders_history(
         self,
         instType: str,
-        uly: str | None = None,
         instFamily: str | None = None,
         product_symbol: str | None = None,
         ordType: str | None = None,
         state: str | None = None,
         category: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
         begin: str | None = None,
         end: str | None = None,
         limit: str | None = None,
@@ -670,7 +688,6 @@ class TradeHTTP(HTTPManager):
 
         Args:
             instType: Instrument type (SPOT, MARGIN, SWAP, FUTURES, OPTION)
-            uly: Underlying asset
             instFamily: Instrument family
             product_symbol: Trading pair symbol
             ordType: Order type
@@ -687,12 +704,13 @@ class TradeHTTP(HTTPManager):
             "get_orders_history",
             self._native_params(
                 instType=instType,
-                uly=uly,
                 instFamily=instFamily,
                 product_symbol=product_symbol,
                 ordType=ordType,
                 state=state,
                 category=category,
+                after=after,
+                before=before,
                 begin=begin,
                 end=end,
                 limit=limit,
@@ -702,12 +720,13 @@ class TradeHTTP(HTTPManager):
     async def get_orders_history_archive(
         self,
         instType: str,
-        uly: str | None = None,
         instFamily: str | None = None,
         product_symbol: str | None = None,
         ordType: str | None = None,
         state: str | None = None,
         category: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
         begin: str | None = None,
         end: str | None = None,
         limit: str | None = None,
@@ -717,7 +736,6 @@ class TradeHTTP(HTTPManager):
 
         Args:
             instType: Instrument type (SPOT, MARGIN, SWAP, FUTURES, OPTION)
-            uly: Underlying asset
             instFamily: Instrument family
             product_symbol: Trading pair symbol
             ordType: Order type
@@ -734,12 +752,13 @@ class TradeHTTP(HTTPManager):
             "get_orders_history_archive",
             self._native_params(
                 instType=instType,
-                uly=uly,
                 instFamily=instFamily,
                 product_symbol=product_symbol,
                 ordType=ordType,
                 state=state,
                 category=category,
+                after=after,
+                before=before,
                 begin=begin,
                 end=end,
                 limit=limit,
@@ -749,11 +768,12 @@ class TradeHTTP(HTTPManager):
     async def get_fills(
         self,
         instType: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
         product_symbol: str | None = None,
         ordId: str | None = None,
         subType: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
         begin: str | None = None,
         end: str | None = None,
         limit: str | None = None,
@@ -763,7 +783,6 @@ class TradeHTTP(HTTPManager):
 
         Args:
             instType: Instrument type (SPOT, MARGIN, SWAP, FUTURES, OPTION)
-            uly: Underlying asset
             instFamily: Instrument family
             product_symbol: Trading pair symbol
             ordId: Order ID
@@ -779,11 +798,12 @@ class TradeHTTP(HTTPManager):
             "get_fills",
             self._native_params(
                 instType=instType,
-                uly=uly,
                 instFamily=instFamily,
                 product_symbol=product_symbol,
                 ordId=ordId,
                 subType=subType,
+                after=after,
+                before=before,
                 begin=begin,
                 end=end,
                 limit=limit,
@@ -793,11 +813,12 @@ class TradeHTTP(HTTPManager):
     async def get_fills_history(
         self,
         instType: str,
-        uly: str | None = None,
         instFamily: str | None = None,
         product_symbol: str | None = None,
         ordId: str | None = None,
         subType: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
         begin: str | None = None,
         end: str | None = None,
         limit: str | None = None,
@@ -807,7 +828,6 @@ class TradeHTTP(HTTPManager):
 
         Args:
             instType: Instrument type (SPOT, MARGIN, SWAP, FUTURES, OPTION)
-            uly: Underlying asset
             instFamily: Instrument family
             product_symbol: Trading pair symbol
             ordId: Order ID
@@ -823,11 +843,12 @@ class TradeHTTP(HTTPManager):
             "get_fills_history",
             self._native_params(
                 instType=instType,
-                uly=uly,
                 instFamily=instFamily,
                 product_symbol=product_symbol,
                 ordId=ordId,
                 subType=subType,
+                after=after,
+                before=before,
                 begin=begin,
                 end=end,
                 limit=limit,

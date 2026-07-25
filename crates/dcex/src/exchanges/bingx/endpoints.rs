@@ -13,7 +13,7 @@ pub(super) const FUND_ACCOUNT_UID: &str = "/openApi/account/v1/uid";
 pub(super) const FUND_API_KEY_INFO: &str = "/openApi/account/v1/apiKey/query";
 
 pub(super) const TRANSFERABLE_COINS: &str = "/openApi/api/asset/v1/transfer/supportCoins";
-pub(super) const ASSET_TRANSFER: &str = "/openApi/api/v3/post/asset/transfer";
+pub(super) const ASSET_TRANSFER: &str = "/openApi/api/asset/v1/transfer";
 pub(super) const TRANSFER_RECORDS: &str = "/openApi/api/v3/asset/transferRecord";
 
 pub(super) const SWAP_PLACE_ORDER: &str = "/openApi/swap/v2/trade/order";

@@ -235,13 +235,12 @@ class TradeHTTP(HTTPManager):
         side: str | OrderSide,
         quantityUnit: str,
         quantity: str,
-        chaseOffset: str,
-        chaseOffsetType: str,
         positionSide: str | None = None,
         reduceOnly: bool | None = None,
+        chaseOffset: str | None = None,
+        chaseOffsetType: str | None = None,
         maxChaseOffset: str | None = None,
         maxChaseOffsetType: str | None = None,
-        priceLimit: str | None = None,
         timeInForce: str | None = None,
         clientStrategyId: str | None = None,
     ) -> dict[str, Any] | list[Any]:
@@ -259,7 +258,6 @@ class TradeHTTP(HTTPManager):
                 chaseOffsetType=chaseOffsetType,
                 maxChaseOffset=maxChaseOffset,
                 maxChaseOffsetType=maxChaseOffsetType,
-                priceLimit=priceLimit,
                 timeInForce=timeInForce,
                 clientStrategyId=clientStrategyId,
             ),
@@ -420,9 +418,11 @@ class TradeHTTP(HTTPManager):
 
     def place_futures_strategy_order(
         self,
-        clientStrategyId: str,
         strategyType: str,
         subOrderList: list[dict[str, Any]],
+        clientStrategyId: str | None = None,
+        builder: str | None = None,
+        feeRate: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place an Aster futures strategy order."""
         return self._native_private(
@@ -431,12 +431,14 @@ class TradeHTTP(HTTPManager):
                 clientStrategyId=clientStrategyId,
                 strategyType=strategyType,
                 subOrderList=subOrderList,
+                builder=builder,
+                feeRate=feeRate,
             ),
         )
 
     def update_futures_strategy_order(
         self,
-        strategyId: str,
+        strategyId: int,
         strategyType: str,
         subOrderList: list[dict[str, Any]],
     ) -> dict[str, Any] | list[Any]:
@@ -453,7 +455,7 @@ class TradeHTTP(HTTPManager):
     def get_futures_strategy_open_order(
         self,
         strategyType: str,
-        strategyId: str | None = None,
+        strategyId: int | None = None,
         clientStrategyId: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Query an open Aster futures strategy order."""
@@ -469,7 +471,7 @@ class TradeHTTP(HTTPManager):
     def get_futures_strategy_history_order(
         self,
         strategyType: str,
-        strategyId: str | None = None,
+        strategyId: int | None = None,
         clientStrategyId: str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,

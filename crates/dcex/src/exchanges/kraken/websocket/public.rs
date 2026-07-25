@@ -65,18 +65,66 @@ impl KrakenPublicWebSocket {
     }
 
     pub async fn subscribe_ticker(&mut self, product_symbol: &str) -> Result<u64> {
-        self.subscribe_channel("ticker", vec![product_symbol.to_string()])
+        self.subscribe_ticker_with_options(product_symbol, "trades", true)
             .await
+    }
+
+    pub async fn subscribe_ticker_with_options(
+        &mut self,
+        product_symbol: &str,
+        event_trigger: &str,
+        snapshot: bool,
+    ) -> Result<u64> {
+        let mut extra = serde_json::Map::new();
+        extra.insert(
+            "event_trigger".to_string(),
+            Value::String(normalize_ticker_trigger(event_trigger)?.to_string()),
+        );
+        extra.insert("snapshot".to_string(), Value::Bool(snapshot));
+        self.send_subscription(
+            "subscribe",
+            "ticker",
+            vec![product_symbol.to_string()],
+            Some(extra),
+        )
+        .await
     }
 
     pub async fn subscribe_trades(&mut self, product_symbol: &str) -> Result<u64> {
-        self.subscribe_channel("trade", vec![product_symbol.to_string()])
+        self.subscribe_trades_with_options(product_symbol, false)
             .await
     }
 
+    pub async fn subscribe_trades_with_options(
+        &mut self,
+        product_symbol: &str,
+        snapshot: bool,
+    ) -> Result<u64> {
+        let mut extra = serde_json::Map::new();
+        extra.insert("snapshot".to_string(), Value::Bool(snapshot));
+        self.send_subscription(
+            "subscribe",
+            "trade",
+            vec![product_symbol.to_string()],
+            Some(extra),
+        )
+        .await
+    }
+
     pub async fn subscribe_orderbook(&mut self, product_symbol: &str, depth: u32) -> Result<u64> {
+        self.subscribe_orderbook_with_options(product_symbol, depth, true)
+            .await
+    }
+
+    pub async fn subscribe_orderbook_with_options(
+        &mut self,
+        product_symbol: &str,
+        depth: u32,
+        snapshot: bool,
+    ) -> Result<u64> {
         let mut extra = serde_json::Map::new();
         extra.insert("depth".to_string(), Value::from(normalize_depth(depth)?));
+        extra.insert("snapshot".to_string(), Value::Bool(snapshot));
         self.send_subscription(
             "subscribe",
             "book",
@@ -87,11 +135,22 @@ impl KrakenPublicWebSocket {
     }
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, interval: u32) -> Result<u64> {
+        self.subscribe_klines_with_options(product_symbol, interval, true)
+            .await
+    }
+
+    pub async fn subscribe_klines_with_options(
+        &mut self,
+        product_symbol: &str,
+        interval: u32,
+        snapshot: bool,
+    ) -> Result<u64> {
         let mut extra = serde_json::Map::new();
         extra.insert(
             "interval".to_string(),
             Value::from(normalize_interval(interval)?),
         );
+        extra.insert("snapshot".to_string(), Value::Bool(snapshot));
         self.send_subscription(
             "subscribe",
             "ohlc",
@@ -156,10 +215,10 @@ fn subscription_payload(
     if let Some(extra_params) = extra_params {
         params.extend(extra_params);
     }
-    params.insert("req_id".to_string(), Value::from(request_id));
     json!({
         "method": method,
         "params": params,
+        "req_id": request_id,
     })
 }
 
@@ -174,21 +233,12 @@ fn normalize_method(method: &str) -> Result<&'static str> {
 }
 
 fn normalize_channel(channel: &str) -> Result<String> {
-    let channel = channel.trim();
-    if channel.is_empty() {
-        return Err(DcexError::InvalidInput(
-            "Kraken WebSocket channel must not be empty.".to_string(),
-        ));
-    }
-    if !channel
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '_')
-    {
-        return Err(DcexError::InvalidInput(format!(
+    match channel.trim() {
+        channel @ ("ticker" | "trade" | "book" | "ohlc") => Ok(channel.to_string()),
+        channel => Err(DcexError::InvalidInput(format!(
             "unsupported Kraken WebSocket channel: {channel}"
-        )));
+        ))),
     }
-    Ok(channel.to_string())
 }
 
 fn normalize_symbol(symbol: &str) -> Result<String> {
@@ -251,6 +301,16 @@ fn normalize_interval(interval: u32) -> Result<u32> {
     }
 }
 
+fn normalize_ticker_trigger(event_trigger: &str) -> Result<&'static str> {
+    match event_trigger.trim() {
+        "bbo" => Ok("bbo"),
+        "trades" => Ok("trades"),
+        event_trigger => Err(DcexError::InvalidInput(format!(
+            "unsupported Kraken ticker event trigger: {event_trigger}"
+        ))),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -269,6 +329,8 @@ mod tests {
         assert!(normalize_depth(50).is_err());
         assert_eq!(normalize_interval(5).expect("interval"), 5);
         assert!(normalize_interval(2).is_err());
+        assert_eq!(normalize_ticker_trigger("bbo").expect("trigger"), "bbo");
+        assert!(normalize_ticker_trigger("trade").is_err());
     }
 
     #[test]
@@ -283,6 +345,27 @@ mod tests {
 
         assert_eq!(payload["method"], "subscribe");
         assert_eq!(payload["params"]["channel"], "trade");
-        assert_eq!(payload["params"]["req_id"], 42);
+        assert_eq!(payload["req_id"], 42);
+        assert!(payload["params"].get("req_id").is_none());
+    }
+
+    #[test]
+    fn subscription_payload_includes_channel_options() {
+        let mut extra = serde_json::Map::new();
+        extra.insert("snapshot".to_string(), Value::Bool(false));
+        extra.insert(
+            "event_trigger".to_string(),
+            Value::String("bbo".to_string()),
+        );
+        let payload = subscription_payload(
+            "subscribe",
+            "ticker".to_string(),
+            vec!["BTC/USD".to_string()],
+            Some(extra),
+            7,
+        );
+
+        assert_eq!(payload["params"]["snapshot"], false);
+        assert_eq!(payload["params"]["event_trigger"], "bbo");
     }
 }

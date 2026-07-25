@@ -4,9 +4,15 @@ import pytest
 
 
 class _FakeNativeBingxPublicWebSocketClient:
-    def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
+    def __init__(
+        self,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+        market: str = "spot",
+    ) -> None:
         self.timeout = timeout
         self.base_url = base_url
+        self.market = market
         self.connected = False
         self.closed = False
         self.ping_count = 0
@@ -65,12 +71,14 @@ class _FakeNativeBingxPrivateWebSocketClient:
         timeout: float = 10.0,
         http_base_url: str | None = None,
         ws_base_url: str | None = None,
+        market: str = "spot",
     ) -> None:
         self.api_key = api_key
         self.api_secret = api_secret
         self.timeout = timeout
         self.http_base_url = http_base_url
         self.ws_base_url = ws_base_url
+        self.market = market
         self.connected = False
         self.closed = False
         self.ping_count = 0
@@ -134,6 +142,7 @@ async def test_bingx_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
         assert native_client.connected is True
         assert native_client.timeout == 2
         assert native_client.base_url == "wss://example.test/ws"
+        assert native_client.market == "spot"
 
         assert await ws.subscribe_trades("BTC-USDT-SPOT") == "sub-1"
         assert await ws.subscribe_ticker("BTC-USDT-SPOT") == "sub-1"
@@ -151,6 +160,18 @@ async def test_bingx_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
     assert native_client.ping_count == 1
     assert event == {"code": 0, "dataType": "BTC-USDT@trade", "data": []}
     assert native_client.closed is True
+
+
+@pytest.mark.asyncio
+async def test_bingx_swap_public_ws_forwards_market(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import bingx
+
+    monkeypatch.setattr(bingx, "_native", _FakeNative)
+    ws = bingx.public(base_url="wss://proxy.test/ws", market="swap")
+
+    assert ws._native_client.base_url == "wss://proxy.test/ws"
+    assert ws._native_client.market == "swap"
 
 
 @pytest.mark.asyncio
@@ -195,6 +216,7 @@ async def test_bingx_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None
         assert native_client.timeout == 2
         assert native_client.http_base_url == "https://example.test/api"
         assert native_client.ws_base_url == "wss://example.test/ws"
+        assert native_client.market == "spot"
         assert ws.listen_key() == "listen-key"
 
         assert await ws.keep_alive() == "listen-key"
@@ -208,3 +230,19 @@ async def test_bingx_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None
     assert event == {"code": 0, "dataType": "spot.executionReport", "data": {}}
     assert native_client.closed is True
     assert ws.listen_key() is None
+
+
+def test_bingx_swap_private_ws_forwards_market(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import bingx
+
+    monkeypatch.setattr(bingx, "_native", _FakeNative)
+    ws = bingx.private(
+        api_key="api-key",
+        api_secret="api-secret",
+        ws_base_url="wss://proxy.test/ws",
+        market="swap",
+    )
+
+    assert ws._native_client.ws_base_url == "wss://proxy.test/ws"
+    assert ws._native_client.market == "swap"

@@ -49,8 +49,8 @@ class _FakeNativeBackpackPublicWebSocketClient:
     async def subscribe_klines(self, product_symbol: str, interval: str) -> None:
         await self.subscribe([f"kline.{interval}.{product_symbol}"])
 
-    async def subscribe_liquidation(self) -> None:
-        await self.subscribe(["liquidation"])
+    async def subscribe_liquidation(self, product_symbol: str) -> None:
+        await self.subscribe([f"liquidation.{product_symbol}"])
 
     async def subscribe_mark_price(self, product_symbol: str) -> None:
         await self.subscribe([f"markPrice.{product_symbol}"])
@@ -147,6 +147,7 @@ async def test_backpack_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> No
         await ws.subscribe_trades("SOL_USDC")
         await ws.subscribe_orderbook("SOL_USDC", speed="200ms")
         await ws.subscribe_klines("SOL_USDC", "1m")
+        await ws.subscribe_liquidation("SOL_USDC_PERP")
         event = await ws.recv()
 
     assert native_client.pings == 1
@@ -154,6 +155,7 @@ async def test_backpack_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> No
         "trade.SOL_USDC",
         "depth.200ms.SOL_USDC",
         "kline.1m.SOL_USDC",
+        "liquidation.SOL_USDC_PERP",
     ]
     assert event == {"stream": "trade.SOL_USDC", "data": {"e": "trade"}}
     assert native_client.closed is True

@@ -9,18 +9,16 @@ class AccountHTTP(HTTPManager):
         instType: str,
         product_symbol: str | None = None,
         instFamily: str | None = None,
-        uly: str | None = None,
+        seriesId: str | None = None,
     ) -> dict[str, Any]:
         """
         Get account instruments information.
 
         Args:
             instType: Instrument type (SPOT, MARGIN, SWAP, FUTURES, OPTION)
-            product_symbol: Product symbol. Only applicable to FUTURES/SWAP/OPTION.
-                If instType is OPTION, either uly or instFamily is required.
+            product_symbol: Product symbol.
             instFamily: Instrument family. Only applicable to FUTURES/SWAP/OPTION.
-                If instType is OPTION, either uly or instFamily is required.
-            uly: Underlying asset
+            seriesId: Instrument series identifier.
 
         Returns:
             Dict containing instruments information
@@ -28,7 +26,10 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "get_account_instruments",
             self._native_params(
-                instType=instType, product_symbol=product_symbol, instFamily=instFamily, uly=uly
+                instType=instType,
+                product_symbol=product_symbol,
+                instFamily=instFamily,
+                seriesId=seriesId,
             ),
         )
 
@@ -54,6 +55,7 @@ class AccountHTTP(HTTPManager):
         self,
         instType: str | None = None,
         product_symbol: str | None = None,
+        posId: str | None = None,
     ) -> dict[str, Any]:
         """
         Get positions information.
@@ -68,13 +70,14 @@ class AccountHTTP(HTTPManager):
         """
         return await self._native_private(
             "get_positions",
-            self._native_params(instType=instType, product_symbol=product_symbol),
+            self._native_params(instType=instType, product_symbol=product_symbol, posId=posId),
         )
 
     async def get_positions_history(
         self,
         instType: str | None = None,
         product_symbol: str | None = None,
+        posId: str | None = None,
         mgnMode: str | None = None,
         type: str | None = None,
         after: str | None = None,
@@ -102,6 +105,7 @@ class AccountHTTP(HTTPManager):
             self._native_params(
                 instType=instType,
                 product_symbol=product_symbol,
+                posId=posId,
                 mgnMode=mgnMode,
                 type=type,
                 after=after,
@@ -137,6 +141,8 @@ class AccountHTTP(HTTPManager):
         ctType: str | None = None,
         type: str | None = None,
         subType: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
         begin: str | None = None,
         end: str | None = None,
         limit: str | None = None,
@@ -169,6 +175,8 @@ class AccountHTTP(HTTPManager):
                 ctType=ctType,
                 type=type,
                 subType=subType,
+                after=after,
+                before=before,
                 begin=begin,
                 end=end,
                 limit=limit,
@@ -184,6 +192,8 @@ class AccountHTTP(HTTPManager):
         ctType: str | None = None,
         type: str | None = None,
         subType: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
         begin: str | None = None,
         end: str | None = None,
         limit: str | None = None,
@@ -216,6 +226,8 @@ class AccountHTTP(HTTPManager):
                 ctType=ctType,
                 type=type,
                 subType=subType,
+                after=after,
+                before=before,
                 begin=begin,
                 end=end,
                 limit=limit,
@@ -226,6 +238,7 @@ class AccountHTTP(HTTPManager):
         self,
         year: str,
         quarter: str,
+        type: str | None = None,
     ) -> dict[str, Any]:
         """
         Get account bills history archive.
@@ -239,13 +252,14 @@ class AccountHTTP(HTTPManager):
         """
         return await self._native_private(
             "get_account_bills_history_archive",
-            self._native_params(year=year, quarter=quarter),
+            self._native_params(year=year, quarter=quarter, type=type),
         )
 
     async def post_account_bills_history_archive(
         self,
         year: str,
         quarter: str,
+        type: str | None = None,
     ) -> dict[str, Any]:
         """
         Generate account bills history archive.
@@ -259,7 +273,7 @@ class AccountHTTP(HTTPManager):
         """
         return await self._native_private(
             "post_account_bills_history_archive",
-            self._native_params(year=year, quarter=quarter),
+            self._native_params(year=year, quarter=quarter, type=type),
         )
 
     async def get_account_config(self) -> dict[str, Any]:
@@ -328,6 +342,8 @@ class AccountHTTP(HTTPManager):
         ccy: str | None = None,
         px: str | None = None,
         leverage: str | None = None,
+        tradeQuoteCcy: str | None = None,
+        outcome: str | None = None,
     ) -> dict[str, Any]:
         """
         Get maximum order size.
@@ -346,7 +362,13 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "get_max_order_size",
             self._native_params(
-                product_symbol=product_symbol, tdMode=tdMode, ccy=ccy, px=px, leverage=leverage
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                ccy=ccy,
+                px=px,
+                leverage=leverage,
+                tradeQuoteCcy=tradeQuoteCcy,
+                outcome=outcome,
             ),
         )
 
@@ -357,6 +379,7 @@ class AccountHTTP(HTTPManager):
         ccy: str | None = None,
         reduceOnly: str | None = None,
         px: str | None = None,
+        tradeQuoteCcy: str | None = None,
     ) -> dict[str, Any]:
         """
         Get maximum available size.
@@ -375,7 +398,12 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "get_max_avail_size",
             self._native_params(
-                product_symbol=product_symbol, tdMode=tdMode, ccy=ccy, reduceOnly=reduceOnly, px=px
+                product_symbol=product_symbol,
+                tdMode=tdMode,
+                ccy=ccy,
+                reduceOnly=reduceOnly,
+                px=px,
+                tradeQuoteCcy=tradeQuoteCcy,
             ),
         )
 
@@ -445,6 +473,7 @@ class AccountHTTP(HTTPManager):
         product_symbol: str | None = None,
         ccy: str | None = None,
         mgnCcy: str | None = None,
+        tradeQuoteCcy: str | None = None,
     ) -> dict[str, Any]:
         """
         Get maximum loan amount.
@@ -461,90 +490,88 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "get_max_loan",
             self._native_params(
-                mgnMode=mgnMode, product_symbol=product_symbol, ccy=ccy, mgnCcy=mgnCcy
+                mgnMode=mgnMode,
+                product_symbol=product_symbol,
+                ccy=ccy,
+                mgnCcy=mgnCcy,
+                tradeQuoteCcy=tradeQuoteCcy,
             ),
         )
 
     async def _request_fee_rates(
         self,
         method_name: str,
-        ruleType: str | None = None,
         product_symbol: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
+        groupId: str | None = None,
     ) -> dict[str, Any]:
         return await self._native_private(
             method_name,
             self._native_params(
-                ruleType=ruleType,
                 product_symbol=product_symbol,
-                uly=uly,
                 instFamily=instFamily,
+                groupId=groupId,
             ),
         )
 
     async def get_spot_fee_rates(
         self,
-        ruleType: str | None = None,
         product_symbol: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
+        groupId: str | None = None,
     ) -> dict[str, Any]:
         """Get OKX Spot trading fee rates."""
         return await self._request_fee_rates(
-            "get_spot_fee_rates", ruleType, product_symbol, uly, instFamily
+            "get_spot_fee_rates", product_symbol, instFamily, groupId
         )
 
     async def get_margin_fee_rates(
         self,
-        ruleType: str | None = None,
         product_symbol: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
+        groupId: str | None = None,
     ) -> dict[str, Any]:
         """Get OKX margin trading fee rates."""
         return await self._request_fee_rates(
-            "get_margin_fee_rates", ruleType, product_symbol, uly, instFamily
+            "get_margin_fee_rates", product_symbol, instFamily, groupId
         )
 
     async def get_swap_fee_rates(
         self,
-        ruleType: str | None = None,
         product_symbol: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
+        groupId: str | None = None,
     ) -> dict[str, Any]:
         """Get OKX perpetual-swap trading fee rates."""
         return await self._request_fee_rates(
-            "get_swap_fee_rates", ruleType, product_symbol, uly, instFamily
+            "get_swap_fee_rates", product_symbol, instFamily, groupId
         )
 
     async def get_futures_fee_rates(
         self,
-        ruleType: str | None = None,
         product_symbol: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
+        groupId: str | None = None,
     ) -> dict[str, Any]:
         """Get OKX delivery-futures trading fee rates."""
         return await self._request_fee_rates(
-            "get_futures_fee_rates", ruleType, product_symbol, uly, instFamily
+            "get_futures_fee_rates", product_symbol, instFamily, groupId
         )
 
     async def get_option_fee_rates(
         self,
-        ruleType: str | None = None,
         product_symbol: str | None = None,
-        uly: str | None = None,
         instFamily: str | None = None,
+        groupId: str | None = None,
     ) -> dict[str, Any]:
         """Get OKX option trading fee rates."""
         return await self._request_fee_rates(
-            "get_option_fee_rates", ruleType, product_symbol, uly, instFamily
+            "get_option_fee_rates", product_symbol, instFamily, groupId
         )
 
     async def get_interest_accrued(
         self,
+        type: str | None = None,
         ccy: str | None = None,
         product_symbol: str | None = None,
         mgnMode: str | None = None,
@@ -569,6 +596,7 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "get_interest_accrued",
             self._native_params(
+                type=type,
                 ccy=ccy,
                 product_symbol=product_symbol,
                 mgnMode=mgnMode,
@@ -634,6 +662,7 @@ class AccountHTTP(HTTPManager):
 
     async def get_interest_limits(
         self,
+        type: str | None = None,
         ccy: str | None = None,
     ) -> dict[str, Any]:
         """
@@ -647,5 +676,5 @@ class AccountHTTP(HTTPManager):
         """
         return await self._native_private(
             "get_interest_limits",
-            self._native_params(ccy=ccy),
+            self._native_params(type=type, ccy=ccy),
         )

@@ -246,8 +246,10 @@ impl OkxPrivateWebSocket {
     }
 
     pub async fn subscribe_orders(&mut self) -> Result<()> {
-        self.subscribe(vec![OkxPrivateWebSocketArg::new("orders")?])
-            .await
+        self.subscribe(vec![OkxPrivateWebSocketArg::with_inst_type(
+            "orders", "ANY",
+        )?])
+        .await
     }
 
     pub async fn subscribe_orders_for_type(&mut self, inst_type: &str) -> Result<()> {
@@ -279,8 +281,11 @@ impl OkxPrivateWebSocket {
     }
 
     pub async fn subscribe_positions(&mut self) -> Result<()> {
-        self.subscribe(vec![OkxPrivateWebSocketArg::new("positions")?])
-            .await
+        self.subscribe(vec![OkxPrivateWebSocketArg::with_inst_type(
+            "positions",
+            "ANY",
+        )?])
+        .await
     }
 
     pub async fn subscribe_positions_for_type(&mut self, inst_type: &str) -> Result<()> {
@@ -309,6 +314,7 @@ impl OkxPrivateWebSocket {
                 "at least one OKX private WebSocket channel is required.".to_string(),
             ));
         }
+        validate_subscription_args(&args)?;
         let op = match op {
             "subscribe" | "unsubscribe" => op,
             _ => {
@@ -388,6 +394,22 @@ fn authenticated_subscription_route(
         }
     }
     Ok(route.unwrap_or(OkxAuthenticatedWebSocketRoute::Private))
+}
+
+fn validate_subscription_args(args: &[OkxPrivateWebSocketArg]) -> Result<()> {
+    for arg in args {
+        if matches!(
+            arg.channel.as_str(),
+            "orders" | "positions" | "orders-algo" | "algo-advance" | "liquidation-warning"
+        ) && arg.inst_type.is_none()
+        {
+            return Err(DcexError::InvalidInput(format!(
+                "OKX {} channel requires instType.",
+                arg.channel
+            )));
+        }
+    }
+    Ok(())
 }
 
 fn login_signature(api_secret: &str, timestamp: &str) -> Result<String> {
@@ -526,6 +548,14 @@ mod tests {
         assert!(validate_login_ack(&json!({"event": "login", "code": "0"})).is_ok());
         assert!(validate_login_ack(&json!({"event": "login", "code": "60012"})).is_err());
         assert!(validate_login_ack(&json!({"event": "subscribe", "code": "0"})).is_err());
+    }
+
+    #[test]
+    fn channels_with_required_instrument_type_reject_missing_filter() {
+        let invalid = OkxPrivateWebSocketArg::new("orders").expect("arg");
+        let any = OkxPrivateWebSocketArg::with_inst_type("positions", "ANY").expect("arg");
+        assert!(validate_subscription_args(&[invalid]).is_err());
+        assert!(validate_subscription_args(&[any]).is_ok());
     }
 
     #[test]

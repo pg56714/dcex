@@ -16,6 +16,9 @@ _native = load_native()
 
 
 def _format_value(value: object) -> str:
+    enum_value = getattr(value, "value", None)
+    if enum_value is not None:
+        value = enum_value
     if isinstance(value, bool):
         return str(value).lower()
     return str(value)
@@ -90,9 +93,9 @@ class HTTPManager(BaseHTTPManager):
         for key, value in kwargs.items():
             if key == "self" or value is None:
                 continue
-            enum_value = getattr(value, "value", None)
-            if enum_value is not None:
-                value = enum_value
+            if isinstance(value, (list, tuple)):
+                params.extend((key, _format_value(item)) for item in value)
+                continue
             params.append((key, _format_value(value)))
         return params
 

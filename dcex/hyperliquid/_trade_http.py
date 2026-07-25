@@ -40,8 +40,16 @@ class TradeHTTP(HTTPManager):
         tpsl: str | None = None,
         vaultAddress: str | None = None,
         expiresAfter: int | None = None,
+        reduceOnly: bool = False,
+        slippage: float = 0.05,
+        cloid: str | None = None,
+        grouping: str = "na",
+        builder_address: str | None = None,
+        fee_ten_bp: int | None = None,
     ) -> dict[str, Any]:
         """Place a future market order."""
+        if (builder_address is None) != (fee_ten_bp is None):
+            raise ValueError("builder_address and fee_ten_bp must be provided together")
         return self._native_private(
             "place_future_market_order",
             self._native_params(**locals()),
@@ -55,8 +63,16 @@ class TradeHTTP(HTTPManager):
         tpsl: str | None = None,
         vaultAddress: str | None = None,
         expiresAfter: int | None = None,
+        reduceOnly: bool = False,
+        slippage: float = 0.05,
+        cloid: str | None = None,
+        grouping: str = "na",
+        builder_address: str | None = None,
+        fee_ten_bp: int | None = None,
     ) -> dict[str, Any]:
         """Place a future market buy order."""
+        if (builder_address is None) != (fee_ten_bp is None):
+            raise ValueError("builder_address and fee_ten_bp must be provided together")
         return self._native_private(
             "place_future_market_buy_order",
             self._native_params(**locals()),
@@ -70,8 +86,16 @@ class TradeHTTP(HTTPManager):
         tpsl: str | None = None,
         vaultAddress: str | None = None,
         expiresAfter: int | None = None,
+        reduceOnly: bool = False,
+        slippage: float = 0.05,
+        cloid: str | None = None,
+        grouping: str = "na",
+        builder_address: str | None = None,
+        fee_ten_bp: int | None = None,
     ) -> dict[str, Any]:
         """Place a future market sell order."""
+        if (builder_address is None) != (fee_ten_bp is None):
+            raise ValueError("builder_address and fee_ten_bp must be provided together")
         return self._native_private(
             "place_future_market_sell_order",
             self._native_params(**locals()),
@@ -84,8 +108,16 @@ class TradeHTTP(HTTPManager):
         price: str,
         size: str,
         tif: str,
+        cloid: str | None = None,
+        grouping: str = "na",
+        builder_address: str | None = None,
+        fee_ten_bp: int | None = None,
+        vaultAddress: str | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place a future limit order."""
+        if (builder_address is None) != (fee_ten_bp is None):
+            raise ValueError("builder_address and fee_ten_bp must be provided together")
         return self._native_private(
             "place_future_limit_order",
             self._native_params(**locals()),
@@ -97,8 +129,16 @@ class TradeHTTP(HTTPManager):
         price: str,
         size: str,
         tif: str,
+        cloid: str | None = None,
+        grouping: str = "na",
+        builder_address: str | None = None,
+        fee_ten_bp: int | None = None,
+        vaultAddress: str | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place a future limit buy order."""
+        if (builder_address is None) != (fee_ten_bp is None):
+            raise ValueError("builder_address and fee_ten_bp must be provided together")
         return self._native_private(
             "place_future_limit_buy_order",
             self._native_params(**locals()),
@@ -110,8 +150,16 @@ class TradeHTTP(HTTPManager):
         price: str,
         size: str,
         tif: str,
+        cloid: str | None = None,
+        grouping: str = "na",
+        builder_address: str | None = None,
+        fee_ten_bp: int | None = None,
+        vaultAddress: str | None = None,
+        expiresAfter: int | None = None,
     ) -> dict[str, Any]:
         """Place a future limit sell order."""
+        if (builder_address is None) != (fee_ten_bp is None):
+            raise ValueError("builder_address and fee_ten_bp must be provided together")
         return self._native_private(
             "place_future_limit_sell_order",
             self._native_params(**locals()),

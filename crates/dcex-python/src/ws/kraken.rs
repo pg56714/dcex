@@ -102,69 +102,77 @@ impl PythonKrakenPublicWebSocketClient {
         })
     }
 
+    #[pyo3(signature = (product_symbol, event_trigger=None, snapshot=true))]
     fn subscribe_ticker<'py>(
         &self,
         py: Python<'py>,
         product_symbol: String,
+        event_trigger: Option<String>,
+        snapshot: bool,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let event_trigger = event_trigger.as_deref().unwrap_or("trades");
             client
                 .lock()
                 .await
-                .subscribe_ticker(&product_symbol)
+                .subscribe_ticker_with_options(&product_symbol, event_trigger, snapshot)
                 .await
                 .map_err(to_py_runtime_error)
         })
     }
 
+    #[pyo3(signature = (product_symbol, snapshot=false))]
     fn subscribe_trades<'py>(
         &self,
         py: Python<'py>,
         product_symbol: String,
+        snapshot: bool,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_trades(&product_symbol)
+                .subscribe_trades_with_options(&product_symbol, snapshot)
                 .await
                 .map_err(to_py_runtime_error)
         })
     }
 
-    #[pyo3(signature = (product_symbol, depth=10))]
+    #[pyo3(signature = (product_symbol, depth=10, snapshot=true))]
     fn subscribe_orderbook<'py>(
         &self,
         py: Python<'py>,
         product_symbol: String,
         depth: u32,
+        snapshot: bool,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_orderbook(&product_symbol, depth)
+                .subscribe_orderbook_with_options(&product_symbol, depth, snapshot)
                 .await
                 .map_err(to_py_runtime_error)
         })
     }
 
-    #[pyo3(signature = (product_symbol, interval=1))]
+    #[pyo3(signature = (product_symbol, interval=1, snapshot=true))]
     fn subscribe_klines<'py>(
         &self,
         py: Python<'py>,
         product_symbol: String,
         interval: u32,
+        snapshot: bool,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_klines(&product_symbol, interval)
+                .subscribe_klines_with_options(&product_symbol, interval, snapshot)
                 .await
                 .map_err(to_py_runtime_error)
         })
@@ -266,13 +274,20 @@ impl PythonKrakenPrivateWebSocketClient {
         })
     }
 
-    fn subscribe_balances<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    #[pyo3(signature = (snapshot=true, rebased=true, users=None))]
+    fn subscribe_balances<'py>(
+        &self,
+        py: Python<'py>,
+        snapshot: bool,
+        rebased: bool,
+        users: Option<String>,
+    ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_balances()
+                .subscribe_balances(snapshot, rebased, users)
                 .await
                 .map_err(to_py_runtime_error)
         })
@@ -290,19 +305,37 @@ impl PythonKrakenPrivateWebSocketClient {
         })
     }
 
-    #[pyo3(signature = (snap_orders=true, snap_trades=false))]
+    #[pyo3(signature = (
+        snap_orders=true,
+        snap_trades=false,
+        order_status=true,
+        rebased=true,
+        ratecounter=false,
+        users=None
+    ))]
     fn subscribe_executions<'py>(
         &self,
         py: Python<'py>,
         snap_orders: bool,
         snap_trades: bool,
+        order_status: bool,
+        rebased: bool,
+        ratecounter: bool,
+        users: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             client
                 .lock()
                 .await
-                .subscribe_executions(snap_orders, snap_trades)
+                .subscribe_executions(
+                    snap_orders,
+                    snap_trades,
+                    order_status,
+                    rebased,
+                    ratecounter,
+                    users,
+                )
                 .await
                 .map_err(to_py_runtime_error)
         })

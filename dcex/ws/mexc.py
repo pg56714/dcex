@@ -50,9 +50,9 @@ class PublicClient(AsyncWebSocketMixin):
         """Unsubscribe from raw MEXC channels."""
         await self._native_client.unsubscribe(channels)
 
-    async def subscribe_trades(self, product_symbol: str) -> None:
+    async def subscribe_trades(self, product_symbol: str, speed: str = "100ms") -> None:
         """Subscribe to trade events for a product."""
-        await self._native_client.subscribe_trades(product_symbol)
+        await self._native_client.subscribe_trades(product_symbol, speed)
 
     async def subscribe_orderbook(self, product_symbol: str, speed: str = "100ms") -> None:
         """Subscribe to incremental order book events for a product."""
@@ -62,9 +62,9 @@ class PublicClient(AsyncWebSocketMixin):
         """Subscribe to partial order book events for a product."""
         await self._native_client.subscribe_partial_orderbook(product_symbol, levels)
 
-    async def subscribe_book_ticker(self, product_symbol: str) -> None:
+    async def subscribe_book_ticker(self, product_symbol: str, speed: str = "100ms") -> None:
         """Subscribe to book ticker events for a product."""
-        await self._native_client.subscribe_book_ticker(product_symbol)
+        await self._native_client.subscribe_book_ticker(product_symbol, speed)
 
     async def subscribe_klines(self, product_symbol: str, interval: str) -> None:
         """Subscribe to kline events for a product."""

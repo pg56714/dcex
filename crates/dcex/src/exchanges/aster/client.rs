@@ -74,10 +74,27 @@ impl AsterClient {
         spot_base_url: String,
         futures_base_url: String,
     ) -> Result<Self> {
+        if spot_base_url.trim().is_empty() || futures_base_url.trim().is_empty() {
+            return Err(DcexError::InvalidInput(
+                "Aster REST base URLs must not be empty.".to_string(),
+            ));
+        }
+        match (&signer_address, &private_key) {
+            (Some(signer), Some(_)) => validate_wallet_address("signer_address", signer)?,
+            (None, None) => {}
+            _ => {
+                return Err(DcexError::InvalidInput(
+                    "Aster signer_address and private_key must be provided together.".to_string(),
+                ));
+            }
+        }
+        if let Some(user) = &user_address {
+            validate_wallet_address("user_address", user)?;
+        }
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
-            spot_base_url,
-            futures_base_url,
+            spot_base_url: spot_base_url.trim_end_matches('/').to_string(),
+            futures_base_url: futures_base_url.trim_end_matches('/').to_string(),
             user_address,
             signer_address,
             private_key: private_key.map(|key| parse_private_key(&key)).transpose()?,
@@ -266,6 +283,21 @@ impl AsterClient {
         }
         Ok(exchange_symbol_fallback(product_symbol))
     }
+}
+
+pub(super) fn validate_wallet_address(label: &str, value: &str) -> Result<()> {
+    let value = value.trim();
+    if value.len() != 42
+        || !value.starts_with("0x")
+        || !value[2..]
+            .chars()
+            .all(|character| character.is_ascii_hexdigit())
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "Aster {label} must be a 0x-prefixed 20-byte hexadecimal address."
+        )));
+    }
+    Ok(())
 }
 
 fn exchange_symbol_fallback(product_symbol: &str) -> String {

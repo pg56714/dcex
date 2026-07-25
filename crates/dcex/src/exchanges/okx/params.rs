@@ -82,6 +82,16 @@ impl OkxParams {
             DcexError::InvalidInput(format!("invalid JSON parameter {key}: {error}"))
         })
     }
+
+    pub(super) fn json_optional(&self, key: &str) -> Result<Option<Value>> {
+        self.get(key)
+            .map(|value| {
+                serde_json::from_str(value).map_err(|error| {
+                    DcexError::InvalidInput(format!("invalid JSON parameter {key}: {error}"))
+                })
+            })
+            .transpose()
+    }
 }
 
 pub(super) fn normalize_inst_id_query(params: &mut [(String, String)]) {

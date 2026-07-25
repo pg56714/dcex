@@ -18,6 +18,9 @@ class TradeHTTP(HTTPManager):
         price: str | None = None,
         isLeverage: int | None = None,
         marketUnit: str | None = None,
+        rpiTakerAccess: bool | None = None,
+        slippageToleranceType: str | None = None,
+        slippageTolerance: str | None = None,
         triggerDirection: int | None = None,
         orderFilter: str | None = None,
         triggerPrice: str | None = None,
@@ -36,6 +39,11 @@ class TradeHTTP(HTTPManager):
         tpOrderType: str | None = None,
         slOrderType: str | None = None,
         positionIdx: int | None = None,
+        orderLinkId: str | None = None,
+        smpType: str | None = None,
+        mmp: bool | None = None,
+        bboSideType: str | None = None,
+        bboLevel: int | None = None,
     ) -> dict[str, Any]:
         """Place an order."""
         return self._native_private(
@@ -48,6 +56,9 @@ class TradeHTTP(HTTPManager):
                 price=price,
                 isLeverage=isLeverage,
                 marketUnit=marketUnit,
+                rpiTakerAccess=rpiTakerAccess,
+                slippageToleranceType=slippageToleranceType,
+                slippageTolerance=slippageTolerance,
                 triggerDirection=triggerDirection,
                 orderFilter=orderFilter,
                 triggerPrice=triggerPrice,
@@ -66,6 +77,11 @@ class TradeHTTP(HTTPManager):
                 tpOrderType=tpOrderType,
                 slOrderType=slOrderType,
                 positionIdx=positionIdx,
+                orderLinkId=orderLinkId,
+                smpType=smpType,
+                mmp=mmp,
+                bboSideType=bboSideType,
+                bboLevel=bboLevel,
             ),
         )
 
@@ -337,7 +353,12 @@ class TradeHTTP(HTTPManager):
         product_symbol: str | None = None,
         settleCoin: str | None = None,
         baseCoin: str | None = None,
+        orderId: str | None = None,
+        orderLinkId: str | None = None,
+        openOnly: int | None = None,
+        orderFilter: str | None = None,
         limit: int = 20,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get open orders."""
         return self._native_private(
@@ -347,7 +368,12 @@ class TradeHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 settleCoin=settleCoin,
                 baseCoin=baseCoin,
+                orderId=orderId,
+                orderLinkId=orderLinkId,
+                openOnly=openOnly,
+                orderFilter=orderFilter,
                 limit=limit,
+                cursor=cursor,
             ),
         )
 
@@ -369,6 +395,7 @@ class TradeHTTP(HTTPManager):
         baseCoin: str | None = None,
         settleCoin: str | None = None,
         orderFilter: str | None = None,
+        stopOrderType: str | None = None,
     ) -> dict[str, Any]:
         """Cancel all orders."""
         return self._native_private(
@@ -379,6 +406,7 @@ class TradeHTTP(HTTPManager):
                 baseCoin=baseCoin,
                 settleCoin=settleCoin,
                 orderFilter=orderFilter,
+                stopOrderType=stopOrderType,
             ),
         )
 
@@ -386,8 +414,14 @@ class TradeHTTP(HTTPManager):
         self,
         category: str = "linear",
         product_symbol: str | None = None,
+        baseCoin: str | None = None,
+        settleCoin: str | None = None,
         orderId: str | None = None,
+        orderLinkId: str | None = None,
+        orderFilter: str | None = None,
+        orderStatus: str | None = None,
         startTime: int | None = None,
+        endTime: int | None = None,
         cursor: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
@@ -397,8 +431,14 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 category=category,
                 product_symbol=product_symbol,
+                baseCoin=baseCoin,
+                settleCoin=settleCoin,
                 orderId=orderId,
+                orderLinkId=orderLinkId,
+                orderFilter=orderFilter,
+                orderStatus=orderStatus,
                 startTime=startTime,
+                endTime=endTime,
                 cursor=cursor,
                 limit=limit,
             ),
@@ -408,8 +448,15 @@ class TradeHTTP(HTTPManager):
         self,
         category: str = "linear",
         product_symbol: str | None = None,
+        orderId: str | None = None,
+        orderLinkId: str | None = None,
+        baseCoin: str | None = None,
+        settleCoin: str | None = None,
         startTime: int | None = None,
+        endTime: int | None = None,
+        execType: str | None = None,
         limit: int = 50,
+        cursor: str | None = None,
     ) -> dict[str, Any]:
         """Get execution list."""
         return self._native_private(
@@ -417,8 +464,15 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 category=category,
                 product_symbol=product_symbol,
+                orderId=orderId,
+                orderLinkId=orderLinkId,
+                baseCoin=baseCoin,
+                settleCoin=settleCoin,
                 startTime=startTime,
+                endTime=endTime,
+                execType=execType,
                 limit=limit,
+                cursor=cursor,
             ),
         )
 

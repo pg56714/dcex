@@ -274,7 +274,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_spot_open_orders(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         pageNum: int | None = None,
         pageSize: int | None = None,
     ) -> dict[str, Any]:
@@ -290,8 +290,11 @@ class TradeHTTP(HTTPManager):
 
     async def get_spot_trade_history(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
         orderId: str | None = None,
+        side: str | None = None,
+        type_: str | None = None,
+        lastId: int | None = None,
         startAt: int | None = None,
         endAt: int | None = None,
         limit: int | None = None,
@@ -305,9 +308,9 @@ class TradeHTTP(HTTPManager):
     async def place_futures_order(
         self,
         product_symbol: str,
-        side: str,
-        type_: str,
-        size: int | str,
+        side: str | None = None,
+        type_: str = "limit",
+        size: int | str | None = None,
         price: str | None = None,
         clientOid: str | None = None,
         leverage: int | str | None = None,
@@ -325,7 +328,9 @@ class TradeHTTP(HTTPManager):
         stopPrice: str | None = None,
         stp: str | None = None,
         remark: str | None = None,
-        tags: str | None = None,
+        qty: str | None = None,
+        valueQty: str | None = None,
+        forceHold: bool | None = None,
     ) -> dict[str, Any]:
         """Place a new KuCoin futures order."""
         return await self._native_private(
@@ -336,14 +341,17 @@ class TradeHTTP(HTTPManager):
     async def place_futures_market_order(
         self,
         product_symbol: str,
-        side: str,
-        size: int | str,
+        side: str | None = None,
+        size: int | str | None = None,
         clientOid: str | None = None,
         leverage: int | str | None = None,
         marginMode: str | None = None,
         positionSide: str | None = None,
         reduceOnly: bool | None = None,
         closeOrder: bool | None = None,
+        qty: str | None = None,
+        valueQty: str | None = None,
+        forceHold: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures market order."""
         return await self._native_private(
@@ -360,7 +368,6 @@ class TradeHTTP(HTTPManager):
         marginMode: str | None = None,
         positionSide: str | None = None,
         reduceOnly: bool | None = None,
-        closeOrder: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures market buy order."""
         return await self._native_private(
@@ -377,7 +384,6 @@ class TradeHTTP(HTTPManager):
         marginMode: str | None = None,
         positionSide: str | None = None,
         reduceOnly: bool | None = None,
-        closeOrder: bool | None = None,
     ) -> dict[str, Any]:
         """Place a KuCoin futures market sell order."""
         return await self._native_private(
@@ -519,12 +525,11 @@ class TradeHTTP(HTTPManager):
     async def get_futures_order_by_client_oid(
         self,
         clientOid: str,
-        product_symbol: str | None = None,
     ) -> dict[str, Any]:
         """Retrieve a KuCoin futures order by client order ID."""
         return await self._native_private(
             "get_futures_order_by_client_oid",
-            self._native_params(clientOid=clientOid, product_symbol=product_symbol),
+            self._native_params(clientOid=clientOid),
         )
 
     async def cancel_futures_order(self, orderId: str) -> dict[str, Any]:
@@ -537,7 +542,7 @@ class TradeHTTP(HTTPManager):
     async def cancel_futures_order_by_client_oid(
         self,
         clientOid: str,
-        product_symbol: str | None = None,
+        product_symbol: str,
     ) -> dict[str, Any]:
         """Cancel a KuCoin futures order by client order ID."""
         return await self._native_private(
@@ -545,7 +550,7 @@ class TradeHTTP(HTTPManager):
             self._native_params(clientOid=clientOid, product_symbol=product_symbol),
         )
 
-    async def cancel_futures_all_orders(self, product_symbol: str | None = None) -> dict[str, Any]:
+    async def cancel_futures_all_orders(self, product_symbol: str) -> dict[str, Any]:
         """Cancel KuCoin futures open orders."""
         return await self._native_private(
             "cancel_futures_all_orders",
@@ -554,7 +559,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_open_order_value(
         self,
-        product_symbol: str | None = None,
+        product_symbol: str,
     ) -> dict[str, Any]:
         """Retrieve KuCoin futures open order value."""
         return await self._native_private(

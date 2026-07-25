@@ -62,11 +62,9 @@ async def test_get_spot_kline(client):
 @pytest.mark.asyncio
 async def test_get_spot_history_kline(client):
     end_time = int(time.time() * 1000)
-    start_time = end_time - 10 * 60 * 1000
     res = await client.get_spot_history_kline(
         product_symbol="BTC-USDT-SPOT",
         granularity="1min",
-        startTime=start_time,
         endTime=end_time,
         limit=5,
     )

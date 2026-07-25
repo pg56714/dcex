@@ -19,11 +19,17 @@ def _decode_event(body: bytes | bytearray | memoryview) -> dict[str, Any] | list
 class PublicClient(AsyncWebSocketMixin):
     """Async BingX public market WebSocket client."""
 
-    def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
+    def __init__(
+        self,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+        market: str = "spot",
+    ) -> None:
         """Create a BingX public WebSocket client."""
         self._native_client = _native.BingxPublicWebSocketClient(
             timeout=timeout,
             base_url=base_url,
+            market=market,
         )
 
     async def connect(self) -> None:
@@ -82,6 +88,7 @@ class PrivateClient(AsyncWebSocketMixin):
         timeout: float = 10.0,
         http_base_url: str | None = None,
         ws_base_url: str | None = None,
+        market: str = "spot",
     ) -> None:
         """Create a BingX private WebSocket client."""
         self._native_client = _native.BingxPrivateWebSocketClient(
@@ -90,6 +97,7 @@ class PrivateClient(AsyncWebSocketMixin):
             timeout=timeout,
             http_base_url=http_base_url,
             ws_base_url=ws_base_url,
+            market=market,
         )
 
     async def connect(self) -> str:
@@ -134,9 +142,13 @@ class PrivateClient(AsyncWebSocketMixin):
         return _decode_event(await self._native_client.recv())
 
 
-def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
+def public(
+    timeout: float = 10.0,
+    base_url: str | None = None,
+    market: str = "spot",
+) -> PublicClient:
     """Create an async BingX public market WebSocket client."""
-    return PublicClient(timeout=timeout, base_url=base_url)
+    return PublicClient(timeout=timeout, base_url=base_url, market=market)
 
 
 def private(
@@ -145,6 +157,7 @@ def private(
     timeout: float = 10.0,
     http_base_url: str | None = None,
     ws_base_url: str | None = None,
+    market: str = "spot",
 ) -> PrivateClient:
     """Create an async BingX private WebSocket client."""
     return PrivateClient(
@@ -153,6 +166,7 @@ def private(
         timeout=timeout,
         http_base_url=http_base_url,
         ws_base_url=ws_base_url,
+        market=market,
     )
 
 

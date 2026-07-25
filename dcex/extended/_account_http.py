@@ -1,5 +1,6 @@
 """Extended account HTTP client backed by Rust."""
 
+from collections.abc import Sequence
 from typing import Any
 
 from ._http_manager import HTTPManager
@@ -19,22 +20,44 @@ class AccountHTTP(HTTPManager):
 
     def get_asset_operations(
         self,
-        type: str | None = None,  # noqa: A002
-        status: str | None = None,
+        accountId: int | Sequence[int] | None = None,  # noqa: N803
+        id: int | str | None = None,  # noqa: A002
+        type: str | Sequence[str] | None = None,  # noqa: A002
+        status: str | Sequence[str] | None = None,
+        startTime: int | None = None,  # noqa: N803
+        endTime: int | None = None,  # noqa: N803
         cursor: int | None = None,
         limit: int | None = None,
     ) -> Any:  # noqa: ANN401
         """Get deposit, withdrawal, and transfer history."""
         return self._native_private(
             "get_asset_operations",
-            self._native_params(type=type, status=status, cursor=cursor, limit=limit),
+            self._native_params(
+                accountId=accountId,
+                id=id,
+                type=type,
+                status=status,
+                startTime=startTime,
+                endTime=endTime,
+                cursor=cursor,
+                limit=limit,
+            ),
         )
 
-    def get_spot_balances(self, accountId: int | str | None = None) -> Any:  # noqa: N803, ANN401
-        query = {} if accountId is None else {"accountId": accountId}
-        return self._request("GET", "/api/v1/user/spot/balances", query, signed=True)
+    def get_spot_balances(
+        self,
+        accountId: int | Sequence[int] | None = None,  # noqa: N803
+    ) -> Any:  # noqa: ANN401
+        return self._native_private(
+            "get_spot_balances",
+            self._native_params(accountId=accountId),
+        )
 
-    def get_positions(self, market: str | None = None, side: str | None = None) -> Any:  # noqa: ANN401
+    def get_positions(
+        self,
+        market: str | Sequence[str] | None = None,
+        side: str | None = None,
+    ) -> Any:  # noqa: ANN401
         return self._native_private(
             "get_positions",
             self._native_params(market=market, side=side),
@@ -42,7 +65,7 @@ class AccountHTTP(HTTPManager):
 
     def get_positions_history(
         self,
-        market: str | None = None,
+        market: str | Sequence[str] | None = None,
         side: str | None = None,
         cursor: int | None = None,
         limit: int | None = None,
@@ -54,7 +77,7 @@ class AccountHTTP(HTTPManager):
 
     def get_trades_history(
         self,
-        market: str | None = None,
+        market: str | Sequence[str] | None = None,
         type: str | None = None,  # noqa: A002
         side: str | None = None,
         cursor: int | None = None,
@@ -73,9 +96,9 @@ class AccountHTTP(HTTPManager):
 
     def get_funding_payments(
         self,
-        market: str | None = None,
+        startTime: int,  # noqa: N803
+        market: str | Sequence[str] | None = None,
         side: str | None = None,
-        startTime: int | None = None,  # noqa: N803
         cursor: int | None = None,
         limit: int | None = None,
     ) -> Any:  # noqa: ANN401
@@ -90,20 +113,18 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
-    def get_leverage(self, market: str | None = None) -> Any:  # noqa: ANN401
+    def get_leverage(self, market: str | Sequence[str] | None = None) -> Any:  # noqa: ANN401
         return self._native_private("get_leverage", self._native_params(market=market))
 
     def get_fees(
         self,
-        market: str | None = None,
+        market: str | Sequence[str] | None = None,
         builderId: int | str | None = None,  # noqa: N803
     ) -> Any:  # noqa: ANN401
-        query = {
-            key: value
-            for key, value in {"market": market, "builderId": builderId}.items()
-            if value is not None
-        }
-        return self._request("GET", "/api/v1/user/fees", query, signed=True)
+        return self._native_private(
+            "get_fees",
+            self._native_params(market=market, builderId=builderId),
+        )
 
     def get_rebates(self) -> Any:  # noqa: ANN401
         """Get account rebate statistics."""

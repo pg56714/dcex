@@ -47,6 +47,26 @@ impl BackpackClient {
         timeout: Duration,
         base_url: String,
     ) -> Result<Self> {
+        if window > 60_000 {
+            return Err(DcexError::InvalidInput(
+                "Backpack X-Window must not exceed 60000 milliseconds".to_string(),
+            ));
+        }
+        match (&api_key, &api_secret) {
+            (Some(api_key), Some(api_secret))
+                if api_key.trim().is_empty() || api_secret.trim().is_empty() =>
+            {
+                return Err(DcexError::InvalidInput(
+                    "Backpack api_key and api_secret must not be empty".to_string(),
+                ));
+            }
+            (Some(_), None) | (None, Some(_)) => {
+                return Err(DcexError::InvalidInput(
+                    "Backpack api_key and api_secret must be provided together".to_string(),
+                ));
+            }
+            _ => {}
+        }
         let signing_key = api_secret
             .map(|secret| decode_signing_key(&secret))
             .transpose()?;
@@ -219,7 +239,18 @@ impl BackpackClient {
         body: Value,
         instruction: &str,
     ) -> Result<ValidatedResponse> {
-        self.private_body_request(HttpMethod::Post, path, body, instruction)
+        self.private_body_request(HttpMethod::Post, path, body, instruction, BTreeMap::new())
+            .await
+    }
+
+    pub(super) async fn private_post_value_with_headers(
+        &self,
+        path: &str,
+        body: Value,
+        instruction: &str,
+        extra_headers: BTreeMap<String, String>,
+    ) -> Result<ValidatedResponse> {
+        self.private_body_request(HttpMethod::Post, path, body, instruction, extra_headers)
             .await
     }
 
@@ -229,7 +260,7 @@ impl BackpackClient {
         body: Value,
         instruction: &str,
     ) -> Result<ValidatedResponse> {
-        self.private_body_request(HttpMethod::Delete, path, body, instruction)
+        self.private_body_request(HttpMethod::Delete, path, body, instruction, BTreeMap::new())
             .await
     }
 
@@ -239,6 +270,7 @@ impl BackpackClient {
         path: &str,
         body: Value,
         instruction: &str,
+        extra_headers: BTreeMap<String, String>,
     ) -> Result<ValidatedResponse> {
         let signature_payload = signature_payload_from_value(&body);
         let body = serde_json::to_vec(&body)
@@ -251,7 +283,7 @@ impl BackpackClient {
             true,
             Some(instruction.to_string()),
             Some(signature_payload),
-            BTreeMap::new(),
+            extra_headers,
         )
         .await
     }

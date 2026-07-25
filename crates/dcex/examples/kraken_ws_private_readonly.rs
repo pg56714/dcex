@@ -12,7 +12,7 @@ async fn main() -> dcex::Result<()> {
 
     let mut ws = KrakenPrivateWebSocket::new(api_key, api_secret, Duration::from_secs(10))?;
     ws.connect().await?;
-    ws.subscribe_balances().await?;
+    ws.subscribe_balances(true, true, None).await?;
     println!("{}", ws.recv().await?);
     ws.close().await?;
     Ok(())

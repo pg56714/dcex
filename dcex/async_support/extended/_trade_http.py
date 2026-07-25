@@ -1,6 +1,6 @@
 """Extended async trade HTTP client backed by Rust."""
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from ._http_manager import HTTPManager
@@ -11,7 +11,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_open_orders(
         self,
-        market: str | None = None,
+        market: str | Sequence[str] | None = None,
         type: str | None = None,  # noqa: A002
         side: str | None = None,
     ) -> Any:  # noqa: ANN401
@@ -22,9 +22,11 @@ class TradeHTTP(HTTPManager):
 
     async def get_orders_history(
         self,
-        market: str | None = None,
+        market: str | Sequence[str] | None = None,
         type: str | None = None,  # noqa: A002
         side: str | None = None,
+        id: int | Sequence[int] | None = None,  # noqa: A002
+        externalId: str | Sequence[str] | None = None,  # noqa: N803
         cursor: int | None = None,
         limit: int | None = None,
         sort: str | None = None,
@@ -35,6 +37,8 @@ class TradeHTTP(HTTPManager):
                 market=market,
                 type=type,
                 side=side,
+                id=id,
+                externalId=externalId,
                 cursor=cursor,
                 limit=limit,
                 sort=sort,
@@ -44,14 +48,13 @@ class TradeHTTP(HTTPManager):
     async def get_order(self, id: int | str) -> Any:  # noqa: A002, ANN401
         return await self._native_private("get_order", self._native_params(id=id))
 
-    async def get_order_by_external_id(self, externalId: int | str) -> Any:  # noqa: N803, ANN401
-        return await self._request(
-            "GET",
-            f"/api/v1/user/orders/external/{externalId}",
-            signed=True,
+    async def get_order_by_external_id(self, externalId: str) -> Any:  # noqa: N803, ANN401
+        return await self._native_private(
+            "get_order_by_external_id",
+            self._native_params(externalId=externalId),
         )
 
-    async def get_orders_by_external_id(self, externalId: int | str) -> Any:  # noqa: N803, ANN401
+    async def get_orders_by_external_id(self, externalId: str) -> Any:  # noqa: N803, ANN401
         return await self.get_order_by_external_id(externalId)
 
     async def sign_create_order(
@@ -201,9 +204,7 @@ class TradeHTTP(HTTPManager):
         return await self._native_private("mass_cancel", self._native_params(body=body))
 
     async def set_deadmanswitch(self, countdownTime: int) -> Any:  # noqa: N803, ANN401
-        return await self._request(
-            "POST",
-            "/api/v1/user/deadmanswitch",
-            {"countdownTime": countdownTime},
-            signed=True,
+        return await self._native_private(
+            "set_deadmanswitch",
+            self._native_params(countdownTime=countdownTime),
         )

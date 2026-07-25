@@ -67,6 +67,22 @@ impl BitgetPrivateWebSocketArg {
                     .to_string(),
             ));
         }
+        if channel == "account" && coin.as_deref() != Some("default") {
+            return Err(DcexError::InvalidInput(
+                "Bitget classic account channel requires coin=default.".to_string(),
+            ));
+        }
+        if channel == "orders" && inst_type == "SPOT" && inst_id.is_none() {
+            return Err(DcexError::InvalidInput(
+                "Bitget spot orders channel requires an instId or default.".to_string(),
+            ));
+        }
+        if channel == "equity" && (inst_type == "SPOT" || inst_id.is_some() || coin.is_some()) {
+            return Err(DcexError::InvalidInput(
+                "Bitget equity channel supports futures instrument types without filters."
+                    .to_string(),
+            ));
+        }
         Ok(Self {
             inst_type,
             channel,
@@ -500,7 +516,8 @@ mod tests {
 
     #[test]
     fn rejects_invalid_private_arg() {
-        assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "account").is_ok());
+        assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "account").is_err());
+        assert!(BitgetPrivateWebSocketArg::with_coin("USDT-FUTURES", "account", "default").is_ok());
         assert!(BitgetPrivateWebSocketArg::new("bad", "orders").is_err());
         assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "orders/").is_err());
         assert!(BitgetPrivateWebSocketArg::new("USDT-FUTURES", "positions").is_err());
@@ -509,6 +526,7 @@ mod tests {
                 .is_err()
         );
         assert!(BitgetPrivateWebSocketArg::with_inst_id("SPOT", "positions", "default").is_err());
+        assert!(BitgetPrivateWebSocketArg::new("SPOT", "orders").is_err());
         assert!(
             BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "positions", "default").is_ok()
         );

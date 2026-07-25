@@ -40,6 +40,7 @@ class MarketHTTP(HTTPManager):
         self,
         category: str = "linear",
         product_symbol: str | None = None,
+        symbolType: str | None = None,
         status: str | None = None,
         baseCoin: str | None = None,
         limit: int | None = None,
@@ -51,6 +52,7 @@ class MarketHTTP(HTTPManager):
             self._params(
                 category=category,
                 product_symbol=product_symbol,
+                symbolType=symbolType,
                 status=status,
                 baseCoin=baseCoin,
                 limit=limit,
@@ -63,6 +65,7 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
         interval: str,
         startTime: int | None = None,
+        endTime: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Get kline/candlestick data."""
@@ -72,6 +75,7 @@ class MarketHTTP(HTTPManager):
                 product_symbol=product_symbol,
                 interval=interval,
                 startTime=startTime,
+                endTime=endTime,
                 limit=limit,
             ),
         )
@@ -92,34 +96,55 @@ class MarketHTTP(HTTPManager):
         category: str = "linear",
         product_symbol: str | None = None,
         baseCoin: str | None = None,
+        expDate: str | None = None,
     ) -> dict[str, Any]:
         """Get ticker information."""
         return await self._native_public(
             "get_tickers",
-            self._params(category=category, product_symbol=product_symbol, baseCoin=baseCoin),
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                baseCoin=baseCoin,
+                expDate=expDate,
+            ),
         )
 
     async def get_funding_rate_history(
         self,
         product_symbol: str,
         startTime: int | None = None,
+        endTime: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Get funding rate history."""
         return await self._native_public(
             "get_funding_rate_history",
-            self._params(product_symbol=product_symbol, startTime=startTime, limit=limit),
+            self._params(
+                product_symbol=product_symbol,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
         )
 
     async def get_public_trade_history(
         self,
-        product_symbol: str,
+        product_symbol: str | None = None,
         limit: int | None = None,
+        category: str = "linear",
+        baseCoin: str | None = None,
+        optionType: str | None = None,
     ) -> dict[str, Any]:
         """Get public trade history."""
         return await self._native_public(
             "get_public_trade_history",
-            self._params(product_symbol=product_symbol, limit=limit),
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                baseCoin=baseCoin,
+                optionType=optionType,
+                limit=limit,
+            ),
         )
 
     async def get_open_interest(
@@ -170,6 +195,7 @@ class MarketHTTP(HTTPManager):
         self,
         category: str = "option",
         baseCoin: str | None = None,
+        quoteCoin: str | None = None,
         period: int | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
@@ -180,6 +206,7 @@ class MarketHTTP(HTTPManager):
             self._params(
                 category=category,
                 baseCoin=baseCoin,
+                quoteCoin=quoteCoin,
                 period=period,
                 startTime=startTime,
                 endTime=endTime,
@@ -195,6 +222,7 @@ class MarketHTTP(HTTPManager):
         category: str = "linear",
         product_symbol: str | None = None,
         baseCoin: str | None = None,
+        settleCoin: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
     ) -> dict[str, Any]:
@@ -205,6 +233,7 @@ class MarketHTTP(HTTPManager):
                 category=category,
                 product_symbol=product_symbol,
                 baseCoin=baseCoin,
+                settleCoin=settleCoin,
                 limit=limit,
                 cursor=cursor,
             ),
@@ -223,13 +252,12 @@ class MarketHTTP(HTTPManager):
 
     async def get_adl_alert(
         self,
-        category: str = "linear",
         product_symbol: str | None = None,
     ) -> dict[str, Any]:
         """Get ADL alert data."""
         return await self._native_public(
             "get_adl_alert",
-            self._params(category=category, product_symbol=product_symbol),
+            self._params(product_symbol=product_symbol),
         )
 
     async def get_risk_limit(

@@ -20,7 +20,8 @@ impl ExtendedPrivateWebSocket {
         base_url: impl Into<String>,
         timeout: Duration,
     ) -> Result<Self> {
-        if api_key.trim().is_empty() {
+        let api_key = api_key.trim().to_string();
+        if api_key.is_empty() {
             return Err(DcexError::InvalidInput(
                 "Extended API key must not be empty.".to_string(),
             ));

@@ -133,10 +133,10 @@ class AccountHTTP(HTTPManager):
 
     def get_deposit_records(
         self,
+        startTime: int | str,
+        endTime: int | str,
         coin: str | None = None,
         orderId: str | None = None,
-        startTime: int | str | None = None,
-        endTime: int | str | None = None,
         idLessThan: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
@@ -225,11 +225,12 @@ class AccountHTTP(HTTPManager):
     def get_futures_account_bills(
         self,
         productType: str = "USDT-FUTURES",
-        symbol: str | None = None,
-        marginCoin: str | None = None,
+        coin: str | None = None,
+        businessType: str | None = None,
+        onlyFunding: str | None = None,
+        idLessThan: str | None = None,
         startTime: int | str | None = None,
         endTime: int | str | None = None,
-        lastEndId: str | None = None,
         limit: int | None = None,
     ) -> dict[str, Any]:
         """Retrieve Bitget futures account bills."""
@@ -237,11 +238,12 @@ class AccountHTTP(HTTPManager):
             "get_futures_account_bills",
             self._native_params(
                 productType=productType,
-                symbol=symbol,
-                marginCoin=marginCoin,
+                coin=coin,
+                businessType=businessType,
+                onlyFunding=onlyFunding,
+                idLessThan=idLessThan,
                 startTime=startTime,
                 endTime=endTime,
-                lastEndId=lastEndId,
                 limit=limit,
             ),
         )
@@ -249,10 +251,12 @@ class AccountHTTP(HTTPManager):
     def set_futures_leverage(
         self,
         product_symbol: str,
-        leverage: int | str,
+        leverage: int | str | None = None,
         marginCoin: str = "USDT",
         productType: str = "USDT-FUTURES",
         holdSide: str | None = None,
+        longLeverage: int | str | None = None,
+        shortLeverage: int | str | None = None,
     ) -> dict[str, Any]:
         """Set Bitget futures leverage."""
         return self._native_private(
@@ -263,6 +267,8 @@ class AccountHTTP(HTTPManager):
                 marginCoin=marginCoin,
                 leverage=leverage,
                 holdSide=holdSide,
+                longLeverage=longLeverage,
+                shortLeverage=shortLeverage,
             ),
         )
 
@@ -322,17 +328,29 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
-    def get_uta_all_fee_rates(self, category: str) -> dict[str, Any]:
+    def get_uta_all_fee_rates(
+        self,
+        category: str,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
         """Retrieve UTA fee rates for every pair in one product category."""
-        return self._native_private("get_uta_all_fee_rates", self._native_params(category=category))
+        return self._native_private(
+            "get_uta_all_fee_rates",
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                symbol=symbol,
+            ),
+        )
 
-    def get_uta_loan_data(self, coin: str | None = None) -> dict[str, Any]:
+    def get_uta_loan_data(self) -> dict[str, Any]:
         """Retrieve current UTA borrowing and interest data."""
-        return self._native_private("get_uta_loan_data", self._native_params(coin=coin))
+        return self._native_private("get_uta_loan_data", [])
 
-    def get_uta_collateral_type(self, coin: str | None = None) -> dict[str, Any]:
+    def get_uta_collateral_type(self) -> dict[str, Any]:
         """Retrieve the UTA collateral-type configuration."""
-        return self._native_private("get_uta_collateral_type", self._native_params(coin=coin))
+        return self._native_private("get_uta_collateral_type", [])
 
     def get_uta_custom_collateral_coins(self) -> dict[str, Any]:
         """Retrieve coins supported as custom UTA collateral."""

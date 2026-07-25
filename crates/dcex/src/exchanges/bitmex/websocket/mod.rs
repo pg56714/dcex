@@ -6,30 +6,12 @@ mod public;
 pub use private::BitmexPrivateWebSocket;
 pub use public::BitmexPublicWebSocket;
 
-const NO_SYMBOL_TABLES: &[&str] = &[
-    "account",
-    "affiliate",
-    "announcement",
-    "connected",
-    "chat",
-    "insurance",
-    "margin",
-    "publicNotifications",
-    "privateNotifications",
-    "transact",
-    "wallet",
-];
-
 pub(super) fn subscription_arg(table: &str, product_symbol: Option<&str>) -> Result<String> {
     let table = normalize_table(table)?;
-    if NO_SYMBOL_TABLES.contains(&table.as_str()) {
-        return Ok(table);
+    match product_symbol {
+        Some(product_symbol) => Ok(format!("{table}:{}", normalize_symbol(product_symbol)?)),
+        None => Ok(table),
     }
-    let product_symbol = product_symbol.ok_or_else(|| {
-        DcexError::InvalidInput(format!("BitMEX table {table} requires a symbol."))
-    })?;
-    let symbol = normalize_symbol(product_symbol)?;
-    Ok(format!("{table}:{symbol}"))
 }
 
 pub(super) fn normalize_subscription_arg(arg: &str) -> Result<String> {
@@ -39,10 +21,10 @@ pub(super) fn normalize_subscription_arg(arg: &str) -> Result<String> {
             "BitMEX WebSocket subscription must not be empty.".to_string(),
         ));
     }
-    if !arg
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || matches!(character, ':' | '_' | '.'))
-    {
+    if !arg.chars().all(|character| {
+        character.is_ascii_alphanumeric()
+            || matches!(character, ':' | '_' | '.' | '@' | '[' | ']' | ',')
+    }) {
         return Err(DcexError::InvalidInput(format!(
             "unsupported BitMEX WebSocket subscription: {arg}"
         )));
@@ -126,10 +108,16 @@ mod tests {
             "trade:XBTUSD"
         );
         assert_eq!(
-            subscription_arg("margin", Some("XBTUSD")).expect("no symbol table"),
-            "margin"
+            subscription_arg("margin", Some("XBTUSD")).expect("filtered table"),
+            "margin:XBTUSD"
+        );
+        assert_eq!(
+            subscription_arg("instrument", None).expect("all table"),
+            "instrument"
         );
         assert!(normalize_subscription_arg("trade:XBTUSD").is_ok());
+        assert!(normalize_subscription_arg("trade:XBTUSD:Primary").is_ok());
+        assert!(normalize_subscription_arg("order@[123,456]").is_ok());
         assert!(normalize_subscription_arg("trade XBTUSD").is_err());
     }
 }

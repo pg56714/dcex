@@ -734,9 +734,7 @@ impl BinanceClient {
             FUTURES_ACCOUNT_TRADES
         };
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
-        if market == BinanceMarket::Spot {
-            push_optional(&mut params, "orderId", request.order_id);
-        }
+        push_optional(&mut params, "orderId", request.order_id);
         push_optional(&mut params, "startTime", request.start_time);
         push_optional(&mut params, "endTime", request.end_time);
         push_optional(&mut params, "fromId", request.from_id);
@@ -746,11 +744,22 @@ impl BinanceClient {
     }
 
     pub async fn get_future_position(&self, product_symbol: &str) -> Result<ValidatedResponse> {
+        self.send_get_future_position(Some(product_symbol)).await
+    }
+
+    pub(super) async fn send_get_future_position(
+        &self,
+        product_symbol: Option<&str>,
+    ) -> Result<ValidatedResponse> {
+        let mut params = Vec::new();
+        if let Some(product_symbol) = product_symbol {
+            params.push(("symbol".to_string(), self.exchange_symbol(product_symbol)?));
+        }
         self.request(
             HttpMethod::Get,
             BinanceMarket::Futures,
             FUTURES_POSITION_INFO,
-            vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)],
+            params,
             true,
         )
         .await
@@ -828,6 +837,14 @@ impl BinanceClient {
             "origClientOrderId",
             request.orig_client_order_id,
         );
+        if market == BinanceMarket::Spot {
+            push_optional(&mut params, "newClientOrderId", request.new_client_order_id);
+            push_optional(
+                &mut params,
+                "cancelRestrictions",
+                request.cancel_restrictions,
+            );
+        }
         self.request(method, market, path, params, true).await
     }
 }

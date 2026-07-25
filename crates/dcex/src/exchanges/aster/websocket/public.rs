@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::time::Duration;
 
 use serde_json::{json, Value};
@@ -16,6 +17,7 @@ pub struct AsterPublicWebSocket {
     market: AsterMarket,
     client: AsterClient,
     next_request_id: u64,
+    subscriptions: HashSet<String>,
 }
 
 impl AsterPublicWebSocket {
@@ -33,6 +35,7 @@ impl AsterPublicWebSocket {
             market,
             client: AsterClient::public(timeout)?,
             next_request_id: 1,
+            subscriptions: HashSet::new(),
         })
     }
 
@@ -54,7 +57,9 @@ impl AsterPublicWebSocket {
     }
 
     pub async fn connect(&mut self) -> Result<()> {
-        self.connection.connect().await
+        self.connection.connect().await?;
+        self.subscriptions.clear();
+        Ok(())
     }
 
     pub async fn close(&mut self) -> Result<()> {
@@ -140,9 +145,26 @@ impl AsterPublicWebSocket {
                 "at least one stream is required.".to_string(),
             ));
         }
+        let streams = normalize_streams(streams)?;
+        if method == "SUBSCRIBE" && self.market == AsterMarket::Futures {
+            let mut subscriptions = self.subscriptions.clone();
+            subscriptions.extend(streams.iter().cloned());
+            if subscriptions.len() > 200 {
+                return Err(DcexError::InvalidInput(
+                    "Aster futures WebSocket connections support at most 200 streams.".to_string(),
+                ));
+            }
+        }
         let id = self.next_id();
-        let payload = subscription_payload(method, streams, id)?;
+        let payload = subscription_payload(method, &streams, id)?;
         self.connection.send_json(&payload).await?;
+        if method == "SUBSCRIBE" {
+            self.subscriptions.extend(streams);
+        } else {
+            for stream in streams {
+                self.subscriptions.remove(&stream);
+            }
+        }
         Ok(id)
     }
 
@@ -177,7 +199,7 @@ fn trade_stream_suffix(market: AsterMarket) -> &'static str {
     }
 }
 
-fn subscription_payload(method: &str, streams: Vec<String>, id: u64) -> Result<Value> {
+fn subscription_payload(method: &str, streams: &[String], id: u64) -> Result<Value> {
     let method = match method {
         "SUBSCRIBE" | "UNSUBSCRIBE" => method,
         _ => {
@@ -186,7 +208,15 @@ fn subscription_payload(method: &str, streams: Vec<String>, id: u64) -> Result<V
             )));
         }
     };
-    let normalized_streams = streams
+    Ok(json!({
+        "method": method,
+        "params": streams,
+        "id": id,
+    }))
+}
+
+fn normalize_streams(streams: Vec<String>) -> Result<Vec<String>> {
+    streams
         .into_iter()
         .map(|stream| {
             let stream = stream.trim();
@@ -197,12 +227,7 @@ fn subscription_payload(method: &str, streams: Vec<String>, id: u64) -> Result<V
             }
             Ok(stream.to_string())
         })
-        .collect::<Result<Vec<_>>>()?;
-    Ok(json!({
-        "method": method,
-        "params": normalized_streams,
-        "id": id,
-    }))
+        .collect()
 }
 
 fn normalize_stream_symbol(symbol: &str) -> Result<String> {
@@ -269,8 +294,8 @@ mod tests {
 
     #[test]
     fn builds_subscription_payload() {
-        let payload = subscription_payload("SUBSCRIBE", vec!["btcusdt@aggTrade".to_string()], 7)
-            .expect("json");
+        let streams = vec!["btcusdt@aggTrade".to_string()];
+        let payload = subscription_payload("SUBSCRIBE", &streams, 7).expect("json");
         assert_eq!(payload["method"], "SUBSCRIBE");
         assert_eq!(payload["params"][0], "btcusdt@aggTrade");
         assert_eq!(payload["id"], 7);
@@ -294,5 +319,14 @@ mod tests {
     fn generic_trade_stream_uses_market_specific_suffix() {
         assert_eq!(trade_stream_suffix(AsterMarket::Spot), "@trade");
         assert_eq!(trade_stream_suffix(AsterMarket::Futures), "@aggTrade");
+    }
+
+    #[tokio::test]
+    async fn rejects_more_than_200_futures_streams_before_transport() {
+        let mut client = AsterPublicWebSocket::new(AsterMarket::Futures, Duration::from_secs(1))
+            .expect("client");
+        client.subscriptions = (0..200).map(|index| format!("stream{index}")).collect();
+        let streams = vec!["stream200".to_string()];
+        assert!(client.subscribe(streams).await.is_err());
     }
 }

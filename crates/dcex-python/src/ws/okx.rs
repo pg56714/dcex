@@ -323,10 +323,12 @@ impl PythonOkxPrivateWebSocketClient {
                 }
                 (None, Some(inst_id)) => {
                     client
-                        .subscribe(vec![dcex::ws::okx::OkxPrivateWebSocketArg::with_inst_id(
-                            "orders", inst_id,
-                        )
-                        .map_err(to_py_runtime_error)?])
+                        .subscribe(vec![
+                            dcex::ws::okx::OkxPrivateWebSocketArg::with_inst_type_and_id(
+                                "orders", "ANY", inst_id,
+                            )
+                            .map_err(to_py_runtime_error)?,
+                        ])
                         .await
                 }
             }

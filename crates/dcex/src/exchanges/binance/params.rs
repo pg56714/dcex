@@ -79,12 +79,15 @@ pub struct BinanceIncomeHistoryParams<'a> {
 #[derive(Clone, Debug, Default)]
 pub struct BinanceKlinesParams {
     pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub time_zone: Option<String>,
     pub limit: Option<u64>,
 }
 
 #[derive(Clone, Debug, Default)]
 pub struct BinanceLimitParams {
     pub limit: Option<u64>,
+    pub symbol_status: Option<String>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -116,6 +119,8 @@ pub struct BinanceOptionalSymbolParams<'a> {
 pub struct BinanceOrderLookupParams<'a> {
     pub order_id: Option<&'a str>,
     pub orig_client_order_id: Option<&'a str>,
+    pub new_client_order_id: Option<&'a str>,
+    pub cancel_restrictions: Option<&'a str>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -128,6 +133,8 @@ pub struct BinancePostOnlyOrderParams<'a> {
 pub struct BinanceSymbolListParams<'a> {
     pub product_symbol: Option<&'a str>,
     pub product_symbols: Option<Vec<String>>,
+    pub permissions: Option<Vec<String>>,
+    pub show_permission_sets: Option<&'a str>,
     pub symbol_status: Option<&'a str>,
 }
 

@@ -306,7 +306,7 @@ def test_native_hyperliquid_market_order_uses_ioc_limit_payload() -> None:
     action = json.loads(exchange_request["body"])["action"]
     order = action["orders"][0]
     assert exchange_request["path"] == "/exchange"
-    assert order["p"] == "103"
+    assert order["p"] == "105"
     assert order["t"] == {"limit": {"tif": "Ioc"}}
 
 
@@ -419,9 +419,9 @@ def test_sync_extended_market_methods_use_documented_paths() -> None:
         client.get_market_statistics("BTC-USD")
         client.get_order_book("BTC-USD")
         client.get_trades("BTC-USD")
-        client.get_candles("BTC-USD", "1m", candleType="mark-prices", limit=50, endTime=123)
+        client.get_candles("BTC-USD", "PT1M", candleType="mark-prices", limit=50, endTime=123)
         client.get_funding("BTC-USD", startTime=100, endTime=200, limit=10)
-        client.get_open_interest("BTC-USD", "1h", startTime=100, endTime=200, limit=10)
+        client.get_open_interest("BTC-USD", "P1H", startTime=100, endTime=200, limit=10)
 
     client.close()
     assert (
@@ -432,7 +432,7 @@ def test_sync_extended_market_methods_use_documented_paths() -> None:
     assert received.get_nowait()["path"] == "/api/v1/info/markets/BTC-USD/trades"
     assert (
         received.get_nowait()["path"]
-        == "/api/v1/info/candles/BTC-USD/mark-prices?interval=1m&limit=50&endTime=123"
+        == "/api/v1/info/candles/BTC-USD/mark-prices?interval=PT1M&limit=50&endTime=123"
     )
     assert (
         received.get_nowait()["path"]
@@ -440,7 +440,7 @@ def test_sync_extended_market_methods_use_documented_paths() -> None:
     )
     assert (
         received.get_nowait()["path"]
-        == "/api/v1/info/BTC-USD/open-interests?interval=1h&startTime=100&endTime=200&limit=10"
+        == "/api/v1/info/BTC-USD/open-interests?interval=P1H&startTime=100&endTime=200&limit=10"
     )
 
 
@@ -454,7 +454,7 @@ def test_sync_extended_candles_require_limit() -> None:
         user_agent="dcex-test",
     )
     with pytest.raises(ValueError, match="limit is required for Extended candles"):
-        client.get_candles("BTC-USD", "1m")
+        client.get_candles("BTC-USD", "PT1M")
     client.close()
 
 

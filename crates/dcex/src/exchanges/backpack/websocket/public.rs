@@ -7,7 +7,9 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::Result;
 
 use super::super::client::BackpackClient;
-use super::{stream_symbol, subscription_payload, validate_depth_speed, WS_URL};
+use super::{
+    stream_symbol, subscription_payload, validate_depth_speed, validate_kline_interval, WS_URL,
+};
 
 pub struct BackpackPublicWebSocket {
     connection: WebSocketConnection,
@@ -90,12 +92,14 @@ impl BackpackPublicWebSocket {
 
     pub async fn subscribe_klines(&mut self, product_symbol: &str, interval: &str) -> Result<()> {
         let symbol = self.stream_symbol(product_symbol)?;
+        let interval = validate_kline_interval(interval)?;
         self.subscribe(vec![format!("kline.{interval}.{symbol}")])
             .await
     }
 
-    pub async fn subscribe_liquidation(&mut self) -> Result<()> {
-        self.subscribe(vec!["liquidation".to_string()]).await
+    pub async fn subscribe_liquidation(&mut self, product_symbol: &str) -> Result<()> {
+        self.subscribe_symbol_stream("liquidation", product_symbol)
+            .await
     }
 
     pub async fn subscribe_mark_price(&mut self, product_symbol: &str) -> Result<()> {

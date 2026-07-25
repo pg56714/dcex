@@ -162,13 +162,18 @@ pub(crate) fn normalize_coin(product_symbol: &str) -> Result<String> {
         ));
     }
     if !coin.chars().all(|character| {
-        character.is_ascii_alphanumeric() || matches!(character, '-' | '_' | '/' | ':' | '#')
+        character.is_ascii_alphanumeric() || matches!(character, '-' | '_' | '/' | ':' | '#' | '@')
     }) {
         return Err(DcexError::InvalidInput(format!(
             "unsupported Hyperliquid coin: {coin}"
         )));
     }
     if is_canonical_product_symbol {
+        if product_symbol.to_ascii_uppercase().ends_with("-SPOT") {
+            return Err(DcexError::InvalidInput(format!(
+                "cannot safely resolve Hyperliquid spot coin for {product_symbol}; load a product table or pass the official raw coin"
+            )));
+        }
         Ok(coin.to_ascii_uppercase())
     } else {
         Ok(coin.to_string())
@@ -280,7 +285,10 @@ mod tests {
     fn preserves_raw_hyperliquid_coin_symbols() {
         assert_eq!(normalize_coin("kPEPE").expect("coin"), "kPEPE");
         assert_eq!(normalize_coin("test:ABC").expect("coin"), "test:ABC");
+        assert_eq!(normalize_coin("test:ABC-1").expect("coin"), "test:ABC-1");
+        assert_eq!(normalize_coin("@107").expect("coin"), "@107");
         assert_eq!(normalize_coin("#10").expect("coin"), "#10");
+        assert!(normalize_coin("HYPE-USDC-SPOT").is_err());
     }
 
     #[test]

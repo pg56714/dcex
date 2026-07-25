@@ -60,17 +60,9 @@ class MarketHTTP(HTTPManager):
         """Retrieve Aster futures server time."""
         return self._native_public("get_futures_server_time", [])
 
-    def get_spot_exchange_info(
-        self,
-        product_symbol: str | None = None,
-        symbols: list[str] | None = None,
-    ) -> dict[str, Any] | list[Any]:
+    def get_spot_exchange_info(self) -> dict[str, Any] | list[Any]:
         """Retrieve Aster spot trading specifications."""
-        symbol = self._symbol(product_symbol) if product_symbol else None
-        return self._native_public(
-            "get_spot_exchange_info",
-            self._params(product_symbol=symbol, symbols=symbols),
-        )
+        return self._native_public("get_spot_exchange_info", [])
 
     def get_futures_exchange_info(self) -> dict[str, Any] | list[Any]:
         """Retrieve Aster futures trading specifications."""

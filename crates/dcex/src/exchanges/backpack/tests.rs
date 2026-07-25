@@ -115,4 +115,27 @@ mod tests {
         );
         assert!(orders[0].get("product_symbol").is_none());
     }
+
+    #[test]
+    fn rejects_window_above_official_maximum() {
+        let error = BackpackClient::public(60_001, Duration::from_secs(1))
+            .err()
+            .expect("window must be rejected");
+
+        assert!(error.to_string().contains("60000"));
+    }
+
+    #[test]
+    fn rejects_partial_credentials() {
+        let error = BackpackClient::new(
+            Some(base64::engine::general_purpose::STANDARD.encode([b'2'; 32])),
+            None,
+            5_000,
+            Duration::from_secs(1),
+        )
+        .err()
+        .expect("partial credentials must be rejected");
+
+        assert!(error.to_string().contains("provided together"));
+    }
 }

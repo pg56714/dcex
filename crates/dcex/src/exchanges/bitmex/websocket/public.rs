@@ -7,7 +7,7 @@ use crate::{DcexError, Result};
 
 use super::{normalize_subscription_arg, subscription_arg};
 
-const WS_URL: &str = "wss://www.bitmex.com/realtime";
+const WS_URL: &str = "wss://ws.bitmex.com/realtime";
 
 pub struct BitmexPublicWebSocket {
     connection: WebSocketConnection,
@@ -37,7 +37,7 @@ impl BitmexPublicWebSocket {
     }
 
     pub async fn ping(&mut self) -> Result<()> {
-        self.connection.send_json(&json!({"op": "ping"})).await
+        self.connection.send_ping(Vec::new()).await
     }
 
     pub async fn subscribe(&mut self, args: Vec<String>) -> Result<()> {
@@ -138,6 +138,7 @@ fn orderbook_table(depth: u32) -> Result<&'static str> {
     match depth {
         0 => Ok("orderBookL2"),
         10 => Ok("orderBook10"),
+        25 => Ok("orderBookL2_25"),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported BitMEX orderbook depth: {depth}"
         ))),
@@ -164,7 +165,7 @@ mod tests {
     fn maps_orderbook_depth_and_trade_bins() {
         assert_eq!(orderbook_table(0).expect("full depth"), "orderBookL2");
         assert_eq!(orderbook_table(10).expect("top 10"), "orderBook10");
-        assert!(orderbook_table(25).is_err());
+        assert_eq!(orderbook_table(25).expect("top 25"), "orderBookL2_25");
         assert_eq!(trade_bin_table("1m").expect("bin"), "tradeBin1m");
         assert!(trade_bin_table("15m").is_err());
     }

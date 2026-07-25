@@ -33,6 +33,14 @@ impl PythonHyperliquidPublicWebSocketClient {
         })
     }
 
+    fn set_product_table(&self, table: PyRef<'_, PythonProductTable>) -> PyResult<()> {
+        let mut client = self.client.try_lock().map_err(|_| {
+            PyRuntimeError::new_err("Hyperliquid WebSocket client is busy; try again later.")
+        })?;
+        client.set_product_table(table.table.clone());
+        Ok(())
+    }
+
     fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

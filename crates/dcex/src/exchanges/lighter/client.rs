@@ -50,9 +50,24 @@ impl LighterClient {
         api_key_index: Option<u64>,
         api_private_key: Option<String>,
     ) -> Result<Self> {
+        if matches!(account_index, Some(value) if value > (1 << 48) - 2) {
+            return Err(DcexError::InvalidInput(
+                "Lighter account_index is outside the valid range".to_string(),
+            ));
+        }
+        if matches!(api_key_index, Some(value) if value > 254) {
+            return Err(DcexError::InvalidInput(
+                "Lighter api_key_index must be between 0 and 254".to_string(),
+            ));
+        }
+        if api_private_key.is_some() && (account_index.is_none() || api_key_index.is_none()) {
+            return Err(DcexError::InvalidInput(
+                "Lighter api_private_key requires account_index and api_key_index".to_string(),
+            ));
+        }
         let mut api_private_keys = BTreeMap::new();
         if let Some(private_key) = api_private_key {
-            let index = api_key_index.unwrap_or(255);
+            let index = api_key_index.expect("validated api key index");
             api_private_keys.insert(index, normalize_private_key(&private_key)?);
         }
         Ok(Self {
@@ -227,6 +242,16 @@ impl LighterClient {
     ) -> Result<String> {
         let account_index = self.private_account_index(None)?;
         let api_key_index = self.private_api_key_index(api_key_index)?;
+        if api_key_index > 254 {
+            return Err(DcexError::InvalidInput(
+                "Lighter auth api_key_index must be between 0 and 254".to_string(),
+            ));
+        }
+        if matches!(deadline, Some(value) if value == 0 || value > 28_800) {
+            return Err(DcexError::InvalidInput(
+                "Lighter auth deadline must be between 1 and 28800 seconds".to_string(),
+            ));
+        }
         let private_key = self.private_key(api_key_index)?;
         create_auth_token(account_index, api_key_index, private_key, deadline)
     }

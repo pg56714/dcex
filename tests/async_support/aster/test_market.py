@@ -42,7 +42,7 @@ async def test_spot_public_market_data(client):
     market = _market(await client.get_spot_exchange_info(), "BTCUSDT")
     symbol = str(market["symbol"])
 
-    assert isinstance(await client.get_spot_exchange_info(symbol), dict)
+    assert isinstance(await client.get_spot_exchange_info(), dict)
     assert isinstance(await client.get_spot_orderbook(symbol, limit=5), dict)
     assert isinstance(await client.get_spot_recent_trades(symbol, limit=5), list)
     assert isinstance(await client.get_spot_historical_trades(symbol, limit=5), list)

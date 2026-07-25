@@ -100,17 +100,20 @@ impl PythonMexcPublicWebSocketClient {
         })
     }
 
+    #[pyo3(signature = (product_symbol, speed=None))]
     fn subscribe_trades<'py>(
         &self,
         py: Python<'py>,
         product_symbol: String,
+        speed: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let speed = speed.unwrap_or_else(|| "100ms".to_string());
             client
                 .lock()
                 .await
-                .subscribe_trades(&product_symbol)
+                .subscribe_trades(&product_symbol, &speed)
                 .await
                 .map_err(to_py_runtime_error)
         })
@@ -153,17 +156,20 @@ impl PythonMexcPublicWebSocketClient {
         })
     }
 
+    #[pyo3(signature = (product_symbol, speed=None))]
     fn subscribe_book_ticker<'py>(
         &self,
         py: Python<'py>,
         product_symbol: String,
+        speed: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let speed = speed.unwrap_or_else(|| "100ms".to_string());
             client
                 .lock()
                 .await
-                .subscribe_book_ticker(&product_symbol)
+                .subscribe_book_ticker(&product_symbol, &speed)
                 .await
                 .map_err(to_py_runtime_error)
         })

@@ -131,6 +131,40 @@ pub(super) fn insert_optional_string(
     }
 }
 
+pub(super) fn insert_optional_i64(
+    body: &mut Map<String, Value>,
+    key: &str,
+    value: Option<&str>,
+) -> Result<()> {
+    if let Some(value) = value {
+        let parsed = value.parse::<i64>().map_err(|error| {
+            DcexError::InvalidInput(format!("invalid integer parameter {key}: {error}"))
+        })?;
+        body.insert(key.to_string(), Value::Number(parsed.into()));
+    }
+    Ok(())
+}
+
+pub(super) fn insert_optional_bool(
+    body: &mut Map<String, Value>,
+    key: &str,
+    value: Option<&str>,
+) -> Result<()> {
+    if let Some(value) = value {
+        let parsed = match value.to_ascii_lowercase().as_str() {
+            "true" => true,
+            "false" => false,
+            _ => {
+                return Err(DcexError::InvalidInput(format!(
+                    "invalid boolean parameter {key}: {value}"
+                )))
+            }
+        };
+        body.insert(key.to_string(), Value::Bool(parsed));
+    }
+    Ok(())
+}
+
 pub(super) fn require_one_identifier(params: &BybitParams, keys: &[&str]) -> Result<()> {
     if keys.iter().any(|key| params.get(key).is_some()) {
         return Ok(());

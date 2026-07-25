@@ -745,7 +745,7 @@ def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
         "modify_futures_order",
     }:
         kwargs["orderId"] = 1
-    if case.exchange == "bitmex" and case.method_name == "amend_order":
+    if case.exchange == "bitmex" and case.method_name in {"amend_order", "cancel_order"}:
         kwargs["orderID"] = "test-order-id"
     if case.exchange == "binance" and case.method_name in {
         "cancel_futures_algo_order",

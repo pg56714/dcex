@@ -64,7 +64,7 @@ UTA_CASES = (
         },
         "NATIVE_PRIVATE",
     ),
-    ("mexc", "cancel_contract_plan_orders", {"orders": "[]"}, "NATIVE_PRIVATE"),
+    ("mexc", "cancel_contract_plan_orders", {"orders": []}, "NATIVE_PRIVATE"),
     ("mexc", "cancel_all_contract_plan_orders", {}, "NATIVE_PRIVATE"),
     ("kraken", "get_spot_system_status", {}, "NATIVE_PUBLIC"),
     ("kraken", "get_spot_assets", {}, "NATIVE_PUBLIC"),
@@ -94,7 +94,7 @@ UTA_CASES = (
     (
         "bitget",
         "get_uta_liquidations",
-        {"product_symbol": "BTC-USDT-SWAP"},
+        {"product_symbol": "BTC-USDT-SWAP", "category": "USDT-FUTURES"},
         "NATIVE_PUBLIC",
     ),
     (
@@ -121,6 +121,7 @@ UTA_CASES = (
         {
             "product_symbol": "BTC-USDT-SWAP",
             "tradeType": "FUTURES",
+            "marginMode": "CROSS",
             "data": "RISK_LIMIT",
             "accountType": "UNIFIED",
         },

@@ -54,7 +54,11 @@ class _FakeNativeBitmexPublicWebSocketClient:
         await self.subscribe_table("quote", product_symbol)
 
     async def subscribe_orderbook(self, product_symbol: str, depth: int = 10) -> None:
-        table = "orderBook10" if depth == 10 else "orderBookL2"
+        table = {
+            0: "orderBookL2",
+            10: "orderBook10",
+            25: "orderBookL2_25",
+        }[depth]
         await self.subscribe_table(table, product_symbol)
 
     async def subscribe_klines(self, product_symbol: str, bin_size: str) -> None:
@@ -149,8 +153,10 @@ async def test_bitmex_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None
         await ws.subscribe_trades("XBTUSD")
         await ws.subscribe_quotes("XBTUSD")
         await ws.subscribe_orderbook("XBTUSD")
+        await ws.subscribe_orderbook("XBTUSD", 25)
         await ws.subscribe_klines("XBTUSD", "1m")
         await ws.subscribe_table("instrument", "XBTUSD")
+        await ws.subscribe_table("instrument")
         await ws.ping()
         event = await ws.recv()
 
@@ -158,8 +164,10 @@ async def test_bitmex_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None
         "trade:XBTUSD",
         "quote:XBTUSD",
         "orderBook10:XBTUSD",
+        "orderBookL2_25:XBTUSD",
         "tradeBin1m:XBTUSD",
         "instrument:XBTUSD",
+        "instrument",
     ]
     assert native_client.ping_count == 1
     assert event == {"table": "trade", "action": "partial", "data": []}
@@ -214,6 +222,7 @@ async def test_bitmex_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         await ws.subscribe_orders()
         await ws.subscribe_executions()
         await ws.subscribe_positions()
+        await ws.subscribe(["order@[123,456]"])
         await ws.subscribe_margin()
         await ws.subscribe_wallet()
         await ws.ping()
@@ -226,6 +235,7 @@ async def test_bitmex_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         "order",
         "execution",
         "position",
+        "order@[123,456]",
         "margin",
         "wallet",
     ]

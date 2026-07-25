@@ -51,15 +51,62 @@ pub(crate) fn normalize_stream(stream: &str) -> Result<String> {
             "Backpack WebSocket stream must not be empty.".to_string(),
         ));
     }
-    if !stream
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || matches!(character, '.' | '_' | '-'))
-    {
-        return Err(DcexError::InvalidInput(format!(
-            "unsupported Backpack WebSocket stream: {stream}"
-        )));
+    for prefix in [
+        "account.orderUpdate",
+        "account.positionUpdate",
+        "account.rfqUpdate",
+    ] {
+        if stream == prefix {
+            return Ok(stream.to_string());
+        }
+        if let Some(symbol) = stream.strip_prefix(&format!("{prefix}.")) {
+            return Ok(format!("{prefix}.{}", stream_symbol(symbol.to_string())?));
+        }
     }
-    Ok(stream.to_string())
+    if let Some(remainder) = stream.strip_prefix("kline.") {
+        let (interval, symbol) = remainder.split_once('.').ok_or_else(|| {
+            DcexError::InvalidInput(format!("unsupported Backpack WebSocket stream: {stream}"))
+        })?;
+        return Ok(format!(
+            "kline.{}.{}",
+            validate_kline_interval(interval)?,
+            stream_symbol(symbol.to_string())?
+        ));
+    }
+    if let Some(remainder) = stream.strip_prefix("depth.") {
+        if let Some((speed, symbol)) = remainder.split_once('.') {
+            if matches!(speed, "200ms" | "600ms" | "1000ms") {
+                return Ok(format!(
+                    "depth.{}.{}",
+                    validate_depth_speed(speed)?,
+                    stream_symbol(symbol.to_string())?
+                ));
+            }
+            if speed.strip_suffix("ms").is_some_and(|millis| {
+                !millis.is_empty() && millis.chars().all(|character| character.is_ascii_digit())
+            }) {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported Backpack depth speed: {speed}"
+                )));
+            }
+        }
+        return Ok(format!("depth.{}", stream_symbol(remainder.to_string())?));
+    }
+    for prefix in [
+        "bookTicker",
+        "liquidation",
+        "markPrice",
+        "ticker",
+        "openInterest",
+        "trade",
+    ] {
+        if let Some(symbol) = stream.strip_prefix(&format!("{prefix}.")) {
+            return Ok(format!("{prefix}.{}", stream_symbol(symbol.to_string())?));
+        }
+    }
+    Err(DcexError::InvalidInput(format!(
+        "unsupported Backpack WebSocket stream: {stream}"
+    )))
 }
 
 pub(crate) fn stream_symbol(symbol: String) -> Result<String> {
@@ -71,13 +118,44 @@ pub(crate) fn stream_symbol(symbol: String) -> Result<String> {
     }
     if !symbol
         .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '_')
+        .all(|character| character.is_ascii_alphanumeric() || matches!(character, '_' | '.'))
+        || symbol.starts_with('.')
+        || symbol.ends_with('.')
+        || !symbol.contains('_')
     {
         return Err(DcexError::InvalidInput(format!(
             "unsupported Backpack stream symbol: {symbol}"
         )));
     }
     Ok(symbol.to_ascii_uppercase())
+}
+
+pub(crate) fn validate_kline_interval(interval: &str) -> Result<String> {
+    let interval = interval.trim();
+    if matches!(
+        interval,
+        "1s" | "1m"
+            | "3m"
+            | "5m"
+            | "15m"
+            | "30m"
+            | "1h"
+            | "2h"
+            | "4h"
+            | "6h"
+            | "8h"
+            | "12h"
+            | "1d"
+            | "3d"
+            | "1w"
+            | "1month"
+    ) {
+        Ok(interval.to_string())
+    } else {
+        Err(DcexError::InvalidInput(format!(
+            "unsupported Backpack K-line interval: {interval}"
+        )))
+    }
 }
 
 pub(crate) fn validate_depth_speed(speed: &str) -> Result<String> {
@@ -146,6 +224,15 @@ mod tests {
     #[test]
     fn validates_stream_and_speed() {
         assert!(normalize_stream("trade.SOL_USDC").is_ok());
+        assert_eq!(
+            normalize_stream("trade.MU.US_USDC").expect("stock stream"),
+            "trade.MU.US_USDC"
+        );
+        assert!(normalize_stream("liquidation").is_err());
+        assert!(normalize_stream("liquidation.SOL_USDC_PERP").is_ok());
+        assert!(normalize_stream("depth.500ms.SOL_USDC").is_err());
+        assert!(normalize_stream("kline.7m.SOL_USDC").is_err());
+        assert!(normalize_stream("account.unknown").is_err());
         assert!(normalize_stream("bad stream").is_err());
         assert!(validate_depth_speed("200ms").is_ok());
         assert!(validate_depth_speed("500ms").is_err());

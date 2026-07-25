@@ -28,20 +28,29 @@ class _FakeNativeKrakenPublicWebSocketClient:
         self.subscriptions.remove((channel, product_symbols))
         return 3
 
-    async def subscribe_ticker(self, product_symbol: str) -> int:
-        self.subscriptions.append(("ticker", [product_symbol]))
+    async def subscribe_ticker(
+        self,
+        product_symbol: str,
+        event_trigger: str = "trades",
+        snapshot: bool = True,
+    ) -> int:
+        self.subscriptions.append((f"ticker:{event_trigger}:{snapshot}", [product_symbol]))
         return 4
 
-    async def subscribe_trades(self, product_symbol: str) -> int:
-        self.subscriptions.append(("trade", [product_symbol]))
+    async def subscribe_trades(self, product_symbol: str, snapshot: bool = False) -> int:
+        self.subscriptions.append((f"trade:{snapshot}", [product_symbol]))
         return 5
 
-    async def subscribe_orderbook(self, product_symbol: str, depth: int = 10) -> int:
-        self.subscriptions.append((f"book:{depth}", [product_symbol]))
+    async def subscribe_orderbook(
+        self, product_symbol: str, depth: int = 10, snapshot: bool = True
+    ) -> int:
+        self.subscriptions.append((f"book:{depth}:{snapshot}", [product_symbol]))
         return 6
 
-    async def subscribe_klines(self, product_symbol: str, interval: int = 1) -> int:
-        self.subscriptions.append((f"ohlc:{interval}", [product_symbol]))
+    async def subscribe_klines(
+        self, product_symbol: str, interval: int = 1, snapshot: bool = True
+    ) -> int:
+        self.subscriptions.append((f"ohlc:{interval}:{snapshot}", [product_symbol]))
         return 7
 
     async def recv(self) -> bytes:
@@ -82,8 +91,13 @@ class _FakeNativeKrakenPrivateWebSocketClient:
     async def ping(self) -> int:
         return 8
 
-    async def subscribe_balances(self) -> int:
-        self.subscriptions.append("balances")
+    async def subscribe_balances(
+        self,
+        snapshot: bool = True,
+        rebased: bool = True,
+        users: str | None = None,
+    ) -> int:
+        self.subscriptions.append(f"balances:{snapshot}:{rebased}:{users}")
         return 9
 
     async def unsubscribe_balances(self) -> int:
@@ -94,8 +108,14 @@ class _FakeNativeKrakenPrivateWebSocketClient:
         self,
         snap_orders: bool = True,
         snap_trades: bool = False,
+        order_status: bool = True,
+        rebased: bool = True,
+        ratecounter: bool = False,
+        users: str | None = None,
     ) -> int:
-        self.subscriptions.append(f"executions:{snap_orders}:{snap_trades}")
+        self.subscriptions.append(
+            f"executions:{snap_orders}:{snap_trades}:{order_status}:{rebased}:{ratecounter}:{users}"
+        )
         return 11
 
     async def unsubscribe_executions(self) -> int:
@@ -131,16 +151,18 @@ async def test_kraken_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None
         assert native_client.timeout == 2
         assert native_client.base_url == "wss://example.test/ws"
 
-        assert await ws.subscribe_trades("BTC-USD-SPOT") == 5
-        assert await ws.subscribe_orderbook("BTC-USD-SPOT", depth=25) == 6
-        assert await ws.subscribe_klines("BTC-USD-SPOT", interval=5) == 7
+        assert await ws.subscribe_ticker("BTC-USD-SPOT", event_trigger="bbo", snapshot=False) == 4
+        assert await ws.subscribe_trades("BTC-USD-SPOT", snapshot=True) == 5
+        assert await ws.subscribe_orderbook("BTC-USD-SPOT", depth=25, snapshot=False) == 6
+        assert await ws.subscribe_klines("BTC-USD-SPOT", interval=5, snapshot=False) == 7
         assert await ws.ping() == 1
         event = await ws.recv()
 
     assert native_client.subscriptions == [
-        ("trade", ["BTC-USD-SPOT"]),
-        ("book:25", ["BTC-USD-SPOT"]),
-        ("ohlc:5", ["BTC-USD-SPOT"]),
+        ("ticker:bbo:False", ["BTC-USD-SPOT"]),
+        ("trade:True", ["BTC-USD-SPOT"]),
+        ("book:25:False", ["BTC-USD-SPOT"]),
+        ("ohlc:5:False", ["BTC-USD-SPOT"]),
     ]
     assert event == {"channel": "trade", "type": "snapshot", "data": []}
     assert native_client.closed is True
@@ -169,12 +191,25 @@ async def test_kraken_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         assert native_client.ws_base_url == "wss://example.test/private"
         assert ws.token() == "token-value"
 
-        assert await ws.subscribe_balances() == 9
-        assert await ws.subscribe_executions(snap_orders=True, snap_trades=True) == 11
+        assert await ws.subscribe_balances(snapshot=False, rebased=False, users="all") == 9
+        assert (
+            await ws.subscribe_executions(
+                snap_orders=True,
+                snap_trades=True,
+                order_status=False,
+                rebased=False,
+                ratecounter=True,
+                users="all",
+            )
+            == 11
+        )
         assert await ws.ping() == 8
         event = await ws.recv()
 
-    assert native_client.subscriptions == ["balances", "executions:True:True"]
+    assert native_client.subscriptions == [
+        "balances:False:False:all",
+        "executions:True:True:False:False:True:all",
+    ]
     assert event == {"channel": "balances", "type": "snapshot", "data": []}
     assert native_client.closed is True
 

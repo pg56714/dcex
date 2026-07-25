@@ -30,6 +30,7 @@ impl BybitClient {
                 )];
                 push_optional(&mut query, "coin", params.get("coin"));
                 push_optional(&mut query, "memberId", params.get("memberId"));
+                push_optional(&mut query, "withBonus", params.get("withBonus"));
                 self.get_request(GET_ALL_COINS_BALANCE, query).await
             }
             "get_coin_balance" => {
@@ -41,7 +42,19 @@ impl BybitClient {
                     ("coin".to_string(), params.required("coin")?.to_string()),
                 ];
                 push_optional(&mut query, "memberId", params.get("memberId"));
+                push_optional(&mut query, "toMemberId", params.get("toMemberId"));
                 push_optional(&mut query, "toAccountType", params.get("toAccountType"));
+                push_optional(&mut query, "withBonus", params.get("withBonus"));
+                push_optional(
+                    &mut query,
+                    "withTransferSafeAmount",
+                    params.get("withTransferSafeAmount"),
+                );
+                push_optional(
+                    &mut query,
+                    "withLtvTransferSafeAmount",
+                    params.get("withLtvTransferSafeAmount"),
+                );
                 self.get_request(GET_SINGLE_COIN_BALANCE, query).await
             }
             "get_withdrawable_amount" => {
@@ -56,8 +69,12 @@ impl BybitClient {
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
                 )];
+                push_optional(&mut query, "transferId", params.get("transferId"));
                 push_optional(&mut query, "coin", params.get("coin"));
+                push_optional(&mut query, "status", params.get("status"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
+                push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_INTERNAL_TRANSFER_RECORDS, query).await
             }
             "get_transferable_coin" => {
@@ -92,9 +109,12 @@ impl BybitClient {
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
                 )];
+                push_optional(&mut query, "transferId", params.get("transferId"));
                 push_optional(&mut query, "coin", params.get("coin"));
                 push_optional(&mut query, "status", params.get("status"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
+                push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_UNIVERSAL_TRANSFER_RECORDS, query)
                     .await
             }
@@ -107,8 +127,12 @@ impl BybitClient {
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
                 )];
+                push_optional(&mut query, "id", params.get("id"));
+                push_optional(&mut query, "txID", params.get("txID"));
                 push_optional(&mut query, "coin", params.get("coin"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
+                push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_DEPOSIT_RECORDS, query).await
             }
             "get_sub_deposit_records" => {
@@ -122,8 +146,12 @@ impl BybitClient {
                         params.get("limit").unwrap_or("20").to_string(),
                     ),
                 ];
+                push_optional(&mut query, "id", params.get("id"));
+                push_optional(&mut query, "txID", params.get("txID"));
                 push_optional(&mut query, "coin", params.get("coin"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
+                push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_SUB_ACCOUNT_DEPOSIT_RECORDS, query)
                     .await
             }
@@ -132,16 +160,17 @@ impl BybitClient {
                     "limit".to_string(),
                     params.get("limit").unwrap_or("20").to_string(),
                 )];
+                push_optional(&mut query, "txID", params.get("txID"));
                 push_optional(&mut query, "coin", params.get("coin"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
+                push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_INTERNAL_DEPOSIT_RECORDS, query).await
             }
             "get_master_deposit_address" => {
-                self.get_request(
-                    GET_MASTER_DEPOSIT_ADDRESS,
-                    vec![("coin".to_string(), params.required("coin")?.to_string())],
-                )
-                .await
+                let mut query = vec![("coin".to_string(), params.required("coin")?.to_string())];
+                push_optional(&mut query, "chainType", params.get("chainType"));
+                self.get_request(GET_MASTER_DEPOSIT_ADDRESS, query).await
             }
             _ => return Ok(None),
         };

@@ -30,19 +30,28 @@ class MarketHTTP(HTTPManager):
         """Get spot market metadata."""
         return await self._native_public("get_spot_meta", [])
 
-    async def get_meta_and_asset_ctxs(self) -> dict[str, Any]:
+    async def get_meta_and_asset_ctxs(self, dex: str | None = None) -> dict[str, Any]:
         """Get market metadata and asset contexts."""
-        return await self._native_public("get_meta_and_asset_ctxs", [])
+        return await self._native_public("get_meta_and_asset_ctxs", self._native_params(dex=dex))
 
     async def get_spot_meta_and_asset_ctxs(self) -> dict[str, Any]:
         """Get spot market metadata and asset contexts."""
         return await self._native_public("get_spot_meta_and_asset_ctxs", [])
 
-    async def get_l2book(self, product_symbol: str) -> dict[str, Any]:
+    async def get_l2book(
+        self,
+        product_symbol: str,
+        nSigFigs: int | None = None,
+        mantissa: int | None = None,
+    ) -> dict[str, Any]:
         """Get L2 order book for a product."""
         return await self._native_public(
             "get_l2book",
-            self._native_params(product_symbol=product_symbol),
+            self._native_params(
+                product_symbol=product_symbol,
+                nSigFigs=nSigFigs,
+                mantissa=mantissa,
+            ),
         )
 
     async def get_candle_snapshot(
@@ -50,7 +59,7 @@ class MarketHTTP(HTTPManager):
         product_symbol: str,
         interval: str,
         startTime: int,
-        endTime: int | None = None,
+        endTime: int,
     ) -> dict[str, Any]:
         """Get candlestick data for a product."""
         return await self._native_public(

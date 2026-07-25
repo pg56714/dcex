@@ -18,13 +18,27 @@ struct PythonBingxPrivateWebSocketClient {
 #[pymethods]
 impl PythonBingxPublicWebSocketClient {
     #[new]
-    #[pyo3(signature = (timeout=10.0, base_url=None))]
-    fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
+    #[pyo3(signature = (timeout=10.0, base_url=None, market="spot"))]
+    fn new(timeout: f64, base_url: Option<String>, market: &str) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
+        let market = market.to_ascii_lowercase();
+        if !matches!(market.as_str(), "spot" | "swap") {
+            return Err(PyValueError::new_err(
+                "BingX public WebSocket market must be 'spot' or 'swap'",
+            ));
+        }
         let client = if let Some(base_url) = base_url {
-            BingxPublicWebSocket::with_url(base_url, timeout)
+            if market == "swap" {
+                BingxPublicWebSocket::with_swap_url(base_url, timeout)
+            } else {
+                BingxPublicWebSocket::with_spot_url(base_url, timeout)
+            }
         } else {
-            BingxPublicWebSocket::new(timeout)
+            match market.as_str() {
+                "spot" => BingxPublicWebSocket::new(timeout),
+                "swap" => BingxPublicWebSocket::new_swap(timeout),
+                _ => unreachable!("market was validated above"),
+            }
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
@@ -183,7 +197,8 @@ impl PythonBingxPrivateWebSocketClient {
         api_secret,
         timeout=10.0,
         http_base_url=None,
-        ws_base_url=None
+        ws_base_url=None,
+        market="spot"
     ))]
     fn new(
         api_key: String,
@@ -191,17 +206,48 @@ impl PythonBingxPrivateWebSocketClient {
         timeout: f64,
         http_base_url: Option<String>,
         ws_base_url: Option<String>,
+        market: &str,
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
+        let market = market.to_ascii_lowercase();
+        if !matches!(market.as_str(), "spot" | "swap") {
+            return Err(PyValueError::new_err(
+                "BingX private WebSocket market must be 'spot' or 'swap'",
+            ));
+        }
         let client = match (http_base_url, ws_base_url) {
-            (None, None) => BingxPrivateWebSocket::new(api_key, api_secret, timeout),
-            (http_base_url, ws_base_url) => BingxPrivateWebSocket::with_urls(
-                api_key,
-                api_secret,
-                timeout,
-                http_base_url.unwrap_or_else(|| "https://open-api.bingx.com".to_string()),
-                ws_base_url.unwrap_or_else(|| "wss://open-api-ws.bingx.com/market".to_string()),
-            ),
+            (None, None) if market == "spot" => {
+                BingxPrivateWebSocket::new(api_key, api_secret, timeout)
+            }
+            (None, None) => BingxPrivateWebSocket::new_swap(api_key, api_secret, timeout),
+            (http_base_url, ws_base_url) => {
+                let http_base_url =
+                    http_base_url.unwrap_or_else(|| "https://open-api.bingx.com".to_string());
+                let ws_base_url = ws_base_url.unwrap_or_else(|| {
+                    if market == "swap" {
+                        "wss://open-api-swap.bingx.com/swap-market".to_string()
+                    } else {
+                        "wss://open-api-ws.bingx.com/market".to_string()
+                    }
+                });
+                if market == "swap" {
+                    BingxPrivateWebSocket::with_swap_urls(
+                        api_key,
+                        api_secret,
+                        timeout,
+                        http_base_url,
+                        ws_base_url,
+                    )
+                } else {
+                    BingxPrivateWebSocket::with_spot_urls(
+                        api_key,
+                        api_secret,
+                        timeout,
+                        http_base_url,
+                        ws_base_url,
+                    )
+                }
+            }
         }
         .map_err(to_py_runtime_error)?;
         Ok(Self {
