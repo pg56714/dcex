@@ -1,3 +1,9 @@
+## 0.29.1 (2026-07-25)
+
+### Fix
+
+- align MEXC and OKX API integrations
+
 ## 0.29.0 (2026-07-25)
 
 ### BREAKING CHANGE

@@ -1,3 +1,10 @@
+## 0.7.1 (2026-07-25)
+
+### Fix
+
+- align Binance and Lighter API validation
+- align MEXC and OKX API integrations
+
 ## 0.7.0 (2026-07-25)
 
 ### BREAKING CHANGE
