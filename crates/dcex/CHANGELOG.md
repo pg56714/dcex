@@ -1,3 +1,13 @@
+## 0.7.0 (2026-07-25)
+
+### BREAKING CHANGE
+
+- remove integration following exchange closure
+
+### Fix
+
+- align exchange APIs with current specifications
+
 ## 0.6.5 (2026-07-20)
 
 ### Fix
