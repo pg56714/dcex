@@ -115,9 +115,19 @@ PUBLIC_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_agg_trades("BTC-USDT-SWAP"),
     ),
     WebSocketSpec(
+        name="aster-spot",
+        factory=lambda: aster.public(market="spot", timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_agg_trades("BTC-USDT-SPOT"),
+    ),
+    WebSocketSpec(
         name="backpack",
         factory=lambda: backpack.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_ticker("SOL_USDC"),
+    ),
+    WebSocketSpec(
+        name="backpack-futures",
+        factory=lambda: backpack.public(timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_ticker("SOL_USDC_PERP"),
     ),
     WebSocketSpec(
         name="binance",
@@ -130,9 +140,19 @@ PUBLIC_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
     ),
     WebSocketSpec(
+        name="bingx-swap",
+        factory=lambda: bingx.public(market="swap", timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SWAP"),
+    ),
+    WebSocketSpec(
         name="bitget",
         factory=lambda: bitget.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
+    ),
+    WebSocketSpec(
+        name="bitget-futures",
+        factory=lambda: bitget.public(inst_type="USDT-FUTURES", timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SWAP"),
     ),
     WebSocketSpec(
         name="bybit",
@@ -140,14 +160,37 @@ PUBLIC_WS_SPECS = (
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
     ),
     WebSocketSpec(
+        name="bybit-linear",
+        factory=lambda: bybit.public(category="linear", timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SWAP"),
+    ),
+    WebSocketSpec(
+        name="bybit-inverse",
+        factory=lambda: bybit.public(category="inverse", timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USD-SWAP"),
+    ),
+    WebSocketSpec(
         name="extended",
         factory=lambda: extended.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("BTC-USD"),
     ),
     WebSocketSpec(
+        name="extended-spot",
+        factory=lambda: extended.public(timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTCSPOT-USD"),
+    ),
+    WebSocketSpec(
         name="hyperliquid",
         factory=lambda: hyperliquid.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("BTC"),
+    ),
+    WebSocketSpec(
+        name="hyperliquid-spot",
+        factory=lambda: hyperliquid.public(
+            timeout=LIVE_WS_TIMEOUT,
+            preload_product_table=True,
+        ),
+        subscribe=lambda ws: ws.subscribe_trades("HYPE-USDC-SPOT"),
     ),
     WebSocketSpec(
         name="kraken",
@@ -179,6 +222,11 @@ PUBLIC_WS_SPECS = (
         factory=lambda: okx.public(timeout=LIVE_WS_TIMEOUT),
         subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SPOT"),
     ),
+    WebSocketSpec(
+        name="okx-futures",
+        factory=lambda: okx.public(timeout=LIVE_WS_TIMEOUT),
+        subscribe=lambda ws: ws.subscribe_trades("BTC-USDT-SWAP"),
+    ),
 )
 
 PRIVATE_WS_SPECS = (
@@ -190,6 +238,18 @@ PRIVATE_WS_SPECS = (
             signer_address=os.environ["ASTER_SIGNER_ADDRESS"],
             private_key=os.environ["ASTER_PRIVATE_KEY"],
             market="futures",
+            timeout=LIVE_WS_TIMEOUT,
+        ),
+        subscribe=lambda ws: ws.keep_alive(),
+    ),
+    WebSocketSpec(
+        name="aster-spot",
+        env=("ASTER_USER_ADDRESS", "ASTER_SIGNER_ADDRESS", "ASTER_PRIVATE_KEY"),
+        factory=lambda: aster.private(
+            user_address=os.environ["ASTER_USER_ADDRESS"],
+            signer_address=os.environ["ASTER_SIGNER_ADDRESS"],
+            private_key=os.environ["ASTER_PRIVATE_KEY"],
+            market="spot",
             timeout=LIVE_WS_TIMEOUT,
         ),
         subscribe=lambda ws: ws.keep_alive(),
@@ -223,6 +283,17 @@ PRIVATE_WS_SPECS = (
             timeout=LIVE_WS_TIMEOUT,
         ),
         subscribe=lambda ws: ws.subscribe_orders(),
+    ),
+    WebSocketSpec(
+        name="bingx-swap",
+        env=("BINGX_API_KEY", "BINGX_API_SECRET"),
+        factory=lambda: bingx.private(
+            api_key=os.environ["BINGX_API_KEY"],
+            api_secret=os.environ["BINGX_API_SECRET"],
+            market="swap",
+            timeout=LIVE_WS_TIMEOUT,
+        ),
+        subscribe=lambda ws: ws.ping(),
     ),
     WebSocketSpec(
         name="bitget",

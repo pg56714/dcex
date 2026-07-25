@@ -64,7 +64,7 @@ def test_spot_account_read_endpoints(client):
     mx_deduct = _assert_response(client.get_spot_mx_deduct_status())
     _assert_response(client.set_spot_mx_deduct(mx_deduct["data"]["mxDeductEnable"]))
     _assert_response(client.get_spot_symbol_commission("BTC-USDT-SPOT"))
-    _assert_response(client.get_currency_info(coin="USDT"))
+    _assert_response(client.get_currency_info())
     _assert_response(client.get_deposit_history(coin="USDT", limit=10))
     _assert_response(client.get_withdraw_history(coin="USDT", limit=10))
     _assert_response(client.get_deposit_address(coin="USDT"))

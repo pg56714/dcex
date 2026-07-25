@@ -186,7 +186,7 @@ async def test_get_contract_deals(client):
 
 @pytest.mark.asyncio
 async def test_get_contract_risk_reverse(client):
-    res = await client.get_contract_risk_reverse()
+    res = await client.get_contract_risk_reverse(product_symbol="BTC-USDT-SWAP")
     _assert_contract_success(res)
     assert res["data"]
 

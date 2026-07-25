@@ -35,13 +35,17 @@ async def test_get_funding_rate_history(client):
 
 @pytest.mark.asyncio
 async def test_get_open_interest(client):
-    res = await client.get_open_interest(product_symbol="BTC-USDT-SWAP")
+    res = await client.get_open_interest(
+        instType="SWAP", product_symbol="BTC-USDT-SWAP"
+    )
     assert res is not None
 
 
 @pytest.mark.asyncio
 async def test_get_position_tiers(client):
-    res = await client.get_position_tiers(product_symbol="BTC-USDT-SWAP")
+    res = await client.get_position_tiers(
+        instType="SWAP", tdMode="cross", product_symbol="BTC-USDT-SWAP"
+    )
     assert res is not None
 
 

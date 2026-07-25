@@ -38,6 +38,15 @@ CURRENT_FIELDS = {
         "start_time",
         "end_time",
     },
+    "get_contract_open_orders": {"product_symbol", "page_num", "page_size"},
+    "get_contract_plan_orders": {
+        "product_symbol",
+        "states",
+        "start_time",
+        "end_time",
+        "page_num",
+        "page_size",
+    },
     "change_contract_leverage": {
         "leverageMode",
         "marginSelected",
@@ -78,7 +87,6 @@ def test_mexc_sync_and_async_expose_current_official_fields(
         ("get_spot_agg_trades", {"fromId"}),
         ("place_spot_order", {"timeInForce"}),
         ("get_spot_all_orders", {"orderId"}),
-        ("get_contract_open_orders", {"product_symbol"}),
         ("get_contract_stop_orders", {"states"}),
     ],
 )
@@ -103,6 +111,11 @@ def test_mexc_current_kline_and_pagination_defaults() -> None:
         history = inspect.signature(client.get_contract_history_orders).parameters
         assert history["page_num"].default == 1
         assert history["page_size"].default == 20
+        open_orders = inspect.signature(client.get_contract_open_orders).parameters
+        assert open_orders["product_symbol"].default is None
+        plan_orders = inspect.signature(client.get_contract_plan_orders).parameters
+        assert plan_orders["start_time"].default is None
+        assert plan_orders["end_time"].default is None
 
 
 def test_sync_mexc_forwards_current_spot_order_fields() -> None:

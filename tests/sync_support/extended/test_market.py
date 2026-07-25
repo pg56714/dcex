@@ -54,7 +54,7 @@ def test_public_funding_and_open_interest(client):
     _assert_response(
         client.get_open_interest(
             market="BTC-USD",
-            interval="PT1H",
+            interval="P1D",
             startTime=start_time,
             endTime=end_time,
             limit=5,

@@ -24,12 +24,14 @@ def test_get_funding_rate_history(client):
 
 
 def test_get_open_interest(client):
-    res = client.get_open_interest(product_symbol="BTC-USDT-SWAP")
+    res = client.get_open_interest(instType="SWAP", product_symbol="BTC-USDT-SWAP")
     assert res is not None
 
 
 def test_get_position_tiers(client):
-    res = client.get_position_tiers(product_symbol="BTC-USDT-SWAP")
+    res = client.get_position_tiers(
+        instType="SWAP", tdMode="cross", product_symbol="BTC-USDT-SWAP"
+    )
     assert res is not None
 
 

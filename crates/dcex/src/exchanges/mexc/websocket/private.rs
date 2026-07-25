@@ -3,9 +3,13 @@ use std::time::Duration;
 
 use serde_json::{json, Value};
 
+use crate::crypto::hmac_sha256_hex;
+use crate::exchange::unix_timestamp_ms;
 use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest};
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
+
+use super::super::signing::encode_params;
 
 const SPOT_HTTP_BASE_URL: &str = "https://api.mexc.com";
 const WS_BASE_URL: &str = "wss://wbs-api.mexc.com/ws";
@@ -15,6 +19,7 @@ pub struct MexcPrivateWebSocket {
     connection: WebSocketConnection,
     transport: AsyncHttpClient,
     api_key: String,
+    api_secret: String,
     spot_http_base_url: String,
     ws_base_url: String,
     timeout: Duration,
@@ -23,10 +28,10 @@ pub struct MexcPrivateWebSocket {
 }
 
 impl MexcPrivateWebSocket {
-    pub fn new(api_key: String, timeout: Duration) -> Result<Self> {
+    pub fn new(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
         Self::with_urls_and_secret(
             api_key,
-            None,
+            api_secret,
             timeout,
             SPOT_HTTP_BASE_URL.to_string(),
             WS_BASE_URL.to_string(),
@@ -34,35 +39,34 @@ impl MexcPrivateWebSocket {
     }
 
     pub fn with_secret(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
-        Self::with_urls_and_secret(
-            api_key,
-            Some(api_secret),
-            timeout,
-            SPOT_HTTP_BASE_URL.to_string(),
-            WS_BASE_URL.to_string(),
-        )
+        Self::new(api_key, api_secret, timeout)
     }
 
     pub fn with_urls(
         api_key: String,
+        api_secret: String,
         timeout: Duration,
         spot_http_base_url: impl Into<String>,
         ws_base_url: impl Into<String>,
     ) -> Result<Self> {
-        Self::with_urls_and_secret(api_key, None, timeout, spot_http_base_url, ws_base_url)
+        Self::with_urls_and_secret(
+            api_key,
+            api_secret,
+            timeout,
+            spot_http_base_url,
+            ws_base_url,
+        )
     }
 
     pub fn with_urls_and_secret(
         api_key: String,
-        api_secret: Option<String>,
+        api_secret: String,
         timeout: Duration,
         spot_http_base_url: impl Into<String>,
         ws_base_url: impl Into<String>,
     ) -> Result<Self> {
         validate_credential("MEXC API key", &api_key)?;
-        if let Some(api_secret) = api_secret.as_deref() {
-            validate_credential("MEXC API secret", api_secret)?;
-        }
+        validate_credential("MEXC API secret", &api_secret)?;
         let spot_http_base_url = spot_http_base_url.into();
         let ws_base_url = ws_base_url.into();
         Ok(Self {
@@ -72,6 +76,7 @@ impl MexcPrivateWebSocket {
             )?),
             transport: AsyncHttpClient::new(timeout)?,
             api_key,
+            api_secret,
             spot_http_base_url,
             ws_base_url,
             timeout,
@@ -223,12 +228,25 @@ impl MexcPrivateWebSocket {
         method: HttpMethod,
         listen_key: Option<&str>,
     ) -> Result<HttpRequest> {
+        self.build_listen_key_request_at(method, listen_key, unix_timestamp_ms()?)
+    }
+
+    fn build_listen_key_request_at(
+        &self,
+        method: HttpMethod,
+        listen_key: Option<&str>,
+        timestamp_ms: u64,
+    ) -> Result<HttpRequest> {
         let mut request = HttpRequest::new(method, &self.spot_http_base_url, LISTEN_KEY_PATH)
             .header("X-MEXC-APIKEY", self.api_key.clone());
         let mut query = Vec::new();
         if let Some(listen_key) = listen_key {
             query.push(("listenKey".to_string(), listen_key.to_string()));
         }
+        query.push(("timestamp".to_string(), timestamp_ms.to_string()));
+        let signature =
+            hmac_sha256_hex(self.api_secret.as_bytes(), encode_params(&query).as_bytes())?;
+        query.push(("signature".to_string(), signature));
         request.query = query;
         Ok(request)
     }
@@ -303,34 +321,46 @@ mod tests {
     }
 
     #[test]
-    fn listen_key_request_uses_only_official_parameters() {
+    fn listen_key_request_is_signed_when_secret_is_available() {
         let ws = MexcPrivateWebSocket::with_urls_and_secret(
             "key".to_string(),
-            Some("secret".to_string()),
+            "secret".to_string(),
             Duration::from_secs(10),
             "https://api.mexc.com",
             "wss://wbs-api.mexc.com/ws",
         )
         .expect("ws");
         let request = ws
-            .build_listen_key_request(HttpMethod::Put, Some("listen-key"))
+            .build_listen_key_request_at(HttpMethod::Put, Some("listen-key"), 1_700_000_000_000)
             .expect("request");
 
         assert_eq!(
             request.query,
-            vec![("listenKey".to_string(), "listen-key".to_string())]
+            vec![
+                ("listenKey".to_string(), "listen-key".to_string()),
+                ("timestamp".to_string(), "1700000000000".to_string()),
+                (
+                    "signature".to_string(),
+                    "8e5d5f23106735511ab4da98c8f06da047cc3f62c67c8902448df538ef9fa900".to_string(),
+                ),
+            ]
         );
 
         let create_request = ws
-            .build_listen_key_request(HttpMethod::Post, None)
+            .build_listen_key_request_at(HttpMethod::Post, None, 1_700_000_000_000)
             .expect("create request");
-        assert!(create_request.query.is_empty());
+        assert_eq!(create_request.query[0].0, "timestamp");
+        assert_eq!(create_request.query[1].0, "signature");
     }
 
     #[tokio::test]
     async fn rejects_more_than_30_subscriptions_before_transport() {
-        let mut client =
-            MexcPrivateWebSocket::new("key".to_string(), Duration::from_secs(1)).expect("client");
+        let mut client = MexcPrivateWebSocket::new(
+            "key".to_string(),
+            "secret".to_string(),
+            Duration::from_secs(1),
+        )
+        .expect("client");
         client.subscriptions = (0..30).map(|index| format!("channel{index}")).collect();
         assert!(client
             .subscribe(vec!["channel30".to_string()])

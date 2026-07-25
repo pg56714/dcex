@@ -54,7 +54,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_contract_order_deal_details(order_id => "order_id"),
         get_contract_order_deals(product_symbol => "product_symbol"),
         get_contract_orders(order_ids => "order_ids"),
-        get_contract_plan_orders(start_time => "start_time", end_time => "end_time"),
+        get_contract_plan_orders(),
         place_contract_plan_order(product_symbol => "product_symbol", vol => "vol", leverage => "leverage", side => "side", open_type => "openType", trigger_price => "triggerPrice", trigger_type => "triggerType", execute_cycle => "executeCycle", order_type => "orderType", trend => "trend"),
         cancel_contract_plan_orders(orders => "orders"),
         cancel_all_contract_plan_orders(),

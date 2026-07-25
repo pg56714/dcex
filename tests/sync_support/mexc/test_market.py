@@ -157,7 +157,7 @@ def test_get_contract_deals(client):
 
 
 def test_get_contract_risk_reverse(client):
-    res = client.get_contract_risk_reverse()
+    res = client.get_contract_risk_reverse(product_symbol="BTC-USDT-SWAP")
     _assert_contract_success(res)
     assert res["data"]
 

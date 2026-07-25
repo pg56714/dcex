@@ -18,7 +18,10 @@ async fn okx_public_live_parity() -> dcex::Result<()> {
                 "get_funding_rate_history",
                 &[("product_symbol", BTC_USDT_SWAP)],
             ),
-            Case::new("get_open_interest", &[("product_symbol", BTC_USDT_SWAP)]),
+            Case::new(
+                "get_open_interest",
+                &[("instType", "SWAP"), ("product_symbol", BTC_USDT_SWAP)],
+            ),
             Case::new(
                 "get_position_tiers",
                 &[

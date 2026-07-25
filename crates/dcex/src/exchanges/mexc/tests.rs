@@ -6,6 +6,7 @@ use std::time::Duration;
 use crate::http::{HttpMethod, RequestBody};
 use crate::product_table::{MarketInfo, ProductTable};
 
+use super::endpoints::CONTRACT_DETAIL;
 use super::*;
 
 fn client() -> MexcClient {
@@ -15,6 +16,11 @@ fn client() -> MexcClient {
         Duration::from_secs(1),
     )
     .expect("client")
+}
+
+#[test]
+fn contract_details_uses_documented_endpoint() {
+    assert_eq!(CONTRACT_DETAIL, "/api/v1/contract/detail");
 }
 
 #[test]

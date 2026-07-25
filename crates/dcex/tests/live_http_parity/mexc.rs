@@ -85,7 +85,10 @@ async fn mexc_public_live_parity() -> dcex::Result<()> {
                 "get_contract_deals",
                 &[("product_symbol", BTC_USDT_SWAP), ("limit", "2")],
             ),
-            Case::new("get_contract_risk_reverse", &[]),
+            Case::new(
+                "get_contract_risk_reverse",
+                &[("product_symbol", BTC_USDT_SWAP)],
+            ),
             Case::new(
                 "get_contract_risk_reverse_history",
                 &[
@@ -167,7 +170,7 @@ async fn mexc_private_read_live_parity() -> dcex::Result<()> {
                 "get_spot_symbol_commission",
                 &[("product_symbol", BTC_USDT_SPOT)],
             ),
-            Case::new("get_currency_info", &[("coin", "USDT")]),
+            Case::new("get_currency_info", &[]),
             Case::new("get_deposit_history", &[("coin", "USDT"), ("limit", "10")]),
             Case::new("get_withdraw_history", &[("coin", "USDT"), ("limit", "10")]),
             Case::new("get_deposit_address", &[("coin", "USDT")]),

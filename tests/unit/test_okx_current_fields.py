@@ -34,7 +34,18 @@ CURRENT_FIELDS = {
     "get_order_list": {"after", "before"},
     "get_orders_history": {"after", "before"},
     "get_fills": {"after", "before"},
-    "amend_order": {"speedBump", "pxAmendType", "attachAlgoOrds"},
+    "place_order": {
+        "isElpTakerAccess",
+        "rpiTakerAccess",
+        "rpiPxRound",
+    },
+    "amend_order": {
+        "speedBump",
+        "rpiTakerAccess",
+        "rpiPxRound",
+        "pxAmendType",
+        "attachAlgoOrds",
+    },
     "close_positions": {"clOrdId"},
 }
 
@@ -60,7 +71,7 @@ def test_okx_sync_and_async_expose_current_official_fields(
         ("get_open_interest", {"uly"}),
         ("get_position_tiers", {"uly"}),
         ("get_spot_fee_rates", {"uly", "ruleType"}),
-        ("place_order", {"quickMgnType", "stpId"}),
+        ("place_order", {"quickMgnType", "speedBump", "stpId"}),
         ("get_order_list", {"uly"}),
         ("get_orders_history", {"uly"}),
         ("get_fills", {"uly"}),
@@ -85,14 +96,16 @@ def test_sync_okx_place_order_serializes_json_values_for_native_rust() -> None:
         "1",
         reduceOnly=True,
         banAmend=False,
-        isElpTakerAccess=True,
+        rpiTakerAccess=True,
+        rpiPxRound=True,
         attachAlgoOrds=attachments,
     )
 
     params = dict(calls[0]["query"])
     assert params["reduceOnly"] == "true"
     assert params["banAmend"] == "false"
-    assert params["isElpTakerAccess"] == "true"
+    assert params["rpiTakerAccess"] == "true"
+    assert params["rpiPxRound"] == "true"
     assert json.loads(params["attachAlgoOrds"]) == attachments
 
 

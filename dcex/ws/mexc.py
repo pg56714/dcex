@@ -81,7 +81,7 @@ class PrivateClient(AsyncWebSocketMixin):
     def __init__(
         self,
         api_key: str,
-        api_secret: str | None = None,
+        api_secret: str,
         timeout: float = 10.0,
         spot_http_base_url: str | None = None,
         ws_base_url: str | None = None,
@@ -152,7 +152,7 @@ def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
 
 def private(
     api_key: str,
-    api_secret: str | None = None,
+    api_secret: str,
     timeout: float = 10.0,
     spot_http_base_url: str | None = None,
     ws_base_url: str | None = None,

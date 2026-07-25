@@ -688,6 +688,7 @@ class TradeHTTP(HTTPManager):
 
     def get_contract_open_orders(
         self,
+        product_symbol: str | None = None,
         page_num: int = 1,
         page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:
@@ -695,6 +696,7 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "get_contract_open_orders",
             self._native_params(
+                product_symbol=product_symbol,
                 page_num=page_num,
                 page_size=page_size,
             ),
@@ -783,11 +785,11 @@ class TradeHTTP(HTTPManager):
 
     def get_contract_plan_orders(
         self,
-        start_time: int,
-        end_time: int,
         product_symbol: str | None = None,
         states: str | None = None,
         side: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
         page_num: int = 1,
         page_size: int = 20,
     ) -> dict[str, Any] | list[Any]:

@@ -35,7 +35,7 @@ pub(super) const SPOT_ALL_ORDERS: &str = "/api/v3/allOrders";
 pub(super) const SPOT_MY_TRADES: &str = "/api/v3/myTrades";
 
 pub(super) const CONTRACT_PING: &str = "/api/v1/contract/ping";
-pub(super) const CONTRACT_DETAIL: &str = "/api/v1/contract/detail/country";
+pub(super) const CONTRACT_DETAIL: &str = "/api/v1/contract/detail";
 pub(super) const CONTRACT_TICKER: &str = "/api/v1/contract/ticker";
 pub(super) const CONTRACT_RISK_REVERSE_HISTORY: &str = "/api/v1/contract/risk_reverse/history";
 pub(super) const CONTRACT_FUNDING_RATE_HISTORY: &str = "/api/v1/contract/funding_rate/history";

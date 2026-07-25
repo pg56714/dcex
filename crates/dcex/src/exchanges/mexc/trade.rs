@@ -158,7 +158,7 @@ impl MexcClient {
                     "newClientOrderId",
                     "recvWindow",
                 ])?;
-                require_one_identifier(&params, &["orderId", "origClientOrderId"])?;
+                require_one_identifier(params, &["orderId", "origClientOrderId"])?;
                 let mut query = params.only(&[
                     "orderId",
                     "origClientOrderId",
@@ -184,7 +184,7 @@ impl MexcClient {
                     "origClientOrderId",
                     "recvWindow",
                 ])?;
-                require_one_identifier(&params, &["orderId", "origClientOrderId"])?;
+                require_one_identifier(params, &["orderId", "origClientOrderId"])?;
                 let mut query = params.only(&["orderId", "origClientOrderId", "recvWindow"]);
                 self.push_product_symbol(&mut query, params, "")?;
                 self.spot_private(HttpMethod::Get, SPOT_ORDER, query).await
@@ -296,12 +296,21 @@ impl MexcClient {
                     .await
             }
             "get_contract_open_orders" => {
-                params.ensure_allowed(&["page_num", "page_size"])?;
+                params.ensure_allowed(&["product_symbol", "symbol", "page_num", "page_size"])?;
                 validate_u64_range(params, "page_num", 1, u64::MAX)?;
                 validate_u64_range(params, "page_size", 1, 100)?;
                 let mut query = params.only(&["page_num", "page_size"]);
+                let path =
+                    if params.get("product_symbol").is_some() || params.get("symbol").is_some() {
+                        format!(
+                            "{CONTRACT_OPEN_ORDERS}/{}",
+                            self.required_contract_symbol(params)?
+                        )
+                    } else {
+                        CONTRACT_OPEN_ORDERS.to_string()
+                    };
                 add_pagination_defaults(&mut query);
-                self.contract_get(CONTRACT_OPEN_ORDERS, query).await
+                self.contract_get(&path, query).await
             }
             "get_contract_history_orders" => {
                 params.ensure_allowed(&[
@@ -403,17 +412,16 @@ impl MexcClient {
                     "page_num",
                     "page_size",
                 ])?;
-                let mut query = vec![
-                    (
-                        "start_time".to_string(),
-                        params.required("start_time")?.to_string(),
-                    ),
-                    (
-                        "end_time".to_string(),
-                        params.required("end_time")?.to_string(),
-                    ),
-                ];
-                query.extend(params.only(&["states", "side", "page_num", "page_size"]));
+                validate_u64_range(params, "page_num", 1, u64::MAX)?;
+                validate_u64_range(params, "page_size", 1, 100)?;
+                let mut query = params.only(&[
+                    "states",
+                    "side",
+                    "start_time",
+                    "end_time",
+                    "page_num",
+                    "page_size",
+                ]);
                 self.push_product_symbol(&mut query, params, "_")?;
                 add_pagination_defaults(&mut query);
                 self.contract_get(CONTRACT_PLAN_ORDERS, query).await

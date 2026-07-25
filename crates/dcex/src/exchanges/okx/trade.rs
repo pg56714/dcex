@@ -184,7 +184,6 @@ impl OkxClient {
                 "clOrdId",
                 "posSide",
                 "px",
-                "speedBump",
                 "outcome",
                 "pxUsd",
                 "pxVol",
@@ -207,6 +206,8 @@ impl OkxClient {
                 "isElpTakerAccess",
                 params.get("isElpTakerAccess"),
             )?;
+            insert_optional_bool(&mut body, "rpiTakerAccess", params.get("rpiTakerAccess"))?;
+            insert_optional_bool(&mut body, "rpiPxRound", params.get("rpiPxRound"))?;
         }
         if let Some(value) = params.json_optional("attachAlgoOrds")? {
             body.insert("attachAlgoOrds".to_string(), value);
@@ -318,6 +319,8 @@ impl OkxClient {
                 "newPxUsd",
                 "newPxVol",
                 "attachAlgoOrds",
+                "rpiTakerAccess",
+                "rpiPxRound",
             ],
         )?;
         let mut body = Map::new();
@@ -336,6 +339,8 @@ impl OkxClient {
             insert_optional_string(&mut body, key, params.get(key));
         }
         insert_optional_bool(&mut body, "cxlOnFail", params.get("cxlOnFail"))?;
+        insert_optional_bool(&mut body, "rpiTakerAccess", params.get("rpiTakerAccess"))?;
+        insert_optional_bool(&mut body, "rpiPxRound", params.get("rpiPxRound"))?;
         if let Some(value) = params.json_optional("attachAlgoOrds")? {
             body.insert("attachAlgoOrds".to_string(), value);
         }
@@ -523,6 +528,9 @@ mod tests {
             ("reduceOnly".to_string(), "true".to_string()),
             ("banAmend".to_string(), "false".to_string()),
             ("isElpTakerAccess".to_string(), "true".to_string()),
+            ("rpiTakerAccess".to_string(), "true".to_string()),
+            ("rpiPxRound".to_string(), "true".to_string()),
+            ("speedBump".to_string(), "1".to_string()),
             (
                 "attachAlgoOrds".to_string(),
                 r#"[{"tpTriggerPx":"110","tpOrdPx":"109"}]"#.to_string(),
@@ -535,6 +543,9 @@ mod tests {
         assert_eq!(body["reduceOnly"], Value::Bool(true));
         assert_eq!(body["banAmend"], Value::Bool(false));
         assert_eq!(body["isElpTakerAccess"], Value::Bool(true));
+        assert_eq!(body["rpiTakerAccess"], Value::Bool(true));
+        assert_eq!(body["rpiPxRound"], Value::Bool(true));
+        assert!(!body.contains_key("speedBump"));
         assert_eq!(
             body["attachAlgoOrds"],
             json!([{"tpTriggerPx": "110", "tpOrdPx": "109"}])
