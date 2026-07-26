@@ -1,3 +1,13 @@
+## 0.8.0 (2026-07-26)
+
+### Feat
+
+- support tokenized equity trading
+
+### Fix
+
+- align RFQ parameters with official API
+
 ## 0.7.1 (2026-07-25)
 
 ### Fix

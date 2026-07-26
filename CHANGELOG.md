@@ -1,3 +1,9 @@
+## 0.30.0 (2026-07-26)
+
+### Feat
+
+- support tokenized equity trading
+
 ## 0.29.1 (2026-07-25)
 
 ### Fix
