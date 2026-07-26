@@ -18,7 +18,6 @@ impl BackpackClient {
         &self,
         product_symbol: &str,
         side: &str,
-        execution_mode: &str,
     ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
         crate::exchanges::ExchangeMethodRequest::private(
             self,
@@ -26,9 +25,18 @@ impl BackpackClient {
             vec![
                 ("product_symbol".to_string(), product_symbol.to_string()),
                 ("side".to_string(), side.to_string()),
-                ("executionMode".to_string(), execution_mode.to_string()),
             ],
         )
+    }
+
+    pub fn submit_rfq_with_execution_mode(
+        &self,
+        product_symbol: &str,
+        side: &str,
+        execution_mode: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        self.submit_rfq(product_symbol, side)
+            .execution_mode(execution_mode)
     }
 
     pub fn accept_rfq_quote(
@@ -41,6 +49,21 @@ impl BackpackClient {
             "accept_rfq_quote",
             vec![
                 ("rfqId".to_string(), rfq_id.to_string()),
+                ("quoteId".to_string(), quote_id.to_string()),
+            ],
+        )
+    }
+
+    pub fn accept_rfq_quote_by_client_id(
+        &self,
+        client_id: u32,
+        quote_id: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "accept_rfq_quote",
+            vec![
+                ("clientId".to_string(), client_id.to_string()),
                 ("quoteId".to_string(), quote_id.to_string()),
             ],
         )
@@ -59,6 +82,17 @@ impl BackpackClient {
             self,
             "cancel_rfq",
             vec![("rfqId".to_string(), rfq_id.to_string())],
+        )
+    }
+
+    pub fn cancel_rfq_by_client_id(
+        &self,
+        client_id: u32,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::private(
+            self,
+            "cancel_rfq",
+            vec![("clientId".to_string(), client_id.to_string())],
         )
     }
 
@@ -204,7 +238,6 @@ impl BackpackClient {
         super::market::validate_symbol_selector(params, true)?;
         params.ensure_exactly_one(&["quantity", "quoteQuantity"])?;
         params.required("side")?;
-        params.required("executionMode")?;
         params.optional_one_of("side", &["Bid", "Ask"])?;
         params.optional_one_of("executionMode", &["AwaitAccept", "Immediate"])?;
         params.optional_u64_range("clientId", 0, u32::MAX.into())?;
@@ -216,7 +249,13 @@ impl BackpackClient {
         ] {
             params.optional_bool(key)?;
         }
-        if params.get("price").is_some() && params.get("executionMode") != Some("Immediate") {
+        let execution_mode = params.get("executionMode").unwrap_or("AwaitAccept");
+        if execution_mode == "Immediate" && params.get("price").is_none() {
+            return Err(DcexError::InvalidInput(
+                "Backpack RFQ executionMode=Immediate requires price.".to_string(),
+            ));
+        }
+        if params.get("price").is_some() && execution_mode != "Immediate" {
             return Err(DcexError::InvalidInput(
                 "Backpack RFQ price is supported only with executionMode=Immediate.".to_string(),
             ));
