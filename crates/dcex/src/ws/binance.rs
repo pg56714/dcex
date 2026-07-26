@@ -1,1 +1,3 @@
-pub use crate::exchanges::binance::websocket::{BinancePrivateWebSocket, BinancePublicWebSocket};
+pub use crate::exchanges::binance::websocket::{
+    BinanceEquityWebSocket, BinancePrivateWebSocket, BinancePublicWebSocket,
+};

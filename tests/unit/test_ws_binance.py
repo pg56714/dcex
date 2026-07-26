@@ -94,9 +94,44 @@ class _FakeNativeBinancePrivateWebSocketClient:
         return b'{"e":"ACCOUNT_UPDATE","E":123}'
 
 
+class _FakeNativeBinanceEquityWebSocketClient:
+    def __init__(
+        self,
+        stream: str,
+        product_symbol: str | None = None,
+        interval: str | None = None,
+        listen_key: str | None = None,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+    ) -> None:
+        self.stream = stream
+        self.product_symbol = product_symbol
+        self.interval = interval
+        self.listen_key = listen_key
+        self.timeout = timeout
+        self.base_url = base_url
+        self.connected = False
+        self.closed = False
+
+    def url(self) -> str:
+        base_url = self.base_url or "wss://nbstream.binance.com/equity"
+        symbol = (self.product_symbol or "").split("-", 1)[0]
+        return f"{base_url}/ws/{symbol}@{self.stream}"
+
+    async def connect(self) -> None:
+        self.connected = True
+
+    async def close(self) -> None:
+        self.closed = True
+
+    async def recv(self) -> bytes:
+        return b'{"e":"quote","s":"AAPLUSDC"}'
+
+
 class _FakeNative:
     BinancePublicWebSocketClient = _FakeNativeBinancePublicWebSocketClient
     BinancePrivateWebSocketClient = _FakeNativeBinancePrivateWebSocketClient
+    BinanceEquityWebSocketClient = _FakeNativeBinanceEquityWebSocketClient
 
 
 @pytest.mark.asyncio
@@ -171,3 +206,30 @@ async def test_binance_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> No
     assert native_client.keep_alive_count == 1
     assert native_client.closed is True
     assert ws.listen_key() is None
+
+
+@pytest.mark.asyncio
+async def test_binance_equity_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import binance
+
+    monkeypatch.setattr(binance, "_native", _FakeNative)
+
+    async with binance.equity(
+        stream="quote",
+        product_symbol="AAPL-USDC-EQUITY",
+        timeout=2,
+        base_url="wss://example.test/equity",
+    ) as ws:
+        native_client = ws._native_client
+        assert native_client.connected is True
+        assert native_client.stream == "quote"
+        assert native_client.product_symbol == "AAPL-USDC-EQUITY"
+        assert native_client.timeout == 2
+        assert native_client.base_url == "wss://example.test/equity"
+        assert ws.url == "wss://example.test/equity/ws/AAPL@quote"
+
+        event = await ws.recv()
+
+    assert event == {"e": "quote", "s": "AAPLUSDC"}
+    assert native_client.closed is True

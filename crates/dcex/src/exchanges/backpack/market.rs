@@ -40,6 +40,7 @@ impl BackpackClient {
                 self.public_get(DEPTH, query).await
             }
             "get_market_sessions" => self.public_get(MARKET_SESSIONS, Vec::new()).await,
+            "get_market_holidays" => self.public_get(MARKET_HOLIDAYS, Vec::new()).await,
             "get_securities" => self.public_get(SECURITIES, Vec::new()).await,
             "get_mark_prices" => {
                 let mut query = params.only(&["marketType"]);
@@ -105,6 +106,7 @@ impl BackpackClient {
             "get_collateral"
             | "get_borrow_lend_markets"
             | "get_market_sessions"
+            | "get_market_holidays"
             | "get_securities"
             | "get_status"
             | "ping"

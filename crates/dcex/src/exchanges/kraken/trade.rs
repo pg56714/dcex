@@ -284,6 +284,11 @@ impl KrakenClient {
         if let Some(asset_class) = params.get("asset_class") {
             validate_allowed("Spot asset_class", asset_class, &["tokenized_asset"])?;
         }
+        let inferred_asset_class = if params.get("asset_class").is_none() {
+            self.spot_asset_class(params.required("product_symbol")?)?
+        } else {
+            None
+        };
         if let Some(trigger) = params.get("trigger") {
             validate_allowed("Spot trigger", trigger, &["index", "last"])?;
         }
@@ -307,7 +312,13 @@ impl KrakenClient {
         push_optional(&mut query, "timeinforce", params.get("timeinforce"));
         push_optional(&mut query, "expiretm", params.get("expiretm"));
         push_optional(&mut query, "starttm", params.get("starttm"));
-        push_optional(&mut query, "asset_class", params.get("asset_class"));
+        push_optional(
+            &mut query,
+            "asset_class",
+            params
+                .get("asset_class")
+                .or(inferred_asset_class.as_deref()),
+        );
         push_optional(&mut query, "trigger", params.get("trigger"));
         push_optional(&mut query, "stptype", params.get("stptype"));
         push_optional(&mut query, "reduce_only", params.get("reduce_only"));

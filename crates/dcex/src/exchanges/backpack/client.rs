@@ -420,6 +420,7 @@ fn exchange_symbol_fallback(product_symbol: &str) -> String {
     let parts = product_symbol.split('-').collect::<Vec<_>>();
     match parts.as_slice() {
         [base, quote, "SPOT"] => format!("{base}_{quote}"),
+        [base, quote, "RFQ"] => format!("{base}_{quote}_RFQ"),
         [base, quote, ..] => format!("{base}_{quote}_PERP"),
         _ => product_symbol.to_string(),
     }

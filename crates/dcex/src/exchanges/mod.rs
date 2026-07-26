@@ -1502,6 +1502,74 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
     }
     // END GENERATED OPTIONAL PARAM SETTERS
 
+    pub fn auto_borrow(self, value: impl ToString) -> Self {
+        self.param("autoBorrow", value)
+    }
+
+    pub fn convert_type(self, value: impl ToString) -> Self {
+        self.param("convertType", value)
+    }
+
+    pub fn deferred_settlement(self, value: impl ToString) -> Self {
+        self.param("deferredSettlement", value)
+    }
+
+    pub fn execution_mode(self, value: impl ToString) -> Self {
+        self.param("executionMode", value)
+    }
+
+    pub fn fill_type(self, value: impl ToString) -> Self {
+        self.param("fillType", value)
+    }
+
+    pub fn issuer_request_id(self, value: impl ToString) -> Self {
+        self.param("issuerRequestId", value)
+    }
+
+    pub fn order_status(self, value: impl ToString) -> Self {
+        self.param("orderStatus", value)
+    }
+
+    pub fn quote_id(self, value: impl ToString) -> Self {
+        self.param("quoteId", value)
+    }
+
+    pub fn rfq_id(self, value: impl ToString) -> Self {
+        self.param("rfqId", value)
+    }
+
+    pub fn time_in_force(self, value: impl ToString) -> Self {
+        self.param("timeInForce", value)
+    }
+
+    pub fn tokenize(self, value: impl ToString) -> Self {
+        self.param("tokenize", value)
+    }
+
+    pub fn tokenized_asset(self, value: impl ToString) -> Self {
+        self.param("tokenizedAsset", value)
+    }
+
+    pub fn tokenized_asset_amount(self, value: impl ToString) -> Self {
+        self.param("tokenizedAssetAmount", value)
+    }
+
+    pub fn trading_session(self, value: impl ToString) -> Self {
+        self.param("tradingSession", value)
+    }
+
+    pub fn underlying_asset(self, value: impl ToString) -> Self {
+        self.param("underlyingAsset", value)
+    }
+
+    pub fn underlying_asset_amount(self, value: impl ToString) -> Self {
+        self.param("underlyingAssetAmount", value)
+    }
+
+    pub fn wallet_type(self, value: impl ToString) -> Self {
+        self.param("walletType", value)
+    }
+
     pub fn optional_param<T: ToString>(self, key: impl Into<String>, value: Option<T>) -> Self {
         if let Some(value) = value {
             self.param(key, value)

@@ -138,4 +138,51 @@ mod tests {
 
         assert!(error.to_string().contains("provided together"));
     }
+
+    #[test]
+    fn rfq_symbol_fallback_uses_the_stock_rfq_suffix() {
+        let client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+        assert_eq!(
+            client.exchange_symbol("AAPL.US-USDC-RFQ").expect("symbol"),
+            "AAPL.US_USDC_RFQ"
+        );
+    }
+
+    #[test]
+    fn rfq_submit_body_resolves_symbol_and_scalar_types() {
+        let client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+        let params = crate::exchanges::backpack::params::BackpackParams::from_pairs(vec![
+            ("product_symbol".to_string(), "AAPL.US-USDC-RFQ".to_string()),
+            ("side".to_string(), "Bid".to_string()),
+            ("executionMode".to_string(), "AwaitAccept".to_string()),
+            ("quantity".to_string(), "0.5".to_string()),
+            ("autoLend".to_string(), "true".to_string()),
+        ]);
+
+        let body = client.rfq_submit_body(&params).expect("body");
+        assert_eq!(body.get("symbol"), Some(&json!("AAPL.US_USDC_RFQ")));
+        assert_eq!(body.get("quantity"), Some(&json!("0.5")));
+        assert_eq!(body.get("autoLend"), Some(&json!(true)));
+    }
+
+    #[test]
+    fn stock_rfq_rejects_quote_quantity() {
+        let client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
+        let error = crate::http::block_on(async move {
+            client
+                .private_request(
+                    "submit_rfq",
+                    vec![
+                        ("product_symbol".to_string(), "AAPL.US-USDC-RFQ".to_string()),
+                        ("side".to_string(), "Bid".to_string()),
+                        ("executionMode".to_string(), "AwaitAccept".to_string()),
+                        ("quoteQuantity".to_string(), "100".to_string()),
+                    ],
+                )
+                .await
+        })
+        .expect_err("stock RFQ quoteQuantity must fail");
+
+        assert!(error.to_string().contains("require quantity"));
+    }
 }

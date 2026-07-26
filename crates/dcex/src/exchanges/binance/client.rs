@@ -14,6 +14,7 @@ use super::signing::{extract_server_time_ms, BinanceResponseValidator, BinanceSi
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinanceMarket {
+    Equity,
     Futures,
     Spot,
 }
@@ -21,12 +22,16 @@ pub enum BinanceMarket {
 impl BinanceMarket {
     pub const fn base_url(self) -> &'static str {
         match self {
+            Self::Equity => SPOT_BASE_URL,
             Self::Futures => FUTURES_BASE_URL,
             Self::Spot => SPOT_BASE_URL,
         }
     }
 
     pub fn from_path(path: &str) -> Result<Self> {
+        if path.starts_with("/sapi/v1/equity/") {
+            return Ok(Self::Equity);
+        }
         if path.starts_with("/fapi/") || path.starts_with("/futures/") {
             return Ok(Self::Futures);
         }
@@ -159,6 +164,7 @@ impl BinanceClient {
 
         let local_start = unix_timestamp_ms()?;
         let path = match market {
+            BinanceMarket::Equity => SPOT_SERVER_TIME,
             BinanceMarket::Futures => FUTURES_SERVER_TIME,
             BinanceMarket::Spot => SPOT_SERVER_TIME,
         };
@@ -186,6 +192,7 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> HttpRequest {
         let base_url = match market {
+            BinanceMarket::Equity => &self.spot_base_url,
             BinanceMarket::Futures => &self.futures_base_url,
             BinanceMarket::Spot => &self.spot_base_url,
         };
@@ -216,6 +223,31 @@ impl BinanceClient {
             .headers
             .insert("X-MBX-APIKEY".to_string(), api_key.to_string());
         self.inner.execute(request, false).await
+    }
+
+    pub(super) async fn timed_api_key_request(
+        &self,
+        method: HttpMethod,
+        market: BinanceMarket,
+        path: &str,
+        mut params: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        self.sync_server_time(market).await?;
+        let local_timestamp = unix_timestamp_ms()? as i64;
+        let offset = {
+            let offset = self.timestamp_offset_ms.lock().map_err(|error| {
+                DcexError::Runtime(format!("Binance timestamp offset lock poisoned: {error}"))
+            })?;
+            offset.unwrap_or_default()
+        };
+        let timestamp = (local_timestamp + offset).max(0);
+        if !params.iter().any(|(key, _)| key == "timestamp") {
+            params.push(("timestamp".to_string(), timestamp.to_string()));
+        }
+        if !params.iter().any(|(key, _)| key == "recvWindow") {
+            params.push(("recvWindow".to_string(), "5000".to_string()));
+        }
+        self.api_key_request(method, market, path, params).await
     }
 
     pub fn request_blocking(
@@ -282,10 +314,10 @@ impl BinanceClient {
         if let Some(table) = &self.product_table {
             if is_canonical_product_symbol(product_symbol) {
                 let product_type = table.get_product_type("binance", Some(product_symbol), None)?;
-                return Ok(if product_type == "spot" {
-                    BinanceMarket::Spot
-                } else {
-                    BinanceMarket::Futures
+                return Ok(match product_type.as_str() {
+                    "equity" | "stock" => BinanceMarket::Equity,
+                    "spot" => BinanceMarket::Spot,
+                    _ => BinanceMarket::Futures,
                 });
             }
         }

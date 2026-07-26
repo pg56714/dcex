@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::time::Duration;
 
 use serde_json::Value;
@@ -86,6 +86,7 @@ fn aster_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
 pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = BackpackClient::public(5_000, timeout)?;
     let response = client.public_request("get_markets", vec![]).await?;
+    let securities = client.public_request("get_securities", vec![]).await?;
     let mut rows = Vec::new();
     for market in value_array(Some(&response.data)) {
         if market.get("visible").and_then(Value::as_bool) == Some(false)
@@ -129,6 +130,25 @@ pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>>
             min_size: value_string(quantity, "minQuantity", "0"),
             base_currency: base,
             quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: "1".to_string(),
+        });
+    }
+    for security in value_array(Some(&securities.data)) {
+        let asset = required_string(security, "asset")?;
+        let sessions = value_array(security.get("sessions"));
+        let session = sessions.first().unwrap_or(&Value::Null);
+        rows.push(MarketInfo {
+            exchange: "backpack".to_string(),
+            exchange_symbol: format!("{asset}_USDC_RFQ"),
+            product_symbol: format!("{asset}-USDC-RFQ"),
+            product_type: "rfq".to_string(),
+            exchange_type: "RFQ".to_string(),
+            price_precision: "0".to_string(),
+            size_precision: value_string(session, "stepSize", "0"),
+            min_size: value_string(session, "minQuantity", "0"),
+            base_currency: asset,
+            quote_currency: "USDC".to_string(),
             min_notional: "0".to_string(),
             size_per_contract: "1".to_string(),
         });
@@ -554,6 +574,12 @@ pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let spot = client
         .public_request("get_spot_asset_pairs", vec![])
         .await?;
+    let tokenized = client
+        .public_request(
+            "get_spot_asset_pairs",
+            vec![("aclass_base".to_string(), "tokenized_asset".to_string())],
+        )
+        .await?;
     let futures = client
         .public_request(
             "get_futures_instruments",
@@ -565,41 +591,67 @@ pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
         )
         .await?;
     let mut rows = Vec::new();
-    if let Some(result) = spot.data.get("result").and_then(Value::as_object) {
-        for (symbol, market) in result {
-            let status = value_string(market, "status", "");
-            if !status.is_empty() && status != "online" {
-                continue;
+    let mut seen_tokenized_symbols = HashSet::new();
+    for (response, requested_asset_class) in [(&spot, None), (&tokenized, Some("tokenized_asset"))]
+    {
+        if let Some(result) = response.data.get("result").and_then(Value::as_object) {
+            for (symbol, market) in result {
+                let asset_class = non_empty_string(market, "aclass_base")
+                    .or_else(|| requested_asset_class.map(str::to_string))
+                    .unwrap_or_else(|| "spot".to_string());
+                let is_tokenized = asset_class == "tokenized_asset";
+                let status = value_string(market, "status", "");
+                if !status.is_empty()
+                    && status != "online"
+                    && !(is_tokenized && status == "post_only")
+                {
+                    continue;
+                }
+                let wsname = value_string(market, "wsname", "");
+                let (base, quote) = if let Some((base, quote)) = wsname.split_once('/') {
+                    (
+                        normalize_kraken_spot_currency(base, is_tokenized),
+                        normalize_kraken_currency(quote),
+                    )
+                } else {
+                    (
+                        normalize_kraken_spot_currency(
+                            &value_string(market, "base", ""),
+                            is_tokenized,
+                        ),
+                        normalize_kraken_currency(&value_string(market, "quote", "")),
+                    )
+                };
+                let exchange_symbol = if is_tokenized {
+                    non_empty_string(market, "altname").unwrap_or_else(|| symbol.clone())
+                } else {
+                    symbol.clone()
+                };
+                if is_tokenized && !seen_tokenized_symbols.insert(exchange_symbol.clone()) {
+                    continue;
+                }
+                rows.push(MarketInfo {
+                    exchange: "kraken".to_string(),
+                    exchange_symbol,
+                    product_symbol: format!("{base}-{quote}-SPOT"),
+                    product_type: "spot".to_string(),
+                    exchange_type: if is_tokenized {
+                        asset_class
+                    } else {
+                        "spot".to_string()
+                    },
+                    price_precision: market.get("tick_size").map_or_else(
+                        || decimal_precision(value_i32(market, "pair_decimals", 0)),
+                        json_string,
+                    ),
+                    size_precision: decimal_precision(value_i32(market, "lot_decimals", 0)),
+                    min_size: value_string(market, "ordermin", "0"),
+                    base_currency: base,
+                    quote_currency: quote,
+                    min_notional: value_string(market, "costmin", "0"),
+                    size_per_contract: "1".to_string(),
+                });
             }
-            let wsname = value_string(market, "wsname", "");
-            let (base, quote) = if let Some((base, quote)) = wsname.split_once('/') {
-                (
-                    normalize_kraken_currency(base),
-                    normalize_kraken_currency(quote),
-                )
-            } else {
-                (
-                    normalize_kraken_currency(&value_string(market, "base", "")),
-                    normalize_kraken_currency(&value_string(market, "quote", "")),
-                )
-            };
-            rows.push(MarketInfo {
-                exchange: "kraken".to_string(),
-                exchange_symbol: symbol.clone(),
-                product_symbol: format!("{base}-{quote}-SPOT"),
-                product_type: "spot".to_string(),
-                exchange_type: "spot".to_string(),
-                price_precision: market.get("tick_size").map_or_else(
-                    || decimal_precision(value_i32(market, "pair_decimals", 0)),
-                    json_string,
-                ),
-                size_precision: decimal_precision(value_i32(market, "lot_decimals", 0)),
-                min_size: value_string(market, "ordermin", "0"),
-                base_currency: base,
-                quote_currency: quote,
-                min_notional: value_string(market, "costmin", "0"),
-                size_per_contract: "1".to_string(),
-            });
         }
     }
     for market in response_array(&futures, &["instruments"]) {

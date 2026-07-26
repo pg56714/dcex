@@ -6,6 +6,7 @@ fn normalizes_exchange_specific_currency_aliases() {
     assert_eq!(normalize_kucoin_currency("XBT"), "BTC");
     assert_eq!(normalize_kraken_currency("XXBT"), "BTC");
     assert_eq!(normalize_kraken_currency("ZUSD"), "USD");
+    assert_eq!(normalize_kraken_spot_currency("XOMx", true), "XOMx");
 }
 
 #[test]

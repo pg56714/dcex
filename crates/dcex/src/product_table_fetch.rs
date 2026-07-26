@@ -263,6 +263,14 @@ fn normalize_kraken_currency(value: &str) -> String {
     value.to_string()
 }
 
+fn normalize_kraken_spot_currency(value: &str, tokenized_asset: bool) -> String {
+    if tokenized_asset {
+        value.to_string()
+    } else {
+        normalize_kraken_currency(value)
+    }
+}
+
 fn kraken_size_precision(market: &Value) -> String {
     let precision = value_i32(market, "contractValueTradePrecision", 0);
     if precision > 0 {

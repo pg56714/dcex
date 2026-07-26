@@ -116,6 +116,50 @@ class PrivateClient(AsyncWebSocketMixin):
         raise RuntimeError(f"Unexpected Binance WebSocket event payload: {event!r}")
 
 
+class EquityClient(AsyncWebSocketMixin):
+    """Async Binance Equity WebSocket client for one documented stock stream."""
+
+    def __init__(
+        self,
+        stream: str,
+        product_symbol: str | None = None,
+        interval: str | None = None,
+        listen_key: str | None = None,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+    ) -> None:
+        """Create a Binance Equity market-data or order-report stream."""
+        self._native_client = _native.BinanceEquityWebSocketClient(
+            stream=stream,
+            product_symbol=product_symbol,
+            interval=interval,
+            listen_key=listen_key,
+            timeout=timeout,
+            base_url=base_url,
+        )
+
+    @property
+    def url(self) -> str:
+        """Return the resolved Binance Equity WebSocket URL."""
+        return str(self._native_client.url())
+
+    async def connect(self) -> None:
+        """Open the WebSocket connection."""
+        await self._native_client.connect()
+
+    async def close(self) -> None:
+        """Close the WebSocket connection."""
+        await self._native_client.close()
+
+    async def recv(self) -> dict[str, Any] | list[Any]:
+        """Receive and decode one Equity WebSocket event."""
+        body = await self._native_client.recv()
+        event = json.loads(bytes(body))
+        if isinstance(event, dict | list):
+            return event
+        raise RuntimeError(f"Unexpected Binance Equity WebSocket event payload: {event!r}")
+
+
 def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
     """Create an async Binance Spot public market WebSocket client."""
     return PublicClient(timeout=timeout, base_url=base_url)
@@ -140,4 +184,23 @@ def private(
     )
 
 
-__all__ = ["PrivateClient", "PublicClient", "private", "public"]
+def equity(
+    stream: str,
+    product_symbol: str | None = None,
+    interval: str | None = None,
+    listen_key: str | None = None,
+    timeout: float = 10.0,
+    base_url: str | None = None,
+) -> EquityClient:
+    """Create a Binance Equity market-data or order-report WebSocket client."""
+    return EquityClient(
+        stream=stream,
+        product_symbol=product_symbol,
+        interval=interval,
+        listen_key=listen_key,
+        timeout=timeout,
+        base_url=base_url,
+    )
+
+
+__all__ = ["EquityClient", "PrivateClient", "PublicClient", "equity", "private", "public"]

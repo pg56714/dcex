@@ -13,6 +13,25 @@ impl KrakenClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let mut params = KrakenParams::from_pairs(params).into_inner();
+        if matches!(
+            method_name,
+            "get_spot_spread"
+                | "get_spot_ticker"
+                | "get_spot_orderbook"
+                | "get_spot_public_trades"
+                | "get_spot_kline"
+        ) && !params.iter().any(|(key, _)| key == "asset_class")
+        {
+            let inferred_asset_class = params
+                .iter()
+                .find(|(key, _)| key == "product_symbol")
+                .map(|(_, value)| self.spot_asset_class(value))
+                .transpose()?
+                .flatten();
+            if let Some(asset_class) = inferred_asset_class {
+                params.push(("asset_class".to_string(), asset_class));
+            }
+        }
         let (auth, path) = match method_name {
             "get_server_time" => (KrakenAuth::Spot, SPOT_SERVER_TIME.to_string()),
             "get_spot_system_status" => (KrakenAuth::Spot, SPOT_SYSTEM_STATUS.to_string()),

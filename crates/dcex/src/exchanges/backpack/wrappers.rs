@@ -12,6 +12,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_market(product_symbol => "product_symbol"),
         get_order_book_depth(product_symbol => "product_symbol"),
         get_market_sessions(),
+        get_market_holidays(),
         get_securities(),
         get_mark_prices(),
         get_open_interest(),

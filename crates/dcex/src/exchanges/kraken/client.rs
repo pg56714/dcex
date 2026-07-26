@@ -278,6 +278,27 @@ impl KrakenClient {
         Ok(exchange_symbol_fallback(product_symbol, futures_prefix))
     }
 
+    pub(super) fn spot_asset_class(&self, product_symbol: &str) -> Result<Option<String>> {
+        if is_canonical_product_symbol(product_symbol) {
+            if let Some(table) = &self.product_table {
+                let exchange_type =
+                    table.get_exchange_type("kraken", Some(product_symbol), None)?;
+                if exchange_type == "tokenized_asset" {
+                    return Ok(Some(exchange_type));
+                }
+                return Ok(None);
+            }
+            if product_symbol
+                .split('-')
+                .next()
+                .is_some_and(|base| base.ends_with('x'))
+            {
+                return Ok(Some("tokenized_asset".to_string()));
+            }
+        }
+        Ok(None)
+    }
+
     pub(super) fn push_product_symbol(
         &self,
         query: &mut Vec<(String, String)>,

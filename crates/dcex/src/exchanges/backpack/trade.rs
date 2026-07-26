@@ -51,6 +51,9 @@ impl BackpackClient {
         if let Some(response) = self.account_private_request(method_name, &params).await? {
             return Ok(response);
         }
+        if let Some(response) = self.rfq_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.trade_private_request(method_name, &params).await? {
             return Ok(response);
         }

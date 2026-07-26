@@ -27,8 +27,12 @@ impl RequestSigner for BinanceSigner {
                 ));
             }
         };
-        params.push(("timestamp".to_string(), timestamp_ms.to_string()));
-        params.push(("recvWindow".to_string(), "5000".to_string()));
+        if !params.iter().any(|(key, _)| key == "timestamp") {
+            params.push(("timestamp".to_string(), timestamp_ms.to_string()));
+        }
+        if !params.iter().any(|(key, _)| key == "recvWindow") {
+            params.push(("recvWindow".to_string(), "5000".to_string()));
+        }
         let encoded = encode_params(params);
         let signature = hmac_sha256_hex(self.api_secret.as_bytes(), encoded.as_bytes())?;
         params.push(("signature".to_string(), signature));

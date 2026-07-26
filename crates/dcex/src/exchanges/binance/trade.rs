@@ -53,9 +53,13 @@ impl BinanceClient {
         order_type: &str,
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
-        if self.market_for_product_symbol(product_symbol)? == BinanceMarket::Futures
-            && is_futures_conditional_order(order_type)
-        {
+        let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            return self
+                .send_place_equity_order(product_symbol, side, order_type, extra_params)
+                .await;
+        }
+        if market == BinanceMarket::Futures && is_futures_conditional_order(order_type) {
             return self
                 .send_place_futures_algo_order(
                     product_symbol,
@@ -101,9 +105,13 @@ impl BinanceClient {
         order_type: &str,
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
-        if self.market_for_product_symbol(product_symbol)? == BinanceMarket::Futures
-            && is_futures_conditional_order(order_type)
-        {
+        let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            return Err(DcexError::InvalidInput(
+                "Binance does not provide a test-order endpoint for Equity orders.".to_string(),
+            ));
+        }
+        if market == BinanceMarket::Futures && is_futures_conditional_order(order_type) {
             return Err(DcexError::InvalidInput(
                 "Binance does not provide a test endpoint for USD-M futures conditional algo orders."
                     .to_string(),
@@ -477,7 +485,13 @@ impl BinanceClient {
         price: &str,
         request: BinancePostOnlyOrderParams<'_>,
     ) -> Result<ValidatedResponse> {
-        if self.market_for_product_symbol(product_symbol)? == BinanceMarket::Spot {
+        let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            return Err(DcexError::InvalidInput(
+                "Binance Equity does not support post-only orders.".to_string(),
+            ));
+        }
+        if market == BinanceMarket::Spot {
             self.send_place_order(
                 product_symbol,
                 side,
@@ -599,6 +613,23 @@ impl BinanceClient {
         request: BinanceOrderLookupParams<'_>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            if request.order_id.is_some() || request.orig_client_order_id.is_some() {
+                return Err(DcexError::InvalidInput(
+                    "Binance Equity open-orders does not accept an order identifier; use get_order instead."
+                        .to_string(),
+                ));
+            }
+            return self
+                .request(
+                    HttpMethod::Get,
+                    BinanceMarket::Equity,
+                    EQUITY_OPEN_ORDERS,
+                    Vec::new(),
+                    true,
+                )
+                .await;
+        }
         let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
         let path = if market == BinanceMarket::Spot {
             SPOT_OPEN_ORDERS
@@ -630,6 +661,17 @@ impl BinanceClient {
         } else {
             market_from_type(request.market_type.unwrap_or("spot"))
         };
+        if market == BinanceMarket::Equity {
+            return self
+                .request(
+                    HttpMethod::Get,
+                    BinanceMarket::Equity,
+                    EQUITY_OPEN_ORDERS,
+                    Vec::new(),
+                    true,
+                )
+                .await;
+        }
         let path = if market == BinanceMarket::Spot {
             SPOT_OPEN_ORDERS
         } else {
@@ -646,6 +688,17 @@ impl BinanceClient {
 
     pub async fn cancel_all_open_orders(&self, product_symbol: &str) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            return self
+                .request(
+                    HttpMethod::Post,
+                    BinanceMarket::Equity,
+                    EQUITY_ORDER_CANCEL_ALL,
+                    Vec::new(),
+                    true,
+                )
+                .await;
+        }
         let path = if market == BinanceMarket::Spot {
             SPOT_OPEN_ORDERS
         } else {
@@ -697,6 +750,39 @@ impl BinanceClient {
         request: BinanceAllOrdersParams<'_>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            if request.order_id.is_some() {
+                return Err(DcexError::InvalidInput(
+                    "Binance Equity order history does not accept orderId; use get_order instead."
+                        .to_string(),
+                ));
+            }
+            let start_time = request.start_time.ok_or_else(|| {
+                DcexError::InvalidInput(
+                    "Binance Equity order history requires startTime.".to_string(),
+                )
+            })?;
+            let end_time = request.end_time.ok_or_else(|| {
+                DcexError::InvalidInput(
+                    "Binance Equity order history requires endTime.".to_string(),
+                )
+            })?;
+            let mut params = vec![
+                ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
+                ("startTime".to_string(), start_time.to_string()),
+                ("endTime".to_string(), end_time.to_string()),
+            ];
+            push_optional(&mut params, "size", request.limit);
+            return self
+                .request(
+                    HttpMethod::Get,
+                    BinanceMarket::Equity,
+                    EQUITY_ORDER_HISTORY,
+                    params,
+                    true,
+                )
+                .await;
+        }
         let path = if market == BinanceMarket::Spot {
             SPOT_ALL_ORDERS
         } else {
@@ -728,6 +814,39 @@ impl BinanceClient {
         request: BinanceAccountTradesParams<'_>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            if request.from_id.is_some() {
+                return Err(DcexError::InvalidInput(
+                    "Binance Equity trade history does not accept fromId.".to_string(),
+                ));
+            }
+            let start_time = request.start_time.ok_or_else(|| {
+                DcexError::InvalidInput(
+                    "Binance Equity trade history requires startTime.".to_string(),
+                )
+            })?;
+            let end_time = request.end_time.ok_or_else(|| {
+                DcexError::InvalidInput(
+                    "Binance Equity trade history requires endTime.".to_string(),
+                )
+            })?;
+            let mut params = vec![
+                ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
+                ("startTime".to_string(), start_time.to_string()),
+                ("endTime".to_string(), end_time.to_string()),
+            ];
+            push_optional(&mut params, "orderId", request.order_id);
+            push_optional(&mut params, "size", request.limit);
+            return self
+                .request(
+                    HttpMethod::Get,
+                    BinanceMarket::Equity,
+                    EQUITY_TRADE_HISTORY,
+                    params,
+                    true,
+                )
+                .await;
+        }
         let path = if market == BinanceMarket::Spot {
             SPOT_ACCOUNT_TRADES
         } else {
@@ -775,11 +894,22 @@ impl BinanceClient {
         extra_params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            if test {
+                return Err(DcexError::InvalidInput(
+                    "Binance does not provide a test-order endpoint for Equity orders.".to_string(),
+                ));
+            }
+            return self
+                .send_place_equity_order(product_symbol, side, order_type, extra_params)
+                .await;
+        }
         let path = match (market, test) {
             (BinanceMarket::Spot, false) => SPOT_ORDER,
             (BinanceMarket::Spot, true) => SPOT_TEST_ORDER,
             (BinanceMarket::Futures, false) => FUTURES_ORDER,
             (BinanceMarket::Futures, true) => FUTURES_TEST_ORDER,
+            (BinanceMarket::Equity, _) => unreachable!("handled above"),
         };
         let mut params = vec![
             ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
@@ -825,6 +955,37 @@ impl BinanceClient {
             ));
         }
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            let order_id = request.order_id.ok_or_else(|| {
+                DcexError::InvalidInput("Binance Equity order lookup requires orderId.".to_string())
+            })?;
+            if request.orig_client_order_id.is_some()
+                || request.new_client_order_id.is_some()
+                || request.cancel_restrictions.is_some()
+            {
+                return Err(DcexError::InvalidInput(
+                    "Binance Equity order lookup supports orderId only.".to_string(),
+                ));
+            }
+            let (method, path) = match method {
+                HttpMethod::Get => (HttpMethod::Get, EQUITY_ORDER_DETAIL),
+                HttpMethod::Delete => (HttpMethod::Post, EQUITY_ORDER_CANCEL),
+                _ => {
+                    return Err(DcexError::InvalidInput(
+                        "unsupported Binance Equity order lookup method.".to_string(),
+                    ))
+                }
+            };
+            return self
+                .request(
+                    method,
+                    BinanceMarket::Equity,
+                    path,
+                    vec![("orderId".to_string(), order_id.to_string())],
+                    true,
+                )
+                .await;
+        }
         let path = if market == BinanceMarket::Spot {
             SPOT_ORDER
         } else {

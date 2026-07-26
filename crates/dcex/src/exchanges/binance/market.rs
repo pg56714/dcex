@@ -11,10 +11,10 @@ use crate::{DcexError, Result};
 
 impl BinanceClient {
     pub async fn get_server_time(&self, market_type: &str) -> Result<ValidatedResponse> {
-        let (market, path) = if market_type == "spot" {
-            (BinanceMarket::Spot, SPOT_SERVER_TIME)
-        } else {
-            (BinanceMarket::Futures, FUTURES_SERVER_TIME)
+        let (market, path) = match market_type.to_ascii_lowercase().as_str() {
+            "equity" | "stock" => (BinanceMarket::Equity, SPOT_SERVER_TIME),
+            "spot" => (BinanceMarket::Spot, SPOT_SERVER_TIME),
+            _ => (BinanceMarket::Futures, FUTURES_SERVER_TIME),
         };
         self.request(HttpMethod::Get, market, path, Vec::new(), false)
             .await
@@ -216,6 +216,12 @@ impl BinanceClient {
         push_optional_display(&mut params, "endTime", request.end_time);
         push_optional_display(&mut params, "limit", request.limit);
         let market = self.market_for_product_symbol(product_symbol)?;
+        if market == BinanceMarket::Equity {
+            return Err(DcexError::InvalidInput(
+                "Binance Equity klines are available through the Equity WebSocket streams, not the Spot or Futures REST kline endpoints."
+                    .to_string(),
+            ));
+        }
         if market == BinanceMarket::Spot {
             push_optional(&mut params, "timeZone", request.time_zone.as_deref());
         }
@@ -551,6 +557,9 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
+        if let Some(response) = self.equity_public_request(method_name, &params).await? {
+            return Ok(response);
+        }
         match method_name {
             "get_server_time" => {
                 self.get_server_time(params.get("market_type").unwrap_or("spot"))

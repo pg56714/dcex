@@ -9,7 +9,9 @@ use std::{
 
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::SPOT_BASE_URL;
-use super::params::{market_for_product_symbol_fallback, normalize_order_side};
+use super::params::{
+    exchange_symbol_fallback, market_for_product_symbol_fallback, normalize_order_side,
+};
 use super::signing::BinanceSigner;
 use crate::exchange::RequestSigner;
 use crate::http::{block_on, HttpMethod, HttpRequest};
@@ -154,6 +156,19 @@ fn product_symbol_selects_expected_market() {
         market_for_product_symbol_fallback("BTC-USDT-SWAP"),
         BinanceMarket::Futures
     );
+    assert_eq!(
+        market_for_product_symbol_fallback("AAPL-USDC-EQUITY"),
+        BinanceMarket::Equity
+    );
+    assert_eq!(exchange_symbol_fallback("AAPL-USDC-EQUITY"), "AAPL");
+}
+
+#[test]
+fn raw_auto_identifies_equity_paths() {
+    assert_eq!(
+        BinanceMarket::from_path("/sapi/v1/equity/order/place").expect("market"),
+        BinanceMarket::Equity
+    );
 }
 
 #[test]
@@ -248,6 +263,170 @@ fn product_table_overrides_symbol_fallback() {
             .market_for_product_symbol("BTC-USDT-250627")
             .expect("market"),
         BinanceMarket::Futures
+    );
+}
+
+#[test]
+fn product_table_selects_equity_market() {
+    let table = ProductTable::new(vec![crate::product_table::MarketInfo {
+        exchange: "binance".to_string(),
+        exchange_symbol: "AAPL".to_string(),
+        product_symbol: "AAPL-USDC-EQUITY".to_string(),
+        product_type: "equity".to_string(),
+        exchange_type: "equity".to_string(),
+        price_precision: "0.01".to_string(),
+        size_precision: "0.0001".to_string(),
+        min_size: "0.0001".to_string(),
+        base_currency: "AAPL".to_string(),
+        quote_currency: "USDC".to_string(),
+        min_notional: "1".to_string(),
+        size_per_contract: "1".to_string(),
+    }]);
+    let client = BinanceClient::public(Duration::from_secs(1))
+        .expect("client")
+        .with_product_table(table);
+
+    assert_eq!(
+        client
+            .market_for_product_symbol("AAPL-USDC-EQUITY")
+            .expect("market"),
+        BinanceMarket::Equity
+    );
+    assert_eq!(
+        client.exchange_symbol("AAPL-USDC-EQUITY").expect("symbol"),
+        "AAPL"
+    );
+}
+
+#[test]
+fn equity_market_data_uses_dedicated_path() {
+    let (spot_base_url, handle) = recording_server();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        None,
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .public_request(
+                "get_equity_quote",
+                vec![("product_symbol".to_string(), "AAPL-USDC-EQUITY".to_string())],
+            )
+            .await
+    })
+    .expect("response");
+
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /sapi/v1/equity/market/quote?symbol=AAPL HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn equity_order_uses_dedicated_signed_path() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "place_equity_order",
+                vec![
+                    ("product_symbol".to_string(), "AAPL-USDC-EQUITY".to_string()),
+                    ("side".to_string(), "SELL".to_string()),
+                    ("orderType".to_string(), "MARKET".to_string()),
+                    ("quantity".to_string(), "0.5".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("POST /sapi/v1/equity/order/place HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn equity_order_matrix_is_validated_before_requesting() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "place_equity_order",
+                vec![
+                    ("product_symbol".to_string(), "AAPL-USDC-EQUITY".to_string()),
+                    ("side".to_string(), "BUY".to_string()),
+                    ("orderType".to_string(), "MARKET".to_string()),
+                    ("quantity".to_string(), "1".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("BUY MARKET quantity must fail");
+    assert!(
+        error.to_string().contains("require notional"),
+        "unexpected error: {error}"
+    );
+
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "place_equity_order",
+                vec![
+                    ("product_symbol".to_string(), "AAPL-USDC-EQUITY".to_string()),
+                    ("side".to_string(), "BUY".to_string()),
+                    ("orderType".to_string(), "LIMIT".to_string()),
+                    ("quantity".to_string(), "1".to_string()),
+                    ("price".to_string(), "200".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("LIMIT without session must fail");
+    assert!(error.to_string().contains("tradingSession"));
+}
+
+#[test]
+fn signer_preserves_a_custom_recv_window() {
+    let signer = BinanceSigner {
+        api_key: "api-key".to_string(),
+        api_secret: "secret".to_string(),
+        timestamp_offset_ms: Arc::new(Mutex::new(None)),
+    };
+    let mut request = HttpRequest::new(
+        HttpMethod::Post,
+        SPOT_BASE_URL,
+        "/sapi/v1/equity/order/place",
+    )
+    .form(vec![("recvWindow".to_string(), "9000".to_string())]);
+
+    signer
+        .sign(&mut request, 1_700_000_000_000)
+        .expect("signature");
+
+    let crate::http::RequestBody::Form(params) = request.body else {
+        panic!("expected form body");
+    };
+    assert_eq!(
+        params
+            .iter()
+            .filter(|(key, _)| key == "recvWindow")
+            .collect::<Vec<_>>(),
+        vec![&("recvWindow".to_string(), "9000".to_string())]
     );
 }
 

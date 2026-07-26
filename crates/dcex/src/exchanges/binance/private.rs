@@ -78,6 +78,9 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
+        if let Some(response) = self.equity_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
         match method_name {
             "get_spot_fee_rates" => {
                 self.get_spot_fee_rates(params.required("product_symbol")?)

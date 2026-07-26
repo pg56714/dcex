@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use dcex::ws::binance::{BinancePrivateWebSocket, BinancePublicWebSocket};
+use dcex::ws::binance::{BinanceEquityWebSocket, BinancePrivateWebSocket, BinancePublicWebSocket};
 use tokio::sync::Mutex;
 
 use super::*;
@@ -13,6 +13,100 @@ struct PythonBinancePublicWebSocketClient {
 #[pyclass(name = "BinancePrivateWebSocketClient")]
 struct PythonBinancePrivateWebSocketClient {
     client: Arc<Mutex<BinancePrivateWebSocket>>,
+}
+
+#[pyclass(name = "BinanceEquityWebSocketClient")]
+struct PythonBinanceEquityWebSocketClient {
+    client: Arc<Mutex<BinanceEquityWebSocket>>,
+}
+
+#[pymethods]
+impl PythonBinanceEquityWebSocketClient {
+    #[new]
+    #[pyo3(signature = (
+        stream,
+        product_symbol=None,
+        interval=None,
+        listen_key=None,
+        timeout=10.0,
+        base_url=None
+    ))]
+    fn new(
+        stream: String,
+        product_symbol: Option<String>,
+        interval: Option<String>,
+        listen_key: Option<String>,
+        timeout: f64,
+        base_url: Option<String>,
+    ) -> PyResult<Self> {
+        let timeout = websocket_timeout(timeout)?;
+        let client = if let Some(base_url) = base_url {
+            BinanceEquityWebSocket::with_base_url(
+                &stream,
+                product_symbol.as_deref(),
+                interval.as_deref(),
+                listen_key.as_deref(),
+                timeout,
+                base_url,
+            )
+        } else {
+            BinanceEquityWebSocket::new(
+                &stream,
+                product_symbol.as_deref(),
+                interval.as_deref(),
+                listen_key.as_deref(),
+                timeout,
+            )
+        }
+        .map_err(to_py_runtime_error)?;
+        Ok(Self {
+            client: Arc::new(Mutex::new(client)),
+        })
+    }
+
+    fn url(&self) -> PyResult<String> {
+        let client = self.client.try_lock().map_err(|_| {
+            PyRuntimeError::new_err("Binance Equity WebSocket client is busy; try again later.")
+        })?;
+        Ok(client.url().to_string())
+    }
+
+    fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .connect()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .close()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let body = client
+                .lock()
+                .await
+                .recv_bytes()
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+        })
+    }
 }
 
 #[pymethods]
@@ -297,5 +391,6 @@ impl PythonBinancePrivateWebSocketClient {
 
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PythonBinancePublicWebSocketClient>()?;
-    m.add_class::<PythonBinancePrivateWebSocketClient>()
+    m.add_class::<PythonBinancePrivateWebSocketClient>()?;
+    m.add_class::<PythonBinanceEquityWebSocketClient>()
 }
