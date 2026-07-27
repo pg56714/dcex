@@ -20,6 +20,10 @@ impl HyperliquidClient {
                 insert_optional_string(&mut payload, "dex", optional_nonempty(&params, "dex")?);
                 payload
             }
+            "get_perp_dexs" => {
+                params.ensure_allowed(&[])?;
+                json!({"type": "perpDexs"})
+            }
             "get_spot_meta" => {
                 params.ensure_allowed(&[])?;
                 json!({"type": "spotMeta"})

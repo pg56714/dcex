@@ -11,6 +11,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_l2book(product_symbol => "product_symbol"),
         get_meta(),
         get_meta_and_asset_ctxs(),
+        get_perp_dexs(),
         get_spot_meta(),
         get_spot_meta_and_asset_ctxs(),
         historical_orders(user => "user"),

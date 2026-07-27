@@ -16,6 +16,12 @@ async def test_get_meta(client):
 
 
 @pytest.mark.asyncio
+async def test_get_perp_dexs(client):
+    res = await client.get_perp_dexs()
+    assert res is not None
+
+
+@pytest.mark.asyncio
 async def test_get_spot_meta(client):
     res = await client.get_spot_meta()
     assert res is not None

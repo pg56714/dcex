@@ -26,6 +26,10 @@ class MarketHTTP(HTTPManager):
         """Get market metadata."""
         return await self._native_public("get_meta", self._native_params(dex=dex))
 
+    async def get_perp_dexs(self) -> list[dict[str, Any] | None]:
+        """Get the available perpetual DEXs."""
+        return await self._native_public("get_perp_dexs", [])
+
     async def get_spot_meta(self) -> dict[str, Any]:
         """Get spot market metadata."""
         return await self._native_public("get_spot_meta", [])

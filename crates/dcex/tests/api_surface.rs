@@ -553,6 +553,7 @@ fn rust_direct_clients_expose_python_method_names() {
         get_l2book,
         get_meta,
         get_meta_and_asset_ctxs,
+        get_perp_dexs,
         get_spot_meta,
         get_spot_meta_and_asset_ctxs,
         historical_orders,

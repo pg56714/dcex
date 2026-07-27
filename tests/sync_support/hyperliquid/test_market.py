@@ -12,6 +12,11 @@ def test_get_meta(client):
     assert res is not None
 
 
+def test_get_perp_dexs(client):
+    res = client.get_perp_dexs()
+    assert res is not None
+
+
 def test_get_spot_meta(client):
     res = client.get_spot_meta()
     assert res is not None

@@ -18,7 +18,9 @@ from tests.unit.endpoint_wrapper_helpers import (
 from tests.unit.native_http_helpers import _http_server
 
 CURRENT_FIELDS = {
+    "get_meta": {"dex"},
     "get_meta_and_asset_ctxs": {"dex"},
+    "get_perp_dexs": set(),
     "get_l2book": {"product_symbol", "nSigFigs", "mantissa"},
     "get_candle_snapshot": {"product_symbol", "interval", "startTime", "endTime"},
     "place_future_market_order": {
@@ -73,6 +75,7 @@ def test_sync_hyperliquid_forwards_current_fields() -> None:
     client = _client_class("sync", "hyperliquid")(**_client_kwargs("hyperliquid"))
     calls = _wire_sync(client)
 
+    client.get_perp_dexs()
     client.get_meta_and_asset_ctxs(dex="xyz")
     client.get_l2book("BTC-USD-SWAP", nSigFigs=5, mantissa=2)
     client.place_future_market_buy_order(
@@ -83,11 +86,12 @@ def test_sync_hyperliquid_forwards_current_fields() -> None:
         cloid="0x1234567890abcdef1234567890abcdef",
     )
 
-    assert dict(calls[0]["query"]) == {"dex": "xyz"}
-    assert dict(calls[1]["query"])["nSigFigs"] == "5"
-    assert dict(calls[1]["query"])["mantissa"] == "2"
-    assert dict(calls[2]["query"])["slippage"] == "0.01"
-    assert dict(calls[2]["query"])["reduceOnly"] == "true"
+    assert dict(calls[0]["query"]) == {}
+    assert dict(calls[1]["query"]) == {"dex": "xyz"}
+    assert dict(calls[2]["query"])["nSigFigs"] == "5"
+    assert dict(calls[2]["query"])["mantissa"] == "2"
+    assert dict(calls[3]["query"])["slippage"] == "0.01"
+    assert dict(calls[3]["query"])["reduceOnly"] == "true"
 
 
 @pytest.mark.asyncio
@@ -121,6 +125,7 @@ def _native_client(base_url: str, *, private: bool = False) -> object:
 
 def test_native_hyperliquid_current_info_payloads_match_docs() -> None:
     responses = [
+        [None, {"name": "xyz"}],
         [{"universe": []}, []],
         {"coin": "BTC", "levels": [[], []], "time": 1},
         [],
@@ -128,6 +133,7 @@ def test_native_hyperliquid_current_info_payloads_match_docs() -> None:
     ]
     with _http_server(responses) as (base_url, received):
         client = _native_client(base_url)
+        client.public_request_json("get_perp_dexs", [])
         client.public_request_json("get_meta_and_asset_ctxs", [("dex", "xyz")])
         client.public_request_json(
             "get_l2book",
@@ -149,6 +155,7 @@ def test_native_hyperliquid_current_info_payloads_match_docs() -> None:
 
     payloads = [json.loads(received.get_nowait()["body"]) for _ in responses]
     assert payloads == [
+        {"type": "perpDexs"},
         {"type": "metaAndAssetCtxs", "dex": "xyz"},
         {"type": "l2Book", "coin": "BTC", "nSigFigs": 5, "mantissa": 2},
         {
@@ -247,9 +254,7 @@ def test_native_hyperliquid_rejects_invalid_current_parameters_before_transport(
 ) -> None:
     client = _native_client("http://127.0.0.1:1", private=method_name == "place_order")
     request = (
-        client.private_request_json
-        if method_name == "place_order"
-        else client.public_request_json
+        client.private_request_json if method_name == "place_order" else client.public_request_json
     )
 
     with pytest.raises(ValueError, match=message):

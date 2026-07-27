@@ -188,6 +188,19 @@ fn binance_product_symbol(base: &str, quote: &str, symbol: &str, spot: bool) -> 
     )
 }
 
+fn canonical_market_pair(
+    market: &Value,
+    display_key: &str,
+    exchange_symbol: &str,
+) -> Result<(String, String)> {
+    if let Some(display_symbol) = non_empty_string(market, display_key) {
+        if let Ok(pair) = split_last(&display_symbol, '-') {
+            return Ok(pair);
+        }
+    }
+    split_last(exchange_symbol, '-')
+}
+
 fn binance_product_type(contract_type: &str) -> &'static str {
     if contract_type == "PERPETUAL" || contract_type == "TRADIFI_PERPETUAL" {
         "swap"

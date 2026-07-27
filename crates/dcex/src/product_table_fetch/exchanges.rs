@@ -226,7 +226,7 @@ pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let mut rows = Vec::new();
     for market in response_array(&swap, &["data"]) {
         let symbol = required_string(market, "symbol")?;
-        let (base, quote) = split_last(&symbol, '-')?;
+        let (base, quote) = canonical_market_pair(market, "displayName", &symbol)?;
         let price_places = value_i32(market, "pricePrecision", 0);
         let quantity_places = value_i32(market, "quantityPrecision", 0);
         rows.push(MarketInfo {
@@ -418,8 +418,7 @@ pub(super) async fn fetch_extended(timeout: Duration) -> Result<Vec<MarketInfo>>
 fn extended_market_info(market: &Value) -> Result<MarketInfo> {
     let symbol = required_string(market, "name")?;
     let market_type = value_string(market, "type", "PERPETUAL");
-    let base = required_string(market, "assetName")?;
-    let quote = required_string(market, "collateralAssetName")?;
+    let (base, quote) = canonical_market_pair(market, "uiName", &symbol)?;
     let config = market.get("tradingConfig").unwrap_or(&Value::Null);
     let product_type = if market_type == "SPOT" {
         "spot"
@@ -449,33 +448,78 @@ fn extended_market_info(market: &Value) -> Result<MarketInfo> {
 pub(super) async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = HyperliquidClient::public(false, timeout)?;
     let perpetual = client.public_request("get_meta", Vec::new()).await?;
+    let perpetual_dexs = client.public_request("get_perp_dexs", Vec::new()).await?;
     let spot = client.public_request("get_spot_meta", Vec::new()).await?;
     let mut rows = Vec::new();
-    for (index, market) in response_array(&perpetual, &["universe"]).iter().enumerate() {
-        let coin = required_string(market, "name")?;
-        let precision = decimal_precision(value_i32(market, "szDecimals", 0));
-        rows.push(MarketInfo {
-            exchange: "hyperliquid".to_string(),
-            exchange_symbol: format!("[\"{coin}\", {index}]"),
-            product_symbol: format!("{coin}-USD-SWAP"),
-            product_type: "swap".to_string(),
-            exchange_type: "perpetual".to_string(),
-            price_precision: precision.clone(),
-            size_precision: precision.clone(),
-            min_size: precision,
-            base_currency: coin,
-            quote_currency: "USD".to_string(),
-            min_notional: "0".to_string(),
-            size_per_contract: "1".to_string(),
-        });
+    append_hyperliquid_perpetual_rows(&mut rows, &perpetual, 0)?;
+    for (dex_index, dex) in value_array(Some(&perpetual_dexs.data))
+        .iter()
+        .enumerate()
+        .skip(1)
+    {
+        let Some(dex_name) = non_empty_string(dex, "name") else {
+            continue;
+        };
+        let metadata = client
+            .public_request("get_meta", vec![("dex".to_string(), dex_name)])
+            .await?;
+        let asset_offset = 100_000 + dex_index as u64 * 10_000;
+        append_hyperliquid_perpetual_rows(&mut rows, &metadata, asset_offset)?;
     }
+    append_hyperliquid_spot_rows(&mut rows, &spot)?;
+    Ok(rows)
+}
+
+fn append_hyperliquid_perpetual_rows(
+    rows: &mut Vec<MarketInfo>,
+    metadata: &crate::exchange::ValidatedResponse,
+    asset_offset: u64,
+) -> Result<()> {
+    for (index, market) in response_array(metadata, &["universe"]).iter().enumerate() {
+        rows.push(hyperliquid_perpetual_market_info(
+            market,
+            asset_offset + index as u64,
+        )?);
+    }
+    Ok(())
+}
+
+pub(super) fn hyperliquid_perpetual_market_info(
+    market: &Value,
+    asset_id: u64,
+) -> Result<MarketInfo> {
+    let coin = required_string(market, "name")?;
+    let base = coin
+        .rsplit_once(':')
+        .map_or_else(|| coin.clone(), |(_, base)| base.to_string());
+    let precision = decimal_precision(value_i32(market, "szDecimals", 0));
+    Ok(MarketInfo {
+        exchange: "hyperliquid".to_string(),
+        exchange_symbol: format!("[\"{coin}\", {asset_id}]"),
+        product_symbol: format!("{coin}-USD-SWAP"),
+        product_type: "swap".to_string(),
+        exchange_type: "perpetual".to_string(),
+        price_precision: precision.clone(),
+        size_precision: precision.clone(),
+        min_size: precision,
+        base_currency: base,
+        quote_currency: "USD".to_string(),
+        min_notional: "0".to_string(),
+        size_per_contract: "1".to_string(),
+    })
+}
+
+fn append_hyperliquid_spot_rows(
+    rows: &mut Vec<MarketInfo>,
+    spot: &crate::exchange::ValidatedResponse,
+) -> Result<()> {
     let mut tokens = HashMap::new();
-    for token in response_array(&spot, &["tokens"]) {
+    for token in response_array(spot, &["tokens"]) {
         if let Some(index) = token.get("index").and_then(Value::as_i64) {
             tokens.insert(index, token);
         }
     }
-    for (index, market) in response_array(&spot, &["universe"]).iter().enumerate() {
+    for (index, market) in response_array(spot, &["universe"]).iter().enumerate() {
         let token_indexes = value_array(market.get("tokens"));
         if token_indexes.len() < 2 {
             continue;
@@ -518,7 +562,7 @@ pub(super) async fn fetch_hyperliquid(timeout: Duration) -> Result<Vec<MarketInf
             size_per_contract: "1".to_string(),
         });
     }
-    Ok(rows)
+    Ok(())
 }
 
 pub(super) async fn fetch_kucoin(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -787,8 +831,7 @@ pub(super) async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
         {
             continue;
         }
-        let base = required_string(market, "baseCoin")?;
-        let quote = required_string(market, "quoteCoin")?;
+        let (base, quote) = mexc_contract_pair(market)?;
         rows.push(MarketInfo {
             exchange: "mexc".to_string(),
             exchange_symbol: required_string(market, "symbol")?,
@@ -805,6 +848,14 @@ pub(super) async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
         });
     }
     Ok(rows)
+}
+
+pub(super) fn mexc_contract_pair(market: &Value) -> Result<(String, String)> {
+    let base = non_empty_string(market, "baseCoinName")
+        .map_or_else(|| required_string(market, "baseCoin"), Ok)?;
+    let quote = non_empty_string(market, "quoteCoinName")
+        .map_or_else(|| required_string(market, "quoteCoin"), Ok)?;
+    Ok((base, quote))
 }
 
 pub(super) async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {

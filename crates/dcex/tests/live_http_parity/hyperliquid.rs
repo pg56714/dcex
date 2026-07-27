@@ -11,6 +11,7 @@ async fn hyperliquid_public_live_parity() -> dcex::Result<()> {
     run_cases(
         vec![
             Case::new("get_meta", &[]),
+            Case::new("get_perp_dexs", &[]),
             Case::new("get_spot_meta", &[]),
             Case::new("get_meta_and_asset_ctxs", &[]),
             Case::new("get_l2book", &[("product_symbol", BTC_USD_SWAP)]),
@@ -30,6 +31,7 @@ async fn hyperliquid_public_live_parity() -> dcex::Result<()> {
                         get_l2book,
                         get_meta,
                         get_meta_and_asset_ctxs,
+                        get_perp_dexs,
                         get_spot_meta,
                     ]
                 )
