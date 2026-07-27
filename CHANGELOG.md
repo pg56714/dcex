@@ -1,3 +1,9 @@
+## 0.31.0 (2026-07-27)
+
+### Feat
+
+- expand tradfi product discovery
+
 ## 0.30.0 (2026-07-26)
 
 ### Feat
