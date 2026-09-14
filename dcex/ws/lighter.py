@@ -4,6 +4,8 @@ import json
 from typing import Any
 
 from .._native_http import load_native
+from ..lighter.credentials import LighterCredentials
+from ..lighter.network_enums import Network, normalize_network
 from ._base import AsyncWebSocketMixin
 
 _native = load_native()
@@ -17,12 +19,14 @@ class PublicClient(AsyncWebSocketMixin):
         testnet: bool = False,
         timeout: float = 10.0,
         base_url: str | None = None,
+        network: Network | str | None = None,
     ) -> None:
         """Create a Lighter public WebSocket client."""
         self._native_client = _native.LighterPublicWebSocketClient(
             testnet=testnet,
             timeout=timeout,
             base_url=base_url,
+            network=None if network is None else normalize_network(network).value,
         )
 
     async def connect(self) -> None:
@@ -106,6 +110,7 @@ class PrivateClient(AsyncWebSocketMixin):
         timeout: float = 10.0,
         ws_base_url: str | None = None,
         http_base_url: str | None = None,
+        network: Network | str | None = None,
     ) -> None:
         """Create a Lighter private WebSocket client."""
         self._native_client = _native.LighterPrivateWebSocketClient(
@@ -116,6 +121,25 @@ class PrivateClient(AsyncWebSocketMixin):
             timeout=timeout,
             ws_base_url=ws_base_url,
             http_base_url=http_base_url,
+            network=None if network is None else normalize_network(network).value,
+        )
+
+    @classmethod
+    def from_env(
+        cls,
+        network: Network | str = Network.MAINNET,
+        *,
+        timeout: float = 10.0,
+    ) -> "PrivateClient":
+        """Create a private WebSocket client from network-scoped credentials."""
+        resolved_network = normalize_network(network)
+        credentials = LighterCredentials.from_env(resolved_network)
+        return cls(
+            account_index=credentials.account_index,
+            api_key_index=credentials.api_key_index,
+            api_private_key=credentials.api_private_key,
+            network=resolved_network,
+            timeout=timeout,
         )
 
     def account_index(self) -> int:
@@ -223,9 +247,10 @@ def public(
     testnet: bool = False,
     timeout: float = 10.0,
     base_url: str | None = None,
+    network: Network | str | None = None,
 ) -> PublicClient:
     """Create an async Lighter public market WebSocket client."""
-    return PublicClient(testnet=testnet, timeout=timeout, base_url=base_url)
+    return PublicClient(testnet=testnet, timeout=timeout, base_url=base_url, network=network)
 
 
 def private(
@@ -236,6 +261,7 @@ def private(
     timeout: float = 10.0,
     ws_base_url: str | None = None,
     http_base_url: str | None = None,
+    network: Network | str | None = None,
 ) -> PrivateClient:
     """Create an async Lighter private user WebSocket client."""
     return PrivateClient(
@@ -246,7 +272,17 @@ def private(
         timeout=timeout,
         ws_base_url=ws_base_url,
         http_base_url=http_base_url,
+        network=network,
     )
 
 
-__all__ = ["PrivateClient", "PublicClient", "private", "public"]
+def private_from_env(
+    network: Network | str = Network.MAINNET,
+    *,
+    timeout: float = 10.0,
+) -> PrivateClient:
+    """Create a private WebSocket client from network-scoped credentials."""
+    return PrivateClient.from_env(network=network, timeout=timeout)
+
+
+__all__ = ["PrivateClient", "PublicClient", "private", "private_from_env", "public"]

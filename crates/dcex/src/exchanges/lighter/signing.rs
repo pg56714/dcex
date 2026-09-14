@@ -11,20 +11,6 @@ use crate::{DcexError, Result};
 const DEFAULT_TX_EXPIRY_MS: u64 = 590_000;
 const DEFAULT_ORDER_EXPIRY_MS: u64 = 28 * 24 * 60 * 60 * 1000;
 
-pub(super) fn chain_id(base_url: &str) -> u64 {
-    if base_url.contains("mainnet.zklighter") {
-        304
-    } else if base_url.contains("testnet.zklighter") {
-        300
-    } else if base_url.contains("api.rh.lighter") {
-        466_324
-    } else if base_url.contains("api.rh-testnet.lighter") {
-        300
-    } else {
-        304
-    }
-}
-
 pub(super) fn normalize_private_key(private_key: &str) -> Result<[u8; 40]> {
     let normalized = private_key.strip_prefix("0x").unwrap_or(private_key);
     let bytes = hex::decode(normalized).map_err(|error| {
@@ -257,15 +243,6 @@ fn unix_timestamp_secs() -> Result<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn maps_current_official_chain_ids() {
-        assert_eq!(chain_id("https://mainnet.zklighter.elliot.ai"), 304);
-        assert_eq!(chain_id("https://testnet.zklighter.elliot.ai"), 300);
-        assert_eq!(chain_id("https://api.rh.lighter.xyz"), 466_324);
-        assert_eq!(chain_id("https://api.rh-testnet.lighter.xyz"), 300);
-        assert_eq!(chain_id("http://localhost:8000"), 304);
-    }
 
     #[test]
     fn encodes_current_transaction_attributes() {

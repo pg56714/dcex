@@ -9,29 +9,27 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.lighter.client import Client
+from dcex.lighter import Network
+from dcex.lighter.credentials import credential_env_names
 from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
-ACCOUNT_INDEX = os.getenv("LIGHTER_ACCOUNT_INDEX")
-API_KEY_INDEX = os.getenv("LIGHTER_API_KEY_INDEX")
-API_PRIVATE_KEY = os.getenv("LIGHTER_API_PRIVATE_KEY")
+NETWORKS = (Network.MAINNET, Network.ROBINHOOD)
 L1_ADDRESS_RE = re.compile(r"^0x[a-fA-F0-9]{40}$")
 
 pytestmark = pytest.mark.private
 
 
-def _env_int(value: str | None) -> int:
-    return int(str(value or "0").strip().lstrip("#"))
-
-
-@pytest_asyncio.fixture
-async def client():
-    async with Client(
-        account_index=_env_int(ACCOUNT_INDEX),
-        api_key_index=_env_int(API_KEY_INDEX),
-        api_private_key=API_PRIVATE_KEY,
+@pytest_asyncio.fixture(params=NETWORKS, ids=lambda network: network.value)
+async def client(request):
+    network = request.param
+    missing = [name for name in credential_env_names(network) if not os.getenv(name)]
+    if missing:
+        pytest.skip(f"Set {', '.join(missing)} before running this private live test.")
+    async with Client.from_env(
         preload_product_table=False,
+        network=network,
     ) as client_instance:
         yield client_instance
 
@@ -41,14 +39,9 @@ def _assert_response(res) -> None:
     assert res.get("code", 200) == 200
 
 
-def _fail_if_no_export_data(exc: FailedRequestError) -> None:
-    if exc.status_code == 400 and (
-        "22504" in exc.message or "no export data found" in exc.message.lower()
-    ):
-        pytest.fail(
-            "Lighter account has no export data for the requested interval.",
-            pytrace=False,
-        )
+def _skip_if_no_export_data(exc: FailedRequestError) -> None:
+    if "22504" in exc.message or "no export data found" in exc.message.lower():
+        pytest.skip("Lighter account has no export data for the requested interval.")
 
 
 def _find_l1_address(value) -> str | None:
@@ -88,7 +81,7 @@ async def test_auth_token_and_key_check(client):
 
 @pytest.mark.asyncio
 async def test_private_account_reads(client):
-    account_index = _env_int(ACCOUNT_INDEX)
+    account_index = int(client.account_index)
     now = int(time.time())
 
     _assert_response(await client.get_account(by="index", value=str(account_index)))
@@ -97,7 +90,7 @@ async def test_private_account_reads(client):
     _assert_response(
         await client.get_api_keys(
             account_index=account_index,
-            api_key_index=_env_int(API_KEY_INDEX),
+            api_key_index=int(client.api_key_index),
         )
     )
     _assert_response(await client.get_account_active_orders())
@@ -124,7 +117,7 @@ async def test_private_account_reads(client):
 
 @pytest.mark.asyncio
 async def test_private_bridge_and_history_reads(client):
-    account_index = _env_int(ACCOUNT_INDEX)
+    account_index = int(client.account_index)
     l1_address = await _l1_address(client, account_index)
 
     _assert_response(await client.get_accounts_by_l1_address(l1_address=l1_address))
@@ -143,11 +136,11 @@ async def test_private_export_read(client):
     try:
         response = await client.get_export(
             type_="trade",
-            start_timestamp=now_ms - 86_400_000,
+            start_timestamp=now_ms - 364 * 86_400_000,
             end_timestamp=now_ms,
         )
     except FailedRequestError as exc:
-        _fail_if_no_export_data(exc)
+        _skip_if_no_export_data(exc)
         raise
 
     _assert_response(response)
@@ -155,7 +148,7 @@ async def test_private_export_read(client):
 
 @pytest.mark.asyncio
 async def test_private_referral_lease_reads(client):
-    account_index = _env_int(ACCOUNT_INDEX)
+    account_index = int(client.account_index)
     l1_address = await _l1_address(client, account_index)
 
     _assert_response(await client.get_liquidations(limit=5))

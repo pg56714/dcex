@@ -8,24 +8,13 @@ use serde_json::{Map, Value};
 
 use crate::{DcexError, Result};
 
-pub(crate) const MAINNET_HTTP_URL: &str = "https://mainnet.zklighter.elliot.ai";
-pub(crate) const TESTNET_HTTP_URL: &str = "https://testnet.zklighter.elliot.ai";
-pub(crate) const MAINNET_WS_URL: &str = "wss://mainnet.zklighter.elliot.ai/stream";
-pub(crate) const TESTNET_WS_URL: &str = "wss://testnet.zklighter.elliot.ai/stream";
+use super::chains::LighterNetwork;
 
-pub(crate) fn http_url(testnet: bool) -> &'static str {
+pub(crate) const fn legacy_network(testnet: bool) -> LighterNetwork {
     if testnet {
-        TESTNET_HTTP_URL
+        LighterNetwork::Testnet
     } else {
-        MAINNET_HTTP_URL
-    }
-}
-
-pub(crate) fn websocket_url(testnet: bool) -> &'static str {
-    if testnet {
-        TESTNET_WS_URL
-    } else {
-        MAINNET_WS_URL
+        LighterNetwork::Mainnet
     }
 }
 

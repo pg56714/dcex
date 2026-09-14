@@ -9,10 +9,12 @@ class _FakeNativeLighterPublicWebSocketClient:
         testnet: bool = False,
         timeout: float = 10.0,
         base_url: str | None = None,
+        network: str | None = None,
     ) -> None:
         self.testnet = testnet
         self.timeout = timeout
         self.base_url = base_url
+        self.network = network
         self.connected = False
         self.closed = False
         self.pings = 0
@@ -78,6 +80,7 @@ class _FakeNativeLighterPrivateWebSocketClient:
         timeout: float = 10.0,
         ws_base_url: str | None = None,
         http_base_url: str | None = None,
+        network: str | None = None,
     ) -> None:
         self._account_index = account_index
         self.api_key_index = api_key_index
@@ -86,6 +89,7 @@ class _FakeNativeLighterPrivateWebSocketClient:
         self.timeout = timeout
         self.ws_base_url = ws_base_url
         self.http_base_url = http_base_url
+        self.network = network
         self.connected = False
         self.closed = False
         self.pings = 0
@@ -188,6 +192,7 @@ async def test_lighter_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
         assert native_client.testnet is True
         assert native_client.timeout == 2
         assert native_client.base_url == "wss://example.test/stream"
+        assert native_client.network is None
 
         await ws.ping()
         await ws.subscribe_trades(0)
@@ -199,6 +204,22 @@ async def test_lighter_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
     assert native_client.subscriptions == ["trade/0", "order_book/1", "candle/2/1m"]
     assert event == {"channel": "trade:0", "type": "update/trade", "trades": []}
     assert native_client.closed is True
+
+
+@pytest.mark.asyncio
+async def test_lighter_robinhood_public_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.lighter import Network
+    from dcex.ws import lighter
+
+    monkeypatch.setattr(lighter, "_native", _FakeNative)
+
+    ws = lighter.public(network=Network.ROBINHOOD)
+    native_client = ws._native_client
+
+    assert native_client.testnet is False
+    assert native_client.base_url is None
+    assert native_client.network == "robinhood"
 
 
 @pytest.mark.asyncio
@@ -226,6 +247,7 @@ async def test_lighter_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> No
         assert native_client.timeout == 2
         assert native_client.ws_base_url == "wss://example.test/stream"
         assert native_client.http_base_url == "https://example.test"
+        assert native_client.network is None
         assert ws.account_index() == 42
         assert ws.create_auth_token(deadline=60, api_key_index=7) == "token:60:7"
 
@@ -243,6 +265,28 @@ async def test_lighter_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> No
     ]
     assert event == {"channel": "account_all_orders:42", "type": "update/account_all_orders"}
     assert native_client.closed is True
+
+
+@pytest.mark.asyncio
+async def test_lighter_robinhood_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.lighter import Network
+    from dcex.ws import lighter
+
+    monkeypatch.setattr(lighter, "_native", _FakeNative)
+
+    ws = lighter.private(
+        account_index=42,
+        api_key_index=7,
+        api_private_key="private-key",
+        network=Network.ROBINHOOD,
+    )
+    native_client = ws._native_client
+
+    assert native_client.testnet is False
+    assert native_client.ws_base_url is None
+    assert native_client.http_base_url is None
+    assert native_client.network == "robinhood"
 
 
 @pytest.mark.asyncio

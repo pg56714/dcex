@@ -9,11 +9,13 @@ use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpRespon
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
-use super::endpoints::{API_KEYS, BASE_URL};
+use super::chains::{LighterEndpointProfile, LighterNetwork};
+use super::credentials::LighterCredentials;
+use super::endpoints::API_KEYS;
 use super::params::insert_optional_pair;
 use super::signing::{
-    chain_id, create_auth_token, encode_params, http_method_name, json_value_string,
-    normalize_private_key, private_key_for, public_key_hex,
+    create_auth_token, encode_params, http_method_name, json_value_string, normalize_private_key,
+    private_key_for, public_key_hex,
 };
 use super::trade::LighterSignedTransaction;
 
@@ -27,7 +29,8 @@ pub enum LighterContentType {
 pub struct LighterClient {
     pub(super) transport: AsyncHttpClient,
     pub(super) base_url: String,
-    pub(super) chain_id: u64,
+    pub(super) network: Option<LighterNetwork>,
+    pub(super) chain_id: Option<u64>,
     pub(super) account_index: Option<u64>,
     pub(super) api_key_index: Option<u64>,
     pub(super) api_private_keys: BTreeMap<u64, [u8; 40]>,
@@ -36,16 +39,129 @@ pub struct LighterClient {
 
 impl LighterClient {
     pub fn new(timeout: Duration) -> Result<Self> {
-        Self::with_base_url(timeout, BASE_URL.to_string())
+        Self::with_network(timeout, LighterNetwork::Mainnet)
+    }
+
+    pub fn with_network(timeout: Duration, network: LighterNetwork) -> Result<Self> {
+        Self::with_network_and_credentials(timeout, network, None, None, None)
     }
 
     pub fn with_base_url(timeout: Duration, base_url: String) -> Result<Self> {
         Self::with_base_url_and_credentials(timeout, base_url, None, None, None)
     }
 
+    pub fn with_network_and_credentials(
+        timeout: Duration,
+        network: LighterNetwork,
+        account_index: Option<u64>,
+        api_key_index: Option<u64>,
+        api_private_key: Option<String>,
+    ) -> Result<Self> {
+        Self::with_profile_and_credentials(
+            timeout,
+            network.profile(),
+            account_index,
+            api_key_index,
+            api_private_key,
+        )
+    }
+
+    pub fn with_credentials(
+        timeout: Duration,
+        network: LighterNetwork,
+        credentials: LighterCredentials,
+    ) -> Result<Self> {
+        let (account_index, api_key_index, api_private_key) = credentials.into_parts();
+        Self::with_network_and_credentials(
+            timeout,
+            network,
+            Some(account_index),
+            Some(api_key_index),
+            Some(api_private_key),
+        )
+    }
+
+    pub fn with_env_credentials(timeout: Duration, network: LighterNetwork) -> Result<Self> {
+        Self::with_credentials(timeout, network, LighterCredentials::from_env(network)?)
+    }
+
+    pub fn with_profile_and_credentials(
+        timeout: Duration,
+        profile: LighterEndpointProfile,
+        account_index: Option<u64>,
+        api_key_index: Option<u64>,
+        api_private_key: Option<String>,
+    ) -> Result<Self> {
+        Self::build(
+            timeout,
+            profile.api_url.to_string(),
+            LighterNetwork::from_api_url(profile.api_url),
+            Some(profile.chain_id),
+            account_index,
+            api_key_index,
+            api_private_key,
+        )
+    }
+
     pub fn with_base_url_and_credentials(
         timeout: Duration,
         base_url: String,
+        account_index: Option<u64>,
+        api_key_index: Option<u64>,
+        api_private_key: Option<String>,
+    ) -> Result<Self> {
+        let network = LighterNetwork::from_api_url(&base_url);
+        let chain_id = network.map(|network| network.profile().chain_id);
+        Self::build(
+            timeout,
+            base_url,
+            network,
+            chain_id,
+            account_index,
+            api_key_index,
+            api_private_key,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn with_base_url_credentials_and_chain_id(
+        timeout: Duration,
+        base_url: String,
+        chain_id: u64,
+        account_index: Option<u64>,
+        api_key_index: Option<u64>,
+        api_private_key: Option<String>,
+    ) -> Result<Self> {
+        if chain_id == 0 {
+            return Err(DcexError::InvalidInput(
+                "Lighter chain_id must be greater than zero.".to_string(),
+            ));
+        }
+        let network = LighterNetwork::from_api_url(&base_url);
+        if let Some(expected) = network.map(|network| network.profile().chain_id) {
+            if chain_id != expected {
+                return Err(DcexError::InvalidInput(format!(
+                    "Lighter chain_id {chain_id} does not match the selected endpoint (expected {expected})."
+                )));
+            }
+        }
+        Self::build(
+            timeout,
+            base_url,
+            network,
+            Some(chain_id),
+            account_index,
+            api_key_index,
+            api_private_key,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn build(
+        timeout: Duration,
+        base_url: String,
+        network: Option<LighterNetwork>,
+        chain_id: Option<u64>,
         account_index: Option<u64>,
         api_key_index: Option<u64>,
         api_private_key: Option<String>,
@@ -72,12 +188,34 @@ impl LighterClient {
         }
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
-            chain_id: chain_id(&base_url),
             base_url,
+            network,
+            chain_id,
             account_index,
             api_key_index,
             api_private_keys,
             product_table: None,
+        })
+    }
+
+    pub const fn network(&self) -> Option<LighterNetwork> {
+        self.network
+    }
+
+    pub fn base_url(&self) -> &str {
+        &self.base_url
+    }
+
+    pub const fn chain_id(&self) -> Option<u64> {
+        self.chain_id
+    }
+
+    pub(super) fn signing_chain_id(&self) -> Result<u64> {
+        self.chain_id.ok_or_else(|| {
+            DcexError::InvalidInput(
+                "Lighter signed requests with a custom base_url require an explicit chain_id."
+                    .to_string(),
+            )
         })
     }
 

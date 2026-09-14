@@ -4,12 +4,15 @@ import time
 
 import pytest
 
+from dcex.lighter import Network
 from dcex.lighter.client import Client
 
+NETWORKS = (Network.MAINNET, Network.ROBINHOOD)
 
-@pytest.fixture
-def client():
-    client_instance = Client(preload_product_table=False)
+
+@pytest.fixture(params=NETWORKS, ids=lambda network: network.value)
+def client(request):
+    client_instance = Client(network=request.param, preload_product_table=False)
     try:
         yield client_instance
     finally:

@@ -79,6 +79,7 @@ class AccountHTTP(HTTPManager):
         side: str | None = None,
         role: str | None = None,
         trade_type: str | None = None,
+        aggregate: bool | None = None,
         authorization: str | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Export Lighter trade or funding records."""

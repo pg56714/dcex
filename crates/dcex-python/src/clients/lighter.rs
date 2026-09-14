@@ -1,5 +1,54 @@
 use super::*;
 
+#[pyclass(name = "LighterCredentials", frozen)]
+#[derive(Clone)]
+struct PythonLighterCredentials {
+    credentials: LighterCredentials,
+}
+
+#[pymethods]
+impl PythonLighterCredentials {
+    #[new]
+    fn new(account_index: u64, api_key_index: u64, api_private_key: String) -> PyResult<Self> {
+        Ok(Self {
+            credentials: LighterCredentials::new(account_index, api_key_index, api_private_key)
+                .map_err(to_py_value_error)?,
+        })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (network="mainnet"))]
+    fn from_env(network: &str) -> PyResult<Self> {
+        let network = lighter_network(network)?;
+        Ok(Self {
+            credentials: LighterCredentials::from_env(network).map_err(to_py_value_error)?,
+        })
+    }
+
+    #[getter]
+    fn account_index(&self) -> u64 {
+        self.credentials.account_index()
+    }
+
+    #[getter]
+    fn api_key_index(&self) -> u64 {
+        self.credentials.api_key_index()
+    }
+
+    #[getter]
+    fn api_private_key(&self) -> &str {
+        self.credentials.api_private_key()
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "LighterCredentials(account_index={}, api_key_index={}, api_private_key='[REDACTED]')",
+            self.credentials.account_index(),
+            self.credentials.api_key_index()
+        )
+    }
+}
+
 #[pyclass(name = "LighterHttpClient")]
 struct PythonLighterHttpClient {
     client: LighterClient,
@@ -13,7 +62,9 @@ impl PythonLighterHttpClient {
         base_url=None,
         account_index=None,
         api_key_index=None,
-        api_private_key=None
+        api_private_key=None,
+        network="mainnet",
+        chain_id=None
     ))]
     fn new(
         timeout: f64,
@@ -21,18 +72,68 @@ impl PythonLighterHttpClient {
         account_index: Option<u64>,
         api_key_index: Option<u64>,
         api_private_key: Option<String>,
+        network: &str,
+        chain_id: Option<u64>,
     ) -> PyResult<Self> {
         let timeout = http_timeout(timeout)?;
-        Ok(Self {
-            client: LighterClient::with_base_url_and_credentials(
+        let network = lighter_network(network)?;
+        let client = if let Some(base_url) = base_url {
+            if let Some(chain_id) = chain_id {
+                LighterClient::with_base_url_credentials_and_chain_id(
+                    timeout,
+                    base_url,
+                    chain_id,
+                    account_index,
+                    api_key_index,
+                    api_private_key,
+                )
+            } else {
+                LighterClient::with_base_url_and_credentials(
+                    timeout,
+                    base_url,
+                    account_index,
+                    api_key_index,
+                    api_private_key,
+                )
+            }
+        } else {
+            if chain_id.is_some() {
+                return Err(PyValueError::new_err(
+                    "Lighter chain_id is only valid with a custom base_url.",
+                ));
+            }
+            LighterClient::with_network_and_credentials(
                 timeout,
-                base_url.unwrap_or_else(|| "https://mainnet.zklighter.elliot.ai".to_string()),
+                network,
                 account_index,
                 api_key_index,
                 api_private_key,
             )
-            .map_err(to_py_runtime_error)?,
+        };
+        Ok(Self {
+            client: client.map_err(to_py_runtime_error)?,
         })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (timeout=10.0, network="mainnet"))]
+    fn from_env(timeout: f64, network: &str) -> PyResult<Self> {
+        let client =
+            LighterClient::with_env_credentials(http_timeout(timeout)?, lighter_network(network)?)
+                .map_err(to_py_runtime_error)?;
+        Ok(Self { client })
+    }
+
+    fn network(&self) -> Option<&'static str> {
+        self.client.network().map(LighterNetwork::as_str)
+    }
+
+    fn base_url(&self) -> &str {
+        self.client.base_url()
+    }
+
+    fn chain_id(&self) -> Option<u64> {
+        self.client.chain_id()
     }
 
     fn set_product_table(&mut self, table: PyRef<'_, PythonProductTable>) {
@@ -254,5 +355,6 @@ impl PythonLighterHttpClient {
 }
 
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<PythonLighterCredentials>()?;
     m.add_class::<PythonLighterHttpClient>()
 }

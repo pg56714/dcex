@@ -211,7 +211,7 @@ impl LighterClient {
             "Nonce": nonce,
         });
         let values = vec![
-            self.chain_id as i128,
+            self.signing_chain_id()? as i128,
             14,
             nonce as i128,
             expired_at as i128,
@@ -270,7 +270,7 @@ impl LighterClient {
             "Nonce": nonce,
         });
         let values = vec![
-            self.chain_id as i128,
+            self.signing_chain_id()? as i128,
             15,
             nonce as i128,
             expired_at as i128,
@@ -342,7 +342,7 @@ impl LighterClient {
             "Nonce": nonce,
         });
         let values = vec![
-            self.chain_id as i128,
+            self.signing_chain_id()? as i128,
             17,
             nonce as i128,
             expired_at as i128,
@@ -399,7 +399,7 @@ impl LighterClient {
             "Nonce": nonce,
         });
         let values = vec![
-            self.chain_id as i128,
+            self.signing_chain_id()? as i128,
             16,
             nonce as i128,
             expired_at as i128,
@@ -453,7 +453,7 @@ impl LighterClient {
             "Nonce": nonce,
         });
         let values = vec![
-            self.chain_id as i128,
+            self.signing_chain_id()? as i128,
             20,
             nonce as i128,
             expired_at as i128,
@@ -518,7 +518,7 @@ impl LighterClient {
         });
         let amount_bits = usdc_amount as u64;
         let values = vec![
-            self.chain_id as i128,
+            self.signing_chain_id()? as i128,
             29,
             nonce as i128,
             expired_at as i128,

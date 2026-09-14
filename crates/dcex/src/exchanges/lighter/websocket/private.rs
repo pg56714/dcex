@@ -5,8 +5,10 @@ use serde_json::Value;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::Result;
 
+use super::super::chains::LighterNetwork;
 use super::super::client::LighterClient;
-use super::{account_channel, http_url, market_channel, subscription_payload, websocket_url};
+use super::super::credentials::LighterCredentials;
+use super::{account_channel, legacy_network, market_channel, subscription_payload};
 
 pub struct LighterPrivateWebSocket {
     connection: WebSocketConnection,
@@ -22,14 +24,57 @@ impl LighterPrivateWebSocket {
         testnet: bool,
         timeout: Duration,
     ) -> Result<Self> {
-        Self::with_urls(
+        Self::with_network(
             account_index,
             api_key_index,
             api_private_key,
-            websocket_url(testnet).to_string(),
-            http_url(testnet).to_string(),
+            legacy_network(testnet),
             timeout,
         )
+    }
+
+    pub fn with_network(
+        account_index: u64,
+        api_key_index: u64,
+        api_private_key: String,
+        network: LighterNetwork,
+        timeout: Duration,
+    ) -> Result<Self> {
+        let profile = network.profile();
+        let client = LighterClient::with_network_and_credentials(
+            timeout,
+            network,
+            Some(account_index),
+            Some(api_key_index),
+            Some(api_private_key),
+        )?;
+        Ok(Self {
+            connection: WebSocketConnection::new(WebSocketConfig::new(
+                profile.ws_url.to_string(),
+                timeout,
+            )?),
+            client,
+            account_index,
+        })
+    }
+
+    pub fn with_credentials(
+        credentials: LighterCredentials,
+        network: LighterNetwork,
+        timeout: Duration,
+    ) -> Result<Self> {
+        let (account_index, api_key_index, api_private_key) = credentials.into_parts();
+        Self::with_network(
+            account_index,
+            api_key_index,
+            api_private_key,
+            network,
+            timeout,
+        )
+    }
+
+    pub fn with_env_credentials(network: LighterNetwork, timeout: Duration) -> Result<Self> {
+        Self::with_credentials(LighterCredentials::from_env(network)?, network, timeout)
     }
 
     pub fn with_urls(

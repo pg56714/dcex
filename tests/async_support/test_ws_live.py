@@ -11,6 +11,8 @@ from typing import Any, Protocol
 import pytest
 from dotenv import load_dotenv
 
+from dcex.lighter import Network
+from dcex.lighter.credentials import credential_env_names
 from dcex.ws import (
     aster,
     backpack,
@@ -76,10 +78,6 @@ def _require_env(names: tuple[str, ...]) -> None:
             f"Set {', '.join(missing)} before running this private live WS test.",
             pytrace=False,
         )
-
-
-def _env_int(name: str) -> int:
-    return int(os.environ[name].strip().lstrip("#"))
 
 
 def _assert_payload(payload: Payload) -> None:
@@ -209,7 +207,18 @@ PUBLIC_WS_SPECS = (
     ),
     WebSocketSpec(
         name="lighter",
-        factory=lambda: lighter.public(timeout=LIVE_WS_TIMEOUT),
+        factory=lambda: lighter.public(
+            network=Network.MAINNET,
+            timeout=LIVE_WS_TIMEOUT,
+        ),
+        subscribe=lambda ws: ws.subscribe_trades(0),
+    ),
+    WebSocketSpec(
+        name="lighter-robinhood",
+        factory=lambda: lighter.public(
+            network=Network.ROBINHOOD,
+            timeout=LIVE_WS_TIMEOUT,
+        ),
         subscribe=lambda ws: ws.subscribe_trades(0),
     ),
     WebSocketSpec(
@@ -369,11 +378,18 @@ PRIVATE_WS_SPECS = (
     ),
     WebSocketSpec(
         name="lighter",
-        env=("LIGHTER_ACCOUNT_INDEX", "LIGHTER_API_KEY_INDEX", "LIGHTER_API_PRIVATE_KEY"),
-        factory=lambda: lighter.private(
-            account_index=_env_int("LIGHTER_ACCOUNT_INDEX"),
-            api_key_index=_env_int("LIGHTER_API_KEY_INDEX"),
-            api_private_key=os.environ["LIGHTER_API_PRIVATE_KEY"],
+        env=credential_env_names(Network.MAINNET),
+        factory=lambda: lighter.private_from_env(
+            network=Network.MAINNET,
+            timeout=LIVE_WS_TIMEOUT,
+        ),
+        subscribe=lambda ws: ws.subscribe_account_all_orders(),
+    ),
+    WebSocketSpec(
+        name="lighter-robinhood",
+        env=credential_env_names(Network.ROBINHOOD),
+        factory=lambda: lighter.private_from_env(
+            network=Network.ROBINHOOD,
             timeout=LIVE_WS_TIMEOUT,
         ),
         subscribe=lambda ws: ws.subscribe_account_all_orders(),

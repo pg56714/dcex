@@ -2,7 +2,7 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Literal, cast
+from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
 from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
@@ -11,6 +11,8 @@ from ..product_table.manager import ProductTableManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
+from .credentials import LighterCredentials
+from .network_enums import Network, normalize_network
 
 _native = load_native()
 
@@ -38,7 +40,7 @@ class HTTPManager(BaseHTTPManager):
 
     EXCHANGE = Common.LIGHTER
 
-    base_url: str = field(default="https://mainnet.zklighter.elliot.ai")
+    base_url: str | None = field(default=None)
     account_index: int | None = field(default=None)
     api_key_index: int | None = field(default=None)
     api_private_key: str | None = field(default=None, repr=False)
@@ -46,11 +48,39 @@ class HTTPManager(BaseHTTPManager):
     logger: logging.Logger | None = field(default=None)
     ptm: ProductTableManager | None = field(init=False, default=None, repr=False)
     preload_product_table: bool = field(default=True)
+    network: Network | str = field(default=Network.MAINNET)
+    chain_id: int | None = field(default=None)
     _native_client: Any | None = field(default=None, init=False, repr=False)
+
+    @classmethod
+    def from_env(
+        cls,
+        network: Network | str = Network.MAINNET,
+        *,
+        timeout: int = 10,
+        logger: logging.Logger | None = None,
+        preload_product_table: bool = True,
+    ) -> Self:
+        """Create a private client from network-scoped environment variables."""
+        resolved_network = normalize_network(network)
+        credentials = LighterCredentials.from_env(resolved_network)
+        return cls(
+            account_index=credentials.account_index,
+            api_key_index=credentials.api_key_index,
+            api_private_key=credentials.api_private_key,
+            network=resolved_network,
+            timeout=timeout,
+            logger=logger,
+            preload_product_table=preload_product_table,
+        )
 
     def __post_init__(self) -> None:
         """Initialize sync HTTP manager."""
         self._logger = self._setup_logger(self.logger)
+        resolved_network = normalize_network(self.network)
+        self.network = resolved_network
+        if self.base_url is None:
+            self.base_url = resolved_network.api_url
         native_client_type = getattr(_native, "LighterHttpClient", None)
         if native_client_type is None:
             raise RuntimeError("The dcex native extension is required.")
@@ -60,8 +90,14 @@ class HTTPManager(BaseHTTPManager):
             account_index=self.account_index,
             api_key_index=self.api_key_index,
             api_private_key=self.api_private_key,
+            network=resolved_network.value,
+            chain_id=self.chain_id,
         )
-        if self.preload_product_table:
+        if (
+            self.preload_product_table
+            and resolved_network is Network.MAINNET
+            and self.base_url == Network.MAINNET.api_url
+        ):
             self.ptm = ProductTableManager.get_instance(Common.LIGHTER)
             if self._native_client is not None and hasattr(
                 self._native_client,

@@ -14,7 +14,9 @@ use dcex::exchanges::extended::ExtendedClient;
 use dcex::exchanges::hyperliquid::HyperliquidClient;
 use dcex::exchanges::kraken::{KrakenAuth, KrakenClient};
 use dcex::exchanges::kucoin::{KucoinClient, KucoinMarket};
-use dcex::exchanges::lighter::{LighterClient, LighterContentType};
+use dcex::exchanges::lighter::{
+    LighterClient, LighterContentType, LighterCredentials, LighterNetwork,
+};
 use dcex::exchanges::mexc::{MexcApi, MexcClient};
 use dcex::exchanges::okx::OkxClient;
 use dcex::http::{
@@ -279,6 +281,10 @@ fn lighter_content_type(content_type: &str) -> PyResult<LighterContentType> {
             "unsupported Lighter content type: {content_type}"
         ))),
     }
+}
+
+fn lighter_network(network: &str) -> PyResult<LighterNetwork> {
+    network.parse().map_err(to_py_value_error)
 }
 
 fn aster_market(market: &str) -> PyResult<AsterMarket> {

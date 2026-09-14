@@ -1,20 +1,27 @@
 use std::time::Duration;
 
-use dcex::exchanges::lighter::LighterClient;
+use dcex::exchanges::lighter::{
+    credential_env_names, LighterClient, LighterCredentials, LighterNetwork,
+};
 use serde_json::Value;
 
 use super::common::{live_http_enabled, require_env, run_cases, run_private_cases, Case};
 
-const LIGHTER_BASE_URL: &str = "https://mainnet.zklighter.elliot.ai";
-
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn lighter_public_live_parity() -> dcex::Result<()> {
-    let client = LighterClient::new(Duration::from_secs(20))?;
     if !live_http_enabled() {
         eprintln!("skipping live HTTP parity test; set RUN_LIVE_HTTP_TESTS=1");
         return Ok(());
     }
+    for network in [LighterNetwork::Mainnet, LighterNetwork::Robinhood] {
+        lighter_public_live_parity_for(network).await?;
+    }
+    Ok(())
+}
+
+async fn lighter_public_live_parity_for(network: LighterNetwork) -> dcex::Result<()> {
+    let client = LighterClient::with_network(Duration::from_secs(20), network)?;
     let details = client.get_order_book_details().await?;
     let market_id = active_market_id(&details.data)?;
     run_cases(
@@ -73,32 +80,27 @@ fn active_market_id(data: &Value) -> dcex::Result<String> {
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
 async fn lighter_private_read_live_parity() -> dcex::Result<()> {
-    let Some(keys) = require_env(&[
-        "LIGHTER_ACCOUNT_INDEX",
-        "LIGHTER_API_KEY_INDEX",
-        "LIGHTER_API_PRIVATE_KEY",
-    ]) else {
+    for network in [LighterNetwork::Mainnet, LighterNetwork::Robinhood] {
+        lighter_private_read_live_parity_for(network).await?;
+    }
+    Ok(())
+}
+
+async fn lighter_private_read_live_parity_for(network: LighterNetwork) -> dcex::Result<()> {
+    let env_names = credential_env_names(network);
+    let Some(keys) = require_env(&env_names) else {
         return Ok(());
     };
     let account_index = keys[0].parse::<u64>().map_err(|error| {
-        dcex::DcexError::InvalidInput(format!("invalid LIGHTER_ACCOUNT_INDEX: {error}"))
+        dcex::DcexError::InvalidInput(format!("invalid {}: {error}", env_names[0]))
     })?;
     let api_key_index = keys[1].parse::<u64>().map_err(|error| {
-        dcex::DcexError::InvalidInput(format!("invalid LIGHTER_API_KEY_INDEX: {error}"))
+        dcex::DcexError::InvalidInput(format!("invalid {}: {error}", env_names[1]))
     })?;
-    let client = LighterClient::with_base_url_and_credentials(
-        Duration::from_secs(20),
-        LIGHTER_BASE_URL.to_string(),
-        Some(account_index),
-        Some(api_key_index),
-        Some(keys[2].clone()),
-    )?;
+    let credentials = LighterCredentials::new(account_index, api_key_index, keys[2].clone())?;
+    let client = LighterClient::with_credentials(Duration::from_secs(20), network, credentials)?;
     run_private_cases(
-        &[
-            "LIGHTER_ACCOUNT_INDEX",
-            "LIGHTER_API_KEY_INDEX",
-            "LIGHTER_API_PRIVATE_KEY",
-        ],
+        &env_names,
         vec![
             Case::new("get_next_nonce", &[]),
             Case::new(

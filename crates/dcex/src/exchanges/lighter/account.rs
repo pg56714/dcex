@@ -56,7 +56,7 @@ impl LighterClient {
             ),
             "get_export" => (
                 EXPORT,
-                self.market_query_renamed(
+                self.account_market_query_renamed(
                     &params,
                     &[
                         ("account_index", "account_index"),
@@ -67,6 +67,7 @@ impl LighterClient {
                         ("side", "side"),
                         ("role", "role"),
                         ("trade_type", "trade_type"),
+                        ("aggregate", "aggregate"),
                     ],
                 )?,
                 auth_header_required(self, &params)?,
@@ -259,6 +260,18 @@ impl LighterClient {
         Ok(query)
     }
 
+    fn account_market_query_renamed(
+        &self,
+        params: &LighterParams,
+        keys: &[(&str, &str)],
+    ) -> Result<Vec<(String, String)>> {
+        let mut query = self.account_query_renamed(params, keys)?;
+        if let Some(product_symbol) = params.get("product_symbol") {
+            super::market::upsert(&mut query, "market_id", self.market_id(product_symbol)?);
+        }
+        Ok(query)
+    }
+
     fn account_query_renamed(
         &self,
         params: &LighterParams,
@@ -346,8 +359,10 @@ impl LighterClient {
                     "side",
                     "role",
                     "trade_type",
+                    "aggregate",
                     "authorization",
                 ])?;
+                self.validate_private_account(params)?;
                 validate_market_selector(params, false)?;
                 params.required_one_of("type_", &["funding", "trade"])?;
                 params.optional_one_of("side", &["all", "long", "short"])?;
@@ -362,6 +377,7 @@ impl LighterClient {
                         "market-settlement",
                     ],
                 )?;
+                params.optional_bool("aggregate")?;
                 validate_optional_timestamp_range(params, 1_735_689_600_000, 1_830_297_600_000)?;
                 validate_optional_nonempty(params, &["authorization"])
             }
@@ -546,8 +562,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn export_accepts_authorization_without_account_index() {
-        let client = LighterClient::new(Duration::from_secs(1)).expect("client");
+    fn export_accepts_configured_account_index() {
+        let client = LighterClient::with_base_url_and_credentials(
+            Duration::from_secs(1),
+            "https://mainnet.zklighter.elliot.ai".to_string(),
+            Some(12),
+            None,
+            None,
+        )
+        .expect("client");
         let params = LighterParams::from_pairs(vec![
             ("type_".to_string(), "trade".to_string()),
             ("authorization".to_string(), "token".to_string()),
@@ -555,6 +578,6 @@ mod tests {
 
         client
             .validate_private_params("get_export", &params)
-            .expect("account_index is optional for export");
+            .expect("configured account_index is accepted for export");
     }
 }

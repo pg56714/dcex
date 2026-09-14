@@ -1,5 +1,3 @@
-pub(super) const BASE_URL: &str = "https://mainnet.zklighter.elliot.ai";
-
 pub(super) const STATUS: &str = "/";
 pub(super) const INFO: &str = "/info";
 pub(super) const ACCOUNT: &str = "/api/v1/account";

@@ -6,11 +6,14 @@ import pytest
 import pytest_asyncio
 
 from dcex.async_support.lighter.client import Client
+from dcex.lighter import Network
+
+NETWORKS = (Network.MAINNET, Network.ROBINHOOD)
 
 
-@pytest_asyncio.fixture
-async def client():
-    async with Client(preload_product_table=False) as client_instance:
+@pytest_asyncio.fixture(params=NETWORKS, ids=lambda network: network.value)
+async def client(request):
+    async with Client(network=request.param, preload_product_table=False) as client_instance:
         yield client_instance
 
 

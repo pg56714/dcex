@@ -91,7 +91,7 @@ async fn main() -> dcex::Result<()> {
 | **BingX**       | Yes  | Yes       | Yes        |
 | **KuCoin**      | Yes  | Yes       | Yes        |
 | **Hyperliquid** | Yes  | Yes       | Yes        |
-| **Lighter**     | Yes  | Yes       | Yes        |
+| **Lighter (Mainnet + Robinhood)** | Yes | Yes | Yes |
 | **Backpack**    | Yes  | Yes       | Yes        |
 | **Aster**       | Yes  | Yes       | Yes        |
 | **Extended**    | Yes  | Yes       | Yes        |
@@ -103,6 +103,14 @@ Extended private REST reads require `EXTENDED_API_KEY`. Rust-backed LIMIT order
 signing additionally requires `EXTENDED_STARK_PRIVATE_KEY`,
 `EXTENDED_STARK_PUBLIC_KEY`, and `EXTENDED_VAULT_NUMBER`; `EXTENDED_CLIENT_ID`
 is kept for reference but is not sent in normal order requests.
+
+## Lighter networks
+
+Select Lighter Mainnet or Robinhood explicitly with `LighterNetwork` on every
+HTTP and WebSocket client. `LighterClient::with_env_credentials` reads the
+matching `LIGHTER_MAINNET_*` or `LIGHTER_ROBINHOOD_*` credential group, allowing
+both clients to coexist in one process. No global `LIGHTER_NETWORK` selector or
+legacy mainnet-only credential fallback is used.
 
 ## Python Package Relationship
 

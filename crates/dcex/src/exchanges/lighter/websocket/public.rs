@@ -5,7 +5,8 @@ use serde_json::Value;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::Result;
 
-use super::{market_channel, normalize_resolution, subscription_payload, websocket_url};
+use super::super::chains::LighterNetwork;
+use super::{legacy_network, market_channel, normalize_resolution, subscription_payload};
 
 pub struct LighterPublicWebSocket {
     connection: WebSocketConnection,
@@ -13,7 +14,11 @@ pub struct LighterPublicWebSocket {
 
 impl LighterPublicWebSocket {
     pub fn new(testnet: bool, timeout: Duration) -> Result<Self> {
-        Self::with_url(websocket_url(testnet).to_string(), timeout)
+        Self::with_network(legacy_network(testnet), timeout)
+    }
+
+    pub fn with_network(network: LighterNetwork, timeout: Duration) -> Result<Self> {
+        Self::with_url(network.profile().ws_url.to_string(), timeout)
     }
 
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {

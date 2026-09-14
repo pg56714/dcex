@@ -10,13 +10,13 @@ import pytest_asyncio
 from dotenv import load_dotenv
 
 from dcex.async_support.lighter.client import Client
+from dcex.lighter import Network
+from dcex.lighter.credentials import credential_env_names
 from dcex.utils.errors import FailedRequestError
 
 load_dotenv()
 
-ACCOUNT_INDEX = os.getenv("LIGHTER_ACCOUNT_INDEX")
-API_KEY_INDEX = os.getenv("LIGHTER_API_KEY_INDEX")
-API_PRIVATE_KEY = os.getenv("LIGHTER_API_PRIVATE_KEY")
+NETWORKS = (Network.MAINNET, Network.ROBINHOOD)
 
 pytestmark = [
     pytest.mark.private,
@@ -28,17 +28,15 @@ pytestmark = [
 ]
 
 
-def _env_int(value: str | None) -> int:
-    return int(str(value or "0").strip().lstrip("#"))
-
-
-@pytest_asyncio.fixture
-async def client():
-    async with Client(
-        account_index=_env_int(ACCOUNT_INDEX),
-        api_key_index=_env_int(API_KEY_INDEX),
-        api_private_key=API_PRIVATE_KEY,
+@pytest_asyncio.fixture(params=NETWORKS, ids=lambda network: network.value)
+async def client(request):
+    network = request.param
+    missing = [name for name in credential_env_names(network) if not os.getenv(name)]
+    if missing:
+        pytest.skip(f"Set {', '.join(missing)} before running this private live test.")
+    async with Client.from_env(
         preload_product_table=False,
+        network=network,
     ) as client_instance:
         await _cleanup_account(client_instance)
         try:
@@ -67,19 +65,20 @@ async def _market(client: Client, preferred_symbols: set[str] | None = None) -> 
     return next(market for market in candidates if market.get("status") == "active")
 
 
-def _post_only_buy_order(market: dict) -> tuple[int, int, int]:
+async def _post_only_buy_order(client: Client, market: dict) -> tuple[int, int, int]:
     price_decimals = int(market["price_decimals"])
     size_decimals = int(market["size_decimals"])
-    last_price = Decimal(str(market["last_trade_price"]))
+    market_index = int(market["market_id"])
+    order_book = await client.get_order_book_orders(market_id=market_index, limit=5)
+    best_bid = Decimal(str(order_book["bids"][0]["price"]))
     price_step = Decimal(1).scaleb(-price_decimals)
-    price = max(price_step, min(last_price - price_step, last_price * Decimal("0.999")))
+    price = max(price_step, min(best_bid - price_step, best_bid * Decimal("0.999")))
     price = price.quantize(price_step, rounding=ROUND_DOWN)
     min_base = Decimal(str(market["min_base_amount"]))
     min_quote = Decimal(str(market["min_quote_amount"]))
     min_size = Decimal(1).scaleb(-size_decimals)
     base = max(min_base, min_quote / price).quantize(min_size, rounding=ROUND_CEILING)
 
-    market_index = int(market["market_id"])
     base_amount = int(base * (Decimal(10) ** size_decimals))
     price_amount = int(price * (Decimal(10) ** price_decimals))
     return market_index, base_amount, price_amount
@@ -132,7 +131,7 @@ async def _wait_for_trade_client_ids(
     market_index: int,
     client_order_ids: set[int],
 ) -> None:
-    account_index = _env_int(ACCOUNT_INDEX)
+    account_index = int(client.account_index)
     pending = {str(client_order_id) for client_order_id in client_order_ids}
     for _ in range(30):
         res = await client.get_trades(
@@ -178,7 +177,7 @@ async def _market_map(client: Client) -> dict[int, dict]:
 
 
 async def _account_positions(client: Client) -> list[dict]:
-    account_index = _env_int(ACCOUNT_INDEX)
+    account_index = int(client.account_index)
     account = await client.get_account(by="index", value=str(account_index))
     accounts = account.get("accounts", []) if isinstance(account, dict) else []
     if not accounts:
@@ -299,7 +298,7 @@ async def _cleanup_account(client: Client) -> None:
 @pytest.mark.asyncio
 async def test_signing_helpers(client):
     market = await _market(client)
-    market_index, base_amount, price = _post_only_buy_order(market)
+    market_index, base_amount, price = await _post_only_buy_order(client, market)
     client_order_index = int(time.time() * 1000)
 
     next_nonce = int((await client.get_next_nonce())["nonce"])
@@ -354,7 +353,7 @@ async def test_signing_helpers(client):
 @pytest.mark.asyncio
 async def test_post_only_order_lifecycle(client):
     market = await _market(client)
-    market_index, base_amount, price = _post_only_buy_order(market)
+    market_index, base_amount, price = await _post_only_buy_order(client, market)
     client_order_index = int(time.time() * 1000)
 
     try:

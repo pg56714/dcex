@@ -1,6 +1,8 @@
 use std::time::Duration;
 
-use dcex::exchanges::lighter::LighterClient;
+use dcex::exchanges::lighter::{
+    credential_env_names, LighterClient, LighterCredentials, LighterNetwork,
+};
 use serde_json::Value;
 use tokio::time::sleep;
 
@@ -9,30 +11,30 @@ use super::common::{
     unique_client_id,
 };
 
-const LIGHTER_BASE_URL: &str = "https://mainnet.zklighter.elliot.ai";
+#[tokio::test]
+#[ignore = "requires live exchange API access"]
+async fn lighter_mainnet_direct_live_stateful_order() -> dcex::Result<()> {
+    lighter_direct_live_stateful_order(LighterNetwork::Mainnet).await
+}
 
 #[tokio::test]
 #[ignore = "requires live exchange API access"]
-async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
+async fn lighter_robinhood_direct_live_stateful_order() -> dcex::Result<()> {
+    lighter_direct_live_stateful_order(LighterNetwork::Robinhood).await
+}
+
+async fn lighter_direct_live_stateful_order(network: LighterNetwork) -> dcex::Result<()> {
     if !require_live_trading() {
         return Ok(());
     }
-    let Some(keys) = require_env(&[
-        "LIGHTER_ACCOUNT_INDEX",
-        "LIGHTER_API_KEY_INDEX",
-        "LIGHTER_API_PRIVATE_KEY",
-    ]) else {
+    let env_names = credential_env_names(network);
+    let Some(keys) = require_env(&env_names) else {
         return Ok(());
     };
-    let account_index = parse_u64(&keys[0], "LIGHTER_ACCOUNT_INDEX")?;
-    let api_key_index = parse_u64(&keys[1], "LIGHTER_API_KEY_INDEX")?;
-    let client = LighterClient::with_base_url_and_credentials(
-        Duration::from_secs(20),
-        LIGHTER_BASE_URL.to_string(),
-        Some(account_index),
-        Some(api_key_index),
-        Some(keys[2].clone()),
-    )?;
+    let account_index = parse_u64(&keys[0], env_names[0])?;
+    let api_key_index = parse_u64(&keys[1], env_names[1])?;
+    let credentials = LighterCredentials::new(account_index, api_key_index, keys[2].clone())?;
+    let client = LighterClient::with_credentials(Duration::from_secs(20), network, credentials)?;
     if let Some(message) = client.check_client().await? {
         return Err(live_test_error(format!(
             "Lighter live stateful order client check failed: {message}"
@@ -45,8 +47,18 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
     let client_order_index = unique_client_id("").parse::<i64>().map_err(|error| {
         dcex::DcexError::InvalidInput(format!("invalid generated Lighter client id: {error}"))
     })?;
-    let (base_amount, price) = post_only_buy_order_amounts(&market)?;
-    let order = super::common::exchange_method_request(
+    let order_book = super::common::exchange_method_request(
+        &client,
+        "get_order_book_orders",
+        vec![
+            ("market_id".to_string(), market_id.clone()),
+            ("limit".to_string(), "5".to_string()),
+        ],
+    )
+    .await?;
+    let best_bid = first_lighter_book_price(&order_book.data, "bids")?;
+    let (base_amount, price) = post_only_buy_order_amounts(&market, best_bid)?;
+    let order_result = super::common::exchange_method_request(
         &client,
         "create_order",
         vec![
@@ -63,25 +75,74 @@ async fn lighter_direct_live_stateful_order() -> dcex::Result<()> {
             ("order_expiry".to_string(), "-1".to_string()),
         ],
     )
-    .await?;
+    .await;
+
+    let lifecycle_result = async {
+        let order = order_result?;
+        ensure_lighter_success(&order, "create order")?;
+        sleep(Duration::from_secs(1)).await;
+        let order_index =
+            active_order_index(&client, account_index, &market_id, client_order_index).await?;
+        let cancel = super::common::exchange_method_request(
+            &client,
+            "cancel_order",
+            vec![
+                ("market_index".to_string(), market_id),
+                ("order_index".to_string(), order_index),
+            ],
+        )
+        .await?;
+        ensure_lighter_success(&cancel, "cancel order")?;
+        Ok::<_, dcex::DcexError>((order, cancel))
+    }
+    .await;
+
+    let cleanup_result = cleanup_lighter_state(&client, account_index).await;
+    cleanup_result?;
+    let (order, cancel) = lifecycle_result?;
     assert_success(&order);
-    sleep(Duration::from_secs(1)).await;
-    let order_index =
-        active_order_index(&client, account_index, &market_id, client_order_index).await?;
-    let cancel = super::common::exchange_method_request(
-        &client,
-        "cancel_order",
-        vec![
-            ("market_index".to_string(), market_id),
-            ("order_index".to_string(), order_index),
-        ],
-    )
-    .await?;
     assert_success(&cancel);
     Ok(())
 }
 
+fn ensure_lighter_success(
+    response: &dcex::exchange::ValidatedResponse,
+    action: &str,
+) -> dcex::Result<()> {
+    if !(200..300).contains(&response.status) {
+        return Err(live_test_error(format!(
+            "Lighter {action} returned HTTP {}: {}",
+            response.status, response.data
+        )));
+    }
+    if let Some(code) = response.data.get("code").and_then(value_f64) {
+        if code != 0.0 && code != 200.0 {
+            return Err(live_test_error(format!(
+                "Lighter {action} returned code {code}: {}",
+                response.data
+            )));
+        }
+    }
+    Ok(())
+}
+
 async fn cleanup_lighter_state(client: &LighterClient, account_index: u64) -> dcex::Result<()> {
+    for _ in 0..10 {
+        cleanup_lighter_state_once(client, account_index).await?;
+        sleep(Duration::from_secs(1)).await;
+        if lighter_account_is_clean(client, account_index).await? {
+            return Ok(());
+        }
+    }
+    Err(live_test_error(
+        "Lighter orders or positions still exist after cleanup",
+    ))
+}
+
+async fn cleanup_lighter_state_once(
+    client: &LighterClient,
+    account_index: u64,
+) -> dcex::Result<()> {
     let active = super::common::exchange_method_request(
         client,
         "get_account_active_orders",
@@ -143,7 +204,26 @@ async fn cleanup_lighter_state(client: &LighterClient, account_index: u64) -> dc
         close_lighter_position(client, market, signed_size).await?;
     }
 
-    let remaining = super::common::exchange_method_request(
+    Ok(())
+}
+
+async fn lighter_account_is_clean(
+    client: &LighterClient,
+    account_index: u64,
+) -> dcex::Result<bool> {
+    let active = super::common::exchange_method_request(
+        client,
+        "get_account_active_orders",
+        vec![("account_index".to_string(), account_index.to_string())],
+    )
+    .await?;
+    let has_active_orders = active
+        .data
+        .get("orders")
+        .and_then(Value::as_array)
+        .is_some_and(|orders| !orders.is_empty());
+
+    let account = super::common::exchange_method_request(
         client,
         "get_account",
         vec![
@@ -152,15 +232,10 @@ async fn cleanup_lighter_state(client: &LighterClient, account_index: u64) -> dc
         ],
     )
     .await?;
-    if lighter_positions(&remaining.data)
+    let has_positions = lighter_positions(&account.data)
         .iter()
-        .any(|position| signed_lighter_position_size(position).unwrap_or(0.0) != 0.0)
-    {
-        return Err(live_test_error(
-            "Lighter positions still exist after cleanup",
-        ));
-    }
-    Ok(())
+        .any(|position| signed_lighter_position_size(position).unwrap_or(0.0) != 0.0);
+    Ok(!has_active_orders && !has_positions)
 }
 
 async fn close_lighter_position(
@@ -263,16 +338,15 @@ async fn active_lighter_market(client: &LighterClient) -> dcex::Result<Value> {
         .ok_or_else(|| dcex::DcexError::Decode("no active Lighter market found".to_string()))
 }
 
-fn post_only_buy_order_amounts(market: &Value) -> dcex::Result<(i64, i64)> {
+fn post_only_buy_order_amounts(market: &Value, best_bid: f64) -> dcex::Result<(i64, i64)> {
     let price_decimals = value_u32(market, "price_decimals")?;
     let size_decimals = value_u32(market, "size_decimals")?;
-    let last_price = value_f64_required(market, "last_trade_price")?;
     let min_base = value_f64_required(market, "min_base_amount")?;
     let min_quote = value_f64_required(market, "min_quote_amount")?;
     let price_step = 1.0 / 10_f64.powi(price_decimals as i32);
     let price = scale_amount(
-        (last_price - price_step)
-            .min(last_price * 0.999)
+        (best_bid - price_step)
+            .min(best_bid * 0.999)
             .max(price_step),
         price_decimals,
         false,

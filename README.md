@@ -134,13 +134,26 @@ added with builder setters such as `.limit(100)` or `.param("key", value)`.
 | **BingX**       | Yes       | Yes        | Yes       | Yes        |
 | **KuCoin**      | Yes       | Yes        | Yes       | Yes        |
 | **Hyperliquid** | Yes       | Yes        | Yes       | Yes        |
-| **Lighter**     | Yes       | Yes        | Yes       | Yes        |
+| **Lighter (Mainnet + Robinhood)** | Yes | Yes | Yes | Yes |
 | **Backpack**    | Yes       | Yes        | Yes       | Yes        |
 | **Aster**       | Yes       | Yes        | Yes       | Yes        |
 | **Extended**    | Yes       | Yes        | Yes       | Yes        |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.
+
+### Lighter networks
+
+Lighter network selection is explicit per HTTP or WebSocket client. Mainnet and
+Robinhood use independent credential groups, so both can run concurrently in a
+single process. There is no global `LIGHTER_NETWORK` selector and the legacy
+mainnet-only `LIGHTER_*` credential fallback is not accepted.
+
+Private Mainnet clients read `LIGHTER_MAINNET_ACCOUNT_INDEX`,
+`LIGHTER_MAINNET_API_KEY_INDEX`, and `LIGHTER_MAINNET_API_PRIVATE_KEY`.
+Robinhood clients use the corresponding `LIGHTER_ROBINHOOD_*` variables.
+Select the deployment for each client with `dcex.lighter.Network`; omitting it
+keeps the Mainnet default.
 
 ## Key Features
 
@@ -212,6 +225,11 @@ uv run pytest
 Live, private, stateful, and generated-report tests use the pytest markers
 configured in `pyproject.toml`. These tests are opt-in because they can require
 network access, exchange credentials, or account state.
+
+Lighter live tests can target Mainnet, Robinhood, or both. Stateful Lighter
+tests create real orders and include post-test cancellation, reduce-only
+position closing, and a final clean-account assertion. Use only dedicated,
+initially empty accounts when enabling `RUN_LIVE_TRADING_TESTS=1`.
 
 ## Benchmarking
 

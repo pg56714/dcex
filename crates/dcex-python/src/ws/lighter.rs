@@ -18,11 +18,23 @@ struct PythonLighterPrivateWebSocketClient {
 #[pymethods]
 impl PythonLighterPublicWebSocketClient {
     #[new]
-    #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None))]
-    fn new(testnet: bool, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
+    #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None, network=None))]
+    fn new(
+        testnet: bool,
+        timeout: f64,
+        base_url: Option<String>,
+        network: Option<&str>,
+    ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
         let client = if let Some(base_url) = base_url {
             LighterPublicWebSocket::with_url(base_url, timeout)
+        } else if let Some(network) = network {
+            if testnet {
+                return Err(PyValueError::new_err(
+                    "Lighter network and testnet cannot be specified together.",
+                ));
+            }
+            LighterPublicWebSocket::with_network(lighter_network(network)?, timeout)
         } else {
             LighterPublicWebSocket::new(testnet, timeout)
         }
@@ -266,7 +278,8 @@ impl PythonLighterPrivateWebSocketClient {
         testnet=false,
         timeout=10.0,
         ws_base_url=None,
-        http_base_url=None
+        http_base_url=None,
+        network=None
     ))]
     fn new(
         account_index: u64,
@@ -276,37 +289,81 @@ impl PythonLighterPrivateWebSocketClient {
         timeout: f64,
         ws_base_url: Option<String>,
         http_base_url: Option<String>,
+        network: Option<&str>,
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
+        let network = network.map(lighter_network).transpose()?;
+        if network.is_some() && testnet {
+            return Err(PyValueError::new_err(
+                "Lighter network and testnet cannot be specified together.",
+            ));
+        }
         let client = match (ws_base_url, http_base_url) {
-            (None, None) => LighterPrivateWebSocket::new(
-                account_index,
-                api_key_index,
-                api_private_key,
-                testnet,
-                timeout,
-            ),
+            (None, None) => {
+                if let Some(network) = network {
+                    LighterPrivateWebSocket::with_network(
+                        account_index,
+                        api_key_index,
+                        api_private_key,
+                        network,
+                        timeout,
+                    )
+                } else {
+                    LighterPrivateWebSocket::new(
+                        account_index,
+                        api_key_index,
+                        api_private_key,
+                        testnet,
+                        timeout,
+                    )
+                }
+            }
             (ws_base_url, http_base_url) => LighterPrivateWebSocket::with_urls(
                 account_index,
                 api_key_index,
                 api_private_key,
                 ws_base_url.unwrap_or_else(|| {
-                    if testnet {
-                        "wss://testnet.zklighter.elliot.ai/stream".to_string()
-                    } else {
-                        "wss://mainnet.zklighter.elliot.ai/stream".to_string()
-                    }
+                    network
+                        .unwrap_or_else(|| {
+                            if testnet {
+                                LighterNetwork::Testnet
+                            } else {
+                                LighterNetwork::Mainnet
+                            }
+                        })
+                        .profile()
+                        .ws_url
+                        .to_string()
                 }),
                 http_base_url.unwrap_or_else(|| {
-                    if testnet {
-                        "https://testnet.zklighter.elliot.ai".to_string()
-                    } else {
-                        "https://mainnet.zklighter.elliot.ai".to_string()
-                    }
+                    network
+                        .unwrap_or_else(|| {
+                            if testnet {
+                                LighterNetwork::Testnet
+                            } else {
+                                LighterNetwork::Mainnet
+                            }
+                        })
+                        .profile()
+                        .api_url
+                        .to_string()
                 }),
                 timeout,
             ),
         }
+        .map_err(to_py_runtime_error)?;
+        Ok(Self {
+            client: Arc::new(Mutex::new(client)),
+        })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (network="mainnet", timeout=10.0))]
+    fn from_env(network: &str, timeout: f64) -> PyResult<Self> {
+        let client = LighterPrivateWebSocket::with_env_credentials(
+            lighter_network(network)?,
+            websocket_timeout(timeout)?,
+        )
         .map_err(to_py_runtime_error)?;
         Ok(Self {
             client: Arc::new(Mutex::new(client)),

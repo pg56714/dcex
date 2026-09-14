@@ -95,7 +95,7 @@ fn product_table_resolves_canonical_symbol_to_market_id() {
 }
 
 #[test]
-fn export_sends_resolved_market_id_without_account_index() {
+fn export_sends_resolved_market_id_with_configured_account_index() {
     let (base_url, handle) = recording_server();
     let table = ProductTable::new(vec![MarketInfo {
         exchange: "lighter".to_string(),
@@ -111,9 +111,15 @@ fn export_sends_resolved_market_id_without_account_index() {
         min_notional: "1".to_string(),
         size_per_contract: "1".to_string(),
     }]);
-    let client = LighterClient::with_base_url(Duration::from_secs(1), base_url)
-        .expect("client")
-        .with_product_table(table);
+    let client = LighterClient::with_base_url_and_credentials(
+        Duration::from_secs(1),
+        base_url,
+        Some(12),
+        None,
+        None,
+    )
+    .expect("client")
+    .with_product_table(table);
 
     block_on(async move {
         client
@@ -122,6 +128,7 @@ fn export_sends_resolved_market_id_without_account_index() {
                 vec![
                     ("product_symbol".to_string(), "BTC-USDC-SWAP".to_string()),
                     ("type_".to_string(), "trade".to_string()),
+                    ("aggregate".to_string(), "true".to_string()),
                     ("authorization".to_string(), "token".to_string()),
                 ],
             )
@@ -133,7 +140,8 @@ fn export_sends_resolved_market_id_without_account_index() {
     assert!(request_line.starts_with("GET /api/v1/export?"));
     assert!(request_line.contains("market_id=42"));
     assert!(request_line.contains("type=trade"));
-    assert!(!request_line.contains("account_index="));
+    assert!(request_line.contains("account_index=12"));
+    assert!(request_line.contains("aggregate=true"));
     assert!(!request_line.contains("product_symbol="));
 }
 
@@ -157,6 +165,57 @@ fn auth_token_uses_configured_private_key() {
     assert_eq!(parts[1], "12");
     assert_eq!(parts[2], "3");
     assert_eq!(bytes::decode_hex_len(parts[3]), Some(80));
+}
+
+#[test]
+fn robinhood_client_uses_explicit_profile() {
+    let client = LighterClient::with_network(Duration::from_secs(1), LighterNetwork::Robinhood)
+        .expect("client");
+
+    assert_eq!(client.network(), Some(LighterNetwork::Robinhood));
+    assert_eq!(client.base_url(), "https://api.rh.lighter.xyz");
+    assert_eq!(client.chain_id(), Some(466_324));
+}
+
+#[test]
+fn custom_url_does_not_guess_a_signing_chain() {
+    let client =
+        LighterClient::with_base_url(Duration::from_secs(1), "http://localhost:8000".to_string())
+            .expect("client");
+
+    assert_eq!(client.network(), None);
+    assert_eq!(client.chain_id(), None);
+    assert!(client.signing_chain_id().is_err());
+}
+
+#[test]
+fn custom_url_accepts_an_explicit_signing_chain() {
+    let client = LighterClient::with_base_url_credentials_and_chain_id(
+        Duration::from_secs(1),
+        "http://localhost:8000".to_string(),
+        466_324,
+        None,
+        None,
+        None,
+    )
+    .expect("client");
+
+    assert_eq!(client.network(), None);
+    assert_eq!(client.chain_id(), Some(466_324));
+}
+
+#[test]
+fn known_endpoint_rejects_a_mismatched_signing_chain() {
+    let result = LighterClient::with_base_url_credentials_and_chain_id(
+        Duration::from_secs(1),
+        "https://api.rh.lighter.xyz".to_string(),
+        304,
+        None,
+        None,
+        None,
+    );
+
+    assert!(result.is_err());
 }
 
 mod bytes {

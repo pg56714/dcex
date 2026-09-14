@@ -21,3 +21,20 @@ cargo run -p dcex --example binance_ws_public
 ```
 
 Use the pytest live suites for endpoint validation.
+
+## Lighter
+
+Lighter examples use explicit network profiles. The private HTTP and WebSocket
+examples demonstrate Mainnet and Robinhood running concurrently with separate
+`LIGHTER_MAINNET_*` and `LIGHTER_ROBINHOOD_*` credentials:
+
+```sh
+uv run python examples/sync/lighter_private_readonly.py
+uv run python examples/async/lighter_private_readonly.py
+uv run python examples/async/lighter_ws_private_readonly.py
+cargo run -p dcex --example lighter_ws_private_readonly
+```
+
+Public clients can pass `Network.ROBINHOOD` or
+`LighterNetwork::Robinhood`; omitting the network preserves the Mainnet
+default.
