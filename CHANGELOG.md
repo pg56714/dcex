@@ -1,3 +1,9 @@
+## 0.32.0 (2026-09-14)
+
+### Feat
+
+- support Robinhood network
+
 ## 0.31.0 (2026-07-27)
 
 ### Feat
