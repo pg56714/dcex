@@ -14,6 +14,7 @@ from . import (
     lighter,
     mexc,
     okx,
+    ondo,
 )
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "lighter",
     "mexc",
     "okx",
+    "ondo",
 ]

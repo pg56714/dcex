@@ -1822,3 +1822,4 @@ pub mod kucoin;
 pub mod lighter;
 pub mod mexc;
 pub mod okx;
+pub mod ondo;

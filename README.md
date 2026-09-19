@@ -138,6 +138,7 @@ added with builder setters such as `.limit(100)` or `.param("key", value)`.
 | **Backpack**    | Yes       | Yes        | Yes       | Yes        |
 | **Aster**       | Yes       | Yes        | Yes       | Yes        |
 | **Extended**    | Yes       | Yes        | Yes       | Yes        |
+| **Ondo Perps**  | Yes       | Yes        | Yes       | Yes        |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.
@@ -154,6 +155,13 @@ Private Mainnet clients read `LIGHTER_MAINNET_ACCOUNT_INDEX`,
 Robinhood clients use the corresponding `LIGHTER_ROBINHOOD_*` variables.
 Select the deployment for each client with `dcex.lighter.Network`; omitting it
 keeps the Mainnet default.
+
+### Ondo Perps
+
+The [official API](https://ondoperps.mintlify.app/) currently lists only
+perpetual futures trading endpoints, not spot endpoints. dcex supports Ondo
+perpetual futures only; private access uses `ONDO_API_KEY_ID` and
+`ONDO_API_SECRET`.
 
 ## Key Features
 
@@ -230,6 +238,10 @@ Lighter live tests can target Mainnet, Robinhood, or both. Stateful Lighter
 tests create real orders and include post-test cancellation, reduce-only
 position closing, and a final clean-account assertion. Use only dedicated,
 initially empty accounts when enabling `RUN_LIVE_TRADING_TESTS=1`.
+
+Ondo's opt-in live test places and cancels a small post-only limit order. It
+requires an account with no open orders or positions; a resting order can
+still fill, so the test attempts a reduce-only close if that occurs.
 
 ## Benchmarking
 

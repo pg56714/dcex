@@ -20,6 +20,7 @@ EXCHANGES = (
     "lighter",
     "mexc",
     "okx",
+    "ondo",
 )
 PYTHON_LIFECYCLE_METHODS = {"async_init", "close"}
 

@@ -16,6 +16,7 @@ use crate::exchanges::kucoin::KucoinClient;
 use crate::exchanges::lighter::LighterClient;
 use crate::exchanges::mexc::MexcClient;
 use crate::exchanges::okx::OkxClient;
+use crate::exchanges::ondo::OndoClient;
 use crate::product_table::MarketInfo;
 use crate::Result;
 
@@ -728,6 +729,37 @@ pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
             quote_currency: quote,
             min_notional: "0".to_string(),
             size_per_contract: value_string(market, "contractSize", "1"),
+        });
+    }
+    Ok(rows)
+}
+
+pub(super) async fn fetch_ondo(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = OndoClient::public(timeout)?;
+    let response = client.public_request("get_markets", Vec::new()).await?;
+    let mut rows = Vec::new();
+    for market in response_array(&response, &["result", "perps", "tradingPairs"]) {
+        if market.get("disabled").and_then(Value::as_bool) == Some(true) {
+            continue;
+        }
+        let pair = market.get("pair").unwrap_or(&Value::Null);
+        let base = required_string(pair, "base")?;
+        let quote = required_string(pair, "quote")?;
+        let symbol = required_string(market, "market")?;
+        let base_increment = required_string(market, "baseIncrement")?;
+        rows.push(MarketInfo {
+            exchange: "ondo".to_string(),
+            exchange_symbol: symbol,
+            product_symbol: format!("{base}-{quote}-SWAP"),
+            product_type: "swap".to_string(),
+            exchange_type: "perpetual".to_string(),
+            price_precision: required_string(market, "quoteIncrement")?,
+            size_precision: base_increment.clone(),
+            min_size: "0".to_string(),
+            base_currency: base,
+            quote_currency: quote,
+            min_notional: "0".to_string(),
+            size_per_contract: "1".to_string(),
         });
     }
     Ok(rows)

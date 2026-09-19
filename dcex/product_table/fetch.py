@@ -68,6 +68,11 @@ def extended() -> ProductTable:
     return _fetch("extended")
 
 
+def ondo() -> ProductTable:
+    """Fetch Ondo perpetual product metadata."""
+    return _fetch("ondo")
+
+
 def hyperliquid() -> ProductTable:
     """Fetch Hyperliquid product metadata."""
     return _fetch("hyperliquid")

@@ -253,6 +253,7 @@ def test_all_product_fetches_match_the_registry() -> None:
         "lighter",
         "mexc",
         "okx",
+        "ondo",
     }
 
 

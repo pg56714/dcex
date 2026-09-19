@@ -19,6 +19,7 @@ use dcex::exchanges::lighter::{
 };
 use dcex::exchanges::mexc::{MexcApi, MexcClient};
 use dcex::exchanges::okx::OkxClient;
+use dcex::exchanges::ondo::OndoClient;
 use dcex::http::{
     block_on, AsyncHttpClient, BlockingHttpClient, HttpMethod, HttpRequest, HttpResponse,
 };
@@ -354,6 +355,10 @@ mod mexc_ws;
 mod okx_client;
 #[path = "ws/okx.rs"]
 mod okx_ws;
+#[path = "clients/ondo.rs"]
+mod ondo_client;
+#[path = "ws/ondo.rs"]
+mod ondo_ws;
 
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -382,6 +387,8 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     mexc_client::register(m)?;
     mexc_ws::register(m)?;
     okx_client::register(m)?;
+    ondo_client::register(m)?;
+    ondo_ws::register(m)?;
     binance_ws::register(m)?;
     okx_ws::register(m)?;
     product_table::register(m)?;

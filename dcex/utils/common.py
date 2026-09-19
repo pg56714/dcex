@@ -19,6 +19,7 @@ class Common(str, Enum):
     KRAKEN = "kraken"
     LIGHTER = "lighter"
     MEXC = "mexc"
+    ONDO = "ondo"
 
     def __str__(self) -> str:
         return self.value

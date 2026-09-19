@@ -20,6 +20,7 @@ from .kucoin.client import Client as KuCoinClient
 from .lighter.client import Client as LighterClient
 from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
+from .ondo.client import Client as OndoClient
 from .utils.jupyter_helper import auto_apply_nest_asyncio
 
 auto_apply_nest_asyncio(verbose=False)
@@ -91,6 +92,11 @@ def okx(**kwargs: Any) -> OKXClient:  # noqa: ANN401
     return OKXClient(**kwargs)
 
 
+def ondo(**kwargs: Any) -> OndoClient:  # noqa: ANN401
+    """Create an Ondo Perps client instance."""
+    return OndoClient(**kwargs)
+
+
 __all__ = [
     "aster",
     "backpack",
@@ -105,4 +111,5 @@ __all__ = [
     "lighter",
     "mexc",
     "okx",
+    "ondo",
 ]

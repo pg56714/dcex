@@ -21,6 +21,7 @@ from .kucoin.client import Client as KuCoinClient
 from .lighter.client import Client as LighterClient
 from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
+from .ondo.client import Client as OndoClient
 
 
 async def aster(
@@ -114,6 +115,13 @@ async def okx(
     return cast(OKXClient, await OKXClient(**kwargs).async_init())
 
 
+async def ondo(
+    **kwargs: Any,  # noqa: ANN401
+) -> OndoClient:
+    """Create and initialize an Ondo Perps client instance."""
+    return cast(OndoClient, await OndoClient(**kwargs).async_init())
+
+
 __all__ = [
     "aster",
     "backpack",
@@ -128,4 +136,5 @@ __all__ = [
     "lighter",
     "mexc",
     "okx",
+    "ondo",
 ]

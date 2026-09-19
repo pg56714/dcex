@@ -44,6 +44,11 @@ async def extended() -> ProductTable:
     return await _fetch("extended")
 
 
+async def ondo() -> ProductTable:
+    """Fetch Ondo perpetual product metadata."""
+    return await _fetch("ondo")
+
+
 async def hyperliquid() -> ProductTable:
     """Fetch Hyperliquid product metadata."""
     return await _fetch("hyperliquid")

@@ -38,3 +38,16 @@ cargo run -p dcex --example lighter_ws_private_readonly
 Public clients can pass `Network.ROBINHOOD` or
 `LighterNetwork::Robinhood`; omitting the network preserves the Mainnet
 default.
+
+## Ondo Perps
+
+The [official Ondo API](https://ondoperps.mintlify.app/) currently lists only
+perpetual futures trading endpoints, not spot endpoints. The private example
+is read-only and requires `ONDO_API_KEY_ID` and `ONDO_API_SECRET`.
+
+```sh
+uv run python examples/sync/ondo_public.py
+uv run python examples/async/ondo_public.py
+uv run python examples/async/ondo_ws_public.py
+uv run python examples/sync/ondo_private_readonly.py
+```

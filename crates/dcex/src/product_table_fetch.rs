@@ -51,6 +51,7 @@ async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Ve
         Exchange::Lighter => self::exchanges::fetch_lighter(timeout).await,
         Exchange::Mexc => self::exchanges::fetch_mexc(timeout).await,
         Exchange::Okx => self::exchanges::fetch_okx(timeout).await,
+        Exchange::Ondo => self::exchanges::fetch_ondo(timeout).await,
     }
 }
 

@@ -95,9 +95,15 @@ async fn main() -> dcex::Result<()> {
 | **Backpack**    | Yes  | Yes       | Yes        |
 | **Aster**       | Yes  | Yes       | Yes        |
 | **Extended**    | Yes  | Yes       | Yes        |
+| **Ondo Perps**  | Yes  | Yes       | Yes        |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.
+
+The [official Ondo API](https://ondoperps.mintlify.app/) currently lists only
+perpetual futures trading endpoints, not spot endpoints. dcex supports Ondo
+perpetual futures only; private access uses `ONDO_API_KEY_ID` and
+`ONDO_API_SECRET`.
 
 Extended private REST reads require `EXTENDED_API_KEY`. Rust-backed LIMIT order
 signing additionally requires `EXTENDED_STARK_PRIVATE_KEY`,

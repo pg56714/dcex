@@ -73,6 +73,7 @@ body:
         - "Kraken"
         - "Lighter"
         - "MEXC"
+        - "Ondo Perps"
         - "Other (please specify in description)"
     validations:
       required: true

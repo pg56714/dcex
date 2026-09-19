@@ -21,10 +21,11 @@ pub enum Exchange {
     Lighter,
     Mexc,
     Okx,
+    Ondo,
 }
 
 impl Exchange {
-    pub const ALL: [Self; 13] = [
+    pub const ALL: [Self; 14] = [
         Self::Aster,
         Self::Backpack,
         Self::Binance,
@@ -38,6 +39,7 @@ impl Exchange {
         Self::Lighter,
         Self::Mexc,
         Self::Okx,
+        Self::Ondo,
     ];
 
     pub const fn as_str(self) -> &'static str {
@@ -55,6 +57,7 @@ impl Exchange {
             Self::Lighter => "lighter",
             Self::Mexc => "mexc",
             Self::Okx => "okx",
+            Self::Ondo => "ondo",
         }
     }
 }
@@ -148,7 +151,7 @@ mod tests {
 
     #[test]
     fn exchange_registry_matches_python_registry() {
-        assert_eq!(Exchange::ALL.len(), 13);
+        assert_eq!(Exchange::ALL.len(), 14);
         assert_eq!(Exchange::Binance.as_str(), "binance");
         assert_eq!(Exchange::Lighter.as_str(), "lighter");
     }
