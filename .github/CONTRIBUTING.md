@@ -53,14 +53,14 @@ Public live exchange tests are opt-in and require network access:
 uv run pytest -m "live and not private"
 ```
 
-Private live tests require the relevant exchange credentials from `.env.sample`.
+Private live tests require the relevant exchange credentials from `.env.example`.
 Use marker filters to avoid unintended account changes:
 
 ```sh
 uv run pytest tests/sync_support/binance tests/async_support/binance -m "live and private and not stateful and not generated"
 ```
 
-Stateful tests can mutate exchange or account settings, such as leverage or position mode. Run them only when that is intentional:
+Stateful tests can mutate exchange or account settings, such as leverage or position mode. Order tests require `RUN_LIVE_TRADING_TESTS=1`; intentional fills additionally require `RUN_LIVE_FILL_TESTS=1`. Use an initially empty dedicated account and verify cleanup afterward:
 
 ```sh
 uv run pytest tests/sync_support/okx tests/async_support/okx -m "live and private and stateful"

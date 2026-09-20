@@ -604,6 +604,7 @@ def test_spot_post_only_order_lifecycle(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_spot_market_round_trip(client):
     _cleanup_account_state(client)
     if _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
@@ -713,6 +714,7 @@ def test_modify_order_wrappers(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_market_wrappers_round_trip(client):
     _cleanup_account_state(client)
     _skip_if_unfunded(client)

@@ -614,6 +614,7 @@ def test_spot_cancel_all_orders(client):
             _cancel_spot(client, txid)
 
 
+@pytest.mark.live_fill
 def test_spot_market_round_trip_and_sell_wrappers(client):
     _skip_if_spot_open_orders(client)
     product_symbol, _, step, min_size, volume = _spot_symbol_with_funds(client)
@@ -728,6 +729,7 @@ def test_futures_cancel_all_orders(client):
         _return_futures_margin(client, transferred)
 
 
+@pytest.mark.live_fill
 def test_futures_market_round_trip(client):
     _skip_if_futures_state(client)
     transferred = _ensure_futures_margin(client)

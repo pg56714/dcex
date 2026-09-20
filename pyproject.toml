@@ -121,6 +121,7 @@ markers = [
   "private: marks tests that require private API keys",
   "generated: marks tests that request generation of downloadable reports or similar server-side artifacts",
   "stateful: marks tests that can mutate exchange or account state",
+  "live_fill: marks tests that intentionally require a real order fill",
 ]
 python_files = ["test_*.py"]
 testpaths = ["tests"]

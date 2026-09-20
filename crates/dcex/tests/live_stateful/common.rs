@@ -59,6 +59,18 @@ pub(crate) fn require_live_trading() -> bool {
     }
 }
 
+pub(crate) fn require_live_fill() -> bool {
+    if !require_live_trading() {
+        return false;
+    }
+    if env_value("RUN_LIVE_FILL_TESTS").as_deref() == Some("1") {
+        true
+    } else {
+        eprintln!("skipping live fill test; set RUN_LIVE_FILL_TESTS=1");
+        false
+    }
+}
+
 pub(crate) fn require_env(names: &[&str]) -> Option<Vec<String>> {
     let mut values = Vec::with_capacity(names.len());
     let mut missing = Vec::new();

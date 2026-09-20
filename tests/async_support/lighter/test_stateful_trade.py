@@ -382,6 +382,11 @@ async def test_post_only_order_lifecycle(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(
+    os.getenv("RUN_LIVE_FILL_TESTS") != "1",
+    reason="Set RUN_LIVE_FILL_TESTS=1 to execute real Lighter fills.",
+)
+@pytest.mark.live_fill
 async def test_ioc_market_fill_lifecycle(client):
     market = await _market(client, preferred_symbols={"SOL", "ETH", "BTC"})
     market_index, base_amount, buy_price, sell_price = await _ioc_market_order(client, market)

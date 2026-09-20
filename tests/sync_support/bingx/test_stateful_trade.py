@@ -655,6 +655,7 @@ def test_swap_replace_order(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_swap_market_buy_and_close_position(client):
     _skip_if_swap_state(client)
     quantity, _ = _swap_order_params(client)
@@ -681,6 +682,7 @@ def test_swap_market_buy_and_close_position(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_swap_market_sell_and_close_all_positions(client):
     _skip_if_swap_state(client)
     quantity, _ = _swap_order_params(client)
@@ -706,6 +708,7 @@ def test_swap_market_sell_and_close_all_positions(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_swap_fillable_limit_buy_and_sell(client):
     _skip_if_swap_state(client)
     quantity, _ = _swap_order_params(client)
@@ -793,6 +796,7 @@ def test_spot_post_only_order_lifecycle(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_spot_market_buy_and_sell(client):
     _skip_if_spot_state(client)
     quote_amount = _spot_market_quote_amount(client)
@@ -819,6 +823,7 @@ def test_spot_market_buy_and_sell(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_spot_fillable_limit_buy_and_sell(client):
     _skip_if_spot_state(client)
     quantity, price = _spot_fillable_limit_buy_params(client)
@@ -860,6 +865,7 @@ def test_spot_fillable_limit_buy_and_sell(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_spot_post_only_sell_order_lifecycle(client):
     _skip_if_spot_state(client)
     quote_amount = _spot_market_quote_amount(client)

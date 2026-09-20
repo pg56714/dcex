@@ -5,7 +5,7 @@ use dcex::ws::hyperliquid::HyperliquidPrivateWebSocket;
 
 #[tokio::main]
 async fn main() -> dcex::Result<()> {
-    let user = env::var("HYPERLIQUID_USER_ADDRESS")
+    let user = env::var("HYPERLIQUID_WALLET_ADDRESS")
         .map_err(|error| dcex::DcexError::InvalidInput(error.to_string()))?;
 
     let mut ws = HyperliquidPrivateWebSocket::new(user, false, Duration::from_secs(10))?;

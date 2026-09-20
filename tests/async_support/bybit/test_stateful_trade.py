@@ -386,6 +386,7 @@ async def test_account_settings_and_internal_transfer(client):
         )
 
 
+@pytest.mark.live_fill
 async def test_spot_stateful_order_lifecycle(client):
     transferred = await _cleanup(client, Decimal("0"))
     await _return_to_funding(client, transferred)

@@ -230,18 +230,26 @@ The default test suite is offline and does not require exchange API keys or netw
 uv run pytest
 ```
 
+For live tests, copy `.env.example` to the ignored `.env` file and fill in only
+the credentials you need. Leave the live-trading flags empty until intentionally
+running those tests.
+
 Live, private, stateful, and generated-report tests use the pytest markers
 configured in `pyproject.toml`. These tests are opt-in because they can require
 network access, exchange credentials, or account state.
+
+Stateful order tests require `RUN_LIVE_TRADING_TESTS=1`. Tests that intentionally
+seek a real fill additionally require `RUN_LIVE_FILL_TESTS=1` in both Python and
+Rust. Use a dedicated account with no open orders or positions; a failed test
+may still need manual order or position cleanup.
 
 Lighter live tests can target Mainnet, Robinhood, or both. Stateful Lighter
 tests create real orders and include post-test cancellation, reduce-only
 position closing, and a final clean-account assertion. Use only dedicated,
 initially empty accounts when enabling `RUN_LIVE_TRADING_TESTS=1`.
 
-Ondo's opt-in live test places and cancels a small post-only limit order. It
-requires an account with no open orders or positions; a resting order can
-still fill, so the test attempts a reduce-only close if that occurs.
+Ondo's opt-in tests cover post-only cancellation and, with the fill flag,
+a small perpetual fill followed by a reduce-only close.
 
 ## Benchmarking
 

@@ -7,8 +7,8 @@ use tokio::time::sleep;
 use super::common::{
     assert_success, asset_amount, fetch_trading_details, first_bid_price, format_step_decimal,
     live_test_error, minimum_order_quantity, params, parse_positive, post_only_buy_price,
-    require_env, require_live_trading, require_order_id, round_down_to_step, unique_client_id,
-    BTC_USDT_SPOT,
+    require_env, require_live_fill, require_live_trading, require_order_id, round_down_to_step,
+    unique_client_id, BTC_USDT_SPOT,
 };
 
 #[tokio::test]
@@ -69,6 +69,100 @@ async fn kucoin_spot_direct_live_stateful_order() -> dcex::Result<()> {
     assert_success(&cancel);
     cleanup_result?;
     Ok(())
+}
+
+#[tokio::test]
+#[ignore = "requires live exchange API access and real fills"]
+async fn kucoin_spot_direct_live_fill_and_sell() -> dcex::Result<()> {
+    if !require_live_fill() {
+        return Ok(());
+    }
+    let Some(keys) = require_env(&[
+        "KUCOIN_API_KEY",
+        "KUCOIN_API_SECRET",
+        "KUCOIN_API_PASSPHRASE",
+    ]) else {
+        return Ok(());
+    };
+    let client = KucoinClient::new(
+        Some(keys[0].clone()),
+        Some(keys[1].clone()),
+        Some(keys[2].clone()),
+        Duration::from_secs(20),
+    )?;
+    let open_orders = super::common::exchange_method_request(
+        &client,
+        "get_spot_open_orders",
+        params(&[("product_symbol", BTC_USDT_SPOT)]),
+    )
+    .await?;
+    if open_orders
+        .data
+        .get("items")
+        .and_then(|value| value.as_array())
+        .is_some_and(|orders| !orders.is_empty())
+    {
+        return Err(live_test_error(
+            "KuCoin fill test requires no open BTC-USDT orders",
+        ));
+    }
+    let initial_btc = kucoin_spot_btc(&client).await?;
+    let book = super::common::exchange_method_request(
+        &client,
+        "get_spot_orderbook",
+        params(&[("product_symbol", BTC_USDT_SPOT)]),
+    )
+    .await?;
+    let bid = first_bid_price(&book.data)?;
+    let details = fetch_trading_details(Exchange::KuCoin, "kucoin", BTC_USDT_SPOT).await?;
+    let min_size = details.min_size.parse::<f64>().unwrap_or(0.0);
+    let min_notional = details.min_notional.parse::<f64>().unwrap_or(0.0);
+    let funds = (min_notional * 1.1).max(min_size * bid * 1.1).max(1.1);
+    if funds > 25.0 {
+        return Err(live_test_error(format!(
+            "KuCoin minimum fill order exceeds 25 USDT: {funds}"
+        )));
+    }
+    let balance = client.get_account_balance().await?;
+    let available_usdt = asset_amount(&balance.data, "USDT", &["available", "free"]);
+    if available_usdt < funds {
+        return Err(live_test_error(format!(
+            "KuCoin fill test needs {funds} USDT in the trading account"
+        )));
+    }
+
+    let lifecycle_result = async {
+        let funds_text = format!("{funds:.8}");
+        let buy = super::common::exchange_method_request(
+            &client,
+            "place_spot_market_buy_order",
+            params(&[
+                ("product_symbol", BTC_USDT_SPOT),
+                ("funds", funds_text.as_str()),
+                ("clientOid", unique_client_id("dcexrs").as_str()),
+            ]),
+        )
+        .await?;
+        assert_success(&buy);
+        let mut acquired = 0.0;
+        for _ in 0..20 {
+            acquired = kucoin_spot_btc(&client).await? - initial_btc;
+            if acquired > 0.0 {
+                break;
+            }
+            sleep(Duration::from_millis(500)).await;
+        }
+        if acquired <= 0.0 {
+            return Err(live_test_error("KuCoin market buy did not acquire BTC"));
+        }
+        cleanup_kucoin_spot_state(&client, initial_btc).await?;
+        Ok::<(), dcex::DcexError>(())
+    }
+    .await;
+
+    let cleanup_result = cleanup_kucoin_spot_state(&client, initial_btc).await;
+    cleanup_result?;
+    lifecycle_result
 }
 
 async fn cleanup_kucoin_spot_orders(client: &KucoinClient) -> dcex::Result<()> {

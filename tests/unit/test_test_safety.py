@@ -57,6 +57,24 @@ def test_stateful_live_test_runs_after_explicit_opt_in(monkeypatch: pytest.Monke
     module.pytest_runtest_setup(_stateful_item(module))
 
 
+def test_live_fill_requires_second_opt_in(monkeypatch: pytest.MonkeyPatch) -> None:
+    module = _load_test_conftest()
+    monkeypatch.setenv("RUN_LIVE_TRADING_TESTS", "1")
+    monkeypatch.delenv("RUN_LIVE_FILL_TESTS", raising=False)
+
+    class FillItem:
+        stash = {module._relative_path_key: Path("sync_support/example/test_stateful_trade.py")}
+
+        def get_closest_marker(self, name: str) -> object | None:
+            return object() if name in {"stateful", "live_fill"} else None
+
+    with pytest.raises(pytest.skip.Exception, match="RUN_LIVE_FILL_TESTS=1"):
+        module.pytest_runtest_setup(FillItem())
+
+    monkeypatch.setenv("RUN_LIVE_FILL_TESTS", "1")
+    module.pytest_runtest_setup(FillItem())
+
+
 def test_change_contract_methods_are_classified_as_stateful(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

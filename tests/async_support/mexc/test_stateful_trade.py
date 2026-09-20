@@ -401,6 +401,7 @@ async def test_transfer_round_trip(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_spot_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
     initial_btc = await _spot_available(client, "BTC")
@@ -532,6 +533,7 @@ async def test_spot_stateful_order_lifecycle(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_contract_stateful_order_lifecycle(client):
     await _skip_if_existing_contract_state(client)
     transferred = Decimal("0")

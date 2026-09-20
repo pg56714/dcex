@@ -10,8 +10,9 @@ use super::common::{
     fetch_trading_details, first_bid_price, format_transfer_amount_ceil,
     format_transfer_amount_floor, leveraged_margin_required, live_test_error, margin_target,
     minimum_order_quantity, params, parse_positive, post_only_buy_price, push, require_env,
-    require_live_trading, require_order_id, sum_abs_values_for_symbols, wait_for_flat_position,
-    wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    require_live_fill, require_live_trading, require_order_id, sum_abs_values_for_symbols,
+    wait_for_flat_position, wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const BYBIT_SWAP_LEVERAGE: &str = "50";
@@ -214,6 +215,10 @@ async fn bybit_swap_direct_live_stateful_order() -> dcex::Result<()> {
         }
     }
 
+    if !require_live_fill() {
+        return_bybit_transfer(&client, transferred).await?;
+        return Ok(());
+    }
     let mut open_params = params(&[
         ("product_symbol", BTC_USDT_SWAP),
         ("qty", quantity.as_str()),

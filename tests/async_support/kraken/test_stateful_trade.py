@@ -628,6 +628,7 @@ async def test_spot_cancel_all_orders(client):
             await _cancel_spot(client, txid)
 
 
+@pytest.mark.live_fill
 async def test_spot_market_round_trip_and_sell_wrappers(client):
     await _skip_if_spot_open_orders(client)
     product_symbol, _, step, min_size, volume = await _spot_symbol_with_funds(client)
@@ -744,6 +745,7 @@ async def test_futures_cancel_all_orders(client):
         await _return_futures_margin(client, transferred)
 
 
+@pytest.mark.live_fill
 async def test_futures_market_round_trip(client):
     await _skip_if_futures_state(client)
     transferred = await _ensure_futures_margin(client)

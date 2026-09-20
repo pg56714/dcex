@@ -5,7 +5,8 @@ use dcex::exchanges::hyperliquid::HyperliquidClient;
 
 use super::common::{
     assert_success, fetch_trading_details, find_f64, find_string, first_bid_price, live_test_error,
-    minimum_order_quantity, require_env, require_live_trading, require_order_id, BTC_USD_SWAP,
+    minimum_order_quantity, require_env, require_live_fill, require_live_trading, require_order_id,
+    BTC_USD_SWAP,
 };
 
 #[tokio::test]
@@ -61,6 +62,115 @@ async fn hyperliquid_direct_live_stateful_order() -> dcex::Result<()> {
     .await?;
     assert_success(&cancel);
     Ok(())
+}
+
+#[tokio::test]
+#[ignore = "requires live exchange API access and real fills"]
+async fn hyperliquid_direct_live_fill_and_close() -> dcex::Result<()> {
+    if !require_live_fill() {
+        return Ok(());
+    }
+    let Some(keys) = require_env(&["HYPERLIQUID_WALLET_ADDRESS", "HYPERLIQUID_PRIVATE_KEY"]) else {
+        return Ok(());
+    };
+    let client = HyperliquidClient::new(
+        false,
+        Some(keys[0].clone()),
+        Some(keys[1].clone()),
+        Duration::from_secs(20),
+    )?;
+    let existing = super::common::exchange_method_request(
+        &client,
+        "open_orders",
+        vec![("user".to_string(), keys[0].clone())],
+    )
+    .await?;
+    if existing
+        .data
+        .as_array()
+        .is_some_and(|orders| !orders.is_empty())
+        || hyperliquid_btc_position_size(&client, &keys[0]).await? != 0.0
+    {
+        return Err(live_test_error(
+            "Hyperliquid fill test requires no open orders or BTC position",
+        ));
+    }
+
+    let book = super::common::exchange_method_request(
+        &client,
+        "get_l2book",
+        vec![("product_symbol".to_string(), BTC_USD_SWAP.to_string())],
+    )
+    .await?;
+    let (_, ask) = hyperliquid_bid_ask(&book.data)?;
+    let price = ((ask * 1.005).ceil() as i64).to_string();
+    let details = fetch_trading_details(Exchange::Hyperliquid, "hyperliquid", BTC_USD_SWAP).await?;
+    let size = hyperliquid_order_size(&price, &minimum_order_quantity(&price, &details)?)?;
+    let notional = price.parse::<f64>().unwrap_or(0.0) * size.parse::<f64>().unwrap_or(0.0);
+    if notional > 25.0 {
+        return Err(live_test_error(format!(
+            "Hyperliquid minimum fill order exceeds 25 USD: {notional}"
+        )));
+    }
+
+    let lifecycle_result = async {
+        let buy = super::common::exchange_method_request(
+            &client,
+            "place_order",
+            vec![
+                ("product_symbol".to_string(), BTC_USD_SWAP.to_string()),
+                ("isBuy".to_string(), "true".to_string()),
+                ("price".to_string(), price),
+                ("size".to_string(), size),
+                ("reduceOnly".to_string(), "false".to_string()),
+                ("tif".to_string(), "Ioc".to_string()),
+            ],
+        )
+        .await?;
+        assert_success(&buy);
+        let mut filled_size = 0.0;
+        for _ in 0..20 {
+            filled_size = hyperliquid_btc_position_size(&client, &keys[0]).await?;
+            if filled_size > 0.0 {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(500)).await;
+        }
+        if filled_size <= 0.0 {
+            return Err(live_test_error(
+                "Hyperliquid IOC buy did not create a BTC position",
+            ));
+        }
+        let close_book = super::common::exchange_method_request(
+            &client,
+            "get_l2book",
+            vec![("product_symbol".to_string(), BTC_USD_SWAP.to_string())],
+        )
+        .await?;
+        let (bid, _) = hyperliquid_bid_ask(&close_book.data)?;
+        let close = super::common::exchange_method_request(
+            &client,
+            "place_order",
+            vec![
+                ("product_symbol".to_string(), BTC_USD_SWAP.to_string()),
+                ("isBuy".to_string(), "false".to_string()),
+                (
+                    "price".to_string(),
+                    ((bid * 0.995).floor() as i64).max(1).to_string(),
+                ),
+                ("size".to_string(), format_hyperliquid_size(filled_size)),
+                ("reduceOnly".to_string(), "true".to_string()),
+                ("tif".to_string(), "Ioc".to_string()),
+            ],
+        )
+        .await?;
+        assert_success(&close);
+        Ok::<(), dcex::DcexError>(())
+    }
+    .await;
+    let cleanup_result = cleanup_hyperliquid_state(&client, &keys[0]).await;
+    cleanup_result?;
+    lifecycle_result
 }
 
 async fn cleanup_hyperliquid_state(client: &HyperliquidClient, user: &str) -> dcex::Result<()> {

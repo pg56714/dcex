@@ -376,6 +376,11 @@ def test_post_only_order_lifecycle(client):
     _assert_response(client.cancel_order(market_index=market_index, order_index=order_index))
 
 
+@pytest.mark.skipif(
+    os.getenv("RUN_LIVE_FILL_TESTS") != "1",
+    reason="Set RUN_LIVE_FILL_TESTS=1 to execute real Lighter fills.",
+)
+@pytest.mark.live_fill
 def test_ioc_market_fill_lifecycle(client):
     market = _market(client, preferred_symbols={"SOL", "ETH", "BTC"})
     market_index, base_amount, buy_price, sell_price = _ioc_market_order(client, market)

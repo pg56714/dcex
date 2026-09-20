@@ -401,6 +401,7 @@ async def test_funds_transfer_round_trip(client):
         )
 
 
+@pytest.mark.live_fill
 async def test_spot_stateful_order_lifecycle(client):
     await _skip_if_existing_state(client)
     initial_btc = await _spot_available(client, "BTC")
@@ -599,6 +600,7 @@ async def test_spot_stateful_order_lifecycle(client):
         await _return_to_funding(client, transferred)
 
 
+@pytest.mark.live_fill
 async def test_swap_close_position_lifecycle(client):
     await _skip_if_existing_state(client)
     initial_btc = await _spot_available(client, "BTC")

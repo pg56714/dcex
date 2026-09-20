@@ -628,6 +628,7 @@ async def test_transfer_round_trip(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_spot_stateful_order_lifecycle(client):
     await _cleanup_state(client)
     initial_btc = await _spot_available(client, "BTC")
@@ -715,6 +716,7 @@ async def test_spot_stateful_order_lifecycle(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_futures_stateful_order_lifecycle(client):
     await _cleanup_state(client)
     transferred = await _ensure_futures_margin(client)

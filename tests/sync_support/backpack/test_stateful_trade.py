@@ -210,6 +210,7 @@ def _cleanup_test_state(client: Client) -> None:
     assert _position_size(client, PERP_SYMBOL) == 0
 
 
+@pytest.mark.live_fill
 def test_spot_stateful_order_lifecycle(client):
     _cleanup_test_state(client)
     min_qty = _min_quantity(client, SPOT_SYMBOL)
@@ -279,6 +280,7 @@ def test_spot_stateful_order_lifecycle(client):
         _return_spot_sol_delta(client, initial_sol)
 
 
+@pytest.mark.live_fill
 def test_perp_stateful_order_lifecycle(client):
     _cleanup_test_state(client)
     qty = _min_quantity(client, PERP_SYMBOL)

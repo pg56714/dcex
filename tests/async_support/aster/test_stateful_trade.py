@@ -480,6 +480,7 @@ async def _cleanup_account(client: Client) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_spot_order_and_transfer_lifecycle(client):
     await _cleanup_account(client)
     _spot_quantity, spot_buy_quote = await _spot_order_params(client)
@@ -563,6 +564,7 @@ async def test_spot_order_and_transfer_lifecycle(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_futures_order_lifecycle(client):
     await _cleanup_account(client)
 

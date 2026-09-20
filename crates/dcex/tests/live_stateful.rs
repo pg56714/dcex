@@ -7,10 +7,12 @@ mod live_stateful {
     mod bingx;
     mod bitget;
     mod bybit;
+    mod extended;
     mod hyperliquid;
     mod kraken;
     mod kucoin;
     mod lighter;
     mod mexc;
     mod okx;
+    mod ondo;
 }

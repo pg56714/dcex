@@ -523,6 +523,7 @@ def test_spot_cancel_all_orders(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_spot_market_round_trip(client):
     step, min_size, _ = _spot_step_and_min(client)
     funds = _spot_market_funds(client)
@@ -636,6 +637,7 @@ def test_futures_cancel_all_orders(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_futures_market_round_trip(client):
     _skip_if_futures_state(client)
     size, _, current_price, multiplier = _futures_order_params(client)

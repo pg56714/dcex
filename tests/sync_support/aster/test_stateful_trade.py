@@ -472,6 +472,7 @@ def _cleanup_account(client: Client) -> None:
     assert _futures_position_amount(client) == 0
 
 
+@pytest.mark.live_fill
 def test_spot_order_and_transfer_lifecycle(client):
     _cleanup_account(client)
     _spot_quantity, spot_buy_quote = _spot_order_params(client)
@@ -545,6 +546,7 @@ def test_spot_order_and_transfer_lifecycle(client):
         _return_test_funds(client, initial_balances)
 
 
+@pytest.mark.live_fill
 def test_futures_order_lifecycle(client):
     _cleanup_account(client)
 

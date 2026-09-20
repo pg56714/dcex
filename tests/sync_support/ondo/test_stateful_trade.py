@@ -97,7 +97,8 @@ def test_post_only_limit_order_and_cancel(client: Client) -> None:
     )
     size = size_steps * size_increment
     assert Decimal("10") <= price * size <= Decimal("20")
-    assert Decimal(_result(client.get_max_order_size(market))["percent25"]["maxBidBaseSize"]) >= size
+    max_bid = _result(client.get_max_order_size(market))["percent25"]["maxBidBaseSize"]
+    assert Decimal(max_bid) >= size
 
     client_order_id = f"dcex-{uuid4().hex[:20]}"
     order_id = None
@@ -125,7 +126,10 @@ def test_post_only_limit_order_and_cancel(client: Client) -> None:
         assert order_id, f"Could not identify Ondo test order: {placed}"
         _result(client.cancel_order(order_id))
     finally:
-        _cancel_test_orders(client, market, client_order_id)
+        try:
+            _cancel_test_orders(client, market, client_order_id)
+        finally:
+            _close_test_position(client, market)
 
     final_order = _result(client.get_order(order_id))
     assert isinstance(final_order, dict)
@@ -144,3 +148,77 @@ def test_post_only_limit_order_and_cancel(client: Client) -> None:
         pytest.fail("Ondo post-only order filled unexpectedly and was closed reduce-only.")
     assert final_order["status"] == "canceled", final_order
     assert not _rows(client.get_positions()), "Ondo test left a position"
+
+
+def _close_test_position(client: Client, market: str) -> None:
+    """Close only the position opened by this test on an initially empty account."""
+    for _ in range(4):
+        positions = [p for p in _rows(client.get_positions()) if p.get("market") == market]
+        if not positions:
+            return
+        for position in positions:
+            size = Decimal(str(position["netQuantity"]))
+            assert size > 0, position
+            side = "sell" if position["direction"] == "long" else "buy"
+            _result(
+                client.place_order(
+                    market=market,
+                    side=side,
+                    type="market",
+                    size=str(size),
+                    reduceOnly=True,
+                )
+            )
+        time.sleep(1)
+    assert not _rows(client.get_positions()), "Ondo test position remains after reduce-only close"
+
+
+@pytest.mark.live_fill
+def test_market_fill_and_reduce_only_close(client: Client) -> None:
+    """Confirm a small real fill, then restore the initially empty account."""
+    if _rows(client.get_positions()) or _rows(client.get_open_orders()):
+        pytest.skip("Ondo account must start without positions or open orders.")
+
+    markets = _result(client.get_markets())
+    assert isinstance(markets, dict)
+    pair = next(
+        p
+        for p in markets["perps"]["tradingPairs"]
+        if p.get("market") == "BTC-USD.P" and not p.get("disabled")
+    )
+    market = pair["market"]
+    depth = _result(client.get_depth(market, 5))
+    assert isinstance(depth, dict) and depth["bids"] and depth["asks"]
+    bid = Decimal(str(depth["bids"][0][0]))
+    ask = Decimal(str(depth["asks"][0][0]))
+    step = Decimal(str(pair["baseIncrement"]))
+    size = (Decimal("10") / (bid * step)).to_integral_value(rounding=ROUND_CEILING) * step
+    assert Decimal("10") <= size * bid and size * ask <= Decimal("20")
+
+    buy_sent = False
+    try:
+        placed = _result(
+            client.place_order(
+                market=market,
+                side="buy",
+                type="market",
+                size=str(size),
+                clientOrderId=f"dcex-{uuid4().hex[:20]}",
+            )
+        )
+        buy_sent = True
+        order_id = _order_id(placed)
+        assert order_id, f"Ondo market buy has no order ID: {placed}"
+        filled = Decimal("0")
+        for _ in range(20):
+            order = _result(client.get_order(order_id))
+            assert isinstance(order, dict)
+            filled = Decimal(str(order.get("filledSize", "0")))
+            if filled > 0:
+                break
+            time.sleep(0.5)
+        assert filled > 0, "Ondo market buy did not report a fill"
+        _close_test_position(client, market)
+    finally:
+        if buy_sent:
+            _close_test_position(client, market)

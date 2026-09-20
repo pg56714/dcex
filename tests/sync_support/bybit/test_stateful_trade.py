@@ -381,6 +381,7 @@ def test_account_settings_and_internal_transfer(client):
         )
 
 
+@pytest.mark.live_fill
 def test_spot_stateful_order_lifecycle(client):
     transferred = _cleanup(client, Decimal("0"))
     _return_to_funding(client, transferred)

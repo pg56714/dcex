@@ -9,8 +9,9 @@ use super::common::{
     format_step_decimal, format_transfer_amount, format_transfer_amount_floor,
     insufficient_funds_error, leveraged_margin_required, live_test_error, margin_target,
     minimum_order_quantity, params, parse_positive, post_only_buy_price, require_env,
-    require_live_trading, require_order_id, round_down_to_step, sum_abs_values_for_symbols,
-    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    require_live_fill, require_live_trading, require_order_id, round_down_to_step,
+    sum_abs_values_for_symbols, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const OKX_SWAP_LEVERAGE: &str = "50";
@@ -186,6 +187,10 @@ async fn okx_swap_direct_live_stateful_order() -> dcex::Result<()> {
     .await?;
     assert_success(&cancel);
 
+    if !require_live_fill() {
+        return_okx_transfer(&client, transferred).await?;
+        return Ok(());
+    }
     let open_result = super::common::exchange_method_request(
         &client,
         "place_market_buy_order",

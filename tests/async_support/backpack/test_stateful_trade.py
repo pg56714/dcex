@@ -211,6 +211,7 @@ async def _cleanup_test_state(client: Client) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_spot_stateful_order_lifecycle(client):
     await _cleanup_test_state(client)
     min_qty = await _min_quantity(client, SPOT_SYMBOL)
@@ -284,6 +285,7 @@ async def test_spot_stateful_order_lifecycle(client):
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_fill
 async def test_perp_stateful_order_lifecycle(client):
     await _cleanup_test_state(client)
     qty = await _min_quantity(client, PERP_SYMBOL)

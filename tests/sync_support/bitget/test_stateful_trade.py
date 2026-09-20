@@ -621,6 +621,7 @@ def test_transfer_round_trip(client):
     _assert_ok(client.get_transfer_records(coin="USDT", limit=20))
 
 
+@pytest.mark.live_fill
 def test_spot_stateful_order_lifecycle(client):
     _cleanup_state(client)
     initial_btc = _spot_available(client, "BTC")
@@ -713,6 +714,7 @@ def test_spot_stateful_order_lifecycle(client):
         _cleanup_spot_btc(client, initial_btc)
 
 
+@pytest.mark.live_fill
 def test_futures_stateful_order_lifecycle(client):
     _cleanup_state(client)
     transferred = _ensure_futures_margin(client)

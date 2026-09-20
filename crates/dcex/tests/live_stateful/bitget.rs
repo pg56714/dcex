@@ -10,8 +10,9 @@ use super::common::{
     contains_non_empty_array, fetch_trading_details, first_bid_price, format_transfer_amount,
     format_transfer_amount_floor, leveraged_margin_required, live_test_error, margin_target,
     minimum_order_quantity, params, post_only_buy_price, price_below_market, push, require_env,
-    require_live_trading, require_order_id, sum_abs_values_for_symbols, unique_client_id,
-    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    require_live_fill, require_live_trading, require_order_id, sum_abs_values_for_symbols,
+    unique_client_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const BITGET_FUTURES_PRODUCT_TYPE: &str = "USDT-FUTURES";
@@ -180,6 +181,10 @@ async fn bitget_swap_direct_live_stateful_order() -> dcex::Result<()> {
     };
     assert_success(&cancel);
 
+    if !require_live_fill() {
+        return_bitget_futures_margin(&client, uta, transferred).await?;
+        return Ok(());
+    }
     let open_result = bitget_place_swap_market_buy(&client, uta, &quantity).await;
     let opened = match open_result {
         Ok(opened) => opened,

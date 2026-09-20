@@ -12,8 +12,8 @@ def require_env(name: str) -> str:
 
 def main() -> None:
     client = dcex.kraken(
-        api_key=require_env("KRAKEN_API_KEY"),
-        api_secret=require_env("KRAKEN_API_SECRET"),
+        api_key=require_env("KRAKEN_SPOT_API_KEY"),
+        api_secret=require_env("KRAKEN_SPOT_API_SECRET"),
     )
 
     balance = client.get_spot_account_balance()

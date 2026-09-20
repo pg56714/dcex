@@ -7,6 +7,9 @@ import textwrap
 from pathlib import Path
 
 import pytest
+from dotenv import load_dotenv
+
+load_dotenv(override=False)
 
 _LIVE_TEST_DIRS = {"sync_support", "async_support"}
 _relative_path_key = pytest.StashKey[Path | None]()
@@ -147,6 +150,13 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         and not _stateful_tests_enabled()
     ):
         pytest.skip("Set RUN_LIVE_TRADING_TESTS=1 before running a stateful live test.")
+
+    if (
+        _is_live_path(relative_path)
+        and item.get_closest_marker("live_fill") is not None
+        and os.getenv("RUN_LIVE_FILL_TESTS") != "1"
+    ):
+        pytest.skip("Set RUN_LIVE_FILL_TESTS=1 before running a live fill test.")
 
     missing = [name for name in _private_env_vars(item, relative_path) if not os.getenv(name)]
     if missing:

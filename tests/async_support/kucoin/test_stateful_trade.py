@@ -1057,6 +1057,7 @@ async def _exercise_futures_stateful_methods(client: Client) -> None:
     assert await client.get_futures_recent_trade_history(product_symbol=FUTURES_SYMBOL) is not None
 
 
+@pytest.mark.live_fill
 async def test_async_stateful_order_transfer_and_position_lifecycle(client):
     await _skip_if_existing_state(client)
     initial = await _snapshot_balances(client)

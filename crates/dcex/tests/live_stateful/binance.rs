@@ -9,7 +9,7 @@ use super::common::{
     first_bid_price, format_transfer_amount, format_transfer_amount_floor,
     insufficient_funds_error, leveraged_margin_required, live_test_error, margin_target,
     minimum_order_quantity, parse_positive, post_only_buy_price_from_bid, price_below_market,
-    require_env, require_live_trading, require_order_id, wait_for_flat_position,
+    require_env, require_live_fill, require_live_trading, require_order_id, wait_for_flat_position,
     wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
 };
 
@@ -143,6 +143,10 @@ async fn binance_futures_direct_live_stateful_order() -> dcex::Result<()> {
     };
     assert_success(&cancel);
 
+    if !require_live_fill() {
+        return_binance_transfer(&client, &transfer).await?;
+        return Ok(());
+    }
     let open_result = client
         .place_market_buy_order(BTC_USDT_SWAP, quantity.as_str())
         .await;

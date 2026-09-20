@@ -7,8 +7,8 @@ use serde_json::Value;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, find_f64, find_string, live_test_error, require_env, require_live_trading,
-    unique_client_id,
+    assert_success, find_f64, find_string, live_test_error, require_env, require_live_fill,
+    require_live_trading, unique_client_id,
 };
 
 #[tokio::test]
@@ -21,6 +21,130 @@ async fn lighter_mainnet_direct_live_stateful_order() -> dcex::Result<()> {
 #[ignore = "requires live exchange API access"]
 async fn lighter_robinhood_direct_live_stateful_order() -> dcex::Result<()> {
     lighter_direct_live_stateful_order(LighterNetwork::Robinhood).await
+}
+
+#[tokio::test]
+#[ignore = "requires live exchange API access and real fills"]
+async fn lighter_mainnet_direct_live_fill_and_close() -> dcex::Result<()> {
+    lighter_direct_live_fill_and_close(LighterNetwork::Mainnet).await
+}
+
+#[tokio::test]
+#[ignore = "requires live exchange API access and real fills"]
+async fn lighter_robinhood_direct_live_fill_and_close() -> dcex::Result<()> {
+    lighter_direct_live_fill_and_close(LighterNetwork::Robinhood).await
+}
+
+async fn lighter_direct_live_fill_and_close(network: LighterNetwork) -> dcex::Result<()> {
+    if !require_live_fill() {
+        return Ok(());
+    }
+    let env_names = credential_env_names(network);
+    let Some(keys) = require_env(&env_names) else {
+        return Ok(());
+    };
+    let account_index = parse_u64(&keys[0], env_names[0])?;
+    let api_key_index = parse_u64(&keys[1], env_names[1])?;
+    let credentials = LighterCredentials::new(account_index, api_key_index, keys[2].clone())?;
+    let client = LighterClient::with_credentials(Duration::from_secs(20), network, credentials)?;
+    if let Some(message) = client.check_client().await? {
+        return Err(live_test_error(format!(
+            "Lighter fill client check failed: {message}"
+        )));
+    }
+    if !lighter_account_is_clean(&client, account_index).await? {
+        return Err(live_test_error(
+            "Lighter fill test requires an account without open orders or positions",
+        ));
+    }
+
+    let market = active_lighter_market(&client).await?;
+    let market_id = value_string(&market, "market_id")?;
+    let price_decimals = value_u32(&market, "price_decimals")?;
+    let size_decimals = value_u32(&market, "size_decimals")?;
+    let min_base = value_f64_required(&market, "min_base_amount")?;
+    let min_quote = value_f64_required(&market, "min_quote_amount")?;
+    let book = super::common::exchange_method_request(
+        &client,
+        "get_order_book_orders",
+        vec![
+            ("market_id".to_string(), market_id.clone()),
+            ("limit".to_string(), "5".to_string()),
+        ],
+    )
+    .await?;
+    let ask = first_lighter_book_price(&book.data, "asks")?;
+    let buy_price = scale_amount(ask * 1.001, price_decimals, true)?;
+    let buy_price_value = buy_price as f64 / 10_f64.powi(price_decimals as i32);
+    let min_size = 1.0 / 10_f64.powi(size_decimals as i32);
+    let base_amount = scale_amount(
+        min_base.max(min_quote / buy_price_value).max(min_size),
+        size_decimals,
+        true,
+    )?;
+    let notional = base_amount as f64 / 10_f64.powi(size_decimals as i32) * buy_price_value;
+    if notional > 25.0 {
+        return Err(live_test_error(format!(
+            "Lighter minimum fill order exceeds 25 quote units: {notional}"
+        )));
+    }
+
+    let lifecycle_result = async {
+        let order = super::common::exchange_method_request(
+            &client,
+            "create_order",
+            vec![
+                ("market_index".to_string(), market_id.clone()),
+                ("client_order_index".to_string(), unique_client_id("")),
+                ("base_amount".to_string(), base_amount.to_string()),
+                ("price".to_string(), buy_price.to_string()),
+                ("is_ask".to_string(), "false".to_string()),
+                ("order_type".to_string(), "1".to_string()),
+                ("time_in_force".to_string(), "0".to_string()),
+                ("order_expiry".to_string(), "0".to_string()),
+            ],
+        )
+        .await?;
+        ensure_lighter_success(&order, "IOC buy")?;
+
+        let mut filled_size = 0.0;
+        for _ in 0..20 {
+            let account = super::common::exchange_method_request(
+                &client,
+                "get_account",
+                vec![
+                    ("by".to_string(), "index".to_string()),
+                    ("value".to_string(), account_index.to_string()),
+                ],
+            )
+            .await?;
+            filled_size = lighter_positions(&account.data)
+                .into_iter()
+                .filter(|position| {
+                    value_string(position, "market_id").ok().as_deref() == Some(&market_id)
+                })
+                .map(signed_lighter_position_size)
+                .collect::<dcex::Result<Vec<_>>>()?
+                .into_iter()
+                .sum();
+            if filled_size > 0.0 {
+                break;
+            }
+            sleep(Duration::from_millis(500)).await;
+        }
+        if filled_size <= 0.0 {
+            return Err(live_test_error(
+                "Lighter IOC buy did not create a long position",
+            ));
+        }
+        close_lighter_position(&client, &market, filled_size).await?;
+        Ok::<(), dcex::DcexError>(())
+    }
+    .await;
+
+    let cleanup_result = cleanup_lighter_state(&client, account_index).await;
+    cleanup_result?;
+    lifecycle_result
 }
 
 async fn lighter_direct_live_stateful_order(network: LighterNetwork) -> dcex::Result<()> {

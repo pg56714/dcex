@@ -394,6 +394,7 @@ def test_transfer_round_trip(client):
     )
 
 
+@pytest.mark.live_fill
 def test_spot_stateful_order_lifecycle(client):
     _skip_if_existing_state(client)
     initial_btc = _spot_available(client, "BTC")
@@ -522,6 +523,7 @@ def test_spot_stateful_order_lifecycle(client):
         _cleanup_spot_btc(client, initial_btc)
 
 
+@pytest.mark.live_fill
 def test_contract_stateful_order_lifecycle(client):
     _skip_if_existing_contract_state(client)
     transferred = Decimal("0")

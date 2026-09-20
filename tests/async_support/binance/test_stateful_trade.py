@@ -482,6 +482,7 @@ async def test_spot_cancel_all_open_orders(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+@pytest.mark.live_fill
 async def test_spot_market_order_round_trip(client):
     quote_amount = await _safe_spot_market_quote(client, SPOT_SYMBOL)
     transferred, reverse_type = await _ensure_balance(
@@ -644,6 +645,7 @@ async def test_futures_cancel_all_open_orders(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+@pytest.mark.live_fill
 async def test_futures_market_long_round_trip(client):
     await _cleanup_futures_test_state(client)
 
@@ -672,6 +674,7 @@ async def test_futures_market_long_round_trip(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+@pytest.mark.live_fill
 async def test_futures_market_short_round_trip(client):
     await _cleanup_futures_test_state(client)
 

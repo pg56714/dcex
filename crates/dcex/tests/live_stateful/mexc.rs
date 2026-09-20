@@ -9,9 +9,10 @@ use super::common::{
     fetch_trading_details, find_f64, first_bid_price, format_step_decimal, format_transfer_amount,
     format_transfer_amount_floor, insufficient_funds_error, leveraged_margin_required,
     live_test_error, margin_target, minimum_order_quantity, params, parse_positive,
-    post_only_buy_price_from_bid, price_below_market, require_env, require_live_trading,
-    require_order_id, round_down_to_step, sum_abs_values_for_symbols, unique_client_id,
-    wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    post_only_buy_price_from_bid, price_below_market, require_env, require_live_fill,
+    require_live_trading, require_order_id, round_down_to_step, sum_abs_values_for_symbols,
+    unique_client_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
+    BTC_USDT_SWAP,
 };
 
 const MEXC_CONTRACT_LEVERAGE: &str = "50";
@@ -162,6 +163,10 @@ async fn mexc_contract_direct_live_stateful_order() -> dcex::Result<()> {
     .await?;
     assert_success(&cancel);
 
+    if !require_live_fill() {
+        return_mexc_contract_transfer(&client, transferred).await?;
+        return Ok(());
+    }
     let open_result = super::common::exchange_method_request(
         &client,
         "place_contract_market_buy_order",

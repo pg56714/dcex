@@ -625,6 +625,7 @@ async def test_spot_post_only_order_lifecycle(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+@pytest.mark.live_fill
 async def test_spot_market_round_trip(client):
     await _cleanup_account_state(client)
     if await _spot_available_usdc(client) < SPOT_REQUIRED_USDC:
@@ -736,6 +737,7 @@ async def test_modify_order_wrappers(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+@pytest.mark.live_fill
 async def test_market_wrapper_buy_and_sell_are_reachable_when_funded(client):
     await _cleanup_account_state(client)
     await _skip_if_unfunded(client)

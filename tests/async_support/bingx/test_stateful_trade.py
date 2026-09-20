@@ -1010,6 +1010,7 @@ async def _exercise_swap_stateful_methods(client: Client) -> None:
     await asyncio.sleep(3)
 
 
+@pytest.mark.live_fill
 async def test_async_stateful_order_transfer_and_position_lifecycle(client):
     await _skip_if_existing_state(client)
     try:

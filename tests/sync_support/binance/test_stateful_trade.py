@@ -461,6 +461,7 @@ def test_spot_cancel_all_open_orders(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_spot_market_order_round_trip(client):
     quote_amount = _safe_spot_market_quote(client, SPOT_SYMBOL)
     transferred, reverse_type = _ensure_balance(
@@ -611,6 +612,7 @@ def test_futures_cancel_all_open_orders(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_futures_market_long_round_trip(client):
     _cleanup_futures_test_state(client)
 
@@ -637,6 +639,7 @@ def test_futures_market_long_round_trip(client):
 
 
 @pytest.mark.private
+@pytest.mark.live_fill
 def test_futures_market_short_round_trip(client):
     _cleanup_futures_test_state(client)
 
