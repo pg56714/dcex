@@ -11,6 +11,54 @@ from .enums import BinanceProductType
 class TradeHTTP(HTTPManager):
     """HTTP client for Binance trading API endpoints."""
 
+    def place_equity_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        order_type: str,
+        *,
+        quantity: str | None = None,
+        notional: str | None = None,
+        price: str | None = None,
+        trading_session: str | None = None,
+        time_in_force: str | None = None,
+        client_order_id: str | None = None,
+    ) -> dict:
+        """Place a stock order; the native client validates the order matrix."""
+        return self._native_private(
+            "place_equity_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                orderType=order_type,
+                quantity=quantity,
+                notional=notional,
+                price=price,
+                tradingSession=trading_session,
+                timeInForce=time_in_force,
+                clientOrderId=client_order_id,
+            ),
+        )
+
+    def cancel_equity_order(self, order_id: str) -> dict:
+        """Cancel one stock order."""
+        return self._native_private("cancel_equity_order", self._params(orderId=order_id))
+
+    def get_equity_order_detail(self, order_id: str) -> dict:
+        """Get one stock order."""
+        return self._native_private("get_equity_order_detail", self._params(orderId=order_id))
+
+    def get_open_equity_orders(self) -> dict:
+        """Get open stock orders."""
+        return self._native_private("get_open_equity_orders", [])
+
+    def get_equity_order_history(self, start_time: int, end_time: int) -> dict:
+        """Get stock order history for a time range."""
+        return self._native_private(
+            "get_equity_order_history",
+            self._params(startTime=start_time, endTime=end_time),
+        )
+
     def _native_private(
         self,
         method_name: str,

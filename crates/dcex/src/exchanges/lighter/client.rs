@@ -454,7 +454,13 @@ impl LighterClient {
 
     pub(super) fn market_id(&self, product_symbol: &str) -> Result<String> {
         if let Some(table) = &self.product_table {
-            return table.get_exchange_symbol("lighter", product_symbol);
+            let exchange = match self.network {
+                Some(LighterNetwork::Robinhood | LighterNetwork::RobinhoodTestnet) => {
+                    "lighter_robinhood"
+                }
+                _ => "lighter",
+            };
+            return table.get_exchange_symbol(exchange, product_symbol);
         }
         if product_symbol.contains('-') {
             return Err(DcexError::InvalidInput(

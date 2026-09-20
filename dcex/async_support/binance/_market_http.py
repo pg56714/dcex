@@ -10,6 +10,22 @@ from .enums import BinanceProductType
 class MarketHTTP(HTTPManager):
     """Async HTTP client for Binance market data API endpoints."""
 
+    async def get_equity_exchange_info(self, product_symbol: str | None = None) -> dict:
+        """Get stock symbols and their order-size rules (requires an API key)."""
+        return await self._native_public(
+            "get_equity_exchange_info", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_equity_tokenized_assets(self) -> list[dict]:
+        """Get stock tokens available for conversion (requires an API key)."""
+        return await self._native_public("get_equity_tokenized_assets", [])
+
+    async def get_equity_quote(self, product_symbol: str) -> dict:
+        """Get the latest bid and ask for a stock symbol."""
+        return await self._native_public(
+            "get_equity_quote", self._params(product_symbol=product_symbol)
+        )
+
     async def _native_public(
         self,
         method_name: str,

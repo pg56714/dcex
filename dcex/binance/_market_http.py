@@ -10,6 +10,20 @@ from .enums import BinanceProductType
 class MarketHTTP(HTTPManager):
     """HTTP client for Binance market data API endpoints."""
 
+    def get_equity_exchange_info(self, product_symbol: str | None = None) -> dict:
+        """Get stock symbols and their order-size rules (requires an API key)."""
+        return self._native_public(
+            "get_equity_exchange_info", self._params(product_symbol=product_symbol)
+        )
+
+    def get_equity_tokenized_assets(self) -> list[dict]:
+        """Get stock tokens available for conversion (requires an API key)."""
+        return self._native_public("get_equity_tokenized_assets", [])
+
+    def get_equity_quote(self, product_symbol: str) -> dict:
+        """Get the latest bid and ask for a stock symbol."""
+        return self._native_public("get_equity_quote", self._params(product_symbol=product_symbol))
+
     def _native_public(self, method_name: str, params: list[tuple[str, str]]) -> Any:  # noqa: ANN401
         """Call a Rust-backed Binance public method and decode its JSON body."""
         if self._native_client is None:

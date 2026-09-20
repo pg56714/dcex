@@ -13,7 +13,7 @@ use crate::exchanges::extended::ExtendedClient;
 use crate::exchanges::hyperliquid::HyperliquidClient;
 use crate::exchanges::kraken::KrakenClient;
 use crate::exchanges::kucoin::KucoinClient;
-use crate::exchanges::lighter::LighterClient;
+use crate::exchanges::lighter::{LighterClient, LighterNetwork};
 use crate::exchanges::mexc::MexcClient;
 use crate::exchanges::okx::OkxClient;
 use crate::exchanges::ondo::OndoClient;
@@ -213,7 +213,39 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
             size_per_contract: "1".to_string(),
         });
     }
+    // The Equity metadata endpoint requires an API key even though it is unsigned.
+    if let Ok(api_key) = std::env::var("BINANCE_API_KEY") {
+        if !api_key.is_empty() {
+            let equity_client = BinanceClient::new(Some(api_key), None, timeout)?;
+            if let Ok(equity) = equity_client
+                .public_request("get_equity_exchange_info", vec![])
+                .await
+            {
+                for market in response_array(&equity, &["symbols"]) {
+                    rows.push(binance_equity_market_info(market)?);
+                }
+            }
+        }
+    }
     Ok(rows)
+}
+
+pub(super) fn binance_equity_market_info(market: &Value) -> Result<MarketInfo> {
+    let symbol = required_string(market, "symbol")?;
+    Ok(MarketInfo {
+        exchange: "binance".to_string(),
+        exchange_symbol: symbol.clone(),
+        product_symbol: format!("{symbol}-USDC-EQUITY"),
+        product_type: "equity".to_string(),
+        exchange_type: "equity".to_string(),
+        price_precision: "0".to_string(),
+        size_precision: value_string(market, "stepSize", "0"),
+        min_size: value_string(market, "minQty", "0"),
+        base_currency: symbol,
+        quote_currency: "USDC".to_string(),
+        min_notional: value_string(market, "minNotional", "0"),
+        size_per_contract: "1".to_string(),
+    })
 }
 
 pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -505,7 +537,7 @@ pub(super) fn hyperliquid_perpetual_market_info(
         min_size: precision,
         base_currency: base,
         quote_currency: "USD".to_string(),
-        min_notional: "0".to_string(),
+        min_notional: "10".to_string(),
         size_per_contract: "1".to_string(),
     })
 }
@@ -559,7 +591,7 @@ fn append_hyperliquid_spot_rows(
             min_size: precision,
             base_currency: base,
             quote_currency: quote,
-            min_notional: "0".to_string(),
+            min_notional: "10".to_string(),
             size_per_contract: "1".to_string(),
         });
     }
@@ -755,7 +787,7 @@ pub(super) async fn fetch_ondo(timeout: Duration) -> Result<Vec<MarketInfo>> {
             exchange_type: "perpetual".to_string(),
             price_precision: required_string(market, "quoteIncrement")?,
             size_precision: base_increment.clone(),
-            min_size: "0".to_string(),
+            min_size: base_increment,
             base_currency: base,
             quote_currency: quote,
             min_notional: "0".to_string(),
@@ -766,7 +798,19 @@ pub(super) async fn fetch_ondo(timeout: Duration) -> Result<Vec<MarketInfo>> {
 }
 
 pub(super) async fn fetch_lighter(timeout: Duration) -> Result<Vec<MarketInfo>> {
-    let client = LighterClient::new(timeout)?;
+    let mut rows = fetch_lighter_network(timeout, LighterNetwork::Mainnet).await?;
+    if let Ok(mut robinhood_rows) = fetch_lighter_network(timeout, LighterNetwork::Robinhood).await
+    {
+        rows.append(&mut robinhood_rows);
+    }
+    Ok(rows)
+}
+
+async fn fetch_lighter_network(
+    timeout: Duration,
+    network: LighterNetwork,
+) -> Result<Vec<MarketInfo>> {
+    let client = LighterClient::with_network(timeout, network)?;
     let response = client
         .public_request("get_order_book_details", Vec::new())
         .await?;
@@ -779,7 +823,11 @@ pub(super) async fn fetch_lighter(timeout: Duration) -> Result<Vec<MarketInfo>> 
             if !value_string(market, "status", "").eq_ignore_ascii_case("active") {
                 continue;
             }
-            rows.push(lighter_market_info(market, product_type)?);
+            let mut row = lighter_market_info(market, product_type)?;
+            if network == LighterNetwork::Robinhood {
+                row.exchange = "lighter_robinhood".to_string();
+            }
+            rows.push(row);
         }
     }
     Ok(rows)

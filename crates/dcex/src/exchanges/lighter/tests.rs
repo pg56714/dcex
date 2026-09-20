@@ -95,6 +95,35 @@ fn product_table_resolves_canonical_symbol_to_market_id() {
 }
 
 #[test]
+fn robinhood_uses_its_own_market_ids() {
+    let mainnet = MarketInfo {
+        exchange: "lighter".to_string(),
+        exchange_symbol: "42".to_string(),
+        product_symbol: "BTC-USDC-SWAP".to_string(),
+        product_type: "swap".to_string(),
+        exchange_type: "swap".to_string(),
+        price_precision: "0.01".to_string(),
+        size_precision: "0.001".to_string(),
+        min_size: "0.001".to_string(),
+        base_currency: "BTC".to_string(),
+        quote_currency: "USDC".to_string(),
+        min_notional: "1".to_string(),
+        size_per_contract: "1".to_string(),
+    };
+    let mut robinhood = mainnet.clone();
+    robinhood.exchange = "lighter_robinhood".to_string();
+    robinhood.exchange_symbol = "77".to_string();
+    let table = ProductTable::new(vec![mainnet, robinhood]);
+    let client = LighterClient::with_network(Duration::from_secs(1), LighterNetwork::Robinhood)
+        .expect("Robinhood client")
+        .with_product_table(table);
+    assert_eq!(
+        client.market_id("BTC-USDC-SWAP").expect("Robinhood market"),
+        "77"
+    );
+}
+
+#[test]
 fn export_sends_resolved_market_id_with_configured_account_index() {
     let (base_url, handle) = recording_server();
     let table = ProductTable::new(vec![MarketInfo {

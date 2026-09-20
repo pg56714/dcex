@@ -1,4 +1,6 @@
-use super::exchanges::{hyperliquid_perpetual_market_info, mexc_contract_pair};
+use super::exchanges::{
+    binance_equity_market_info, hyperliquid_perpetual_market_info, mexc_contract_pair,
+};
 use super::*;
 use crate::product_table::MarketInfo;
 
@@ -151,4 +153,21 @@ fn builds_hyperliquid_builder_perpetual_asset_mapping() {
     assert_eq!(row.product_symbol, "xyz:AAPL-USD-SWAP");
     assert_eq!(row.base_currency, "AAPL");
     assert_eq!(row.quote_currency, "USD");
+    assert_eq!(row.min_notional, "10");
+}
+
+#[test]
+fn builds_binance_equity_market_metadata() {
+    let market = serde_json::json!({
+        "symbol": "AAPL",
+        "stepSize": "0.01",
+        "minQty": "0.01",
+        "minNotional": "1"
+    });
+    let row = binance_equity_market_info(&market).expect("Binance equity metadata");
+    assert_eq!(row.product_symbol, "AAPL-USDC-EQUITY");
+    assert_eq!(row.exchange_symbol, "AAPL");
+    assert_eq!(row.size_precision, "0.01");
+    assert_eq!(row.min_size, "0.01");
+    assert_eq!(row.min_notional, "1");
 }
