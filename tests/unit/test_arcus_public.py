@@ -28,10 +28,14 @@ def test_arcus_sync_public_market_parameters() -> None:
     native = _Native()
     client._native_client = native
     assert client.get_markets() == {"ok": True}
+    assert client.get_spot_assets() == {"ok": True}
+    assert client.get_fee_tiers() == {"ok": True}
     assert client.get_bbo("BTC-USD") == {"ok": True}
     assert client.get_l2_orderbook("BTC-USD", 5) == {"ok": True}
     assert native.calls == [
         ("get_markets", []),
+        ("get_spot_assets", []),
+        ("get_fee_tiers", []),
         ("get_bbo", [("market", "BTC-USD")]),
         ("get_l2_orderbook", [("market", "BTC-USD"), ("nLevels", "5")]),
     ]
@@ -45,6 +49,18 @@ def test_arcus_async_public_market_parameters() -> None:
         native = _Native()
         client._native_client = native
         assert await client.get_bbo("ETH-USD") == {"ok": True}
-        assert native.calls == [("get_bbo", [("market", "ETH-USD")])]
+        assert await client.get_transfer_updates(
+            "0x1111111111111111111111111111111111111111"
+        ) == {"ok": True}
+        assert native.calls == [
+            ("get_bbo", [("market", "ETH-USD")]),
+            (
+                "get_transfer_updates",
+                [
+                    ("address", "0x1111111111111111111111111111111111111111"),
+                    ("accountIndex", "0"),
+                ],
+            ),
+        ]
 
     asyncio.run(check())

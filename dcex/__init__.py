@@ -5,9 +5,10 @@ A comprehensive library for cryptocurrency exchange interactions with both sync 
 Automatically handles Jupyter Notebook compatibility with nest_asyncio.
 """
 
-from typing import Any
+from typing import Any, Literal
 
 from .arcus.client import Client as ArcusClient
+from .arcus.spot import SpotClient as ArcusSpotClient
 from .aster.client import Client as AsterClient
 from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
@@ -28,9 +29,16 @@ auto_apply_nest_asyncio(verbose=False)
 
 
 # Create callable functions for each exchange (synchronous clients)
-def arcus(**kwargs: Any) -> ArcusClient:  # noqa: ANN401
-    """Create an Arcus perpetuals client instance."""
-    return ArcusClient(**kwargs)
+def arcus(
+    market: Literal["spot", "perps"] = "spot",
+    **kwargs: Any,  # noqa: ANN401
+) -> ArcusSpotClient | ArcusClient:
+    """Create an Arcus Spot client by default, or select Perps explicitly."""
+    if market == "spot":
+        return ArcusSpotClient(**kwargs)
+    if market == "perps":
+        return ArcusClient(**kwargs)
+    raise ValueError("Arcus market must be 'spot' or 'perps'.")
 
 
 def aster(**kwargs: Any) -> AsterClient:  # noqa: ANN401

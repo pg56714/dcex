@@ -95,7 +95,8 @@ async fn main() -> dcex::Result<()> {
 | **Backpack**    | Yes  | Yes       | Yes        |
 | **Aster**       | Yes  | Yes       | Yes        |
 | **Extended**    | Yes  | Yes       | Yes        |
-| **Ondo Perps**  | Yes  | Yes       | Yes        |
+| **Ondo**        | Yes  | Yes       | Yes        |
+| **Arcus**       | Yes  | Yes       | Yes        |
 
 WS private support currently covers authenticated or address-scoped user-data
 streams. Order placement and cancellation remain on HTTP clients.
@@ -104,6 +105,15 @@ The [official Ondo API](https://ondoperps.mintlify.app/) currently lists only
 perpetual futures trading endpoints, not spot endpoints. dcex supports Ondo
 perpetual futures only; private access uses `ONDO_API_KEY_ID` and
 `ONDO_API_SECRET`.
+
+Arcus Spot uses `ArcusSpotClient` and a separate RFQ router; the caller must
+provide a wallet-signed EIP-712 quote for submission. Public hosted quotes
+need no API key. `ArcusClient` targets Perps, whose trading access is
+released by waitlist cohort; its private execution is not yet live-verified.
+Read-only account/market queries, single-order operations, cancel-all, leverage
+changes, and same-wallet internal transfer submission are available. Batch and
+modify-order operations, isolated-margin adjustments, collateral loan
+settlement, external withdrawals, and ancillary API groups are not wrapped.
 
 Extended private REST reads require `EXTENDED_API_KEY`. Rust-backed LIMIT order
 signing additionally requires `EXTENDED_STARK_PRIVATE_KEY`,

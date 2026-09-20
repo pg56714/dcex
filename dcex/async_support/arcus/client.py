@@ -1,6 +1,8 @@
 """Asynchronous Arcus perpetuals REST client."""
 
+import json
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Self
 
@@ -72,6 +74,14 @@ class Client(BaseHTTPManager):
         """Get all perpetual markets."""
         return await self.public_request("get_markets")
 
+    async def get_spot_assets(self) -> Any:  # noqa: ANN401
+        """Get lending collateral assets; these are not RFQ spot pairs."""
+        return await self.public_request("get_spot_assets")
+
+    async def get_fee_tiers(self) -> Any:  # noqa: ANN401
+        """Get exchange-wide perpetual fee tiers."""
+        return await self.public_request("get_fee_tiers")
+
     async def get_account(self, address: str | None = None) -> Any:  # noqa: ANN401
         """Get a wallet account snapshot."""
         return await self.public_request(
@@ -111,6 +121,41 @@ class Client(BaseHTTPManager):
         """Get account fills."""
         return await self.public_request(
             "get_fills", address=address or self.address, accountIndex=self.account_index
+        )
+
+    async def get_transfer_updates(self, address: str | None = None) -> Any:  # noqa: ANN401
+        """Get deposits and internal-transfer updates for an address."""
+        return await self.public_request(
+            "get_transfer_updates", address=address or self.address, accountIndex=self.account_index
+        )
+
+    async def get_leverages(self, address: str | None = None) -> Any:  # noqa: ANN401
+        """Get effective leverage and margin mode across markets."""
+        return await self.public_request(
+            "get_leverages", address=address or self.address, accountIndex=self.account_index
+        )
+
+    async def cancel_all_orders(
+        self, product_symbol: str | None = None, valid_until: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """Request cancel-all for this account, optionally limited to a market."""
+        return await self.private_request(
+            "cancel_all_orders", product_symbol=product_symbol, valid_until=valid_until
+        )
+
+    async def set_leverage(
+        self, product_symbol: str, leverage: int, *, isolated: bool | None = None
+    ) -> Any:  # noqa: ANN401
+        """Request a leverage or margin-mode change for one market."""
+        return await self.private_request(
+            "set_leverage", product_symbol=product_symbol, leverage=leverage, isolated=isolated
+        )
+
+    async def submit_internal_transfer(self, signed_transfer: Mapping[str, Any]) -> Any:  # noqa: ANN401
+        """Submit a same-wallet EIP-712-signed collateral transfer, not a withdrawal."""
+        return await self.private_request(
+            "submit_internal_transfer",
+            signed_transfer_json=json.dumps(dict(signed_transfer), separators=(",", ":")),
         )
 
     async def place_order(

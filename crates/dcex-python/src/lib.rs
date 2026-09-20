@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use dcex::common::{self, OrderSide};
 use dcex::exchange::ValidatedResponse;
-use dcex::exchanges::arcus::ArcusClient;
+use dcex::exchanges::arcus::{ArcusClient, ArcusSpotClient};
 use dcex::exchanges::aster::{AsterClient, AsterMarket};
 use dcex::exchanges::backpack::{BackpackClient, SignaturePayload};
 use dcex::exchanges::binance::{BinanceClient, BinanceMarket};

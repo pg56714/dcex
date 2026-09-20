@@ -44,6 +44,10 @@ class TradeHTTP(HTTPManager):
         """Cancel one stock order."""
         return await self._native_private("cancel_equity_order", self._params(orderId=order_id))
 
+    async def cancel_all_equity_orders(self) -> dict:
+        """Cancel all open stock orders."""
+        return await self._native_private("cancel_all_equity_orders", [])
+
     async def get_equity_order_detail(self, order_id: str) -> dict:
         """Get one stock order."""
         return await self._native_private("get_equity_order_detail", self._params(orderId=order_id))
@@ -58,6 +62,86 @@ class TradeHTTP(HTTPManager):
             "get_equity_order_history",
             self._params(startTime=start_time, endTime=end_time),
         )
+
+    async def get_equity_trade_history(
+        self,
+        start_time: int,
+        end_time: int,
+        *,
+        product_symbol: str | None = None,
+        side: OrderSide | str | None = None,
+        order_id: str | None = None,
+        current: int | None = None,
+        size: int | None = None,
+    ) -> dict:
+        """Get stock fills in a time range."""
+        return await self._native_private(
+            "get_equity_trade_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                product_symbol=product_symbol,
+                side=self._side(side) if side is not None else None,
+                orderId=order_id,
+                current=current,
+                size=size,
+            ),
+        )
+
+    async def mint_equity_token(
+        self, underlying_asset: str, amount: str, client_order_id: str | None = None
+    ) -> dict:
+        """Convert an underlying asset into its stock token."""
+        return await self._native_private(
+            "mint_equity_token",
+            self._params(
+                underlyingAsset=underlying_asset,
+                underlyingAssetAmount=amount,
+                clientOrderId=client_order_id,
+            ),
+        )
+
+    async def redeem_equity_token(
+        self, tokenized_asset: str, amount: str, client_order_id: str | None = None
+    ) -> dict:
+        """Redeem a stock token into its underlying asset."""
+        return await self._native_private(
+            "redeem_equity_token",
+            self._params(
+                tokenizedAsset=tokenized_asset,
+                tokenizedAssetAmount=amount,
+                clientOrderId=client_order_id,
+            ),
+        )
+
+    async def get_equity_convert_status(self, issuer_request_id: str, convert_type: str) -> dict:
+        """Get one stock-token conversion status."""
+        return await self._native_private(
+            "get_equity_convert_status",
+            self._params(issuerRequestId=issuer_request_id, convertType=convert_type),
+        )
+
+    async def get_equity_convert_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        last_id: int | None = None,
+        size: int | None = None,
+    ) -> dict:
+        """Get stock-token conversion history."""
+        return await self._native_private(
+            "get_equity_convert_history",
+            self._params(startTime=start_time, endTime=end_time, lastId=last_id, size=size),
+        )
+
+    async def sign_equity_disclaimer(self) -> dict:
+        """Accept the stock trading disclaimer."""
+        return await self._native_private("sign_equity_disclaimer", [])
+
+    async def create_or_renew_equity_listen_key(self) -> dict:
+        """Create or renew the stock user-data listen key."""
+        return await self._native_private("create_or_renew_equity_listen_key", [])
 
     async def _native_private(
         self,

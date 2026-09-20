@@ -6,9 +6,10 @@ which return an initialized async client (after awaiting `async_init`).
 """
 
 # Import exchange client classes and create callable functions
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from .arcus.client import Client as ArcusClient
+from .arcus.spot import SpotClient as ArcusSpotClient
 from .aster.client import Client as AsterClient
 from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
@@ -26,10 +27,15 @@ from .ondo.client import Client as OndoClient
 
 
 async def arcus(
+    market: Literal["spot", "perps"] = "spot",
     **kwargs: Any,  # noqa: ANN401
-) -> ArcusClient:
-    """Create and initialize an Arcus perpetuals client instance."""
-    return cast(ArcusClient, await ArcusClient(**kwargs).async_init())
+) -> ArcusSpotClient | ArcusClient:
+    """Create an Arcus Spot client by default, or select Perps explicitly."""
+    if market == "spot":
+        return cast(ArcusSpotClient, await ArcusSpotClient(**kwargs).async_init())
+    if market == "perps":
+        return cast(ArcusClient, await ArcusClient(**kwargs).async_init())
+    raise ValueError("Arcus market must be 'spot' or 'perps'.")
 
 
 async def aster(

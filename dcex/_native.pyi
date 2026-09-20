@@ -138,6 +138,36 @@ class AsterHttpClient(_NativeExchangeClient):
         self, *args: object, **kwargs: object
     ) -> NativeJsonResponse: ...
 
+class ArcusHttpClient(_NativeExchangeClient):
+    def __init__(
+        self,
+        api_key: str | None = None,
+        api_secret: str | None = None,
+        address: str | None = None,
+        account_index: int = 0,
+        testnet: bool = False,
+        timeout: float = 10.0,
+    ) -> None: ...
+
+class ArcusSpotHttpClient(_NativeExchangeClient):
+    def __init__(
+        self,
+        api_key: str | None = None,
+        testnet: bool = False,
+        timeout: float = 10.0,
+        base_url: str | None = None,
+    ) -> None: ...
+
+class ArcusWebSocketClient:
+    def __init__(self, testnet: bool = False, timeout: float = 10.0) -> None: ...
+    def is_connected(self) -> bool: ...
+    async def connect(self) -> None: ...
+    async def close(self) -> None: ...
+    async def ping(self) -> None: ...
+    async def subscribe(self, channel: str, id: str | None = None) -> None: ...
+    async def unsubscribe(self, channel: str, id: str | None = None) -> None: ...
+    async def recv(self) -> bytes: ...
+
 class AsterPublicWebSocketClient:
     def __init__(
         self,

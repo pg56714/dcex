@@ -9,6 +9,180 @@ from ._http_manager import HTTPManager
 class TradeHTTP(HTTPManager):
     """Async HTTP client for Backpack private trading operations."""
 
+    async def get_rfqs(
+        self,
+        product_symbol: str | None = None,
+        rfq_id: str | None = None,
+        deferred_settlement: bool | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Retrieve active RFQs."""
+        return await self._native_private(
+            "get_rfqs",
+            self._native_params(
+                product_symbol=product_symbol,
+                rfqId=rfq_id,
+                deferredSettlement=deferred_settlement,
+            ),
+        )
+
+    async def submit_rfq(
+        self,
+        product_symbol: str,
+        side: str,
+        *,
+        quantity: str | None = None,
+        quote_quantity: str | None = None,
+        execution_mode: str = "AwaitAccept",
+        price: str | None = None,
+        client_id: int | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Submit an RFQ. Stock RFQs require quantity, not quote_quantity."""
+        return await self._native_private(
+            "submit_rfq",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                quantity=quantity,
+                quoteQuantity=quote_quantity,
+                executionMode=execution_mode,
+                price=price,
+                clientId=client_id,
+            ),
+        )
+
+    async def accept_rfq_quote(
+        self,
+        quote_id: str,
+        *,
+        rfq_id: str | None = None,
+        client_id: int | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Accept a firm quote using exactly one RFQ or client ID."""
+        if (rfq_id is None) == (client_id is None):
+            raise ValueError("Specify exactly one of rfq_id or client_id.")
+        return await self._native_private(
+            "accept_rfq_quote",
+            self._native_params(quoteId=quote_id, rfqId=rfq_id, clientId=client_id),
+        )
+
+    async def refresh_rfq(self, rfq_id: str) -> dict[str, Any] | list[Any] | str:
+        """Refresh an RFQ."""
+        return await self._native_private("refresh_rfq", self._native_params(rfqId=rfq_id))
+
+    async def cancel_rfq(
+        self, *, rfq_id: str | None = None, client_id: int | None = None
+    ) -> dict[str, Any] | list[Any] | str:
+        """Cancel an RFQ using exactly one RFQ or client ID."""
+        if (rfq_id is None) == (client_id is None):
+            raise ValueError("Specify exactly one of rfq_id or client_id.")
+        return await self._native_private(
+            "cancel_rfq", self._native_params(rfqId=rfq_id, clientId=client_id)
+        )
+
+    async def get_rfq_history(
+        self,
+        product_symbol: str | None = None,
+        *,
+        rfq_id: str | None = None,
+        status: str | None = None,
+        side: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        sort_direction: str | None = None,
+        deferred_settlement: bool | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Get historical RFQs."""
+        return await self._native_private(
+            "get_rfq_history",
+            self._native_params(
+                product_symbol=product_symbol,
+                rfqId=rfq_id,
+                status=status,
+                side=side,
+                limit=limit,
+                offset=offset,
+                sortDirection=sort_direction,
+                deferredSettlement=deferred_settlement,
+            ),
+        )
+
+    async def get_quote_history(
+        self,
+        product_symbol: str | None = None,
+        *,
+        quote_id: str | None = None,
+        status: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        sort_direction: str | None = None,
+        deferred_settlement: bool | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Get historical RFQ quotes."""
+        return await self._native_private(
+            "get_quote_history",
+            self._native_params(
+                product_symbol=product_symbol,
+                quoteId=quote_id,
+                status=status,
+                limit=limit,
+                offset=offset,
+                sortDirection=sort_direction,
+                deferredSettlement=deferred_settlement,
+            ),
+        )
+
+    async def get_rfq_fill_history(
+        self,
+        product_symbol: str | None = None,
+        *,
+        rfq_id: str | None = None,
+        quote_id: str | None = None,
+        side: str | None = None,
+        fill_type: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        sort_direction: str | None = None,
+        deferred_settlement: bool | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Get RFQ fills."""
+        return await self._native_private(
+            "get_rfq_fill_history",
+            self._native_params(
+                product_symbol=product_symbol,
+                rfqId=rfq_id,
+                quoteId=quote_id,
+                side=side,
+                fillType=fill_type,
+                limit=limit,
+                offset=offset,
+                sortDirection=sort_direction,
+                deferredSettlement=deferred_settlement,
+            ),
+        )
+
+    async def get_quote_fill_history(
+        self,
+        product_symbol: str | None = None,
+        *,
+        quote_id: str | None = None,
+        side: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        sort_direction: str | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Get quote fills."""
+        return await self._native_private(
+            "get_quote_fill_history",
+            self._native_params(
+                product_symbol=product_symbol,
+                quoteId=quote_id,
+                side=side,
+                limit=limit,
+                offset=offset,
+                sortDirection=sort_direction,
+            ),
+        )
+
     def _symbol(self, product_symbol: str) -> str:
         if "_" in product_symbol:
             return product_symbol
