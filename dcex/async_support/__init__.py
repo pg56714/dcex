@@ -8,6 +8,7 @@ which return an initialized async client (after awaiting `async_init`).
 # Import exchange client classes and create callable functions
 from typing import Any, cast
 
+from .arcus.client import Client as ArcusClient
 from .aster.client import Client as AsterClient
 from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
@@ -22,6 +23,13 @@ from .lighter.client import Client as LighterClient
 from .mexc.client import Client as MEXCClient
 from .okx.client import Client as OKXClient
 from .ondo.client import Client as OndoClient
+
+
+async def arcus(
+    **kwargs: Any,  # noqa: ANN401
+) -> ArcusClient:
+    """Create and initialize an Arcus perpetuals client instance."""
+    return cast(ArcusClient, await ArcusClient(**kwargs).async_init())
 
 
 async def aster(
@@ -123,6 +131,7 @@ async def ondo(
 
 
 __all__ = [
+    "arcus",
     "aster",
     "backpack",
     "binance",

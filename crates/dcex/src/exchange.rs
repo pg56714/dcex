@@ -8,6 +8,7 @@ use crate::{DcexError, Result};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Exchange {
+    Arcus,
     Aster,
     Backpack,
     Binance,
@@ -25,7 +26,8 @@ pub enum Exchange {
 }
 
 impl Exchange {
-    pub const ALL: [Self; 14] = [
+    pub const ALL: [Self; 15] = [
+        Self::Arcus,
         Self::Aster,
         Self::Backpack,
         Self::Binance,
@@ -44,6 +46,7 @@ impl Exchange {
 
     pub const fn as_str(self) -> &'static str {
         match self {
+            Self::Arcus => "arcus",
             Self::Aster => "aster",
             Self::Backpack => "backpack",
             Self::Binance => "binance",
@@ -151,7 +154,7 @@ mod tests {
 
     #[test]
     fn exchange_registry_matches_python_registry() {
-        assert_eq!(Exchange::ALL.len(), 14);
+        assert_eq!(Exchange::ALL.len(), 15);
         assert_eq!(Exchange::Binance.as_str(), "binance");
         assert_eq!(Exchange::Lighter.as_str(), "lighter");
     }

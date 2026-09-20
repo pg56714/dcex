@@ -96,8 +96,8 @@ impl OrderSide {
             )));
         }
         let value = match (self, exchange.as_str()) {
-            (Self::Buy, "aster" | "binance" | "bingx" | "mexc") => "BUY",
-            (Self::Sell, "aster" | "binance" | "bingx" | "mexc") => "SELL",
+            (Self::Buy, "arcus" | "aster" | "binance" | "bingx" | "mexc") => "BUY",
+            (Self::Sell, "arcus" | "aster" | "binance" | "bingx" | "mexc") => "SELL",
             (Self::Buy, "backpack") => "Bid",
             (Self::Sell, "backpack") => "Ask",
             (Self::Buy, "bybit") => "Buy",

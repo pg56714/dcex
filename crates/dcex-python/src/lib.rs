@@ -4,6 +4,7 @@ use std::time::Duration;
 
 use dcex::common::{self, OrderSide};
 use dcex::exchange::ValidatedResponse;
+use dcex::exchanges::arcus::ArcusClient;
 use dcex::exchanges::aster::{AsterClient, AsterMarket};
 use dcex::exchanges::backpack::{BackpackClient, SignaturePayload};
 use dcex::exchanges::binance::{BinanceClient, BinanceMarket};
@@ -301,6 +302,10 @@ fn aster_market(market: &str) -> PyResult<AsterMarket> {
 mod functions;
 mod product_table;
 
+#[path = "clients/arcus.rs"]
+mod arcus_client;
+#[path = "ws/arcus.rs"]
+mod arcus_ws;
 #[path = "clients/aster.rs"]
 mod aster_client;
 #[path = "ws/aster.rs"]
@@ -362,6 +367,8 @@ mod ondo_ws;
 
 #[pymodule]
 fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    arcus_client::register(m)?;
+    arcus_ws::register(m)?;
     aster_client::register(m)?;
     aster_ws::register(m)?;
     backpack_client::register(m)?;

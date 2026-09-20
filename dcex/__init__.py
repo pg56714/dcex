@@ -7,6 +7,7 @@ Automatically handles Jupyter Notebook compatibility with nest_asyncio.
 
 from typing import Any
 
+from .arcus.client import Client as ArcusClient
 from .aster.client import Client as AsterClient
 from .backpack.client import Client as BackpackClient
 from .binance.client import Client as BinanceClient
@@ -27,6 +28,11 @@ auto_apply_nest_asyncio(verbose=False)
 
 
 # Create callable functions for each exchange (synchronous clients)
+def arcus(**kwargs: Any) -> ArcusClient:  # noqa: ANN401
+    """Create an Arcus perpetuals client instance."""
+    return ArcusClient(**kwargs)
+
+
 def aster(**kwargs: Any) -> AsterClient:  # noqa: ANN401
     """Create an Aster client instance."""
     return AsterClient(**kwargs)
@@ -98,6 +104,7 @@ def ondo(**kwargs: Any) -> OndoClient:  # noqa: ANN401
 
 
 __all__ = [
+    "arcus",
     "aster",
     "backpack",
     "binance",

@@ -38,6 +38,7 @@ pub(crate) async fn fetch_product_rows(
 
 async fn fetch_exchange_rows(exchange: Exchange, timeout: Duration) -> Result<Vec<MarketInfo>> {
     match exchange {
+        Exchange::Arcus => self::exchanges::fetch_arcus(timeout).await,
         Exchange::Aster => self::exchanges::fetch_aster(timeout).await,
         Exchange::Backpack => self::exchanges::fetch_backpack(timeout).await,
         Exchange::Binance => self::exchanges::fetch_binance(timeout).await,

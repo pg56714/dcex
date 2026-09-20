@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use serde_json::Value;
 
+use crate::exchanges::arcus::ArcusClient;
 use crate::exchanges::aster::AsterClient;
 use crate::exchanges::backpack::BackpackClient;
 use crate::exchanges::binance::BinanceClient;
@@ -21,6 +22,35 @@ use crate::product_table::MarketInfo;
 use crate::Result;
 
 use super::*;
+pub(super) async fn fetch_arcus(timeout: Duration) -> Result<Vec<MarketInfo>> {
+    let client = ArcusClient::public(timeout)?;
+    let response = client.public_request("get_markets", vec![]).await?;
+    response_array(&response, &["markets"])
+        .iter()
+        .filter(|market| value_string(market, "status", "") == "ONLINE")
+        .map(arcus_market_info)
+        .collect()
+}
+
+pub(super) fn arcus_market_info(market: &Value) -> Result<MarketInfo> {
+    let base = required_string(market, "baseAsset")?;
+    let quote = required_string(market, "quoteAsset")?;
+    Ok(MarketInfo {
+        exchange: "arcus".into(),
+        exchange_symbol: required_string(market, "marketId")?,
+        product_symbol: format!("{base}-{quote}-SWAP"),
+        product_type: "swap".into(),
+        exchange_type: value_string(market, "type", "PERPETUAL"),
+        price_precision: value_string(market, "tickSize", "0"),
+        size_precision: value_string(market, "stepSize", "0"),
+        min_size: value_string(market, "minOrderSize", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: value_string(market, "minOrderNotional", "0"),
+        size_per_contract: "1".into(),
+    })
+}
+
 pub(super) async fn fetch_aster(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = AsterClient::public(timeout)?;
     let spot = client

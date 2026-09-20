@@ -240,6 +240,7 @@ def test_all_product_fetches_match_the_registry() -> None:
         function.__name__ for function in async_manager.VALID_EXCHANGES
     ]
     assert {function.__name__ for function in sync_manager.VALID_EXCHANGES} == {
+        "arcus",
         "aster",
         "backpack",
         "binance",

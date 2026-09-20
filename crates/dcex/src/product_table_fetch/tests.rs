@@ -1,5 +1,6 @@
 use super::exchanges::{
-    binance_equity_market_info, hyperliquid_perpetual_market_info, mexc_contract_pair,
+    arcus_market_info, binance_equity_market_info, hyperliquid_perpetual_market_info,
+    mexc_contract_pair,
 };
 use super::*;
 use crate::product_table::MarketInfo;
@@ -170,4 +171,18 @@ fn builds_binance_equity_market_metadata() {
     assert_eq!(row.size_precision, "0.01");
     assert_eq!(row.min_size, "0.01");
     assert_eq!(row.min_notional, "1");
+}
+
+#[test]
+fn builds_arcus_stock_perpetual_market_metadata() {
+    let market = serde_json::json!({
+        "marketId": 17, "baseAsset": "AAPL", "quoteAsset": "USD",
+        "type": "PERPETUAL", "tickSize": "0.01",
+        "stepSize": "0.001", "minOrderSize": "0.01",
+        "minOrderNotional": "5"
+    });
+    let row = arcus_market_info(&market).expect("Arcus market");
+    assert_eq!(row.exchange_symbol, "17");
+    assert_eq!(row.product_symbol, "AAPL-USD-SWAP");
+    assert_eq!(row.min_notional, "5");
 }

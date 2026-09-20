@@ -9,6 +9,11 @@ async def _fetch(exchange: str) -> ProductTable:
     return await _native.fetch_product_table_async(exchange)
 
 
+async def arcus() -> ProductTable:
+    """Fetch Arcus perpetual market metadata."""
+    return await _fetch("arcus")
+
+
 async def aster() -> ProductTable:
     """Fetch Aster product metadata."""
     return await _fetch("aster")

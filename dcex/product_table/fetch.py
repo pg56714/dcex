@@ -33,6 +33,11 @@ def _fetch(exchange: str) -> ProductTable:
     return _native.fetch_product_table(exchange)
 
 
+def arcus() -> ProductTable:
+    """Fetch Arcus perpetual market metadata."""
+    return _fetch("arcus")
+
+
 def aster() -> ProductTable:
     """Fetch Aster product metadata."""
     return _fetch("aster")
