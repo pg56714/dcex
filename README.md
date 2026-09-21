@@ -166,32 +166,18 @@ perpetual futures only; private access uses `ONDO_API_KEY_ID` and
 
 ### Arcus
 
-[Arcus Spot Beta](https://arcus.xyz/) is available to eligible users without a
-waitlist. Spot uses the [separate RFQ router](https://github.com/arcus-xyz/arcus-spot-sdk),
-not the perpetuals order book. Use `dcex.arcus.SpotClient` (or its async
-equivalent), or the default `dcex.arcus()` factory, for tokens, price, firm
-quotes, submission of an already
-wallet-signed quote, and transaction status. Hosted public quotes need no API
-key; `ARCUS_SPOT_MAINNET_API_KEY` / `ARCUS_SPOT_TESTNET_API_KEY` are optional
-router-integration keys. Spot submission requires an EVM wallet's EIP-712
-signature (and, when needed, a token permit/approval); the client does not
-create that signature. The perpetuals Ed25519 key cannot sign spot trades.
+[Arcus Spot](https://github.com/arcus-xyz/arcus-spot-sdk) uses a separate RFQ
+router. `dcex.arcus()` supports token discovery, prices, firm quotes,
+submission of an already wallet-signed EIP-712 quote, and status checks;
+public hosted quotes need no API key. Wallet signing and any required token
+permit/approval remain the caller's responsibility.
 
-Arcus Perps Beta is released by waitlist cohort, so a documented API or
-working public market-data request does **not** establish that an account may
-trade perpetuals. Selected Perps endpoints are implemented, but private order
-execution has not been verified with an authorized account. It uses separate
-`ARCUS_MAINNET_*` / `ARCUS_TESTNET_*` Ed25519 credentials and retains
-`dcex.arcus.Client` or `dcex.arcus(market="perps")` for compatibility.
-Perps stock markets appear in the
-product table as `AAPL-USD-SWAP`-style symbols. A place-order response
-acknowledges submission, not a confirmed fill; observe order status or fills
-before treating it as executed. The Perps client also supports public
-account/market queries, cancel-all, leverage changes, and same-wallet internal
-transfers with an external wallet EIP-712 signature. External withdrawals,
-batch operations, modify-order, isolated-margin adjustments, collateral loan
-settlement, and ancillary API groups are not wrapped. Spot RFQ tokens are not
-currently normalized into the perpetuals product table.
+Arcus Perps uses `dcex.arcus(market="perps")` and separate Ed25519 credentials.
+Market/account queries, single-order placement and cancellation, fills,
+positions, cancel-all, leverage changes, and same-wallet internal transfers
+are implemented. Private Perps execution remains unverified until an account
+with Perps access is available; external withdrawals are intentionally not
+supported.
 
 ## Key Features
 

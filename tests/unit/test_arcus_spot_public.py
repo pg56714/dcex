@@ -1,8 +1,9 @@
-"""Offline public Arcus Spot RFQ router tests (never submits a quote)."""
+"""Offline Arcus Spot and Perps route tests; no request reaches Arcus."""
 
 # ruff: noqa: D103
 
 import asyncio
+import json
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -18,6 +19,20 @@ from tests.unit.native_http_helpers import _http_server
 SELL = "0x" + "11" * 20
 BUY = "0x" + "22" * 20
 TAKER = "0x" + "33" * 20
+SIGNATURE = "0x" + "44" * 65
+
+
+def _signed_spot_quote(chain_id: int) -> dict[str, object]:
+    return {
+        "venue": "arcus",
+        "chainId": chain_id,
+        "taker": TAKER,
+        "typedData": {
+            "domain": {"chainId": chain_id},
+            "primaryType": "PermitWitnessTransferFrom",
+        },
+        "signature": SIGNATURE,
+    }
 
 
 def test_arcus_spot_native_public_routes() -> None:
@@ -75,6 +90,27 @@ def test_arcus_spot_python_sync_public_methods() -> None:
         ]
 
 
+def test_arcus_spot_signed_submit_and_status_routes_are_complete() -> None:
+    """Exercise the real submit/status routes against a local server only."""
+    with _http_server({"ok": True}) as (base_url, received):
+        client = SyncSpotClient(base_url=base_url)
+        signed_quote = _signed_spot_quote(4663)
+        assert client.submit_signed_quote(signed_quote) == {"ok": True}
+        submit = received.get_nowait()
+        assert submit["path"] == "/v1/submit"
+        assert json.loads(submit["body"]) == signed_quote
+
+        tx_hash = "0x" + "55" * 32
+        assert client.get_status(tx_hash) == {"ok": True}
+        status = urlsplit(received.get_nowait()["path"])
+        assert status.path == "/v1/status"
+        assert parse_qs(status.query) == {
+            "chainId": ["4663"],
+            "id": [tx_hash],
+            "venue": ["arcus"],
+        }
+
+
 def test_arcus_factories_select_spot_by_default() -> None:
     """Market selection is per client, with Spot as the public default."""
     assert isinstance(dcex.arcus(), SyncSpotClient)
@@ -114,3 +150,42 @@ def test_arcus_async_factory_market_selection() -> None:
             await async_dcex.arcus(market="unknown")
 
     asyncio.run(check())
+
+
+def test_arcus_perps_signed_order_and_cancel_routes_are_complete() -> None:
+    """Verify Perps market lookup, signing, order and cancellation locally."""
+    market_response = {
+        "markets": [
+            {
+                "marketId": 1,
+                "marketDisplayName": "BTC-USD",
+                "baseAsset": "BTC",
+                "quoteAsset": "USD",
+                "status": "ONLINE",
+                "tickSize": "0.1",
+                "stepSize": "0.001",
+                "minOrderSize": "0.001",
+                "maxOrderSize": "100",
+                "minOrderNotional": "1",
+            }
+        ]
+    }
+    with _http_server(market_response) as (base_url, received):
+        client = SyncPerpsClient(
+            api_secret="00" * 32,
+            address="0x" + "66" * 20,
+            base_url=base_url,
+        )
+        client.place_order("BTC-USD-SWAP", "BUY", "100", "0.01")
+        assert urlsplit(received.get_nowait()["path"]).path == "/v1/markets"
+        placed = received.get_nowait()
+        assert urlsplit(placed["path"]).path == "/v1/placeOrder"
+        assert placed["x-api-key"]
+        assert placed["x-signature"]
+        assert json.loads(placed["body"])["marketId"] == 1
+
+        client.cancel_order("BTC-USD-SWAP", "order-1")
+        assert urlsplit(received.get_nowait()["path"]).path == "/v1/markets"
+        cancelled = received.get_nowait()
+        assert urlsplit(cancelled["path"]).path == "/v1/cancelOrder"
+        assert json.loads(cancelled["body"])["orderId"] == "order-1"

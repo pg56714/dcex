@@ -86,7 +86,7 @@ struct PythonArcusHttpClient {
 #[pymethods]
 impl PythonArcusHttpClient {
     #[new]
-    #[pyo3(signature = (api_key=None, api_secret=None, address=None, account_index=0, testnet=false, timeout=10.0))]
+    #[pyo3(signature = (api_key=None, api_secret=None, address=None, account_index=0, testnet=false, timeout=10.0, base_url=None))]
     fn new(
         api_key: Option<String>,
         api_secret: Option<String>,
@@ -94,18 +94,23 @@ impl PythonArcusHttpClient {
         account_index: u8,
         testnet: bool,
         timeout: f64,
+        base_url: Option<String>,
     ) -> PyResult<Self> {
-        Ok(Self {
-            client: ArcusClient::new(
-                api_key,
-                api_secret,
-                address,
-                account_index,
-                testnet,
-                http_timeout(timeout)?,
-            )
-            .map_err(to_py_runtime_error)?,
-        })
+        let mut client = ArcusClient::new(
+            api_key,
+            api_secret,
+            address,
+            account_index,
+            testnet,
+            http_timeout(timeout)?,
+        )
+        .map_err(to_py_runtime_error)?;
+        if let Some(base_url) = base_url {
+            client = client
+                .with_base_url(base_url)
+                .map_err(to_py_runtime_error)?;
+        }
+        Ok(Self { client })
     }
 
     #[pyo3(signature = (method_name, params=None))]

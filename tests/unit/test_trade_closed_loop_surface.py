@@ -1,0 +1,282 @@
+"""Required sync/async API surface for each supported trading workflow."""
+
+from __future__ import annotations
+
+from importlib import import_module
+
+import pytest
+
+WORKFLOWS: dict[str, tuple[str, ...]] = {
+    "arcus:spot": (
+        "get_tokens",
+        "get_price",
+        "get_quote",
+        "submit_signed_quote",
+        "get_status",
+    ),
+    "arcus:perps": (
+        "get_markets",
+        "get_l2_orderbook",
+        "place_order",
+        "cancel_order",
+        "get_open_orders",
+        "get_order_status",
+        "get_fills",
+        "get_positions",
+    ),
+    "aster:spot": (
+        "get_spot_exchange_info",
+        "get_spot_orderbook",
+        "place_spot_order",
+        "cancel_spot_order",
+        "get_spot_order",
+        "get_spot_user_trades",
+        "get_spot_account",
+    ),
+    "aster:perps": (
+        "get_futures_exchange_info",
+        "get_futures_orderbook",
+        "place_futures_order",
+        "cancel_futures_order",
+        "get_futures_order",
+        "get_futures_user_trades",
+        "get_futures_position_risk",
+    ),
+    "backpack:spot": (
+        "get_markets",
+        "get_order_book_depth",
+        "place_order",
+        "cancel_order",
+        "get_open_order",
+        "get_fill_history",
+        "get_balances",
+    ),
+    "backpack:perps": (
+        "get_markets",
+        "get_order_book_depth",
+        "place_order",
+        "cancel_order",
+        "get_open_order",
+        "get_fill_history",
+        "get_open_positions",
+    ),
+    "backpack:rfq": (
+        "get_securities",
+        "get_market_sessions",
+        "submit_rfq",
+        "accept_rfq_quote",
+        "cancel_rfq",
+        "get_rfq_history",
+        "get_rfq_fill_history",
+    ),
+    "binance:spot": (
+        "get_spot_exchange_info",
+        "get_spot_orderbook",
+        "place_order",
+        "cancel_order",
+        "get_order",
+        "get_account_trades",
+        "get_account_balance",
+    ),
+    "binance:perps": (
+        "get_futures_exchange_info",
+        "get_futures_ticker",
+        "place_order",
+        "cancel_order",
+        "get_order",
+        "get_future_all_order",
+        "get_future_position",
+    ),
+    "binance:equity": (
+        "get_equity_exchange_info",
+        "get_equity_quote",
+        "place_equity_order",
+        "cancel_equity_order",
+        "get_equity_order_detail",
+        "get_equity_trade_history",
+    ),
+    "bingx:spot": (
+        "get_spot_instrument_info",
+        "get_spot_orderbook",
+        "place_spot_order",
+        "cancel_spot_order",
+        "get_spot_order",
+        "get_spot_my_trades",
+        "get_spot_account_balance",
+    ),
+    "bingx:perps": (
+        "get_swap_instrument_info",
+        "get_orderbook",
+        "place_swap_order",
+        "cancel_swap_order",
+        "get_order_detail",
+        "get_order_history",
+        "get_open_positions",
+    ),
+    "bitget:spot": (
+        "get_spot_symbols",
+        "get_spot_orderbook",
+        "place_spot_order",
+        "cancel_spot_order",
+        "get_spot_order",
+        "get_spot_fills",
+        "get_spot_account_assets",
+    ),
+    "bitget:perps": (
+        "get_futures_contracts",
+        "get_futures_orderbook",
+        "place_futures_order",
+        "cancel_futures_order",
+        "get_futures_order",
+        "get_futures_fills",
+        "get_futures_positions",
+    ),
+    "bitget:uta": (
+        "place_uta_order",
+        "cancel_uta_order",
+        "get_uta_order",
+        "get_uta_fills",
+        "get_uta_positions",
+        "get_uta_account_assets",
+    ),
+    "bybit:unified": (
+        "get_instruments_info",
+        "get_orderbook",
+        "place_order",
+        "cancel_order",
+        "get_open_orders",
+        "get_execution_list",
+        "get_positions",
+        "get_wallet_balance",
+    ),
+    "extended:perps": (
+        "get_markets",
+        "get_order_book",
+        "place_order",
+        "cancel_order",
+        "get_order",
+        "get_trades_history",
+        "get_positions",
+        "get_balance",
+    ),
+    "hyperliquid:spot": (
+        "get_spot_meta",
+        "get_l2book",
+        "place_order",
+        "cancel_order",
+        "order_status",
+        "user_fills",
+        "spot_clearinghouse_state",
+    ),
+    "hyperliquid:perps": (
+        "get_meta",
+        "get_l2book",
+        "place_order",
+        "cancel_order",
+        "order_status",
+        "user_fills",
+        "clearinghouse_state",
+    ),
+    "kraken:spot": (
+        "get_spot_asset_pairs",
+        "get_spot_orderbook",
+        "place_spot_order",
+        "cancel_spot_order",
+        "get_spot_orders",
+        "get_spot_trade_history",
+        "get_spot_account_balance",
+    ),
+    "kraken:perps": (
+        "get_futures_instruments",
+        "get_futures_orderbook",
+        "place_futures_order",
+        "cancel_futures_order",
+        "get_futures_order_status",
+        "get_futures_fills",
+        "get_futures_open_positions",
+    ),
+    "kucoin:spot": (
+        "get_spot_instrument_info",
+        "get_spot_orderbook",
+        "place_spot_order",
+        "cancel_spot_order",
+        "get_spot_open_orders",
+        "get_spot_trade_history",
+        "get_account_balance",
+    ),
+    "kucoin:perps": (
+        "get_futures_contracts",
+        "get_futures_orderbook",
+        "place_futures_order",
+        "cancel_futures_order",
+        "get_futures_order",
+        "get_futures_trade_history",
+        "get_futures_positions",
+    ),
+    "lighter:perps": (
+        "get_order_book_details",
+        "get_order_book_orders",
+        "create_order",
+        "cancel_order",
+        "get_account_active_orders",
+        "get_account_inactive_orders",
+        "get_trades",
+        "get_account",
+    ),
+    "mexc:spot": (
+        "get_spot_exchange_info",
+        "get_spot_orderbook",
+        "place_spot_order",
+        "cancel_spot_order",
+        "get_spot_order",
+        "get_spot_my_trades",
+        "get_spot_account",
+    ),
+    "mexc:perps": (
+        "get_contract_details",
+        "get_contract_depth",
+        "place_contract_order",
+        "cancel_contract_order",
+        "get_contract_order",
+        "get_contract_order_deals",
+        "get_contract_open_positions",
+    ),
+    "okx:unified": (
+        "get_public_instruments",
+        "get_orderbook",
+        "place_order",
+        "cancel_order",
+        "get_order",
+        "get_fills",
+        "get_positions",
+        "get_account_balance",
+    ),
+    "ondo:perps": (
+        "get_markets",
+        "get_depth",
+        "place_order",
+        "cancel_order",
+        "get_order",
+        "get_fills",
+        "get_positions",
+        "get_balance",
+    ),
+}
+
+
+def _client_classes(workflow: str) -> tuple[type, type]:
+    exchange, product = workflow.split(":", 1)
+    module = "spot" if workflow == "arcus:spot" else "client"
+    class_name = "SpotClient" if workflow == "arcus:spot" else "Client"
+    sync = getattr(import_module(f"dcex.{exchange}.{module}"), class_name)
+    async_ = getattr(import_module(f"dcex.async_support.{exchange}.{module}"), class_name)
+    assert product
+    return sync, async_
+
+
+@pytest.mark.parametrize("workflow", WORKFLOWS)
+def test_sync_and_async_clients_keep_trade_workflow_complete(workflow: str) -> None:
+    """Every supported workflow keeps discovery, execution and reconciliation APIs."""
+    for client_class in _client_classes(workflow):
+        missing = sorted(name for name in WORKFLOWS[workflow] if not hasattr(client_class, name))
+        assert not missing, f"{workflow} {client_class.__module__}: {missing}"

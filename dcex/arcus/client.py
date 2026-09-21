@@ -32,6 +32,7 @@ class Client(BaseHTTPManager):
     account_index: int | None = None
     testnet: bool = False
     timeout: float = 10.0
+    base_url: str | None = None
     _native_client: Any = field(default=None, init=False, repr=False)  # noqa: ANN401
 
     def __post_init__(self) -> None:
@@ -48,6 +49,7 @@ class Client(BaseHTTPManager):
             account_index=self.account_index,
             testnet=self.testnet,
             timeout=self.timeout,
+            base_url=self.base_url,
         )
 
     def _call(self, kind: str, method_name: str, params: list[tuple[str, str]]) -> Any:  # noqa: ANN401

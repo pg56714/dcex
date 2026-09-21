@@ -25,6 +25,7 @@ class Client(BaseHTTPManager):
     account_index: int | None = None
     testnet: bool = False
     timeout: float = 10.0
+    base_url: str | None = None
     _native_client: Any = field(default=None, init=False, repr=False)  # noqa: ANN401
 
     async def async_init(self) -> Self:
@@ -42,6 +43,7 @@ class Client(BaseHTTPManager):
             account_index=self.account_index,
             testnet=self.testnet,
             timeout=self.timeout,
+            base_url=self.base_url,
         )
         return self
 

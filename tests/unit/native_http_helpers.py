@@ -77,6 +77,7 @@ def _http_server(
             for header in ("X-API-Key", "X-Signature", "X-Timestamp", "X-Window"):
                 if value := self.headers.get(header):
                     request[f"backpack_{header.lower()}"] = value
+                    request[header.lower()] = value
             for header in ("X-Broker-ID", "X-Broker-Key"):
                 if value := self.headers.get(header):
                     request[f"backpack_{header.lower()}"] = value
