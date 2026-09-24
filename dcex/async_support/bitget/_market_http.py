@@ -304,6 +304,129 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
+    async def get_uta_instruments(
+        self,
+        category: str,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA instrument metadata, including Reality flags."""
+        return await self._native_public(
+            "get_uta_instruments",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                symbol=symbol,
+            ),
+        )
+
+    async def get_uta_tickers(
+        self,
+        category: str,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA tickers."""
+        return await self._native_public(
+            "get_uta_tickers",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                symbol=symbol,
+            ),
+        )
+
+    async def get_uta_orderbook(
+        self,
+        category: str,
+        product_symbol: str,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA orderbook depth."""
+        return await self._native_public(
+            "get_uta_orderbook",
+            self._params(category=category, product_symbol=product_symbol, limit=limit),
+        )
+
+    async def get_uta_public_fills(
+        self,
+        category: str,
+        product_symbol: str,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve recent public Bitget UTA fills."""
+        return await self._native_public(
+            "get_uta_public_fills",
+            self._params(category=category, product_symbol=product_symbol, limit=limit),
+        )
+
+    async def get_uta_kline(
+        self,
+        category: str,
+        product_symbol: str,
+        interval: str,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        type_: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA candles."""
+        return await self._native_public(
+            "get_uta_kline",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                interval=interval,
+                startTime=startTime,
+                endTime=endTime,
+                type=type_,
+                limit=limit,
+            ),
+        )
+
+    async def get_uta_history_kline(
+        self,
+        category: str,
+        product_symbol: str,
+        interval: str,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        type_: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve historical Bitget UTA candles."""
+        return await self._native_public(
+            "get_uta_history_kline",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                interval=interval,
+                startTime=startTime,
+                endTime=endTime,
+                type=type_,
+                limit=limit,
+            ),
+        )
+
+    async def get_reality_stock_info(
+        self,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget Reality underlying-stock and trading-session metadata."""
+        return await self._native_public(
+            "get_reality_stock_info",
+            self._params(product_symbol=product_symbol, symbol=symbol),
+        )
+
+    async def get_reality_market_states(self) -> dict[str, Any]:
+        """Retrieve Bitget Reality US-market session hours."""
+        return await self._native_public("get_reality_market_states", [])
+
+    async def get_reality_market_calendar(self) -> dict[str, Any]:
+        """Retrieve Bitget Reality US-market closure calendar."""
+        return await self._native_public("get_reality_market_calendar", [])
+
     async def get_uta_liquidations(
         self,
         category: str,

@@ -14,6 +14,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_market_sessions(),
         get_market_holidays(),
         get_securities(),
+        get_rfq_constraints(product_symbol => "product_symbol", session_name => "sessionName"),
         get_mark_prices(),
         get_open_interest(),
         get_funding_rates(product_symbol => "product_symbol"),

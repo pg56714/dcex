@@ -35,6 +35,16 @@ def _signed_spot_quote(chain_id: int) -> dict[str, object]:
     }
 
 
+def _firm_spot_quote(chain_id: int) -> dict[str, object]:
+    return {
+        "venue": "arcus",
+        "toSign": {
+            "domain": {"chainId": chain_id},
+            "primaryType": "PermitWitnessTransferFrom",
+        },
+    }
+
+
 def test_arcus_spot_native_public_routes() -> None:
     native = pytest.importorskip("dcex._native")
     with _http_server({"ok": True}) as (base_url, received):
@@ -109,6 +119,29 @@ def test_arcus_spot_signed_submit_and_status_routes_are_complete() -> None:
             "id": [tx_hash],
             "venue": ["arcus"],
         }
+
+
+def test_arcus_spot_builds_submit_body_from_external_signature() -> None:
+    client = SyncSpotClient()
+    body = client.build_signed_quote(
+        _firm_spot_quote(4663),
+        TAKER,
+        SIGNATURE,
+        permits=[{"token": SELL}],
+        route_tag="strategy-a",
+    )
+    assert body == {
+        "venue": "arcus",
+        "chainId": 4663,
+        "taker": TAKER,
+        "typedData": _firm_spot_quote(4663)["toSign"],
+        "signature": SIGNATURE,
+        "permits": [{"token": SELL}],
+        "routeTag": "strategy-a",
+    }
+
+    with pytest.raises(ValueError, match="selected network"):
+        client.build_signed_quote(_firm_spot_quote(46630), TAKER, SIGNATURE)
 
 
 def test_arcus_factories_select_spot_by_default() -> None:

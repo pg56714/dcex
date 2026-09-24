@@ -304,6 +304,129 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
+    def get_uta_instruments(
+        self,
+        category: str,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA instrument metadata, including Reality flags."""
+        return self._native_public(
+            "get_uta_instruments",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                symbol=symbol,
+            ),
+        )
+
+    def get_uta_tickers(
+        self,
+        category: str,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA tickers."""
+        return self._native_public(
+            "get_uta_tickers",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                symbol=symbol,
+            ),
+        )
+
+    def get_uta_orderbook(
+        self,
+        category: str,
+        product_symbol: str,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA orderbook depth."""
+        return self._native_public(
+            "get_uta_orderbook",
+            self._params(category=category, product_symbol=product_symbol, limit=limit),
+        )
+
+    def get_uta_public_fills(
+        self,
+        category: str,
+        product_symbol: str,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve recent public Bitget UTA fills."""
+        return self._native_public(
+            "get_uta_public_fills",
+            self._params(category=category, product_symbol=product_symbol, limit=limit),
+        )
+
+    def get_uta_kline(
+        self,
+        category: str,
+        product_symbol: str,
+        interval: str,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        type_: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget UTA candles."""
+        return self._native_public(
+            "get_uta_kline",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                interval=interval,
+                startTime=startTime,
+                endTime=endTime,
+                type=type_,
+                limit=limit,
+            ),
+        )
+
+    def get_uta_history_kline(
+        self,
+        category: str,
+        product_symbol: str,
+        interval: str,
+        startTime: int | str | None = None,
+        endTime: int | str | None = None,
+        type_: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve historical Bitget UTA candles."""
+        return self._native_public(
+            "get_uta_history_kline",
+            self._params(
+                category=category,
+                product_symbol=product_symbol,
+                interval=interval,
+                startTime=startTime,
+                endTime=endTime,
+                type=type_,
+                limit=limit,
+            ),
+        )
+
+    def get_reality_stock_info(
+        self,
+        product_symbol: str | None = None,
+        symbol: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Bitget Reality underlying-stock and trading-session metadata."""
+        return self._native_public(
+            "get_reality_stock_info",
+            self._params(product_symbol=product_symbol, symbol=symbol),
+        )
+
+    def get_reality_market_states(self) -> dict[str, Any]:
+        """Retrieve Bitget Reality US-market session hours."""
+        return self._native_public("get_reality_market_states", [])
+
+    def get_reality_market_calendar(self) -> dict[str, Any]:
+        """Retrieve Bitget Reality US-market closure calendar."""
+        return self._native_public("get_reality_market_calendar", [])
+
     def get_uta_liquidations(
         self,
         category: str,

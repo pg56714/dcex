@@ -208,6 +208,47 @@ def test_backpack_current_public_queries_match_wire_format() -> None:
     }
 
 
+def test_backpack_rfq_constraints_select_the_requested_session() -> None:
+    securities = [
+        {
+            "asset": "AAPL.US",
+            "name": "Apple",
+            "sessions": [
+                {
+                    "name": "regular",
+                    "minQuantity": "0.01",
+                    "maxQuantity": "100",
+                    "stepSize": "0.01",
+                },
+                {
+                    "name": "extended",
+                    "minQuantity": "0.1",
+                    "maxQuantity": "50",
+                    "stepSize": "0.1",
+                },
+            ],
+        }
+    ]
+    with _http_server(securities) as (base_url, received):
+        client = _native_client(base_url=base_url)
+        response = client.public_request_json(
+            "get_rfq_constraints",
+            [("product_symbol", "AAPL.US-USDC-RFQ"), ("sessionName", "extended")],
+        )[2]
+
+    assert received.get_nowait()["path"] == "/api/v1/securities"
+    assert response == {
+        "asset": "AAPL.US",
+        "symbol": "AAPL.US_USDC_RFQ",
+        "session": {
+            "name": "extended",
+            "minQuantity": "0.1",
+            "maxQuantity": "50",
+            "stepSize": "0.1",
+        },
+    }
+
+
 def test_backpack_current_private_queries_and_order_headers_match_wire_format() -> None:
     with _http_server({"ok": True}) as (base_url, received):
         client = _native_client(base_url=base_url, private=True)

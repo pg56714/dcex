@@ -291,9 +291,15 @@ pub(super) fn is_equity_product_symbol(product_symbol: &str) -> bool {
     product_symbol.ends_with("-EQUITY")
 }
 
+pub(super) fn is_options_product_symbol(product_symbol: &str) -> bool {
+    product_symbol.ends_with("-OPTION") || product_symbol.ends_with("-OPTIONS")
+}
+
 pub(super) fn market_for_product_symbol_fallback(product_symbol: &str) -> BinanceMarket {
     if is_equity_product_symbol(product_symbol) {
         BinanceMarket::Equity
+    } else if is_options_product_symbol(product_symbol) {
+        BinanceMarket::Options
     } else if is_spot_product_symbol(product_symbol) {
         BinanceMarket::Spot
     } else {
@@ -304,6 +310,10 @@ pub(super) fn market_for_product_symbol_fallback(product_symbol: &str) -> Binanc
 pub(super) fn market_from_type(market_type: &str) -> BinanceMarket {
     if market_type.eq_ignore_ascii_case("equity") || market_type.eq_ignore_ascii_case("stock") {
         BinanceMarket::Equity
+    } else if market_type.eq_ignore_ascii_case("option")
+        || market_type.eq_ignore_ascii_case("options")
+    {
+        BinanceMarket::Options
     } else if market_type.eq_ignore_ascii_case("spot") {
         BinanceMarket::Spot
     } else {

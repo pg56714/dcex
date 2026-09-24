@@ -1,3 +1,4 @@
+from json import dumps
 from typing import Any
 
 from .._native_http import request_native_json
@@ -142,6 +143,199 @@ class TradeHTTP(HTTPManager):
     def create_or_renew_equity_listen_key(self) -> dict:
         """Create or renew the stock user-data listen key."""
         return self._native_private("create_or_renew_equity_listen_key", [])
+
+    def place_options_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        quantity: str,
+        price: str,
+        *,
+        timeInForce: str = "GTC",
+        reduceOnly: bool | None = None,
+        postOnly: bool | None = None,
+        newOrderRespType: str | None = None,
+        clientOrderId: str | None = None,
+        selfTradePreventionMode: str | None = None,
+    ) -> dict[str, Any]:
+        """Place a Binance Options limit order."""
+        return self._native_private(
+            "place_options_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type="LIMIT",
+                quantity=quantity,
+                price=price,
+                timeInForce=timeInForce,
+                reduceOnly=reduceOnly,
+                postOnly=postOnly,
+                newOrderRespType=newOrderRespType,
+                clientOrderId=clientOrderId,
+                selfTradePreventionMode=selfTradePreventionMode,
+            ),
+        )
+
+    def place_options_batch_orders(self, orders: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Place multiple Binance Options orders in one request."""
+        return self._native_private(
+            "place_options_batch_orders",
+            self._params(orders=dumps(orders, separators=(",", ":"))),
+        )
+
+    def cancel_options_batch_orders(
+        self,
+        product_symbol: str,
+        *,
+        orderIds: list[int] | None = None,
+        clientOrderIds: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Cancel multiple Binance Options orders."""
+        return self._native_private(
+            "cancel_options_batch_orders",
+            self._params(
+                product_symbol=product_symbol,
+                orderIds=dumps(orderIds) if orderIds is not None else None,
+                clientOrderIds=dumps(clientOrderIds) if clientOrderIds is not None else None,
+            ),
+        )
+
+    def get_options_order(
+        self,
+        product_symbol: str,
+        *,
+        orderId: int | None = None,
+        clientOrderId: str | None = None,
+    ) -> dict[str, Any]:
+        """Get one Binance Options order."""
+        return self._native_private(
+            "get_options_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                clientOrderId=clientOrderId,
+            ),
+        )
+
+    def cancel_options_order(
+        self,
+        product_symbol: str,
+        *,
+        orderId: int | None = None,
+        clientOrderId: str | None = None,
+    ) -> dict[str, Any]:
+        """Cancel one Binance Options order."""
+        return self._native_private(
+            "cancel_options_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                clientOrderId=clientOrderId,
+            ),
+        )
+
+    def cancel_all_options_orders(self, product_symbol: str) -> dict[str, Any]:
+        """Cancel all open option orders for one symbol."""
+        return self._native_private(
+            "cancel_all_options_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def cancel_all_options_orders_by_underlying(self, underlying: str) -> dict[str, Any]:
+        """Cancel all open option orders for one underlying."""
+        return self._native_private(
+            "cancel_all_options_orders_by_underlying",
+            self._params(underlying=underlying),
+        )
+
+    def get_options_positions(self, product_symbol: str | None = None) -> list[dict[str, Any]]:
+        """Get current Binance Options positions."""
+        return self._native_private(
+            "get_options_positions", self._params(product_symbol=product_symbol)
+        )
+
+    def get_open_options_orders(
+        self,
+        product_symbol: str | None = None,
+        *,
+        orderId: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get current open Binance Options orders."""
+        return self._native_private(
+            "get_open_options_orders",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+            ),
+        )
+
+    def get_options_order_history(
+        self,
+        product_symbol: str,
+        *,
+        orderId: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get completed Binance Options orders."""
+        return self._native_private(
+            "get_options_order_history",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
+
+    def get_options_account_trades(
+        self,
+        product_symbol: str,
+        *,
+        fromId: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get Binance Options account trades."""
+        return self._native_private(
+            "get_options_account_trades",
+            self._params(
+                product_symbol=product_symbol,
+                fromId=fromId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
+
+    def get_options_commission(self) -> dict[str, Any]:
+        """Get Binance Options commission rates."""
+        return self._native_private("get_options_commission", [])
+
+    def get_options_exercise_records(
+        self,
+        product_symbol: str | None = None,
+        *,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get the account's Binance Options exercise records."""
+        return self._native_private(
+            "get_options_exercise_records",
+            self._params(
+                product_symbol=product_symbol,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
 
     def _native_private(
         self,

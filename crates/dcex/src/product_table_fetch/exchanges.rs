@@ -332,7 +332,12 @@ pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
 
 pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = BitgetClient::public(timeout)?;
-    let spot = client.public_request("get_spot_symbols", vec![]).await?;
+    let spot = client
+        .public_request(
+            "get_uta_instruments",
+            vec![("category".to_string(), "SPOT".to_string())],
+        )
+        .await?;
     let futures = client
         .public_request(
             "get_futures_contracts",
@@ -355,10 +360,10 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
             exchange_type: "spot".to_string(),
             price_precision: decimal_precision(value_i32(market, "pricePrecision", 0)),
             size_precision: decimal_precision(value_i32(market, "quantityPrecision", 0)),
-            min_size: value_string(market, "minTradeAmount", "0"),
+            min_size: value_string(market, "minOrderQty", "0"),
             base_currency: base,
             quote_currency: quote,
-            min_notional: value_string(market, "minTradeUSDT", "0"),
+            min_notional: value_string(market, "minOrderAmount", "0"),
             size_per_contract: "1".to_string(),
         });
     }

@@ -42,6 +42,53 @@ impl BackpackClient {
             "get_market_sessions" => self.public_get(MARKET_SESSIONS, Vec::new()).await,
             "get_market_holidays" => self.public_get(MARKET_HOLIDAYS, Vec::new()).await,
             "get_securities" => self.public_get(SECURITIES, Vec::new()).await,
+            "get_rfq_constraints" => {
+                let selector = params.required_any(&["product_symbol", "symbol"])?;
+                let exchange_symbol = self.exchange_symbol(selector)?;
+                let asset = exchange_symbol.strip_suffix("_USDC_RFQ").ok_or_else(|| {
+                    DcexError::InvalidInput(
+                        "Backpack RFQ constraints require an *_USDC_RFQ symbol".to_string(),
+                    )
+                })?;
+                let session_name = params.required("sessionName")?;
+                let mut response = self.public_get(SECURITIES, Vec::new()).await?;
+                let security = response
+                    .data
+                    .as_array()
+                    .and_then(|items| {
+                        items.iter().find(|item| {
+                            item.get("asset")
+                                .and_then(serde_json::Value::as_str)
+                                .is_some_and(|value| value.eq_ignore_ascii_case(asset))
+                        })
+                    })
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput(format!("unknown Backpack RFQ security: {asset}"))
+                    })?;
+                let session = security
+                    .get("sessions")
+                    .and_then(serde_json::Value::as_array)
+                    .and_then(|sessions| {
+                        sessions.iter().find(|session| {
+                            session
+                                .get("name")
+                                .and_then(serde_json::Value::as_str)
+                                .is_some_and(|value| value.eq_ignore_ascii_case(session_name))
+                        })
+                    })
+                    .cloned()
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput(format!(
+                            "unknown Backpack session {session_name} for {asset}"
+                        ))
+                    })?;
+                response.data = serde_json::json!({
+                    "asset": asset,
+                    "symbol": exchange_symbol,
+                    "session": session,
+                });
+                Ok(response)
+            }
             "get_mark_prices" => {
                 let mut query = params.only(&["marketType"]);
                 self.push_optional_symbol(&mut query, &params)?;
@@ -112,6 +159,12 @@ impl BackpackClient {
             | "ping"
             | "get_time"
             | "get_wallets" => params.ensure_allowed(&[], &[]),
+            "get_rfq_constraints" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "sessionName"], &[])?;
+                validate_symbol_selector(params, true)?;
+                params.required("sessionName")?;
+                Ok(())
+            }
             "get_borrow_lend_market_history" => {
                 params.ensure_allowed(&["interval", "symbol"], &[])?;
                 params.required("interval")?;

@@ -1,4 +1,5 @@
 use std::time::Duration;
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::{
     io::{Read, Write},
     net::TcpListener,
@@ -7,6 +8,7 @@ use std::{
 
 use super::client::signing_domain_for_base_url;
 use super::ExtendedClient;
+use serde_json::json;
 
 #[test]
 fn testnet_base_url_uses_sepolia_signing_domain() {
@@ -238,6 +240,41 @@ async fn private_methods_use_documented_paths_and_params() {
         "POST /api/v1/user/deadmanswitch?countdownTime=60 HTTP/1.1",
     );
     assert!(deadman_request.ends_with("\r\n\r\n"));
+
+    let expiry = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("time")
+        .as_millis() as u64
+        + 60_000;
+    let rfq_order = json!({
+        "id": "rfq-order-1",
+        "market": "AAPL-USD",
+        "type": "MARKET",
+        "side": "BUY",
+        "qty": "1",
+        "price": "200",
+        "reduceOnly": false,
+        "postOnly": false,
+        "timeInForce": "IOC",
+        "expiryEpochMillis": expiry,
+        "fee": "0.00025",
+        "nonce": "1",
+        "selfTradeProtectionLevel": "ACCOUNT",
+        "rfqStartPrice": "199",
+        "settlement": {
+            "signature": {"r": "0x1", "s": "0x2"},
+            "starkKey": "0x3",
+            "collateralPosition": "4"
+        }
+    });
+    assert_request_line(
+        private_request(
+            "place_rfq_order",
+            vec![("body".to_string(), rfq_order.to_string())],
+        )
+        .await,
+        "POST /api/v1/user/order/rfq HTTP/1.1",
+    );
 }
 
 async fn public_request(method: &str, params: Vec<(String, String)>) -> String {

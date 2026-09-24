@@ -14,6 +14,7 @@ pub(super) const POSITIONS_HISTORY: &str = "/api/v1/user/positions/history";
 pub(super) const ORDERS: &str = "/api/v1/user/orders";
 pub(super) const ORDERS_HISTORY: &str = "/api/v1/user/orders/history";
 pub(super) const ORDER: &str = "/api/v1/user/order";
+pub(super) const RFQ_ORDER: &str = "/api/v1/user/order/rfq";
 pub(super) const FILLS: &str = "/api/v1/user/trades";
 pub(super) const FUNDING_PAYMENTS: &str = "/api/v1/user/funding/history";
 pub(super) const LEVERAGE: &str = "/api/v1/user/leverage";

@@ -904,11 +904,18 @@ impl BinanceClient {
                 .send_place_equity_order(product_symbol, side, order_type, extra_params)
                 .await;
         }
+        if market == BinanceMarket::Options && test {
+            return Err(DcexError::InvalidInput(
+                "Binance does not provide a test-order endpoint for Options orders.".to_string(),
+            ));
+        }
         let path = match (market, test) {
             (BinanceMarket::Spot, false) => SPOT_ORDER,
             (BinanceMarket::Spot, true) => SPOT_TEST_ORDER,
             (BinanceMarket::Futures, false) => FUTURES_ORDER,
             (BinanceMarket::Futures, true) => FUTURES_TEST_ORDER,
+            (BinanceMarket::Options, false) => OPTIONS_ORDER,
+            (BinanceMarket::Options, true) => unreachable!("handled above"),
             (BinanceMarket::Equity, _) => unreachable!("handled above"),
         };
         let mut params = vec![

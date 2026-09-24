@@ -97,6 +97,24 @@ class SpotClient(BaseHTTPManager):
         """Get normalized execution status for a submitted Arcus spot trade."""
         return self._call("public_request", "get_status", _params(venue="arcus", id=tx_hash))
 
+    def build_signed_quote(
+        self,
+        quote: Mapping[str, Any],
+        taker: str,
+        signature: str,
+        *,
+        permits: list[Mapping[str, Any]] | None = None,
+        route_tag: str | None = None,
+    ) -> dict[str, Any]:
+        """Build a validated submit body from an externally signed firm quote."""
+        return self._native_client.build_signed_quote_json(
+            json.dumps(dict(quote), separators=(",", ":")),
+            taker,
+            signature,
+            None if permits is None else json.dumps(permits, separators=(",", ":")),
+            route_tag,
+        )
+
     def submit_signed_quote(self, signed_quote: Mapping[str, Any]) -> Any:  # noqa: ANN401
         """Submit a wallet-signed Arcus quote; this can execute a real spot trade."""
         return self._call(

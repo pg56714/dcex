@@ -13,6 +13,7 @@ impl BinanceClient {
     pub async fn get_server_time(&self, market_type: &str) -> Result<ValidatedResponse> {
         let (market, path) = match market_type.to_ascii_lowercase().as_str() {
             "equity" | "stock" => (BinanceMarket::Equity, SPOT_SERVER_TIME),
+            "option" | "options" => (BinanceMarket::Options, OPTIONS_SERVER_TIME),
             "spot" => (BinanceMarket::Spot, SPOT_SERVER_TIME),
             _ => (BinanceMarket::Futures, FUTURES_SERVER_TIME),
         };
@@ -558,6 +559,9 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
         if let Some(response) = self.equity_public_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.options_public_request(method_name, &params).await? {
             return Ok(response);
         }
         match method_name {

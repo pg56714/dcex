@@ -25,6 +25,32 @@ impl PythonArcusSpotHttpClient {
         Ok(Self { client })
     }
 
+    #[pyo3(signature = (quote_json, taker, signature, permits_json=None, route_tag=None))]
+    fn build_signed_quote_json(
+        &self,
+        py: Python<'_>,
+        quote_json: String,
+        taker: String,
+        signature: String,
+        permits_json: Option<String>,
+        route_tag: Option<String>,
+    ) -> PyResult<Py<PyAny>> {
+        let quote = serde_json::from_str(&quote_json)
+            .map_err(|error| PyValueError::new_err(format!("invalid Arcus quote JSON: {error}")))?;
+        let permits = permits_json
+            .map(|value| {
+                serde_json::from_str(&value).map_err(|error| {
+                    PyValueError::new_err(format!("invalid Arcus permits JSON: {error}"))
+                })
+            })
+            .transpose()?;
+        let body = self
+            .client
+            .build_signed_quote(quote, &taker, &signature, permits, route_tag.as_deref())
+            .map_err(to_py_runtime_error)?;
+        json_value_to_py(py, &body)
+    }
+
     #[pyo3(signature = (method_name, params=None))]
     fn public_request_json(
         &self,

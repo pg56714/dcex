@@ -3,6 +3,7 @@ mod client;
 mod endpoints;
 mod equity;
 mod market;
+mod options;
 mod params;
 mod private;
 mod signing;

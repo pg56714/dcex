@@ -26,6 +26,103 @@ class MarketHTTP(HTTPManager):
             "get_equity_quote", self._params(product_symbol=product_symbol)
         )
 
+    async def get_options_exchange_info(self) -> dict[str, Any]:
+        """Get Binance Options contracts and trading rules."""
+        return await self._native_public("get_options_exchange_info", [])
+
+    async def get_options_exercise_history(
+        self,
+        underlying: str | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get historical option exercise records."""
+        return await self._native_public(
+            "get_options_exercise_history",
+            self._params(
+                underlying=underlying,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
+
+    async def get_options_index_price(self, underlying: str) -> dict[str, Any]:
+        """Get the spot index price for an option underlying."""
+        return await self._native_public(
+            "get_options_index_price", self._params(underlying=underlying)
+        )
+
+    async def get_options_klines(
+        self,
+        product_symbol: str,
+        interval: str,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+    ) -> list[list[Any]]:
+        """Get candlesticks for an option symbol."""
+        return await self._native_public(
+            "get_options_klines",
+            self._params(
+                product_symbol=product_symbol,
+                interval=interval,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
+
+    async def get_options_open_interest(
+        self, underlyingAsset: str, expiration: str
+    ) -> list[dict[str, Any]]:
+        """Get option open interest by underlying asset and expiration."""
+        return await self._native_public(
+            "get_options_open_interest",
+            self._params(underlyingAsset=underlyingAsset, expiration=expiration),
+        )
+
+    async def get_options_mark_price(
+        self, product_symbol: str | None = None
+    ) -> list[dict[str, Any]]:
+        """Get option mark prices and Greeks."""
+        return await self._native_public(
+            "get_options_mark_price", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_options_orderbook(
+        self, product_symbol: str, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get an option order book."""
+        return await self._native_public(
+            "get_options_orderbook",
+            self._params(product_symbol=product_symbol, limit=limit),
+        )
+
+    async def get_options_block_trades(self) -> list[dict[str, Any]]:
+        """Get recent public option block trades."""
+        return await self._native_public("get_options_block_trades", [])
+
+    async def get_options_trades(
+        self, product_symbol: str, limit: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Get recent option trades."""
+        return await self._native_public(
+            "get_options_trades",
+            self._params(product_symbol=product_symbol, limit=limit),
+        )
+
+    async def ping_options(self) -> dict[str, Any]:
+        """Test Binance Options REST connectivity."""
+        return await self._native_public("ping_options", [])
+
+    async def get_options_ticker(self, product_symbol: str | None = None) -> list[dict[str, Any]]:
+        """Get 24-hour option ticker statistics."""
+        return await self._native_public(
+            "get_options_ticker", self._params(product_symbol=product_symbol)
+        )
+
     async def _native_public(
         self,
         method_name: str,
@@ -59,7 +156,7 @@ class MarketHTTP(HTTPManager):
         return params
 
     async def get_server_time(self, market_type: str = BinanceProductType.SPOT) -> dict:
-        """Get Binance server time for spot or futures."""
+        """Get Binance server time for spot, futures, equity, or options."""
         return await self._native_public(
             "get_server_time",
             self._params(market_type=str(market_type)),

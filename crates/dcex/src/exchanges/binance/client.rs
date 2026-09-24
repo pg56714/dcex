@@ -16,6 +16,7 @@ use super::signing::{extract_server_time_ms, BinanceResponseValidator, BinanceSi
 pub enum BinanceMarket {
     Equity,
     Futures,
+    Options,
     Spot,
 }
 
@@ -24,6 +25,7 @@ impl BinanceMarket {
         match self {
             Self::Equity => SPOT_BASE_URL,
             Self::Futures => FUTURES_BASE_URL,
+            Self::Options => OPTIONS_BASE_URL,
             Self::Spot => SPOT_BASE_URL,
         }
     }
@@ -34,6 +36,9 @@ impl BinanceMarket {
         }
         if path.starts_with("/fapi/") || path.starts_with("/futures/") {
             return Ok(Self::Futures);
+        }
+        if path.starts_with("/eapi/") {
+            return Ok(Self::Options);
         }
         if path.starts_with("/api/") || path.starts_with("/sapi/") {
             return Ok(Self::Spot);
@@ -48,6 +53,7 @@ impl BinanceMarket {
 pub struct BinanceClient {
     inner: ExchangeHttpClient,
     futures_base_url: String,
+    options_base_url: String,
     spot_base_url: String,
     api_key: Option<String>,
     timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
@@ -60,12 +66,13 @@ impl BinanceClient {
         api_secret: Option<String>,
         timeout: Duration,
     ) -> Result<Self> {
-        Self::with_base_urls(
+        Self::with_all_base_urls(
             api_key,
             api_secret,
             timeout,
             SPOT_BASE_URL.to_string(),
             FUTURES_BASE_URL.to_string(),
+            OPTIONS_BASE_URL.to_string(),
         )
     }
 
@@ -79,6 +86,24 @@ impl BinanceClient {
         timeout: Duration,
         spot_base_url: String,
         futures_base_url: String,
+    ) -> Result<Self> {
+        Self::with_all_base_urls(
+            api_key,
+            api_secret,
+            timeout,
+            spot_base_url,
+            futures_base_url,
+            OPTIONS_BASE_URL.to_string(),
+        )
+    }
+
+    pub fn with_all_base_urls(
+        api_key: Option<String>,
+        api_secret: Option<String>,
+        timeout: Duration,
+        spot_base_url: String,
+        futures_base_url: String,
+        options_base_url: String,
     ) -> Result<Self> {
         let timestamp_offset_ms = Arc::new(Mutex::new(None));
         let mut inner =
@@ -94,6 +119,7 @@ impl BinanceClient {
         Ok(Self {
             inner,
             futures_base_url,
+            options_base_url,
             spot_base_url,
             api_key: api_key_header,
             timestamp_offset_ms,
@@ -166,6 +192,7 @@ impl BinanceClient {
         let path = match market {
             BinanceMarket::Equity => SPOT_SERVER_TIME,
             BinanceMarket::Futures => FUTURES_SERVER_TIME,
+            BinanceMarket::Options => OPTIONS_SERVER_TIME,
             BinanceMarket::Spot => SPOT_SERVER_TIME,
         };
         let request = self.build_request(HttpMethod::Get, market, path, Vec::new());
@@ -194,6 +221,7 @@ impl BinanceClient {
         let base_url = match market {
             BinanceMarket::Equity => &self.spot_base_url,
             BinanceMarket::Futures => &self.futures_base_url,
+            BinanceMarket::Options => &self.options_base_url,
             BinanceMarket::Spot => &self.spot_base_url,
         };
         match method {
@@ -316,6 +344,7 @@ impl BinanceClient {
                 let product_type = table.get_product_type("binance", Some(product_symbol), None)?;
                 return Ok(match product_type.as_str() {
                     "equity" | "stock" => BinanceMarket::Equity,
+                    "option" | "options" => BinanceMarket::Options,
                     "spot" => BinanceMarket::Spot,
                     _ => BinanceMarket::Futures,
                 });

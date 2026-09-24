@@ -51,6 +51,42 @@ async def test_get_futures_server_time(client):
 
 
 @pytest.mark.asyncio
+async def test_get_options_server_time(client):
+    res = await client.get_server_time(market_type="options")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_options_exchange_info(client):
+    res = await client.get_options_exchange_info()
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_options_index_price(client):
+    res = await client.get_options_index_price("BTCUSDT")
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_options_mark_price(client):
+    res = await client.get_options_mark_price()
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_get_options_ticker(client):
+    res = await client.get_options_ticker()
+    assert res is not None
+
+
+@pytest.mark.asyncio
+async def test_ping_options(client):
+    res = await client.ping_options()
+    assert res is not None
+
+
+@pytest.mark.asyncio
 async def test_get_futures_exchange_info(client):
     res = await client.get_futures_exchange_info()
     assert res is not None

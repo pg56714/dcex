@@ -195,6 +195,75 @@ impl BitgetClient {
                 )
                 .await
             }
+            "get_uta_instruments" => {
+                params.required("category")?;
+                self.public_get(
+                    UTA_INSTRUMENTS,
+                    self.normalize_symbol_params(params.only(&[
+                        "product_symbol",
+                        "symbol",
+                        "category",
+                    ]))?,
+                )
+                .await
+            }
+            "get_uta_tickers" => {
+                params.required("category")?;
+                self.public_get(
+                    UTA_TICKERS,
+                    self.normalize_symbol_params(params.only(&[
+                        "product_symbol",
+                        "symbol",
+                        "category",
+                    ]))?,
+                )
+                .await
+            }
+            "get_uta_orderbook" => {
+                require_all(&params, &["category", "product_symbol"])?;
+                self.public_get(
+                    UTA_ORDERBOOK,
+                    self.normalize_symbol_params(params.only(&[
+                        "product_symbol",
+                        "category",
+                        "limit",
+                    ]))?,
+                )
+                .await
+            }
+            "get_uta_public_fills" => {
+                require_all(&params, &["category", "product_symbol"])?;
+                self.public_get(
+                    UTA_PUBLIC_FILLS,
+                    self.normalize_symbol_params(params.only(&[
+                        "product_symbol",
+                        "category",
+                        "limit",
+                    ]))?,
+                )
+                .await
+            }
+            "get_uta_kline" | "get_uta_history_kline" => {
+                require_all(&params, &["category", "product_symbol", "interval"])?;
+                let endpoint = if method_name == "get_uta_kline" {
+                    UTA_CANDLES
+                } else {
+                    UTA_HISTORY_CANDLES
+                };
+                self.public_get(
+                    endpoint,
+                    self.normalize_symbol_params(params.only(&[
+                        "product_symbol",
+                        "category",
+                        "interval",
+                        "startTime",
+                        "endTime",
+                        "type",
+                        "limit",
+                    ]))?,
+                )
+                .await
+            }
             "get_uta_liquidations" => {
                 params.required("category")?;
                 self.public_get(
@@ -207,6 +276,17 @@ impl BitgetClient {
                     ]))?,
                 )
                 .await
+            }
+            "get_reality_stock_info" => {
+                self.public_get(
+                    REALITY_STOCK_INFO,
+                    self.normalize_symbol_params(params.only(&["product_symbol", "symbol"]))?,
+                )
+                .await
+            }
+            "get_reality_market_states" => self.public_get(REALITY_MARKET_STATES, Vec::new()).await,
+            "get_reality_market_calendar" => {
+                self.public_get(REALITY_MARKET_CALENDAR, Vec::new()).await
             }
             _ => Err(DcexError::InvalidInput(format!(
                 "unsupported Bitget public method: {method_name}"

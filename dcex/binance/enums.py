@@ -8,6 +8,7 @@ class BinanceProductType(str, Enum):
 
     SPOT = "spot"
     SWAP = "swap"
+    OPTIONS = "options"
 
     def __str__(self) -> str:
         return self.value

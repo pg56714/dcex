@@ -191,6 +191,10 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    def place_rfq_order(self, body: Mapping[str, Any]) -> Any:  # noqa: ANN401
+        """Submit an already signed order through Extended's RFQ-only route."""
+        return self._native_private("place_rfq_order", self._native_params(body=body))
+
     def cancel_order(self, id: int | str) -> Any:  # noqa: A002, ANN401
         return self._native_private("cancel_order", self._native_params(id=id))
 

@@ -75,9 +75,24 @@ class MarketHTTP(HTTPManager):
         """Retrieve Backpack market sessions."""
         return self._native_public("get_market_sessions", [])
 
+    def get_market_holidays(self) -> dict[str, Any] | list[Any] | str:
+        """Retrieve Backpack market closures and shortened trading days."""
+        return self._native_public("get_market_holidays", [])
+
     def get_securities(self) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack securities."""
         return self._native_public("get_securities", [])
+
+    def get_rfq_constraints(
+        self,
+        product_symbol: str,
+        session_name: str,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Retrieve exact RFQ quantity constraints for one security session."""
+        return self._native_public(
+            "get_rfq_constraints",
+            self._native_params(product_symbol=product_symbol, sessionName=session_name),
+        )
 
     def get_mark_prices(
         self,

@@ -43,6 +43,36 @@ def test_get_futures_server_time(client):
     assert res is not None
 
 
+def test_get_options_server_time(client):
+    res = client.get_server_time(market_type="options")
+    assert res is not None
+
+
+def test_get_options_exchange_info(client):
+    res = client.get_options_exchange_info()
+    assert res is not None
+
+
+def test_get_options_index_price(client):
+    res = client.get_options_index_price("BTCUSDT")
+    assert res is not None
+
+
+def test_get_options_mark_price(client):
+    res = client.get_options_mark_price()
+    assert res is not None
+
+
+def test_get_options_ticker(client):
+    res = client.get_options_ticker()
+    assert res is not None
+
+
+def test_ping_options(client):
+    res = client.ping_options()
+    assert res is not None
+
+
 def test_get_futures_exchange_info(client):
     res = client.get_futures_exchange_info()
     assert res is not None

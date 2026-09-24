@@ -13,7 +13,8 @@ impl PythonBinanceHttpClient {
         api_secret=None,
         timeout=10.0,
         spot_base_url=None,
-        futures_base_url=None
+        futures_base_url=None,
+        options_base_url=None
     ))]
     fn new(
         api_key: Option<String>,
@@ -21,15 +22,17 @@ impl PythonBinanceHttpClient {
         timeout: f64,
         spot_base_url: Option<String>,
         futures_base_url: Option<String>,
+        options_base_url: Option<String>,
     ) -> PyResult<Self> {
         let timeout = http_timeout(timeout)?;
         Ok(Self {
-            client: BinanceClient::with_base_urls(
+            client: BinanceClient::with_all_base_urls(
                 api_key,
                 api_secret,
                 timeout,
                 spot_base_url.unwrap_or_else(|| "https://api.binance.com".to_string()),
                 futures_base_url.unwrap_or_else(|| "https://fapi.binance.com".to_string()),
+                options_base_url.unwrap_or_else(|| "https://eapi.binance.com".to_string()),
             )
             .map_err(to_py_runtime_error)?,
         })

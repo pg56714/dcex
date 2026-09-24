@@ -147,6 +147,7 @@ class ArcusHttpClient(_NativeExchangeClient):
         account_index: int = 0,
         testnet: bool = False,
         timeout: float = 10.0,
+        base_url: str | None = None,
     ) -> None: ...
 
 class ArcusSpotHttpClient(_NativeExchangeClient):
@@ -157,6 +158,14 @@ class ArcusSpotHttpClient(_NativeExchangeClient):
         timeout: float = 10.0,
         base_url: str | None = None,
     ) -> None: ...
+    def build_signed_quote_json(
+        self,
+        quote_json: str,
+        taker: str,
+        signature: str,
+        permits_json: str | None = None,
+        route_tag: str | None = None,
+    ) -> dict[str, Any]: ...
 
 class ArcusWebSocketClient:
     def __init__(self, testnet: bool = False, timeout: float = 10.0) -> None: ...

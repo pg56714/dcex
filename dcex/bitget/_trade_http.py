@@ -402,6 +402,30 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    def place_reality_order(
+        self,
+        product_symbol: str,
+        side: str,
+        orderType: str,
+        qty: str,
+        price: str | None = None,
+        category: str = "SPOT",
+        clientOid: str | None = None,
+    ) -> dict[str, Any]:
+        """Place a Bitget Reality stock order through the dedicated endpoint."""
+        return self._native_private(
+            "place_reality_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                orderType=orderType,
+                qty=qty,
+                price=price,
+                category=category,
+                clientOid=clientOid,
+            ),
+        )
+
     def place_uta_batch_orders(self, orderList: list[dict[str, Any]]) -> dict[str, Any]:
         """Place Bitget UTA orders in batch."""
         return self._native_private(
@@ -419,6 +443,24 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "cancel_uta_order",
             self._native_params(orderId=orderId, clientOid=clientOid, category=category),
+        )
+
+    def cancel_reality_order(
+        self,
+        product_symbol: str,
+        orderId: str | None = None,
+        clientOid: str | None = None,
+        category: str = "SPOT",
+    ) -> dict[str, Any]:
+        """Cancel a Bitget Reality stock order through the dedicated endpoint."""
+        return self._native_private(
+            "cancel_reality_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                clientOid=clientOid,
+                category=category,
+            ),
         )
 
     def cancel_uta_batch_orders(self, orderList: list[dict[str, Any]]) -> dict[str, Any]:

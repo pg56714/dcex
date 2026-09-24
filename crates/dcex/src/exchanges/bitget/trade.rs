@@ -161,11 +161,13 @@ impl BitgetClient {
                 self.get_private(SPOT_FILLS, query).await
             }
             "place_uta_order" => self.place_uta_order_from_params(params).await,
+            "place_reality_order" => self.place_reality_order_from_params(params).await,
             "place_uta_batch_orders" => {
                 self.post_private(UTA_BATCH_PLACE_ORDER, params.json_required("orderList")?)
                     .await
             }
             "cancel_uta_order" => self.cancel_uta_order_from_params(params).await,
+            "cancel_reality_order" => self.cancel_reality_order_from_params(params).await,
             "cancel_uta_batch_orders" => {
                 self.post_private(UTA_BATCH_CANCEL_ORDERS, params.json_required("orderList")?)
                     .await
@@ -528,6 +530,32 @@ impl BitgetClient {
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
         self.place_futures_order_request(params, None, None, None)
+            .await
+    }
+
+    async fn place_reality_order_from_params(
+        &self,
+        params: &BitgetParams,
+    ) -> Result<ValidatedResponse> {
+        for key in ["side", "orderType", "qty"] {
+            params.required(key)?;
+        }
+        require_uta_symbol(params)?;
+        let mut body = params.body(&["category", "side", "orderType", "qty", "price", "clientOid"]);
+        self.insert_uta_symbol(&mut body, params)?;
+        self.post_private(REALITY_PLACE_ORDER, Value::Object(body))
+            .await
+    }
+
+    async fn cancel_reality_order_from_params(
+        &self,
+        params: &BitgetParams,
+    ) -> Result<ValidatedResponse> {
+        require_uta_symbol(params)?;
+        require_one_identifier(params, &["orderId", "clientOid"])?;
+        let mut body = params.body(&["category", "orderId", "clientOid"]);
+        self.insert_uta_symbol(&mut body, params)?;
+        self.post_private(REALITY_CANCEL_ORDER, Value::Object(body))
             .await
     }
 

@@ -162,6 +162,56 @@ mod spot {
             self.chain_id
         }
 
+        /// Assemble the Arcus `/v1/submit` body from a firm quote and a signature
+        /// produced by the caller's EVM wallet.
+        pub fn build_signed_quote(
+            &self,
+            quote: Value,
+            taker: &str,
+            signature: &str,
+            permits: Option<Value>,
+            route_tag: Option<&str>,
+        ) -> Result<Value> {
+            validate_address(taker)?;
+            validate_hex(signature, 65)?;
+            let quote = quote.as_object().ok_or_else(|| {
+                DcexError::InvalidInput("Arcus spot firm quote must be a JSON object".into())
+            })?;
+            if quote.get("venue").and_then(Value::as_str) != Some("arcus") {
+                return Err(DcexError::InvalidInput(
+                    "Arcus spot firm quote venue must be arcus".into(),
+                ));
+            }
+            let typed_data = quote.get("toSign").cloned().ok_or_else(|| {
+                DcexError::InvalidInput("Arcus spot firm quote toSign is required".into())
+            })?;
+            validate_typed_data(&typed_data, self.chain_id)?;
+
+            let mut body = serde_json::Map::new();
+            body.insert("venue".into(), Value::String("arcus".into()));
+            body.insert("chainId".into(), Value::from(self.chain_id));
+            body.insert("taker".into(), Value::String(taker.into()));
+            body.insert("typedData".into(), typed_data);
+            body.insert("signature".into(), Value::String(signature.into()));
+            if let Some(permits) = permits {
+                if !permits.is_array() {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus spot permits must be a JSON array".into(),
+                    ));
+                }
+                body.insert("permits".into(), permits);
+            }
+            if let Some(route_tag) = route_tag {
+                if route_tag.trim().is_empty() {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus spot routeTag must not be empty".into(),
+                    ));
+                }
+                body.insert("routeTag".into(), Value::String(route_tag.into()));
+            }
+            Ok(Value::Object(body))
+        }
+
         pub async fn public_request(
             &self,
             method_name: &str,
@@ -281,14 +331,14 @@ mod spot {
             let typed_data = object.get("typedData").ok_or_else(|| {
                 DcexError::InvalidInput("Arcus spot typedData is required".into())
             })?;
-            if !typed_data.is_object()
-                || typed_data["domain"]["chainId"].as_u64() != Some(self.chain_id)
-                || typed_data["primaryType"].as_str() != Some("PermitWitnessTransferFrom")
+            validate_typed_data(typed_data, self.chain_id)?;
+            if object
+                .get("permits")
+                .is_some_and(|permits| !permits.is_array())
             {
                 return Err(DcexError::InvalidInput(
-                "Arcus spot typedData must match the selected network and PermitWitnessTransferFrom"
-                    .into(),
-            ));
+                    "Arcus spot permits must be a JSON array".into(),
+                ));
             }
             let request =
                 HttpRequest::new(HttpMethod::Post, &self.base_url, "/v1/submit").json(signed_quote);
@@ -387,6 +437,19 @@ mod spot {
         Ok(())
     }
 
+    fn validate_typed_data(typed_data: &Value, chain_id: u64) -> Result<()> {
+        if !typed_data.is_object()
+            || typed_data["domain"]["chainId"].as_u64() != Some(chain_id)
+            || typed_data["primaryType"].as_str() != Some("PermitWitnessTransferFrom")
+        {
+            return Err(DcexError::InvalidInput(
+                "Arcus spot typedData must match the selected network and PermitWitnessTransferFrom"
+                    .into(),
+            ));
+        }
+        Ok(())
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
@@ -398,6 +461,34 @@ mod spot {
             assert!(validate_positive_atoms("1000000").is_ok());
             assert!(validate_positive_atoms("0").is_err());
             assert!(validate_positive_atoms("1.5").is_err());
+        }
+
+        #[test]
+        fn builds_arcus_submit_body_from_external_wallet_signature() {
+            let client = ArcusSpotClient::new(None, false, Duration::from_secs(1)).expect("client");
+            let taker = format!("0x{}", "11".repeat(20));
+            let signature = format!("0x{}", "22".repeat(65));
+            let body = client
+                .build_signed_quote(
+                    serde_json::json!({
+                        "venue": "arcus",
+                        "toSign": {
+                            "domain": {"chainId": 4663},
+                            "primaryType": "PermitWitnessTransferFrom"
+                        }
+                    }),
+                    &taker,
+                    &signature,
+                    Some(serde_json::json!([{"token": "permit"}])),
+                    Some("strategy-a"),
+                )
+                .expect("signed quote");
+
+            assert_eq!(body["chainId"], 4663);
+            assert_eq!(body["taker"], taker);
+            assert_eq!(body["signature"], signature);
+            assert_eq!(body["permits"][0]["token"], "permit");
+            assert_eq!(body["routeTag"], "strategy-a");
         }
     }
 }

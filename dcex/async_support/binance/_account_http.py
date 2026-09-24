@@ -137,6 +137,42 @@ class AccountHTTP(HTTPManager):
         """
         return await self._native_private("get_futures_account_info", [])
 
+    async def get_options_account_bill(
+        self,
+        currency: str,
+        recordId: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get Binance Options account funding flows."""
+        return await self._native_private(
+            "get_options_account_bill",
+            self._params(
+                currency=currency,
+                recordId=recordId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
+
+    async def get_options_margin_account(self) -> dict[str, Any]:
+        """Get the Binance Options margin account state."""
+        return await self._native_private("get_options_margin_account", [])
+
+    async def create_options_listen_key(self) -> dict[str, Any]:
+        """Start or renew a Binance Options user data stream."""
+        return await self._native_private("create_options_listen_key", [])
+
+    async def keep_alive_options_listen_key(self) -> dict[str, Any]:
+        """Keep a Binance Options user data stream alive."""
+        return await self._native_private("keep_alive_options_listen_key", [])
+
+    async def close_options_listen_key(self) -> dict[str, Any]:
+        """Close the active Binance Options user data stream."""
+        return await self._native_private("close_options_listen_key", [])
+
     async def get_wallet_balance(
         self,
         quoteAsset: str | None = None,

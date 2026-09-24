@@ -137,6 +137,42 @@ class AccountHTTP(HTTPManager):
         """
         return self._native_private("get_futures_account_info", [])
 
+    def get_options_account_bill(
+        self,
+        currency: str,
+        recordId: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Get Binance Options account funding flows."""
+        return self._native_private(
+            "get_options_account_bill",
+            self._params(
+                currency=currency,
+                recordId=recordId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+            ),
+        )
+
+    def get_options_margin_account(self) -> dict[str, Any]:
+        """Get the Binance Options margin account state."""
+        return self._native_private("get_options_margin_account", [])
+
+    def create_options_listen_key(self) -> dict[str, Any]:
+        """Start or renew a Binance Options user data stream."""
+        return self._native_private("create_options_listen_key", [])
+
+    def keep_alive_options_listen_key(self) -> dict[str, Any]:
+        """Keep a Binance Options user data stream alive."""
+        return self._native_private("keep_alive_options_listen_key", [])
+
+    def close_options_listen_key(self) -> dict[str, Any]:
+        """Close the active Binance Options user data stream."""
+        return self._native_private("close_options_listen_key", [])
+
     def get_wallet_balance(
         self,
         quoteAsset: str | None = None,

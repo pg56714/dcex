@@ -167,10 +167,10 @@ perpetual futures only; private access uses `ONDO_API_KEY_ID` and
 ### Arcus
 
 [Arcus Spot](https://github.com/arcus-xyz/arcus-spot-sdk) uses a separate RFQ
-router. `dcex.arcus()` supports token discovery, prices, firm quotes,
-submission of an already wallet-signed EIP-712 quote, and status checks;
-public hosted quotes need no API key. Wallet signing and any required token
-permit/approval remain the caller's responsibility.
+router. `dcex.arcus()` supports token discovery, prices, firm quotes, validated
+assembly and submission of an externally wallet-signed EIP-712 quote, and
+status checks; public hosted quotes need no API key. Wallet signing and any
+required token permit/approval remain the caller's responsibility.
 
 Arcus Perps uses `dcex.arcus(market="perps")` and separate Ed25519 credentials.
 Market/account queries, single-order placement and cancellation, fills,
@@ -178,6 +178,23 @@ positions, cancel-all, leverage changes, and same-wallet internal transfers
 are implemented. Private Perps execution remains unverified until an account
 with Perps access is available; external withdrawals are intentionally not
 supported.
+
+### Bitget Reality
+
+Bitget Reality rTokens use the UTA V3 API. dcex supports instrument limits,
+stock-session and closure metadata, regular UTA trading, and the dedicated
+Reality place/cancel endpoints. Whitelist-only Reality depth and public fills
+are not required for order execution and are not exposed.
+
+### Binance Options
+
+Binance Options is available through the exchange-specific sync, async, and
+Rust clients. Supported REST workflows include contract discovery, index and
+mark prices with Greeks, klines, open interest, order books, trades, account
+and position queries, single and batch order management, exercise records,
+commissions, and user-data listen keys. Market-maker-only controls are not
+wrapped. Option symbols currently use Binance's native format because options
+are not yet normalized by the unified Product Table Manager.
 
 ## Key Features
 

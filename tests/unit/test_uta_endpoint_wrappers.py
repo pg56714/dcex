@@ -98,6 +98,43 @@ UTA_CASES = (
     ),
     (
         "bitget",
+        "get_uta_instruments",
+        {"category": "SPOT", "product_symbol": "RAAPL-USDT-SPOT"},
+        "NATIVE_PUBLIC",
+    ),
+    (
+        "bitget",
+        "get_uta_orderbook",
+        {"category": "SPOT", "product_symbol": "RAAPL-USDT-SPOT"},
+        "NATIVE_PUBLIC",
+    ),
+    ("bitget", "get_reality_market_states", {}, "NATIVE_PUBLIC"),
+    ("bitget", "get_reality_market_calendar", {}, "NATIVE_PUBLIC"),
+    (
+        "bitget",
+        "place_reality_order",
+        {
+            "product_symbol": "RAAPL-USDT-SPOT",
+            "side": "buy",
+            "orderType": "limit",
+            "qty": "1",
+            "price": "100",
+            "category": "SPOT",
+        },
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "bitget",
+        "cancel_reality_order",
+        {
+            "product_symbol": "RAAPL-USDT-SPOT",
+            "orderId": "123",
+            "category": "SPOT",
+        },
+        "NATIVE_PRIVATE",
+    ),
+    (
+        "bitget",
         "place_uta_strategy_order",
         {"category": "USDT-FUTURES", "product_symbol": "BTC-USDT-SWAP"},
         "NATIVE_PRIVATE",

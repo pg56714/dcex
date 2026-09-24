@@ -256,6 +256,8 @@ fn pow10(exp: u32) -> BigInt {
 #[serde(rename_all = "camelCase")]
 pub(super) struct ExtendedMarket {
     name: String,
+    #[serde(default)]
+    is_rfq: bool,
     l2_config: ExtendedL2Config,
 }
 
@@ -272,6 +274,7 @@ struct ExtendedL2Config {
 pub(super) struct ExtendedSignedOrder {
     pub body: Value,
     pub order_hash: Felt,
+    pub is_rfq: bool,
 }
 
 pub(super) fn build_signed_order(
@@ -280,6 +283,7 @@ pub(super) fn build_signed_order(
     credentials: &ExtendedSigningCredentials,
     domain: StarknetDomain,
 ) -> Result<ExtendedSignedOrder> {
+    let is_rfq = market.is_rfq;
     let spec = ExtendedOrderSpec::from_params(params, market.name)?;
     spec.validate(domain)?;
 
@@ -398,6 +402,7 @@ pub(super) fn build_signed_order(
     Ok(ExtendedSignedOrder {
         body: Value::Object(body),
         order_hash,
+        is_rfq,
     })
 }
 
@@ -814,6 +819,7 @@ mod tests {
     fn signed_order_body_uses_official_json_shape() {
         let market = ExtendedMarket {
             name: "BTC-USD".to_string(),
+            is_rfq: false,
             l2_config: ExtendedL2Config {
                 collateral_id: "0x555344430000000000000000000000".to_string(),
                 collateral_resolution: 1_000_000,

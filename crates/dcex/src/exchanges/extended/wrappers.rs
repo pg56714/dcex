@@ -53,6 +53,7 @@ crate::exchanges::impl_exchange_method_wrappers!(
             amount => "amount"
         ),
         place_order(body => "body"),
+        place_rfq_order(body => "body"),
         place_limit_order(
             market => "market",
             side => "side",

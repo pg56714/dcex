@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 import inspect
+import json
+import time
 from enum import Enum
 from urllib.parse import parse_qsl, urlsplit
 
@@ -158,6 +160,40 @@ def test_extended_current_private_queries_match_wire_format() -> None:
     assert parse_qsl(orders.query).count(("id", "1")) == 1
     assert parse_qsl(orders.query).count(("id", "2")) == 1
     assert dict(parse_qsl(funding.query)) == {"startTime": "100", "limit": "1000"}
+
+
+def test_extended_rfq_order_uses_the_dedicated_official_route() -> None:
+    body = {
+        "id": "rfq-order-1",
+        "market": "AAPL-USD",
+        "type": "MARKET",
+        "side": "BUY",
+        "qty": "1",
+        "price": "200",
+        "reduceOnly": False,
+        "postOnly": False,
+        "timeInForce": "IOC",
+        "expiryEpochMillis": int(time.time() * 1000) + 60_000,
+        "fee": "0.00025",
+        "nonce": "1",
+        "selfTradeProtectionLevel": "ACCOUNT",
+        "rfqStartPrice": "199",
+        "settlement": {
+            "signature": {"r": "0x1", "s": "0x2"},
+            "starkKey": "0x3",
+            "collateralPosition": "4",
+        },
+    }
+    with _http_server({"status": "OK", "data": {"id": 1}}) as (base_url, received):
+        client = _native_client(base_url=base_url, private=True)
+        response = client.private_request_json(
+            "place_rfq_order", [("body", json.dumps(body))]
+        )[2]
+
+    request = received.get_nowait()
+    assert request["path"] == "/api/v1/user/order/rfq"
+    assert json.loads(request["body"])["rfqStartPrice"] == "199"
+    assert response == {"status": "OK", "data": {"id": 1}}
 
 
 def test_extended_rejects_invalid_current_parameters_before_transport() -> None:

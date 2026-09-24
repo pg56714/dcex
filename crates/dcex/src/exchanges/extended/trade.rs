@@ -105,12 +105,23 @@ impl ExtendedClient {
                 }
                 None => {
                     validate_signing_params(params)?;
-                    self.place_signed_limit_order(params).await
+                    self.place_signed_order(params, None).await
+                }
+            },
+            "place_rfq_order" | "create_rfq_order" => match params.body_optional()? {
+                Some(body) => {
+                    params.ensure_allowed(&["body", "order"], &[])?;
+                    validate_order_body(&body, self.signing_domain())?;
+                    self.private_post_value(RFQ_ORDER, body, Vec::new()).await
+                }
+                None => {
+                    validate_signing_params(params)?;
+                    self.place_signed_order(params, Some(true)).await
                 }
             },
             "place_limit_order" | "create_limit_order" => {
                 validate_signing_params(params)?;
-                self.place_signed_limit_order(params).await
+                self.place_signed_order(params, None).await
             }
             "sign_create_order" | "sign_order" => {
                 validate_signing_params(params)?;
@@ -158,9 +169,19 @@ impl ExtendedClient {
         Ok(Some(response))
     }
 
-    async fn place_signed_limit_order(&self, params: &ExtendedParams) -> Result<ValidatedResponse> {
+    async fn place_signed_order(
+        &self,
+        params: &ExtendedParams,
+        require_rfq: Option<bool>,
+    ) -> Result<ValidatedResponse> {
         let signed = self.signed_order_from_params(params).await?;
-        self.private_post_value(ORDER, signed.body, Vec::new())
+        if require_rfq == Some(true) && !signed.is_rfq {
+            return Err(DcexError::InvalidInput(
+                "Extended place_rfq_order requires an RFQ market".to_string(),
+            ));
+        }
+        let endpoint = if signed.is_rfq { RFQ_ORDER } else { ORDER };
+        self.private_post_value(endpoint, signed.body, Vec::new())
             .await
     }
 
@@ -350,6 +371,7 @@ fn validate_order_body(body: &Value, domain: StarknetDomain) -> Result<()> {
             "builderFee",
             "builderId",
             "debuggingAmounts",
+            "rfqStartPrice",
         ],
     )?;
     for key in ["id", "market"] {
@@ -384,6 +406,14 @@ fn validate_order_body(body: &Value, domain: StarknetDomain) -> Result<()> {
         } else {
             validate_positive_decimal("price", price)?;
         }
+    }
+    if let Some(rfq_start_price) = json_decimal(body, "rfqStartPrice", false)? {
+        if order_type != "MARKET" {
+            return Err(DcexError::InvalidInput(
+                "Extended rfqStartPrice is only valid for MARKET orders".to_string(),
+            ));
+        }
+        validate_positive_decimal("rfqStartPrice", rfq_start_price)?;
     }
     if let Some(cancel_id) = body.get("cancelId") {
         if !cancel_id.is_null() {

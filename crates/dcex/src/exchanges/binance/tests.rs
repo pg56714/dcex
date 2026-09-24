@@ -172,6 +172,130 @@ fn raw_auto_identifies_equity_paths() {
 }
 
 #[test]
+fn raw_auto_identifies_options_paths() {
+    assert_eq!(
+        BinanceMarket::from_path("/eapi/v1/exchangeInfo").expect("market"),
+        BinanceMarket::Options
+    );
+}
+
+#[test]
+fn raw_auto_routes_options_paths_to_options_base_url() {
+    let (options_base_url, handle) = recording_server();
+    let client = BinanceClient::with_all_base_urls(
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        "http://127.0.0.1:9".to_string(),
+        options_base_url,
+    )
+    .expect("client");
+
+    let response = client
+        .request_raw_auto_blocking(HttpMethod::Get, "/eapi/v1/exchangeInfo", Vec::new(), false)
+        .expect("response");
+
+    assert_eq!(response.status, 200);
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /eapi/v1/exchangeInfo HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn options_market_data_uses_dedicated_path() {
+    let (options_base_url, handle) = recording_server();
+    let client = BinanceClient::with_all_base_urls(
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        "http://127.0.0.1:9".to_string(),
+        options_base_url,
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .public_request(
+                "get_options_orderbook",
+                vec![
+                    (
+                        "product_symbol".to_string(),
+                        "BTC-260925-100000-C".to_string(),
+                    ),
+                    ("limit".to_string(), "10".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /eapi/v1/depth?limit=10&symbol=BTC-260925-100000-C HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn options_order_uses_dedicated_signed_path() {
+    let (options_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_all_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        "http://127.0.0.1:9".to_string(),
+        options_base_url,
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "place_options_order",
+                vec![
+                    (
+                        "product_symbol".to_string(),
+                        "BTC-260925-100000-C".to_string(),
+                    ),
+                    ("side".to_string(), "buy".to_string()),
+                    ("type".to_string(), "limit".to_string()),
+                    ("quantity".to_string(), "0.01".to_string()),
+                    ("price".to_string(), "1".to_string()),
+                    ("timeInForce".to_string(), "GTC".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("POST /eapi/v1/order HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn options_order_requires_an_order_identifier_for_lookup() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "get_options_order",
+                vec![(
+                    "product_symbol".to_string(),
+                    "BTC-260925-100000-C".to_string(),
+                )],
+            )
+            .await
+    })
+    .expect_err("order identifier must be required");
+    assert!(error.to_string().contains("orderId, clientOrderId"));
+}
+
+#[test]
 fn raw_auto_routes_spot_paths_to_spot_base_url() {
     let (spot_base_url, handle) = recording_server();
     let client = BinanceClient::with_base_urls(

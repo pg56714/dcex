@@ -231,6 +231,7 @@ fn binance_market(market: &str) -> PyResult<BinanceMarket> {
     match market.to_ascii_lowercase().as_str() {
         "equity" | "stock" => Ok(BinanceMarket::Equity),
         "futures" | "future" | "swap" => Ok(BinanceMarket::Futures),
+        "option" | "options" => Ok(BinanceMarket::Options),
         "spot" | "wallet" => Ok(BinanceMarket::Spot),
         _ => Err(PyValueError::new_err(format!(
             "unsupported Binance market: {market}"
