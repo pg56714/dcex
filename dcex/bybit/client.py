@@ -13,6 +13,8 @@ from ._asset_http import AssetHTTP
 from ._earn_http import EarnHTTP
 from ._market_http import MarketHTTP
 from ._position_http import PositionHTTP
+from ._rfq_http import RFQHTTP
+from ._spot_x_http import SpotXHTTP
 from ._trade_http import TradeHTTP
 
 
@@ -20,6 +22,8 @@ class Client(
     TradeHTTP,
     AccountHTTP,
     EarnHTTP,
+    SpotXHTTP,
+    RFQHTTP,
     AssetHTTP,
     PositionHTTP,
     MarketHTTP,

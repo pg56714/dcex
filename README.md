@@ -263,11 +263,37 @@ wrapped.
 ### Bybit Finance and Transfers
 
 Bybit supports UTA manual borrowing and repayment, spot-margin risk and
-interest queries, fixed-rate borrowing, Easy Earn and On-chain Earn workflows,
-and account-to-account asset transfers. Universal transfers can move assets
-between master and sub-account UIDs; live tests only query balances, limits,
-positions, histories, and transfer records and never create a loan, Earn order,
-or transfer.
+interest queries, fixed-rate borrowing, Easy Earn, On-chain Earn, Fixed Saving,
+Hold-to-Earn, BYUSDT, RWA Earn, and Advanced Earn workflows, plus
+account-to-account asset transfers. Easy and On-Chain Earn include APR history,
+coupons, and eligible On-Chain position auto-reinvestment. Fixed Saving covers
+products, positions, orders, subscriptions, eligible early redemption, and
+automatic reinvestment. Hold-to-Earn exposes
+airdrop products and yield records. BYUSDT covers minting, redemption,
+positions, orders, yield records, and APR history. RWA Earn exposes products,
+NAV charts, positions, order history, and asynchronous staking/redemption;
+mutation routes are not exercised live. Advanced Earn covers Dual Assets,
+Smart Leverage, Double Win, and Discount Buy product discovery,
+quotes, positions, order history, redemption estimates, leverage calculations,
+and supported stake or redemption orders. Liquidity Mining supports pool
+discovery, positions, orders, yield and liquidation history, liquidity changes,
+reinvestment, margin top-ups, and interest claims. Spot X Launchpool supports
+project discovery, current staking, operation logs, and completed position
+history. Universal transfers can move assets between master and sub-account
+UIDs; live tests only query balances, limits,
+products, positions, histories, and transfer records and never create a loan,
+Earn order, or transfer.
+
+### Bybit RFQ
+
+Bybit RFQ is available through the Rust core and exchange-specific sync and
+async clients. The complete REST workflow covers configuration, public block
+trades, real-time and historical RFQs and quotes, detailed RFQ records, trade
+history, creation, cancellation, non-LP quote acceptance, quoting, and quote
+execution. Bybit requires signed access for the public-trades route and limits
+RFQ trading to eligible UTA 2.0 accounts; it is unavailable to Demo users.
+Live tests call read-only endpoints only, while every state-changing route is
+validated offline.
 
 ### Bitget Finance
 

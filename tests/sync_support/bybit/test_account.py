@@ -90,3 +90,154 @@ def test_earn_read_endpoints(client):
         if "10005" in str(exc) and "Permission denied" in str(exc):
             pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
         raise
+
+
+def test_advanced_earn_public_products_and_quotes(client):
+    categories = ("DualAssets", "SmartLeverage", "DoubleWin", "DiscountBuy")
+    for category in categories:
+        products = client.get_advanced_earn_products(category)
+        assert products["retCode"] == 0
+        product = products["result"]["list"][0]
+        quote = client.get_advanced_earn_product_quote(category, product["productId"])
+        assert quote["retCode"] == 0
+
+
+@pytest.mark.private
+def test_advanced_earn_private_read_endpoints(client):
+    categories = ("DualAssets", "SmartLeverage", "DoubleWin", "DiscountBuy")
+    for category in categories:
+        try:
+            assert client.get_advanced_earn_positions(category, limit=1) is not None
+            assert client.get_advanced_earn_orders(category, limit=1) is not None
+        except FailedRequestError as exc:
+            if "10005" in str(exc) and "Permission denied" in str(exc):
+                pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
+            raise
+
+
+def test_liquidity_mining_public_products(client):
+    products = client.get_liquidity_mining_products()
+    assert products["retCode"] == 0
+    assert "products" in products["result"]
+
+
+@pytest.mark.private
+def test_liquidity_mining_private_read_endpoints(client):
+    try:
+        assert client.get_liquidity_mining_positions() is not None
+        assert client.get_liquidity_mining_orders(limit=1) is not None
+        assert client.get_liquidity_mining_yield_records(limit=1) is not None
+        assert client.get_liquidity_mining_liquidation_records(limit=1) is not None
+    except FailedRequestError as exc:
+        if "10005" in str(exc) and "Permission denied" in str(exc):
+            pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
+        raise
+
+
+def test_fixed_earn_public_products(client):
+    products = client.get_fixed_earn_products(coin="USDT")
+    assert products["retCode"] == 0
+    assert "list" in products["result"]
+
+
+@pytest.mark.private
+def test_fixed_earn_private_read_endpoints(client):
+    try:
+        assert client.get_fixed_earn_positions() is not None
+        assert client.get_fixed_earn_orders(limit=1) is not None
+    except FailedRequestError as exc:
+        if "10005" in str(exc) and "Permission denied" in str(exc):
+            pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
+        raise
+
+
+def test_hold_to_earn_public_products(client):
+    products = client.get_hold_to_earn_products()
+    assert products["retCode"] == 0
+    assert "products" in products["result"]
+
+
+@pytest.mark.private
+def test_hold_to_earn_private_yield(client):
+    try:
+        assert client.get_hold_to_earn_yield_history(limit=1) is not None
+    except FailedRequestError as exc:
+        if "10005" in str(exc) and "Permission denied" in str(exc):
+            pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
+        raise
+
+
+def test_byusdt_public_product_and_apr(client):
+    assert client.get_byusdt_product()["retCode"] == 0
+    assert client.get_byusdt_apr_history(1)["retCode"] == 0
+
+
+@pytest.mark.private
+def test_byusdt_private_read_endpoints(client):
+    try:
+        assert client.get_byusdt_position() is not None
+        assert client.get_byusdt_orders(limit=1) is not None
+        assert client.get_byusdt_daily_yield(limit=1) is not None
+        assert client.get_byusdt_hourly_yield(limit=1) is not None
+    except FailedRequestError as exc:
+        if "10005" in str(exc) and "Permission denied" in str(exc):
+            pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
+        raise
+
+
+def test_rwa_earn_public_products_and_nav(client):
+    products = client.get_rwa_earn_products()
+    assert products["retCode"] == 0
+    assert "list" in products["result"]
+    if products["result"]["list"]:
+        product_id = products["result"]["list"][0]["productId"]
+        chart = client.get_rwa_earn_nav_chart(product_id)
+        assert chart["retCode"] == 0
+
+
+@pytest.mark.private
+def test_rwa_earn_private_read_endpoints(client):
+    try:
+        assert client.get_rwa_earn_positions() is not None
+        assert client.get_rwa_earn_orders(limit=1) is not None
+    except FailedRequestError as exc:
+        if "10005" in str(exc) and "Permission denied" in str(exc):
+            pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
+        raise
+
+
+def test_earn_public_apr_history(client):
+    products = client.get_earn_products("FlexibleSaving", coin="USDT")
+    assert products["retCode"] == 0
+    product_id = str(products["result"]["list"][0]["productId"])
+    history = client.get_earn_apr_history("FlexibleSaving", product_id)
+    assert history["retCode"] == 0
+
+
+@pytest.mark.private
+def test_earn_coupon_list(client):
+    try:
+        assert client.get_earn_coupons("FlexibleSaving") is not None
+        assert client.get_earn_coupons("DualAssets") is not None
+    except FailedRequestError as exc:
+        if "10005" in str(exc) and "Permission denied" in str(exc):
+            pytest.skip("BYBIT_API_KEY does not have the Earn permission enabled.")
+        raise
+
+
+def test_launchpool_public_projects(client):
+    projects = client.get_launchpool_projects(1)
+    assert projects["retCode"] == 0
+    assert "list" in projects["result"]
+
+
+@pytest.mark.private
+def test_launchpool_private_read_endpoints(client):
+    try:
+        assert client.get_launchpool_current_staking() is not None
+        assert client.get_launchpool_activity_log(pageSize=1) is not None
+        assert client.get_launchpool_history(pageSize=1) is not None
+    except FailedRequestError as exc:
+        if "10005" in str(exc) and "Permission denied" in str(exc):
+            pytest.skip("BYBIT_API_KEY lacks permission for Launchpool queries.")
+        raise

@@ -16,18 +16,23 @@ impl BybitClient {
         method_name: &str,
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
-        if method_name != "get_earn_products" {
-            return Ok(None);
-        }
+        let path = match method_name {
+            "get_earn_products" => EARN_PRODUCT,
+            "get_earn_apr_history" => {
+                params.required("productId")?;
+                validate_apr_times(params)?;
+                EARN_APR_HISTORY
+            }
+            _ => return Ok(None),
+        };
         validate_category(params)?;
+        let keys: &[&str] = if path == EARN_PRODUCT {
+            &["category", "coin"]
+        } else {
+            &["category", "productId", "startTime", "endTime"]
+        };
         let result = self
-            .request(
-                HttpMethod::Get,
-                EARN_PRODUCT,
-                params.only(&["category", "coin"]),
-                None,
-                false,
-            )
+            .request(HttpMethod::Get, path, params.only(keys), None, false)
             .await?;
         Ok(Some(result))
     }
@@ -38,6 +43,28 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "get_earn_coupons" => {
+                validate_enum(params, "category", &["FlexibleSaving", "DualAssets"])?;
+                self.get_request(EARN_COUPONS, params.only(&["category"]))
+                    .await
+            }
+            "set_earn_auto_reinvest" => {
+                validate_enum(params, "category", &["OnChain"])?;
+                let product_id = positive_id(params, "productId")?;
+                let position_id = positive_id(params, "positionId")?;
+                let auto_reinvest = params.i64_required("autoReinvest")?;
+                if !matches!(auto_reinvest, 0 | 1) {
+                    return Err(DcexError::InvalidInput(
+                        "autoReinvest must be 0 or 1".to_string(),
+                    ));
+                }
+                let mut body = Map::new();
+                body.insert("category".to_string(), Value::String("OnChain".to_string()));
+                body.insert("productId".to_string(), Value::from(product_id));
+                body.insert("positionId".to_string(), Value::from(position_id));
+                body.insert("autoReinvest".to_string(), Value::from(auto_reinvest));
+                self.post_request(EARN_POSITION_MODIFY, body).await
+            }
             "place_earn_order" => {
                 validate_category(params)?;
                 validate_enum(params, "orderType", &["Stake", "Redeem"])?;
@@ -210,6 +237,36 @@ fn validate_history(params: &BybitParams) -> Result<()> {
     Ok(())
 }
 
+fn positive_id(params: &BybitParams, key: &str) -> Result<i64> {
+    let value = params.i64_required(key)?;
+    if value <= 0 {
+        return Err(DcexError::InvalidInput(format!("{key} must be positive")));
+    }
+    Ok(value)
+}
+
+fn validate_apr_times(params: &BybitParams) -> Result<()> {
+    let parse = |key: &str| -> Result<Option<u64>> {
+        params
+            .get(key)
+            .map(|value| {
+                value.parse::<u64>().map_err(|error| {
+                    DcexError::InvalidInput(format!("invalid integer parameter {key}: {error}"))
+                })
+            })
+            .transpose()
+    };
+    if let (Some(start), Some(end)) = (parse("startTime")?, parse("endTime")?) {
+        const MAX_APR_RANGE_MS: u64 = 182 * 24 * 60 * 60 * 1_000;
+        if end < start || end - start > MAX_APR_RANGE_MS {
+            return Err(DcexError::InvalidInput(
+                "APR history range must be ordered and no longer than 182 days".to_string(),
+            ));
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -228,5 +285,14 @@ mod tests {
         let params =
             BybitParams::from_pairs(vec![("category".to_string(), "FixedSaving".to_string())]);
         assert!(validate_category(&params).is_err());
+    }
+
+    #[test]
+    fn apr_history_rejects_ranges_over_182_days() {
+        let params = BybitParams::from_pairs(vec![
+            ("startTime".to_string(), "0".to_string()),
+            ("endTime".to_string(), "15724800001".to_string()),
+        ]);
+        assert!(validate_apr_times(&params).is_err());
     }
 }

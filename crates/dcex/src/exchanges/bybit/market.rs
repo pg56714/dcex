@@ -12,6 +12,48 @@ impl BybitClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         if let Some(result) = self
+            .launchpool_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .rwa_earn_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .byusdt_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .hold_to_earn_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .fixed_earn_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .liquidity_mining_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .advanced_earn_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
             .earn_public_request(method_name, &BybitParams::from_pairs(params.clone()))
             .await?
         {
