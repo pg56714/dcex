@@ -133,6 +133,140 @@ impl BybitClient {
                 self.get_request(HISTORICAL_INTEREST, query).await
             }
             "get_status_and_leverage" => self.get_request(STATUS_AND_LEVERAGE, Vec::new()).await,
+            "get_margin_max_borrowable" => {
+                self.get_request(
+                    MARGIN_MAX_BORROWABLE,
+                    vec![(
+                        "currency".to_string(),
+                        params.required("currency")?.to_string(),
+                    )],
+                )
+                .await
+            }
+            "get_margin_position_tiers" => {
+                self.get_request(MARGIN_POSITION_TIERS, params.only(&["currency"]))
+                    .await
+            }
+            "get_margin_coin_state" => {
+                self.get_request(MARGIN_COIN_STATE, params.only(&["currency"]))
+                    .await
+            }
+            "get_margin_repayment_available_amount" => {
+                self.get_request(
+                    MARGIN_REPAYMENT_AVAILABLE_AMOUNT,
+                    vec![(
+                        "currency".to_string(),
+                        params.required("currency")?.to_string(),
+                    )],
+                )
+                .await
+            }
+            "set_margin_auto_repay_mode" => {
+                let mode = params.required("autoRepayMode")?;
+                if !["0", "1"].contains(&mode) {
+                    return Err(crate::DcexError::InvalidInput(
+                        "autoRepayMode must be 0 or 1.".to_string(),
+                    ));
+                }
+                let mut body = Map::new();
+                insert_optional_string(&mut body, "currency", params.get("currency"));
+                body.insert("autoRepayMode".to_string(), Value::String(mode.to_string()));
+                self.post_request(SET_MARGIN_AUTO_REPAY_MODE, body).await
+            }
+            "get_margin_auto_repay_mode" => {
+                self.get_request(GET_MARGIN_AUTO_REPAY_MODE, params.only(&["currency"]))
+                    .await
+            }
+            "get_fixed_borrow_quote" => {
+                let mut query = vec![(
+                    "orderCurrency".to_string(),
+                    params.required("orderCurrency")?.to_string(),
+                )];
+                for key in ["term", "orderBy", "sort", "limit"] {
+                    push_optional(&mut query, key, params.get(key));
+                }
+                self.get_request(FIXED_BORROW_QUOTE, query).await
+            }
+            "borrow_fixed_rate" => {
+                let mut body = Map::new();
+                for key in ["orderCurrency", "orderAmount", "annualRate", "term"] {
+                    body.insert(
+                        key.to_string(),
+                        Value::String(params.required(key)?.to_string()),
+                    );
+                }
+                for key in ["repayType", "strategyType"] {
+                    insert_optional_string(&mut body, key, params.get(key));
+                }
+                self.post_request(FIXED_BORROW, body).await
+            }
+            "renew_fixed_rate_borrow" => {
+                let mut body = Map::new();
+                body.insert(
+                    "loanId".to_string(),
+                    Value::String(params.required("loanId")?.to_string()),
+                );
+                insert_optional_string(&mut body, "qty", params.get("qty"));
+                self.post_request(FIXED_BORROW_RENEW, body).await
+            }
+            "get_fixed_borrow_orders" => {
+                self.get_request(
+                    FIXED_BORROW_ORDER_INFO,
+                    params.only(&[
+                        "orderId",
+                        "orderCurrency",
+                        "state",
+                        "term",
+                        "limit",
+                        "cursor",
+                    ]),
+                )
+                .await
+            }
+            "get_fixed_borrow_contracts" => {
+                self.get_request(
+                    FIXED_BORROW_CONTRACT_INFO,
+                    params.only(&["orderId", "orderCurrency", "term", "limit", "cursor"]),
+                )
+                .await
+            }
+            "get_margin_liability" => {
+                self.get_request(
+                    MARGIN_LIABILITY,
+                    vec![(
+                        "currency".to_string(),
+                        params.required("currency")?.to_string(),
+                    )],
+                )
+                .await
+            }
+            "get_flexible_borrow_inventory" => {
+                self.get_request(
+                    FLEXIBLE_BORROW_INVENTORY,
+                    vec![(
+                        "currency".to_string(),
+                        params.required("currency")?.to_string(),
+                    )],
+                )
+                .await
+            }
+            "get_fixed_borrow_inventory" => {
+                self.get_request(
+                    FIXED_BORROW_INVENTORY,
+                    vec![
+                        (
+                            "currency".to_string(),
+                            params.required("currency")?.to_string(),
+                        ),
+                        ("term".to_string(), params.required("term")?.to_string()),
+                        (
+                            "annualRate".to_string(),
+                            params.required("annualRate")?.to_string(),
+                        ),
+                    ],
+                )
+                .await
+            }
             _ => return Ok(None),
         };
         Ok(Some(result?))

@@ -14,6 +14,12 @@ impl BitgetClient {
         if let Some(result) = self.account_private_request(method_name, &params).await? {
             return Ok(result);
         }
+        if let Some(result) = self.earn_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
+        if let Some(result) = self.loan_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
         if let Some(result) = self.trade_private_request(method_name, &params).await? {
             return Ok(result);
         }

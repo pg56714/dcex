@@ -241,6 +241,64 @@ and accounts under the same master account. Account creation, product
 activation, API-key or IP management, managed sub-accounts, deposits, and
 withdrawals are intentionally not wrapped.
 
+### KuCoin Margin and Lending
+
+KuCoin cross and isolated margin are available through the exchange-specific
+sync, async, and Rust clients. Supported workflows cover margin limits and
+risk, borrowing, repayment, interest history, leverage settings, and margin
+lending purchase, modification, redemption, and order history. Live tests are
+read-only; all operations that change balances or liabilities are covered by
+offline request tests only.
+
+### KuCoin Earn and Sub Account
+
+KuCoin Simple Earn, staking, structured Earn, and Dual Investment discovery
+are available through the exchange-specific sync, async, and Rust clients.
+The wrappers also cover Classic and UTA sub-account lists and balances plus
+the existing internal transfer workflow. Live tests are read-only; Earn
+purchases and redemptions are covered by offline request tests only. Account
+creation, API-key management, deposits, and withdrawals are intentionally not
+wrapped.
+
+### Bybit Finance and Transfers
+
+Bybit supports UTA manual borrowing and repayment, spot-margin risk and
+interest queries, fixed-rate borrowing, Easy Earn and On-chain Earn workflows,
+and account-to-account asset transfers. Universal transfers can move assets
+between master and sub-account UIDs; live tests only query balances, limits,
+positions, histories, and transfer records and never create a loan, Earn order,
+or transfer.
+
+### Bitget Finance
+
+Bitget supports Crypto Loans and Savings/Elite Earn through the Rust core and
+exchange-specific sync and async clients. Loan discovery, interest,
+liabilities, repayment and adjustment histories, Earn products, account
+assets, order status, and record queries are included. Balance-changing
+operations are covered offline only.
+
+### Kraken Earn
+
+Kraken Earn wrappers cover strategy discovery, allocations, allocation and
+deallocation requests, and their status queries. Live coverage is read-only;
+fund allocation changes are tested offline only.
+
+### OKX Finance and Sub Accounts
+
+OKX wrappers cover Savings, staking, ETH/SOL staking, flexible loans, Dual
+Investment, OKUSD, spot borrowing/repayment, option market analytics, and
+sub-account balances, bills, interest limits, and internal transfers. Live
+coverage is read-only; subscriptions, redemptions, loans, staking actions, and
+transfers are tested offline only.
+
+### MEXC and BingX Sub Accounts
+
+MEXC and BingX expose master-account sub-account lists, balances/assets, and
+internal transfer history through sync, async, and Rust clients. Their
+master/sub-account transfer routes are implemented but are never called by the
+default or read-only live suites. Account lifecycle and API-key administration
+are intentionally not wrapped.
+
 ## Key Features
 
 - Product Table Manager for unifying trading instruments across exchanges

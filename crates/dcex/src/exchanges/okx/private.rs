@@ -17,6 +17,15 @@ impl OkxClient {
         if let Some(result) = self.asset_private_request(method_name, &params).await? {
             return Ok(result);
         }
+        if let Some(result) = self.finance_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .subaccount_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(result);
+        }
         if let Some(result) = self.trade_private_request(method_name, &params).await? {
             return Ok(result);
         }

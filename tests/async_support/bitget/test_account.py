@@ -36,6 +36,13 @@ def _assert_ok(response) -> dict:
     return response
 
 
+async def _assert_crypto_loan_debts_or_empty(client) -> None:
+    try:
+        _assert_ok(await client.get_crypto_loan_debts())
+    except FailedRequestError as exc:
+        assert "[40054]" in exc.message and "is empty" in exc.message, exc
+
+
 async def _is_uta(client) -> bool:
     try:
         data = _assert_ok(await client.get_uta_account_info()).get("data", {})
@@ -121,3 +128,54 @@ async def test_private_trade_read_endpoints(client):
     _assert_ok(await client.get_futures_open_orders(product_symbol="BTC-USDT-SWAP", limit=20))
     _assert_ok(await client.get_futures_history_orders(product_symbol="BTC-USDT-SWAP", limit=20))
     _assert_ok(await client.get_futures_fills(product_symbol="BTC-USDT-SWAP", limit=20))
+
+
+@pytest.mark.asyncio
+async def test_crypto_loan_read_endpoints(client):
+    end_time = int(time.time() * 1000)
+    start_time = end_time - 7 * 24 * 60 * 60 * 1000
+
+    _assert_ok(await client.get_crypto_loan_coins())
+    _assert_ok(await client.get_crypto_loan_ongoing())
+    _assert_ok(await client.get_crypto_loan_borrow_history(str(start_time), str(end_time)))
+    _assert_ok(await client.get_crypto_loan_repay_history(str(start_time), str(end_time)))
+    _assert_ok(await client.get_crypto_loan_pledge_history(str(start_time), str(end_time)))
+    _assert_ok(await client.get_crypto_loan_liquidations(str(start_time), str(end_time)))
+    await _assert_crypto_loan_debts_or_empty(client)
+
+
+@pytest.mark.asyncio
+async def test_savings_read_endpoints(client):
+    try:
+        _assert_ok(await client.get_earn_account_assets())
+        _assert_ok(await client.get_savings_account())
+        products = _assert_ok(await client.get_savings_products(filter="available_and_held"))[
+            "data"
+        ]
+        _assert_ok(await client.get_savings_assets("flexible", limit=20))
+        _assert_ok(await client.get_savings_records("flexible", limit=20))
+        if products:
+            _assert_ok(
+                await client.get_savings_subscription_info(
+                    products[0]["productId"], products[0]["periodType"]
+                )
+            )
+    except FailedRequestError as exc:
+        if "[40085]" in exc.message and "Unified Account mode" in exc.message:
+            pytest.skip("Bitget Classic Savings API is unavailable in Unified Account mode")
+        raise
+
+
+@pytest.mark.asyncio
+async def test_elite_earn_read_endpoints(client):
+    products_response = _assert_ok(await client.get_elite_earn_products())
+    _assert_ok(await client.get_elite_earn_assets())
+    for record_type in ("subscribe", "redeem", "interest"):
+        _assert_ok(await client.get_elite_earn_records(record_type, limit=20))
+
+    products = products_response["data"]
+    if isinstance(products, list) and products:
+        product_id = products[0].get("productId")
+        if product_id:
+            _assert_ok(await client.get_elite_earn_subscription_info(product_id))
+            _assert_ok(await client.get_elite_earn_redemption_info(product_id))

@@ -138,6 +138,94 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
+    def get_subaccounts(
+        self,
+        subAccount: str | None = None,
+        isFreeze: bool | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Retrieve MEXC sub-accounts for the master account."""
+        return self._native_private(
+            "get_subaccounts",
+            self._native_params(
+                subAccount=subAccount,
+                isFreeze=isFreeze,
+                page=page,
+                limit=limit,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    def get_subaccount_asset(
+        self,
+        subAccount: str,
+        accountType: str = "SPOT",
+        recvWindow: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Retrieve the Spot assets of one MEXC sub-account."""
+        return self._native_private(
+            "get_subaccount_asset",
+            self._native_params(
+                subAccount=subAccount,
+                accountType=accountType,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    def transfer_subaccount_assets(
+        self,
+        fromAccountType: str,
+        toAccountType: str,
+        asset: str,
+        amount: str,
+        fromAccount: str | None = None,
+        toAccount: str | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Transfer assets among a MEXC master account and its sub-accounts."""
+        return self._native_private(
+            "transfer_subaccount_assets",
+            self._native_params(
+                fromAccount=fromAccount,
+                toAccount=toAccount,
+                fromAccountType=fromAccountType,
+                toAccountType=toAccountType,
+                asset=asset,
+                amount=amount,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    def get_subaccount_transfer_history(
+        self,
+        fromAccountType: str,
+        toAccountType: str,
+        fromAccount: str | None = None,
+        toAccount: str | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Retrieve MEXC master/sub-account universal-transfer history."""
+        return self._native_private(
+            "get_subaccount_transfer_history",
+            self._native_params(
+                fromAccount=fromAccount,
+                toAccount=toAccount,
+                fromAccountType=fromAccountType,
+                toAccountType=toAccountType,
+                startTime=startTime,
+                endTime=endTime,
+                page=page,
+                limit=limit,
+                recvWindow=recvWindow,
+            ),
+        )
+
     def get_user_universal_transfer_history(
         self,
         fromAccountType: str,

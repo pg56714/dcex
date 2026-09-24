@@ -53,6 +53,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_open_orders(),
         get_spot_order(product_symbol => "product_symbol"),
         get_spot_order_history(),
+        get_subaccount_all_account_balance(page_index => "pageIndex", page_size => "pageSize"),
+        get_subaccount_assets(sub_uid => "subUid"),
+        get_subaccount_transfer_history(uid => "uid"),
+        get_subaccount_transferable_amounts(from_uid => "fromUid", from_account_type => "fromAccountType", to_uid => "toUid", to_account_type => "toAccountType"),
+        get_subaccounts(page => "page", limit => "limit"),
         get_swap_account_balance(),
         get_transferable_coins(from_account => "fromAccount", to_account => "toAccount"),
         keep_alive_listen_key(listen_key => "listen_key"),
@@ -81,5 +86,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         set_leverage(product_symbol => "product_symbol", side => "side", leverage => "leverage"),
         set_position_mode(dual_side_position => "dualSidePosition"),
         test_swap_order(product_symbol => "product_symbol", type_ => "type_", side => "side"),
+        transfer_subaccount_assets(asset_name => "assetName", transfer_amount => "transferAmount", from_uid => "fromUid", from_type => "fromType", from_account_type => "fromAccountType", to_uid => "toUid", to_type => "toType", to_account_type => "toAccountType", remark => "remark"),
     ];
 }

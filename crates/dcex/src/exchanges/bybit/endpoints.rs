@@ -14,11 +14,20 @@ pub(super) const DELIVERY_PRICE: &str = "/v5/market/delivery-price";
 pub(super) const LONG_SHORT_RATIO: &str = "/v5/market/account-ratio";
 pub(super) const ORDER_PRICE_LIMIT: &str = "/v5/market/price-limit";
 pub(super) const ADL_ALERT: &str = "/v5/market/adlAlert";
+pub(super) const EARN_PRODUCT: &str = "/v5/earn/product";
+pub(super) const EARN_PLACE_ORDER: &str = "/v5/earn/place-order";
+pub(super) const EARN_ORDER_HISTORY: &str = "/v5/earn/order";
+pub(super) const EARN_POSITION: &str = "/v5/earn/position";
+pub(super) const EARN_YIELD_HISTORY: &str = "/v5/earn/yield";
+pub(super) const EARN_HOURLY_YIELD: &str = "/v5/earn/hourly-yield";
 pub(super) const GET_WALLET_BALANCE: &str = "/v5/account/wallet-balance";
 pub(super) const GET_TRANSFERABLE_AMOUNT: &str = "/v5/account/withdrawal";
 pub(super) const UPGRADE_TO_UNIFIED_ACCOUNT: &str = "/v5/account/upgrade-to-uta";
 pub(super) const GET_BORROW_HISTORY: &str = "/v5/account/borrow-history";
 pub(super) const GET_COLLATERAL_INFO: &str = "/v5/account/collateral-info";
+pub(super) const MANUAL_BORROW: &str = "/v5/account/borrow";
+pub(super) const MANUAL_REPAY: &str = "/v5/account/repay";
+pub(super) const MANUAL_REPAY_WITHOUT_CONVERSION: &str = "/v5/account/no-convert-repay";
 pub(super) const GET_FEE_RATE: &str = "/v5/account/fee-rate";
 pub(super) const GET_ACCOUNT_INFO: &str = "/v5/account/info";
 pub(super) const GET_TRANSACTION_LOG: &str = "/v5/account/transaction-log";
@@ -33,6 +42,7 @@ pub(super) const GET_INTERNAL_TRANSFER_RECORDS: &str =
     "/v5/asset/transfer/query-inter-transfer-list";
 pub(super) const GET_TRANSFERABLE_COIN: &str = "/v5/asset/transfer/query-transfer-coin-list";
 pub(super) const CREATE_INTERNAL_TRANSFER: &str = "/v5/asset/transfer/inter-transfer";
+pub(super) const CREATE_UNIVERSAL_TRANSFER: &str = "/v5/asset/transfer/universal-transfer";
 pub(super) const GET_UNIVERSAL_TRANSFER_RECORDS: &str =
     "/v5/asset/transfer/query-universal-transfer-list";
 pub(super) const SET_DEPOSIT_ACCOUNT: &str = "/v5/asset/deposit/deposit-to-account";
@@ -62,3 +72,20 @@ pub(super) const VIP_MARGIN_DATA: &str = "/v5/spot-margin-trade/data";
 pub(super) const SPOT_MARGIN_COLLATERAL: &str = "/v5/spot-margin-trade/collateral";
 pub(super) const HISTORICAL_INTEREST: &str = "/v5/spot-margin-trade/interest-rate-history";
 pub(super) const STATUS_AND_LEVERAGE: &str = "/v5/spot-margin-trade/state";
+pub(super) const MARGIN_MAX_BORROWABLE: &str = "/v5/spot-margin-trade/max-borrowable";
+pub(super) const MARGIN_POSITION_TIERS: &str = "/v5/spot-margin-trade/position-tiers";
+pub(super) const MARGIN_COIN_STATE: &str = "/v5/spot-margin-trade/coinstate";
+pub(super) const MARGIN_REPAYMENT_AVAILABLE_AMOUNT: &str =
+    "/v5/spot-margin-trade/repayment-available-amount";
+pub(super) const SET_MARGIN_AUTO_REPAY_MODE: &str = "/v5/spot-margin-trade/set-auto-repay-mode";
+pub(super) const GET_MARGIN_AUTO_REPAY_MODE: &str = "/v5/spot-margin-trade/get-auto-repay-mode";
+pub(super) const FIXED_BORROW_QUOTE: &str = "/v5/spot-margin-trade/fixedborrow-order-quote";
+pub(super) const FIXED_BORROW: &str = "/v5/spot-margin-trade/fixedborrow";
+pub(super) const FIXED_BORROW_RENEW: &str = "/v5/spot-margin-trade/fixedborrow-renew";
+pub(super) const FIXED_BORROW_ORDER_INFO: &str = "/v5/spot-margin-trade/fixedborrow-order-info";
+pub(super) const FIXED_BORROW_CONTRACT_INFO: &str =
+    "/v5/spot-margin-trade/fixedborrow-contract-info";
+pub(super) const MARGIN_LIABILITY: &str = "/v5/spot-margin-trade/liability";
+pub(super) const FLEXIBLE_BORROW_INVENTORY: &str =
+    "/v5/spot-margin-trade/flexible-available-inventory";
+pub(super) const FIXED_BORROW_INVENTORY: &str = "/v5/spot-margin-trade/fixed-available-inventory";

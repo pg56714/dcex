@@ -4,6 +4,8 @@
 from typing import Any
 
 from ._account_http import AccountHTTP
+from ._earn_http import EarnHTTP
+from ._margin_http import MarginHTTP
 from ._market_http import MarketHTTP
 from ._trade_http import TradeHTTP
 
@@ -11,6 +13,8 @@ from ._trade_http import TradeHTTP
 class Client(
     MarketHTTP,
     AccountHTTP,
+    EarnHTTP,
+    MarginHTTP,
     TradeHTTP,
 ):
     """KuCoin async client for trading operations."""

@@ -116,6 +116,45 @@ def test_sync_bybit_transferable_amount_validates_and_sends_coins() -> None:
         manager.get_transferable_amount(["BTC"] * 21)
 
 
+def test_sync_bybit_manual_margin_wrappers_forward_official_fields() -> None:
+    from dcex.bybit._account_http import AccountHTTP
+    from dcex.bybit._trade_http import TradeHTTP
+
+    account = AccountHTTP(preload_product_table=False)
+    account_capture = _capture_sync_private_request(account)
+    account.manual_repay_without_conversion("USDT", "1", "ALL")
+    assert account_capture == {
+        "method_name": "manual_repay_without_conversion",
+        "params": [
+            ("coin", "USDT"),
+            ("amount", "1"),
+            ("repaymentType", "ALL"),
+        ],
+    }
+
+    trade = TradeHTTP(preload_product_table=False)
+    trade_capture = _capture_sync_private_request(trade)
+    trade.borrow_fixed_rate(
+        "USDT",
+        "10",
+        "0.02",
+        "7",
+        repayType="1",
+        strategyType="FULL",
+    )
+    assert trade_capture == {
+        "method_name": "borrow_fixed_rate",
+        "params": [
+            ("orderCurrency", "USDT"),
+            ("orderAmount", "10"),
+            ("annualRate", "0.02"),
+            ("term", "7"),
+            ("repayType", "1"),
+            ("strategyType", "FULL"),
+        ],
+    }
+
+
 @pytest.mark.asyncio
 async def test_async_bybit_transferable_amount_validates_and_sends_coins() -> None:
     from dcex.async_support.bybit._account_http import AccountHTTP
@@ -131,6 +170,63 @@ async def test_async_bybit_transferable_amount_validates_and_sends_coins() -> No
         await manager.get_transferable_amount([])
     with pytest.raises(ValueError, match="no more than 20"):
         await manager.get_transferable_amount(["BTC"] * 21)
+
+
+@pytest.mark.asyncio
+async def test_async_bybit_manual_margin_wrappers_forward_official_fields() -> None:
+    from dcex.async_support.bybit._account_http import AccountHTTP
+    from dcex.async_support.bybit._trade_http import TradeHTTP
+
+    account = AccountHTTP(preload_product_table=False)
+    account_capture = _capture_async_private_request(account)
+    await account.manual_borrow("USDT", "1")
+    assert account_capture == {
+        "method_name": "manual_borrow",
+        "params": [("coin", "USDT"), ("amount", "1")],
+    }
+
+    trade = TradeHTTP(preload_product_table=False)
+    trade_capture = _capture_async_private_request(trade)
+    await trade.get_fixed_borrow_inventory("USDT", "7", "0.02")
+    assert trade_capture == {
+        "method_name": "get_fixed_borrow_inventory",
+        "params": [
+            ("currency", "USDT"),
+            ("term", "7"),
+            ("annualRate", "0.02"),
+        ],
+    }
+
+
+@pytest.mark.parametrize(
+    "method_name",
+    [
+        "manual_borrow",
+        "manual_repay",
+        "manual_repay_without_conversion",
+        "get_margin_max_borrowable",
+        "get_margin_position_tiers",
+        "get_margin_coin_state",
+        "get_margin_repayment_available_amount",
+        "set_margin_auto_repay_mode",
+        "get_margin_auto_repay_mode",
+        "get_fixed_borrow_quote",
+        "borrow_fixed_rate",
+        "renew_fixed_rate_borrow",
+        "get_fixed_borrow_orders",
+        "get_fixed_borrow_contracts",
+        "get_margin_liability",
+        "get_flexible_borrow_inventory",
+        "get_fixed_borrow_inventory",
+    ],
+)
+def test_bybit_margin_methods_keep_sync_async_signatures(method_name: str) -> None:
+    from dcex.async_support.bybit.client import Client as AsyncClient
+    from dcex.bybit.client import Client
+
+    sync_fields = tuple(inspect.signature(getattr(Client, method_name)).parameters)
+    async_fields = tuple(inspect.signature(getattr(AsyncClient, method_name)).parameters)
+    assert sync_fields == async_fields
 
 
 def test_bybit_post_only_order_has_consistent_sync_and_async_parameters() -> None:
@@ -270,3 +366,40 @@ def test_sync_bybit_current_market_and_asset_fields_are_forwarded() -> None:
         "limit": "20",
         "cursor": "next-page",
     }
+
+
+def test_sync_bybit_universal_transfer_fields_are_forwarded() -> None:
+    from dcex.bybit._asset_http import AssetHTTP
+
+    asset = AssetHTTP(preload_product_table=False)
+    captured = _capture_sync_private_request(asset)
+    asset.create_universal_transfer(
+        "USDT",
+        "1",
+        "111",
+        "222",
+        "UNIFIED",
+        "FUND",
+        transferId="00000000-0000-4000-8000-000000000001",
+    )
+
+    assert captured == {
+        "method_name": "create_universal_transfer",
+        "params": [
+            ("coin", "USDT"),
+            ("amount", "1"),
+            ("fromMemberId", "111"),
+            ("toMemberId", "222"),
+            ("fromAccountType", "UNIFIED"),
+            ("toAccountType", "FUND"),
+            ("transferId", "00000000-0000-4000-8000-000000000001"),
+        ],
+    }
+
+    asset.get_universal_transfer_records(
+        fromMemberId="111",
+        toMemberId="222",
+        limit=10,
+    )
+    assert dict(captured["params"])["fromMemberId"] == "111"
+    assert dict(captured["params"])["toMemberId"] == "222"

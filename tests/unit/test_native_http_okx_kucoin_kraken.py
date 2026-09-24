@@ -67,6 +67,47 @@ def test_sync_okx_manager_uses_native_transport() -> None:
     assert received.get_nowait()["path"] == "/api/v5/public/time?source=native"
 
 
+def test_native_okx_spot_borrow_repay_uses_official_paths_and_types() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server({"code": "0", "data": []}) as (base_url, received):
+        client = native.OkxHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            passphrase="passphrase",
+            timeout=2,
+            base_url=base_url,
+        )
+        client.private_request_json(
+            "spot_manual_borrow_repay",
+            [("ccy", "USDT"), ("side", "borrow"), ("amt", "1")],
+        )
+        client.private_request_json("set_spot_auto_repay", [("autoRepay", "true")])
+        client.private_request_json(
+            "get_spot_borrow_repay_history",
+            [("ccy", "USDT"), ("type", "manual_borrow"), ("limit", "1")],
+        )
+
+    borrow = received.get_nowait()
+    auto_repay = received.get_nowait()
+    history = received.get_nowait()
+
+    assert borrow["path"] == "/api/v5/account/spot-manual-borrow-repay"
+    assert json.loads(borrow["body"]) == {
+        "ccy": "USDT",
+        "side": "borrow",
+        "amt": "1",
+    }
+    assert auto_repay["path"] == "/api/v5/account/set-auto-repay"
+    assert json.loads(auto_repay["body"]) == {"autoRepay": True}
+    assert history["path"].startswith("/api/v5/account/spot-borrow-repay-history?")
+    assert dict(parse_qsl(urlsplit(history["path"]).query)) == {
+        "ccy": "USDT",
+        "type": "manual_borrow",
+        "limit": "1",
+    }
+
+
 @pytest.mark.asyncio
 async def test_async_okx_manager_uses_native_transport() -> None:
     from dcex.async_support.okx._http_manager import HTTPManager

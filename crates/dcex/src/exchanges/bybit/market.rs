@@ -1,6 +1,6 @@
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{bybit_timeframe, is_canonical_product_symbol};
+use super::params::{bybit_timeframe, is_canonical_product_symbol, BybitParams};
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};
@@ -11,6 +11,12 @@ impl BybitClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if let Some(result) = self
+            .earn_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
         let (path, params) = match method_name {
             "get_instruments_info" => (
                 INSTRUMENTS_INFO,

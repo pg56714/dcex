@@ -348,6 +348,208 @@ class AccountHTTP(HTTPManager):
         """Retrieve current UTA borrowing and interest data."""
         return self._native_private("get_uta_loan_data", [])
 
+    def get_crypto_loan_coins(self, coin: str | None = None) -> dict[str, Any]:
+        """Get supported Crypto Loan assets, limits, rates, and collateral ratios."""
+        return self._native_private("get_crypto_loan_coins", self._native_params(coin=coin))
+
+    def get_crypto_loan_interest(
+        self,
+        loanCoin: str,
+        pledgeCoin: str,
+        daily: str,
+        pledgeAmount: str,
+    ) -> dict[str, Any]:
+        """Estimate Crypto Loan interest and borrowable amount."""
+        return self._native_private(
+            "get_crypto_loan_interest",
+            self._native_params(
+                loanCoin=loanCoin,
+                pledgeCoin=pledgeCoin,
+                daily=daily,
+                pledgeAmount=pledgeAmount,
+            ),
+        )
+
+    def borrow_crypto_loan(
+        self,
+        loanCoin: str,
+        pledgeCoin: str,
+        daily: str,
+        pledgeAmount: str | None = None,
+        loanAmount: str | None = None,
+    ) -> dict[str, Any]:
+        """Borrow using exactly one of collateral amount or desired loan amount."""
+        return self._native_private(
+            "borrow_crypto_loan",
+            self._native_params(
+                loanCoin=loanCoin,
+                pledgeCoin=pledgeCoin,
+                daily=daily,
+                pledgeAmount=pledgeAmount,
+                loanAmount=loanAmount,
+            ),
+        )
+
+    def get_crypto_loan_ongoing(
+        self,
+        orderId: str | None = None,
+        loanCoin: str | None = None,
+        pledgeCoin: str | None = None,
+    ) -> dict[str, Any]:
+        """Get current Crypto Loan orders and accrued interest."""
+        return self._native_private(
+            "get_crypto_loan_ongoing",
+            self._native_params(orderId=orderId, loanCoin=loanCoin, pledgeCoin=pledgeCoin),
+        )
+
+    def get_crypto_loan_borrow_history(
+        self,
+        startTime: str,
+        endTime: str,
+        orderId: str | None = None,
+        loanCoin: str | None = None,
+        pledgeCoin: str | None = None,
+        status: str | None = None,
+        pageNum: str | None = None,
+        pageSize: str | None = None,
+    ) -> dict[str, Any]:
+        """Get Crypto Loan borrow history from the last three months."""
+        return self._native_private(
+            "get_crypto_loan_borrow_history",
+            self._native_params(
+                startTime=startTime,
+                endTime=endTime,
+                orderId=orderId,
+                loanCoin=loanCoin,
+                pledgeCoin=pledgeCoin,
+                status=status,
+                pageNum=pageNum,
+                pageSize=pageSize,
+            ),
+        )
+
+    def repay_crypto_loan(
+        self,
+        orderId: str,
+        repayAll: str,
+        amount: str | None = None,
+        repayUnlock: str | None = None,
+    ) -> dict[str, Any]:
+        """Repay part or all of a Crypto Loan."""
+        return self._native_private(
+            "repay_crypto_loan",
+            self._native_params(
+                orderId=orderId,
+                repayAll=repayAll,
+                amount=amount,
+                repayUnlock=repayUnlock,
+            ),
+        )
+
+    def get_crypto_loan_repay_history(
+        self,
+        startTime: str,
+        endTime: str,
+        orderId: str | None = None,
+        loanCoin: str | None = None,
+        pledgeCoin: str | None = None,
+        pageNum: str | None = None,
+        pageSize: str | None = None,
+    ) -> dict[str, Any]:
+        """Get Crypto Loan repayment history from the last three months."""
+        return self._native_private(
+            "get_crypto_loan_repay_history",
+            self._native_params(
+                startTime=startTime,
+                endTime=endTime,
+                orderId=orderId,
+                loanCoin=loanCoin,
+                pledgeCoin=pledgeCoin,
+                pageNum=pageNum,
+                pageSize=pageSize,
+            ),
+        )
+
+    def revise_crypto_loan_pledge(
+        self, orderId: str, amount: str, pledgeCoin: str, reviseType: str
+    ) -> dict[str, Any]:
+        """Add or withdraw collateral for a Crypto Loan."""
+        return self._native_private(
+            "revise_crypto_loan_pledge",
+            self._native_params(
+                orderId=orderId,
+                amount=amount,
+                pledgeCoin=pledgeCoin,
+                reviseType=reviseType,
+            ),
+        )
+
+    def get_crypto_loan_pledge_history(
+        self,
+        startTime: str,
+        endTime: str,
+        orderId: str | None = None,
+        reviseSide: str | None = None,
+        pledgeCoin: str | None = None,
+        pageNum: str | None = None,
+        pageSize: str | None = None,
+    ) -> dict[str, Any]:
+        """Get Crypto Loan collateral-ratio adjustment history."""
+        return self._native_private(
+            "get_crypto_loan_pledge_history",
+            self._native_params(
+                startTime=startTime,
+                endTime=endTime,
+                orderId=orderId,
+                reviseSide=reviseSide,
+                pledgeCoin=pledgeCoin,
+                pageNum=pageNum,
+                pageSize=pageSize,
+            ),
+        )
+
+    def get_crypto_loan_liquidations(
+        self,
+        startTime: str,
+        endTime: str,
+        orderId: str | None = None,
+        loanCoin: str | None = None,
+        pledgeCoin: str | None = None,
+        status: str | None = None,
+        pageNum: str | None = None,
+        pageSize: str | None = None,
+    ) -> dict[str, Any]:
+        """Get Crypto Loan liquidation records."""
+        return self._native_private(
+            "get_crypto_loan_liquidations",
+            self._native_params(
+                startTime=startTime,
+                endTime=endTime,
+                orderId=orderId,
+                loanCoin=loanCoin,
+                pledgeCoin=pledgeCoin,
+                status=status,
+                pageNum=pageNum,
+                pageSize=pageSize,
+            ),
+        )
+
+    def get_crypto_loan_debts(self) -> dict[str, Any]:
+        """Get Crypto Loan liabilities and collateral assets."""
+        return self._native_private("get_crypto_loan_debts", [])
+
+    def repay_uta_liability(
+        self, repayableCoinList: list[str], paymentCoinList: list[str]
+    ) -> dict[str, Any]:
+        """Repay UTA liabilities with selected repayment and payment assets."""
+        return self._native_private(
+            "repay_uta_liability",
+            self._native_params(
+                repayableCoinList=repayableCoinList,
+                paymentCoinList=paymentCoinList,
+            ),
+        )
+
     def get_uta_collateral_type(self) -> dict[str, Any]:
         """Retrieve the UTA collateral-type configuration."""
         return self._native_private("get_uta_collateral_type", [])

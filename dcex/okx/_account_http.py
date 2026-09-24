@@ -670,3 +670,37 @@ class AccountHTTP(HTTPManager):
             "get_interest_limits",
             self._native_params(type=type, ccy=ccy),
         )
+
+    def spot_manual_borrow_repay(self, ccy: str, side: str, amt: str) -> dict[str, Any]:
+        """Manually borrow or repay an asset in borrowing-enabled Spot mode."""
+        return self._native_private(
+            "spot_manual_borrow_repay",
+            self._native_params(ccy=ccy, side=side, amt=amt),
+        )
+
+    def set_spot_auto_repay(self, autoRepay: bool) -> dict[str, Any]:
+        """Enable or disable automatic repayment in borrowing-enabled Spot mode."""
+        return self._native_private(
+            "set_spot_auto_repay",
+            self._native_params(autoRepay=autoRepay),
+        )
+
+    def get_spot_borrow_repay_history(
+        self,
+        ccy: str | None = None,
+        type: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """Get manual and automatic Spot-mode borrow/repay history."""
+        return self._native_private(
+            "get_spot_borrow_repay_history",
+            self._native_params(
+                ccy=ccy,
+                type=type,
+                after=after,
+                before=before,
+                limit=limit,
+            ),
+        )

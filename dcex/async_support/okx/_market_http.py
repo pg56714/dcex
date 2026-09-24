@@ -100,3 +100,9 @@ class MarketHTTP(HTTPManager):
             "get_public_trades",
             self._params(instId=self._exchange_symbol(product_symbol), limit=limit),
         )
+
+    async def get_option_family_trades(self, instFamily: str) -> dict[str, Any]:
+        """Get option trades for an instrument family."""
+        return await self._native_public(
+            "get_option_family_trades", self._params(instFamily=instFamily)
+        )

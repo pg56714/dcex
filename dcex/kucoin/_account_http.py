@@ -86,6 +86,79 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
+    def get_subaccounts(
+        self,
+        currentPage: int = 1,
+        pageSize: int = 10,
+    ) -> dict[str, Any]:
+        """Retrieve the Classic account's paginated sub-account summary."""
+        return self._native_private(
+            "get_subaccounts",
+            self._native_params(currentPage=currentPage, pageSize=pageSize),
+        )
+
+    def get_subaccount_balance(
+        self,
+        subUserId: str,
+        includeBaseAmount: bool | None = None,
+        baseCurrency: str | None = None,
+        baseAmount: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve balances for one Classic sub-account."""
+        return self._native_private(
+            "get_subaccount_balance",
+            self._native_params(
+                subUserId=subUserId,
+                includeBaseAmount=includeBaseAmount,
+                baseCurrency=baseCurrency,
+                baseAmount=baseAmount,
+            ),
+        )
+
+    def get_spot_subaccount_balances(
+        self,
+        currentPage: int = 1,
+        pageSize: int = 10,
+    ) -> dict[str, Any]:
+        """Retrieve paginated Classic Spot balances for all sub-accounts."""
+        return self._native_private(
+            "get_spot_subaccount_balances",
+            self._native_params(currentPage=currentPage, pageSize=pageSize),
+        )
+
+    def get_futures_subaccount_balances(
+        self,
+        currency: str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve Classic Futures balances for all sub-accounts."""
+        return self._native_private(
+            "get_futures_subaccount_balances",
+            self._native_params(currency=currency),
+        )
+
+    def get_uta_subaccounts(
+        self,
+        currentPage: int = 1,
+        pageSize: int = 10,
+    ) -> dict[str, Any]:
+        """Retrieve the UTA account's paginated sub-account list."""
+        return self._native_private(
+            "get_uta_subaccounts",
+            self._native_params(currentPage=currentPage, pageSize=pageSize),
+        )
+
+    def get_uta_subaccount_currency_assets(
+        self,
+        uid: int | str | None = None,
+        pageSize: int = 50,
+        lastId: int | str | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve currency-level assets held by UTA sub-accounts."""
+        return self._native_private(
+            "get_uta_subaccount_currency_assets",
+            self._native_params(uid=uid, pageSize=pageSize, lastId=lastId),
+        )
+
     def get_futures_account(
         self,
         currency: str | None = None,

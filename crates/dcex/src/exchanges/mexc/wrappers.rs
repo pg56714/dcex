@@ -76,6 +76,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_order(),
         get_spot_self_symbols(),
         get_spot_symbol_commission(product_symbol => "product_symbol"),
+        get_subaccount_asset(sub_account => "subAccount", account_type => "accountType"),
+        get_subaccount_transfer_history(from_account_type => "fromAccountType", to_account_type => "toAccountType"),
+        get_subaccounts(),
         get_user_universal_transfer_by_id(tran_id => "tranId"),
         get_user_universal_transfer_history(from_account_type => "fromAccountType", to_account_type => "toAccountType"),
         get_withdraw_history(),
@@ -102,6 +105,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_spot_post_only_limit_sell_order(product_symbol => "product_symbol", quantity => "quantity", price => "price"),
         set_spot_mx_deduct(mx_deduct_enable => "mxDeductEnable"),
         test_spot_order(product_symbol => "product_symbol", side => "side", type_ => "type"),
+        transfer_subaccount_assets(from_account_type => "fromAccountType", to_account_type => "toAccountType", asset => "asset", amount => "amount"),
         user_universal_transfer(from_account_type => "fromAccountType", to_account_type => "toAccountType", asset => "asset", amount => "amount"),
     ];
 }

@@ -136,6 +136,101 @@ impl MexcClient {
                 )
                 .await
             }
+            "get_subaccounts" => {
+                params.ensure_allowed(&[
+                    "subAccount",
+                    "isFreeze",
+                    "page",
+                    "limit",
+                    "recvWindow",
+                ])?;
+                validate_enum(params, "isFreeze", &["true", "false"])?;
+                validate_u64_range(params, "page", 1, u64::MAX)?;
+                validate_u64_range(params, "limit", 1, 200)?;
+                self.spot_private(
+                    HttpMethod::Get,
+                    SPOT_SUBACCOUNT_LIST,
+                    params.only(&["subAccount", "isFreeze", "page", "limit", "recvWindow"]),
+                )
+                .await
+            }
+            "get_subaccount_asset" => {
+                params.ensure_allowed(&["subAccount", "accountType", "recvWindow"])?;
+                params.required("subAccount")?;
+                params.required("accountType")?;
+                validate_enum(params, "accountType", &["SPOT"])?;
+                self.spot_private(
+                    HttpMethod::Get,
+                    SPOT_SUBACCOUNT_ASSET,
+                    params.only(&["subAccount", "accountType", "recvWindow"]),
+                )
+                .await
+            }
+            "transfer_subaccount_assets" => {
+                params.ensure_allowed(&[
+                    "fromAccount",
+                    "toAccount",
+                    "fromAccountType",
+                    "toAccountType",
+                    "asset",
+                    "amount",
+                    "recvWindow",
+                ])?;
+                for key in ["fromAccountType", "toAccountType", "asset", "amount"] {
+                    params.required(key)?;
+                }
+                validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
+                validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
+                self.spot_private(
+                    HttpMethod::Post,
+                    SPOT_SUBACCOUNT_UNIVERSAL_TRANSFER,
+                    params.only(&[
+                        "fromAccount",
+                        "toAccount",
+                        "fromAccountType",
+                        "toAccountType",
+                        "asset",
+                        "amount",
+                        "recvWindow",
+                    ]),
+                )
+                .await
+            }
+            "get_subaccount_transfer_history" => {
+                params.ensure_allowed(&[
+                    "fromAccount",
+                    "toAccount",
+                    "fromAccountType",
+                    "toAccountType",
+                    "startTime",
+                    "endTime",
+                    "page",
+                    "limit",
+                    "recvWindow",
+                ])?;
+                params.required("fromAccountType")?;
+                params.required("toAccountType")?;
+                validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
+                validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
+                validate_u64_range(params, "page", 1, u64::MAX)?;
+                validate_u64_range(params, "limit", 1, 500)?;
+                self.spot_private(
+                    HttpMethod::Get,
+                    SPOT_SUBACCOUNT_UNIVERSAL_TRANSFER,
+                    params.only(&[
+                        "fromAccount",
+                        "toAccount",
+                        "fromAccountType",
+                        "toAccountType",
+                        "startTime",
+                        "endTime",
+                        "page",
+                        "limit",
+                        "recvWindow",
+                    ]),
+                )
+                .await
+            }
             "user_universal_transfer" => {
                 params.ensure_allowed(&[
                     "fromAccountType",

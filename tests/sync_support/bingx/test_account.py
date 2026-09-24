@@ -98,6 +98,21 @@ def test_get_asset_transfer_records(client):
 
 
 @pytest.mark.private
+def test_subaccount_read_endpoints(client):
+    uid = client.get_account_uid()["data"]["uid"]
+    subaccounts = client.get_subaccounts(page=1, limit=10)
+    assert subaccounts is not None
+    assert client.get_subaccount_all_account_balance(pageIndex=1, pageSize=10) is not None
+    assert client.get_subaccount_transfer_history(uid=uid, pagingSize=10) is not None
+
+    accounts = subaccounts.get("data", {}).get("subAccountList", [])
+    if accounts:
+        sub_uid = accounts[0]["uid"]
+        assert client.get_subaccount_assets(sub_uid) is not None
+        assert client.get_subaccount_transferable_amounts(uid, 1, sub_uid, 1) is not None
+
+
+@pytest.mark.private
 def test_get_open_positions(client):
     res = client.get_open_positions(product_symbol="BTC-USDT-SWAP")
     assert res is not None

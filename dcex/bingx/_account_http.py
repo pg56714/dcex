@@ -130,6 +130,135 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
+    def get_subaccounts(
+        self,
+        page: int = 1,
+        limit: int = 100,
+        subUid: int | str | None = None,
+        subAccountString: str | None = None,
+        isFeeze: bool | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve BingX sub-accounts owned by the master account."""
+        return self._native_private(
+            "get_subaccounts",
+            self._native_params(
+                page=page,
+                limit=limit,
+                subUid=subUid,
+                subAccountString=subAccountString,
+                isFeeze=isFeeze,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    def get_subaccount_assets(
+        self,
+        subUid: int | str,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve one BingX sub-account's funding assets."""
+        return self._native_private(
+            "get_subaccount_assets",
+            self._native_params(subUid=subUid, recvWindow=recvWindow),
+        )
+
+    def get_subaccount_all_account_balance(
+        self,
+        pageIndex: int = 1,
+        pageSize: int = 10,
+        subUid: int | str | None = None,
+        accountType: str | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve paginated BingX sub-account asset overviews."""
+        return self._native_private(
+            "get_subaccount_all_account_balance",
+            self._native_params(
+                pageIndex=pageIndex,
+                pageSize=pageSize,
+                subUid=subUid,
+                accountType=accountType,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    def get_subaccount_transfer_history(
+        self,
+        uid: int | str,
+        type_: str | None = None,
+        tranId: str | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        pageId: int | None = None,
+        pagingSize: int | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve BingX master/sub-account asset-transfer history."""
+        return self._native_private(
+            "get_subaccount_transfer_history",
+            self._native_params(
+                uid=uid,
+                type=type_,
+                tranId=tranId,
+                startTime=startTime,
+                endTime=endTime,
+                pageId=pageId,
+                pagingSize=pagingSize,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    def get_subaccount_transferable_amounts(
+        self,
+        fromUid: int | str,
+        fromAccountType: int,
+        toUid: int | str,
+        toAccountType: int,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve transferable assets between BingX master/sub-accounts."""
+        return self._native_private(
+            "get_subaccount_transferable_amounts",
+            self._native_params(
+                fromUid=fromUid,
+                fromAccountType=fromAccountType,
+                toUid=toUid,
+                toAccountType=toAccountType,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    def transfer_subaccount_assets(
+        self,
+        assetName: str,
+        transferAmount: str,
+        fromUid: int | str,
+        fromType: int,
+        fromAccountType: int,
+        toUid: int | str,
+        toType: int,
+        toAccountType: int,
+        remark: str,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Transfer assets among BingX master and sub-accounts."""
+        return self._native_private(
+            "transfer_subaccount_assets",
+            self._native_params(
+                assetName=assetName,
+                transferAmount=transferAmount,
+                fromUid=fromUid,
+                fromType=fromType,
+                fromAccountType=fromAccountType,
+                toUid=toUid,
+                toType=toType,
+                toAccountType=toAccountType,
+                remark=remark,
+                recvWindow=recvWindow,
+            ),
+        )
+
     def get_open_positions(
         self,
         product_symbol: str | None = None,

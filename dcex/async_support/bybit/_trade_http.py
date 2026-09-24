@@ -552,6 +552,157 @@ class TradeHTTP(HTTPManager):
         """Get spot margin trading status and leverage."""
         return await self._native_private("get_status_and_leverage", [])
 
+    async def get_margin_max_borrowable(self, currency: str) -> dict[str, Any]:
+        """Get the maximum amount currently borrowable for a currency."""
+        return await self._native_private(
+            "get_margin_max_borrowable", self._native_params(currency=currency)
+        )
+
+    async def get_margin_position_tiers(self, currency: str | None = None) -> dict[str, Any]:
+        """Get spot-margin position tiers and risk ratios."""
+        return await self._native_private(
+            "get_margin_position_tiers", self._native_params(currency=currency)
+        )
+
+    async def get_margin_coin_state(self, currency: str | None = None) -> dict[str, Any]:
+        """Get spot-margin leverage state by currency."""
+        return await self._native_private(
+            "get_margin_coin_state", self._native_params(currency=currency)
+        )
+
+    async def get_margin_repayment_available_amount(self, currency: str) -> dict[str, Any]:
+        """Get the debt amount repayable without asset conversion."""
+        return await self._native_private(
+            "get_margin_repayment_available_amount",
+            self._native_params(currency=currency),
+        )
+
+    async def set_margin_auto_repay_mode(
+        self, autoRepayMode: str, currency: str | None = None
+    ) -> dict[str, Any]:
+        """Enable or disable automatic no-conversion repayment."""
+        return await self._native_private(
+            "set_margin_auto_repay_mode",
+            self._native_params(autoRepayMode=autoRepayMode, currency=currency),
+        )
+
+    async def get_margin_auto_repay_mode(self, currency: str | None = None) -> dict[str, Any]:
+        """Get automatic repayment settings."""
+        return await self._native_private(
+            "get_margin_auto_repay_mode", self._native_params(currency=currency)
+        )
+
+    async def get_fixed_borrow_quote(
+        self,
+        orderCurrency: str,
+        term: str | None = None,
+        orderBy: str | None = None,
+        sort: int | None = None,
+        limit: int = 10,
+    ) -> dict[str, Any]:
+        """Get available fixed-rate borrow quotes."""
+        return await self._native_private(
+            "get_fixed_borrow_quote",
+            self._native_params(
+                orderCurrency=orderCurrency,
+                term=term,
+                orderBy=orderBy,
+                sort=sort,
+                limit=limit,
+            ),
+        )
+
+    async def borrow_fixed_rate(
+        self,
+        orderCurrency: str,
+        orderAmount: str,
+        annualRate: str,
+        term: str,
+        repayType: str | None = None,
+        strategyType: str | None = None,
+    ) -> dict[str, Any]:
+        """Submit a fixed-rate spot-margin borrow order."""
+        return await self._native_private(
+            "borrow_fixed_rate",
+            self._native_params(
+                orderCurrency=orderCurrency,
+                orderAmount=orderAmount,
+                annualRate=annualRate,
+                term=term,
+                repayType=repayType,
+                strategyType=strategyType,
+            ),
+        )
+
+    async def renew_fixed_rate_borrow(self, loanId: str, qty: str | None = None) -> dict[str, Any]:
+        """Renew a fixed-rate spot-margin loan."""
+        return await self._native_private(
+            "renew_fixed_rate_borrow", self._native_params(loanId=loanId, qty=qty)
+        )
+
+    async def get_fixed_borrow_orders(
+        self,
+        orderId: str | None = None,
+        orderCurrency: str | None = None,
+        state: str | None = None,
+        term: str | None = None,
+        limit: int = 10,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Get fixed-rate borrow order history."""
+        return await self._native_private(
+            "get_fixed_borrow_orders",
+            self._native_params(
+                orderId=orderId,
+                orderCurrency=orderCurrency,
+                state=state,
+                term=term,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    async def get_fixed_borrow_contracts(
+        self,
+        orderId: str | None = None,
+        orderCurrency: str | None = None,
+        term: str | None = None,
+        limit: int = 10,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Get fixed-rate borrow contracts."""
+        return await self._native_private(
+            "get_fixed_borrow_contracts",
+            self._native_params(
+                orderId=orderId,
+                orderCurrency=orderCurrency,
+                term=term,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    async def get_margin_liability(self, currency: str) -> dict[str, Any]:
+        """Get flexible and fixed-rate liabilities for a currency."""
+        return await self._native_private(
+            "get_margin_liability", self._native_params(currency=currency)
+        )
+
+    async def get_flexible_borrow_inventory(self, currency: str) -> dict[str, Any]:
+        """Get available variable-rate borrowing inventory."""
+        return await self._native_private(
+            "get_flexible_borrow_inventory", self._native_params(currency=currency)
+        )
+
+    async def get_fixed_borrow_inventory(
+        self, currency: str, term: str, annualRate: str
+    ) -> dict[str, Any]:
+        """Get available fixed-rate borrowing inventory."""
+        return await self._native_private(
+            "get_fixed_borrow_inventory",
+            self._native_params(currency=currency, term=term, annualRate=annualRate),
+        )
+
     async def pre_check_order(
         self,
         product_symbol: str,

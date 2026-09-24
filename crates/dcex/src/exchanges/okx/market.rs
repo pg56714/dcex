@@ -92,6 +92,24 @@ impl OkxClient {
             "get_contracts_open_interest_and_volume" => {
                 (&["ccy"], &["ccy", "period", "end", "begin"])
             }
+            "get_delivery_exercise_history" => (
+                &["instType"],
+                &["instType", "uly", "after", "before", "limit", "instFamily"],
+            ),
+            "get_option_summary" => (&[], &["uly", "expTime", "instFamily"]),
+            "get_option_tick_bands" => (&[], &["instType", "instFamily"]),
+            "get_option_trades" => (&[], &["instId", "instFamily", "optType"]),
+            "get_option_family_trades" => (&["instFamily"], &["instFamily"]),
+            "get_options_open_interest_and_volume"
+            | "get_option_put_call_ratio"
+            | "get_option_open_interest_and_volume_by_expiry"
+            | "get_option_taker_block_volume" => (&["ccy"], &["ccy", "period"]),
+            "get_option_open_interest_and_volume_by_strike" => {
+                (&["ccy", "expTime"], &["ccy", "expTime", "period"])
+            }
+            "get_public_borrow_info" => (&[], &["ccy"]),
+            "get_public_borrow_history" => (&[], &["ccy", "after", "before", "limit"]),
+            "get_eth_staking_apy_history" | "get_sol_staking_apy_history" => (&["days"], &["days"]),
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported OKX public method: {method_name}"
@@ -168,6 +186,24 @@ impl OkxClient {
                 normalize_inst_id_query(&mut params);
                 PUBLIC_CONTRACT_OPEN_INTEREST_HISTORY
             }
+            "get_delivery_exercise_history" => PUBLIC_DELIVERY_EXERCISE_HISTORY,
+            "get_option_summary" => PUBLIC_OPTION_SUMMARY,
+            "get_option_tick_bands" => PUBLIC_OPTION_TICK_BANDS,
+            "get_option_trades" => PUBLIC_OPTION_TRADES,
+            "get_option_family_trades" => MARKET_OPTION_FAMILY_TRADES,
+            "get_options_open_interest_and_volume" => PUBLIC_OPTIONS_OPEN_INTEREST_VOLUME,
+            "get_option_put_call_ratio" => PUBLIC_OPTION_PUT_CALL_RATIO,
+            "get_option_open_interest_and_volume_by_expiry" => {
+                PUBLIC_OPTION_OPEN_INTEREST_VOLUME_EXPIRY
+            }
+            "get_option_open_interest_and_volume_by_strike" => {
+                PUBLIC_OPTION_OPEN_INTEREST_VOLUME_STRIKE
+            }
+            "get_option_taker_block_volume" => PUBLIC_OPTION_TAKER_BLOCK_VOLUME,
+            "get_public_borrow_info" => SAVINGS_PUBLIC_BORROW_INFO,
+            "get_public_borrow_history" => SAVINGS_PUBLIC_BORROW_HISTORY,
+            "get_eth_staking_apy_history" => ETH_STAKING_APY_HISTORY,
+            "get_sol_staking_apy_history" => SOL_STAKING_APY_HISTORY,
             _ => unreachable!("public method was validated above"),
         };
         self.request(HttpMethod::Get, path, params, None, false)

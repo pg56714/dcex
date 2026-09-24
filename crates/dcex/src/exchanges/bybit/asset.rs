@@ -104,6 +104,22 @@ impl BybitClient {
                 body.insert("transferId".to_string(), Value::String(transfer_id));
                 self.post_request(CREATE_INTERNAL_TRANSFER, body).await
             }
+            "create_universal_transfer" => {
+                let mut body = string_body(&[
+                    ("coin", params.required("coin")?),
+                    ("amount", params.required("amount")?),
+                    ("fromMemberId", params.required("fromMemberId")?),
+                    ("toMemberId", params.required("toMemberId")?),
+                    ("fromAccountType", params.required("fromAccountType")?),
+                    ("toAccountType", params.required("toAccountType")?),
+                ]);
+                let transfer_id = params
+                    .get("transferId")
+                    .map(str::to_string)
+                    .unwrap_or_else(generate_transfer_id);
+                body.insert("transferId".to_string(), Value::String(transfer_id));
+                self.post_request(CREATE_UNIVERSAL_TRANSFER, body).await
+            }
             "get_universal_transfer_records" => {
                 let mut query = vec![(
                     "limit".to_string(),
@@ -114,6 +130,8 @@ impl BybitClient {
                 push_optional(&mut query, "status", params.get("status"));
                 push_optional(&mut query, "startTime", params.get("startTime"));
                 push_optional(&mut query, "endTime", params.get("endTime"));
+                push_optional(&mut query, "fromMemberId", params.get("fromMemberId"));
+                push_optional(&mut query, "toMemberId", params.get("toMemberId"));
                 push_optional(&mut query, "cursor", params.get("cursor"));
                 self.get_request(GET_UNIVERSAL_TRANSFER_RECORDS, query)
                     .await

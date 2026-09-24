@@ -16,6 +16,9 @@ impl BybitClient {
         if let Some(result) = self.asset_private_request(method_name, &params).await? {
             return Ok(result);
         }
+        if let Some(result) = self.earn_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
         if let Some(result) = self.position_private_request(method_name, &params).await? {
             return Ok(result);
         }

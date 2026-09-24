@@ -16,6 +16,16 @@ pub(super) const TRANSFERABLE_COINS: &str = "/openApi/api/asset/v1/transfer/supp
 pub(super) const ASSET_TRANSFER: &str = "/openApi/api/asset/v1/transfer";
 pub(super) const TRANSFER_RECORDS: &str = "/openApi/api/v3/asset/transferRecord";
 
+pub(super) const SUBACCOUNT_LIST: &str = "/openApi/subAccount/v1/list";
+pub(super) const SUBACCOUNT_ASSETS: &str = "/openApi/subAccount/v1/assets";
+pub(super) const SUBACCOUNT_ALL_ACCOUNT_BALANCE: &str = "/openApi/subAccount/v1/allAccountBalance";
+pub(super) const SUBACCOUNT_TRANSFER_HISTORY: &str =
+    "/openApi/account/transfer/v1/subAccount/asset/transferHistory";
+pub(super) const SUBACCOUNT_TRANSFERABLE_AMOUNTS: &str =
+    "/openApi/account/transfer/v1/subAccount/transferAsset/supportCoins";
+pub(super) const SUBACCOUNT_ASSET_TRANSFER: &str =
+    "/openApi/account/transfer/v1/subAccount/transferAsset";
+
 pub(super) const SWAP_PLACE_ORDER: &str = "/openApi/swap/v2/trade/order";
 pub(super) const SWAP_TEST_ORDER: &str = "/openApi/swap/v2/trade/order/test";
 pub(super) const SWAP_PLACE_BATCH_ORDER: &str = "/openApi/swap/v2/trade/batchOrders";

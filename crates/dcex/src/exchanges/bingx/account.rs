@@ -150,6 +150,180 @@ impl BingxClient {
                 }
                 self.private_get(TRANSFER_RECORDS, query).await
             }
+            "get_subaccounts" => {
+                params.ensure_allowed(&[
+                    "subUid",
+                    "subAccountString",
+                    "isFeeze",
+                    "page",
+                    "limit",
+                    "recvWindow",
+                ])?;
+                params.required("page")?;
+                params.required("limit")?;
+                validate_enum(params, "isFeeze", &["true", "false"])?;
+                validate_u64_range(params, "subUid", 1, u64::MAX)?;
+                validate_u64_range(params, "page", 1, u64::MAX)?;
+                validate_u64_range(params, "limit", 1, 1000)?;
+                validate_recv_window(params)?;
+                self.private_get(
+                    SUBACCOUNT_LIST,
+                    params.only(&[
+                        "subUid",
+                        "subAccountString",
+                        "isFeeze",
+                        "page",
+                        "limit",
+                        "recvWindow",
+                    ]),
+                )
+                .await
+            }
+            "get_subaccount_assets" => {
+                params.ensure_allowed(&["subUid", "recvWindow"])?;
+                params.required("subUid")?;
+                validate_u64_range(params, "subUid", 1, u64::MAX)?;
+                validate_recv_window(params)?;
+                self.private_get(SUBACCOUNT_ASSETS, params.only(&["subUid", "recvWindow"]))
+                    .await
+            }
+            "get_subaccount_all_account_balance" => {
+                params.ensure_allowed(&[
+                    "pageIndex",
+                    "pageSize",
+                    "subUid",
+                    "accountType",
+                    "recvWindow",
+                ])?;
+                params.required("pageIndex")?;
+                params.required("pageSize")?;
+                validate_u64_range(params, "pageIndex", 1, u64::MAX)?;
+                validate_u64_range(params, "pageSize", 1, 10)?;
+                validate_u64_range(params, "subUid", 1, u64::MAX)?;
+                validate_recv_window(params)?;
+                self.private_get(
+                    SUBACCOUNT_ALL_ACCOUNT_BALANCE,
+                    params.only(&[
+                        "pageIndex",
+                        "pageSize",
+                        "subUid",
+                        "accountType",
+                        "recvWindow",
+                    ]),
+                )
+                .await
+            }
+            "get_subaccount_transfer_history" => {
+                params.ensure_allowed(&[
+                    "uid",
+                    "type",
+                    "tranId",
+                    "startTime",
+                    "endTime",
+                    "pageId",
+                    "pagingSize",
+                    "recvWindow",
+                ])?;
+                params.required("uid")?;
+                validate_u64_range(params, "uid", 1, u64::MAX)?;
+                validate_u64_range(params, "pageId", 1, u64::MAX)?;
+                validate_u64_range(params, "pagingSize", 1, 100)?;
+                validate_time_range(params, "startTime", "endTime", None)?;
+                validate_recv_window(params)?;
+                self.private_get(
+                    SUBACCOUNT_TRANSFER_HISTORY,
+                    params.only(&[
+                        "uid",
+                        "type",
+                        "tranId",
+                        "startTime",
+                        "endTime",
+                        "pageId",
+                        "pagingSize",
+                        "recvWindow",
+                    ]),
+                )
+                .await
+            }
+            "get_subaccount_transferable_amounts" => {
+                params.ensure_allowed(&[
+                    "fromUid",
+                    "fromAccountType",
+                    "toUid",
+                    "toAccountType",
+                    "recvWindow",
+                ])?;
+                for key in ["fromUid", "fromAccountType", "toUid", "toAccountType"] {
+                    params.required(key)?;
+                }
+                validate_u64_range(params, "fromUid", 1, u64::MAX)?;
+                validate_u64_range(params, "toUid", 1, u64::MAX)?;
+                validate_u64_range(params, "fromAccountType", 1, 3)?;
+                validate_u64_range(params, "toAccountType", 1, 3)?;
+                validate_recv_window(params)?;
+                self.private_post(
+                    SUBACCOUNT_TRANSFERABLE_AMOUNTS,
+                    params.only(&[
+                        "fromUid",
+                        "fromAccountType",
+                        "toUid",
+                        "toAccountType",
+                        "recvWindow",
+                    ]),
+                )
+                .await
+            }
+            "transfer_subaccount_assets" => {
+                params.ensure_allowed(&[
+                    "assetName",
+                    "transferAmount",
+                    "fromUid",
+                    "fromType",
+                    "fromAccountType",
+                    "toUid",
+                    "toType",
+                    "toAccountType",
+                    "remark",
+                    "recvWindow",
+                ])?;
+                for key in [
+                    "assetName",
+                    "transferAmount",
+                    "fromUid",
+                    "fromType",
+                    "fromAccountType",
+                    "toUid",
+                    "toType",
+                    "toAccountType",
+                    "remark",
+                ] {
+                    params.required(key)?;
+                }
+                validate_positive_number(params, "transferAmount")?;
+                validate_u64_range(params, "fromUid", 1, u64::MAX)?;
+                validate_u64_range(params, "toUid", 1, u64::MAX)?;
+                validate_u64_range(params, "fromType", 1, 2)?;
+                validate_u64_range(params, "toType", 1, 2)?;
+                validate_u64_range(params, "fromAccountType", 1, 3)?;
+                validate_u64_range(params, "toAccountType", 1, 3)?;
+                validate_recv_window(params)?;
+                self.private_post(
+                    SUBACCOUNT_ASSET_TRANSFER,
+                    params.only(&[
+                        "assetName",
+                        "transferAmount",
+                        "fromUid",
+                        "fromType",
+                        "fromAccountType",
+                        "toUid",
+                        "toType",
+                        "toAccountType",
+                        "remark",
+                        "recvWindow",
+                    ]),
+                )
+                .await
+            }
             "get_open_positions" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "recvWindow"])?;
                 validate_recv_window(params)?;

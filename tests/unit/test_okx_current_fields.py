@@ -26,6 +26,9 @@ CURRENT_FIELDS = {
     "get_spot_fee_rates": {"product_symbol", "instFamily", "groupId"},
     "get_interest_accrued": {"type"},
     "get_interest_limits": {"type"},
+    "spot_manual_borrow_repay": {"ccy", "side", "amt"},
+    "set_spot_auto_repay": {"autoRepay"},
+    "get_spot_borrow_repay_history": {"ccy", "type", "after", "before", "limit"},
     "funds_transfer": {"loanTrans", "omitPosRisk", "clientId"},
     "get_bills": {"ccy", "thirdPartyType"},
     "get_candles_ticks": {"adjust"},
@@ -169,3 +172,26 @@ async def test_async_okx_asset_current_fields_are_forwarded() -> None:
     assert params["loanTrans"] == "true"
     assert params["omitPosRisk"] == "false"
     assert params["clientId"] == "transfer-client-id"
+
+
+def test_sync_okx_spot_borrow_repay_fields_are_forwarded() -> None:
+    client = _client_class("sync", "okx")(**_client_kwargs("okx"))
+    calls = _wire_sync(client)
+
+    client.spot_manual_borrow_repay("USDT", "borrow", "1")
+    client.set_spot_auto_repay(True)
+    client.get_spot_borrow_repay_history(
+        ccy="USDT", type="manual_borrow", limit="1"
+    )
+
+    assert dict(calls[0]["query"]) == {
+        "ccy": "USDT",
+        "side": "borrow",
+        "amt": "1",
+    }
+    assert dict(calls[1]["query"]) == {"autoRepay": "true"}
+    assert dict(calls[2]["query"]) == {
+        "ccy": "USDT",
+        "type": "manual_borrow",
+        "limit": "1",
+    }

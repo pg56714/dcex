@@ -126,6 +126,30 @@ class AssetHTTP(HTTPManager):
             ),
         )
 
+    async def create_universal_transfer(
+        self,
+        coin: str,
+        amount: str,
+        fromMemberId: str,
+        toMemberId: str,
+        fromAccountType: str,
+        toAccountType: str,
+        transferId: str | None = None,
+    ) -> dict[str, Any]:
+        """Transfer assets among Bybit master and sub-account UIDs."""
+        return await self._native_private(
+            "create_universal_transfer",
+            self._native_params(
+                coin=coin,
+                amount=amount,
+                fromMemberId=fromMemberId,
+                toMemberId=toMemberId,
+                fromAccountType=fromAccountType,
+                toAccountType=toAccountType,
+                transferId=transferId,
+            ),
+        )
+
     async def get_universal_transfer_records(
         self,
         transferId: str | None = None,
@@ -133,6 +157,8 @@ class AssetHTTP(HTTPManager):
         status: str | None = None,
         startTime: int | None = None,
         endTime: int | None = None,
+        fromMemberId: str | None = None,
+        toMemberId: str | None = None,
         limit: int = 20,
         cursor: str | None = None,
     ) -> dict[str, Any]:
@@ -145,6 +171,8 @@ class AssetHTTP(HTTPManager):
                 status=status,
                 startTime=startTime,
                 endTime=endTime,
+                fromMemberId=fromMemberId,
+                toMemberId=toMemberId,
                 limit=limit,
                 cursor=cursor,
             ),

@@ -141,6 +141,54 @@ impl KucoinClient {
                 self.private_post(KucoinMarket::Spot, SPOT_FLEX_TRANSFER, Value::Object(body))
                     .await
             }
+            "get_subaccounts" | "get_spot_subaccount_balances" | "get_uta_subaccounts" => {
+                params.ensure_allowed(&["currentPage", "pageSize"])?;
+                let path = match method_name {
+                    "get_subaccounts" => SUBACCOUNT_LIST,
+                    "get_spot_subaccount_balances" => SPOT_SUBACCOUNT_BALANCES,
+                    "get_uta_subaccounts" => UTA_SUBACCOUNT_LIST,
+                    _ => unreachable!(),
+                };
+                self.private_get(
+                    KucoinMarket::Spot,
+                    path,
+                    params.only(&["currentPage", "pageSize"]),
+                )
+                .await
+            }
+            "get_subaccount_balance" => {
+                params.ensure_allowed(&[
+                    "subUserId",
+                    "includeBaseAmount",
+                    "baseCurrency",
+                    "baseAmount",
+                ])?;
+                let path = SUBACCOUNT_BALANCE.replace("{subUserId}", params.required("subUserId")?);
+                self.private_get(
+                    KucoinMarket::Spot,
+                    path,
+                    params.only(&["includeBaseAmount", "baseCurrency", "baseAmount"]),
+                )
+                .await
+            }
+            "get_futures_subaccount_balances" => {
+                params.ensure_allowed(&["currency"])?;
+                self.private_get(
+                    KucoinMarket::Futures,
+                    FUTURES_SUBACCOUNT_BALANCES,
+                    params.only(&["currency"]),
+                )
+                .await
+            }
+            "get_uta_subaccount_currency_assets" => {
+                params.ensure_allowed(&["uid", "pageSize", "lastId"])?;
+                self.private_get(
+                    KucoinMarket::Spot,
+                    UTA_SUBACCOUNT_CURRENCY_ASSETS,
+                    params.only(&["uid", "pageSize", "lastId"]),
+                )
+                .await
+            }
             "get_futures_account" => {
                 params.ensure_allowed(&["currency"])?;
                 self.private_get(

@@ -23,6 +23,10 @@ pub(super) const SPOT_CURRENCY_INFO: &str = "/api/v3/capital/config/getall";
 pub(super) const SPOT_DEPOSIT_HISTORY: &str = "/api/v3/capital/deposit/hisrec";
 pub(super) const SPOT_WITHDRAW_HISTORY: &str = "/api/v3/capital/withdraw/history";
 pub(super) const SPOT_DEPOSIT_ADDRESS: &str = "/api/v3/capital/deposit/address";
+pub(super) const SPOT_SUBACCOUNT_LIST: &str = "/api/v3/sub-account/list";
+pub(super) const SPOT_SUBACCOUNT_ASSET: &str = "/api/v3/sub-account/asset";
+pub(super) const SPOT_SUBACCOUNT_UNIVERSAL_TRANSFER: &str =
+    "/api/v3/capital/sub-account/universalTransfer";
 pub(super) const SPOT_USER_UNIVERSAL_TRANSFER: &str = "/api/v3/capital/transfer";
 pub(super) const SPOT_USER_UNIVERSAL_TRANSFER_BY_ID: &str = "/api/v3/capital/transfer/tranId";
 pub(super) const SPOT_INTERNAL_TRANSFER_HISTORY: &str = "/api/v3/capital/transfer/internal";

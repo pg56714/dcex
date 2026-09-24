@@ -35,6 +35,20 @@ CURRENT_FIELDS = {
     "get_futures_open_orders": {"status", "startTime", "endTime"},
     "get_futures_history_orders": {"orderId", "clientOid", "orderSource"},
     "get_uta_history_strategy_orders": {"cursor"},
+    "get_crypto_loan_coins": {"coin"},
+    "get_crypto_loan_interest": {"loanCoin", "pledgeCoin", "daily", "pledgeAmount"},
+    "borrow_crypto_loan": {
+        "loanCoin",
+        "pledgeCoin",
+        "daily",
+        "pledgeAmount",
+        "loanAmount",
+    },
+    "get_crypto_loan_borrow_history": {"startTime", "endTime", "status"},
+    "repay_crypto_loan": {"orderId", "repayAll", "amount", "repayUnlock"},
+    "get_crypto_loan_pledge_history": {"startTime", "endTime", "reviseSide"},
+    "get_crypto_loan_liquidations": {"startTime", "endTime", "status"},
+    "repay_uta_liability": {"repayableCoinList", "paymentCoinList"},
 }
 
 

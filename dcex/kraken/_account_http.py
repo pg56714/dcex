@@ -8,6 +8,76 @@ from ._http_manager import HTTPManager
 class AccountHTTP(HTTPManager):
     """HTTP client for Kraken private account operations."""
 
+    def get_earn_strategies(
+        self,
+        *,
+        ascending: bool | None = None,
+        asset: str | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+        lock_type: list[str] | tuple[str, ...] | None = None,
+    ) -> dict[str, Any]:
+        """List Earn strategies available to this Kraken account."""
+        return self._native_private(
+            "get_earn_strategies",
+            self._native_params(
+                ascending=ascending,
+                asset=asset,
+                cursor=cursor,
+                limit=limit,
+                lock_type=lock_type,
+            ),
+        )
+
+    def get_earn_allocations(
+        self,
+        *,
+        ascending: bool | None = None,
+        converted_asset: str | None = None,
+        cursor: str | None = None,
+        hide_zero_allocations: bool | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """List this account's Kraken Earn allocations."""
+        return self._native_private(
+            "get_earn_allocations",
+            self._native_params(
+                ascending=ascending,
+                converted_asset=converted_asset,
+                cursor=cursor,
+                hide_zero_allocations=hide_zero_allocations,
+                limit=limit,
+            ),
+        )
+
+    def allocate_earn_funds(self, strategy_id: str, amount: str) -> dict[str, Any]:
+        """Allocate funds to a Kraken Earn strategy."""
+        return self._native_private(
+            "allocate_earn_funds",
+            self._native_params(strategy_id=strategy_id, amount=amount),
+        )
+
+    def deallocate_earn_funds(self, strategy_id: str, amount: str) -> dict[str, Any]:
+        """Deallocate funds from a Kraken Earn strategy."""
+        return self._native_private(
+            "deallocate_earn_funds",
+            self._native_params(strategy_id=strategy_id, amount=amount),
+        )
+
+    def get_earn_allocation_status(self, strategy_id: str) -> dict[str, Any]:
+        """Return the latest allocation status for an Earn strategy."""
+        return self._native_private(
+            "get_earn_allocation_status",
+            self._native_params(strategy_id=strategy_id),
+        )
+
+    def get_earn_deallocation_status(self, strategy_id: str) -> dict[str, Any]:
+        """Return the latest deallocation status for an Earn strategy."""
+        return self._native_private(
+            "get_earn_deallocation_status",
+            self._native_params(strategy_id=strategy_id),
+        )
+
     def get_spot_account_balance(
         self,
         rebase_multiplier: str | None = None,

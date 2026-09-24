@@ -550,6 +550,60 @@ def test_sync_bitget_manager_uses_native_transport() -> None:
     assert received.get_nowait()["path"] == "/test?symbol=BTCUSDT"
 
 
+def test_native_bitget_crypto_loan_uses_official_paths_and_json_types() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server({"code": "00000"}) as (base_url, received):
+        client = native.BitgetHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            passphrase="passphrase",
+            timeout=2,
+            base_url=base_url,
+        )
+        client.private_request_json(
+            "borrow_crypto_loan",
+            [
+                ("loanCoin", "USDT"),
+                ("pledgeCoin", "BTC"),
+                ("daily", "FLEXIBLE"),
+                ("loanAmount", "1"),
+            ],
+        )
+        client.private_request_json(
+            "repay_crypto_loan",
+            [("orderId", "loan-1"), ("repayAll", "yes")],
+        )
+        client.private_request_json("get_crypto_loan_debts", [])
+        client.private_request_json(
+            "repay_uta_liability",
+            [
+                ("repayableCoinList", '["USDT"]'),
+                ("paymentCoinList", '["BTC","ETH"]'),
+            ],
+        )
+
+    borrow = received.get_nowait()
+    repay = received.get_nowait()
+    debts = received.get_nowait()
+    uta_repay = received.get_nowait()
+
+    assert borrow["path"] == "/api/v3/loan/borrow"
+    assert json.loads(borrow["body"]) == {
+        "loanCoin": "USDT",
+        "pledgeCoin": "BTC",
+        "daily": "FLEXIBLE",
+        "loanAmount": "1",
+    }
+    assert repay["path"] == "/api/v3/loan/repay"
+    assert json.loads(repay["body"]) == {"orderId": "loan-1", "repayAll": "yes"}
+    assert debts["path"] == "/api/v3/loan/debts"
+    assert json.loads(uta_repay["body"]) == {
+        "repayableCoinList": ["USDT"],
+        "paymentCoinList": ["BTC", "ETH"],
+    }
+
+
 @pytest.mark.asyncio
 async def test_async_bitget_manager_uses_native_transport() -> None:
     from dcex.async_support.bitget._http_manager import HTTPManager
@@ -668,3 +722,62 @@ async def test_async_bybit_manager_uses_native_transport() -> None:
     assert result == {"retCode": 0}
     assert manager.last_response_headers["x-response"] == "native"
     assert received.get_nowait()["path"] == "/test?symbol=ETHUSDT"
+
+
+def test_native_bybit_margin_lifecycle_uses_official_paths_and_payloads() -> None:
+    native = pytest.importorskip("dcex._native")
+
+    with _http_server({"retCode": 0}) as (base_url, received):
+        client = native.BybitHttpClient(
+            api_key="api-key",
+            api_secret="secret",
+            sync_server_time=False,
+            timeout=2,
+            base_url=base_url,
+        )
+        client.private_request_json(
+            "manual_borrow", [("coin", "USDT"), ("amount", "1")]
+        )
+        client.private_request_json(
+            "manual_repay_without_conversion",
+            [
+                ("coin", "USDT"),
+                ("amount", "1"),
+                ("repaymentType", "FLEXIBLE"),
+            ],
+        )
+        client.private_request_json(
+            "get_margin_liability", [("currency", "USDT")]
+        )
+        client.private_request_json(
+            "borrow_fixed_rate",
+            [
+                ("orderCurrency", "USDT"),
+                ("orderAmount", "10"),
+                ("annualRate", "0.02"),
+                ("term", "7"),
+            ],
+        )
+
+    borrow = received.get_nowait()
+    repay = received.get_nowait()
+    liability = received.get_nowait()
+    fixed = received.get_nowait()
+
+    assert borrow["path"] == "/v5/account/borrow"
+    assert json.loads(borrow["body"]) == {"coin": "USDT", "amount": "1"}
+    assert repay["path"] == "/v5/account/no-convert-repay"
+    assert json.loads(repay["body"]) == {
+        "coin": "USDT",
+        "amount": "1",
+        "repaymentType": "FLEXIBLE",
+    }
+    assert liability["path"].startswith("/v5/spot-margin-trade/liability?")
+    assert dict(parse_qsl(urlsplit(liability["path"]).query))["currency"] == "USDT"
+    assert fixed["path"] == "/v5/spot-margin-trade/fixedborrow"
+    assert json.loads(fixed["body"]) == {
+        "orderCurrency": "USDT",
+        "orderAmount": "10",
+        "annualRate": "0.02",
+        "term": "7",
+    }

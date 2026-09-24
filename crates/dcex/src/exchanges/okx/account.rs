@@ -5,7 +5,9 @@ use crate::Result;
 
 use super::client::OkxClient;
 use super::endpoints::*;
-use super::params::{insert_optional_string, push_optional, push_optional_owned, OkxParams};
+use super::params::{
+    insert_optional_bool, insert_optional_string, push_optional, push_optional_owned, OkxParams,
+};
 
 impl OkxClient {
     pub(super) async fn account_private_request(
@@ -182,6 +184,37 @@ impl OkxClient {
             "get_interest_limits" => {
                 self.get_request(ACCOUNT_INTEREST_LIMITS, params.only(&["type", "ccy"]))
                     .await
+            }
+            "spot_manual_borrow_repay" => {
+                let side = params.required("side")?;
+                if !["borrow", "repay"].contains(&side) {
+                    return Err(crate::DcexError::InvalidInput(
+                        "side must be borrow or repay.".to_string(),
+                    ));
+                }
+                self.post_request(
+                    ACCOUNT_SPOT_MANUAL_BORROW_REPAY,
+                    Value::Object(params.required_body(&["ccy", "side", "amt"])?),
+                )
+                .await
+            }
+            "set_spot_auto_repay" => {
+                let mut body = serde_json::Map::new();
+                insert_optional_bool(&mut body, "autoRepay", params.get("autoRepay"))?;
+                if !body.contains_key("autoRepay") {
+                    return Err(crate::DcexError::InvalidInput(
+                        "missing required parameter: autoRepay".to_string(),
+                    ));
+                }
+                self.post_request(ACCOUNT_SET_AUTO_REPAY, Value::Object(body))
+                    .await
+            }
+            "get_spot_borrow_repay_history" => {
+                self.get_request(
+                    ACCOUNT_SPOT_BORROW_REPAY_HISTORY,
+                    params.only(&["ccy", "type", "after", "before", "limit"]),
+                )
+                .await
             }
             _ => return Ok(None),
         };

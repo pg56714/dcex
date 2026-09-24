@@ -91,6 +91,30 @@ impl KucoinClient {
                 self.normalize_symbol_list_query(&mut params, true, 10)?;
                 (KucoinMarket::Spot, UTA_POSITION_TIERS.to_string(), false)
             }
+            "get_cross_margin_symbols" => {
+                self.normalize_symbol_query(&mut params, false)?;
+                (KucoinMarket::Spot, CROSS_MARGIN_SYMBOLS.to_string(), false)
+            }
+            "get_isolated_margin_symbols" => (
+                KucoinMarket::Spot,
+                ISOLATED_MARGIN_SYMBOLS.to_string(),
+                false,
+            ),
+            "get_margin_collateral_ratio" => (
+                KucoinMarket::Spot,
+                MARGIN_COLLATERAL_RATIO.to_string(),
+                false,
+            ),
+            "get_margin_available_inventory" => (
+                KucoinMarket::Spot,
+                MARGIN_AVAILABLE_INVENTORY.to_string(),
+                false,
+            ),
+            "get_margin_loan_market_interest_rate" => (
+                KucoinMarket::Spot,
+                MARGIN_LOAN_MARKET_RATE.to_string(),
+                false,
+            ),
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported KuCoin public method: {method_name}"
@@ -273,6 +297,18 @@ impl KucoinClient {
                     )?,
                     _ => unreachable!(),
                 }
+                Ok(())
+            }
+            "get_cross_margin_symbols" => {
+                params.ensure_allowed(&["product_symbol", "symbol"])?;
+                Ok(())
+            }
+            "get_isolated_margin_symbols" => params.ensure_allowed(&[]),
+            "get_margin_collateral_ratio" => params.ensure_allowed(&["currencyList"]),
+            "get_margin_available_inventory" => params.ensure_allowed(&["currency"]),
+            "get_margin_loan_market_interest_rate" => {
+                params.ensure_allowed(&["currency"])?;
+                params.required("currency")?;
                 Ok(())
             }
             _ => Ok(()),

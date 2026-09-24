@@ -92,3 +92,24 @@ def test_get_futures_kline(client):
 def test_get_futures_open_interest(client):
     res = client.get_futures_open_interest(product_symbol="BTC-USDT-SWAP")
     assert res is not None
+
+
+def test_get_margin_public_data(client):
+    assert client.get_cross_margin_symbols() is not None
+    assert client.get_isolated_margin_symbols() is not None
+    assert client.get_margin_collateral_ratio(currencyList="USDT") is not None
+    assert client.get_margin_available_inventory(currency="USDT") is not None
+    assert client.get_margin_loan_market_interest_rate(currency="USDT") is not None
+
+
+@pytest.mark.private
+def test_get_dual_investment_products(client):
+    assert (
+        client.get_dual_investment_products(
+            category="DUAL_CLASSIC",
+            strikeCurrency="USDT",
+            investCurrency="BTC",
+            side="CALL",
+        )
+        is not None
+    )

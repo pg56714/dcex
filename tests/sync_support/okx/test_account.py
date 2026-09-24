@@ -175,6 +175,11 @@ def test_get_interest_limits(client):
 
 
 @pytest.mark.private
+def test_get_spot_borrow_repay_history(client):
+    assert client.get_spot_borrow_repay_history(ccy="USDT", limit="1") is not None
+
+
+@pytest.mark.private
 def test_set_leverage(client):
     res = client.set_leverage(lever="10", mgnMode="isolated", product_symbol="BTC-USDT-SWAP")
     assert res is not None

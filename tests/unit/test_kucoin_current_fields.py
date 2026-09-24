@@ -68,6 +68,67 @@ CURRENT_FIELDS = {
     "cancel_futures_order_by_client_oid": {"clientOid", "product_symbol"},
     "cancel_futures_all_orders": {"product_symbol"},
     "get_futures_open_order_value": {"product_symbol"},
+    "borrow_margin": {
+        "currency",
+        "size",
+        "timeInForce",
+        "isIsolated",
+        "isHf",
+        "product_symbol",
+    },
+    "get_margin_borrow_history": {
+        "currency",
+        "isIsolated",
+        "product_symbol",
+        "orderNo",
+        "startTime",
+        "endTime",
+        "currentPage",
+        "pageSize",
+    },
+    "modify_margin_leverage": {"leverage", "isIsolated", "product_symbol"},
+    "get_margin_lending_purchase_orders": {
+        "status",
+        "currency",
+        "purchaseOrderNo",
+        "currentPage",
+        "pageSize",
+    },
+    "get_subaccount_balance": {
+        "subUserId",
+        "includeBaseAmount",
+        "baseCurrency",
+        "baseAmount",
+    },
+    "get_uta_subaccount_currency_assets": {"uid", "pageSize", "lastId"},
+    "purchase_earn": {"productId", "amount", "accountType"},
+    "redeem_earn": {"orderId", "amount", "fromAccountType", "confirmPunishRedeem"},
+    "get_earn_account_holdings": {
+        "currency",
+        "productId",
+        "productCategory",
+        "currentPage",
+        "pageSize",
+    },
+    "get_dual_investment_products": {
+        "category",
+        "strikeCurrency",
+        "investCurrency",
+        "side",
+    },
+    "purchase_structured_earn": {
+        "productId",
+        "investCurrency",
+        "investAmount",
+        "accountType",
+    },
+    "get_structured_earn_orders": {
+        "categories",
+        "orderId",
+        "investCurrency",
+        "currentPage",
+        "pageSize",
+    },
 }
 
 
@@ -85,9 +146,7 @@ def test_kucoin_sync_and_async_expose_current_official_fields(
 
 
 def test_kucoin_removed_obsolete_futures_order_fields() -> None:
-    fields = set(
-        inspect.signature(_client_class("sync", "kucoin").place_futures_order).parameters
-    )
+    fields = set(inspect.signature(_client_class("sync", "kucoin").place_futures_order).parameters)
 
     assert "tags" not in fields
 
@@ -129,6 +188,25 @@ def test_sync_kucoin_forwards_current_public_and_private_fields() -> None:
         price="100000",
         forceHold=True,
     )
+    client.get_margin_collateral_ratio(currencyList="USDT,USDC")
+    client.get_cross_margin_account(quoteCurrency="USDT")
+    client.get_margin_borrow_history(
+        currency="USDT",
+        product_symbol="BTC-USDT-SPOT",
+        pageSize=20,
+    )
+    client.get_subaccount_balance(
+        "sub-user",
+        includeBaseAmount=True,
+        baseCurrency="USDT",
+    )
+    client.purchase_earn("product-1", "1", accountType="TRADE")
+    client.get_dual_investment_products(
+        category="DUAL_CLASSIC",
+        strikeCurrency="USDT",
+        investCurrency="BTC",
+        side="CALL",
+    )
 
     assert dict(calls[0]["query"]) == {"market": "USDS"}
     assert dict(calls[1]["query"])["product_symbol"] == json.dumps(
@@ -140,6 +218,13 @@ def test_sync_kucoin_forwards_current_public_and_private_fields() -> None:
     assert dict(calls[4]["query"])["type"] == "limit"
     assert dict(calls[5]["query"])["qty"] == "0.001"
     assert dict(calls[5]["query"])["forceHold"] == "true"
+    assert dict(calls[6]["query"]) == {"currencyList": "USDT,USDC"}
+    assert dict(calls[7]["query"])["queryType"] == "MARGIN"
+    assert dict(calls[8]["query"])["product_symbol"] == "BTC-USDT-SPOT"
+    assert dict(calls[9]["query"])["subUserId"] == "sub-user"
+    assert dict(calls[9]["query"])["includeBaseAmount"] == "true"
+    assert dict(calls[10]["query"])["productId"] == "product-1"
+    assert dict(calls[11]["query"])["category"] == "DUAL_CLASSIC"
 
 
 @pytest.mark.asyncio
@@ -154,11 +239,24 @@ async def test_async_kucoin_forwards_current_required_fields() -> None:
     )
     await client.cancel_futures_all_orders("BTC-USDT-SWAP")
     await client.get_futures_open_order_value("BTC-USDT-SWAP")
+    await client.get_margin_available_inventory("USDT")
+    await client.get_isolated_margin_account("BTC-USDT-SPOT")
+    await client.get_margin_lending_purchase_orders(status="DONE", currency="USDT", pageSize=20)
+    await client.get_uta_subaccounts(currentPage=1, pageSize=10)
+    await client.get_earn_account_holdings(currency="USDT", currentPage=1, pageSize=20)
+    await client.purchase_structured_earn("product-1", "USDT", "10")
 
     assert dict(calls[0]["query"]) == {"tradeType": "FUTURES", "symbol": "XBTUSDTM"}
     assert dict(calls[1]["query"])["product_symbol"] == "BTC-USDT-SWAP"
     assert dict(calls[2]["query"])["product_symbol"] == "BTC-USDT-SWAP"
     assert dict(calls[3]["query"])["product_symbol"] == "BTC-USDT-SWAP"
+    assert dict(calls[4]["query"]) == {"currency": "USDT"}
+    assert dict(calls[5]["query"])["queryType"] == "ISOLATED"
+    assert dict(calls[6]["query"])["pageSize"] == "20"
+    assert dict(calls[6]["query"])["status"] == "DONE"
+    assert dict(calls[7]["query"])["pageSize"] == "10"
+    assert dict(calls[8]["query"])["currency"] == "USDT"
+    assert dict(calls[9]["query"])["investAmount"] == "10"
 
 
 def _native_client(base_url: str) -> object:

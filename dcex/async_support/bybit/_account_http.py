@@ -60,6 +60,45 @@ class AccountHTTP(HTTPManager):
             self._native_params(currency=currency),
         )
 
+    async def manual_borrow(self, coin: str, amount: str) -> dict[str, Any]:
+        """Borrow an asset at Bybit's variable rate."""
+        return await self._native_private(
+            "manual_borrow",
+            self._native_params(coin=coin, amount=amount),
+        )
+
+    async def manual_repay(
+        self,
+        coin: str | None = None,
+        amount: str | None = None,
+        repaymentType: str = "FLEXIBLE",
+    ) -> dict[str, Any]:
+        """Repay flexible, fixed-rate, or all UTA liabilities."""
+        return await self._native_private(
+            "manual_repay",
+            self._native_params(
+                coin=coin,
+                amount=amount,
+                repaymentType=repaymentType,
+            ),
+        )
+
+    async def manual_repay_without_conversion(
+        self,
+        coin: str,
+        amount: str | None = None,
+        repaymentType: str = "FLEXIBLE",
+    ) -> dict[str, Any]:
+        """Repay using only the available balance of the debt asset."""
+        return await self._native_private(
+            "manual_repay_without_conversion",
+            self._native_params(
+                coin=coin,
+                amount=amount,
+                repaymentType=repaymentType,
+            ),
+        )
+
     async def _request_fee_rates(
         self,
         method_name: str,

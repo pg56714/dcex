@@ -17,8 +17,10 @@ from typing import Any
 
 from ._account_http import AccountHTTP
 from ._asset_http import AssetHTTP
+from ._finance_http import FinanceHTTP
 from ._market_http import MarketHTTP
 from ._public_http import PublicHTTP
+from ._subaccount_http import SubaccountHTTP
 from ._trade_http import TradeHTTP
 
 
@@ -26,6 +28,8 @@ class Client(
     TradeHTTP,
     AccountHTTP,
     AssetHTTP,
+    FinanceHTTP,
+    SubaccountHTTP,
     PublicHTTP,
     MarketHTTP,
 ):

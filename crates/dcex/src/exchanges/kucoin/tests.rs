@@ -347,6 +347,11 @@ async fn current_required_and_conditional_fields_are_rejected_before_transport()
             ],
             "cannot use a V2 margin account type",
         ),
+        (
+            "get_structured_earn_orders",
+            vec![],
+            "missing required parameter: categories",
+        ),
     ] {
         let error = client
             .private_request(method, params)
@@ -373,6 +378,135 @@ async fn current_required_and_conditional_fields_are_rejected_before_transport()
     assert!(error
         .to_string()
         .contains("historical open interest requires exactly one symbol"));
+}
+
+#[tokio::test]
+async fn margin_borrow_uses_v3_endpoint_and_normalizes_symbol() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    client
+        .private_request(
+            "borrow_margin",
+            vec![
+                ("currency".to_string(), "USDT".to_string()),
+                ("size".to_string(), "1".to_string()),
+                ("isIsolated".to_string(), "true".to_string()),
+                ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+            ],
+        )
+        .await
+        .expect("response");
+
+    let request = handle.join().expect("server");
+    assert!(request.starts_with("POST /api/v3/margin/borrow HTTP/1.1"));
+    let body = request.split("\r\n\r\n").nth(1).expect("body");
+    let body: serde_json::Value = serde_json::from_str(body).expect("json body");
+    assert_eq!(body["currency"], "USDT");
+    assert_eq!(body["size"], "1");
+    assert_eq!(body["isIsolated"], true);
+    assert_eq!(body["symbol"], "BTC-USDT");
+}
+
+#[tokio::test]
+async fn margin_history_normalizes_canonical_product_symbol() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    client
+        .private_request(
+            "get_margin_borrow_history",
+            vec![
+                ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                ("pageSize".to_string(), "20".to_string()),
+            ],
+        )
+        .await
+        .expect("response");
+
+    let request = handle.join().expect("server");
+    assert!(request.starts_with("GET /api/v3/margin/borrow?symbol=BTC-USDT&pageSize=20 HTTP/1.1"));
+}
+
+#[tokio::test]
+async fn earn_purchase_uses_json_body_and_endpoint() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    client
+        .private_request(
+            "purchase_earn",
+            vec![
+                ("productId".to_string(), "2611".to_string()),
+                ("amount".to_string(), "1".to_string()),
+                ("accountType".to_string(), "TRADE".to_string()),
+            ],
+        )
+        .await
+        .expect("response");
+
+    let request = handle.join().expect("server");
+    assert!(request.starts_with("POST /api/v1/earn/orders HTTP/1.1"));
+    let body = request.split("\r\n\r\n").nth(1).expect("body");
+    let body: serde_json::Value = serde_json::from_str(body).expect("json body");
+    assert_eq!(body["productId"], "2611");
+    assert_eq!(body["amount"], "1");
+    assert_eq!(body["accountType"], "TRADE");
+}
+
+#[tokio::test]
+async fn subaccount_balance_uses_path_and_query() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".to_string()),
+        Some("secret".to_string()),
+        Some("passphrase".to_string()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    client
+        .private_request(
+            "get_subaccount_balance",
+            vec![
+                ("subUserId".to_string(), "sub-user".to_string()),
+                ("includeBaseAmount".to_string(), "true".to_string()),
+                ("baseCurrency".to_string(), "USDT".to_string()),
+            ],
+        )
+        .await
+        .expect("response");
+
+    let request = handle.join().expect("server");
+    assert!(request.starts_with(
+        "GET /api/v1/sub-accounts/sub-user?includeBaseAmount=true&baseCurrency=USDT HTTP/1.1"
+    ));
 }
 
 fn server() -> (String, thread::JoinHandle<String>) {

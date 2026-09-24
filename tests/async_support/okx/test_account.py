@@ -205,6 +205,12 @@ async def test_get_interest_limits(client):
 
 @pytest.mark.asyncio
 @pytest.mark.private
+async def test_get_spot_borrow_repay_history(client):
+    assert await client.get_spot_borrow_repay_history(ccy="USDT", limit="1") is not None
+
+
+@pytest.mark.asyncio
+@pytest.mark.private
 async def test_set_leverage(client):
     res = await client.set_leverage(lever="10", mgnMode="isolated", product_symbol="BTC-USDT-SWAP")
     assert res is not None

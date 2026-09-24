@@ -2,7 +2,7 @@ use serde_json::{Map, Value};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{push_optional, BybitParams};
+use super::params::{insert_optional_string, push_optional, BybitParams};
 use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
 
@@ -60,6 +60,64 @@ impl BybitClient {
                     params.get("currency").or_else(|| params.get("coin")),
                 );
                 self.get_request(GET_COLLATERAL_INFO, query).await
+            }
+            "manual_borrow" => {
+                let mut body = Map::new();
+                body.insert(
+                    "coin".to_string(),
+                    Value::String(params.required("coin")?.to_string()),
+                );
+                body.insert(
+                    "amount".to_string(),
+                    Value::String(params.required("amount")?.to_string()),
+                );
+                self.post_request(MANUAL_BORROW, body).await
+            }
+            "manual_repay" => {
+                let repayment_type = params.get("repaymentType").unwrap_or("FLEXIBLE");
+                if !["ALL", "FIXED", "FLEXIBLE"].contains(&repayment_type) {
+                    return Err(DcexError::InvalidInput(
+                        "repaymentType must be ALL, FIXED, or FLEXIBLE.".to_string(),
+                    ));
+                }
+                if params.get("coin").is_none() && params.get("amount").is_some() {
+                    return Err(DcexError::InvalidInput(
+                        "coin is required when amount is provided.".to_string(),
+                    ));
+                }
+                if params.get("coin").is_none() && repayment_type != "ALL" {
+                    return Err(DcexError::InvalidInput(
+                        "repaymentType must be ALL when coin is omitted.".to_string(),
+                    ));
+                }
+                let mut body = Map::new();
+                insert_optional_string(&mut body, "coin", params.get("coin"));
+                insert_optional_string(&mut body, "amount", params.get("amount"));
+                body.insert(
+                    "repaymentType".to_string(),
+                    Value::String(repayment_type.to_string()),
+                );
+                self.post_request(MANUAL_REPAY, body).await
+            }
+            "manual_repay_without_conversion" => {
+                let repayment_type = params.get("repaymentType").unwrap_or("FLEXIBLE");
+                if !["ALL", "FIXED", "FLEXIBLE"].contains(&repayment_type) {
+                    return Err(DcexError::InvalidInput(
+                        "repaymentType must be ALL, FIXED, or FLEXIBLE.".to_string(),
+                    ));
+                }
+                let mut body = Map::new();
+                body.insert(
+                    "coin".to_string(),
+                    Value::String(params.required("coin")?.to_string()),
+                );
+                insert_optional_string(&mut body, "amount", params.get("amount"));
+                body.insert(
+                    "repaymentType".to_string(),
+                    Value::String(repayment_type.to_string()),
+                );
+                self.post_request(MANUAL_REPAY_WITHOUT_CONVERSION, body)
+                    .await
             }
             "get_spot_fee_rates"
             | "get_linear_fee_rates"

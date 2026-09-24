@@ -279,3 +279,98 @@ class PublicHTTP(HTTPManager):
                 limit=limit,
             ),
         )
+
+    def get_delivery_exercise_history(
+        self,
+        instType: str = "OPTION",
+        *,
+        uly: str | None = None,
+        instFamily: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Get futures delivery or option exercise history."""
+        return self._native_public(
+            "get_delivery_exercise_history",
+            self._params(
+                instType=instType,
+                uly=uly,
+                instFamily=instFamily,
+                after=after,
+                before=before,
+                limit=limit,
+            ),
+        )
+
+    def get_option_summary(
+        self,
+        *,
+        uly: str | None = None,
+        expTime: str | None = None,
+        instFamily: str | None = None,
+    ) -> dict[str, Any]:
+        """Get option market data including Greeks and implied volatility."""
+        return self._native_public(
+            "get_option_summary",
+            self._params(uly=uly, expTime=expTime, instFamily=instFamily),
+        )
+
+    def get_option_tick_bands(
+        self, instType: str = "OPTION", *, instFamily: str | None = None
+    ) -> dict[str, Any]:
+        """Get option instrument tick bands."""
+        return self._native_public(
+            "get_option_tick_bands",
+            self._params(instType=instType, instFamily=instFamily),
+        )
+
+    def get_option_trades(
+        self,
+        *,
+        instId: str | None = None,
+        instFamily: str | None = None,
+        optType: str | None = None,
+    ) -> dict[str, Any]:
+        """Get recent public option trades."""
+        return self._native_public(
+            "get_option_trades",
+            self._params(instId=instId, instFamily=instFamily, optType=optType),
+        )
+
+    def get_options_open_interest_and_volume(self, ccy: str, period: str = "8H") -> dict[str, Any]:
+        """Get aggregate option open interest and volume."""
+        return self._native_public(
+            "get_options_open_interest_and_volume",
+            self._params(ccy=ccy, period=period),
+        )
+
+    def get_option_put_call_ratio(self, ccy: str, period: str = "8H") -> dict[str, Any]:
+        """Get option put/call open-interest and volume ratios."""
+        return self._native_public(
+            "get_option_put_call_ratio", self._params(ccy=ccy, period=period)
+        )
+
+    def get_option_open_interest_and_volume_by_expiry(
+        self, ccy: str, period: str = "8H"
+    ) -> dict[str, Any]:
+        """Get option open interest and volume grouped by expiry."""
+        return self._native_public(
+            "get_option_open_interest_and_volume_by_expiry",
+            self._params(ccy=ccy, period=period),
+        )
+
+    def get_option_open_interest_and_volume_by_strike(
+        self, ccy: str, expTime: str, *, period: str = "8H"
+    ) -> dict[str, Any]:
+        """Get option open interest and volume grouped by strike."""
+        return self._native_public(
+            "get_option_open_interest_and_volume_by_strike",
+            self._params(ccy=ccy, expTime=expTime, period=period),
+        )
+
+    def get_option_taker_block_volume(self, ccy: str, period: str = "8H") -> dict[str, Any]:
+        """Get option taker and block-trade buy/sell volume."""
+        return self._native_public(
+            "get_option_taker_block_volume", self._params(ccy=ccy, period=period)
+        )

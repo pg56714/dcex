@@ -93,6 +93,21 @@ def test_transfer_read_endpoints(client):
     )
 
 
+def test_subaccount_read_endpoints(client):
+    subaccounts = _assert_response(client.get_subaccounts(page=1, limit=10))
+    accounts = subaccounts.get("subAccounts", [])
+    if accounts:
+        _assert_response(client.get_subaccount_asset(accounts[0]["subAccount"]))
+    _assert_response(
+        client.get_subaccount_transfer_history(
+            fromAccountType="SPOT",
+            toAccountType="SPOT",
+            page=1,
+            limit=10,
+        )
+    )
+
+
 def test_contract_account_read_endpoints(client):
     _assert_contract_success(client.get_contract_assets())
     _assert_contract_success(client.get_contract_asset("USDT"))

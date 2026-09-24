@@ -1,6 +1,8 @@
 mod account;
 mod client;
+mod earn;
 mod endpoints;
+mod margin;
 mod market;
 mod params;
 mod private;
