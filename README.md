@@ -190,6 +190,34 @@ queries. `dcex.ws.bitget.reality_private(...)` exposes the UTA V3 Reality
 orderbook channel. Bitget requires BD whitelist access for Reality depth and
 platform fills; these are not required for order execution.
 
+### MEXC stock-linked products
+
+The public Spot `exchangeInfo` identifies tokenized stocks through the
+`Tokenized Stocks` concept category. Futures `contract/detail` identifies stock
+contracts through `mc-trade-zone-Stock` and reports `apiAllowed`. The Product
+Table Manager keeps their standard Spot/Swap routing and marks their
+`exchange_type` as `tokenized_stock` or `stock_perpetual`. These products are
+distinct from MEXC RealStocks, whose separate API is not integrated.
+Spot size precision comes from `baseAssetPrecision`, while
+`quoteAmountPrecision` is the minimum order amount. Some stock tokens report
+`baseSizePrecision=0`; their executable minimum quantity still depends on the
+current price and order rules.
+
+### Backpack stock RFQ limits
+
+Stock RFQ quantity limits vary by market session. The Product Table Manager
+reports the largest minimum quantity and step size across sessions as a
+conservative summary; query `get_rfq_constraints(symbol, session_name)` before
+trading to obtain the limits for the intended session.
+
+### OKX X-Perps
+
+OKX publishes X-Perps through `instType=FUTURES`; normal X-Perps use
+`ruleType=xperp` and pre-market X-Perps use `ruleType=pre_market`.
+`instCategory=3` denotes stocks. The product table preserves
+the `FUTURES` API type and the reported `ctVal` contract size rather than
+treating these products as ordinary `SWAP` instruments.
+
 ### Binance Options
 
 Binance Options is available through the exchange-specific sync, async, and

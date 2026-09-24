@@ -86,3 +86,12 @@ def test_get_system_public_data(client):
 def test_get_securities_public_data(client):
     assert isinstance(client.get_market_sessions(), list)
     assert isinstance(client.get_securities(), list)
+
+
+def test_stock_rfq_constraints_vary_by_session(client):
+    symbol = "AAPL.US-USDC-RFQ"
+    regular = client.get_rfq_constraints(symbol, "US_EQUITIES_REGULAR")
+    pre_market = client.get_rfq_constraints(symbol, "US_EQUITIES_PRE_MARKET")
+    assert regular["symbol"] == "AAPL.US_USDC_RFQ"
+    assert pre_market["symbol"] == regular["symbol"]
+    assert float(regular["session"]["minQuantity"]) <= float(pre_market["session"]["minQuantity"])

@@ -166,25 +166,40 @@ pub(super) async fn fetch_backpack(timeout: Duration) -> Result<Vec<MarketInfo>>
         });
     }
     for security in value_array(Some(&securities.data)) {
-        let asset = required_string(security, "asset")?;
-        let sessions = value_array(security.get("sessions"));
-        let session = sessions.first().unwrap_or(&Value::Null);
-        rows.push(MarketInfo {
-            exchange: "backpack".to_string(),
-            exchange_symbol: format!("{asset}_USDC_RFQ"),
-            product_symbol: format!("{asset}-USDC-RFQ"),
-            product_type: "rfq".to_string(),
-            exchange_type: "RFQ".to_string(),
-            price_precision: "0".to_string(),
-            size_precision: value_string(session, "stepSize", "0"),
-            min_size: value_string(session, "minQuantity", "0"),
-            base_currency: asset,
-            quote_currency: "USDC".to_string(),
-            min_notional: "0".to_string(),
-            size_per_contract: "1".to_string(),
-        });
+        rows.push(backpack_rfq_market_info(security)?);
     }
     Ok(rows)
+}
+
+pub(super) fn backpack_rfq_market_info(security: &Value) -> Result<MarketInfo> {
+    let asset = required_string(security, "asset")?;
+    let sessions = value_array(security.get("sessions"));
+    Ok(MarketInfo {
+        exchange: "backpack".to_string(),
+        exchange_symbol: format!("{asset}_USDC_RFQ"),
+        product_symbol: format!("{asset}-USDC-RFQ"),
+        product_type: "rfq".to_string(),
+        exchange_type: "RFQ".to_string(),
+        price_precision: "0".to_string(),
+        size_precision: backpack_largest_session_limit(sessions, "stepSize"),
+        min_size: backpack_largest_session_limit(sessions, "minQuantity"),
+        base_currency: asset,
+        quote_currency: "USDC".to_string(),
+        min_notional: "0".to_string(),
+        size_per_contract: "1".to_string(),
+    })
+}
+
+fn backpack_largest_session_limit(sessions: &[Value], key: &str) -> String {
+    sessions
+        .iter()
+        .filter_map(|session| {
+            let value = non_empty_string(session, key)?;
+            let number = value.parse::<f64>().ok()?;
+            (number.is_finite() && number >= 0.0).then_some((number, value))
+        })
+        .max_by(|(left, _), (right, _)| left.total_cmp(right))
+        .map_or_else(|| "0".to_string(), |(_, value)| value)
 }
 
 pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -1083,22 +1098,7 @@ pub(super) async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
         {
             continue;
         }
-        let base = required_string(market, "baseAsset")?;
-        let quote = required_string(market, "quoteAsset")?;
-        rows.push(MarketInfo {
-            exchange: "mexc".to_string(),
-            exchange_symbol: required_string(market, "symbol")?,
-            product_symbol: format!("{base}-{quote}-SPOT"),
-            product_type: "spot".to_string(),
-            exchange_type: "spot".to_string(),
-            price_precision: decimal_precision(value_i32(market, "quotePrecision", 0)),
-            size_precision: value_string(market, "baseSizePrecision", "0"),
-            min_size: value_string(market, "baseSizePrecision", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: value_string(market, "quoteAmountPrecision", "0"),
-            size_per_contract: "1".to_string(),
-        });
+        rows.push(mexc_spot_market_info(market)?);
     }
     let contract_data = contracts.data.get("data").unwrap_or(&Value::Null);
     let contract_rows = if contract_data.is_object() {
@@ -1114,23 +1114,70 @@ pub(super) async fn fetch_mexc(timeout: Duration) -> Result<Vec<MarketInfo>> {
         {
             continue;
         }
-        let (base, quote) = mexc_contract_pair(market)?;
-        rows.push(MarketInfo {
-            exchange: "mexc".to_string(),
-            exchange_symbol: required_string(market, "symbol")?,
-            product_symbol: format!("{base}-{quote}-SWAP"),
-            product_type: "swap".to_string(),
-            exchange_type: "perpetual".to_string(),
-            price_precision: value_string(market, "priceUnit", "0"),
-            size_precision: value_string(market, "volUnit", "0"),
-            min_size: value_string(market, "minVol", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: "0".to_string(),
-            size_per_contract: value_string(market, "contractSize", "1"),
-        });
+        rows.push(mexc_contract_market_info(market)?);
     }
     Ok(rows)
+}
+
+pub(super) fn mexc_spot_market_info(market: &Value) -> Result<MarketInfo> {
+    let base = required_string(market, "baseAsset")?;
+    let quote = required_string(market, "quoteAsset")?;
+    Ok(MarketInfo {
+        exchange: "mexc".to_string(),
+        exchange_symbol: required_string(market, "symbol")?,
+        product_symbol: format!("{base}-{quote}-SPOT"),
+        product_type: "spot".to_string(),
+        exchange_type: if mexc_market_has_category(market, "conceptPlates", "Tokenized Stocks") {
+            "tokenized_stock"
+        } else {
+            "spot"
+        }
+        .to_string(),
+        price_precision: decimal_precision(value_i32(market, "quotePrecision", 0)),
+        size_precision: market.get("baseAssetPrecision").map_or_else(
+            || value_string(market, "baseSizePrecision", "0"),
+            |_| decimal_precision(value_i32(market, "baseAssetPrecision", 0)),
+        ),
+        min_size: value_string(market, "baseSizePrecision", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: value_string(market, "quoteAmountPrecision", "0"),
+        size_per_contract: "1".to_string(),
+    })
+}
+
+pub(super) fn mexc_contract_market_info(market: &Value) -> Result<MarketInfo> {
+    let (base, quote) = mexc_contract_pair(market)?;
+    Ok(MarketInfo {
+        exchange: "mexc".to_string(),
+        exchange_symbol: required_string(market, "symbol")?,
+        product_symbol: format!("{base}-{quote}-SWAP"),
+        product_type: "swap".to_string(),
+        exchange_type: if mexc_market_has_category(market, "conceptPlate", "mc-trade-zone-Stock") {
+            "stock_perpetual"
+        } else {
+            "perpetual"
+        }
+        .to_string(),
+        price_precision: value_string(market, "priceUnit", "0"),
+        size_precision: value_string(market, "volUnit", "0"),
+        min_size: value_string(market, "minVol", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".to_string(),
+        size_per_contract: value_string(market, "contractSize", "1"),
+    })
+}
+
+fn mexc_market_has_category(market: &Value, key: &str, category: &str) -> bool {
+    market
+        .get(key)
+        .and_then(Value::as_array)
+        .is_some_and(|categories| {
+            categories
+                .iter()
+                .any(|value| value.as_str() == Some(category))
+        })
 }
 
 pub(super) fn mexc_contract_pair(market: &Value) -> Result<(String, String)> {
@@ -1159,38 +1206,7 @@ pub(super) async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {
             if parts.len() < 2 {
                 continue;
             }
-            let base = if product_type == "spot" {
-                required_string(market, "baseCcy")?
-            } else {
-                parts[0].to_string()
-            };
-            let quote = if product_type == "spot" {
-                required_string(market, "quoteCcy")?
-            } else {
-                parts[1].to_string()
-            };
-            rows.push(MarketInfo {
-                exchange: "okx".to_string(),
-                product_symbol: if product_type == "spot" {
-                    format!("{exchange_symbol}-SPOT")
-                } else {
-                    exchange_symbol.clone()
-                },
-                exchange_symbol,
-                product_type: product_type.to_string(),
-                exchange_type: value_string(market, "instType", ""),
-                price_precision: value_string(market, "tickSz", "0"),
-                size_precision: value_string(market, "lotSz", "0"),
-                min_size: value_string(market, "minSz", "0"),
-                base_currency: base,
-                quote_currency: quote,
-                min_notional: "0".to_string(),
-                size_per_contract: if product_type == "swap" {
-                    value_string(market, "ctVal", "1")
-                } else {
-                    "1".to_string()
-                },
-            });
+            rows.push(okx_market_info(market, product_type)?);
         }
     }
     let families = client
@@ -1226,4 +1242,41 @@ pub(super) async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {
         }
     }
     Ok(rows)
+}
+
+pub(super) fn okx_market_info(market: &Value, product_type: &str) -> Result<MarketInfo> {
+    let exchange_symbol = required_string(market, "instId")?;
+    let parts = exchange_symbol.split('-').collect::<Vec<_>>();
+    let base = if product_type == "spot" {
+        required_string(market, "baseCcy")?
+    } else {
+        parts[0].to_string()
+    };
+    let quote = if product_type == "spot" {
+        required_string(market, "quoteCcy")?
+    } else {
+        parts[1].to_string()
+    };
+    Ok(MarketInfo {
+        exchange: "okx".to_string(),
+        product_symbol: if product_type == "spot" {
+            format!("{exchange_symbol}-SPOT")
+        } else {
+            exchange_symbol.clone()
+        },
+        exchange_symbol,
+        product_type: product_type.to_string(),
+        exchange_type: value_string(market, "instType", ""),
+        price_precision: value_string(market, "tickSz", "0"),
+        size_precision: value_string(market, "lotSz", "0"),
+        min_size: value_string(market, "minSz", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".to_string(),
+        size_per_contract: if matches!(product_type, "swap" | "futures") {
+            value_string(market, "ctVal", "1")
+        } else {
+            "1".to_string()
+        },
+    })
 }

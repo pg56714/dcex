@@ -1,7 +1,9 @@
 use super::exchanges::{
-    arcus_market_info, binance_equity_market_info, binance_option_market_info, bybit_option_expiry,
-    bybit_option_market_info, hyperliquid_perpetual_market_info, mexc_contract_pair,
-    okx_option_market_info, okx_unlisted_option_family, option_product_symbol,
+    arcus_market_info, backpack_rfq_market_info, binance_equity_market_info,
+    binance_option_market_info, bybit_option_expiry, bybit_option_market_info,
+    hyperliquid_perpetual_market_info, mexc_contract_market_info, mexc_contract_pair,
+    mexc_spot_market_info, okx_market_info, okx_option_market_info, okx_unlisted_option_family,
+    option_product_symbol,
 };
 use super::*;
 use crate::product_table::MarketInfo;
@@ -201,6 +203,76 @@ fn canonicalizes_mexc_contract_currency_names() {
         mexc_contract_pair(&market).expect("MEXC currency names"),
         ("AAPL".to_string(), "USDT".to_string())
     );
+}
+
+#[test]
+fn backpack_rfq_product_table_uses_conservative_session_limits() {
+    let security = serde_json::json!({
+        "asset": "AAPL.US",
+        "sessions": [
+            {"name": "US_EQUITIES_REGULAR", "minQuantity": "0.01", "stepSize": "0.00001"},
+            {"name": "US_EQUITIES_PRE_MARKET", "minQuantity": "1", "stepSize": "1"}
+        ]
+    });
+    let row = backpack_rfq_market_info(&security).expect("Backpack RFQ limits");
+    assert_eq!(row.product_symbol, "AAPL.US-USDC-RFQ");
+    assert_eq!(row.min_size, "1");
+    assert_eq!(row.size_precision, "1");
+}
+
+#[test]
+fn classifies_mexc_stock_products_from_exchange_categories() {
+    let tokenized = serde_json::json!({
+        "symbol": "AAPLONUSDT", "baseAsset": "AAPLON", "quoteAsset": "USDT",
+        "quotePrecision": 2, "baseAssetPrecision": 3,
+        "baseSizePrecision": "0", "quoteAmountPrecision": "1",
+        "conceptPlates": ["Innovation", "Tokenized Stocks"]
+    });
+    let tokenized = mexc_spot_market_info(&tokenized).expect("MEXC tokenized stock");
+    assert_eq!(tokenized.product_symbol, "AAPLON-USDT-SPOT");
+    assert_eq!(tokenized.exchange_type, "tokenized_stock");
+    assert_eq!(tokenized.size_precision, "0.001");
+    assert_eq!(tokenized.min_size, "0");
+    assert_eq!(tokenized.min_notional, "1");
+
+    let stock_contract = serde_json::json!({
+        "symbol": "AAPLSTOCK_USDT", "baseCoin": "AAPLSTOCK",
+        "baseCoinName": "AAPL", "quoteCoin": "USDT",
+        "conceptPlate": ["mc-trade-zone-Stock"],
+        "priceUnit": 0.01, "volUnit": 1, "minVol": 1, "contractSize": 0.01
+    });
+    let stock_contract = mexc_contract_market_info(&stock_contract).expect("MEXC stock contract");
+    assert_eq!(stock_contract.product_symbol, "AAPL-USDT-SWAP");
+    assert_eq!(stock_contract.exchange_symbol, "AAPLSTOCK_USDT");
+    assert_eq!(stock_contract.exchange_type, "stock_perpetual");
+    assert_eq!(stock_contract.min_size, "1");
+    assert_eq!(stock_contract.size_per_contract, "0.01");
+
+    let crypto = serde_json::json!({
+        "symbol": "BTCUSDT", "baseAsset": "BTC", "quoteAsset": "USDT",
+        "conceptPlates": ["Main", "POW"]
+    });
+    assert_eq!(
+        mexc_spot_market_info(&crypto)
+            .expect("MEXC crypto spot")
+            .exchange_type,
+        "spot"
+    );
+}
+
+#[test]
+fn okx_xperp_keeps_futures_api_type_and_contract_value() {
+    let market = serde_json::json!({
+        "instId": "AAPL-USD_UM_XPERP-310613", "instType": "FUTURES",
+        "instCategory": "3", "ruleType": "xperp", "lotSz": "0.01",
+        "minSz": "0.01", "ctVal": "0.1"
+    });
+    let row = okx_market_info(&market, "futures").expect("OKX stock X-Perp");
+    assert_eq!(row.product_symbol, "AAPL-USD_UM_XPERP-310613");
+    assert_eq!(row.product_type, "futures");
+    assert_eq!(row.exchange_type, "FUTURES");
+    assert_eq!(row.min_size, "0.01");
+    assert_eq!(row.size_per_contract, "0.1");
 }
 
 #[test]

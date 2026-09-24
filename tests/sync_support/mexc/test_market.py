@@ -41,6 +41,20 @@ def test_get_spot_exchange_info(client):
     assert res["symbols"][0]["symbol"] == "BTCUSDT"
 
 
+def test_stock_linked_product_metadata(client):
+    spot = client.get_spot_exchange_info(symbols="AAPLONUSDT,AAPLXUSDT")
+    tokenized = {market["symbol"]: market for market in spot["symbols"]}
+    for symbol in ("AAPLONUSDT", "AAPLXUSDT"):
+        assert tokenized[symbol]["isSpotTradingAllowed"] is True
+        assert "Tokenized Stocks" in tokenized[symbol]["conceptPlates"]
+
+    contracts = client.get_contract_details()
+    _assert_contract_success(contracts)
+    stock = next(market for market in contracts["data"] if market["symbol"] == "AAPLSTOCK_USDT")
+    assert stock["apiAllowed"] is True
+    assert "mc-trade-zone-Stock" in stock["conceptPlate"]
+
+
 def test_get_spot_orderbook(client):
     res = client.get_spot_orderbook(product_symbol="BTC-USDT-SPOT", limit=5)
     assert res["bids"]
