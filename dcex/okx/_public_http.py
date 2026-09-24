@@ -65,6 +65,10 @@ class PublicHTTP(HTTPManager):
             ),
         )
 
+    def get_public_underlying(self, instType: str) -> dict[str, Any]:
+        """Get available futures or options instrument families."""
+        return self._native_public("get_public_underlying", self._params(instType=instType))
+
     def get_funding_rate(self, product_symbol: str) -> dict[str, Any]:
         """Get current funding rate for a trading pair."""
         return self._native_public(

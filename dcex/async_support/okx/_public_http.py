@@ -65,6 +65,10 @@ class PublicHTTP(HTTPManager):
             ),
         )
 
+    async def get_public_underlying(self, instType: str) -> dict[str, Any]:
+        """Get available futures or options instrument families."""
+        return await self._native_public("get_public_underlying", self._params(instType=instType))
+
     async def get_funding_rate(self, product_symbol: str) -> dict[str, Any]:
         """Get funding rate information."""
         return await self._native_public(

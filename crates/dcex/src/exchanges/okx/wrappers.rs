@@ -25,6 +25,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_orderbook(product_symbol => "product_symbol"),
         get_position_tiers(inst_type => "instType", td_mode => "tdMode"),
         get_public_instruments(inst_type => "instType"),
+        get_public_underlying(inst_type => "instType"),
         get_public_trades(product_symbol => "product_symbol"),
         get_taker_volume(ccy => "ccy"),
         get_tickers(inst_type => "instType"),

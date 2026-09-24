@@ -39,6 +39,7 @@ impl OkxClient {
                     "instId",
                 ],
             ),
+            "get_public_underlying" => (&["instType"], &["instType"]),
             "get_funding_rate" => (&["product_symbol"], &["product_symbol", "instId"]),
             "get_funding_rate_history" => (
                 &["product_symbol"],
@@ -146,6 +147,7 @@ impl OkxClient {
                 normalize_inst_id_query(&mut params);
                 PUBLIC_INSTRUMENTS
             }
+            "get_public_underlying" => PUBLIC_UNDERLYING,
             "get_funding_rate" => {
                 normalize_inst_id_query(&mut params);
                 PUBLIC_FUNDING_RATE

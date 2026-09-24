@@ -8,7 +8,7 @@
 
 A high-performance and lightweight Python and Rust library for interacting with cryptocurrency exchanges. dcex offers Python clients backed by a Rust core, plus direct Rust APIs for low-level HTTP, WebSocket, signing, and exchange integrations.
 
-Scope note: dcex focuses on market data, account queries, trading/order APIs, and market/user-data streams. External withdrawal creation endpoints are not currently wrapped, and options support is limited to exchange-specific APIs rather than the unified Product Table Manager.
+Scope note: dcex focuses on market data, account queries, trading/order APIs, and market/user-data streams. External withdrawal creation endpoints are not currently wrapped. The unified Product Table Manager includes listed options from Binance, Bybit, and OKX; option trading remains exchange-specific.
 
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
 [![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org/)
@@ -193,8 +193,8 @@ Rust clients. Supported REST workflows include contract discovery, index and
 mark prices with Greeks, klines, open interest, order books, trades, account
 and position queries, single and batch order management, exercise records,
 commissions, and user-data listen keys. Market-maker-only controls are not
-wrapped. Option symbols currently use Binance's native format because options
-are not yet normalized by the unified Product Table Manager.
+wrapped. The Product Table Manager maps listed Binance options to normalized
+symbols while the exchange-specific API still accepts native option symbols.
 
 ### Binance Margin
 
@@ -345,7 +345,7 @@ It is a table that contains the following columns:
 | exchange          | The exchange name                                                                                                                                                                                                          |
 | product_symbol    | The symbol we use to identify the product, it will be the same in different exchanges. For example, `BTC-USDT-SWAP` is the same product in Binance and Bybit, which named `BTCUSDT` in Binance and `BTC-USDT-SWAP` in OKX. |
 | exchange_symbol   | The symbol that the exchange actually uses                                                                                                                                                                                 |
-| product_type      | The normalized product type used by dcex, e.g. `spot`, `swap`, `futures`                                                                                                                                                   |
+| product_type      | The normalized product type used by dcex, e.g. `spot`, `swap`, `futures`, `option`                                                                                                                                         |
 | exchange_type     | The exchange-specific product type, e.g. `spot`, `linear`, `inverse`, `perpetual`, `delivery`                                                                                                                              |
 | base_currency     | The base currency, e.g. `BTC`                                                                                                                                                                                              |
 | quote_currency    | The quote currency, e.g. `USDT`                                                                                                                                                                                            |
@@ -355,7 +355,7 @@ It is a table that contains the following columns:
 | min_notional      | The minimum notional, e.g. `0.000001`                                                                                                                                                                                      |
 | size_per_contract | The size per contract. Sometimes 1 contract is not the same as 1 unit in exchanges like OKX.                                                                                                                               |
 
-Options are not currently included in the unified PTM output. Some exchange-specific clients expose option-related parameters or market endpoints, but options are not normalized across exchanges.
+Listed Binance, Bybit, and OKX options are included in PTM. Their normalized symbols use `BASE-QUOTE-YYMMDD-STRIKE-C|P-OPTION` (for example, `BTC-USDT-260925-145000-C-OPTION`); the original exchange symbol remains available in `exchange_symbol`. Quote currencies are part of the normalized symbol, while contract size remains exchange-specific metadata.
 
 ## How to use Product Table Manager?
 

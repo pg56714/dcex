@@ -1,9 +1,68 @@
 use super::exchanges::{
-    arcus_market_info, binance_equity_market_info, hyperliquid_perpetual_market_info,
-    mexc_contract_pair,
+    arcus_market_info, binance_equity_market_info, binance_option_market_info, bybit_option_expiry,
+    bybit_option_market_info, hyperliquid_perpetual_market_info, mexc_contract_pair,
+    okx_option_market_info, okx_unlisted_option_family, option_product_symbol,
 };
 use super::*;
 use crate::product_table::MarketInfo;
+
+#[test]
+fn normalizes_listed_option_symbols_across_exchanges() {
+    let binance = serde_json::json!({
+        "symbol": "BTC-260925-145000-C", "quoteAsset": "USDT", "unit": 1,
+        "filters": [
+            {"filterType": "PRICE_FILTER", "tickSize": "5.000"},
+            {"filterType": "LOT_SIZE", "stepSize": "0.01", "minQty": "0.01"}
+        ]
+    });
+    let bybit = serde_json::json!({
+        "symbol": "BTC-25SEP26-145000-C-USDT", "baseCoin": "BTC", "quoteCoin": "USDT",
+        "priceFilter": {"tickSize": "5"},
+        "lotSizeFilter": {"qtyStep": "0.01", "minOrderQty": "0.01"}
+    });
+    let okx = serde_json::json!({
+        "instId": "BTC-USD-260925-40000-C", "tickSz": "0.0001",
+        "lotSz": "1", "minSz": "1", "ctVal": "1"
+    });
+    let binance = binance_option_market_info(&binance).expect("Binance option");
+    let bybit = bybit_option_market_info(&bybit).expect("Bybit option");
+    let okx = okx_option_market_info(&okx).expect("OKX option");
+    assert_eq!(binance.product_symbol, "BTC-USDT-260925-145000-C-OPTION");
+    assert_eq!(bybit.product_symbol, binance.product_symbol);
+    assert_eq!(binance.product_type, "option");
+    assert_eq!(binance.size_precision, "0.01");
+    assert_eq!(bybit.exchange_symbol, "BTC-25SEP26-145000-C-USDT");
+    assert_eq!(okx.product_symbol, "BTC-USD-260925-40000-C-OPTION");
+    assert_eq!(okx.size_per_contract, "1");
+}
+
+#[test]
+fn rejects_malformed_option_symbols() {
+    assert_eq!(bybit_option_expiry("25JUN27").as_deref(), Some("270625"));
+    assert!(bybit_option_expiry("32JUN27").is_none());
+    assert!(option_product_symbol("BTC", "USDT", "260925", "0", "C").is_none());
+    assert!(option_product_symbol("BTC", "USDT", "260925", "145000", "X").is_none());
+    assert_eq!(
+        option_product_symbol("BTC", "USDT", "260925", "145000.000", "P").as_deref(),
+        Some("BTC-USDT-260925-145000-P-OPTION")
+    );
+}
+
+#[test]
+fn skips_only_unlisted_okx_option_families() {
+    let error = crate::DcexError::HttpStatus {
+        status: 400,
+        message: "OKX API Error: [51000] Parameter instFamily error".into(),
+        headers: vec![],
+    };
+    assert!(okx_unlisted_option_family(&error));
+    let unrelated = crate::DcexError::HttpStatus {
+        status: 400,
+        message: "OKX API Error: [50011] Rate limit reached".into(),
+        headers: vec![],
+    };
+    assert!(!okx_unlisted_option_family(&unrelated));
+}
 
 #[test]
 fn normalizes_exchange_specific_currency_aliases() {

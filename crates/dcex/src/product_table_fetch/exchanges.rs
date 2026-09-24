@@ -19,7 +19,7 @@ use crate::exchanges::mexc::MexcClient;
 use crate::exchanges::okx::OkxClient;
 use crate::exchanges::ondo::OndoClient;
 use crate::product_table::MarketInfo;
-use crate::Result;
+use crate::{DcexError, Result};
 
 use super::*;
 pub(super) async fn fetch_arcus(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -243,6 +243,16 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
             size_per_contract: "1".to_string(),
         });
     }
+    let options = client
+        .public_request("get_options_exchange_info", vec![])
+        .await?;
+    for market in response_array(&options, &["optionSymbols"]) {
+        if value_string(market, "status", "") == "TRADING" {
+            if let Some(row) = binance_option_market_info(market) {
+                rows.push(row);
+            }
+        }
+    }
     // The Equity metadata endpoint requires an API key even though it is unsigned.
     if let Ok(api_key) = std::env::var("BINANCE_API_KEY") {
         if !api_key.is_empty() {
@@ -276,6 +286,153 @@ pub(super) fn binance_equity_market_info(market: &Value) -> Result<MarketInfo> {
         min_notional: value_string(market, "minNotional", "0"),
         size_per_contract: "1".to_string(),
     })
+}
+
+pub(super) fn option_product_symbol(
+    base: &str,
+    quote: &str,
+    expiry: &str,
+    strike: &str,
+    side: &str,
+) -> Option<String> {
+    if base.is_empty()
+        || quote.is_empty()
+        || expiry.len() != 6
+        || !expiry.bytes().all(|byte| byte.is_ascii_digit())
+        || !matches!(side, "C" | "P")
+        || strike
+            .parse::<f64>()
+            .ok()
+            .filter(|value| value.is_finite() && *value > 0.0)
+            .is_none()
+    {
+        return None;
+    }
+    let strike = if strike.contains('.') {
+        strike.trim_end_matches('0').trim_end_matches('.')
+    } else {
+        strike
+    };
+    Some(format!("{base}-{quote}-{expiry}-{strike}-{side}-OPTION"))
+}
+
+pub(super) fn bybit_option_expiry(expiry: &str) -> Option<String> {
+    if expiry.len() != 7 {
+        return None;
+    }
+    let day = &expiry[0..2];
+    let month = match &expiry[2..5].to_ascii_uppercase()[..] {
+        "JAN" => "01",
+        "FEB" => "02",
+        "MAR" => "03",
+        "APR" => "04",
+        "MAY" => "05",
+        "JUN" => "06",
+        "JUL" => "07",
+        "AUG" => "08",
+        "SEP" => "09",
+        "OCT" => "10",
+        "NOV" => "11",
+        "DEC" => "12",
+        _ => return None,
+    };
+    let year = &expiry[5..7];
+    if !day.bytes().all(|byte| byte.is_ascii_digit())
+        || !year.bytes().all(|byte| byte.is_ascii_digit())
+        || !(1..=31).contains(&day.parse::<u8>().ok()?)
+    {
+        return None;
+    }
+    Some(format!("{year}{month}{day}"))
+}
+
+pub(super) fn binance_option_market_info(market: &Value) -> Option<MarketInfo> {
+    let symbol = non_empty_string(market, "symbol")?;
+    let parts = symbol.split('-').collect::<Vec<_>>();
+    if parts.len() != 4 {
+        return None;
+    }
+    let quote = non_empty_string(market, "quoteAsset")?;
+    let product_symbol = option_product_symbol(parts[0], &quote, parts[1], parts[2], parts[3])?;
+    let filters = value_array(market.get("filters"));
+    let price = find_filter(filters, &["PRICE_FILTER"]);
+    let lot = find_filter(filters, &["LOT_SIZE"]);
+    let base = parts[0].to_string();
+    Some(MarketInfo {
+        exchange: "binance".into(),
+        exchange_symbol: symbol,
+        product_symbol,
+        product_type: "option".into(),
+        exchange_type: "option".into(),
+        price_precision: value_string(price, "tickSize", "0"),
+        size_precision: value_string(lot, "stepSize", "0"),
+        min_size: value_string(lot, "minQty", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".into(),
+        size_per_contract: value_string(market, "unit", "1"),
+    })
+}
+
+pub(super) fn bybit_option_market_info(market: &Value) -> Option<MarketInfo> {
+    let symbol = non_empty_string(market, "symbol")?;
+    let parts = symbol.split('-').collect::<Vec<_>>();
+    if parts.len() != 5 {
+        return None;
+    }
+    let base = non_empty_string(market, "baseCoin")?;
+    let quote = non_empty_string(market, "quoteCoin")?;
+    let expiry = bybit_option_expiry(parts[1])?;
+    let product_symbol = option_product_symbol(&base, &quote, &expiry, parts[2], parts[3])?;
+    let price = market.get("priceFilter").unwrap_or(&Value::Null);
+    let lot = market.get("lotSizeFilter").unwrap_or(&Value::Null);
+    Some(MarketInfo {
+        exchange: "bybit".into(),
+        exchange_symbol: symbol,
+        product_symbol,
+        product_type: "option".into(),
+        exchange_type: "option".into(),
+        price_precision: value_string(price, "tickSize", "0"),
+        size_precision: value_string(lot, "qtyStep", "0"),
+        min_size: value_string(lot, "minOrderQty", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".into(),
+        size_per_contract: "1".into(),
+    })
+}
+
+pub(super) fn okx_option_market_info(market: &Value) -> Option<MarketInfo> {
+    let symbol = non_empty_string(market, "instId")?;
+    let parts = symbol.split('-').collect::<Vec<_>>();
+    if parts.len() != 5 {
+        return None;
+    }
+    let product_symbol = option_product_symbol(parts[0], parts[1], parts[2], parts[3], parts[4])?;
+    let base = parts[0].to_string();
+    let quote = parts[1].to_string();
+    Some(MarketInfo {
+        exchange: "okx".into(),
+        exchange_symbol: symbol,
+        product_symbol,
+        product_type: "option".into(),
+        exchange_type: "OPTION".into(),
+        price_precision: value_string(market, "tickSz", "0"),
+        size_precision: value_string(market, "lotSz", "0"),
+        min_size: value_string(market, "minSz", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".into(),
+        size_per_contract: value_string(market, "ctVal", "1"),
+    })
+}
+
+pub(super) fn okx_unlisted_option_family(error: &DcexError) -> bool {
+    matches!(
+        error,
+        DcexError::HttpStatus { status: 400, message, .. }
+            if message.contains("[51000] Parameter instFamily error")
+    )
 }
 
 pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -399,9 +556,17 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
 pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
     let client = BybitClient::public(5_000, false, timeout)?;
     let mut rows = Vec::new();
-    for category in ["linear", "inverse", "spot"] {
+    for category in ["linear", "inverse", "spot", "option"] {
         let markets = bybit_instruments(&client, category).await?;
         for market in markets {
+            if category == "option" {
+                if value_string(&market, "status", "") == "Trading" {
+                    if let Some(row) = bybit_option_market_info(&market) {
+                        rows.push(row);
+                    }
+                }
+                continue;
+            }
             let mut base = required_string(&market, "baseCoin")?;
             let quote = required_string(&market, "quoteCoin")?;
             let symbol = required_string(&market, "symbol")?;
@@ -449,6 +614,9 @@ async fn bybit_instruments(client: &BybitClient, category: &str) -> Result<Vec<V
     let mut cursor: Option<String> = None;
     loop {
         let mut params = vec![("category".to_string(), category.to_string())];
+        if category == "option" {
+            params.push(("baseCoin".to_string(), "All".to_string()));
+        }
         if let Some(cursor) = cursor.as_ref() {
             params.push(("cursor".to_string(), cursor.clone()));
         }
@@ -1023,6 +1191,38 @@ pub(super) async fn fetch_okx(timeout: Duration) -> Result<Vec<MarketInfo>> {
                     "1".to_string()
                 },
             });
+        }
+    }
+    let families = client
+        .public_request(
+            "get_public_underlying",
+            vec![("instType".to_string(), "OPTION".to_string())],
+        )
+        .await?;
+    for group in response_array(&families, &["data"]) {
+        for family in value_array(Some(group)).iter().filter_map(Value::as_str) {
+            let options = match client
+                .public_request(
+                    "get_public_instruments",
+                    vec![
+                        ("instType".to_string(), "OPTION".to_string()),
+                        ("instFamily".to_string(), family.to_string()),
+                    ],
+                )
+                .await
+            {
+                Ok(response) => response,
+                // OKX can list an underlying before it has queryable option contracts.
+                Err(error) if okx_unlisted_option_family(&error) => continue,
+                Err(error) => return Err(error),
+            };
+            for market in response_array(&options, &["data"]) {
+                if value_string(market, "state", "") == "live" {
+                    if let Some(row) = okx_option_market_info(market) {
+                        rows.push(row);
+                    }
+                }
+            }
         }
     }
     Ok(rows)

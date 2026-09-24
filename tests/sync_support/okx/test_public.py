@@ -13,6 +13,11 @@ def test_get_public_instruments(client):
     assert res is not None
 
 
+def test_get_public_underlying(client):
+    res = client.get_public_underlying(instType="OPTION")
+    assert res["code"] == "0"
+
+
 def test_get_funding_rate(client):
     res = client.get_funding_rate(product_symbol="BTC-USDT-SWAP")
     assert res is not None

@@ -39,6 +39,7 @@ def test_sync_okx_option_data_wrappers_forward_official_fields() -> None:
     client.get_option_open_interest_and_volume_by_expiry("BTC")
     client.get_option_open_interest_and_volume_by_strike("BTC", "2000000000000")
     client.get_option_taker_block_volume("BTC")
+    client.get_public_underlying("OPTION")
 
     assert native.calls[0] == (
         "get_delivery_exercise_history",
@@ -50,6 +51,7 @@ def test_sync_okx_option_data_wrappers_forward_official_fields() -> None:
         ("expTime", "2000000000000"),
         ("period", "8H"),
     ]
+    assert native.calls[-1] == ("get_public_underlying", [("instType", "OPTION")])
 
 
 @pytest.mark.asyncio
@@ -66,7 +68,9 @@ async def test_async_okx_option_data_wrappers_forward_official_fields() -> None:
     await client.get_option_open_interest_and_volume_by_strike(
         "BTC", "2000000000000", period="1D"
     )
+    await client.get_public_underlying("OPTION")
 
     assert native.calls[0] == ("get_option_summary", [("uly", "BTC-USD")])
     assert native.calls[1] == ("get_option_family_trades", [("instFamily", "BTC-USD")])
-    assert native.calls[-1][1][-1] == ("period", "1D")
+    assert native.calls[-2][1][-1] == ("period", "1D")
+    assert native.calls[-1] == ("get_public_underlying", [("instType", "OPTION")])

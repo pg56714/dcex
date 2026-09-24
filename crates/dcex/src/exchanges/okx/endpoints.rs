@@ -1,5 +1,6 @@
 pub(super) const BASE_URL: &str = "https://openapi.okx.com";
 pub(super) const PUBLIC_INSTRUMENTS: &str = "/api/v5/public/instruments";
+pub(super) const PUBLIC_UNDERLYING: &str = "/api/v5/public/underlying";
 pub(super) const PUBLIC_FUNDING_RATE: &str = "/api/v5/public/funding-rate";
 pub(super) const PUBLIC_FUNDING_RATE_HISTORY: &str = "/api/v5/public/funding-rate-history";
 pub(super) const PUBLIC_OPEN_INTEREST: &str = "/api/v5/public/open-interest";

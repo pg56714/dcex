@@ -22,6 +22,12 @@ async def test_get_public_instruments(client):
 
 
 @pytest.mark.asyncio
+async def test_get_public_underlying(client):
+    res = await client.get_public_underlying(instType="OPTION")
+    assert res["code"] == "0"
+
+
+@pytest.mark.asyncio
 async def test_get_funding_rate(client):
     res = await client.get_funding_rate(product_symbol="BTC-USDT-SWAP")
     assert res is not None
