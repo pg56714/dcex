@@ -78,10 +78,31 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
+        if let Some(response) = self
+            .subaccount_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self.staking_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.loan_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .simple_earn_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
         if let Some(response) = self.equity_private_request(method_name, &params).await? {
             return Ok(response);
         }
         if let Some(response) = self.options_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.margin_private_request(method_name, &params).await? {
             return Ok(response);
         }
         match method_name {

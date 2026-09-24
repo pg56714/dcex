@@ -7,6 +7,20 @@ pub(super) const SPOT_ORDERBOOK: &str = "/api/v3/depth";
 pub(super) const SPOT_TRADES: &str = "/api/v3/trades";
 pub(super) const SPOT_KLINES: &str = "/api/v3/klines";
 pub(super) const SPOT_PRICE: &str = "/api/v3/ticker/price";
+pub(super) const MARGIN_ALL_ASSETS: &str = "/sapi/v1/margin/allAssets";
+pub(super) const MARGIN_ALL_PAIRS: &str = "/sapi/v1/margin/allPairs";
+pub(super) const MARGIN_ALL_ISOLATED_SYMBOLS: &str = "/sapi/v1/margin/isolated/allPairs";
+pub(super) const MARGIN_PRICE_INDEX: &str = "/sapi/v1/margin/priceIndex";
+pub(super) const MARGIN_CROSS_ACCOUNT: &str = "/sapi/v1/margin/account";
+pub(super) const MARGIN_ISOLATED_ACCOUNT: &str = "/sapi/v1/margin/isolated/account";
+pub(super) const MARGIN_BORROW_REPAY: &str = "/sapi/v1/margin/borrow-repay";
+pub(super) const MARGIN_INTEREST_HISTORY: &str = "/sapi/v1/margin/interestHistory";
+pub(super) const MARGIN_MAX_BORROWABLE: &str = "/sapi/v1/margin/maxBorrowable";
+pub(super) const MARGIN_MAX_TRANSFERABLE: &str = "/sapi/v1/margin/maxTransferable";
+pub(super) const MARGIN_ORDER: &str = "/sapi/v1/margin/order";
+pub(super) const MARGIN_OPEN_ORDERS: &str = "/sapi/v1/margin/openOrders";
+pub(super) const MARGIN_ALL_ORDERS: &str = "/sapi/v1/margin/allOrders";
+pub(super) const MARGIN_ACCOUNT_TRADES: &str = "/sapi/v1/margin/myTrades";
 pub(super) const FUTURES_SERVER_TIME: &str = "/fapi/v1/time";
 pub(super) const OPTIONS_SERVER_TIME: &str = "/eapi/v1/time";
 pub(super) const OPTIONS_EXCHANGE_INFO: &str = "/eapi/v1/exchangeInfo";
@@ -69,6 +83,118 @@ pub(super) const SPOT_COMMISSION_RATE: &str = "/api/v3/account/commission";
 pub(super) const WALLET_BALANCE: &str = "/sapi/v1/asset/wallet/balance";
 pub(super) const FUNDING_WALLET: &str = "/sapi/v1/asset/get-funding-asset";
 pub(super) const UNIVERSAL_TRANSFER: &str = "/sapi/v1/asset/transfer";
+pub(super) const SIMPLE_EARN_ACCOUNT: &str = "/sapi/v1/simple-earn/account";
+pub(super) const SIMPLE_EARN_FLEXIBLE_LIST: &str = "/sapi/v1/simple-earn/flexible/list";
+pub(super) const SIMPLE_EARN_LOCKED_LIST: &str = "/sapi/v1/simple-earn/locked/list";
+pub(super) const SIMPLE_EARN_FLEXIBLE_POSITION: &str = "/sapi/v1/simple-earn/flexible/position";
+pub(super) const SIMPLE_EARN_LOCKED_POSITION: &str = "/sapi/v1/simple-earn/locked/position";
+pub(super) const SIMPLE_EARN_FLEXIBLE_SUBSCRIBE: &str = "/sapi/v1/simple-earn/flexible/subscribe";
+pub(super) const SIMPLE_EARN_LOCKED_SUBSCRIBE: &str = "/sapi/v1/simple-earn/locked/subscribe";
+pub(super) const SIMPLE_EARN_FLEXIBLE_REDEEM: &str = "/sapi/v1/simple-earn/flexible/redeem";
+pub(super) const SIMPLE_EARN_LOCKED_REDEEM: &str = "/sapi/v1/simple-earn/locked/redeem";
+pub(super) const SIMPLE_EARN_FLEXIBLE_SUBSCRIPTIONS: &str =
+    "/sapi/v1/simple-earn/flexible/history/subscriptionRecord";
+pub(super) const SIMPLE_EARN_LOCKED_SUBSCRIPTIONS: &str =
+    "/sapi/v1/simple-earn/locked/history/subscriptionRecord";
+pub(super) const SIMPLE_EARN_FLEXIBLE_REDEMPTIONS: &str =
+    "/sapi/v1/simple-earn/flexible/history/redemptionRecord";
+pub(super) const SIMPLE_EARN_LOCKED_REDEMPTIONS: &str =
+    "/sapi/v1/simple-earn/locked/history/redemptionRecord";
+pub(super) const SIMPLE_EARN_FLEXIBLE_REWARDS: &str =
+    "/sapi/v1/simple-earn/flexible/history/rewardsRecord";
+pub(super) const SIMPLE_EARN_LOCKED_REWARDS: &str =
+    "/sapi/v1/simple-earn/locked/history/rewardsRecord";
+pub(super) const FLEXIBLE_LOAN_COLLATERAL_REPAY_RATE: &str = "/sapi/v2/loan/flexible/repay/rate";
+pub(super) const FLEXIBLE_LOAN_ADJUST_LTV: &str = "/sapi/v2/loan/flexible/adjust/ltv";
+pub(super) const FLEXIBLE_LOAN_BORROW: &str = "/sapi/v2/loan/flexible/borrow";
+pub(super) const FLEXIBLE_LOAN_REPAY: &str = "/sapi/v2/loan/flexible/repay";
+pub(super) const FLEXIBLE_LOAN_ASSETS: &str = "/sapi/v2/loan/flexible/loanable/data";
+pub(super) const FLEXIBLE_LOAN_BORROW_HISTORY: &str = "/sapi/v2/loan/flexible/borrow/history";
+pub(super) const FLEXIBLE_LOAN_COLLATERAL_ASSETS: &str = "/sapi/v2/loan/flexible/collateral/data";
+pub(super) const FLEXIBLE_LOAN_INTEREST_RATE_HISTORY: &str = "/sapi/v2/loan/interestRateHistory";
+pub(super) const FLEXIBLE_LOAN_LIQUIDATION_HISTORY: &str =
+    "/sapi/v2/loan/flexible/liquidation/history";
+pub(super) const FLEXIBLE_LOAN_LTV_ADJUSTMENT_HISTORY: &str =
+    "/sapi/v2/loan/flexible/ltv/adjustment/history";
+pub(super) const FLEXIBLE_LOAN_ONGOING_ORDERS: &str = "/sapi/v2/loan/flexible/ongoing/orders";
+pub(super) const FLEXIBLE_LOAN_REPAYMENT_HISTORY: &str = "/sapi/v2/loan/flexible/repay/history";
+pub(super) const CRYPTO_LOAN_INCOME_HISTORY: &str = "/sapi/v1/loan/income";
+pub(super) const STABLE_LOAN_BORROW_HISTORY: &str = "/sapi/v1/loan/borrow/history";
+pub(super) const STABLE_LOAN_LTV_ADJUSTMENT_HISTORY: &str = "/sapi/v1/loan/ltv/adjustment/history";
+pub(super) const STABLE_LOAN_REPAYMENT_HISTORY: &str = "/sapi/v1/loan/repay/history";
+pub(super) const ETH_STAKING_ACCOUNT: &str = "/sapi/v2/eth-staking/account";
+pub(super) const ETH_STAKING_QUOTA: &str = "/sapi/v1/eth-staking/eth/quota";
+pub(super) const ETH_REDEMPTION_HISTORY: &str =
+    "/sapi/v1/eth-staking/eth/history/redemptionHistory";
+pub(super) const ETH_STAKING_HISTORY: &str = "/sapi/v1/eth-staking/eth/history/stakingHistory";
+pub(super) const WBETH_RATE_HISTORY: &str = "/sapi/v1/eth-staking/eth/history/rateHistory";
+pub(super) const WBETH_REWARDS_HISTORY: &str =
+    "/sapi/v1/eth-staking/eth/history/wbethRewardsHistory";
+pub(super) const WBETH_UNWRAP_HISTORY: &str = "/sapi/v1/eth-staking/wbeth/history/unwrapHistory";
+pub(super) const WBETH_WRAP_HISTORY: &str = "/sapi/v1/eth-staking/wbeth/history/wrapHistory";
+pub(super) const ETH_STAKING_REDEEM: &str = "/sapi/v1/eth-staking/eth/redeem";
+pub(super) const ETH_STAKING_SUBSCRIBE: &str = "/sapi/v2/eth-staking/eth/stake";
+pub(super) const WBETH_WRAP: &str = "/sapi/v1/eth-staking/wbeth/wrap";
+pub(super) const ONCHAIN_YIELDS_PERSONAL_QUOTA: &str =
+    "/sapi/v1/onchain-yields/locked/personalLeftQuota";
+pub(super) const ONCHAIN_YIELDS_PRODUCTS: &str = "/sapi/v1/onchain-yields/locked/list";
+pub(super) const ONCHAIN_YIELDS_POSITIONS: &str = "/sapi/v1/onchain-yields/locked/position";
+pub(super) const ONCHAIN_YIELDS_REDEMPTION_HISTORY: &str =
+    "/sapi/v1/onchain-yields/locked/history/redemptionRecord";
+pub(super) const ONCHAIN_YIELDS_REWARDS_HISTORY: &str =
+    "/sapi/v1/onchain-yields/locked/history/rewardsRecord";
+pub(super) const ONCHAIN_YIELDS_SUBSCRIPTION_PREVIEW: &str =
+    "/sapi/v1/onchain-yields/locked/subscriptionPreview";
+pub(super) const ONCHAIN_YIELDS_SUBSCRIPTION_HISTORY: &str =
+    "/sapi/v1/onchain-yields/locked/history/subscriptionRecord";
+pub(super) const ONCHAIN_YIELDS_ACCOUNT: &str = "/sapi/v1/onchain-yields/account";
+pub(super) const ONCHAIN_YIELDS_REDEEM: &str = "/sapi/v1/onchain-yields/locked/redeem";
+pub(super) const ONCHAIN_YIELDS_SET_AUTO_SUBSCRIBE: &str =
+    "/sapi/v1/onchain-yields/locked/setAutoSubscribe";
+pub(super) const ONCHAIN_YIELDS_SET_REDEEM_OPTION: &str =
+    "/sapi/v1/onchain-yields/locked/setRedeemOption";
+pub(super) const ONCHAIN_YIELDS_SUBSCRIBE: &str = "/sapi/v1/onchain-yields/locked/subscribe";
+pub(super) const SOFT_STAKING_PRODUCTS: &str = "/sapi/v1/soft-staking/list";
+pub(super) const SOFT_STAKING_REWARDS_HISTORY: &str = "/sapi/v1/soft-staking/history/rewardsRecord";
+pub(super) const SOFT_STAKING_SET: &str = "/sapi/v1/soft-staking/set";
+pub(super) const SOL_STAKING_CLAIM: &str = "/sapi/v1/sol-staking/sol/claim";
+pub(super) const BNSOL_RATE_HISTORY: &str = "/sapi/v1/sol-staking/sol/history/rateHistory";
+pub(super) const BNSOL_REWARDS_HISTORY: &str =
+    "/sapi/v1/sol-staking/sol/history/bnsolRewardsHistory";
+pub(super) const SOL_BOOST_REWARDS_HISTORY: &str =
+    "/sapi/v1/sol-staking/sol/history/boostRewardsHistory";
+pub(super) const SOL_REDEMPTION_HISTORY: &str =
+    "/sapi/v1/sol-staking/sol/history/redemptionHistory";
+pub(super) const SOL_STAKING_HISTORY: &str = "/sapi/v1/sol-staking/sol/history/stakingHistory";
+pub(super) const SOL_STAKING_QUOTA: &str = "/sapi/v1/sol-staking/sol/quota";
+pub(super) const SOL_UNCLAIMED_REWARDS: &str = "/sapi/v1/sol-staking/sol/history/unclaimedRewards";
+pub(super) const SOL_STAKING_REDEEM: &str = "/sapi/v1/sol-staking/sol/redeem";
+pub(super) const SOL_STAKING_ACCOUNT: &str = "/sapi/v1/sol-staking/account";
+pub(super) const SOL_STAKING_SUBSCRIBE: &str = "/sapi/v1/sol-staking/sol/stake";
+pub(super) const SUBACCOUNT_LIST: &str = "/sapi/v1/sub-account/list";
+pub(super) const SUBACCOUNT_STATUS: &str = "/sapi/v1/sub-account/status";
+pub(super) const SUBACCOUNT_TRANSACTION_STATISTICS: &str =
+    "/sapi/v1/sub-account/transaction-statistics";
+pub(super) const SUBACCOUNT_FUTURES_POSITION_RISK: &str =
+    "/sapi/v2/sub-account/futures/positionRisk";
+pub(super) const SUBACCOUNT_FUTURES_ACCOUNT: &str = "/sapi/v2/sub-account/futures/account";
+pub(super) const SUBACCOUNT_MARGIN_ACCOUNT: &str = "/sapi/v1/sub-account/margin/account";
+pub(super) const SUBACCOUNT_FUTURES_SUMMARY: &str = "/sapi/v2/sub-account/futures/accountSummary";
+pub(super) const SUBACCOUNT_MARGIN_SUMMARY: &str = "/sapi/v1/sub-account/margin/accountSummary";
+pub(super) const SUBACCOUNT_ASSETS: &str = "/sapi/v4/sub-account/assets";
+pub(super) const SUBACCOUNT_SPOT_SUMMARY: &str = "/sapi/v1/sub-account/spotSummary";
+pub(super) const SUBACCOUNT_FUTURES_TRANSFER: &str = "/sapi/v1/sub-account/futures/transfer";
+pub(super) const SUBACCOUNT_MARGIN_TRANSFER: &str = "/sapi/v1/sub-account/margin/transfer";
+pub(super) const SUBACCOUNT_FUTURES_TRANSFER_HISTORY: &str =
+    "/sapi/v1/sub-account/futures/internalTransfer";
+pub(super) const SUBACCOUNT_FUTURES_INTERNAL_TRANSFER: &str =
+    "/sapi/v1/sub-account/futures/internalTransfer";
+pub(super) const SUBACCOUNT_SPOT_TRANSFER_HISTORY: &str =
+    "/sapi/v1/sub-account/sub/transfer/history";
+pub(super) const SUBACCOUNT_UNIVERSAL_TRANSFER: &str = "/sapi/v1/sub-account/universalTransfer";
+pub(super) const SUBACCOUNT_TRANSFER_HISTORY: &str = "/sapi/v1/sub-account/transfer/subUserHistory";
+pub(super) const SUBACCOUNT_TO_MASTER_TRANSFER: &str = "/sapi/v1/sub-account/transfer/subToMaster";
+pub(super) const SUBACCOUNT_TO_SUBACCOUNT_TRANSFER: &str = "/sapi/v1/sub-account/transfer/subToSub";
 pub(super) const FUTURES_ACCOUNT_BALANCE: &str = "/fapi/v3/balance";
 pub(super) const FUTURES_ACCOUNT_INFO: &str = "/fapi/v3/account";
 pub(super) const FUTURES_COMMISSION_RATE: &str = "/fapi/v1/commissionRate";

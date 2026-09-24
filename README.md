@@ -196,6 +196,51 @@ commissions, and user-data listen keys. Market-maker-only controls are not
 wrapped. Option symbols currently use Binance's native format because options
 are not yet normalized by the unified Product Table Manager.
 
+### Binance Margin
+
+Binance cross and isolated margin are available through the exchange-specific
+sync, async, and Rust clients. The API covers margin assets and pairs, account
+risk and liabilities, borrow/repay and interest history, borrowing and transfer
+limits, and the full margin-order lifecycle. Margin orders support Binance's
+`sideEffectType`, including `AUTO_BORROW_REPAY`; borrowing, repayment, and
+order placement are never performed by the default test suite.
+
+### Binance Simple Earn
+
+Binance Simple Earn flexible and locked products are available through the
+exchange-specific sync, async, and Rust clients. Supported workflows include
+product discovery, account and position queries, subscriptions, redemptions,
+and subscription, redemption, and reward histories. Live tests are read-only;
+subscriptions and redemptions are covered by offline request tests only.
+
+### Binance Crypto Loan
+
+Binance Flexible Loan v2 is available through the exchange-specific sync,
+async, and Rust clients. The API covers loanable and collateral assets,
+interest rates, active loans, borrowing, repayment, LTV adjustment, liquidation
+records, and history. Legacy stable-rate loan history remains queryable. Live
+tests are read-only; borrowing, repayment, and collateral changes are covered
+by offline request tests only.
+
+### Binance Staking
+
+Binance ETH Staking, SOL Staking, On-chain Yields, and Soft Staking are
+available through the exchange-specific sync, async, and Rust clients. The
+wrappers cover accounts, quotas, products, positions, subscriptions,
+redemptions, wrapping, reward and rate histories, and product settings. Live
+tests are read-only; staking, redemption, reward claims, and setting changes
+are covered by offline request tests only.
+
+### Binance Sub Account
+
+Binance standard Sub Account queries and internal asset transfers are available
+through the exchange-specific sync, async, and Rust clients. Supported queries
+cover account lists and status, assets, spot, margin and futures summaries,
+futures position risk, and transfer history. Transfers are limited to wallets
+and accounts under the same master account. Account creation, product
+activation, API-key or IP management, managed sub-accounts, deposits, and
+withdrawals are intentionally not wrapped.
+
 ## Key Features
 
 - Product Table Manager for unifying trading instruments across exchanges

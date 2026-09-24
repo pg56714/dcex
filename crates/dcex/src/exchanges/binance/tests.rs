@@ -856,3 +856,285 @@ fn futures_positions_can_be_queried_without_a_symbol() {
     assert!(request_line.contains("/fapi/v3/positionRisk?timestamp="));
     assert!(!request_line.contains("symbol="));
 }
+
+#[test]
+fn margin_market_data_uses_spot_base_url_and_api_key() {
+    let (spot_base_url, handle) = recording_server();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        None,
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_margin_price_index",
+                vec![("product_symbol".to_string(), "BTC-USDT-SPOT".to_string())],
+            )
+            .await
+    })
+    .expect("response");
+
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /sapi/v1/margin/priceIndex?symbol=BTCUSDT HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn margin_order_uses_signed_margin_path() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "place_margin_order",
+                vec![
+                    ("product_symbol".to_string(), "BTC-USDT-SPOT".to_string()),
+                    ("side".to_string(), "buy".to_string()),
+                    ("type".to_string(), "limit".to_string()),
+                    ("quantity".to_string(), "0.001".to_string()),
+                    ("price".to_string(), "1".to_string()),
+                    ("timeInForce".to_string(), "GTC".to_string()),
+                    (
+                        "sideEffectType".to_string(),
+                        "auto_borrow_repay".to_string(),
+                    ),
+                    ("isIsolated".to_string(), "true".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("POST /sapi/v1/margin/order HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn margin_order_lookup_requires_an_identifier() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "get_margin_order",
+                vec![("product_symbol".to_string(), "BTC-USDT-SPOT".to_string())],
+            )
+            .await
+    })
+    .expect_err("order identifier must be required");
+
+    assert!(error.to_string().contains("orderId or origClientOrderId"));
+}
+
+#[test]
+fn margin_borrow_repay_type_is_validated_before_requesting() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "margin_borrow_repay",
+                vec![
+                    ("asset".to_string(), "USDT".to_string()),
+                    ("amount".to_string(), "1".to_string()),
+                    ("type".to_string(), "INVALID".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("transaction type must be validated");
+
+    assert!(error.to_string().contains("BORROW or REPAY"));
+}
+
+#[test]
+fn simple_earn_products_use_signed_spot_path() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_flexible_earn_products",
+                vec![
+                    ("asset".to_string(), "USDT".to_string()),
+                    ("size".to_string(), "10".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("/sapi/v1/simple-earn/flexible/list?"));
+    assert!(request_line.contains("asset=USDT"));
+    assert!(request_line.contains("size=10"));
+}
+
+#[test]
+fn flexible_earn_partial_redemption_requires_amount() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "redeem_flexible_earn",
+                vec![
+                    ("productId".to_string(), "USDT001".to_string()),
+                    ("redeemAll".to_string(), "false".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("partial redemption must require amount");
+
+    assert!(error.to_string().contains("requires amount"));
+}
+
+#[test]
+fn flexible_loan_assets_use_signed_v2_path() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_flexible_loan_assets",
+                vec![("loanCoin".to_string(), "USDT".to_string())],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("/sapi/v2/loan/flexible/loanable/data?"));
+    assert!(request_line.contains("loanCoin=USDT"));
+}
+
+#[test]
+fn flexible_loan_borrow_requires_an_amount() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "borrow_flexible_loan",
+                vec![
+                    ("loanCoin".to_string(), "USDT".to_string()),
+                    ("collateralCoin".to_string(), "BTC".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("an amount must be required");
+
+    assert!(error.to_string().contains("loanAmount or collateralAmount"));
+}
+
+#[test]
+fn eth_staking_account_uses_current_signed_path() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request("get_eth_staking_account", Vec::new())
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("/sapi/v2/eth-staking/account?timestamp="));
+}
+
+#[test]
+fn staking_mutations_require_documented_identifiers() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request("subscribe_onchain_yields", Vec::new())
+            .await
+    })
+    .expect_err("project and amount must be required");
+
+    assert!(error.to_string().contains("projectId"));
+}
+
+#[test]
+fn subaccount_list_uses_signed_spot_path() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url,
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client");
+
+    block_on(async move {
+        client
+            .private_request(
+                "get_subaccounts",
+                vec![("limit".to_string(), "10".to_string())],
+            )
+            .await
+    })
+    .expect("response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.contains("/sapi/v1/sub-account/list?"));
+    assert!(request_line.contains("limit=10"));
+}
+
+#[test]
+fn subaccount_transfer_requires_internal_account_fields() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "transfer_between_subaccounts",
+                vec![
+                    ("fromAccountType".to_string(), "SPOT".to_string()),
+                    ("toAccountType".to_string(), "SPOT".to_string()),
+                ],
+            )
+            .await
+    })
+    .expect_err("asset and amount must be required");
+
+    assert!(error.to_string().contains("asset"));
+}

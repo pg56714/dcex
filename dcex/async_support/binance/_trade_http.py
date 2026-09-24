@@ -1202,3 +1202,176 @@ class TradeHTTP(HTTPManager):
             "get_future_position",
             self._params(product_symbol=product_symbol),
         )
+
+    async def place_margin_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        type_: str,
+        *,
+        quantity: str | None = None,
+        quoteOrderQty: str | None = None,
+        price: str | None = None,
+        stopPrice: str | None = None,
+        timeInForce: str | None = None,
+        newClientOrderId: str | None = None,
+        icebergQty: str | None = None,
+        newOrderRespType: str | None = None,
+        sideEffectType: str = "NO_SIDE_EFFECT",
+        isIsolated: bool = False,
+        selfTradePreventionMode: str | None = None,
+        autoRepayAtCancel: bool | None = None,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Place a margin order with optional automatic borrowing or repayment."""
+        return await self._native_private(
+            "place_margin_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type=type_,
+                quantity=quantity,
+                quoteOrderQty=quoteOrderQty,
+                price=price,
+                stopPrice=stopPrice,
+                timeInForce=timeInForce,
+                newClientOrderId=newClientOrderId,
+                icebergQty=icebergQty,
+                newOrderRespType=newOrderRespType,
+                sideEffectType=sideEffectType,
+                isIsolated=isIsolated,
+                selfTradePreventionMode=selfTradePreventionMode,
+                autoRepayAtCancel=autoRepayAtCancel,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    async def cancel_margin_order(
+        self,
+        product_symbol: str,
+        *,
+        orderId: int | None = None,
+        origClientOrderId: str | None = None,
+        newClientOrderId: str | None = None,
+        isIsolated: bool = False,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Cancel one Binance Margin order."""
+        return await self._native_private(
+            "cancel_margin_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                origClientOrderId=origClientOrderId,
+                newClientOrderId=newClientOrderId,
+                isIsolated=isIsolated,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    async def get_margin_order(
+        self,
+        product_symbol: str,
+        *,
+        orderId: int | None = None,
+        origClientOrderId: str | None = None,
+        isIsolated: bool = False,
+        recvWindow: int | None = None,
+    ) -> dict[str, Any]:
+        """Query one Binance Margin order."""
+        return await self._native_private(
+            "get_margin_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                origClientOrderId=origClientOrderId,
+                isIsolated=isIsolated,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    async def get_open_margin_orders(
+        self,
+        *,
+        product_symbol: str | None = None,
+        isIsolated: bool = False,
+        recvWindow: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query open cross- or isolated-margin orders."""
+        return await self._native_private(
+            "get_open_margin_orders",
+            self._params(
+                product_symbol=product_symbol,
+                isIsolated=isIsolated,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    async def cancel_all_open_margin_orders(
+        self,
+        product_symbol: str,
+        *,
+        isIsolated: bool = False,
+        recvWindow: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Cancel every open Binance Margin order on one symbol."""
+        return await self._native_private(
+            "cancel_all_open_margin_orders",
+            self._params(
+                product_symbol=product_symbol,
+                isIsolated=isIsolated,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    async def get_all_margin_orders(
+        self,
+        product_symbol: str,
+        *,
+        isIsolated: bool = False,
+        orderId: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        limit: int | None = None,
+        recvWindow: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query Binance Margin order history."""
+        return await self._native_private(
+            "get_all_margin_orders",
+            self._params(
+                product_symbol=product_symbol,
+                isIsolated=isIsolated,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+                limit=limit,
+                recvWindow=recvWindow,
+            ),
+        )
+
+    async def get_margin_account_trades(
+        self,
+        product_symbol: str,
+        *,
+        isIsolated: bool = False,
+        orderId: int | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
+        fromId: int | None = None,
+        limit: int | None = None,
+        recvWindow: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query Binance Margin account fills."""
+        return await self._native_private(
+            "get_margin_account_trades",
+            self._params(
+                product_symbol=product_symbol,
+                isIsolated=isIsolated,
+                orderId=orderId,
+                startTime=startTime,
+                endTime=endTime,
+                fromId=fromId,
+                limit=limit,
+                recvWindow=recvWindow,
+            ),
+        )

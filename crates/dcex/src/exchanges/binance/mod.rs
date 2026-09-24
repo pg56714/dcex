@@ -1,13 +1,18 @@
 mod account;
 mod client;
+mod earn;
 mod endpoints;
 mod equity;
+mod loan;
+mod margin;
 mod market;
 mod options;
 mod params;
 mod private;
 mod signing;
+mod staking;
 mod stream;
+mod subaccount;
 mod trade;
 pub mod websocket;
 
