@@ -8,6 +8,7 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
 const PRIVATE_WS_URL: &str = "wss://ws.bitget.com/v2/ws/private";
+const UTA_PRIVATE_WS_URL: &str = "wss://ws.bitget.com/v3/ws/private";
 const LOGIN_METHOD: &str = "GET";
 const LOGIN_PATH: &str = "/user/verify";
 
@@ -114,6 +115,7 @@ pub struct BitgetPrivateWebSocket {
     api_secret: String,
     passphrase: String,
     logged_in: bool,
+    uta_v3: bool,
 }
 
 impl BitgetPrivateWebSocket {
@@ -142,13 +144,28 @@ impl BitgetPrivateWebSocket {
         validate_credential("Bitget API key", &api_key)?;
         validate_credential("Bitget API secret", &api_secret)?;
         validate_credential("Bitget passphrase", &passphrase)?;
+        let url = url.into();
+        let uta_v3 = url
+            .split('?')
+            .next()
+            .is_some_and(|path| path.ends_with("/v3/ws/private"));
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             api_key,
             api_secret,
             passphrase,
             logged_in: false,
+            uta_v3,
         })
+    }
+
+    pub fn new_uta(
+        api_key: String,
+        api_secret: String,
+        passphrase: String,
+        timeout: Duration,
+    ) -> Result<Self> {
+        Self::with_url(api_key, api_secret, passphrase, UTA_PRIVATE_WS_URL, timeout)
     }
 
     pub fn is_connected(&self) -> bool {
@@ -339,6 +356,30 @@ impl BitgetPrivateWebSocket {
 
     pub async fn subscribe_equity(&mut self, inst_type: &str) -> Result<()> {
         self.subscribe_channel(inst_type, "equity").await
+    }
+
+    pub async fn subscribe_reality_orderbook(&mut self, symbol: &str) -> Result<()> {
+        self.send_reality_orderbook("subscribe", symbol).await
+    }
+
+    pub async fn unsubscribe_reality_orderbook(&mut self, symbol: &str) -> Result<()> {
+        self.send_reality_orderbook("unsubscribe", symbol).await
+    }
+
+    async fn send_reality_orderbook(&mut self, op: &str, symbol: &str) -> Result<()> {
+        if !self.uta_v3 || !self.logged_in {
+            return Err(DcexError::InvalidInput(
+                "Bitget Reality orderbook requires an authenticated UTA V3 private WebSocket."
+                    .to_string(),
+            ));
+        }
+        let symbol = normalize_inst_id(symbol)?;
+        self.connection
+            .send_json(&json!({
+                "op": op,
+                "args": [{"instType": "UTA", "topic": "reality-orderbook", "symbol": symbol}],
+            }))
+            .await
     }
 
     pub async fn recv(&mut self) -> Result<Value> {

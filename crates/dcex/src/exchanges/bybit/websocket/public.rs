@@ -16,6 +16,7 @@ const PUBLIC_SPOT_WS_URL: &str = "wss://stream.bybit.com/v5/public/spot";
 const PUBLIC_LINEAR_WS_URL: &str = "wss://stream.bybit.com/v5/public/linear";
 const PUBLIC_INVERSE_WS_URL: &str = "wss://stream.bybit.com/v5/public/inverse";
 const PUBLIC_OPTION_WS_URL: &str = "wss://stream.bybit.com/v5/public/option";
+const PUBLIC_RFQ_WS_URL: &str = "wss://stream.bybit.com/v5/public/rfq";
 
 pub struct BybitPublicWebSocket {
     connection: WebSocketConnection,
@@ -228,6 +229,7 @@ fn category_url(category: &str) -> &'static str {
         "linear" => PUBLIC_LINEAR_WS_URL,
         "inverse" => PUBLIC_INVERSE_WS_URL,
         "option" => PUBLIC_OPTION_WS_URL,
+        "rfq" => PUBLIC_RFQ_WS_URL,
         _ => PUBLIC_LINEAR_WS_URL,
     }
 }
@@ -235,7 +237,7 @@ fn category_url(category: &str) -> &'static str {
 fn normalize_category(category: &str) -> Result<String> {
     let category = category.trim().to_ascii_lowercase();
     match category.as_str() {
-        "spot" | "linear" | "inverse" | "option" => Ok(category),
+        "spot" | "linear" | "inverse" | "option" | "rfq" => Ok(category),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bybit WebSocket category: {category}"
         ))),
@@ -314,6 +316,8 @@ mod tests {
     #[test]
     fn normalizes_category() {
         assert_eq!(normalize_category("LINEAR").expect("category"), "linear");
+        assert_eq!(normalize_category("RFQ").expect("rfq"), "rfq");
+        assert_eq!(category_url("rfq"), PUBLIC_RFQ_WS_URL);
         assert!(normalize_category("bad").is_err());
     }
 

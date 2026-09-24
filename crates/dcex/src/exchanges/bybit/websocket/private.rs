@@ -8,6 +8,7 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
 const PRIVATE_WS_URL: &str = "wss://stream.bybit.com/v5/private";
+const TRADE_WS_URL: &str = "wss://stream.bybit.com/v5/trade";
 const AUTH_PAYLOAD_PREFIX: &str = "GET/realtime";
 
 pub struct BybitPrivateWebSocket {
@@ -16,11 +17,16 @@ pub struct BybitPrivateWebSocket {
     api_secret: String,
     next_request_id: u64,
     authenticated: bool,
+    trade_mode: bool,
 }
 
 impl BybitPrivateWebSocket {
     pub fn new(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
         Self::with_url(api_key, api_secret, PRIVATE_WS_URL.to_string(), timeout)
+    }
+
+    pub fn new_trade(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
+        Self::with_url(api_key, api_secret, TRADE_WS_URL.to_string(), timeout)
     }
 
     pub fn with_url(
@@ -31,12 +37,18 @@ impl BybitPrivateWebSocket {
     ) -> Result<Self> {
         validate_credential("Bybit API key", &api_key)?;
         validate_credential("Bybit API secret", &api_secret)?;
+        let url = url.into();
+        let trade_mode = url
+            .split('?')
+            .next()
+            .is_some_and(|path| path.ends_with("/v5/trade"));
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             api_key,
             api_secret,
             next_request_id: 1,
             authenticated: false,
+            trade_mode,
         })
     }
 
@@ -58,11 +70,11 @@ impl BybitPrivateWebSocket {
         let expires = auth_expires_ms(unix_timestamp_ms()?);
         let signature = auth_signature(&self.api_secret, expires)?;
         let request_id = self.next_request_id();
-        let payload = json!({
-            "req_id": request_id,
-            "op": "auth",
-            "args": [self.api_key, expires, signature],
-        });
+        let payload = if self.trade_mode {
+            json!({"reqId": request_id, "op": "auth", "args": [self.api_key, expires, signature]})
+        } else {
+            json!({"req_id": request_id, "op": "auth", "args": [self.api_key, expires, signature]})
+        };
         self.connection.send_json(&payload).await?;
         let event = self.connection.recv_json().await?;
         validate_auth_ack(&event)?;
@@ -86,11 +98,56 @@ impl BybitPrivateWebSocket {
     }
 
     pub async fn subscribe(&mut self, topics: Vec<String>) -> Result<String> {
+        if self.trade_mode {
+            return Err(DcexError::InvalidInput(
+                "Bybit trade WebSocket does not support topic subscriptions; use the private stream for order updates.".to_string(),
+            ));
+        }
         self.send_topics("subscribe", topics).await
     }
 
     pub async fn unsubscribe(&mut self, topics: Vec<String>) -> Result<String> {
+        if self.trade_mode {
+            return Err(DcexError::InvalidInput(
+                "Bybit trade WebSocket does not support topic subscriptions.".to_string(),
+            ));
+        }
         self.send_topics("unsubscribe", topics).await
+    }
+
+    pub async fn send_trade_order(&mut self, op: &str, args: Value) -> Result<String> {
+        if !self.trade_mode || !self.authenticated {
+            return Err(DcexError::InvalidInput(
+                "Bybit trade WebSocket must be connected and authenticated.".to_string(),
+            ));
+        }
+        if !matches!(
+            op,
+            "order.create"
+                | "order.amend"
+                | "order.cancel"
+                | "order.create-batch"
+                | "order.amend-batch"
+                | "order.cancel-batch"
+        ) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported Bybit trade operation: {op}"
+            )));
+        }
+        if !args.is_object() {
+            return Err(DcexError::InvalidInput(
+                "Bybit trade order args must be a JSON object.".to_string(),
+            ));
+        }
+        let request_id = self.next_request_id();
+        let payload = json!({
+            "reqId": request_id,
+            "header": {"X-BAPI-TIMESTAMP": unix_timestamp_ms()?.to_string()},
+            "op": op,
+            "args": [args],
+        });
+        self.connection.send_json(&payload).await?;
+        Ok(request_id)
     }
 
     pub async fn subscribe_orders(&mut self) -> Result<String> {

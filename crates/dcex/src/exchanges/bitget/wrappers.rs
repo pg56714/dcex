@@ -63,6 +63,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_transfer_records(coin => "coin"),
         get_transferable_coins(from_type => "fromType", to_type => "toType"),
         get_uta_account_assets(),
+        get_reality_orderbook(product_symbol => "product_symbol"),
+        get_reality_fills(product_symbol => "product_symbol"),
         get_uta_account_info(),
         get_uta_all_fee_rates(category => "category"),
         get_uta_loan_data(),

@@ -897,3 +897,250 @@ class TradeHTTP(HTTPManager):
                 page_size=page_size,
             ),
         )
+
+    async def amend_contract_limit_order(
+        self, orderId: str | int, price: str, vol: str
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract amend contract limit order."""
+        return await self._native_private(
+            "amend_contract_limit_order", self._native_params(orderId=orderId, price=price, vol=vol)
+        )
+
+    async def chase_contract_limit_order(self, orderId: str | int) -> dict[str, Any] | list[Any]:
+        """MEXC Contract chase contract limit order."""
+        return await self._native_private(
+            "chase_contract_limit_order", self._native_params(orderId=orderId)
+        )
+
+    async def get_contract_open_order_count(self) -> dict[str, Any] | list[Any]:
+        """MEXC Contract get contract open order count."""
+        return await self._native_private("get_contract_open_order_count", [])
+
+    async def reverse_contract_position(
+        self, product_symbol: str, positionId: str | int, vol: str
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract reverse contract position."""
+        return await self._native_private(
+            "reverse_contract_position",
+            self._native_params(product_symbol=product_symbol, positionId=positionId, vol=vol),
+        )
+
+    async def close_all_contract_positions(self) -> dict[str, Any] | list[Any]:
+        """MEXC Contract close all contract positions."""
+        return await self._native_private("close_all_contract_positions", [])
+
+    async def place_contract_trailing_order(
+        self,
+        product_symbol: str,
+        leverage: int,
+        side: int,
+        vol: str,
+        openType: int,
+        trend: int,
+        backType: int,
+        backValue: str,
+        positionMode: int,
+        activePrice: str | None = None,
+        reduceOnly: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract place contract trailing order."""
+        return await self._native_private(
+            "place_contract_trailing_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                leverage=leverage,
+                side=side,
+                vol=vol,
+                openType=openType,
+                trend=trend,
+                backType=backType,
+                backValue=backValue,
+                positionMode=positionMode,
+                activePrice=activePrice,
+                reduceOnly=reduceOnly,
+            ),
+        )
+
+    async def cancel_contract_trailing_order(
+        self, product_symbol: str | None = None, trackOrderId: str | int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract cancel contract trailing order."""
+        return await self._native_private(
+            "cancel_contract_trailing_order",
+            self._native_params(product_symbol=product_symbol, trackOrderId=trackOrderId),
+        )
+
+    async def amend_contract_trailing_order(
+        self,
+        product_symbol: str,
+        trackOrderId: str | int,
+        trend: int,
+        backType: int,
+        backValue: str,
+        vol: str,
+        activePrice: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract amend contract trailing order."""
+        return await self._native_private(
+            "amend_contract_trailing_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                trackOrderId=trackOrderId,
+                trend=trend,
+                backType=backType,
+                backValue=backValue,
+                vol=vol,
+                activePrice=activePrice,
+            ),
+        )
+
+    async def get_contract_trailing_orders(
+        self,
+        states: list[int],
+        product_symbol: str | None = None,
+        side: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        pageIndex: int | None = None,
+        pageSize: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract get contract trailing orders."""
+        return await self._native_private(
+            "get_contract_trailing_orders",
+            self._native_params(
+                states=states,
+                product_symbol=product_symbol,
+                side=side,
+                start_time=start_time,
+                end_time=end_time,
+                pageIndex=pageIndex,
+                pageSize=pageSize,
+            ),
+        )
+
+    async def amend_contract_plan_order(
+        self,
+        product_symbol: str,
+        orderId: str | int,
+        triggerPrice: str,
+        price: str,
+        orderType: int,
+        triggerType: int,
+        trend: int,
+        from_: int,
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract amend contract plan order."""
+        return await self._native_private(
+            "amend_contract_plan_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                triggerPrice=triggerPrice,
+                price=price,
+                orderType=orderType,
+                triggerType=triggerType,
+                trend=trend,
+                **{"from": from_},
+            ),
+        )
+
+    async def place_contract_position_tpsl(
+        self,
+        lossTrend: int,
+        profitTrend: int,
+        positionId: str | int,
+        vol: str,
+        stopLossPrice: str | None = None,
+        takeProfitPrice: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """MEXC Contract place contract position tpsl."""
+        return await self._native_private(
+            "place_contract_position_tpsl",
+            self._native_params(
+                lossTrend=lossTrend,
+                profitTrend=profitTrend,
+                positionId=positionId,
+                vol=vol,
+                stopLossPrice=stopLossPrice,
+                takeProfitPrice=takeProfitPrice,
+            ),
+        )
+
+    async def cancel_contract_tpsl_orders(
+        self, orders: list[dict[str, str | int]]
+    ) -> dict[str, Any] | list[Any]:
+        """Cancel contract tpsl orders on MEXC Contract."""
+        return await self._native_private(
+            "cancel_contract_tpsl_orders", self._native_params(orders=orders)
+        )
+
+    async def cancel_all_contract_tpsl_orders(
+        self, product_symbol: str | None = None, positionId: str | int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """Cancel all contract tpsl orders on MEXC Contract."""
+        return await self._native_private(
+            "cancel_all_contract_tpsl_orders",
+            self._native_params(product_symbol=product_symbol, positionId=positionId),
+        )
+
+    async def amend_contract_limit_tpsl(
+        self,
+        orderId: str | int,
+        stopLossPrice: str | None = None,
+        takeProfitPrice: str | None = None,
+        lossTrend: int | None = None,
+        profitTrend: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Amend contract limit tpsl on MEXC Contract."""
+        return await self._native_private(
+            "amend_contract_limit_tpsl",
+            self._native_params(
+                orderId=orderId,
+                stopLossPrice=stopLossPrice,
+                takeProfitPrice=takeProfitPrice,
+                lossTrend=lossTrend,
+                profitTrend=profitTrend,
+            ),
+        )
+
+    async def amend_contract_tpsl_order(
+        self,
+        stopPlanOrderId: str | int,
+        stopLossPrice: str | None = None,
+        takeProfitPrice: str | None = None,
+        lossTrend: int | None = None,
+        profitTrend: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Amend contract tpsl order on MEXC Contract."""
+        return await self._native_private(
+            "amend_contract_tpsl_order",
+            self._native_params(
+                stopPlanOrderId=stopPlanOrderId,
+                stopLossPrice=stopLossPrice,
+                takeProfitPrice=takeProfitPrice,
+                lossTrend=lossTrend,
+                profitTrend=profitTrend,
+            ),
+        )
+
+    async def amend_contract_plan_tpsl(
+        self,
+        product_symbol: str,
+        orderId: str | int,
+        stopLossPrice: str | None = None,
+        takeProfitPrice: str | None = None,
+        lossTrend: int | None = None,
+        profitTrend: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Amend contract plan tpsl on MEXC Contract."""
+        return await self._native_private(
+            "amend_contract_plan_tpsl",
+            self._native_params(
+                product_symbol=product_symbol,
+                orderId=orderId,
+                stopLossPrice=stopLossPrice,
+                takeProfitPrice=takeProfitPrice,
+                lossTrend=lossTrend,
+                profitTrend=profitTrend,
+            ),
+        )

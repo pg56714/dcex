@@ -77,6 +77,24 @@ impl BinanceClient {
         )
     }
 
+    pub fn borrow_margin_asset(
+        &self,
+        asset: &str,
+        amount: &str,
+        is_isolated: bool,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        self.margin_borrow_repay(asset, amount, "BORROW", is_isolated)
+    }
+
+    pub fn repay_margin_asset(
+        &self,
+        asset: &str,
+        amount: &str,
+        is_isolated: bool,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        self.margin_borrow_repay(asset, amount, "REPAY", is_isolated)
+    }
+
     pub fn get_margin_borrow_repay_records(
         &self,
         transaction_type: &str,

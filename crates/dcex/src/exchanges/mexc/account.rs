@@ -327,6 +327,14 @@ impl MexcClient {
                 params.ensure_allowed(&[])?;
                 self.contract_get(CONTRACT_ASSETS, Vec::new()).await
             }
+            "change_contract_multi_asset_mode" => {
+                params.ensure_allowed(&["isMultiAssetMode"])?;
+                validate_enum(params, "isMultiAssetMode", &["true", "false"])?;
+                let path = CONTRACT_CHANGE_MULTI_ASSET_MODE
+                    .replace("{isMultiAssetMode}", params.required("isMultiAssetMode")?);
+                self.contract_post_json(&path, Value::Object(Default::default()))
+                    .await
+            }
             "get_contract_asset" => {
                 params.ensure_allowed(&["currency"])?;
                 let path = CONTRACT_ASSET.replace("{currency}", params.required("currency")?);
@@ -428,6 +436,19 @@ impl MexcClient {
                 validate_enum(params, "type", &["ADD", "SUB"])?;
                 let body = params.body(&["positionId", "amount", "type"], &["positionId"], &[]);
                 self.contract_post_json(CONTRACT_CHANGE_MARGIN, Value::Object(body))
+                    .await
+            }
+            "change_contract_auto_add_margin" => {
+                params.ensure_allowed(&["positionId", "isEnabled"])?;
+                params.required("positionId")?;
+                validate_enum(params, "isEnabled", &["true", "false"])?;
+                params.required("isEnabled")?;
+                let body = params.body(
+                    &["positionId", "isEnabled"],
+                    &["positionId"],
+                    &["isEnabled"],
+                );
+                self.contract_post_json(CONTRACT_CHANGE_AUTO_ADD_MARGIN, Value::Object(body))
                     .await
             }
             "change_contract_leverage" => {

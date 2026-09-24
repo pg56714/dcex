@@ -157,6 +157,20 @@ class AccountHTTP(HTTPManager):
         """Retrieve Bitget UTA account assets."""
         return await self._native_private("get_uta_account_assets", [])
 
+    async def get_reality_orderbook(self, product_symbol: str) -> dict[str, Any]:
+        """Return Reality raw-depth snapshot (requires Bitget whitelist)."""
+        return await self._native_private(
+            "get_reality_orderbook", self._native_params(product_symbol=product_symbol)
+        )
+
+    async def get_reality_fills(
+        self, product_symbol: str, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Return recent Reality platform fills (requires Bitget whitelist)."""
+        return await self._native_private(
+            "get_reality_fills", self._native_params(product_symbol=product_symbol, limit=limit)
+        )
+
     async def get_uta_account_info(self) -> dict[str, Any]:
         """Retrieve Bitget UTA API account information."""
         return await self._native_private("get_uta_account_info", [])

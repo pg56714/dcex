@@ -438,6 +438,38 @@ impl PythonBitgetPrivateWebSocketClient {
         })
     }
 
+    fn subscribe_reality_orderbook<'py>(
+        &self,
+        py: Python<'py>,
+        symbol: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe_reality_orderbook(&symbol)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn unsubscribe_reality_orderbook<'py>(
+        &self,
+        py: Python<'py>,
+        symbol: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .unsubscribe_reality_orderbook(&symbol)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     fn is_logged_in(&self) -> PyResult<bool> {
         let client = self
             .client

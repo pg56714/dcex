@@ -162,6 +162,14 @@ class PrivateClient(AsyncWebSocketMixin):
         """Subscribe to equity update events."""
         await self._native_client.subscribe_equity(inst_type)
 
+    async def subscribe_reality_orderbook(self, symbol: str) -> None:
+        """Subscribe to a whitelisted Reality orderbook on UTA V3 private WS."""
+        await self._native_client.subscribe_reality_orderbook(symbol)
+
+    async def unsubscribe_reality_orderbook(self, symbol: str) -> None:
+        """Unsubscribe from a Reality orderbook on UTA V3 private WS."""
+        await self._native_client.unsubscribe_reality_orderbook(symbol)
+
     def is_logged_in(self) -> bool:
         """Return whether login has been acknowledged."""
         return bool(self._native_client.is_logged_in())
@@ -201,4 +209,20 @@ def private(
     )
 
 
-__all__ = ["PrivateClient", "PublicClient", "private", "public"]
+def reality_private(
+    api_key: str,
+    api_secret: str,
+    passphrase: str,
+    timeout: float = 10.0,
+) -> PrivateClient:
+    """Create an authenticated UTA V3 WebSocket for Reality orderbook data."""
+    return PrivateClient(
+        api_key,
+        api_secret,
+        passphrase,
+        timeout,
+        "wss://ws.bitget.com/v3/ws/private",
+    )
+
+
+__all__ = ["PrivateClient", "PublicClient", "private", "public", "reality_private"]

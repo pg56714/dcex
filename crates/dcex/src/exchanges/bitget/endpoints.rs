@@ -46,6 +46,8 @@ pub(super) const UTA_LIQUIDATIONS: &str = "/api/v3/market/liquidations";
 pub(super) const REALITY_STOCK_INFO: &str = "/api/v3/reality/market/stock-info";
 pub(super) const REALITY_MARKET_STATES: &str = "/api/v3/reality/market/states";
 pub(super) const REALITY_MARKET_CALENDAR: &str = "/api/v3/reality/market/calendar";
+pub(super) const REALITY_ORDERBOOK: &str = "/api/v3/account/reality-orderbook";
+pub(super) const REALITY_FILLS: &str = "/api/v3/account/reality-fills";
 
 pub(super) const COMMON_ALL_ACCOUNT_BALANCE: &str = "/api/v2/account/all-account-balance";
 pub(super) const COMMON_FUNDING_ASSETS: &str = "/api/v2/account/funding-assets";

@@ -79,6 +79,19 @@ async fn uta_strategy_modification_requires_order_id_and_quantity() {
 }
 
 #[tokio::test]
+async fn reality_fills_rejects_out_of_range_limit_before_transport() {
+    let params = BitgetParams::from_pairs(vec![
+        ("product_symbol".into(), "RAAPLUSDT".into()),
+        ("limit".into(), "101".into()),
+    ]);
+    let error = private_client()
+        .account_private_request("get_reality_fills", &params)
+        .await
+        .expect_err("limit above 100");
+    assert!(error.to_string().contains("between 1 and 100"));
+}
+
+#[tokio::test]
 async fn reality_order_requires_symbol_and_identifier_before_cancel() {
     let empty = BitgetParams::from_pairs(Vec::new());
     let error = private_client()

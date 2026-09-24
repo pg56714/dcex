@@ -455,3 +455,19 @@ class AccountHTTP(HTTPManager):
             "change_contract_position_mode",
             self._native_params(positionMode=positionMode),
         )
+
+    async def change_contract_multi_asset_mode(self, enabled: bool) -> dict[str, Any] | list[Any]:
+        """Enable or disable MEXC cross-asset futures collateral mode."""
+        return await self._native_private(
+            "change_contract_multi_asset_mode",
+            self._native_params(isMultiAssetMode=str(enabled).lower()),
+        )
+
+    async def change_contract_auto_add_margin(
+        self, positionId: str | int, enabled: bool
+    ) -> dict[str, Any] | list[Any]:
+        """Enable or disable auto-add margin for an isolated futures position."""
+        return await self._native_private(
+            "change_contract_auto_add_margin",
+            self._native_params(positionId=positionId, isEnabled=str(enabled).lower()),
+        )

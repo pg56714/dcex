@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -69,5 +70,6 @@ def test_rust_clients_cover_python_client_method_names() -> None:
             method
             for method in _python_client_methods(ROOT / "dcex", exchange)
             if f"{method}(" not in rust_source
+            and not re.search(rf"\b{re.escape(method)}\s*,", rust_source)
         )
         assert not missing, f"{exchange}: {missing}"

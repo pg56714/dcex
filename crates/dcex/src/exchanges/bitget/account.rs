@@ -118,6 +118,26 @@ impl BitgetClient {
                 .await
             }
             "get_uta_account_assets" => self.get_private(UTA_ACCOUNT_ASSETS, Vec::new()).await,
+            "get_reality_orderbook" => {
+                let mut query = Vec::new();
+                self.push_required_product_symbol(&mut query, params)?;
+                self.get_private(REALITY_ORDERBOOK, query).await
+            }
+            "get_reality_fills" => {
+                if let Some(limit) = params.get("limit") {
+                    if !limit
+                        .parse::<u16>()
+                        .is_ok_and(|value| (1..=100).contains(&value))
+                    {
+                        return Err(crate::DcexError::InvalidInput(
+                            "Bitget Reality fills limit must be between 1 and 100.".to_string(),
+                        ));
+                    }
+                }
+                let mut query = params.only(&["limit"]);
+                self.push_required_product_symbol(&mut query, params)?;
+                self.get_private(REALITY_FILLS, query).await
+            }
             "get_uta_account_info" => self.get_private(UTA_ACCOUNT_INFO, Vec::new()).await,
             "get_uta_all_fee_rates" => {
                 params.required("category")?;

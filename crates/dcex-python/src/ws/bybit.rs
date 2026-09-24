@@ -331,6 +331,26 @@ impl PythonBybitPrivateWebSocketClient {
         })
     }
 
+    fn send_trade_order<'py>(
+        &self,
+        py: Python<'py>,
+        op: String,
+        args_json: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let args: serde_json::Value = serde_json::from_str(&args_json).map_err(|error| {
+            PyValueError::new_err(format!("invalid Bybit trade args JSON: {error}"))
+        })?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .send_trade_order(&op, args)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     fn is_authenticated(&self) -> PyResult<bool> {
         let client = self
             .client

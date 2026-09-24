@@ -128,6 +128,10 @@ class PrivateClient(AsyncWebSocketMixin):
         """Subscribe to wallet update events."""
         return str(await self._native_client.subscribe_wallet())
 
+    async def send_trade_order(self, op: str, args: dict[str, Any]) -> str:
+        """Submit one order.create, order.amend, or order.cancel request on /v5/trade."""
+        return str(await self._native_client.send_trade_order(op, json.dumps(args)))
+
     def is_authenticated(self) -> bool:
         """Return whether auth has been acknowledged."""
         return bool(self._native_client.is_authenticated())
@@ -165,4 +169,19 @@ def private(
     )
 
 
-__all__ = ["PrivateClient", "PublicClient", "private", "public"]
+def trade(
+    api_key: str,
+    api_secret: str,
+    timeout: float = 10.0,
+    base_url: str = "wss://stream.bybit.com/v5/trade",
+) -> PrivateClient:
+    """
+    Create an authenticated Bybit WebSocket trade client.
+
+    Order acknowledgements are not fill confirmations; use a separate private
+    order stream to confirm the final order state.
+    """
+    return PrivateClient(api_key, api_secret, timeout, base_url)
+
+
+__all__ = ["PrivateClient", "PublicClient", "private", "public", "trade"]

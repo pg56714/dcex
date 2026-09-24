@@ -55,12 +55,33 @@ pub(super) const CONTRACT_RISK_LIMITS: &str = "/api/v1/private/account/risk_limi
 pub(super) const CONTRACT_TRADING_FEE_RATE: &str = "/api/v1/private/account/tiered_fee_rate/v2";
 pub(super) const CONTRACT_LEVERAGE: &str = "/api/v1/private/position/leverage";
 pub(super) const CONTRACT_CHANGE_MARGIN: &str = "/api/v1/private/position/change_margin";
+pub(super) const CONTRACT_CHANGE_AUTO_ADD_MARGIN: &str =
+    "/api/v1/private/position/change_auto_add_im";
 pub(super) const CONTRACT_CHANGE_LEVERAGE: &str = "/api/v1/private/position/change_leverage";
 pub(super) const CONTRACT_POSITION_MODE: &str = "/api/v1/private/position/position_mode";
 pub(super) const CONTRACT_CHANGE_POSITION_MODE: &str =
     "/api/v1/private/position/change_position_mode";
+pub(super) const CONTRACT_CHANGE_MULTI_ASSET_MODE: &str =
+    "/api/v1/private/multiAssets/changeMultiAssetMode/{isMultiAssetMode}";
 
 pub(super) const CONTRACT_CREATE_ORDER: &str = "/api/v1/private/order/create";
+pub(super) const CONTRACT_CHANGE_LIMIT_ORDER: &str = "/api/v1/private/order/change_limit_order";
+pub(super) const CONTRACT_CHASE_LIMIT_ORDER: &str = "/api/v1/private/order/chase_limit_order";
+pub(super) const CONTRACT_OPEN_ORDER_TOTAL_COUNT: &str =
+    "/api/v1/private/order/open_order_total_count";
+pub(super) const CONTRACT_REVERSE_POSITION: &str = "/api/v1/private/position/reverse";
+pub(super) const CONTRACT_CLOSE_ALL_POSITIONS: &str = "/api/v1/private/position/close_all";
+pub(super) const CONTRACT_TRACK_PLACE: &str = "/api/v1/private/trackorder/place";
+pub(super) const CONTRACT_TRACK_CANCEL: &str = "/api/v1/private/trackorder/cancel";
+pub(super) const CONTRACT_TRACK_CHANGE: &str = "/api/v1/private/trackorder/change_order";
+pub(super) const CONTRACT_TRACK_LIST: &str = "/api/v1/private/trackorder/list/orders";
+pub(super) const CONTRACT_CHANGE_PLAN_ORDER: &str = "/api/v1/private/planorder/change_price";
+pub(super) const CONTRACT_PLACE_POSITION_TPSL: &str = "/api/v1/private/stoporder/place";
+pub(super) const CONTRACT_CANCEL_TPSL: &str = "/api/v1/private/stoporder/cancel";
+pub(super) const CONTRACT_CANCEL_ALL_TPSL: &str = "/api/v1/private/stoporder/cancel_all";
+pub(super) const CONTRACT_CHANGE_LIMIT_TPSL: &str = "/api/v1/private/stoporder/change_price";
+pub(super) const CONTRACT_CHANGE_TPSL: &str = "/api/v1/private/stoporder/change_plan_price";
+pub(super) const CONTRACT_CHANGE_PLAN_TPSL: &str = "/api/v1/private/planorder/change_stop_order";
 pub(super) const CONTRACT_CANCEL_ORDERS: &str = "/api/v1/private/order/cancel";
 pub(super) const CONTRACT_CANCEL_ORDER_WITH_EXTERNAL_ID: &str =
     "/api/v1/private/order/cancel_with_external";

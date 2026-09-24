@@ -141,8 +141,10 @@ added with builder setters such as `.limit(100)` or `.param("key", value)`.
 | **Ondo**        | Yes       | Yes        | Yes       | Yes        |
 | **Arcus**       | Yes       | Yes        | Yes       | Yes        |
 
-WS private support currently covers authenticated or address-scoped user-data
-streams. Order placement and cancellation remain on HTTP clients.
+WS private support covers authenticated or address-scoped user-data streams.
+Bybit additionally exposes an authenticated `/v5/trade` WebSocket for single
+and batch order create/amend/cancel requests; its acknowledgement is not a fill
+confirmation.
 
 ### Lighter networks
 
@@ -182,9 +184,11 @@ supported.
 ### Bitget Reality
 
 Bitget Reality rTokens use the UTA V3 API. dcex supports instrument limits,
-stock-session and closure metadata, regular UTA trading, and the dedicated
-Reality place/cancel endpoints. Whitelist-only Reality depth and public fills
-are not required for order execution and are not exposed.
+stock-session and closure metadata, regular UTA trading, dedicated Reality
+place/cancel endpoints, and the authenticated Reality orderbook/fills REST
+queries. `dcex.ws.bitget.reality_private(...)` exposes the UTA V3 Reality
+orderbook channel. Bitget requires BD whitelist access for Reality depth and
+platform fills; these are not required for order execution.
 
 ### Binance Options
 

@@ -263,6 +263,342 @@ impl MexcClient {
                     .await
             }
             "cancel_contract_orders" => self.cancel_contract_orders_from_params(params).await,
+            "amend_contract_limit_order" => {
+                params.ensure_allowed(&["orderId", "price", "vol"])?;
+                for key in ["orderId", "price", "vol"] {
+                    params.required(key)?;
+                }
+                let body = params.body(&["orderId", "price", "vol"], &["orderId"], &[]);
+                self.contract_post_json(CONTRACT_CHANGE_LIMIT_ORDER, Value::Object(body))
+                    .await
+            }
+            "chase_contract_limit_order" => {
+                params.ensure_allowed(&["orderId"])?;
+                params.required("orderId")?;
+                let body = params.body(&["orderId"], &["orderId"], &[]);
+                self.contract_post_json(CONTRACT_CHASE_LIMIT_ORDER, Value::Object(body))
+                    .await
+            }
+            "get_contract_open_order_count" => {
+                params.ensure_allowed(&[])?;
+                self.contract_post_json(CONTRACT_OPEN_ORDER_TOTAL_COUNT, Value::Object(Map::new()))
+                    .await
+            }
+            "reverse_contract_position" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "positionId", "vol"])?;
+                params.required("positionId")?;
+                params.required("vol")?;
+                let mut body = params.body(&["positionId", "vol"], &["positionId"], &[]);
+                self.insert_required_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_REVERSE_POSITION, Value::Object(body))
+                    .await
+            }
+            "close_all_contract_positions" => {
+                params.ensure_allowed(&[])?;
+                self.contract_post_json(CONTRACT_CLOSE_ALL_POSITIONS, Value::Object(Map::new()))
+                    .await
+            }
+            "place_contract_trailing_order" => {
+                const KEYS: &[&str] = &[
+                    "leverage",
+                    "side",
+                    "vol",
+                    "openType",
+                    "trend",
+                    "backType",
+                    "backValue",
+                    "positionMode",
+                    "activePrice",
+                    "reduceOnly",
+                ];
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "leverage",
+                    "side",
+                    "vol",
+                    "openType",
+                    "trend",
+                    "backType",
+                    "backValue",
+                    "positionMode",
+                    "activePrice",
+                    "reduceOnly",
+                ])?;
+                for key in [
+                    "leverage",
+                    "side",
+                    "vol",
+                    "openType",
+                    "trend",
+                    "backType",
+                    "backValue",
+                    "positionMode",
+                ] {
+                    params.required(key)?;
+                }
+                let mut body = params.body(
+                    KEYS,
+                    &[
+                        "leverage",
+                        "side",
+                        "openType",
+                        "trend",
+                        "backType",
+                        "positionMode",
+                    ],
+                    &["reduceOnly"],
+                );
+                self.insert_required_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_TRACK_PLACE, Value::Object(body))
+                    .await
+            }
+            "cancel_contract_trailing_order" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "trackOrderId"])?;
+                require_one_identifier(params, &["product_symbol", "symbol", "trackOrderId"])?;
+                let mut body = params.body(&["trackOrderId"], &["trackOrderId"], &[]);
+                self.insert_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_TRACK_CANCEL, Value::Object(body))
+                    .await
+            }
+            "amend_contract_trailing_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "trackOrderId",
+                    "trend",
+                    "activePrice",
+                    "backType",
+                    "backValue",
+                    "vol",
+                ])?;
+                for key in ["trackOrderId", "trend", "backType", "backValue", "vol"] {
+                    params.required(key)?;
+                }
+                let mut body = params.body(
+                    &[
+                        "trackOrderId",
+                        "trend",
+                        "activePrice",
+                        "backType",
+                        "backValue",
+                        "vol",
+                    ],
+                    &["trackOrderId", "trend", "backType"],
+                    &[],
+                );
+                self.insert_required_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_TRACK_CHANGE, Value::Object(body))
+                    .await
+            }
+            "get_contract_trailing_orders" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "states",
+                    "side",
+                    "start_time",
+                    "end_time",
+                    "pageIndex",
+                    "pageSize",
+                ])?;
+                params.required("states")?;
+                validate_u64_range(params, "pageIndex", 1, u64::MAX)?;
+                validate_u64_range(params, "pageSize", 1, 100)?;
+                let mut query = params.only(&[
+                    "states",
+                    "side",
+                    "start_time",
+                    "end_time",
+                    "pageIndex",
+                    "pageSize",
+                ]);
+                self.push_product_symbol(&mut query, params, "_")?;
+                self.contract_get(CONTRACT_TRACK_LIST, query).await
+            }
+            "amend_contract_plan_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "orderId",
+                    "triggerPrice",
+                    "price",
+                    "orderType",
+                    "triggerType",
+                    "trend",
+                    "from",
+                ])?;
+                for key in [
+                    "orderId",
+                    "triggerPrice",
+                    "price",
+                    "orderType",
+                    "triggerType",
+                    "trend",
+                    "from",
+                ] {
+                    params.required(key)?;
+                }
+                let mut body = params.body(
+                    &[
+                        "orderId",
+                        "triggerPrice",
+                        "price",
+                        "orderType",
+                        "triggerType",
+                        "trend",
+                        "from",
+                    ],
+                    &["orderId", "orderType", "triggerType", "trend", "from"],
+                    &[],
+                );
+                self.insert_required_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_CHANGE_PLAN_ORDER, Value::Object(body))
+                    .await
+            }
+            "place_contract_position_tpsl" => {
+                params.ensure_allowed(&[
+                    "lossTrend",
+                    "profitTrend",
+                    "positionId",
+                    "vol",
+                    "stopLossPrice",
+                    "takeProfitPrice",
+                    "priceProtect",
+                    "profitLossVolType",
+                    "takeProfitVol",
+                    "stopLossVol",
+                    "volType",
+                    "takeProfitReverse",
+                    "stopLossReverse",
+                    "takeProfitType",
+                    "takeProfitOrderPrice",
+                    "stopLossType",
+                    "stopLossOrderPrice",
+                ])?;
+                for key in ["lossTrend", "profitTrend", "positionId", "vol"] {
+                    params.required(key)?;
+                }
+                require_one_identifier(params, &["stopLossPrice", "takeProfitPrice"])?;
+                let body = params.body(
+                    &[
+                        "lossTrend",
+                        "profitTrend",
+                        "positionId",
+                        "vol",
+                        "stopLossPrice",
+                        "takeProfitPrice",
+                        "priceProtect",
+                        "profitLossVolType",
+                        "takeProfitVol",
+                        "stopLossVol",
+                        "volType",
+                        "takeProfitReverse",
+                        "stopLossReverse",
+                        "takeProfitType",
+                        "takeProfitOrderPrice",
+                        "stopLossType",
+                        "stopLossOrderPrice",
+                    ],
+                    &[
+                        "lossTrend",
+                        "profitTrend",
+                        "positionId",
+                        "priceProtect",
+                        "volType",
+                        "takeProfitReverse",
+                        "stopLossReverse",
+                        "takeProfitType",
+                        "stopLossType",
+                    ],
+                    &[],
+                );
+                self.contract_post_json(CONTRACT_PLACE_POSITION_TPSL, Value::Object(body))
+                    .await
+            }
+            "cancel_contract_tpsl_orders" => {
+                params.ensure_allowed(&["orders"])?;
+                let orders = params.json_required("orders")?;
+                let Value::Array(ref items) = orders else {
+                    return Err(DcexError::InvalidInput(
+                        "MEXC TP/SL cancellation requires an array.".into(),
+                    ));
+                };
+                if items.is_empty()
+                    || items.len() > 50
+                    || items
+                        .iter()
+                        .any(|item| item.get("stopPlanOrderId").is_none())
+                {
+                    return Err(DcexError::InvalidInput(
+                        "MEXC TP/SL cancellation requires 1 to 50 stopPlanOrderId entries.".into(),
+                    ));
+                }
+                self.contract_post_json(CONTRACT_CANCEL_TPSL, orders).await
+            }
+            "cancel_all_contract_tpsl_orders" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "positionId"])?;
+                let mut body = params.body(&["positionId"], &["positionId"], &[]);
+                self.insert_product_symbol(&mut body, params, "_")?;
+                self.contract_post_json(CONTRACT_CANCEL_ALL_TPSL, Value::Object(body))
+                    .await
+            }
+            "amend_contract_limit_tpsl"
+            | "amend_contract_tpsl_order"
+            | "amend_contract_plan_tpsl" => {
+                let plan = method_name == "amend_contract_plan_tpsl";
+                let tpsl_order = method_name == "amend_contract_tpsl_order";
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "orderId",
+                    "stopPlanOrderId",
+                    "lossTrend",
+                    "profitTrend",
+                    "stopLossPrice",
+                    "takeProfitPrice",
+                    "takeProfitReverse",
+                    "stopLossReverse",
+                ])?;
+                let identifier = if tpsl_order {
+                    "stopPlanOrderId"
+                } else {
+                    "orderId"
+                };
+                params.required(identifier)?;
+                let mut body = params.body(
+                    &[
+                        "orderId",
+                        "stopPlanOrderId",
+                        "lossTrend",
+                        "profitTrend",
+                        "stopLossPrice",
+                        "takeProfitPrice",
+                        "takeProfitReverse",
+                        "stopLossReverse",
+                    ],
+                    &[
+                        "orderId",
+                        "stopPlanOrderId",
+                        "lossTrend",
+                        "profitTrend",
+                        "takeProfitReverse",
+                        "stopLossReverse",
+                    ],
+                    &[],
+                );
+                if plan {
+                    self.insert_required_product_symbol(&mut body, params, "_")?;
+                }
+                let path = if plan {
+                    CONTRACT_CHANGE_PLAN_TPSL
+                } else if tpsl_order {
+                    CONTRACT_CHANGE_TPSL
+                } else {
+                    CONTRACT_CHANGE_LIMIT_TPSL
+                };
+                self.contract_post_json(path, Value::Object(body)).await
+            }
             "cancel_contract_order" => {
                 params.ensure_allowed(&["order_id", "orderId"])?;
                 let order_id = params
