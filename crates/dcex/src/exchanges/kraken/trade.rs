@@ -205,6 +205,19 @@ impl KrakenClient {
                 self.private_post(KrakenAuth::Futures, FUTURES_CANCEL_ALL, query)
                     .await
             }
+            "cancel_futures_all_orders_after" => {
+                let timeout = params.required("timeout")?.parse::<u32>().map_err(|_| {
+                    crate::DcexError::InvalidInput(
+                        "Kraken Futures timeout must be a non-negative 32-bit integer".to_string(),
+                    )
+                })?;
+                self.private_post(
+                    KrakenAuth::Futures,
+                    FUTURES_CANCEL_ALL_AFTER,
+                    vec![("timeout".to_string(), timeout.to_string())],
+                )
+                .await
+            }
             _ => return Ok(None),
         };
 

@@ -41,6 +41,7 @@ impl HyperliquidClient {
             "cancel_order" => self.cancel_order_from_params(&params).await,
             "cancel_order_by_cloid" => self.cancel_order_by_cloid_from_params(&params).await,
             "schedule_cancel" => self.schedule_cancel_from_params(&params).await,
+            "transfer_between_dexes" => self.transfer_between_dexes_from_params(&params).await,
             "modify_order" => self.modify_order_from_params(&params).await,
             "modify_batch_orders" => self.modify_batch_orders_from_params(&params).await,
             "update_leverage" => self.update_leverage_from_params(&params).await,
@@ -171,6 +172,41 @@ impl HyperliquidClient {
         }
         let action = object(fields);
         self.submit_action(action, params).await
+    }
+
+    async fn transfer_between_dexes_from_params(
+        &self,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        let source_dex = params.get("sourceDex").unwrap_or("");
+        let destination_dex = params.get("destinationDex").unwrap_or("");
+        if source_dex == destination_dex {
+            return Err(DcexError::InvalidInput(
+                "Hyperliquid internal transfer requires distinct source and destination DEXes"
+                    .to_string(),
+            ));
+        }
+        let destination = self.wallet_address.as_deref().ok_or_else(|| {
+            DcexError::InvalidInput(
+                "Hyperliquid internal transfer requires wallet address".to_string(),
+            )
+        })?;
+        let token = params.required("token")?;
+        let amount = params.positive_decimal("amount")?;
+        let nonce = unix_timestamp_ms()?;
+        let action = object(vec![
+            ("type", string("agentSendAsset")),
+            ("destination", string(destination)),
+            ("sourceDex", string(source_dex)),
+            ("destinationDex", string(destination_dex)),
+            ("token", string(token)),
+            ("amount", string(amount)),
+            ("fromSubAccount", string("")),
+            ("nonce", uint(nonce)),
+        ]);
+        let payload = serde_json::json!({"action": action.to_json()});
+        self.exchange_payload_at_nonce(payload, encode_msgpack(&action), nonce)
+            .await
     }
 
     async fn modify_order_from_params(
@@ -617,6 +653,7 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
         "cancel_order" => &["product_symbol", "oid", "vaultAddress", "expiresAfter"],
         "cancel_order_by_cloid" => &["product_symbol", "cloid", "vaultAddress", "expiresAfter"],
         "schedule_cancel" => &["time", "vaultAddress", "expiresAfter"],
+        "transfer_between_dexes" => &["sourceDex", "destinationDex", "token", "amount"],
         "modify_order" => &[
             "oid",
             "product_symbol",
@@ -915,5 +952,25 @@ mod tests {
         assert_eq!(format_market_order_price(0.090527, true, 5), "0.09053");
         assert_eq!(format_market_order_price(0.090527, false, 5), "0.09052");
         assert_eq!(format_market_order_price(103.0, true, 1), "103");
+    }
+
+    #[test]
+    fn transfer_rejects_identical_dexes_before_network() {
+        let client = HyperliquidClient::public(false, Duration::from_secs(1)).expect("client");
+        let error = crate::http::block_on(async move {
+            client
+                .private_request(
+                    "transfer_between_dexes",
+                    vec![
+                        ("sourceDex".into(), "spot".into()),
+                        ("destinationDex".into(), "spot".into()),
+                        ("token".into(), "USDC:0x0".into()),
+                        ("amount".into(), "1".into()),
+                    ],
+                )
+                .await
+        })
+        .expect_err("identical dexes");
+        assert!(error.to_string().contains("distinct source"));
     }
 }

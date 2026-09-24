@@ -2,12 +2,12 @@
 
 from typing import Any
 
-from ._account_http import AccountHTTP
-from ._market_http import MarketHTTP
+from ._coin_futures_http import CoinFuturesHTTP
+from ._convert_http import ConvertHTTP
 from ._trade_http import TradeHTTP
 
 
-class Client(TradeHTTP, AccountHTTP, MarketHTTP):
+class Client(CoinFuturesHTTP, ConvertHTTP, TradeHTTP):
     """
     Unified Binance API client combining trading, account, and market data functionality.
 

@@ -17,6 +17,70 @@ impl OkxClient {
         params: &OkxParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "get_easy_convert_currencies" => {
+                if let Some(source) = params.get("source") {
+                    if !matches!(source, "1" | "2") {
+                        return Err(DcexError::InvalidInput(
+                            "OKX easy convert source must be 1 or 2".to_string(),
+                        ));
+                    }
+                }
+                self.get_request(TRADE_EASY_CONVERT_CURRENCIES, params.only(&["source"]))
+                    .await
+            }
+            "get_easy_convert_history" => {
+                if let Some(limit) = params.get("limit") {
+                    if !(1..=100).contains(&limit.parse::<u16>().map_err(|_| {
+                        DcexError::InvalidInput(
+                            "OKX easy convert limit must be an integer".to_string(),
+                        )
+                    })?) {
+                        return Err(DcexError::InvalidInput(
+                            "OKX easy convert limit must be between 1 and 100".to_string(),
+                        ));
+                    }
+                }
+                self.get_request(
+                    TRADE_EASY_CONVERT_HISTORY,
+                    params.only(&["after", "before", "limit"]),
+                )
+                .await
+            }
+            "place_easy_convert" => {
+                let currencies = params.json_required("fromCcy")?;
+                if !currencies.as_array().is_some_and(|items| {
+                    (1..=5).contains(&items.len())
+                        && items.iter().all(|item| {
+                            item.as_str()
+                                .is_some_and(|currency| !currency.trim().is_empty())
+                        })
+                }) {
+                    return Err(DcexError::InvalidInput(
+                        "OKX easy convert fromCcy must contain 1 to 5 currency strings".to_string(),
+                    ));
+                }
+                let to_ccy = params.required("toCcy")?;
+                if currencies
+                    .as_array()
+                    .is_some_and(|items| items.iter().any(|item| item.as_str() == Some(to_ccy)))
+                {
+                    return Err(DcexError::InvalidInput(
+                        "OKX easy convert toCcy must differ from fromCcy".to_string(),
+                    ));
+                }
+                if let Some(source) = params.get("source") {
+                    if !matches!(source, "1" | "2") {
+                        return Err(DcexError::InvalidInput(
+                            "OKX easy convert source must be 1 or 2".to_string(),
+                        ));
+                    }
+                }
+                let mut body = params.required_body(&["toCcy"])?;
+                body.insert("fromCcy".to_string(), currencies);
+                insert_optional_string(&mut body, "source", params.get("source"));
+                self.post_request(TRADE_EASY_CONVERT, Value::Object(body))
+                    .await
+            }
             "place_order" => self.place_order_from_params(params).await,
             "pre_check_order" => self.pre_check_order_from_params(params).await,
             "set_cancel_all_after" => {
@@ -550,6 +614,21 @@ mod tests {
             body["attachAlgoOrds"],
             json!([{"tpTriggerPx": "110", "tpOrdPx": "109"}])
         );
+    }
+
+    #[test]
+    fn easy_convert_rejects_more_than_five_currencies_before_network() {
+        let params = OkxParams::from_pairs(vec![
+            ("fromCcy".into(), r#"["A","B","C","D","E","F"]"#.into()),
+            ("toCcy".into(), "USDT".into()),
+        ]);
+        let error = crate::http::block_on(async move {
+            client()
+                .trade_private_request("place_easy_convert", &params)
+                .await
+        })
+        .expect_err("too many currencies");
+        assert!(error.to_string().contains("1 to 5"));
     }
 
     #[test]

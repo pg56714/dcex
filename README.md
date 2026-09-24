@@ -228,6 +228,17 @@ commissions, and user-data listen keys. Market-maker-only controls are not
 wrapped. The Product Table Manager maps listed Binance options to normalized
 symbols while the exchange-specific API still accepts native option symbols.
 
+### Binance COIN-M Futures and Convert
+
+The Binance exchange-specific Rust, synchronous Python, and asynchronous Python
+clients expose COIN-M market data, balances, positions, and basic order
+placement/query/cancellation through the official `dapi` host. COIN-M methods
+currently require native symbols such as `BTCUSD_PERP`; they are not yet
+mapped by the unified Product Table Manager. Convert covers pair limits, asset
+precision, quotes, quote acceptance, order status/history, and limit-order
+management through `sapi`. Balance-changing calls are not included in
+read-only live tests.
+
 ### Binance Margin
 
 Binance cross and isolated margin are available through the exchange-specific
@@ -341,6 +352,9 @@ Kraken Earn wrappers cover strategy discovery, allocations, allocation and
 deallocation requests, and their status queries. Live coverage is read-only;
 fund allocation changes are tested offline only.
 
+Kraken Futures also exposes the dead man's switch
+(`cancel_futures_all_orders_after`); a timeout of `0` disables it.
+
 ### OKX Finance and Sub Accounts
 
 OKX wrappers cover Savings, staking, ETH/SOL staking, flexible loans, Dual
@@ -348,6 +362,12 @@ Investment, OKUSD, spot borrowing/repayment, option market analytics, and
 sub-account balances, bills, interest limits, and internal transfers. Live
 coverage is read-only; subscriptions, redemptions, loans, staking actions, and
 transfers are tested offline only.
+
+OKX Easy Convert currency discovery, conversion, and recent history are
+available through the exchange-specific clients. Hyperliquid also exposes
+agent-signed transfers between the owner's DEX balances; the destination
+address is fixed to the configured wallet. Neither conversion nor transfer is
+called by read-only live tests.
 
 ### MEXC and BingX Sub Accounts
 

@@ -647,3 +647,9 @@ class TradeHTTP(HTTPManager):
             "cancel_futures_all_orders",
             self._native_params(product_symbol=product_symbol),
         )
+
+    async def cancel_futures_all_orders_after(self, timeout: int) -> dict[str, Any]:
+        """Cancel all futures orders after timeout seconds; zero disables the timer."""
+        return await self._native_private(
+            "cancel_futures_all_orders_after", self._native_params(timeout=timeout)
+        )

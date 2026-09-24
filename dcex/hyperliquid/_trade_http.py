@@ -8,6 +8,20 @@ from ._http_manager import HTTPManager
 class TradeHTTP(HTTPManager):
     """HTTP client for trading operations on Hyperliquid exchange."""
 
+    def transfer_between_dexes(
+        self, source_dex: str, destination_dex: str, token: str, amount: str
+    ) -> dict[str, Any]:
+        """Move collateral between this wallet''s Spot and Perp DEX balances."""
+        return self._native_private(
+            "transfer_between_dexes",
+            self._native_params(
+                sourceDex=source_dex,
+                destinationDex=destination_dex,
+                token=token,
+                amount=amount,
+            ),
+        )
+
     def place_order(
         self,
         product_symbol: str,

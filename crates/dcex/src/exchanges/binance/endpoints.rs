@@ -1,5 +1,7 @@
 pub(super) const SPOT_BASE_URL: &str = "https://api.binance.com";
 pub(super) const FUTURES_BASE_URL: &str = "https://fapi.binance.com";
+pub(super) const COIN_FUTURES_BASE_URL: &str = "https://dapi.binance.com";
+pub(super) const COIN_FUTURES_SERVER_TIME: &str = "/dapi/v1/time";
 pub(super) const OPTIONS_BASE_URL: &str = "https://eapi.binance.com";
 pub(super) const SPOT_SERVER_TIME: &str = "/api/v3/time";
 pub(super) const SPOT_EXCHANGE_INFO: &str = "/api/v3/exchangeInfo";

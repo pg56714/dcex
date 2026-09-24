@@ -180,6 +180,90 @@ fn raw_auto_identifies_options_paths() {
 }
 
 #[test]
+fn raw_auto_identifies_coin_futures_paths() {
+    assert_eq!(
+        BinanceMarket::from_path("/dapi/v1/exchangeInfo").expect("market"),
+        BinanceMarket::CoinFutures
+    );
+}
+
+#[test]
+fn coin_futures_market_data_uses_dapi_base_url() {
+    let (coin_base_url, handle) = recording_server();
+    let client = BinanceClient::public(Duration::from_secs(2))
+        .expect("client")
+        .with_coin_futures_base_url(coin_base_url);
+    block_on(async move {
+        client
+            .public_request(
+                "get_coin_futures_orderbook",
+                vec![
+                    ("symbol".into(), "BTCUSD_PERP".into()),
+                    ("limit".into(), "5".into()),
+                ],
+            )
+            .await
+    })
+    .expect("response");
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /dapi/v1/depth?symbol=BTCUSD_PERP&limit=5 HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn coin_futures_balance_uses_dapi_signed_route() {
+    let (coin_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::new(
+        Some("api-key".into()),
+        Some("secret".into()),
+        Duration::from_secs(2),
+    )
+    .expect("client")
+    .with_coin_futures_base_url(coin_base_url);
+    block_on(async move {
+        client
+            .private_request("get_coin_futures_balance", Vec::new())
+            .await
+    })
+    .expect("response");
+    assert!(handle
+        .join()
+        .expect("server")
+        .expect("request")
+        .starts_with("GET /dapi/v1/balance?"));
+}
+
+#[test]
+fn convert_pairs_require_at_least_one_asset() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error =
+        block_on(async move { client.public_request("get_convert_pairs", Vec::new()).await })
+            .expect_err("missing filter");
+    assert!(error.to_string().contains("fromAsset or toAsset"));
+}
+
+#[test]
+fn convert_quote_requires_one_amount_before_network() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "get_convert_quote",
+                vec![
+                    ("fromAsset".into(), "BTC".into()),
+                    ("toAsset".into(), "USDT".into()),
+                    ("fromAmount".into(), "1".into()),
+                    ("toAmount".into(), "100".into()),
+                ],
+            )
+            .await
+    })
+    .expect_err("two amounts");
+    assert!(error.to_string().contains("exactly one"));
+}
+
+#[test]
 fn raw_auto_routes_options_paths_to_options_base_url() {
     let (options_base_url, handle) = recording_server();
     let client = BinanceClient::with_all_base_urls(

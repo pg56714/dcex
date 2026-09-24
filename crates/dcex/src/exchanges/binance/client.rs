@@ -14,6 +14,7 @@ use super::signing::{extract_server_time_ms, BinanceResponseValidator, BinanceSi
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinanceMarket {
+    CoinFutures,
     Equity,
     Futures,
     Options,
@@ -23,6 +24,7 @@ pub enum BinanceMarket {
 impl BinanceMarket {
     pub const fn base_url(self) -> &'static str {
         match self {
+            Self::CoinFutures => COIN_FUTURES_BASE_URL,
             Self::Equity => SPOT_BASE_URL,
             Self::Futures => FUTURES_BASE_URL,
             Self::Options => OPTIONS_BASE_URL,
@@ -31,6 +33,9 @@ impl BinanceMarket {
     }
 
     pub fn from_path(path: &str) -> Result<Self> {
+        if path.starts_with("/dapi/") {
+            return Ok(Self::CoinFutures);
+        }
         if path.starts_with("/sapi/v1/equity/") {
             return Ok(Self::Equity);
         }
@@ -52,6 +57,7 @@ impl BinanceMarket {
 #[derive(Clone)]
 pub struct BinanceClient {
     inner: ExchangeHttpClient,
+    coin_futures_base_url: String,
     futures_base_url: String,
     options_base_url: String,
     spot_base_url: String,
@@ -118,6 +124,7 @@ impl BinanceClient {
         }
         Ok(Self {
             inner,
+            coin_futures_base_url: COIN_FUTURES_BASE_URL.to_string(),
             futures_base_url,
             options_base_url,
             spot_base_url,
@@ -129,6 +136,11 @@ impl BinanceClient {
 
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
         self.product_table = Some(Arc::new(product_table));
+        self
+    }
+
+    pub fn with_coin_futures_base_url(mut self, base_url: impl Into<String>) -> Self {
+        self.coin_futures_base_url = base_url.into();
         self
     }
 
@@ -190,6 +202,7 @@ impl BinanceClient {
 
         let local_start = unix_timestamp_ms()?;
         let path = match market {
+            BinanceMarket::CoinFutures => COIN_FUTURES_SERVER_TIME,
             BinanceMarket::Equity => SPOT_SERVER_TIME,
             BinanceMarket::Futures => FUTURES_SERVER_TIME,
             BinanceMarket::Options => OPTIONS_SERVER_TIME,
@@ -219,6 +232,7 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> HttpRequest {
         let base_url = match market {
+            BinanceMarket::CoinFutures => &self.coin_futures_base_url,
             BinanceMarket::Equity => &self.spot_base_url,
             BinanceMarket::Futures => &self.futures_base_url,
             BinanceMarket::Options => &self.options_base_url,

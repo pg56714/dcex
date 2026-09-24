@@ -20,6 +20,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         cancel_futures_all_orders(),
+        cancel_futures_all_orders_after(timeout => "timeout"),
         cancel_futures_order(),
         cancel_spot_all_orders(),
         cancel_spot_all_orders_after(timeout => "timeout"),

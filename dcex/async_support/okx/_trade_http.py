@@ -5,6 +5,32 @@ from ._http_manager import HTTPManager
 
 
 class TradeHTTP(HTTPManager):
+    async def get_easy_convert_currencies(self, source: str | None = None) -> dict[str, Any]:
+        """Return currencies eligible for OKX Easy Convert."""
+        return await self._native_private(
+            "get_easy_convert_currencies", self._native_params(source=source)
+        )
+
+    async def get_easy_convert_history(
+        self, after: str | None = None, before: str | None = None, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Return OKX Easy Convert transactions."""
+        return await self._native_private(
+            "get_easy_convert_history",
+            self._native_params(after=after, before=before, limit=limit),
+        )
+
+    async def place_easy_convert(
+        self, from_ccy: list[str], to_ccy: str, source: str | None = None
+    ) -> dict[str, Any]:
+        """Convert up to five small currency balances."""
+        if not 1 <= len(from_ccy) <= 5:
+            raise ValueError("from_ccy must contain one to five currencies")
+        return await self._native_private(
+            "place_easy_convert",
+            self._native_params(fromCcy=from_ccy, toCcy=to_ccy, source=source),
+        )
+
     async def place_order(
         self,
         product_symbol: str,

@@ -18,7 +18,7 @@ pub struct HyperliquidClient {
     transport: AsyncHttpClient,
     endpoint: String,
     testnet: bool,
-    wallet_address: Option<String>,
+    pub(super) wallet_address: Option<String>,
     private_key: Option<[u8; 32]>,
     product_table: Option<Arc<ProductTable>>,
 }
@@ -159,6 +159,30 @@ impl HyperliquidClient {
             true,
         )
         .await
+    }
+
+    pub(super) async fn exchange_payload_at_nonce(
+        &self,
+        payload: Value,
+        action_msgpack: Vec<u8>,
+        nonce: u64,
+    ) -> Result<ValidatedResponse> {
+        let request = self.build_request(
+            HttpMethod::Post,
+            EXCHANGE,
+            json_bytes(&payload)?,
+            Some(&action_msgpack),
+            true,
+            nonce,
+        )?;
+        let response = self.transport.execute(request).await?;
+        response.ensure_success()?;
+        let data = response.json()?;
+        Ok(ValidatedResponse {
+            status: response.status,
+            headers: response.headers,
+            data,
+        })
     }
 
     fn build_request(

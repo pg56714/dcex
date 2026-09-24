@@ -1,5 +1,7 @@
 mod account;
 mod client;
+mod coin_futures;
+mod convert;
 mod earn;
 mod endpoints;
 mod equity;

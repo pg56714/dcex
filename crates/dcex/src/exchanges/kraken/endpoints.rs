@@ -46,5 +46,6 @@ pub(super) const SPOT_TRADES_HISTORY: &str = "/0/private/TradesHistory";
 pub(super) const FUTURES_SEND_ORDER: &str = "/derivatives/api/v3/sendorder";
 pub(super) const FUTURES_CANCEL_ORDER: &str = "/derivatives/api/v3/cancelorder";
 pub(super) const FUTURES_CANCEL_ALL: &str = "/derivatives/api/v3/cancelallorders";
+pub(super) const FUTURES_CANCEL_ALL_AFTER: &str = "/derivatives/api/v3/cancelallordersafter";
 pub(super) const FUTURES_OPEN_ORDERS: &str = "/derivatives/api/v3/openorders";
 pub(super) const FUTURES_ORDER_STATUS: &str = "/derivatives/api/v3/orders/status";

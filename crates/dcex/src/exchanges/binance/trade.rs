@@ -917,6 +917,9 @@ impl BinanceClient {
             (BinanceMarket::Options, false) => OPTIONS_ORDER,
             (BinanceMarket::Options, true) => unreachable!("handled above"),
             (BinanceMarket::Equity, _) => unreachable!("handled above"),
+            (BinanceMarket::CoinFutures, _) => {
+                unreachable!("COIN-M uses its dedicated order methods")
+            }
         };
         let mut params = vec![
             ("symbol".to_string(), self.exchange_symbol(product_symbol)?),

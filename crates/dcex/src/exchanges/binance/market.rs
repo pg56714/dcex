@@ -558,6 +558,15 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
+        if let Some(response) = self
+            .coin_futures_public_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self.convert_public_request(method_name, &params).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.equity_public_request(method_name, &params).await? {
             return Ok(response);
         }
