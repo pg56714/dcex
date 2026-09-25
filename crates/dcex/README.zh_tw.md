@@ -8,7 +8,7 @@
 
 > 本專案衍生自 [krex](https://github.com/kairosresearchio/krex)；krex 是 [ccxt](https://github.com/ccxt/ccxt) Python 函式庫的簡化版本。
 
-[![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org/)
+[![Rust](https://img.shields.io/badge/rust-2024-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Crates.io](https://img.shields.io/crates/v/dcex)](https://crates.io/crates/dcex)
 

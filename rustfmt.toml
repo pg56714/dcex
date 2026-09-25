@@ -1,0 +1,2 @@
+# Preserve the existing formatting style while using Rust 2024 syntax.
+style_edition = "2021"

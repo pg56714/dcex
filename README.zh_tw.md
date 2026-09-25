@@ -9,7 +9,7 @@ dcex 是以 Rust 為核心的交易所函式庫，提供 Python 同步／非同�
 > 本專案衍生自 [krex](https://github.com/kairosresearchio/krex)；krex 是 [ccxt](https://github.com/ccxt/ccxt) Python 函式庫的簡化版本。
 
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
-[![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org/)
+[![Rust](https://img.shields.io/badge/rust-2024-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/dcex)](https://badge.fury.io/py/dcex)
 [![Crates.io](https://img.shields.io/crates/v/dcex)](https://crates.io/crates/dcex)

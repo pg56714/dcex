@@ -9,7 +9,7 @@ dcex is a Rust-backed exchange library with synchronous and asynchronous Python 
 > Forked from [krex](https://github.com/kairosresearchio/krex), a simplified version of the [ccxt](https://github.com/ccxt/ccxt) Python library.
 
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
-[![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org/)
+[![Rust](https://img.shields.io/badge/rust-2024-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/dcex)](https://badge.fury.io/py/dcex)
 [![Crates.io](https://img.shields.io/crates/v/dcex)](https://crates.io/crates/dcex)
