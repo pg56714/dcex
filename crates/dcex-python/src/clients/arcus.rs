@@ -8,12 +8,14 @@ struct PythonArcusSpotHttpClient {
 #[pymethods]
 impl PythonArcusSpotHttpClient {
     #[new]
-    #[pyo3(signature = (api_key=None, testnet=false, timeout=10.0, base_url=None))]
+    #[pyo3(signature = (api_key=None, testnet=false, timeout=10.0, base_url=None, wallet_address=None, rpc_url=None))]
     fn new(
         api_key: Option<String>,
         testnet: bool,
         timeout: f64,
         base_url: Option<String>,
+        wallet_address: Option<String>,
+        rpc_url: Option<String>,
     ) -> PyResult<Self> {
         let mut client = ArcusSpotClient::new(api_key, testnet, http_timeout(timeout)?)
             .map_err(to_py_runtime_error)?;
@@ -22,10 +24,18 @@ impl PythonArcusSpotHttpClient {
                 .with_base_url(base_url)
                 .map_err(to_py_runtime_error)?;
         }
+        if let Some(wallet_address) = wallet_address {
+            client = client
+                .with_wallet_address(wallet_address)
+                .map_err(to_py_runtime_error)?;
+        }
+        if let Some(rpc_url) = rpc_url {
+            client = client.with_rpc_url(rpc_url).map_err(to_py_runtime_error)?;
+        }
         Ok(Self { client })
     }
 
-    #[pyo3(signature = (quote_json, taker, signature, permits_json=None, route_tag=None))]
+    #[pyo3(signature = (quote_json, taker, signature, permits_json=None, route_tag=None, builder_fee_bps=None))]
     fn build_signed_quote_json(
         &self,
         py: Python<'_>,
@@ -34,6 +44,7 @@ impl PythonArcusSpotHttpClient {
         signature: String,
         permits_json: Option<String>,
         route_tag: Option<String>,
+        builder_fee_bps: Option<u16>,
     ) -> PyResult<Py<PyAny>> {
         let quote = serde_json::from_str(&quote_json)
             .map_err(|error| PyValueError::new_err(format!("invalid Arcus quote JSON: {error}")))?;
@@ -46,7 +57,14 @@ impl PythonArcusSpotHttpClient {
             .transpose()?;
         let body = self
             .client
-            .build_signed_quote(quote, &taker, &signature, permits, route_tag.as_deref())
+            .build_signed_quote_with_fee(
+                quote,
+                &taker,
+                &signature,
+                permits,
+                route_tag.as_deref(),
+                builder_fee_bps,
+            )
             .map_err(to_py_runtime_error)?;
         json_value_to_py(py, &body)
     }

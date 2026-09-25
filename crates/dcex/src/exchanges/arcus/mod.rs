@@ -6,6 +6,7 @@ mod market;
 mod params;
 mod signing;
 mod trade;
+mod wallet;
 mod wrappers;
 
 #[cfg(test)]

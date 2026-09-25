@@ -171,8 +171,16 @@ perpetual futures only; private access uses `ONDO_API_KEY_ID` and
 [Arcus Spot](https://github.com/arcus-xyz/arcus-spot-sdk) uses a separate RFQ
 router. `dcex.arcus()` supports token discovery, prices, firm quotes, validated
 assembly and submission of an externally wallet-signed EIP-712 quote, and
-status checks; public hosted quotes need no API key. Wallet signing and any
-required token permit/approval remain the caller's responsibility.
+status checks; public hosted quotes need no API key. Spot wallet ETH/token
+balances, Permit2 allowance, transaction receipts, and SwapShell trade history
+are read from Robinhood Chain RPC, not the Perps account API. Pass
+`wallet_address` and optionally `rpc_url` to `dcex.arcus()`, or set
+`ARCUS_ADDRESS`. Public RPC is rate-limited; use a provider URL for production.
+`get_balances()` includes
+the router-listed tokens and their wrapped representations by default; pass
+`include_wrapped=False` to omit the latter. Balance/allowance amounts are
+decimal strings in atomic units. Wallet signing and any required token
+permit/approval remain the caller's responsibility.
 The Arcus app's Ed25519 API key is for the Perps API, not the Spot Router.
 Spot integration partners can pass their separately issued router key as
 `api_key` when constructing a Spot client.

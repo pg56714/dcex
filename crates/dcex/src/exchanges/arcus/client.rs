@@ -127,10 +127,12 @@ mod spot {
 
     #[derive(Clone)]
     pub struct ArcusSpotClient {
-        transport: AsyncHttpClient,
+        pub(in crate::exchanges::arcus) transport: AsyncHttpClient,
         base_url: String,
-        chain_id: u64,
+        pub(in crate::exchanges::arcus) chain_id: u64,
         api_key: Option<String>,
+        pub(in crate::exchanges::arcus) rpc_url: String,
+        pub(in crate::exchanges::arcus) wallet_address: Option<String>,
     }
 
     impl ArcusSpotClient {
@@ -140,7 +142,32 @@ mod spot {
                 base_url: if testnet { TESTNET_URL } else { MAINNET_URL }.into(),
                 chain_id: if testnet { 46630 } else { 4663 },
                 api_key,
+                rpc_url: if testnet {
+                    "https://rpc.testnet.chain.robinhood.com"
+                } else {
+                    "https://rpc.mainnet.chain.robinhood.com"
+                }
+                .into(),
+                wallet_address: None,
             })
+        }
+
+        pub fn with_rpc_url(mut self, rpc_url: String) -> Result<Self> {
+            let url = url::Url::parse(&rpc_url)
+                .map_err(|_| DcexError::InvalidInput("invalid Arcus wallet RPC URL".into()))?;
+            if !matches!(url.scheme(), "https" | "http") || url.host_str().is_none() {
+                return Err(DcexError::InvalidInput(
+                    "Arcus wallet RPC URL must use HTTP(S)".into(),
+                ));
+            }
+            self.rpc_url = rpc_url;
+            Ok(self)
+        }
+
+        pub fn with_wallet_address(mut self, address: String) -> Result<Self> {
+            validate_address(&address)?;
+            self.wallet_address = Some(address);
+            Ok(self)
         }
 
         pub fn with_base_url(mut self, base_url: String) -> Result<Self> {
@@ -171,6 +198,18 @@ mod spot {
             signature: &str,
             permits: Option<Value>,
             route_tag: Option<&str>,
+        ) -> Result<Value> {
+            self.build_signed_quote_with_fee(quote, taker, signature, permits, route_tag, None)
+        }
+
+        pub fn build_signed_quote_with_fee(
+            &self,
+            quote: Value,
+            taker: &str,
+            signature: &str,
+            permits: Option<Value>,
+            route_tag: Option<&str>,
+            builder_fee_bps: Option<u16>,
         ) -> Result<Value> {
             validate_address(taker)?;
             validate_hex(signature, 65)?;
@@ -209,10 +248,34 @@ mod spot {
                 }
                 body.insert("routeTag".into(), Value::String(route_tag.into()));
             }
+            if let Some(bps) = builder_fee_bps {
+                self.validate_builder_fee(bps)?;
+                body.insert("builderFeeBps".into(), Value::from(bps));
+            }
             Ok(Value::Object(body))
         }
 
         pub async fn public_request(
+            &self,
+            method_name: &str,
+            params: Vec<(String, String)>,
+        ) -> Result<ValidatedResponse> {
+            if matches!(
+                method_name,
+                "get_native_balance"
+                    | "get_token_balance"
+                    | "get_allowance"
+                    | "get_balances"
+                    | "get_transaction_receipt"
+                    | "get_block_number"
+                    | "get_trade_history"
+            ) {
+                return self.wallet_request(method_name, params).await;
+            }
+            self.router_request(method_name, params).await
+        }
+
+        pub(in crate::exchanges::arcus) async fn router_request(
             &self,
             method_name: &str,
             params: Vec<(String, String)>,
@@ -237,9 +300,16 @@ mod spot {
                             "taker",
                             "slippageBps",
                             "allowWrapped",
+                            "builderFeeBps",
                         ][..]
                     } else {
-                        &["chainId", "sellToken", "buyToken", "sellAmount"][..]
+                        &[
+                            "chainId",
+                            "sellToken",
+                            "buyToken",
+                            "sellAmount",
+                            "builderFeeBps",
+                        ][..]
                     };
                     ensure_allowed(&values, allowed)?;
                     let sell = required(&values, "sellToken")?;
@@ -252,6 +322,12 @@ mod spot {
                         ));
                     }
                     validate_positive_atoms(required(&values, "sellAmount")?)?;
+                    if let Some(fee) = values.get("builderFeeBps") {
+                        let bps = fee.parse::<u16>().map_err(|_| {
+                            DcexError::InvalidInput("invalid Arcus spot builderFeeBps".into())
+                        })?;
+                        self.validate_builder_fee(bps)?;
+                    }
                     if method_name == "get_quote" {
                         validate_address(required(&values, "taker")?)?;
                         if let Some(slippage) = values.get("slippageBps") {
@@ -340,6 +416,15 @@ mod spot {
                     "Arcus spot permits must be a JSON array".into(),
                 ));
             }
+            if let Some(fee) = object.get("builderFeeBps") {
+                let bps = fee
+                    .as_u64()
+                    .and_then(|value| u16::try_from(value).ok())
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput("invalid Arcus spot builderFeeBps".into())
+                    })?;
+                self.validate_builder_fee(bps)?;
+            }
             let request =
                 HttpRequest::new(HttpMethod::Post, &self.base_url, "/v1/submit").json(signed_quote);
             self.execute(request).await
@@ -375,6 +460,20 @@ mod spot {
                 values.insert("chainId".into(), self.chain_id.to_string());
             }
             Ok(values.into_iter().collect())
+        }
+
+        fn validate_builder_fee(&self, bps: u16) -> Result<()> {
+            if bps > 10_000 {
+                return Err(DcexError::InvalidInput(
+                    "Arcus spot builderFeeBps must be at most 10000".into(),
+                ));
+            }
+            if bps > 0 && self.api_key.is_none() {
+                return Err(DcexError::InvalidInput(
+                    "Arcus spot builderFeeBps requires a router API key".into(),
+                ));
+            }
+            Ok(())
         }
 
         async fn execute(&self, mut request: HttpRequest) -> Result<ValidatedResponse> {
@@ -489,6 +588,37 @@ mod spot {
             assert_eq!(body["signature"], signature);
             assert_eq!(body["permits"][0]["token"], "permit");
             assert_eq!(body["routeTag"], "strategy-a");
+        }
+
+        #[test]
+        fn builder_fee_requires_separate_router_key() {
+            let quote = serde_json::json!({
+                "venue": "arcus",
+                "toSign": {
+                    "domain": {"chainId": 4663},
+                    "primaryType": "PermitWitnessTransferFrom"
+                }
+            });
+            let taker = format!("0x{}", "11".repeat(20));
+            let signature = format!("0x{}", "22".repeat(65));
+            let public = ArcusSpotClient::new(None, false, Duration::from_secs(1)).unwrap();
+            assert!(public
+                .build_signed_quote_with_fee(
+                    quote.clone(),
+                    &taker,
+                    &signature,
+                    None,
+                    None,
+                    Some(80),
+                )
+                .is_err());
+            let partner =
+                ArcusSpotClient::new(Some("router-key".into()), false, Duration::from_secs(1))
+                    .unwrap();
+            let body = partner
+                .build_signed_quote_with_fee(quote, &taker, &signature, None, None, Some(80))
+                .unwrap();
+            assert_eq!(body["builderFeeBps"], 80);
         }
     }
 }

@@ -25,7 +25,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
         health(), get_tokens(),
         get_price(sell_token => "sellToken", buy_token => "buyToken", sell_amount => "sellAmount"),
-        get_quote(sell_token => "sellToken", buy_token => "buyToken", sell_amount => "sellAmount", taker => "taker")
+        get_quote(sell_token => "sellToken", buy_token => "buyToken", sell_amount => "sellAmount", taker => "taker"),
+        get_native_balance(), get_balances(), get_block_number(),
+        get_token_balance(token => "token"), get_allowance(token => "token"),
+        get_transaction_receipt(tx_hash => "tx_hash"),
+        get_trade_history(from_block => "from_block")
     ];
     private [];
 }

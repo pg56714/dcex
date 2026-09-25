@@ -3,7 +3,9 @@
 # ruff: noqa: D103
 
 import asyncio
+import importlib
 import json
+from types import SimpleNamespace
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -210,6 +212,70 @@ def test_arcus_spot_async_key_is_explicit_and_separate_from_perps(
     asyncio.run(check())
 
 
+def test_arcus_spot_wallet_python_wrappers_forward_to_native(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Wallet methods use the same Rust-backed request path in sync and async."""
+
+    class NativeWalletStub:
+        def __init__(self, **kwargs: object) -> None:
+            self.options = kwargs
+
+        def public_request_json(
+            self, method_name: str, params: list[tuple[str, str]]
+        ) -> tuple[int, dict[str, str], dict[str, object]]:
+            return 200, {}, {"method": method_name, "params": params}
+
+        async def public_request_json_async(
+            self, method_name: str, params: list[tuple[str, str]]
+        ) -> tuple[int, dict[str, str], dict[str, object]]:
+            return self.public_request_json(method_name, params)
+
+    native = SimpleNamespace(ArcusSpotHttpClient=NativeWalletStub)
+    sync_module = importlib.import_module("dcex.arcus.spot")
+    async_module = importlib.import_module("dcex.async_support.arcus.spot")
+    monkeypatch.setattr(sync_module, "load_native", lambda: native)
+    monkeypatch.setattr(async_module, "load_native", lambda: native)
+    monkeypatch.setenv("ARCUS_ADDRESS", TAKER)
+
+    default_client = SyncSpotClient()
+    assert default_client._native_client.options["wallet_address"] == TAKER
+
+    client = SyncSpotClient(wallet_address=TAKER, rpc_url="http://rpc.local")
+    assert client._native_client.options["wallet_address"] == TAKER
+    assert client.get_native_balance()["method"] == "get_native_balance"
+    assert client.get_token_balance(SELL)["params"] == [("token", SELL)]
+    assert client.get_allowance(SELL)["method"] == "get_allowance"
+    assert client.get_balances(tokens=[SELL])["params"] == [("tokens_json", json.dumps([SELL]))]
+    assert client.get_balances(tokens=[SELL], include_wrapped=False)["params"] == [
+        ("tokens_json", json.dumps([SELL])),
+        ("include_wrapped", "false"),
+    ]
+    assert client.get_block_number()["method"] == "get_block_number"
+    assert client.get_transaction_receipt("0x" + "55" * 32)["method"] == ("get_transaction_receipt")
+    assert client.get_trade_history(100, 200, token_in=SELL)["params"] == [
+        ("from_block", "100"),
+        ("to_block", "200"),
+        ("token_in", SELL),
+    ]
+
+    async def check() -> None:
+        default_async_client = await AsyncSpotClient().async_init()
+        assert default_async_client._native_client.options["wallet_address"] == TAKER
+        async_client = await AsyncSpotClient(wallet_address=TAKER).async_init()
+        assert (await async_client.get_native_balance())["method"] == "get_native_balance"
+        assert (await async_client.get_token_balance(SELL))["method"] == "get_token_balance"
+        assert (await async_client.get_balances(tokens=[SELL]))["method"] == "get_balances"
+        assert (await async_client.get_allowance(SELL))["method"] == "get_allowance"
+        assert (await async_client.get_block_number())["method"] == "get_block_number"
+        assert (await async_client.get_transaction_receipt("0x" + "55" * 32))["method"] == (
+            "get_transaction_receipt"
+        )
+        assert (await async_client.get_trade_history(100))["method"] == "get_trade_history"
+
+    asyncio.run(check())
+
+
 def test_arcus_async_factory_market_selection() -> None:
     """The async entry point mirrors sync Spot and Perps selection."""
 
@@ -222,8 +288,11 @@ def test_arcus_async_factory_market_selection() -> None:
     asyncio.run(check())
 
 
-def test_arcus_perps_signed_order_and_cancel_routes_are_complete() -> None:
+def test_arcus_perps_signed_order_and_cancel_routes_are_complete(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Verify Perps market lookup, signing, order and cancellation locally."""
+    monkeypatch.delenv("ARCUS_API_KEY", raising=False)
     market_response = {
         "markets": [
             {

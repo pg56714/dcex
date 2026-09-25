@@ -89,6 +89,10 @@ impl HttpRequest {
 
     pub fn url(&self) -> Result<Url> {
         let base = self.base_url.trim_end_matches('/');
+        if self.path.is_empty() {
+            return Url::parse(base)
+                .map_err(|error| DcexError::InvalidInput(format!("invalid request URL: {error}")));
+        }
         let path = self.path.trim_start_matches('/');
         Url::parse(&format!("{base}/{path}"))
             .map_err(|error| DcexError::InvalidInput(format!("invalid request URL: {error}")))

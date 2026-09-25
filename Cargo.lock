@@ -261,6 +261,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "sha3",
  "starknet-crypto",
  "tokio",
  "tokio-tungstenite",
