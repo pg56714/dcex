@@ -40,7 +40,7 @@ pub(super) fn public_path(method_name: &str) -> Result<&'static str> {
         _ => {
             return Err(DcexError::InvalidInput(format!(
                 "unknown Arcus public method: {method_name}"
-            )))
+            )));
         }
     })
 }

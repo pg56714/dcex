@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_i64, insert_optional_string, string_body, BybitParams};
+use super::params::{BybitParams, insert_optional_i64, insert_optional_string, string_body};
 
 impl BybitClient {
     pub(super) async fn liquidity_mining_public_request(
@@ -296,11 +296,13 @@ mod tests {
     #[test]
     fn liquidity_order_link_id_is_bounded() {
         assert!(order_body(&params(&[("productId", "1"), ("orderLinkId", "a")])).is_ok());
-        assert!(order_body(&params(&[
-            ("productId", "1"),
-            ("orderLinkId", &"a".repeat(41))
-        ]))
-        .is_err());
+        assert!(
+            order_body(&params(&[
+                ("productId", "1"),
+                ("orderLinkId", &"a".repeat(41))
+            ]))
+            .is_err()
+        );
     }
 
     #[test]

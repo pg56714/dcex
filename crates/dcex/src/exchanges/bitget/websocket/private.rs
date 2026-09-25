@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::crypto::hmac_sha256_base64;
 use crate::exchange::unix_timestamp_ms;
@@ -571,13 +571,15 @@ mod tests {
         assert!(
             BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "positions", "default").is_ok()
         );
-        assert!(BitgetPrivateWebSocketArg::with_inst_id_and_coin(
-            "USDT-FUTURES",
-            "positions",
-            "default",
-            "USDT"
-        )
-        .is_err());
+        assert!(
+            BitgetPrivateWebSocketArg::with_inst_id_and_coin(
+                "USDT-FUTURES",
+                "positions",
+                "default",
+                "USDT"
+            )
+            .is_err()
+        );
     }
 
     #[test]

@@ -1,11 +1,11 @@
 use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::BitgetClient;
 use super::endpoints::*;
-use super::params::{require_one_identifier, BitgetParams};
+use super::params::{BitgetParams, require_one_identifier};
 
 impl BitgetClient {
     pub(super) async fn account_private_request(

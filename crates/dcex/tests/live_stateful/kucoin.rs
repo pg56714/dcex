@@ -5,10 +5,10 @@ use dcex::exchanges::kucoin::KucoinClient;
 use tokio::time::sleep;
 
 use super::common::{
-    assert_success, asset_amount, fetch_trading_details, first_bid_price, format_step_decimal,
-    live_test_error, minimum_order_quantity, params, parse_positive, post_only_buy_price,
-    require_env, require_live_fill, require_live_trading, require_order_id, round_down_to_step,
-    unique_client_id, BTC_USDT_SPOT,
+    BTC_USDT_SPOT, assert_success, asset_amount, fetch_trading_details, first_bid_price,
+    format_step_decimal, live_test_error, minimum_order_quantity, params, parse_positive,
+    post_only_buy_price, require_env, require_live_fill, require_live_trading, require_order_id,
+    round_down_to_step, unique_client_id,
 };
 
 #[tokio::test]

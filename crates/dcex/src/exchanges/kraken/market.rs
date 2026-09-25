@@ -4,7 +4,7 @@ use crate::{DcexError, Result};
 
 use super::client::{KrakenAuth, KrakenClient};
 use super::endpoints::*;
-use super::params::{take_param, KrakenParams};
+use super::params::{KrakenParams, take_param};
 
 impl KrakenClient {
     pub async fn public_request(

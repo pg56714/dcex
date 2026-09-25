@@ -7,7 +7,7 @@ use crate::{DcexError, Result};
 use super::client::MexcClient;
 use super::endpoints::*;
 use super::params::{
-    add_pagination_defaults, require_one_identifier, validate_enum, validate_u64_range, MexcParams,
+    MexcParams, add_pagination_defaults, require_one_identifier, validate_enum, validate_u64_range,
 };
 use super::signing::json_value_string;
 

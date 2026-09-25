@@ -1,9 +1,9 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
 use super::params::{
-    push_optional, push_optional_display, BinanceFundingRateParams, BinanceFuturesBasisParams,
-    BinanceFuturesPeriodParams, BinanceKlinesParams, BinanceLimitParams,
-    BinanceOptionalSymbolParams, BinanceSymbolListParams, PublicParams,
+    BinanceFundingRateParams, BinanceFuturesBasisParams, BinanceFuturesPeriodParams,
+    BinanceKlinesParams, BinanceLimitParams, BinanceOptionalSymbolParams, BinanceSymbolListParams,
+    PublicParams, push_optional, push_optional_display,
 };
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;

@@ -3,7 +3,7 @@ use std::time::Duration;
 use dcex::exchanges::bingx::BingxClient;
 
 use super::common::{
-    require_env, run_cases, run_private_cases, Case, BTC_USDT_SPOT, BTC_USDT_SWAP,
+    BTC_USDT_SPOT, BTC_USDT_SWAP, Case, require_env, run_cases, run_private_cases,
 };
 
 #[tokio::test]

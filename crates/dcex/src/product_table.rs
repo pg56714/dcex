@@ -542,9 +542,11 @@ mod tests {
             ),
         ]);
 
-        assert!(table
-            .get_product_symbol("example", "BTCUSD", Some("futures"), None)
-            .is_err());
+        assert!(
+            table
+                .get_product_symbol("example", "BTCUSD", Some("futures"), None)
+                .is_err()
+        );
         assert_eq!(
             table
                 .get_product_symbol("example", "BTCUSD", Some("futures"), Some("dated-2026"),)

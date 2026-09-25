@@ -136,7 +136,7 @@ impl BackpackClient {
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported Backpack public method: {method_name}"
-                )))
+                )));
             }
         }?;
         Ok(response)

@@ -5,12 +5,12 @@ use serde_json::{Map, Value};
 use super::client::ExtendedClient;
 use super::endpoints::*;
 use super::params::{
-    body_object, json_bool, json_string, json_u64, object_allowed, object_required, path_with_id,
-    validate_non_negative_decimal, validate_positive_decimal, ExtendedParams,
+    ExtendedParams, body_object, json_bool, json_string, json_u64, object_allowed, object_required,
+    path_with_id, validate_non_negative_decimal, validate_positive_decimal,
 };
 use super::signing::{
-    build_signed_order, extract_market_from_param, extract_market_from_response,
-    signed_order_response, StarknetDomain,
+    StarknetDomain, build_signed_order, extract_market_from_param, extract_market_from_response,
+    signed_order_response,
 };
 
 impl ExtendedClient {
@@ -692,11 +692,9 @@ fn validate_expiry(expiry_epoch_millis: u64, domain: StarknetDomain) -> Result<(
     };
     let max_order_lifetime_ms = max_days * 24 * 60 * 60 * 1_000;
     if expiry_epoch_millis <= now || expiry_epoch_millis - now > max_order_lifetime_ms {
-        return Err(DcexError::InvalidInput(
-            format!(
-                "Extended expiryEpochMillis must be in the future and no more than {max_days} days away"
-            ),
-        ));
+        return Err(DcexError::InvalidInput(format!(
+            "Extended expiryEpochMillis must be in the future and no more than {max_days} days away"
+        )));
     }
     Ok(())
 }

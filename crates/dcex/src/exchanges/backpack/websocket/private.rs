@@ -2,13 +2,13 @@ use std::time::Duration;
 
 use serde_json::Value;
 
+use crate::Result;
 use crate::exchange::unix_timestamp_ms;
 use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
-use crate::Result;
 
 use super::super::client::BackpackClient;
-use super::{stream_symbol, subscription_payload, WS_URL};
+use super::{WS_URL, stream_symbol, subscription_payload};
 
 pub struct BackpackPrivateWebSocket {
     connection: WebSocketConnection,

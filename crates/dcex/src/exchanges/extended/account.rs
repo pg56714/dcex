@@ -1,5 +1,5 @@
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::ExtendedClient;
 use super::endpoints::*;

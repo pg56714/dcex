@@ -5,12 +5,12 @@ use std::time::Duration;
 use serde_json::Value;
 
 use crate::exchange::ValidatedResponse;
-use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody};
+use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody, block_on};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{BASE_URL, USER_AGENT};
-use super::signing::{parse_felt_hex, ExtendedSigningCredentials, StarknetDomain};
+use super::signing::{ExtendedSigningCredentials, StarknetDomain, parse_felt_hex};
 
 #[derive(Clone)]
 pub struct ExtendedClient {

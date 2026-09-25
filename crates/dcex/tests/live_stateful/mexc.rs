@@ -5,14 +5,14 @@ use dcex::exchanges::mexc::MexcClient;
 use tokio::time::sleep;
 
 use super::common::{
-    account_restriction, assert_success, asset_amount, contains_non_empty_array,
-    fetch_trading_details, find_f64, first_bid_price, format_step_decimal, format_transfer_amount,
-    format_transfer_amount_floor, insufficient_funds_error, leveraged_margin_required,
-    live_test_error, margin_target, minimum_order_quantity, params, parse_positive,
-    post_only_buy_price_from_bid, price_below_market, require_env, require_live_fill,
-    require_live_trading, require_order_id, round_down_to_step, sum_abs_values_for_symbols,
-    unique_client_id, wait_for_flat_position, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    BTC_USDT_SPOT, BTC_USDT_SWAP, account_restriction, assert_success, asset_amount,
+    contains_non_empty_array, fetch_trading_details, find_f64, first_bid_price,
+    format_step_decimal, format_transfer_amount, format_transfer_amount_floor,
+    insufficient_funds_error, leveraged_margin_required, live_test_error, margin_target,
+    minimum_order_quantity, params, parse_positive, post_only_buy_price_from_bid,
+    price_below_market, require_env, require_live_fill, require_live_trading, require_order_id,
+    round_down_to_step, sum_abs_values_for_symbols, unique_client_id, wait_for_flat_position,
+    wait_for_positive_position,
 };
 
 const MEXC_CONTRACT_LEVERAGE: &str = "50";

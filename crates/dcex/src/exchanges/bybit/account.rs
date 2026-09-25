@@ -2,7 +2,7 @@ use serde_json::{Map, Value};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_string, push_optional, BybitParams};
+use super::params::{BybitParams, insert_optional_string, push_optional};
 use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
 

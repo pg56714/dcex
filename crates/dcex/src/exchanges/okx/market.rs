@@ -4,7 +4,7 @@ use crate::{DcexError, Result};
 
 use super::client::OkxClient;
 use super::endpoints::*;
-use super::params::{normalize_inst_id_query, OkxParams};
+use super::params::{OkxParams, normalize_inst_id_query};
 
 impl OkxClient {
     pub async fn public_request(

@@ -1,5 +1,5 @@
 use crate::exchange::RequestSigner;
-use crate::http::{block_on, HttpMethod, HttpRequest};
+use crate::http::{HttpMethod, HttpRequest, block_on};
 use std::io::{Read, Write};
 use std::net::TcpListener;
 use std::thread;
@@ -139,16 +139,18 @@ fn swap_commission_route_is_signed_and_funding_range_is_checked() {
     );
     assert!(line.contains("signature="), "{line}");
     let client = BingxClient::public(Duration::from_secs(1)).expect("client");
-    assert!(block_on(async move {
-        client
-            .public_request(
-                "get_swap_funding_rate",
-                vec![
-                    ("start_time".into(), "2000".into()),
-                    ("end_time".into(), "1000".into()),
-                ],
-            )
-            .await
-    })
-    .is_err());
+    assert!(
+        block_on(async move {
+            client
+                .public_request(
+                    "get_swap_funding_rate",
+                    vec![
+                        ("start_time".into(), "2000".into()),
+                        ("end_time".into(), "1000".into()),
+                    ],
+                )
+                .await
+        })
+        .is_err()
+    );
 }

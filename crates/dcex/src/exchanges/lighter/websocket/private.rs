@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use serde_json::Value;
 
-use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::Result;
+use crate::ws::{WebSocketConfig, WebSocketConnection};
 
 use super::super::chains::LighterNetwork;
 use super::super::client::LighterClient;

@@ -4,7 +4,7 @@ use std::net::TcpListener;
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 
-use crate::http::{block_on, HttpMethod, RequestBody};
+use crate::http::{HttpMethod, RequestBody, block_on};
 use crate::product_table::{MarketInfo, ProductTable};
 
 use super::*;
@@ -246,58 +246,66 @@ fn account_orders_uses_client_indexes_and_auth_header() {
 fn new_lighter_queries_reject_invalid_parameters_before_network() {
     let client = LighterClient::with_base_url(Duration::from_secs(1), "http://127.0.0.1:1".into())
         .expect("client");
-    assert!(block_on({
-        let client = client.clone();
-        async move {
+    assert!(
+        block_on({
+            let client = client.clone();
+            async move {
+                client
+                    .public_request("get_synthetic_spot_info", vec![])
+                    .await
+            }
+        })
+        .is_err()
+    );
+    assert!(
+        block_on({
+            let client = client.clone();
+            async move {
+                client
+                    .public_request(
+                        "get_market_price_charts",
+                        vec![("market_ids".into(), "-1".into())],
+                    )
+                    .await
+            }
+        })
+        .is_err()
+    );
+    assert!(
+        block_on({
+            let client = client.clone();
+            async move {
+                client
+                    .public_request(
+                        "get_mark_price_candles",
+                        vec![
+                            ("market_id".into(), "1".into()),
+                            ("resolution".into(), "1w".into()),
+                            ("start_timestamp".into(), "1".into()),
+                            ("end_timestamp".into(), "2".into()),
+                            ("count_back".into(), "1".into()),
+                        ],
+                    )
+                    .await
+            }
+        })
+        .is_err()
+    );
+    assert!(
+        block_on(async move {
             client
-                .public_request("get_synthetic_spot_info", vec![])
-                .await
-        }
-    })
-    .is_err());
-    assert!(block_on({
-        let client = client.clone();
-        async move {
-            client
-                .public_request(
-                    "get_market_price_charts",
-                    vec![("market_ids".into(), "-1".into())],
-                )
-                .await
-        }
-    })
-    .is_err());
-    assert!(block_on({
-        let client = client.clone();
-        async move {
-            client
-                .public_request(
-                    "get_mark_price_candles",
+                .private_request(
+                    "get_account_orders",
                     vec![
-                        ("market_id".into(), "1".into()),
-                        ("resolution".into(), "1w".into()),
-                        ("start_timestamp".into(), "1".into()),
-                        ("end_timestamp".into(), "2".into()),
-                        ("count_back".into(), "1".into()),
+                        ("account_index".into(), "12".into()),
+                        ("client_order_indexes".into(), "1,".into()),
+                        ("authorization".into(), "token".into()),
                     ],
                 )
                 .await
-        }
-    })
-    .is_err());
-    assert!(block_on(async move {
-        client
-            .private_request(
-                "get_account_orders",
-                vec![
-                    ("account_index".into(), "12".into()),
-                    ("client_order_indexes".into(), "1,".into()),
-                    ("authorization".into(), "token".into()),
-                ],
-            )
-            .await
-    })
-    .is_err());
+        })
+        .is_err()
+    );
 }
 
 #[test]

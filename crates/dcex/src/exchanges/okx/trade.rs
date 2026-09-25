@@ -7,7 +7,7 @@ use crate::{DcexError, Result};
 use super::client::OkxClient;
 use super::endpoints::*;
 use super::params::{
-    insert_optional_bool, insert_optional_string, push_optional, require_one, OkxParams,
+    OkxParams, insert_optional_bool, insert_optional_string, push_optional, require_one,
 };
 
 impl OkxClient {

@@ -3,13 +3,13 @@ use std::time::Duration;
 
 use serde_json::{Map, Number, Value};
 
-use crate::exchange::{unix_timestamp_ms, ValidatedResponse};
-use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody};
+use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
+use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody, block_on};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{EXCHANGE, INFO, MAINNET_URL, TESTNET_URL};
-use super::msgpack::{encode_msgpack, OrderedValue};
+use super::msgpack::{OrderedValue, encode_msgpack};
 use super::params::{fallback_coin, is_canonical_product_symbol, normalize_address};
 use super::signing::{encode_query, http_method_name, hyperliquid_signature, parse_private_key};
 

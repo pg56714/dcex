@@ -4,7 +4,7 @@ mod public;
 pub use private::BackpackPrivateWebSocket;
 pub use public::BackpackPublicWebSocket;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::{DcexError, Result};
 

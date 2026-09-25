@@ -4,7 +4,7 @@ use std::time::Duration;
 use serde_json::Value;
 
 use crate::exchange::{ExchangeHttpClient, ValidatedResponse};
-use crate::http::{block_on, HttpMethod, HttpRequest, HttpResponse};
+use crate::http::{HttpMethod, HttpRequest, HttpResponse, block_on};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 

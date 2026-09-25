@@ -1,10 +1,10 @@
 use serde_json::{Map, Number, Value};
 
-use crate::exchange::{unix_timestamp_ms, ValidatedResponse};
+use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
 use crate::{DcexError, Result};
 
 use super::client::HyperliquidClient;
-use super::msgpack::{encode_msgpack, OrderedValue};
+use super::msgpack::{OrderedValue, encode_msgpack};
 use super::params::HyperliquidParams;
 
 impl HyperliquidClient {
@@ -346,7 +346,7 @@ impl HyperliquidClient {
             _ => {
                 return Err(DcexError::InvalidInput(
                     "builder_address and fee_ten_bp must be provided together".to_string(),
-                ))
+                ));
             }
         }
         Ok(object(fields))

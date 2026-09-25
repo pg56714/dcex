@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
@@ -266,9 +266,11 @@ mod tests {
     async fn rejects_more_than_1024_streams_before_transport() {
         let mut client = BinancePublicWebSocket::new(Duration::from_secs(1)).expect("client");
         client.subscriptions = (0..1_024).map(|index| format!("stream{index}")).collect();
-        assert!(client
-            .subscribe(vec!["stream1024".to_string()])
-            .await
-            .is_err());
+        assert!(
+            client
+                .subscribe(vec!["stream1024".to_string()])
+                .await
+                .is_err()
+        );
     }
 }

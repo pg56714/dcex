@@ -162,7 +162,7 @@ fn equity_stream_url(
         _ => {
             return Err(DcexError::InvalidInput(format!(
                 "unsupported Binance Equity WebSocket stream: {stream}"
-            )))
+            )));
         }
     };
     Ok(format!("{base_url}/ws/{path}"))
@@ -257,22 +257,26 @@ mod tests {
 
     #[test]
     fn validates_equity_stream_arguments() {
-        assert!(equity_stream_url(
-            EQUITY_WS_BASE_URL,
-            "quote",
-            Some("BTC-USDT-SPOT"),
-            None,
-            None,
-        )
-        .is_err());
-        assert!(equity_stream_url(
-            EQUITY_WS_BASE_URL,
-            "order_report",
-            None,
-            None,
-            Some("bad/key"),
-        )
-        .is_err());
+        assert!(
+            equity_stream_url(
+                EQUITY_WS_BASE_URL,
+                "quote",
+                Some("BTC-USDT-SPOT"),
+                None,
+                None,
+            )
+            .is_err()
+        );
+        assert!(
+            equity_stream_url(
+                EQUITY_WS_BASE_URL,
+                "order_report",
+                None,
+                None,
+                Some("bad/key"),
+            )
+            .is_err()
+        );
         assert!(equity_stream_url(EQUITY_WS_BASE_URL, "unknown", None, None, None).is_err());
     }
 }

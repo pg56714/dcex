@@ -2,7 +2,7 @@ use crate::{DcexError, Result};
 
 use std::collections::HashSet;
 
-use super::msgpack::{parse_ordered_json, OrderedValue};
+use super::msgpack::{OrderedValue, parse_ordered_json};
 
 pub(super) struct HyperliquidParams(pub(super) Vec<(String, String)>);
 

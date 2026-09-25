@@ -58,19 +58,21 @@ fn signed_request_uses_exact_encoded_path_and_raw_body() {
 #[tokio::test]
 async fn invalid_order_is_rejected_before_transport() {
     let client = OndoClient::public(Duration::from_secs(5)).expect("client");
-    assert!(client
-        .private_request(
-            "place_order",
-            vec![
-                ("market".to_string(), "AAPL-USD.P".to_string()),
-                ("side".to_string(), "buy".to_string()),
-                ("type".to_string(), "market".to_string()),
-                ("price".to_string(), "200".to_string()),
-                ("size".to_string(), "1".to_string()),
-            ]
-        )
-        .await
-        .is_err());
+    assert!(
+        client
+            .private_request(
+                "place_order",
+                vec![
+                    ("market".to_string(), "AAPL-USD.P".to_string()),
+                    ("side".to_string(), "buy".to_string()),
+                    ("type".to_string(), "market".to_string()),
+                    ("price".to_string(), "200".to_string()),
+                    ("size".to_string(), "1".to_string()),
+                ]
+            )
+            .await
+            .is_err()
+    );
 }
 
 #[test]
@@ -113,9 +115,11 @@ async fn raw_json_orders_cannot_bypass_validation() {
         )
         .await
         .expect_err("missing limit price");
-    assert!(error
-        .to_string()
-        .contains("limit order requires price and size"));
+    assert!(
+        error
+            .to_string()
+            .contains("limit order requires price and size")
+    );
 }
 
 #[tokio::test]
@@ -145,9 +149,11 @@ async fn stateful_account_requests_are_validated_before_transport() {
             .private_request(method, Vec::new())
             .await
             .expect_err("external withdrawal creation is outside project scope");
-        assert!(error
-            .to_string()
-            .contains("unsupported Ondo private method"));
+        assert!(
+            error
+                .to_string()
+                .contains("unsupported Ondo private method")
+        );
     }
 
     let error = client

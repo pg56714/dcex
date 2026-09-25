@@ -157,7 +157,7 @@ pub(super) fn insert_optional_bool(
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "invalid boolean parameter {key}: {value}"
-                )))
+                )));
             }
         };
         body.insert(key.to_string(), Value::Bool(parsed));

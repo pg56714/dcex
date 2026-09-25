@@ -6,13 +6,12 @@ use serde_json::Value;
 use tokio::time::sleep;
 
 use super::common::{
-    account_restriction, assert_success, asset_amount, contains_non_empty_array,
-    fetch_trading_details, first_bid_price, format_transfer_amount_ceil,
+    BTC_USDT_SPOT, BTC_USDT_SWAP, account_restriction, assert_success, asset_amount,
+    contains_non_empty_array, fetch_trading_details, first_bid_price, format_transfer_amount_ceil,
     format_transfer_amount_floor, leveraged_margin_required, live_test_error, margin_target,
     minimum_order_quantity, params, parse_positive, post_only_buy_price, push, require_env,
     require_live_fill, require_live_trading, require_order_id, sum_abs_values_for_symbols,
-    wait_for_flat_position, wait_for_non_empty_records, wait_for_positive_position, BTC_USDT_SPOT,
-    BTC_USDT_SWAP,
+    wait_for_flat_position, wait_for_non_empty_records, wait_for_positive_position,
 };
 
 const BYBIT_SWAP_LEVERAGE: &str = "50";

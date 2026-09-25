@@ -5,7 +5,7 @@ mod tests {
     use std::time::Duration;
 
     use base64::Engine;
-    use serde_json::{json, Value};
+    use serde_json::{Value, json};
 
     use crate::http::HttpMethod;
     use crate::product_table::{MarketInfo, ProductTable};
@@ -176,9 +176,11 @@ mod tests {
         })
         .expect_err("valid RFQ should reach credential validation");
 
-        assert!(error
-            .to_string()
-            .contains("Signed Backpack requests require api_key and api_secret"));
+        assert!(
+            error
+                .to_string()
+                .contains("Signed Backpack requests require api_key and api_secret")
+        );
     }
 
     #[test]
@@ -204,17 +206,21 @@ mod tests {
                 .await
         })
         .expect_err("valid clientId accept should reach credential validation");
-        assert!(accept_error
-            .to_string()
-            .contains("Signed Backpack requests require api_key and api_secret"));
+        assert!(
+            accept_error
+                .to_string()
+                .contains("Signed Backpack requests require api_key and api_secret")
+        );
 
         let cancel_client = BackpackClient::public(5_000, Duration::from_secs(1)).expect("client");
         let cancel_error =
             crate::http::block_on(async move { cancel_client.cancel_rfq_by_client_id(42).await })
                 .expect_err("valid clientId cancel should reach credential validation");
-        assert!(cancel_error
-            .to_string()
-            .contains("Signed Backpack requests require api_key and api_secret"));
+        assert!(
+            cancel_error
+                .to_string()
+                .contains("Signed Backpack requests require api_key and api_secret")
+        );
     }
 
     #[test]

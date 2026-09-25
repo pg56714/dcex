@@ -1,5 +1,5 @@
-use serde::de::{self, MapAccess, SeqAccess, Visitor};
 use serde::Deserialize;
+use serde::de::{self, MapAccess, SeqAccess, Visitor};
 use serde_json::{Number, Value};
 
 use crate::{DcexError, Result};

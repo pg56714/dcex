@@ -1,10 +1,10 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
 use super::params::{
-    market_from_type, normalize_order_side, push_optional, BinanceAccountTradesParams,
-    BinanceAlgoOrderLookupParams, BinanceAllFuturesAlgoOrdersParams, BinanceAllOpenOrdersParams,
-    BinanceAllOrdersParams, BinanceLimitOrderParams, BinanceMarketOrderParams,
-    BinanceOpenFuturesAlgoOrdersParams, BinanceOrderLookupParams, BinancePostOnlyOrderParams,
+    BinanceAccountTradesParams, BinanceAlgoOrderLookupParams, BinanceAllFuturesAlgoOrdersParams,
+    BinanceAllOpenOrdersParams, BinanceAllOrdersParams, BinanceLimitOrderParams,
+    BinanceMarketOrderParams, BinanceOpenFuturesAlgoOrdersParams, BinanceOrderLookupParams,
+    BinancePostOnlyOrderParams, market_from_type, normalize_order_side, push_optional,
 };
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
@@ -983,7 +983,7 @@ impl BinanceClient {
                 _ => {
                     return Err(DcexError::InvalidInput(
                         "unsupported Binance Equity order lookup method.".to_string(),
-                    ))
+                    ));
                 }
             };
             return self

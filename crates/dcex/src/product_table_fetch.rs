@@ -173,11 +173,7 @@ fn python_float_string(value: &str) -> String {
 }
 
 fn first_non_empty(first: String, second: String) -> String {
-    if first.is_empty() {
-        second
-    } else {
-        first
-    }
+    if first.is_empty() { second } else { first }
 }
 
 fn binance_product_symbol(base: &str, quote: &str, symbol: &str, spot: bool) -> String {

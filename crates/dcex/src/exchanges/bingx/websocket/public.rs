@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};

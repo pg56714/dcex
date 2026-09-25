@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use ed25519_dalek::Signer;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use super::client::ArcusClient;
 use super::params::{compare_decimals, decimal_product_below, exact_units, required};
@@ -56,7 +56,7 @@ impl ArcusClient {
                     _ => {
                         return Err(DcexError::InvalidInput(
                             "Arcus side must be BUY or SELL".into(),
-                        ))
+                        ));
                     }
                 };
                 let order_type = values
@@ -86,7 +86,7 @@ impl ArcusClient {
                     _ => {
                         return Err(DcexError::InvalidInput(
                             "unsupported Arcus time in force".into(),
-                        ))
+                        ));
                     }
                 };
                 if !is_modify && order_type == "MARKET" && tif != 2 {
@@ -146,14 +146,14 @@ impl ArcusClient {
                     None if is_modify => {
                         return Err(DcexError::InvalidInput(
                             "Arcus modify_order requires reduce_only".into(),
-                        ))
+                        ));
                     }
                     None | Some("false") => false,
                     Some("true") => true,
                     _ => {
                         return Err(DcexError::InvalidInput(
                             "Arcus reduce_only must be true or false".into(),
-                        ))
+                        ));
                     }
                 };
                 let good_til_ns = good_til_time.checked_mul(1_000).ok_or_else(|| {
@@ -232,7 +232,7 @@ impl ArcusClient {
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unknown Arcus private method: {method_name}"
-                )))
+                )));
             }
         };
         let message =
@@ -433,7 +433,7 @@ impl ArcusClient {
                         _ => {
                             return Err(DcexError::InvalidInput(
                                 "Arcus isolated must be true or false".into(),
-                            ))
+                            ));
                         }
                     };
                     body.insert("isolated".into(), json!(enabled));

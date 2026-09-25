@@ -178,7 +178,7 @@ fn kucoin_spot_timeframe(timeframe: &str) -> Result<String> {
         _ => {
             return Err(DcexError::InvalidInput(
                 "timeframe not supported".to_string(),
-            ))
+            ));
         }
     };
     Ok(value.to_string())

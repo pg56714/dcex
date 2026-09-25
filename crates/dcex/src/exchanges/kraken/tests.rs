@@ -1,5 +1,5 @@
-use super::signing::{encode_params, futures_signature, spot_signature};
 use super::KrakenClient;
+use super::signing::{encode_params, futures_signature, spot_signature};
 use crate::product_table::{MarketInfo, ProductTable};
 use std::time::Duration;
 

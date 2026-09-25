@@ -1,12 +1,12 @@
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicI64, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicI64, Ordering};
 use std::time::Duration;
 
 use serde_json::Value;
 
-use crate::exchange::{unix_timestamp_ms, ValidatedResponse};
-use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody};
+use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
+use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody, block_on};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
@@ -284,7 +284,7 @@ impl OndoClient {
                 _ => {
                     return Err(DcexError::InvalidInput(
                         "Signed Ondo requests require api_key_id and api_secret.".to_string(),
-                    ))
+                    ));
                 }
             }
         }
@@ -431,10 +431,9 @@ mod timestamp_tests {
         let message = r#"{"error_code":"timestamp_too_far","error":"timestamp too far in the future. current time unixMilli 1789810892725, timestamp 1789810894652"}"#;
         assert!(timestamp_rejection_offset(&response(401, message)).is_some());
         assert!(timestamp_rejection_offset(&response(400, message)).is_none());
-        assert!(timestamp_rejection_offset(&response(
-            401,
-            r#"{"error_code":"signature_mismatch"}"#
-        ))
-        .is_none());
+        assert!(
+            timestamp_rejection_offset(&response(401, r#"{"error_code":"signature_mismatch"}"#))
+                .is_none()
+        );
     }
 }

@@ -1,9 +1,9 @@
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::{KrakenAuth, KrakenClient};
 use super::endpoints::*;
-use super::params::{push_optional, KrakenParams};
+use super::params::{KrakenParams, push_optional};
 
 impl KrakenClient {
     pub(super) async fn account_private_request(

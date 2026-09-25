@@ -240,7 +240,7 @@ RUST_CORE_CARGO_TOML = """
 name = "dcex-core-release-benchmark"
 version = "0.0.0"
 # Match the published dcex crate workspace edition.
-edition = "2021"
+edition = "2024"
 publish = false
 
 [dependencies]

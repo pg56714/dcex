@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use dcex::exchanges::kraken::KrakenClient;
 
-use super::common::{require_env, run_cases, run_private_cases, Case, BTC_USDT_SPOT, BTC_USD_SWAP};
+use super::common::{BTC_USD_SWAP, BTC_USDT_SPOT, Case, require_env, run_cases, run_private_cases};
 
 #[tokio::test]
 #[ignore = "requires live exchange API access"]

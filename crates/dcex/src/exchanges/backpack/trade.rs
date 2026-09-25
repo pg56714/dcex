@@ -8,7 +8,7 @@ use crate::{DcexError, Result};
 use super::client::BackpackClient;
 use super::endpoints::*;
 use super::params::{
-    insert_optional_integer, insert_optional_string, insert_required_string, BackpackParams,
+    BackpackParams, insert_optional_integer, insert_optional_string, insert_required_string,
 };
 
 const ORDER_STRING_KEYS: &[&str] = &[
@@ -532,9 +532,11 @@ mod tests {
             ("orderType".to_string(), "Limit".to_string()),
             ("quantity".to_string(), "1".to_string()),
         ]);
-        assert!(client
-            .validate_order_params(&conflicting_type, Some("Market"))
-            .is_err());
+        assert!(
+            client
+                .validate_order_params(&conflicting_type, Some("Market"))
+                .is_err()
+        );
 
         let market_with_true_post_only = BackpackParams::from_pairs(vec![
             ("product_symbol".to_string(), "BTC-USDC-SPOT".to_string()),
@@ -542,9 +544,11 @@ mod tests {
             ("quantity".to_string(), "1".to_string()),
             ("postOnly".to_string(), "True".to_string()),
         ]);
-        assert!(client
-            .validate_order_params(&market_with_true_post_only, Some("Market"))
-            .is_err());
+        assert!(
+            client
+                .validate_order_params(&market_with_true_post_only, Some("Market"))
+                .is_err()
+        );
 
         let broker_params = BackpackParams::from_pairs(vec![
             ("brokerId".to_string(), "42".to_string()),

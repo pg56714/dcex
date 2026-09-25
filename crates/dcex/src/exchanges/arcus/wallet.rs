@@ -3,7 +3,7 @@
 use std::collections::{BTreeMap, HashSet};
 
 use num_bigint::BigUint;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sha3::{Digest, Keccak256};
 
 use super::ArcusSpotClient;
@@ -42,7 +42,7 @@ impl ArcusSpotClient {
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unknown Arcus spot wallet method: {method_name}"
-                )))
+                )));
             }
         };
         if let Some(key) = values.keys().find(|key| !allowed.contains(&key.as_str())) {
@@ -105,7 +105,7 @@ impl ArcusSpotClient {
                     _ => {
                         return Err(DcexError::InvalidInput(
                             "Arcus spot include_wrapped must be true or false".into(),
-                        ))
+                        ));
                     }
                 };
                 let tokens = if let Some(raw) = values.get("tokens_json") {
@@ -619,14 +619,18 @@ mod tests {
         assert_eq!(requests.len(), 11);
         assert_eq!(requests[1]["method"], "eth_getBalance");
         assert_eq!(requests[3]["method"], "eth_call");
-        assert!(requests[3]["params"][0]["data"]
-            .as_str()
-            .unwrap()
-            .starts_with("0x70a08231"));
-        assert!(requests[5]["params"][0]["data"]
-            .as_str()
-            .unwrap()
-            .starts_with("0xdd62ed3e"));
+        assert!(
+            requests[3]["params"][0]["data"]
+                .as_str()
+                .unwrap()
+                .starts_with("0x70a08231")
+        );
+        assert!(
+            requests[5]["params"][0]["data"]
+                .as_str()
+                .unwrap()
+                .starts_with("0xdd62ed3e")
+        );
         assert_eq!(requests[10]["method"], "eth_getLogs");
         assert_eq!(requests[10]["params"][0]["fromBlock"], "0x64");
     }
@@ -643,9 +647,11 @@ mod tests {
         let error =
             block_on(async move { client.wallet_request("get_native_balance", vec![]).await })
                 .expect_err("wrong chain must fail");
-        assert!(error
-            .to_string()
-            .contains("does not match selected network"));
+        assert!(
+            error
+                .to_string()
+                .contains("does not match selected network")
+        );
         assert_eq!(server.join().unwrap().len(), 1);
     }
 

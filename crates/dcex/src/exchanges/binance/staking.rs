@@ -1,9 +1,9 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
 use super::params::PublicParams;
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
-use crate::Result;
 
 macro_rules! staking_methods {
     ($($name:ident),+ $(,)?) => {

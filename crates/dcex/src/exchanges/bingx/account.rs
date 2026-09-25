@@ -1,11 +1,11 @@
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::BingxClient;
 use super::endpoints::*;
 use super::params::{
-    push_optional, require_pair_or_identifier, validate_enum, validate_positive_number,
-    validate_time_range, validate_u64_range, BingxParams,
+    BingxParams, push_optional, require_pair_or_identifier, validate_enum,
+    validate_positive_number, validate_time_range, validate_u64_range,
 };
 
 const ACCOUNT_TYPES: &[&str] = &[

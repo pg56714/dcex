@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{string_body, BybitParams};
+use super::params::{BybitParams, string_body};
 
 impl BybitClient {
     pub(super) async fn rwa_earn_public_request(

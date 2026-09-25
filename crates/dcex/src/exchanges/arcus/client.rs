@@ -371,7 +371,7 @@ mod spot {
                 _ => {
                     return Err(DcexError::InvalidInput(format!(
                         "unknown Arcus spot public method: {method_name}"
-                    )))
+                    )));
                 }
             };
             let mut request = HttpRequest::new(HttpMethod::Get, &self.base_url, path);
@@ -602,16 +602,18 @@ mod spot {
             let taker = format!("0x{}", "11".repeat(20));
             let signature = format!("0x{}", "22".repeat(65));
             let public = ArcusSpotClient::new(None, false, Duration::from_secs(1)).unwrap();
-            assert!(public
-                .build_signed_quote_with_fee(
-                    quote.clone(),
-                    &taker,
-                    &signature,
-                    None,
-                    None,
-                    Some(80),
-                )
-                .is_err());
+            assert!(
+                public
+                    .build_signed_quote_with_fee(
+                        quote.clone(),
+                        &taker,
+                        &signature,
+                        None,
+                        None,
+                        Some(80),
+                    )
+                    .is_err()
+            );
             let partner =
                 ArcusSpotClient::new(Some("router-key".into()), false, Duration::from_secs(1))
                     .unwrap();

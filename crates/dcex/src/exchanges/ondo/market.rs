@@ -77,7 +77,7 @@ impl OndoClient {
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported Ondo public method: {method_name}"
-                )))
+                )));
             }
         }?;
         Ok(response)

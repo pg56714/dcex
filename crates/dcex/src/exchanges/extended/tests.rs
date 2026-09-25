@@ -6,8 +6,8 @@ use std::{
     thread,
 };
 
-use super::client::signing_domain_for_base_url;
 use super::ExtendedClient;
+use super::client::signing_domain_for_base_url;
 use serde_json::json;
 
 #[test]
@@ -123,9 +123,11 @@ async fn get_candles_requires_interval_and_limit() {
         )
         .await
         .expect_err("interval must be required");
-    assert!(missing_interval
-        .to_string()
-        .contains("missing required parameter: interval"));
+    assert!(
+        missing_interval
+            .to_string()
+            .contains("missing required parameter: interval")
+    );
 
     let missing_limit = client
         .public_request(
@@ -137,18 +139,22 @@ async fn get_candles_requires_interval_and_limit() {
         )
         .await
         .expect_err("limit must be required");
-    assert!(missing_limit
-        .to_string()
-        .contains("missing required parameter: limit"));
+    assert!(
+        missing_limit
+            .to_string()
+            .contains("missing required parameter: limit")
+    );
 }
 
 #[tokio::test]
 async fn get_order_uses_plural_order_path() {
     let request = private_request("get_order", vec![("id".to_string(), "123".to_string())]).await;
     assert_request_line(request.as_str(), "GET /api/v1/user/orders/123 HTTP/1.1");
-    assert!(request
-        .to_ascii_lowercase()
-        .contains("x-api-key: extended-key"));
+    assert!(
+        request
+            .to_ascii_lowercase()
+            .contains("x-api-key: extended-key")
+    );
 }
 
 #[tokio::test]

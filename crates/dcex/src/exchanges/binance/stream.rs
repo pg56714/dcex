@@ -1,9 +1,9 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
 use super::params::ensure_futures_listen_key_market;
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
-use crate::Result;
 
 impl BinanceClient {
     pub async fn create_futures_listen_key(&self) -> Result<ValidatedResponse> {

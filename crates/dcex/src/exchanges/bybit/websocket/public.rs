@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
@@ -375,9 +375,11 @@ mod tests {
         option.subscriptions = (0..2_000)
             .map(|index| format!("tickers.OPTION{index}"))
             .collect();
-        assert!(option
-            .subscribe(vec!["tickers.OPTION2000".to_string()])
-            .await
-            .is_err());
+        assert!(
+            option
+                .subscribe(vec!["tickers.OPTION2000".to_string()])
+                .await
+                .is_err()
+        );
     }
 }

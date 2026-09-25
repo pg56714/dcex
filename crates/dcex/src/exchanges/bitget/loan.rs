@@ -5,7 +5,7 @@ use crate::{DcexError, Result};
 
 use super::client::BitgetClient;
 use super::endpoints::*;
-use super::params::{insert_optional_value, require_one_identifier, BitgetParams};
+use super::params::{BitgetParams, insert_optional_value, require_one_identifier};
 
 const HISTORY_FIELDS: &[&str] = &[
     "orderId",

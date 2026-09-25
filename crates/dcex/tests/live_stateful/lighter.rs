@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use dcex::exchanges::lighter::{
-    credential_env_names, LighterClient, LighterCredentials, LighterNetwork,
+    LighterClient, LighterCredentials, LighterNetwork, credential_env_names,
 };
 use serde_json::Value;
 use tokio::time::sleep;

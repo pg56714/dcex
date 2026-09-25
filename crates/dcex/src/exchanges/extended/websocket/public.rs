@@ -4,8 +4,8 @@ use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
 use super::{
-    normalize_candle_interval, normalize_candle_type, normalize_market, optional_market_path,
-    stream_url, USER_AGENT, WS_URL,
+    USER_AGENT, WS_URL, normalize_candle_interval, normalize_candle_type, normalize_market,
+    optional_market_path, stream_url,
 };
 
 pub struct ExtendedPublicWebSocket {

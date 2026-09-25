@@ -5,9 +5,9 @@ use crate::{DcexError, Result};
 use super::client::{AsterClient, AsterMarket};
 use super::endpoints::*;
 use super::params::{
-    push_optional_display, AsterAggTradesParams, AsterFundingRateParams,
-    AsterHistoricalTradesParams, AsterIndexPriceKlinesParams, AsterKlinesParams, AsterLimitParams,
-    AsterOptionalSymbolParams, AsterParams,
+    AsterAggTradesParams, AsterFundingRateParams, AsterHistoricalTradesParams,
+    AsterIndexPriceKlinesParams, AsterKlinesParams, AsterLimitParams, AsterOptionalSymbolParams,
+    AsterParams, push_optional_display,
 };
 
 const KLINE_INTERVALS: &[&str] = &[

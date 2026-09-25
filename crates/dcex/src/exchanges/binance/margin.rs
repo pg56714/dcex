@@ -1,6 +1,6 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
-use super::params::{normalize_order_side, PublicParams};
+use super::params::{PublicParams, normalize_order_side};
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};

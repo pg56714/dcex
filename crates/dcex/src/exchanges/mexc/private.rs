@@ -2,7 +2,7 @@ use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
 
 use super::client::MexcClient;
-use super::params::{validate_u64_range, MexcParams};
+use super::params::{MexcParams, validate_u64_range};
 
 impl MexcClient {
     pub async fn private_request(

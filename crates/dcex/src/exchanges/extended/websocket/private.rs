@@ -3,7 +3,7 @@ use std::time::Duration;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
 
-use super::{stream_url, USER_AGENT, WS_URL};
+use super::{USER_AGENT, WS_URL, stream_url};
 
 pub struct ExtendedPrivateWebSocket {
     connection: WebSocketConnection,

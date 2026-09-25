@@ -1,13 +1,13 @@
 use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::OkxClient;
 use super::endpoints::*;
 use super::params::{
-    insert_optional_bool, insert_optional_string, okx_account_id, push_optional_owned,
-    validate_deposit_withdraw_status, OkxParams,
+    OkxParams, insert_optional_bool, insert_optional_string, okx_account_id, push_optional_owned,
+    validate_deposit_withdraw_status,
 };
 
 impl OkxClient {

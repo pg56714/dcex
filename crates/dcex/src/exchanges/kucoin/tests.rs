@@ -251,9 +251,11 @@ async fn futures_order_serializes_current_quantity_and_force_hold_fields() {
     assert_eq!(body["qty"], "0.001");
     assert_eq!(body["forceHold"], true);
     assert!(body.get("size").is_none());
-    assert!(body["clientOid"]
-        .as_str()
-        .is_some_and(|value| value.starts_with("dcex-")));
+    assert!(
+        body["clientOid"]
+            .as_str()
+            .is_some_and(|value| value.starts_with("dcex-"))
+    );
 }
 
 #[tokio::test]
@@ -375,9 +377,11 @@ async fn current_required_and_conditional_fields_are_rejected_before_transport()
         .await
         .err()
         .expect("validation error");
-    assert!(error
-        .to_string()
-        .contains("historical open interest requires exactly one symbol"));
+    assert!(
+        error
+            .to_string()
+            .contains("historical open interest requires exactly one symbol")
+    );
 }
 
 #[tokio::test]

@@ -264,7 +264,7 @@ async fn ondo_close_until_flat(client: &OndoClient) -> dcex::Result<()> {
             other => {
                 return Err(live_test_error(format!(
                     "Ondo position direction is invalid: {other:?}"
-                )))
+                )));
             }
         };
         let size = format!("{size:.8}");

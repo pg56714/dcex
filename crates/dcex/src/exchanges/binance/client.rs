@@ -1,8 +1,8 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use crate::exchange::{unix_timestamp_ms, ExchangeHttpClient, ValidatedResponse};
-use crate::http::{block_on, HttpMethod, HttpRequest, HttpResponse};
+use crate::exchange::{ExchangeHttpClient, ValidatedResponse, unix_timestamp_ms};
+use crate::http::{HttpMethod, HttpRequest, HttpResponse, block_on};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
@@ -10,7 +10,7 @@ use super::endpoints::*;
 use super::params::{
     exchange_symbol_fallback, is_canonical_product_symbol, market_for_product_symbol_fallback,
 };
-use super::signing::{extract_server_time_ms, BinanceResponseValidator, BinanceSigner};
+use super::signing::{BinanceResponseValidator, BinanceSigner, extract_server_time_ms};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BinanceMarket {

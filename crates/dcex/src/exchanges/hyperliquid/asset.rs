@@ -1,7 +1,7 @@
 use serde_json::json;
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::HyperliquidClient;
 use super::params::HyperliquidParams;

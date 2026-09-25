@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::future::Future;
-use std::sync::{mpsc, Arc, OnceLock};
+use std::sync::{Arc, OnceLock, mpsc};
 use std::time::Duration;
 
 use reqwest::header::{HeaderName, HeaderValue};
@@ -300,9 +300,11 @@ X-Test: yes\r\nContent-Length: 11\r\nConnection: close\r\n\r\n{\"ok\":true}",
             response.headers.get("x-test").map(String::as_str),
             Some("yes")
         );
-        assert!(handle
-            .join()
-            .expect("server")
-            .starts_with("GET /health HTTP/1.1"));
+        assert!(
+            handle
+                .join()
+                .expect("server")
+                .starts_with("GET /health HTTP/1.1")
+        );
     }
 }

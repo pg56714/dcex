@@ -1,6 +1,6 @@
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
-use crate::Result;
 
 use super::client::{AsterClient, AsterMarket};
 use super::endpoints::*;

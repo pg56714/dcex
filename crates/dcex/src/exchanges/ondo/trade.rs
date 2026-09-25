@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 use super::client::OndoClient;
 use super::endpoints::*;
 use super::market::validate_pagination_and_time;
-use super::params::{path_with_id, OndoParams};
+use super::params::{OndoParams, path_with_id};
 
 const ORDER_FIELDS: &[&str] = &[
     "market",

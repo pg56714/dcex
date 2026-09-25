@@ -7,8 +7,8 @@ use crate::{DcexError, Result};
 use super::client::{KucoinClient, KucoinMarket};
 use super::endpoints::*;
 use super::params::{
-    normalize_futures_timeframe, normalize_spot_timeframe, take_param, validate_enum,
-    validate_time_range, validate_u64_range, KucoinParams,
+    KucoinParams, normalize_futures_timeframe, normalize_spot_timeframe, take_param, validate_enum,
+    validate_time_range, validate_u64_range,
 };
 
 impl KucoinClient {

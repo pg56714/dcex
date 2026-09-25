@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::crypto::hmac_sha256_base64;
 use crate::exchange::unix_timestamp_ms;

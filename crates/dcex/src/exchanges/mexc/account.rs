@@ -7,7 +7,7 @@ use crate::{DcexError, Result};
 use super::client::MexcClient;
 use super::endpoints::*;
 use super::params::{
-    add_pagination_defaults, insert_number, validate_enum, validate_u64_range, MexcParams,
+    MexcParams, add_pagination_defaults, insert_number, validate_enum, validate_u64_range,
 };
 
 impl MexcClient {

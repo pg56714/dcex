@@ -10,8 +10,8 @@ use super::params::{
 };
 use super::signing::{encode_params, extract_server_time_ms, validate_response};
 use crate::crypto::hmac_sha256_hex;
-use crate::exchange::{unix_timestamp_ms, ValidatedResponse};
-use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody};
+use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
+use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody, block_on};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 

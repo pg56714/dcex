@@ -1,9 +1,9 @@
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::{KrakenAuth, KrakenClient};
 use super::endpoints::*;
-use super::params::{push_optional, require_one_identifier, KrakenParams};
+use super::params::{KrakenParams, push_optional, require_one_identifier};
 
 impl KrakenClient {
     pub(super) async fn trade_private_request(
@@ -569,8 +569,10 @@ mod tests {
         let error = push_required_or_override(&mut query, "side", None, &params, "side")
             .expect_err("fallback should be required");
 
-        assert!(error
-            .to_string()
-            .contains("missing required parameter: side"));
+        assert!(
+            error
+                .to_string()
+                .contains("missing required parameter: side")
+        );
     }
 }

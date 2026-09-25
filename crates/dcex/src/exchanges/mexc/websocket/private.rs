@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::crypto::hmac_sha256_hex;
 use crate::exchange::unix_timestamp_ms;
@@ -362,9 +362,11 @@ mod tests {
         )
         .expect("client");
         client.subscriptions = (0..30).map(|index| format!("channel{index}")).collect();
-        assert!(client
-            .subscribe(vec!["channel30".to_string()])
-            .await
-            .is_err());
+        assert!(
+            client
+                .subscribe(vec!["channel30".to_string()])
+                .await
+                .is_err()
+        );
     }
 }

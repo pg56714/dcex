@@ -1,6 +1,6 @@
 mod live_http_parity {
     macro_rules! request_case {
-        ($client:expr_2021, $case:expr_2021, [$($method:ident),+ $(,)?]) => {{
+        ($client:expr, $case:expr, [$($method:ident),+ $(,)?]) => {{
             let case = $case;
             match case.method {
                 $(

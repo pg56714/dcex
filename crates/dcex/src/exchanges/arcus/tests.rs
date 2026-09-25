@@ -22,15 +22,17 @@ fn decimal_to_engine_units_is_exact() {
 #[test]
 fn secret_must_match_public_key() {
     let secret = "00".repeat(32);
-    assert!(ArcusClient::new(
-        Some("ff".repeat(32)),
-        Some(secret),
-        None,
-        0,
-        true,
-        Duration::from_secs(1)
-    )
-    .is_err());
+    assert!(
+        ArcusClient::new(
+            Some("ff".repeat(32)),
+            Some(secret),
+            None,
+            0,
+            true,
+            Duration::from_secs(1)
+        )
+        .is_err()
+    );
 }
 
 #[test]

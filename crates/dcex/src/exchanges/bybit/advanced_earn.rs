@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_string, string_body, BybitParams};
+use super::params::{BybitParams, insert_optional_string, string_body};
 
 const CATEGORIES: &[&str] = &["DualAssets", "SmartLeverage", "DoubleWin", "DiscountBuy"];
 const EXTRA_FIELDS: &[&str] = &[

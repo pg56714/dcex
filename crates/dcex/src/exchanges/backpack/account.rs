@@ -1,7 +1,7 @@
 use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::BackpackClient;
 use super::endpoints::*;

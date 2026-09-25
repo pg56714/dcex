@@ -22,14 +22,14 @@ use dcex::exchanges::mexc::{MexcApi, MexcClient};
 use dcex::exchanges::okx::OkxClient;
 use dcex::exchanges::ondo::OndoClient;
 use dcex::http::{
-    block_on, AsyncHttpClient, BlockingHttpClient, HttpMethod, HttpRequest, HttpResponse,
+    AsyncHttpClient, BlockingHttpClient, HttpMethod, HttpRequest, HttpResponse, block_on,
 };
 use dcex::lighter;
 use dcex::product_table::{MarketInfo, ProductFilter, ProductTable};
+use pyo3::IntoPyObjectExt;
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyDict, PyList};
-use pyo3::IntoPyObjectExt;
 use serde_json::Value;
 
 fn to_py_value_error(error: dcex::DcexError) -> PyErr {

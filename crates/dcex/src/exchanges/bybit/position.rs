@@ -2,7 +2,7 @@ use serde_json::{Map, Value};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_string, push_optional, require_one_identifier, BybitParams};
+use super::params::{BybitParams, insert_optional_string, push_optional, require_one_identifier};
 use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
 
@@ -339,12 +339,16 @@ mod tests {
             None,
         );
         assert_eq!(request.method_name, "set_trading_stop");
-        assert!(request
-            .params
-            .contains(&("takeProfit".into(), "120000".into())));
-        assert!(request
-            .params
-            .contains(&("stopLoss".into(), "90000".into())));
+        assert!(
+            request
+                .params
+                .contains(&("takeProfit".into(), "120000".into()))
+        );
+        assert!(
+            request
+                .params
+                .contains(&("stopLoss".into(), "90000".into()))
+        );
     }
 
     #[test]
@@ -368,17 +372,21 @@ mod tests {
             ]))
             .expect("auto-add body");
         assert_eq!(auto.get("autoAddMargin"), Some(&Value::Number(1.into())));
-        assert!(client()
-            .auto_add_margin_body_from_params(&BybitParams::from_pairs(vec![
-                ("product_symbol".into(), "BTC-USD-SWAP".into()),
-                ("autoAddMargin".into(), "1".into()),
-            ]))
-            .is_err());
-        assert!(client()
-            .position_margin_body_from_params(&BybitParams::from_pairs(vec![
-                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
-                ("margin".into(), "0.0000".into()),
-            ]))
-            .is_err());
+        assert!(
+            client()
+                .auto_add_margin_body_from_params(&BybitParams::from_pairs(vec![
+                    ("product_symbol".into(), "BTC-USD-SWAP".into()),
+                    ("autoAddMargin".into(), "1".into()),
+                ]))
+                .is_err()
+        );
+        assert!(
+            client()
+                .position_margin_body_from_params(&BybitParams::from_pairs(vec![
+                    ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                    ("margin".into(), "0.0000".into()),
+                ]))
+                .is_err()
+        );
     }
 }

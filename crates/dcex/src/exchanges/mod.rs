@@ -1,8 +1,8 @@
 use std::future::{Future, IntoFuture};
 use std::pin::Pin;
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 pub type ExchangeMethodFuture<'a> =
     Pin<Box<dyn Future<Output = Result<ValidatedResponse>> + Send + 'a>>;

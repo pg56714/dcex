@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 use super::client::LighterClient;
 use super::endpoints::*;
 use super::market::{auth_header_from_params, auth_header_required};
-use super::params::{insert_optional_pair, LighterParams};
+use super::params::{LighterParams, insert_optional_pair};
 
 impl LighterClient {
     pub async fn private_request(
@@ -194,7 +194,7 @@ impl LighterClient {
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported Lighter private method: {method_name}"
-                )))
+                )));
             }
         };
         query.retain(|(_, value)| !value.is_empty());

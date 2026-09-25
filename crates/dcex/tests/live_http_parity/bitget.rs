@@ -3,8 +3,8 @@ use std::time::Duration;
 use dcex::exchanges::bitget::BitgetClient;
 
 use super::common::{
-    is_bitget_unified_account_error, live_http_enabled, now_ms, require_env, run_cases, Case,
-    BTC_USDT_SPOT, BTC_USDT_SWAP,
+    BTC_USDT_SPOT, BTC_USDT_SWAP, Case, is_bitget_unified_account_error, live_http_enabled, now_ms,
+    require_env, run_cases,
 };
 
 #[tokio::test]

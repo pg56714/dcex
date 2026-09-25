@@ -375,12 +375,14 @@ mod tests {
             data: json!({"listenKey": "abc123"}),
         };
         assert_eq!(extract_listen_key(&response).expect("key"), "abc123");
-        assert!(extract_listen_key(&ValidatedResponse {
-            status: 200,
-            headers: BTreeMap::new(),
-            data: json!({}),
-        })
-        .is_err());
+        assert!(
+            extract_listen_key(&ValidatedResponse {
+                status: 200,
+                headers: BTreeMap::new(),
+                data: json!({}),
+            })
+            .is_err()
+        );
     }
 
     #[test]

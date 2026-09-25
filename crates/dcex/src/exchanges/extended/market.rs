@@ -130,7 +130,7 @@ impl ExtendedClient {
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unsupported Extended public method: {method_name}"
-                )))
+                )));
             }
         }?;
         Ok(response)

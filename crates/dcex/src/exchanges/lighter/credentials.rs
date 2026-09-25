@@ -215,9 +215,11 @@ mod tests {
         )
         .expect_err("Robinhood must require scoped credentials");
 
-        assert!(error
-            .to_string()
-            .contains("LIGHTER_ROBINHOOD_ACCOUNT_INDEX"));
+        assert!(
+            error
+                .to_string()
+                .contains("LIGHTER_ROBINHOOD_ACCOUNT_INDEX")
+        );
     }
 
     #[test]

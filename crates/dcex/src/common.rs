@@ -2,8 +2,8 @@ use std::sync::LazyLock;
 
 use regex::{Captures, Regex};
 
-use crate::exchange::unix_timestamp_ms;
 use crate::exchange::Exchange;
+use crate::exchange::unix_timestamp_ms;
 use crate::{DcexError, Result};
 
 static URL_PATTERN: LazyLock<Regex> = LazyLock::new(|| {

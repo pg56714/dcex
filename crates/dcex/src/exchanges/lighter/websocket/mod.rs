@@ -54,9 +54,10 @@ pub(crate) fn normalize_channel(channel: &str) -> Result<String> {
     let valid = match parts.as_slice() {
         ["height"] | ["rfq"] => true,
         ["market_stats", "all"] | ["spot_market_stats", "all"] => true,
-        [prefix @ ("order_book" | "ticker" | "market_stats" | "trade" | "spot_market_stats"), market_id] => {
-            validate_ws_market(market_id, prefix).is_ok()
-        }
+        [
+            prefix @ ("order_book" | "ticker" | "market_stats" | "trade" | "spot_market_stats"),
+            market_id,
+        ] => validate_ws_market(market_id, prefix).is_ok(),
         [prefix, account_id]
             if matches!(
                 *prefix,

@@ -1,6 +1,6 @@
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{bybit_timeframe, is_canonical_product_symbol, BybitParams};
+use super::params::{BybitParams, bybit_timeframe, is_canonical_product_symbol};
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
 use crate::{DcexError, Result};
@@ -186,8 +186,10 @@ mod tests {
 
         assert!(params.contains(&("start".to_string(), "100".to_string())));
         assert!(params.contains(&("end".to_string(), "200".to_string())));
-        assert!(!params
-            .iter()
-            .any(|(key, _)| key == "startTime" || key == "endTime"));
+        assert!(
+            !params
+                .iter()
+                .any(|(key, _)| key == "startTime" || key == "endTime")
+        );
     }
 }

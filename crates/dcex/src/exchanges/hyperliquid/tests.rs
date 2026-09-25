@@ -1,4 +1,4 @@
-use super::msgpack::{encode_msgpack, OrderedValue};
+use super::msgpack::{OrderedValue, encode_msgpack};
 use super::*;
 
 #[test]

@@ -3,12 +3,12 @@ use serde_json::{Map, Value};
 use super::client::BybitClient;
 use super::endpoints::*;
 use super::params::{
-    insert_optional_bool, insert_optional_i64, insert_optional_string, push_optional,
-    require_one_identifier, BybitParams,
+    BybitParams, insert_optional_bool, insert_optional_i64, insert_optional_string, push_optional,
+    require_one_identifier,
 };
+use crate::Result;
 use crate::common::OrderSide;
 use crate::exchange::ValidatedResponse;
-use crate::Result;
 
 impl BybitClient {
     pub(super) async fn trade_private_request(

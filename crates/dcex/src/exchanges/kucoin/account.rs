@@ -1,13 +1,13 @@
 use serde_json::{Map, Value};
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::{KucoinClient, KucoinMarket};
 use super::endpoints::*;
 use super::params::{
-    generate_client_oid, insert_optional_string, insert_required_string, validate_enum,
-    validate_positive_number, validate_text_length, KucoinParams,
+    KucoinParams, generate_client_oid, insert_optional_string, insert_required_string,
+    validate_enum, validate_positive_number, validate_text_length,
 };
 
 impl KucoinClient {

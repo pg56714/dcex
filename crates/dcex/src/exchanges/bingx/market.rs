@@ -1,10 +1,10 @@
-use crate::exchange::{unix_timestamp_ms, ValidatedResponse};
+use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
 use crate::{DcexError, Result};
 
 use super::client::BingxClient;
 use super::endpoints::*;
 use super::params::{
-    push_optional_value, validate_enum, validate_time_range, validate_u64_range, BingxParams,
+    BingxParams, push_optional_value, validate_enum, validate_time_range, validate_u64_range,
 };
 
 const KLINE_INTERVALS: &[&str] = &[

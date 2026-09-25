@@ -13,10 +13,10 @@ use super::params::{
     exchange_symbol_fallback, market_for_product_symbol_fallback, normalize_order_side,
 };
 use super::signing::BinanceSigner;
-use crate::exchange::RequestSigner;
-use crate::http::{block_on, HttpMethod, HttpRequest};
-use crate::product_table::ProductTable;
 use crate::DcexError;
+use crate::exchange::RequestSigner;
+use crate::http::{HttpMethod, HttpRequest, block_on};
+use crate::product_table::ProductTable;
 
 fn recording_server() -> (String, JoinHandle<Option<String>>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
@@ -227,11 +227,13 @@ fn coin_futures_balance_uses_dapi_signed_route() {
             .await
     })
     .expect("response");
-    assert!(handle
-        .join()
-        .expect("server")
-        .expect("request")
-        .starts_with("GET /dapi/v1/balance?"));
+    assert!(
+        handle
+            .join()
+            .expect("server")
+            .expect("request")
+            .starts_with("GET /dapi/v1/balance?")
+    );
 }
 
 #[test]

@@ -295,7 +295,7 @@ async fn extended_close_until_flat(
                 other => {
                     return Err(live_test_error(format!(
                         "Extended position side is invalid: {other:?}"
-                    )))
+                    )));
                 }
             };
             let qty = format_step_decimal(qty, step)?;

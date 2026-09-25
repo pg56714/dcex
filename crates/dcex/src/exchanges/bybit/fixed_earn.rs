@@ -4,7 +4,7 @@ use crate::{DcexError, Result};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_bool, string_body, BybitParams};
+use super::params::{BybitParams, insert_optional_bool, string_body};
 
 const CATEGORIES: &[&str] = &["FixedTermSaving", "FundPool", "FundPoolPremium"];
 

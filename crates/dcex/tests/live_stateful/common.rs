@@ -7,7 +7,7 @@ use dcex::exchange::{Exchange, ValidatedResponse};
 use dcex::product_table::{ProductTable, TradingDetails};
 use dcex::{DcexError, Result};
 use serde_json::Value;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 pub(crate) const BTC_USDT_SPOT: &str = "BTC-USDT-SPOT";
 pub(crate) const BTC_USDT_SWAP: &str = "BTC-USDT-SWAP";

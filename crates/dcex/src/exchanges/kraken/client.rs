@@ -2,12 +2,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::exchange::ValidatedResponse;
-use crate::http::{block_on, AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody};
+use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody, block_on};
 use crate::product_table::ProductTable;
 use crate::{DcexError, Result};
 
 use super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL};
-use super::params::{exchange_symbol_fallback, is_canonical_product_symbol, KrakenParams};
+use super::params::{KrakenParams, exchange_symbol_fallback, is_canonical_product_symbol};
 use super::signing::{
     encode_params, futures_signature, http_method_name, spot_signature, unix_timestamp_ns,
     validate_response,

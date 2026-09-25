@@ -5,7 +5,7 @@ use crate::{DcexError, Result};
 
 use super::client::OkxClient;
 use super::endpoints::*;
-use super::params::{insert_optional_bool, insert_optional_string, OkxParams};
+use super::params::{OkxParams, insert_optional_bool, insert_optional_string};
 
 impl OkxClient {
     pub(super) async fn finance_private_request(

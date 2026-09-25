@@ -6,8 +6,8 @@ use super::client::MexcApi;
 use super::client::MexcClient;
 use super::endpoints::*;
 use super::params::{
-    add_pagination_defaults, require_one_identifier, require_paired, validate_enum,
-    validate_u64_range, MexcParams,
+    MexcParams, add_pagination_defaults, require_one_identifier, require_paired, validate_enum,
+    validate_u64_range,
 };
 
 const SPOT_KLINE_INTERVALS: &[&str] = &["1m", "5m", "15m", "30m", "60m", "4h", "1d", "1W", "1M"];

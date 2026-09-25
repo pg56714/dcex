@@ -6,8 +6,8 @@ use crate::{DcexError, Result};
 use super::client::BybitClient;
 use super::endpoints::*;
 use super::params::{
-    insert_optional_bool, insert_optional_i64, insert_optional_string, require_one_identifier,
-    string_body, BybitParams,
+    BybitParams, insert_optional_bool, insert_optional_i64, insert_optional_string,
+    require_one_identifier, string_body,
 };
 
 const RFQ_STATUSES: &[&str] = &[
@@ -375,21 +375,25 @@ mod tests {
     #[test]
     fn create_rfq_requires_non_empty_json_arrays() {
         assert!(create_rfq_body(&params(&[("counterparties", "[]"), ("list", "[]")])).is_err());
-        assert!(create_rfq_body(&params(&[
-            ("counterparties", "[\"desk\"]"),
-            ("list", "[{\"category\":\"linear\"}]")
-        ]))
-        .is_ok());
+        assert!(
+            create_rfq_body(&params(&[
+                ("counterparties", "[\"desk\"]"),
+                ("list", "[{\"category\":\"linear\"}]")
+            ]))
+            .is_ok()
+        );
     }
 
     #[test]
     fn create_quote_requires_at_least_one_side() {
         assert!(create_quote_body(&params(&[("rfqId", "1")])).is_err());
-        assert!(create_quote_body(&params(&[
-            ("rfqId", "1"),
-            ("quoteBuyList", "[{\"price\":\"1\"}]")
-        ]))
-        .is_ok());
+        assert!(
+            create_quote_body(&params(&[
+                ("rfqId", "1"),
+                ("quoteBuyList", "[{\"price\":\"1\"}]")
+            ]))
+            .is_ok()
+        );
     }
 
     #[test]

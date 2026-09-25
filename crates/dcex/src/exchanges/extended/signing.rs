@@ -4,8 +4,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use serde::Deserialize;
-use serde_json::{json, Map, Value};
-use starknet_crypto::{rfc6979_generate_k, sign, Felt, PoseidonHasher, SignError};
+use serde_json::{Map, Value, json};
+use starknet_crypto::{Felt, PoseidonHasher, SignError, rfc6979_generate_k, sign};
 
 use crate::{DcexError, Result};
 
@@ -695,12 +695,12 @@ fn sign_message(private_key: &Felt, message_hash: &Felt) -> Result<StarkSignatur
                 return Ok(StarkSignature {
                     r: signature.r,
                     s: signature.s,
-                })
+                });
             }
             Err(SignError::InvalidMessageHash) => {
                 return Err(DcexError::InvalidInput(
                     "Extended message hash is outside the Stark signing range".to_string(),
-                ))
+                ));
             }
             Err(SignError::InvalidK) => {
                 seed = Some(seed.map_or(Felt::ONE, |previous| previous + Felt::ONE));
@@ -863,10 +863,12 @@ mod tests {
             "4272448241247734333"
         );
         assert_eq!(order.body["fee"], "0");
-        assert!(order.body["settlement"]["signature"]["r"]
-            .as_str()
-            .unwrap()
-            .starts_with("0x"));
+        assert!(
+            order.body["settlement"]["signature"]["r"]
+                .as_str()
+                .unwrap()
+                .starts_with("0x")
+        );
     }
 
     #[test]

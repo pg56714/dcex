@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use serde_json::Value;
 
-use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::Result;
+use crate::ws::{WebSocketConfig, WebSocketConnection};
 
 use super::{
     coin_subscription, normalize_user, subscription_payload, user_subscription, websocket_url,

@@ -1,2 +1,2 @@
-# Preserve the existing formatting style while using Rust 2024 syntax.
-style_edition = "2021"
+# Format the workspace with Rust 2024 style rules.
+style_edition = "2024"

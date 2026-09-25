@@ -6,10 +6,10 @@ use crate::{DcexError, Result};
 use super::client::{KucoinClient, KucoinMarket};
 use super::endpoints::*;
 use super::params::{
-    bool_value, generate_client_oid, insert_required_string, insert_truthy_bool, json_value_string,
-    require_exactly_one, validate_client_oid, validate_enum, validate_positive_number,
-    validate_positive_u64, validate_text_length, validate_time_range, validate_u64_range,
-    KucoinParams,
+    KucoinParams, bool_value, generate_client_oid, insert_required_string, insert_truthy_bool,
+    json_value_string, require_exactly_one, validate_client_oid, validate_enum,
+    validate_positive_number, validate_positive_u64, validate_text_length, validate_time_range,
+    validate_u64_range,
 };
 
 const SPOT_ORDER_STRING_KEYS: &[&str] = &[

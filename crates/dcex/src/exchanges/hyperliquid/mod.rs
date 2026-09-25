@@ -11,7 +11,7 @@ pub mod websocket;
 mod wrappers;
 
 pub use client::HyperliquidClient;
-pub use signing::{hyperliquid_signature, HyperliquidSignature};
+pub use signing::{HyperliquidSignature, hyperliquid_signature};
 
 #[cfg(test)]
 mod tests;

@@ -1,13 +1,13 @@
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::BingxClient;
 use super::endpoints::*;
 use super::params::{
-    batch_orders_query, bool_or_string, comma_list, normalize_side, push_optional,
+    BingxParams, batch_orders_query, bool_or_string, comma_list, normalize_side, push_optional,
     python_list_string, require_one_identifier, validate_bool, validate_client_id, validate_enum,
     validate_json_object, validate_page_window, validate_positive_number, validate_time_range,
-    validate_u64_range, BingxParams,
+    validate_u64_range,
 };
 
 const SPOT_ORDER_TYPES: &[&str] = &[

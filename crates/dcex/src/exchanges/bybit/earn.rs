@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{insert_optional_string, BybitParams};
+use super::params::{BybitParams, insert_optional_string};
 
 const EARN_CATEGORIES: &[&str] = &["FlexibleSaving", "OnChain"];
 

@@ -288,9 +288,11 @@ mod tests {
     async fn rejects_more_than_30_subscriptions_before_transport() {
         let mut client = MexcPublicWebSocket::new(Duration::from_secs(1)).expect("client");
         client.subscriptions = (0..30).map(|index| format!("channel{index}")).collect();
-        assert!(client
-            .subscribe(vec!["channel30".to_string()])
-            .await
-            .is_err());
+        assert!(
+            client
+                .subscribe(vec!["channel30".to_string()])
+                .await
+                .is_err()
+        );
     }
 }

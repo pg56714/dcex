@@ -2,9 +2,9 @@ use serde_json::Value;
 
 use super::client::BybitClient;
 use super::endpoints::*;
-use super::params::{generate_transfer_id, push_optional, string_body, BybitParams};
-use crate::exchange::ValidatedResponse;
+use super::params::{BybitParams, generate_transfer_id, push_optional, string_body};
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 impl BybitClient {
     pub(super) async fn asset_private_request(

@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use dcex::exchanges::backpack::BackpackClient;
 
-use super::common::{require_env, run_cases, run_private_cases, Case};
+use super::common::{Case, require_env, run_cases, run_private_cases};
 
 const BTC_USDC_SPOT: &str = "BTC-USDC-SPOT";
 const BTC_USDC_SWAP: &str = "BTC-USDC-SWAP";

@@ -103,8 +103,8 @@ pub(super) fn validate_credential(label: &str, value: &str) -> Result<()> {
 mod tests {
     use std::io::Write;
 
-    use flate2::write::GzEncoder;
     use flate2::Compression;
+    use flate2::write::GzEncoder;
     use serde_json::json;
 
     use super::*;

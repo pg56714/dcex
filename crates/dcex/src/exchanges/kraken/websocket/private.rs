@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::exchanges::kraken::{KrakenAuth, KrakenClient};
 use crate::http::HttpMethod;

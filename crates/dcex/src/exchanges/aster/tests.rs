@@ -5,14 +5,14 @@ use std::{
     time::{Duration, Instant},
 };
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::http::HttpMethod;
 use crate::product_table::{MarketInfo, ProductTable};
 
-use super::{sign_message, AsterClient, AsterMarket};
-use crate::exchanges::aster::params::AsterParams;
+use super::{AsterClient, AsterMarket, sign_message};
 use crate::DcexError;
+use crate::exchanges::aster::params::AsterParams;
 
 fn recording_server() -> (String, JoinHandle<Option<String>>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
@@ -87,12 +87,16 @@ fn signed_futures_request_includes_user_before_signer() {
         Some("application/json")
     );
     assert!(request.path.contains("nonce=1700000000000000"));
-    assert!(request
-        .path
-        .contains("user=0x0000000000000000000000000000000000000001"));
-    assert!(request
-        .path
-        .contains("signer=0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"));
+    assert!(
+        request
+            .path
+            .contains("user=0x0000000000000000000000000000000000000001")
+    );
+    assert!(
+        request
+            .path
+            .contains("signer=0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a")
+    );
     assert!(request.path.contains("signature=0x"));
 }
 
@@ -214,18 +218,22 @@ fn batch_orders_resolve_product_symbol_and_side() {
 
 #[test]
 fn credentials_must_be_paired_and_addresses_are_validated() {
-    assert!(AsterClient::new(
-        None,
-        Some("0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a".to_string()),
-        None,
-        Duration::from_secs(1),
-    )
-    .is_err());
-    assert!(AsterClient::new(
-        Some("not-an-address".to_string()),
-        None,
-        None,
-        Duration::from_secs(1),
-    )
-    .is_err());
+    assert!(
+        AsterClient::new(
+            None,
+            Some("0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a".to_string()),
+            None,
+            Duration::from_secs(1),
+        )
+        .is_err()
+    );
+    assert!(
+        AsterClient::new(
+            Some("not-an-address".to_string()),
+            None,
+            None,
+            Duration::from_secs(1),
+        )
+        .is_err()
+    );
 }

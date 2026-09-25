@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 use crate::{DcexError, Result};
@@ -82,7 +82,7 @@ impl ArcusWebSocket {
             _ => {
                 return Err(DcexError::InvalidInput(format!(
                     "unknown Arcus WS channel: {channel}"
-                )))
+                )));
             }
         };
         if required_id && id.is_none_or(str::is_empty) {

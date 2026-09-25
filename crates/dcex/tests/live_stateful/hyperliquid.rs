@@ -4,9 +4,9 @@ use dcex::exchange::Exchange;
 use dcex::exchanges::hyperliquid::HyperliquidClient;
 
 use super::common::{
-    assert_success, fetch_trading_details, find_f64, find_string, first_bid_price, live_test_error,
-    minimum_order_quantity, require_env, require_live_fill, require_live_trading, require_order_id,
-    BTC_USD_SWAP,
+    BTC_USD_SWAP, assert_success, fetch_trading_details, find_f64, find_string, first_bid_price,
+    live_test_error, minimum_order_quantity, require_env, require_live_fill, require_live_trading,
+    require_order_id,
 };
 
 #[tokio::test]

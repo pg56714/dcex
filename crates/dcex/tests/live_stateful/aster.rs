@@ -4,10 +4,10 @@ use dcex::exchange::Exchange;
 use dcex::exchanges::aster::AsterClient;
 
 use super::common::{
-    assert_success, fetch_trading_details, find_f64, first_bid_price, live_test_error,
-    minimum_order_quantity, params, post_only_buy_price, require_env, require_live_fill,
-    require_live_trading, require_order_id, wait_for_flat_position, wait_for_positive_position,
-    BTC_USDT_SWAP,
+    BTC_USDT_SWAP, assert_success, fetch_trading_details, find_f64, first_bid_price,
+    live_test_error, minimum_order_quantity, params, post_only_buy_price, require_env,
+    require_live_fill, require_live_trading, require_order_id, wait_for_flat_position,
+    wait_for_positive_position,
 };
 
 #[tokio::test]

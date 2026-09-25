@@ -1,11 +1,11 @@
 use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::BitgetClient;
 use super::endpoints::*;
-use super::params::{insert_optional_value, require_one_identifier, BitgetParams};
+use super::params::{BitgetParams, insert_optional_value, require_one_identifier};
 
 const SPOT_ORDER_KEYS: &[&str] = &[
     "side",

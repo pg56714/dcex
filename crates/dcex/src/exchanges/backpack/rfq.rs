@@ -6,7 +6,7 @@ use crate::{DcexError, Result};
 use super::client::BackpackClient;
 use super::endpoints::*;
 use super::params::{
-    insert_optional_integer, insert_optional_string, insert_required_string, BackpackParams,
+    BackpackParams, insert_optional_integer, insert_optional_string, insert_required_string,
 };
 
 impl BackpackClient {

@@ -1,13 +1,13 @@
 use super::client::{BinanceClient, BinanceMarket};
 use super::endpoints::*;
 use super::params::{
-    push_optional, push_optional_display, BinanceFundingWalletParams, BinanceIncomeHistoryParams,
-    BinanceUniversalTransferHistoryParams, BinanceUniversalTransferParams,
-    BinanceWalletBalanceParams,
+    BinanceFundingWalletParams, BinanceIncomeHistoryParams, BinanceUniversalTransferHistoryParams,
+    BinanceUniversalTransferParams, BinanceWalletBalanceParams, push_optional,
+    push_optional_display,
 };
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
-use crate::Result;
 
 impl BinanceClient {
     pub async fn get_spot_fee_rates(&self, product_symbol: &str) -> Result<ValidatedResponse> {

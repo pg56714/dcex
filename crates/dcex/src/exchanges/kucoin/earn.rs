@@ -1,11 +1,11 @@
 use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
 use crate::Result;
+use crate::exchange::ValidatedResponse;
 
 use super::client::{KucoinClient, KucoinMarket};
 use super::endpoints::*;
-use super::params::{validate_enum, validate_positive_number, KucoinParams};
+use super::params::{KucoinParams, validate_enum, validate_positive_number};
 
 impl KucoinClient {
     pub(super) async fn earn_private_request(

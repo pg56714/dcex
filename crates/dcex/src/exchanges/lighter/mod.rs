@@ -12,7 +12,7 @@ mod wrappers;
 
 pub use chains::{LighterEndpointProfile, LighterNetwork};
 pub use client::{LighterClient, LighterContentType};
-pub use credentials::{credential_env_names, credentials_env_prefix, LighterCredentials};
+pub use credentials::{LighterCredentials, credential_env_names, credentials_env_prefix};
 pub use trade::LighterSignedTransaction;
 
 #[cfg(test)]
