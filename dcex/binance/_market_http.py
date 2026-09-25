@@ -246,6 +246,17 @@ class MarketHTTP(HTTPManager):
         """Get futures trading exchange information from Binance."""
         return self._native_public("get_futures_exchange_info", [])
 
+    def get_futures_orderbook(
+        self,
+        product_symbol: str,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Get USDⓈ-M futures order book data from Binance."""
+        return self._native_public(
+            "get_futures_orderbook",
+            self._params(product_symbol=product_symbol, limit=limit),
+        )
+
     def get_futures_ticker(
         self,
         product_symbol: str | None = None,

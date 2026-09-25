@@ -246,6 +246,34 @@ impl BinanceClient {
         .await
     }
 
+    pub fn get_futures_orderbook(
+        &self,
+        product_symbol: &str,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        crate::exchanges::ExchangeMethodRequest::public(
+            self,
+            "get_futures_orderbook",
+            vec![("product_symbol".to_string(), product_symbol.to_string())],
+        )
+    }
+
+    pub(super) async fn send_get_futures_orderbook(
+        &self,
+        product_symbol: &str,
+        limit: Option<u64>,
+    ) -> Result<ValidatedResponse> {
+        let mut params = vec![("symbol".to_string(), self.exchange_symbol(product_symbol)?)];
+        push_optional_display(&mut params, "limit", limit);
+        self.request(
+            HttpMethod::Get,
+            BinanceMarket::Futures,
+            FUTURES_ORDERBOOK,
+            params,
+            false,
+        )
+        .await
+    }
+
     pub fn get_futures_ticker(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
         crate::exchanges::ExchangeMethodRequest::public(self, "get_futures_ticker", Vec::new())
     }
@@ -632,6 +660,15 @@ impl BinanceClient {
                 .await
             }
             "get_futures_exchange_info" => self.get_futures_exchange_info().await,
+            "get_futures_orderbook" => {
+                params.ensure_allowed(&["product_symbol", "limit"])?;
+                params.optional_one_of("limit", &["5", "10", "20", "50", "100", "500", "1000"])?;
+                self.send_get_futures_orderbook(
+                    params.required("product_symbol")?,
+                    params.u64("limit")?,
+                )
+                .await
+            }
             "get_futures_ticker" => {
                 self.send_get_futures_ticker(BinanceOptionalSymbolParams {
                     product_symbol: params.get("product_symbol"),

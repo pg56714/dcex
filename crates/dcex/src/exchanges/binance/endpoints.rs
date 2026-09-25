@@ -66,6 +66,7 @@ pub(super) const EQUITY_TOKENIZED_HISTORY: &str = "/sapi/v1/equity/tokenized/his
 pub(super) const EQUITY_DISCLAIMER: &str = "/sapi/v1/equity/account/disclaimer";
 pub(super) const EQUITY_LISTEN_KEY: &str = "/sapi/v1/equity/listenKey";
 pub(super) const FUTURES_EXCHANGE_INFO: &str = "/fapi/v1/exchangeInfo";
+pub(super) const FUTURES_ORDERBOOK: &str = "/fapi/v1/depth";
 pub(super) const FUTURES_BOOK_TICKER: &str = "/fapi/v1/ticker/bookTicker";
 pub(super) const FUTURES_KLINES: &str = "/fapi/v1/klines";
 pub(super) const FUTURES_PREMIUM_INDEX: &str = "/fapi/v1/premiumIndex";

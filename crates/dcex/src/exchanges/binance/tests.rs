@@ -188,6 +188,34 @@ fn raw_auto_identifies_coin_futures_paths() {
 }
 
 #[test]
+fn futures_orderbook_uses_fapi_base_url() {
+    let (futures_base_url, handle) = recording_server();
+    let client = BinanceClient::with_base_urls(
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".to_string(),
+        futures_base_url,
+    )
+    .expect("client");
+    block_on(async move { client.get_futures_orderbook("BTC-USDT-SWAP").limit(5).await })
+        .expect("response");
+    assert_eq!(
+        handle.join().expect("server"),
+        Some("GET /fapi/v1/depth?symbol=BTCUSDT&limit=5 HTTP/1.1".to_string())
+    );
+}
+
+#[test]
+fn futures_orderbook_rejects_unsupported_limit() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error =
+        block_on(async move { client.get_futures_orderbook("BTC-USDT-SWAP").limit(7).await })
+            .expect_err("unsupported limit must be rejected before the request");
+    assert!(error.to_string().contains("invalid Binance limit: 7"));
+}
+
+#[test]
 fn coin_futures_market_data_uses_dapi_base_url() {
     let (coin_base_url, handle) = recording_server();
     let client = BinanceClient::public(Duration::from_secs(2))

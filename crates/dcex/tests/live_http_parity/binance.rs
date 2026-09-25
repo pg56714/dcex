@@ -28,6 +28,10 @@ async fn binance_public_live_parity() -> dcex::Result<()> {
             Case::new("get_server_time", &[("market_type", "spot")]),
             Case::new("get_server_time", &[("market_type", "swap")]),
             Case::new("get_futures_exchange_info", &[]),
+            Case::new(
+                "get_futures_orderbook",
+                &[("product_symbol", BTC_USDT_SWAP), ("limit", "5")],
+            ),
             Case::new("get_futures_ticker", &[("product_symbol", BTC_USDT_SWAP)]),
             Case::new(
                 "get_klines",

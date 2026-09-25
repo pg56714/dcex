@@ -224,6 +224,44 @@ async def test_async_binance_public_wrapper_uses_native_dispatcher() -> None:
     assert received.get_nowait()["path"] == "/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=2"
 
 
+def test_sync_binance_futures_orderbook_uses_native_dispatcher() -> None:
+    native = pytest.importorskip("dcex._native")
+    from dcex.binance.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(preload_product_table=False)
+        client._native_client = native.BinanceHttpClient(
+            timeout=2,
+            spot_base_url="http://127.0.0.1:9",
+            futures_base_url=base_url,
+        )
+        result = client.get_futures_orderbook("BTC-USDT-SWAP", limit=5)
+
+    client.close()
+    assert result == {"ok": True}
+    assert received.get_nowait()["path"] == "/fapi/v1/depth?symbol=BTCUSDT&limit=5"
+
+
+@pytest.mark.asyncio
+async def test_async_binance_futures_orderbook_uses_native_dispatcher() -> None:
+    native = pytest.importorskip("dcex._native")
+    from dcex.async_support.binance.client import Client
+
+    with _http_server() as (base_url, received):
+        client = Client(preload_product_table=False)
+        await client.async_init()
+        client._native_client = native.BinanceHttpClient(
+            timeout=2,
+            spot_base_url="http://127.0.0.1:9",
+            futures_base_url=base_url,
+        )
+        result = await client.get_futures_orderbook("BTC-USDT-SWAP", limit=5)
+
+    await client.close()
+    assert result == {"ok": True}
+    assert received.get_nowait()["path"] == "/fapi/v1/depth?symbol=BTCUSDT&limit=5"
+
+
 def test_sync_binance_private_trade_wrapper_uses_native_dispatcher() -> None:
     native = pytest.importorskip("dcex._native")
     from dcex.binance.client import Client
