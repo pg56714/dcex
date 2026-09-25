@@ -233,11 +233,16 @@ symbols while the exchange-specific API still accepts native option symbols.
 The Binance exchange-specific Rust, synchronous Python, and asynchronous Python
 clients expose COIN-M market data, balances, positions, and basic order
 placement/query/cancellation through the official `dapi` host. COIN-M methods
-currently require native symbols such as `BTCUSD_PERP`; they are not yet
-mapped by the unified Product Table Manager. Convert covers pair limits, asset
+currently require native symbols such as `BTCUSD_PERP`. The unified Product
+Table Manager lists COIN-M instruments under `binance_coinm` (separate from
+USD-M `binance`) and can resolve their native symbols; generic Binance order
+routing remains USD-M-only. Convert covers pair limits, asset
 precision, quotes, quote acceptance, order status/history, and limit-order
 management through `sapi`. Balance-changing calls are not included in
 read-only live tests.
+
+For inverse COIN-M contracts, `size_per_contract` is the exchange's USD face
+value (`contractSize`), not a fixed amount of base currency.
 
 ### Binance Margin
 

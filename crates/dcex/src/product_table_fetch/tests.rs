@@ -1,9 +1,10 @@
 use super::exchanges::{
-    arcus_market_info, backpack_rfq_market_info, binance_equity_market_info,
-    binance_option_market_info, bybit_option_expiry, bybit_option_market_info,
-    hyperliquid_perpetual_market_info, mexc_contract_market_info, mexc_contract_pair,
-    mexc_spot_market_info, okx_market_info, okx_option_market_info, okx_unlisted_option_family,
-    option_product_symbol,
+    arcus_market_info, backpack_rfq_market_info, binance_coin_futures_market_info,
+    binance_equity_market_info, binance_option_market_info, bitget_uta_futures_market_info,
+    bybit_option_expiry, bybit_option_market_info, disambiguate_bingx_products,
+    hyperliquid_perpetual_market_info, kucoin_futures_market_info, mexc_contract_market_info,
+    mexc_contract_pair, mexc_spot_market_info, okx_market_info, okx_option_market_info,
+    okx_unlisted_option_family, option_product_symbol,
 };
 use super::*;
 use crate::product_table::MarketInfo;
@@ -189,6 +190,96 @@ fn canonicalizes_exchange_display_symbols() {
         canonical_market_pair(&extended, "uiName", "AAPL_24_5-USD").expect("Extended UI symbol"),
         ("AAPL".to_string(), "USD".to_string())
     );
+}
+
+#[test]
+fn maps_coin_m_contracts_without_usd_m_routing() {
+    let market = serde_json::json!({
+        "symbol": "BTCUSD_PERP", "baseAsset": "BTC", "quoteAsset": "USD",
+        "contractType": "PERPETUAL", "contractSize": 100,
+        "filters": [
+            {"filterType": "PRICE_FILTER", "tickSize": "0.1"},
+            {"filterType": "LOT_SIZE", "stepSize": "1", "minQty": "1"}
+        ]
+    });
+    let row = binance_coin_futures_market_info(&market).expect("COIN-M perpetual");
+    assert_eq!(row.exchange, "binance_coinm");
+    assert_eq!(row.product_symbol, "BTC-USD-SWAP");
+    assert_eq!(row.size_per_contract, "100");
+    let dated = serde_json::json!({
+        "symbol": "BTCUSD_260925", "baseAsset": "BTC", "quoteAsset": "USD",
+        "contractType": "CURRENT_QUARTER", "contractSize": 100
+    });
+    let row = binance_coin_futures_market_info(&dated).expect("COIN-M delivery");
+    assert_eq!(row.product_symbol, "BTC-USD-260925-FUTURES");
+    assert_eq!(row.product_type, "futures");
+}
+
+#[test]
+fn maps_bitget_uta_coin_and_usdc_futures() {
+    let coin = serde_json::json!({
+        "symbol": "BTCUSD_CM", "baseCoin": "BTC", "quoteCoin": "USD",
+        "type": "perpetual", "pricePrecision": "1", "quantityPrecision": "0",
+        "minOrderQty": "1", "minOrderAmount": "5"
+    });
+    let row = bitget_uta_futures_market_info(&coin, "COIN-FUTURES").unwrap();
+    assert_eq!(row.product_symbol, "BTC-USD-SWAP");
+    assert_eq!(row.exchange_type, "COIN-FUTURES");
+    assert_eq!(row.min_size, "1");
+    let usdc = serde_json::json!({
+        "symbol": "BTCPERP", "baseCoin": "BTC", "quoteCoin": "USDC",
+        "type": "perpetual"
+    });
+    let row = bitget_uta_futures_market_info(&usdc, "USDC-FUTURES").unwrap();
+    assert_eq!(row.product_symbol, "BTC-USDC-SWAP");
+}
+
+#[test]
+fn distinguishes_kucoin_delivery_months_from_perpetuals() {
+    let perpetual = serde_json::json!({
+        "symbol": "XBTUSDM", "baseCurrency": "XBT", "quoteCurrency": "USD",
+        "type": "FFWCSX", "expireDate": null
+    });
+    let dated = serde_json::json!({
+        "symbol": "XBTMU26", "baseCurrency": "XBT", "quoteCurrency": "USD",
+        "type": "FFICSX", "expireDate": 1780000000000_i64
+    });
+    assert_eq!(
+        kucoin_futures_market_info(&perpetual)
+            .unwrap()
+            .product_symbol,
+        "BTC-USD-SWAP"
+    );
+    let dated = kucoin_futures_market_info(&dated).unwrap();
+    assert_eq!(dated.product_symbol, "BTC-USD-U26-FUTURES");
+    assert_eq!(dated.product_type, "futures");
+}
+
+#[test]
+fn disambiguates_only_colliding_bingx_display_aliases() {
+    let make_row = |native: &str, display: &str| MarketInfo {
+        exchange: "bingx".into(),
+        exchange_symbol: native.into(),
+        product_symbol: display.into(),
+        product_type: "swap".into(),
+        exchange_type: "perpetual".into(),
+        price_precision: "0.01".into(),
+        size_precision: "1".into(),
+        min_size: "1".into(),
+        base_currency: display.split('-').next().unwrap().into(),
+        quote_currency: "USDT".into(),
+        min_notional: "0".into(),
+        size_per_contract: "1".into(),
+    };
+    let mut rows = vec![
+        make_row("ONE-USDT", "ONE-USDT-SWAP"),
+        make_row("CROSS-USDT", "ONE-USDT-SWAP"),
+        make_row("NCSKAAPL2USD-USDT", "AAPL-USDT-SWAP"),
+    ];
+    disambiguate_bingx_products(&mut rows);
+    assert_eq!(rows[0].product_symbol, "ONE-USDT-SWAP");
+    assert_eq!(rows[1].product_symbol, "CROSS-USDT-SWAP");
+    assert_eq!(rows[2].product_symbol, "AAPL-USDT-SWAP");
 }
 
 #[test]

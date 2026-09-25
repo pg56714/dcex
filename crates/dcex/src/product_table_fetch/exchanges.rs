@@ -258,6 +258,14 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
             size_per_contract: "1".to_string(),
         });
     }
+    let coin_futures = client
+        .public_request("get_coin_futures_exchange_info", vec![])
+        .await?;
+    for market in response_array(&coin_futures, &["symbols"]) {
+        if value_string(market, "contractStatus", "") == "TRADING" {
+            rows.push(binance_coin_futures_market_info(market)?);
+        }
+    }
     let options = client
         .public_request("get_options_exchange_info", vec![])
         .await?;
@@ -283,6 +291,44 @@ pub(super) async fn fetch_binance(timeout: Duration) -> Result<Vec<MarketInfo>> 
         }
     }
     Ok(rows)
+}
+
+pub(super) fn binance_coin_futures_market_info(market: &Value) -> Result<MarketInfo> {
+    let base = required_string(market, "baseAsset")?;
+    let quote = required_string(market, "quoteAsset")?;
+    let symbol = required_string(market, "symbol")?;
+    let contract_type = required_string(market, "contractType")?;
+    let product_type = binance_product_type(&contract_type);
+    let product_symbol = if product_type == "swap" {
+        format!("{base}-{quote}-SWAP")
+    } else {
+        let expiry = symbol.rsplit_once('_').map_or("", |(_, expiry)| expiry);
+        if expiry.is_empty() {
+            return Err(DcexError::Decode(format!(
+                "Binance COIN-M delivery symbol lacks expiry: {symbol}"
+            )));
+        }
+        format!("{base}-{quote}-{expiry}-FUTURES")
+    };
+    let filters = value_array(market.get("filters"));
+    let price = find_filter(filters, &["PRICE_FILTER"]);
+    let lot = find_filter(filters, &["LOT_SIZE"]);
+    Ok(MarketInfo {
+        // COIN-M must not share the USD-M namespace: generic Binance order
+        // routing interprets binance swaps/futures as USD-M products.
+        exchange: "binance_coinm".to_string(),
+        exchange_symbol: symbol,
+        product_symbol,
+        product_type: product_type.to_string(),
+        exchange_type: contract_type,
+        price_precision: value_string(price, "tickSize", "0"),
+        size_precision: value_string(lot, "stepSize", "0"),
+        min_size: value_string(lot, "minQty", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".to_string(),
+        size_per_contract: value_string(market, "contractSize", "1"),
+    })
 }
 
 pub(super) fn binance_equity_market_info(market: &Value) -> Result<MarketInfo> {
@@ -499,7 +545,31 @@ pub(super) async fn fetch_bingx(timeout: Duration) -> Result<Vec<MarketInfo>> {
             size_per_contract: "1".to_string(),
         });
     }
+    disambiguate_bingx_products(&mut rows);
     Ok(rows)
+}
+
+pub(super) fn disambiguate_bingx_products(rows: &mut [MarketInfo]) {
+    let mut counts = HashMap::new();
+    for row in rows.iter() {
+        *counts.entry(row.product_symbol.clone()).or_insert(0usize) += 1;
+    }
+    for row in rows.iter_mut() {
+        if counts.get(&row.product_symbol).copied().unwrap_or(0) < 2 {
+            continue;
+        }
+        // Preserve display aliases for unique products (including equities).
+        // Only colliding aliases fall back to the exchange's unique symbol.
+        if let Ok((base, quote)) = split_last(&row.exchange_symbol, '-') {
+            let native_product =
+                format!("{base}-{quote}-{}", row.product_type.to_ascii_uppercase());
+            if native_product != row.product_symbol {
+                row.base_currency = base;
+                row.quote_currency = quote;
+                row.product_symbol = native_product;
+            }
+        }
+    }
 }
 
 pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -565,7 +635,51 @@ pub(super) async fn fetch_bitget(timeout: Duration) -> Result<Vec<MarketInfo>> {
             size_per_contract: value_string(market, "sizeMultiplier", "1"),
         });
     }
+    for category in ["COIN-FUTURES", "USDC-FUTURES"] {
+        let response = client
+            .public_request(
+                "get_uta_instruments",
+                vec![("category".to_string(), category.to_string())],
+            )
+            .await?;
+        for market in response_array(&response, &["data"]) {
+            if value_string(market, "status", "").eq_ignore_ascii_case("online") {
+                rows.push(bitget_uta_futures_market_info(market, category)?);
+            }
+        }
+    }
     Ok(rows)
+}
+
+pub(super) fn bitget_uta_futures_market_info(market: &Value, category: &str) -> Result<MarketInfo> {
+    let base = required_string(market, "baseCoin")?;
+    let quote = required_string(market, "quoteCoin")?;
+    let symbol = required_string(market, "symbol")?;
+    let contract_type = value_string(market, "type", "perpetual");
+    let product_type = if contract_type.eq_ignore_ascii_case("perpetual") {
+        "swap"
+    } else {
+        "futures"
+    };
+    let product_symbol = if product_type == "swap" {
+        format!("{base}-{quote}-SWAP")
+    } else {
+        format!("{base}-{quote}-{symbol}-FUTURES")
+    };
+    Ok(MarketInfo {
+        exchange: "bitget".to_string(),
+        exchange_symbol: symbol,
+        product_symbol,
+        product_type: product_type.to_string(),
+        exchange_type: category.to_string(),
+        price_precision: decimal_precision(value_i32(market, "pricePrecision", 0)),
+        size_precision: decimal_precision(value_i32(market, "quantityPrecision", 0)),
+        min_size: value_string(market, "minOrderQty", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: value_string(market, "minOrderAmount", "0"),
+        size_per_contract: "1".to_string(),
+    })
 }
 
 pub(super) async fn fetch_bybit(timeout: Duration) -> Result<Vec<MarketInfo>> {
@@ -844,24 +958,42 @@ pub(super) async fn fetch_kucoin(timeout: Duration) -> Result<Vec<MarketInfo>> {
         });
     }
     for market in response_array(&futures, &["data"]) {
-        let base = normalize_kucoin_currency(&required_string(market, "baseCurrency")?);
-        let quote = required_string(market, "quoteCurrency")?;
-        rows.push(MarketInfo {
-            exchange: "kucoin".to_string(),
-            exchange_symbol: required_string(market, "symbol")?,
-            product_symbol: format!("{base}-{quote}-SWAP"),
-            product_type: "swap".to_string(),
-            exchange_type: value_string(market, "type", ""),
-            price_precision: value_string(market, "tickSize", "0"),
-            size_precision: value_string(market, "lotSize", "0"),
-            min_size: value_string(market, "lotSize", "0"),
-            base_currency: base,
-            quote_currency: quote,
-            min_notional: "0".to_string(),
-            size_per_contract: value_string(market, "multiplier", "1"),
-        });
+        rows.push(kucoin_futures_market_info(market)?);
     }
     Ok(rows)
+}
+
+pub(super) fn kucoin_futures_market_info(market: &Value) -> Result<MarketInfo> {
+    let base = normalize_kucoin_currency(&required_string(market, "baseCurrency")?);
+    let quote = required_string(market, "quoteCurrency")?;
+    let symbol = required_string(market, "symbol")?;
+    let is_dated = market
+        .get("expireDate")
+        .is_some_and(|expiry| !expiry.is_null());
+    let product_type = if is_dated { "futures" } else { "swap" };
+    let product_symbol = if is_dated {
+        // KuCoin embeds the standard delivery month/year code in the
+        // contract symbol (for example XBTMU26 versus XBTMZ26).
+        let expiry = symbol.chars().rev().take(3).collect::<String>();
+        let expiry = expiry.chars().rev().collect::<String>();
+        format!("{base}-{quote}-{expiry}-FUTURES")
+    } else {
+        format!("{base}-{quote}-SWAP")
+    };
+    Ok(MarketInfo {
+        exchange: "kucoin".to_string(),
+        exchange_symbol: symbol,
+        product_symbol,
+        product_type: product_type.to_string(),
+        exchange_type: value_string(market, "type", ""),
+        price_precision: value_string(market, "tickSize", "0"),
+        size_precision: value_string(market, "lotSize", "0"),
+        min_size: value_string(market, "lotSize", "0"),
+        base_currency: base,
+        quote_currency: quote,
+        min_notional: "0".to_string(),
+        size_per_contract: value_string(market, "multiplier", "1"),
+    })
 }
 
 pub(super) async fn fetch_kraken(timeout: Duration) -> Result<Vec<MarketInfo>> {
