@@ -6,7 +6,6 @@ firm quote's EIP-712 typed data before submission.
 """
 
 import json
-import os
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
@@ -31,8 +30,6 @@ class SpotClient(BaseHTTPManager):
     _native_client: Any = field(default=None, init=False, repr=False)  # noqa: ANN401
 
     def __post_init__(self) -> None:
-        prefix = "ARCUS_SPOT_TESTNET" if self.testnet else "ARCUS_SPOT_MAINNET"
-        self.api_key = self.api_key or os.getenv(f"{prefix}_API_KEY") or None
         self._native_client = load_native().ArcusSpotHttpClient(
             api_key=self.api_key,
             testnet=self.testnet,

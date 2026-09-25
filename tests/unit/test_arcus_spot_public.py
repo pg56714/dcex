@@ -53,19 +53,16 @@ def test_arcus_spot_native_public_routes() -> None:
         assert received.get_nowait()["path"] == "/health"
         assert client.public_request_json("get_tokens", [])[2] == {"ok": True}
         assert received.get_nowait()["path"] == "/v1/tokens"
-        assert (
-            client.public_request_json(
-                "get_quote",
-                [
-                    ("sellToken", SELL),
-                    ("buyToken", BUY),
-                    ("sellAmount", "1000000"),
-                    ("taker", TAKER),
-                    ("slippageBps", "50"),
-                ],
-            )[2]
-            == {"ok": True}
-        )
+        assert client.public_request_json(
+            "get_quote",
+            [
+                ("sellToken", SELL),
+                ("buyToken", BUY),
+                ("sellAmount", "1000000"),
+                ("taker", TAKER),
+                ("slippageBps", "50"),
+            ],
+        )[2] == {"ok": True}
         request = received.get_nowait()
         assert urlsplit(request["path"]).path == "/v1/quote"
         query = parse_qs(urlsplit(request["path"]).query)
@@ -98,6 +95,23 @@ def test_arcus_spot_python_sync_public_methods() -> None:
             "/v1/price",
             "/v1/quote",
         ]
+
+
+def test_arcus_spot_key_is_explicit_and_separate_from_perps(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ARCUS_MAINNET_API_KEY", "perps-key")
+    monkeypatch.setenv("ARCUS_SPOT_MAINNET_API_KEY", "old-router-key")
+    with _http_server({"ok": True}) as (base_url, received):
+        public_client = SyncSpotClient(base_url=base_url)
+        assert public_client.health() == {"ok": True}
+        assert "x-api-key" not in received.get_nowait()
+        public_client.close()
+
+        partner_client = SyncSpotClient(api_key="partner-key", base_url=base_url)
+        assert partner_client.health() == {"ok": True}
+        assert received.get_nowait()["x-api-key"] == "partner-key"
+        partner_client.close()
 
 
 def test_arcus_spot_signed_submit_and_status_routes_are_complete() -> None:
@@ -169,6 +183,29 @@ def test_arcus_spot_python_async_public_methods() -> None:
                 "/v1/quote",
             ]
             assert parse_qs(paths[-1].query)["chainId"] == ["46630"]
+
+    asyncio.run(check())
+
+
+def test_arcus_spot_async_key_is_explicit_and_separate_from_perps(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ARCUS_TESTNET_API_KEY", "perps-key")
+    monkeypatch.setenv("ARCUS_SPOT_TESTNET_API_KEY", "old-router-key")
+
+    async def check() -> None:
+        with _http_server({"ok": True}) as (base_url, received):
+            public_client = await AsyncSpotClient(testnet=True, base_url=base_url).async_init()
+            assert await public_client.health() == {"ok": True}
+            assert "x-api-key" not in received.get_nowait()
+            await public_client.close()
+
+            partner_client = await AsyncSpotClient(
+                api_key="partner-key", testnet=True, base_url=base_url
+            ).async_init()
+            assert await partner_client.health() == {"ok": True}
+            assert received.get_nowait()["x-api-key"] == "partner-key"
+            await partner_client.close()
 
     asyncio.run(check())
 

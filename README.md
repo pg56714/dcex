@@ -173,6 +173,9 @@ router. `dcex.arcus()` supports token discovery, prices, firm quotes, validated
 assembly and submission of an externally wallet-signed EIP-712 quote, and
 status checks; public hosted quotes need no API key. Wallet signing and any
 required token permit/approval remain the caller's responsibility.
+The Arcus app's Ed25519 API key is for the Perps API, not the Spot Router.
+Spot integration partners can pass their separately issued router key as
+`api_key` when constructing a Spot client.
 
 Arcus Perps uses `dcex.arcus(market="perps")` and separate Ed25519 credentials.
 Market/account queries, single-order placement and cancellation, fills,

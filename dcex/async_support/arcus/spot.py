@@ -1,7 +1,6 @@
 """Asynchronous Arcus spot RFQ router client."""
 
 import json
-import os
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, Self
@@ -27,8 +26,6 @@ class SpotClient(BaseHTTPManager):
 
     async def async_init(self) -> Self:
         """Initialize the native spot router client."""
-        prefix = "ARCUS_SPOT_TESTNET" if self.testnet else "ARCUS_SPOT_MAINNET"
-        self.api_key = self.api_key or os.getenv(f"{prefix}_API_KEY") or None
         self._native_client = load_native().ArcusSpotHttpClient(
             api_key=self.api_key,
             testnet=self.testnet,
