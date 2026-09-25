@@ -1,3 +1,31 @@
+## 0.11.0 (2026-09-25)
+
+### Feat
+
+- add USD-M futures order book wrappers
+- add spot wallet read endpoints
+- add trading lifecycle and market data endpoints
+- add coin futures, convert, and risk-control APIs
+- expand advanced exchange trading surfaces
+- normalize listed options in product tables
+- expand Bybit RFQ, finance, and Launchpool workflows
+- add cross-exchange finance and subaccount workflows
+- add Binance finance and subaccount workflows
+- expand stock, RFQ, and options trading
+- add Arcus spot router and expand exchange wrappers
+- add Arcus perpetual REST and WebSocket clients
+- add perps REST and WebSocket clients
+
+### Fix
+
+- include omitted futures and disambiguate products
+- classify stock markets and correct product limits
+- complete stock market metadata routing
+
+### Refactor
+
+- modularize Arcus trading workflows
+
 ## 0.10.0 (2026-09-14)
 
 ### Feat
