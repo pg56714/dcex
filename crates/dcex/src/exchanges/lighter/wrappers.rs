@@ -40,6 +40,10 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         cancel_all_orders(time_in_force => "time_in_force", timestamp_ms => "timestamp_ms"),
+        create_rfq(market_index => "market_index", direction => "direction"),
+        get_rfq(rfq_id => "rfq_id"),
+        list_rfqs(),
+        update_rfq(rfq_id => "rfq_id", status => "status"),
         cancel_order(market_index => "market_index", order_index => "order_index"),
         create_order(market_index => "market_index", client_order_index => "client_order_index", base_amount => "base_amount", price => "price", is_ask => "is_ask", order_type => "order_type", time_in_force => "time_in_force"),
         get_account_active_orders(),

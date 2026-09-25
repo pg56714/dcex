@@ -29,6 +29,8 @@ pub(super) const MAX_BORROW_QUANTITY: &str = "/api/v1/account/limits/borrow";
 pub(super) const MAX_ORDER_QUANTITY: &str = "/api/v1/account/limits/order";
 pub(super) const MAX_WITHDRAWAL_QUANTITY: &str = "/api/v1/account/limits/withdrawal";
 pub(super) const BORROW_LEND_POSITIONS: &str = "/api/v1/borrowLend/positions";
+pub(super) const BORROW_LEND_LIQUIDATION_PRICE: &str =
+    "/api/v1/borrowLend/position/liquidationPrice";
 pub(super) const BORROW_HISTORY: &str = "/wapi/v1/history/borrowLend";
 pub(super) const INTEREST_HISTORY: &str = "/wapi/v1/history/interest";
 pub(super) const BORROW_POSITION_HISTORY: &str = "/wapi/v1/history/borrowLend/positions";

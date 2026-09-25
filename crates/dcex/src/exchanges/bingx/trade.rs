@@ -134,6 +134,56 @@ impl BingxClient {
                 push_optional(&mut query, "recvWindow", params.get("recvWindow"));
                 self.private_post(SPOT_PLACE_BATCH_ORDER, query).await
             }
+            "replace_spot_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "cancelOrderId",
+                    "cancelClientOrderID",
+                    "cancelRestrictions",
+                    "cancelReplaceMode",
+                    "side",
+                    "type_",
+                    "timeInForce",
+                    "quantity",
+                    "quoteOrderQty",
+                    "price",
+                    "stopPrice",
+                    "newClientOrderId",
+                    "recvWindow",
+                ])?;
+                require_one_identifier(params, &["cancelOrderId", "cancelClientOrderID"])?;
+                validate_u64_range(params, "cancelOrderId", 1, u64::MAX)?;
+                validate_client_id(params, "cancelClientOrderID", false)?;
+                validate_enum(
+                    params,
+                    "cancelRestrictions",
+                    &["NEW", "PENDING", "PARTIALLY_FILLED"],
+                )?;
+                validate_enum(
+                    params,
+                    "cancelReplaceMode",
+                    &["STOP_ON_FAILURE", "ALLOW_FAILURE"],
+                )?;
+                validate_spot_order(params, params.required("type_")?)?;
+                let mut query = params.only(&[
+                    "cancelOrderId",
+                    "cancelClientOrderID",
+                    "cancelRestrictions",
+                    "cancelReplaceMode",
+                    "timeInForce",
+                    "quantity",
+                    "quoteOrderQty",
+                    "price",
+                    "stopPrice",
+                    "newClientOrderId",
+                    "recvWindow",
+                ]);
+                self.push_required_symbol(&mut query, params)?;
+                query.push(("side".into(), normalize_side(params.required("side")?)?));
+                query.push(("type".into(), params.required("type_")?.to_string()));
+                self.private_post(SPOT_CANCEL_REPLACE, query).await
+            }
             "cancel_spot_order" => {
                 params.ensure_allowed(&[
                     "product_symbol",
@@ -194,6 +244,24 @@ impl BingxClient {
                 let mut query = params.only(&["recvWindow"]);
                 self.push_optional_symbol(&mut query, params)?;
                 self.private_post(SPOT_CANCEL_OPEN_ORDERS, query).await
+            }
+            "set_spot_cancel_all_after" => {
+                params.ensure_allowed(&["type_", "timeOut", "recvWindow"])?;
+                validate_enum(params, "type_", &["ACTIVATE", "CLOSE"])?;
+                validate_u64_range(params, "recvWindow", 1, 5000)?;
+                let action = params.required("type_")?;
+                let mut query = vec![("type".to_string(), action.to_string())];
+                if action == "ACTIVATE" {
+                    params.required("timeOut")?;
+                    validate_u64_range(params, "timeOut", 10, 120)?;
+                    push_optional(&mut query, "timeOut", params.get("timeOut"));
+                } else if params.get("timeOut").is_some() {
+                    return Err(crate::DcexError::InvalidInput(
+                        "timeOut is only valid for ACTIVATE".into(),
+                    ));
+                }
+                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
+                self.private_post(SPOT_CANCEL_ALL_AFTER, query).await
             }
             "get_spot_order" => {
                 params.ensure_allowed(&[

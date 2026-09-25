@@ -209,6 +209,18 @@ impl AsterClient {
                 )
                 .await
             }
+            "modify_futures_batch_orders" => {
+                self.signed(
+                    HttpMethod::Put,
+                    AsterMarket::Futures,
+                    FUTURES_BATCH_ORDERS,
+                    vec![(
+                        "batchOrders".to_string(),
+                        self.resolve_batch_amendments(params)?,
+                    )],
+                )
+                .await
+            }
             "get_futures_order" => {
                 ensure_order_lookup(params)?;
                 let mut query = params.only(&["orderId", "origClientOrderId"]);
@@ -398,6 +410,45 @@ impl AsterClient {
             order.ensure_allowed(BATCH_ORDER_KEYS, &[])?;
             validate_symbol_alias(&order, true)?;
             validate_futures_order(&order, true)?;
+        }
+        Ok(value.to_string())
+    }
+
+    pub(super) fn resolve_batch_amendments(&self, params: &AsterParams) -> Result<String> {
+        let mut value = params.json_required("batchOrders")?;
+        let Value::Array(orders) = &mut value else {
+            return Err(DcexError::InvalidInput(
+                "Aster batchOrders must be a JSON array".into(),
+            ));
+        };
+        if orders.is_empty() || orders.len() > 5 {
+            return Err(DcexError::InvalidInput(
+                "Aster batch amendments must contain between 1 and 5 orders".into(),
+            ));
+        }
+        for order in orders {
+            self.resolve_order_object(order)?;
+            let Value::Object(order) = order else {
+                unreachable!("resolve_order_object validated object")
+            };
+            let order = AsterParams::from_json_object(order)?;
+            order.ensure_allowed(
+                &[
+                    "symbol",
+                    "orderId",
+                    "origClientOrderId",
+                    "side",
+                    "quantity",
+                    "price",
+                ],
+                &[],
+            )?;
+            order.required("symbol")?;
+            ensure_order_lookup(&order)?;
+            order.u64("orderId")?;
+            order.optional_one_of("side", &["BUY", "SELL"])?;
+            order.required_positive_decimal("quantity")?;
+            order.required_positive_decimal("price")?;
         }
         Ok(value.to_string())
     }
@@ -839,6 +890,11 @@ fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()
             params.optional_one_of("maxChaseOffsetType", &["ABSOLUTE", "PERCENTAGE"])?;
             params.optional_one_of("timeInForce", &["GTX"])?;
             validate_client_id(params, "clientStrategyId", 28)
+        }
+        "modify_futures_batch_orders" => {
+            params.ensure_allowed(&["batchOrders"], &[])?;
+            params.required("batchOrders")?;
+            Ok(())
         }
         "place_futures_batch_orders" => {
             params.ensure_allowed(&["batchOrders"], &[])?;

@@ -386,3 +386,66 @@ mod bytes {
         hex::decode(value).ok().map(|bytes| bytes.len())
     }
 }
+
+#[test]
+fn rfq_routes_validate_requests_and_keep_maker_response_out_of_scope() {
+    for (method, params, route) in [
+        (
+            "create_rfq",
+            vec![
+                ("market_index".into(), "1".into()),
+                ("direction".into(), "0".into()),
+                ("base_amount".into(), "0.1".into()),
+                ("authorization".into(), "token".into()),
+            ],
+            "POST /api/v1/rfq/create HTTP/1.1",
+        ),
+        (
+            "get_rfq",
+            vec![
+                ("rfq_id".into(), "10".into()),
+                ("authorization".into(), "token".into()),
+            ],
+            "GET /api/v1/rfq/get?rfq_id=10 HTTP/1.1",
+        ),
+        (
+            "list_rfqs",
+            vec![
+                ("limit".into(), "20".into()),
+                ("authorization".into(), "token".into()),
+            ],
+            "GET /api/v1/rfq/list?limit=20 HTTP/1.1",
+        ),
+        (
+            "update_rfq",
+            vec![
+                ("rfq_id".into(), "10".into()),
+                ("status".into(), "CANCELED".into()),
+                ("authorization".into(), "token".into()),
+            ],
+            "POST /api/v1/rfq/update HTTP/1.1",
+        ),
+    ] {
+        let (base_url, server) = recording_server();
+        let client =
+            LighterClient::with_base_url(Duration::from_secs(2), base_url).expect("client");
+        block_on(async move { client.private_request(method, params).await }).expect(method);
+        assert_eq!(server.join().expect("server"), Some(route.to_string()));
+    }
+    let client = LighterClient::new(Duration::from_secs(1)).expect("client");
+    assert!(
+        block_on(async move {
+            client
+                .private_request(
+                    "create_rfq",
+                    vec![
+                        ("market_index".into(), "1".into()),
+                        ("direction".into(), "0".into()),
+                        ("authorization".into(), "token".into()),
+                    ],
+                )
+                .await
+        })
+        .is_err()
+    );
+}

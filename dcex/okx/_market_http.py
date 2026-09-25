@@ -8,6 +8,50 @@ from ._http_manager import HTTPManager
 
 
 class MarketHTTP(HTTPManager):
+    "HTTP client for OKX market data operations."
+
+    def get_spread_spreads(
+        self,
+        *,
+        base_ccy: str | None = None,
+        inst_id: str | None = None,
+        sprd_id: str | None = None,
+        state: str | None = None,
+    ) -> dict[str, Any]:
+        """List available Nitro Spreads."""
+        return self._native_public(
+            "get_spread_spreads",
+            self._params(baseCcy=base_ccy, instId=inst_id, sprdId=sprd_id, state=state),
+        )
+
+    def get_spread_books(self, sprd_id: str, *, depth: int | None = None) -> dict[str, Any]:
+        """Get a Nitro Spread order book."""
+        return self._native_public("get_spread_books", self._params(sprdId=sprd_id, sz=depth))
+
+    def get_spread_ticker(self, sprd_id: str) -> dict[str, Any]:
+        """Get a Nitro Spread ticker."""
+        return self._native_public("get_spread_ticker", self._params(sprdId=sprd_id))
+
+    def get_spread_candles(
+        self, sprd_id: str, *, bar: str | None = None, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get recent Nitro Spread candlesticks."""
+        return self._native_public(
+            "get_spread_candles", self._params(sprdId=sprd_id, bar=bar, limit=limit)
+        )
+
+    def get_spread_history_candles(
+        self, sprd_id: str, *, bar: str | None = None, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get historical Nitro Spread candlesticks."""
+        return self._native_public(
+            "get_spread_history_candles", self._params(sprdId=sprd_id, bar=bar, limit=limit)
+        )
+
+    def get_spread_public_trades(self, sprd_id: str) -> dict[str, Any]:
+        """Get public Nitro Spread trades."""
+        return self._native_public("get_spread_public_trades", self._params(sprdId=sprd_id))
+
     """HTTP client for OKX market data operations."""
 
     def _native_public(

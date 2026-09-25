@@ -26,6 +26,9 @@ impl OkxClient {
         {
             return Ok(result);
         }
+        if let Some(result) = self.spread_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
         if let Some(result) = self.trade_private_request(method_name, &params).await? {
             return Ok(result);
         }

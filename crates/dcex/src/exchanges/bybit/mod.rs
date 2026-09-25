@@ -16,6 +16,7 @@ mod private;
 mod rfq;
 mod rwa_earn;
 mod signing;
+mod spread;
 mod trade;
 pub mod websocket;
 mod wrappers;

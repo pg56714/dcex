@@ -35,6 +35,7 @@ pub(super) const FUTURES_TRANSFER: &str = "/derivatives/api/v3/transfer";
 pub(super) const FUTURES_WITHDRAWAL: &str = "/derivatives/api/v3/withdrawal";
 
 pub(super) const SPOT_ADD_ORDER: &str = "/0/private/AddOrder";
+pub(super) const SPOT_AMEND_ORDER: &str = "/0/private/AmendOrder";
 pub(super) const SPOT_CANCEL_ORDER: &str = "/0/private/CancelOrder";
 pub(super) const SPOT_CANCEL_ALL: &str = "/0/private/CancelAll";
 pub(super) const SPOT_CANCEL_ALL_AFTER: &str = "/0/private/CancelAllOrdersAfter";
@@ -44,6 +45,7 @@ pub(super) const SPOT_CLOSED_ORDERS: &str = "/0/private/ClosedOrders";
 pub(super) const SPOT_QUERY_ORDERS: &str = "/0/private/QueryOrders";
 pub(super) const SPOT_TRADES_HISTORY: &str = "/0/private/TradesHistory";
 pub(super) const FUTURES_SEND_ORDER: &str = "/derivatives/api/v3/sendorder";
+pub(super) const FUTURES_EDIT_ORDER: &str = "/derivatives/api/v3/editorder";
 pub(super) const FUTURES_CANCEL_ORDER: &str = "/derivatives/api/v3/cancelorder";
 pub(super) const FUTURES_CANCEL_ALL: &str = "/derivatives/api/v3/cancelallorders";
 pub(super) const FUTURES_CANCEL_ALL_AFTER: &str = "/derivatives/api/v3/cancelallordersafter";

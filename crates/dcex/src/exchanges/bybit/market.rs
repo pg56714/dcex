@@ -12,6 +12,12 @@ impl BybitClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         if let Some(result) = self
+            .spread_public_request(method_name, &BybitParams::from_pairs(params.clone()))
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
             .launchpool_public_request(method_name, &BybitParams::from_pairs(params.clone()))
             .await?
         {

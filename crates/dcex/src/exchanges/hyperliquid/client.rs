@@ -71,6 +71,10 @@ impl HyperliquidClient {
         })
     }
 
+    pub(super) fn is_testnet(&self) -> bool {
+        self.testnet
+    }
+
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
         self.product_table = Some(Arc::new(product_table));
         self

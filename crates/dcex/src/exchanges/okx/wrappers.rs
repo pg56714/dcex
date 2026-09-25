@@ -3,6 +3,12 @@ use super::client::OkxClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     OkxClient;
     public [
+        get_spread_spreads(),
+        get_spread_books(sprd_id => "sprdId"),
+        get_spread_ticker(sprd_id => "sprdId"),
+        get_spread_public_trades(sprd_id => "sprdId"),
+        get_spread_candles(sprd_id => "sprdId"),
+        get_spread_history_candles(sprd_id => "sprdId"),
         get_candles_ticks(product_symbol => "product_symbol"),
         get_contract_long_short_ratio(product_symbol => "product_symbol"),
         get_contract_open_interest_history(product_symbol => "product_symbol"),
@@ -38,6 +44,14 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_sol_staking_apy_history(days => "days"),
     ];
     private [
+        place_spread_order(sprd_id => "sprdId", side => "side", order_type => "ordType", size => "sz"),
+        cancel_spread_order(order_id => "ordId"),
+        cancel_all_spread_orders(),
+        get_spread_order(order_id => "ordId"),
+        get_spread_orders_pending(),
+        get_spread_orders_history(),
+        get_spread_trades(),
+        set_spread_cancel_all_after(time_out => "timeOut"),
         amend_multiple_orders(orders => "orders"),
         amend_order(product_symbol => "product_symbol"),
         cancel_all_orders(),

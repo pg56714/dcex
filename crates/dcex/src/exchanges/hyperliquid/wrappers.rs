@@ -44,6 +44,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_twap_order(product_symbol => "product_symbol", is_buy => "isBuy", size => "size", reduce_only => "reduceOnly", minutes => "minutes", randomize => "randomize"),
         schedule_cancel(),
         transfer_between_dexes(source_dex => "sourceDex", destination_dex => "destinationDex", token => "token", amount => "amount"),
+        transfer_usdc_spot_perp(amount => "amount", to_perp => "toPerp", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
         update_isolate_margin(product_symbol => "product_symbol", is_buy => "isBuy", ntli => "ntli"),
         update_leverage(product_symbol => "product_symbol", is_cross => "isCross", leverage => "leverage")
     ];

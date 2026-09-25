@@ -513,6 +513,128 @@ async fn subaccount_balance_uses_path_and_query() {
     ));
 }
 
+#[tokio::test]
+async fn dcp_uses_signed_uta_routes_and_symbol_array() {
+    let (base_url, server_handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".into()),
+        Some("secret".into()),
+        Some("passphrase".into()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".into(),
+    )
+    .expect("client");
+    client
+        .private_request(
+            "set_dcp",
+            vec![
+                ("tradeType".into(), "SPOT".into()),
+                ("timeout".into(), "10".into()),
+                ("symbol".into(), r#"["BTC-USDT","ETH-USDT"]"#.into()),
+            ],
+        )
+        .await
+        .expect("set DCP");
+    let request = server_handle.join().expect("server");
+    assert!(request.starts_with("POST /api/ua/v1/dcp/set HTTP/1.1"));
+    let body: serde_json::Value =
+        serde_json::from_str(request.split("\r\n\r\n").nth(1).expect("body")).expect("JSON");
+    assert_eq!(body["tradeType"], "SPOT");
+    assert_eq!(body["timeout"], 10);
+    assert_eq!(body["symbol"], serde_json::json!(["BTC-USDT", "ETH-USDT"]));
+
+    let (base_url, server_handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".into()),
+        Some("secret".into()),
+        Some("passphrase".into()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".into(),
+    )
+    .expect("client");
+    client
+        .private_request("get_dcp", vec![("tradeType".into(), "SPOT".into())])
+        .await
+        .expect("get DCP");
+    let request = server_handle.join().expect("server");
+    assert!(request.starts_with("GET /api/ua/v1/dcp/query?tradeType=SPOT HTTP/1.1"));
+}
+
+#[tokio::test]
+async fn test_orders_reuse_live_order_validation_and_use_test_routes() {
+    for (method, route, symbol) in [
+        ("test_spot_order", "/api/v1/hf/orders/test", "BTC-USDT-SPOT"),
+        ("test_futures_order", "/api/v1/orders/test", "XBT-USDT-SWAP"),
+    ] {
+        let (base_url, server_handle) = server();
+        let client = KucoinClient::with_base_urls(
+            Some("key".into()),
+            Some("secret".into()),
+            Some("passphrase".into()),
+            Duration::from_secs(2),
+            base_url.clone(),
+            base_url,
+        )
+        .expect("client");
+        client
+            .private_request(
+                method,
+                vec![
+                    ("product_symbol".into(), symbol.into()),
+                    ("side".into(), "buy".into()),
+                    ("type".into(), "limit".into()),
+                    ("size".into(), "1".into()),
+                    ("price".into(), "100".into()),
+                ],
+            )
+            .await
+            .expect("test order");
+        let request = server_handle.join().expect("server");
+        assert!(
+            request.starts_with(&format!("POST {route} HTTP/1.1")),
+            "{request}"
+        );
+        let body: serde_json::Value =
+            serde_json::from_str(request.split("\r\n\r\n").nth(1).expect("body")).expect("JSON");
+        assert_eq!(body["side"], "buy");
+        assert_eq!(body["price"], "100");
+    }
+}
+
+#[tokio::test]
+async fn alter_spot_order_uses_validated_json_body() {
+    let (base_url, server_handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".into()),
+        Some("secret".into()),
+        Some("passphrase".into()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".into(),
+    )
+    .expect("client");
+    client
+        .private_request(
+            "alter_spot_order",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SPOT".into()),
+                ("orderId".into(), "123".into()),
+                ("newPrice".into(), "30000".into()),
+            ],
+        )
+        .await
+        .expect("alter order");
+    let request = server_handle.join().expect("server");
+    assert!(request.starts_with("POST /api/v1/hf/orders/alter HTTP/1.1"));
+    let body: serde_json::Value =
+        serde_json::from_str(request.split("\r\n\r\n").nth(1).expect("body")).expect("JSON");
+    assert_eq!(body["symbol"], "BTC-USDT");
+    assert_eq!(body["orderId"], "123");
+    assert_eq!(body["newPrice"], "30000");
+}
+
 fn server() -> (String, thread::JoinHandle<String>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
     let address = listener.local_addr().expect("address");
@@ -520,7 +642,20 @@ fn server() -> (String, thread::JoinHandle<String>) {
         let (mut stream, _) = listener.accept().expect("accept");
         let mut buffer = [0u8; 4096];
         let size = stream.read(&mut buffer).expect("read");
-        let request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+        let mut request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+        let content_length = request
+            .lines()
+            .find_map(|line| {
+                line.to_ascii_lowercase()
+                    .strip_prefix("content-length: ")
+                    .and_then(|value| value.trim().parse::<usize>().ok())
+            })
+            .unwrap_or(0);
+        while request.split("\r\n\r\n").nth(1).map_or(0, str::len) < content_length {
+            let size = stream.read(&mut buffer).expect("read body");
+            assert!(size > 0, "request ended before the declared body length");
+            request.push_str(&String::from_utf8_lossy(&buffer[..size]));
+        }
         stream
             .write_all(
                 b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\
@@ -530,4 +665,73 @@ Content-Length: 46\r\nConnection: close\r\n\r\n{\"code\":\"200000\",\"data\":{\"
         request
     });
     (format!("http://{address}"), handle)
+}
+
+#[tokio::test]
+async fn uta_v2_order_uses_signed_unified_route_and_normalized_symbol() {
+    let (base_url, handle) = server();
+    let client = KucoinClient::with_base_urls(
+        Some("key".into()),
+        Some("secret".into()),
+        Some("passphrase".into()),
+        Duration::from_secs(2),
+        base_url,
+        "http://127.0.0.1:9".into(),
+    )
+    .expect("client");
+
+    client
+        .place_uta_order("FUTURES", "BTC-USDT-SWAP", "BUY", "LIMIT", "1")
+        .price("30000")
+        .await
+        .expect("response");
+
+    let request = handle.join().expect("server");
+    assert!(request.starts_with("POST /api/ua/v2/unified/order/place HTTP/1.1"));
+    assert!(request.to_ascii_lowercase().contains("kc-api-sign:"));
+    let body: serde_json::Value =
+        serde_json::from_str(request.split("\r\n\r\n").nth(1).expect("body")).expect("JSON");
+    assert_eq!(body["tradeType"], "FUTURES");
+    assert_eq!(body["symbol"], "XBTUSDTM");
+    assert_eq!(body["price"], "30000");
+    assert_eq!(body["size"], "1");
+    assert!(body["clientOid"].as_str().is_some());
+}
+
+#[tokio::test]
+async fn uta_v2_positions_and_v1_risk_overview_use_documented_paths() {
+    for (method, path) in [
+        ("get_uta_positions", "/api/ua/v2/unified/position/open-list"),
+        (
+            "get_uta_account_overview",
+            "/api/ua/v1/unified/account/overview",
+        ),
+    ] {
+        let (base_url, handle) = server();
+        let client = KucoinClient::with_base_urls(
+            Some("key".into()),
+            Some("secret".into()),
+            Some("passphrase".into()),
+            Duration::from_secs(2),
+            base_url,
+            "http://127.0.0.1:9".into(),
+        )
+        .expect("client");
+        client
+            .private_request(method, Vec::new())
+            .await
+            .expect("response");
+        let request = handle.join().expect("server");
+        assert!(request.starts_with(&format!("GET {path} HTTP/1.1")));
+    }
+}
+
+#[tokio::test]
+async fn uta_v2_order_identifier_is_required_before_network() {
+    let client = KucoinClient::public(Duration::from_secs(1)).expect("client");
+    let error = client
+        .cancel_uta_order("SPOT", "BTC-USDT")
+        .await
+        .expect_err("order id is required");
+    assert!(error.to_string().contains("orderId"));
 }

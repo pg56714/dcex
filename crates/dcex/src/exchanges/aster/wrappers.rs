@@ -47,6 +47,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         modify_futures_order(product_symbol => "product_symbol", quantity => "quantity", price => "price"),
         place_futures_chase_order(product_symbol => "product_symbol", side => "side", quantity_unit => "quantityUnit", quantity => "quantity"),
         place_futures_batch_orders(batch_orders => "batchOrders"),
+        modify_futures_batch_orders(batch_orders => "batchOrders"),
         get_futures_order(product_symbol => "product_symbol"),
         cancel_futures_order(product_symbol => "product_symbol"),
         cancel_all_futures_open_orders(product_symbol => "product_symbol"),

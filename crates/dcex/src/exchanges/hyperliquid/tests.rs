@@ -59,3 +59,96 @@ fn action_json_preserves_signed_field_order() {
     assert!(type_index < orders_index);
     assert!(orders_index < grouping_index);
 }
+
+#[test]
+fn wallet_signed_spot_perp_transfer_preserves_action_and_nonce() {
+    use std::{
+        io::{Read, Write},
+        net::TcpListener,
+        thread,
+        time::Duration,
+    };
+
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let address = listener.local_addr().expect("address");
+    let server = thread::spawn(move || {
+        let (mut stream, _) = listener.accept().expect("accept");
+        let mut buffer = [0u8; 4096];
+        let size = stream.read(&mut buffer).expect("read");
+        let mut request = String::from_utf8_lossy(&buffer[..size]).into_owned();
+        let content_length = request
+            .lines()
+            .find_map(|line| {
+                line.to_ascii_lowercase()
+                    .strip_prefix("content-length: ")
+                    .and_then(|value| value.trim().parse::<usize>().ok())
+            })
+            .unwrap_or(0);
+        while request.split("\r\n\r\n").nth(1).map_or(0, str::len) < content_length {
+            let size = stream.read(&mut buffer).expect("body");
+            assert!(size > 0);
+            request.push_str(&String::from_utf8_lossy(&buffer[..size]));
+        }
+        let body = r#"{"status":"ok","response":{"type":"default"}}"#;
+        let response = format!(
+            "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+            body.len(),
+            body
+        );
+        stream.write_all(response.as_bytes()).expect("write");
+        request
+    });
+
+    let client = HyperliquidClient::with_endpoint(
+        false,
+        None,
+        None,
+        Duration::from_secs(2),
+        format!("http://{address}"),
+    )
+    .expect("client");
+    let signature = serde_json::json!({
+        "r": format!("0x{}", "1".repeat(64)),
+        "s": format!("0x{}", "2".repeat(64)),
+        "v": 27
+    });
+    let signature_json = signature.to_string();
+    crate::http::block_on(async move {
+        client
+            .transfer_usdc_spot_perp("1", true, 1_700_000_000_000u64, &signature_json, "0xa4b1")
+            .await
+    })
+    .expect("response");
+
+    let request = server.join().expect("server");
+    assert!(request.starts_with("POST /exchange HTTP/1.1"));
+    let body: serde_json::Value =
+        serde_json::from_str(request.split("\r\n\r\n").nth(1).expect("body")).expect("JSON");
+    assert_eq!(body["action"]["type"], "usdClassTransfer");
+    assert_eq!(body["action"]["amount"], "1");
+    assert_eq!(body["action"]["toPerp"], true);
+    assert_eq!(body["action"]["nonce"], 1_700_000_000_000u64);
+    assert_eq!(body["nonce"], 1_700_000_000_000u64);
+    assert_eq!(body["signature"], signature);
+}
+
+#[test]
+fn spot_perp_transfer_rejects_missing_wallet_signature() {
+    let client =
+        HyperliquidClient::public(false, std::time::Duration::from_secs(1)).expect("client");
+    let error = crate::http::block_on(async move {
+        client
+            .private_request(
+                "transfer_usdc_spot_perp",
+                vec![
+                    ("amount".into(), "1".into()),
+                    ("toPerp".into(), "true".into()),
+                    ("nonce".into(), "1700000000000".into()),
+                    ("signatureChainId".into(), "0xa4b1".into()),
+                ],
+            )
+            .await
+    })
+    .expect_err("signature required");
+    assert!(error.to_string().contains("signature"));
+}

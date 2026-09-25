@@ -168,3 +168,18 @@ pub(super) const TRADE_ORDERS_HISTORY_ARCHIVE: &str = "/api/v5/trade/orders-hist
 pub(super) const TRADE_FILLS: &str = "/api/v5/trade/fills";
 pub(super) const TRADE_FILLS_HISTORY: &str = "/api/v5/trade/fills-history";
 pub(super) const TRADE_ACCOUNT_RATE_LIMIT: &str = "/api/v5/trade/account-rate-limit";
+
+// Nitro Spreads (distinct from order-book trading).
+pub(super) const SPREAD_ORDER: &str = "/api/v5/sprd/order";
+pub(super) const SPREAD_CANCEL_ORDER: &str = "/api/v5/sprd/cancel-order";
+pub(super) const SPREAD_MASS_CANCEL: &str = "/api/v5/sprd/mass-cancel";
+pub(super) const SPREAD_ORDERS_PENDING: &str = "/api/v5/sprd/orders-pending";
+pub(super) const SPREAD_ORDERS_HISTORY: &str = "/api/v5/sprd/orders-history";
+pub(super) const SPREAD_TRADES: &str = "/api/v5/sprd/trades";
+pub(super) const SPREAD_SPREADS: &str = "/api/v5/sprd/spreads";
+pub(super) const SPREAD_BOOKS: &str = "/api/v5/sprd/books";
+pub(super) const SPREAD_TICKER: &str = "/api/v5/market/sprd-ticker";
+pub(super) const SPREAD_CANDLES: &str = "/api/v5/market/sprd-candles";
+pub(super) const SPREAD_HISTORY_CANDLES: &str = "/api/v5/market/sprd-history-candles";
+pub(super) const SPREAD_CANCEL_ALL_AFTER: &str = "/api/v5/sprd/cancel-all-after";
+pub(super) const SPREAD_PUBLIC_TRADES: &str = "/api/v5/sprd/public-trades";

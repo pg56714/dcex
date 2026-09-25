@@ -24,6 +24,13 @@ impl BackpackClient {
                 )
                 .await
             }
+            "get_borrow_lend_liquidation_price" => {
+                self.public_get(
+                    BORROW_LEND_LIQUIDATION_PRICE,
+                    params.only(&["borrow", "subaccountId"]),
+                )
+                .await
+            }
             "get_borrow_lend_apy" => {
                 self.public_get(BORROW_LEND_APY, params.only(&["tierId"]))
                     .await
@@ -173,6 +180,24 @@ impl BackpackClient {
             "get_borrow_lend_apy" => {
                 params.ensure_allowed(&["tierId"], &[])?;
                 params.optional_i64_range("tierId", i32::MIN.into(), i32::MAX.into())
+            }
+            "get_borrow_lend_liquidation_price" => {
+                use base64::Engine;
+                params.ensure_allowed(&["borrow", "subaccountId"], &[])?;
+                let encoded = params.required("borrow")?;
+                let decoded = base64::engine::general_purpose::STANDARD
+                    .decode(encoded)
+                    .map_err(|_| {
+                        DcexError::InvalidInput("invalid Backpack borrow base64".into())
+                    })?;
+                let payload: serde_json::Value = serde_json::from_slice(&decoded)
+                    .map_err(|_| DcexError::InvalidInput("invalid Backpack borrow JSON".into()))?;
+                if !payload.is_object() {
+                    return Err(DcexError::InvalidInput(
+                        "Backpack borrow payload must be a JSON object".into(),
+                    ));
+                }
+                params.optional_u64_range("subaccountId", 0, u16::MAX.into())
             }
             "get_markets" => {
                 params.ensure_allowed(&["marketType"], &["marketType"])?;

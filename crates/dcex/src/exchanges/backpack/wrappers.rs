@@ -8,6 +8,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_borrow_lend_markets(),
         get_borrow_lend_market_history(interval => "interval"),
         get_borrow_lend_apy(),
+        get_borrow_lend_liquidation_price(borrow => "borrow"),
         get_markets(),
         get_market(product_symbol => "product_symbol"),
         get_order_book_depth(product_symbol => "product_symbol"),

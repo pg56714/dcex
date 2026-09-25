@@ -1584,3 +1584,175 @@ class AccountHTTP(HTTPManager):
             amount=amount,
             recvWindow=recvWindow,
         )
+
+    async def get_pm_account(self, *, recv_window: int | None = None) -> dict:
+        """Return Portfolio Margin account collateral and risk metrics."""
+        return await self._native_private("get_pm_account", self._params(recvWindow=recv_window))
+
+    async def get_pm_um_account(self, *, recv_window: int | None = None) -> dict:
+        """Return Portfolio Margin USD-M account balances."""
+        return await self._native_private("get_pm_um_account", self._params(recvWindow=recv_window))
+
+    async def get_pm_um_position_risk(
+        self, *, product_symbol: str | None = None, recv_window: int | None = None
+    ) -> dict:
+        """Return Portfolio Margin USD-M position risk."""
+        return await self._native_private(
+            "get_pm_um_position_risk",
+            self._params(product_symbol=product_symbol, recvWindow=recv_window),
+        )
+
+    async def get_pm_cm_account(self) -> dict:
+        """Query Binance Portfolio Margin cm account."""
+        return await self._native_private("get_pm_cm_account", self._params())
+
+    async def get_pm_cm_position_risk(
+        self, margin_asset: str | None = None, pair: str | None = None
+    ) -> dict:
+        """Query Binance Portfolio Margin cm position risk."""
+        return await self._native_private(
+            "get_pm_cm_position_risk", self._params(marginAsset=margin_asset, pair=pair)
+        )
+
+    async def get_pm_um_account_config(self) -> dict:
+        """Query Binance Portfolio Margin um account config."""
+        return await self._native_private("get_pm_um_account_config", self._params())
+
+    async def get_pm_um_symbol_config(self, product_symbol: str | None = None) -> dict:
+        """Query Binance Portfolio Margin um symbol config."""
+        return await self._native_private(
+            "get_pm_um_symbol_config", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_pm_um_leverage_bracket(self, product_symbol: str | None = None) -> dict:
+        """Query Binance Portfolio Margin um leverage bracket."""
+        return await self._native_private(
+            "get_pm_um_leverage_bracket", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_pm_um_api_trading_status(self, product_symbol: str | None = None) -> dict:
+        """Query Binance Portfolio Margin um api trading status."""
+        return await self._native_private(
+            "get_pm_um_api_trading_status", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_pm_cm_adl_quantile(self, product_symbol: str) -> dict:
+        """Query Binance Portfolio Margin cm adl quantile."""
+        return await self._native_private(
+            "get_pm_cm_adl_quantile", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_pm_margin_max_borrowable(self, asset: str) -> dict:
+        """Query Binance Portfolio Margin margin max borrowable."""
+        return await self._native_private("get_pm_margin_max_borrowable", self._params(asset=asset))
+
+    async def get_pm_um_force_orders(self, product_symbol: str | None = None) -> dict:
+        """Query Binance Portfolio Margin um force orders."""
+        return await self._native_private(
+            "get_pm_um_force_orders", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_pm_cm_force_orders(self, product_symbol: str | None = None) -> dict:
+        """Query Binance Portfolio Margin cm force orders."""
+        return await self._native_private(
+            "get_pm_cm_force_orders", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_pm_margin_force_orders(self) -> dict:
+        """Query Binance Portfolio Margin margin force orders."""
+        return await self._native_private("get_pm_margin_force_orders", self._params())
+
+    async def borrow_pm_margin(
+        self,
+        asset: str,
+        amount: str,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Borrow an asset in a Portfolio Margin account."""
+        return await self._native_private(
+            "borrow_pm_margin", self._params(asset=asset, amount=amount, recvWindow=recv_window)
+        )
+
+    async def repay_pm_margin(
+        self,
+        asset: str,
+        amount: str,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Repay a Portfolio Margin loan."""
+        return await self._native_private(
+            "repay_pm_margin", self._params(asset=asset, amount=amount, recvWindow=recv_window)
+        )
+
+    async def get_pm_balance(self, asset: str | None = None) -> dict:
+        """Get Portfolio Margin collateral balances by asset."""
+        return await self._native_private("get_pm_balance", self._params(asset=asset))
+
+    async def get_pm_cm_leverage_bracket(
+        self,
+        product_symbol: str | None = None,
+    ) -> dict:
+        """Get Portfolio Margin COIN-M leverage brackets."""
+        return await self._native_private(
+            "get_pm_cm_leverage_bracket", self._params(product_symbol=product_symbol)
+        )
+
+    async def set_pm_um_leverage(self, product_symbol: str, leverage: int) -> dict:
+        """Set Portfolio Margin USD-M initial leverage."""
+        return await self._native_private(
+            "set_pm_um_leverage",
+            self._params(product_symbol=product_symbol, leverage=leverage),
+        )
+
+    async def set_pm_cm_leverage(self, product_symbol: str, leverage: int) -> dict:
+        """Set Portfolio Margin COIN-M initial leverage."""
+        return await self._native_private(
+            "set_pm_cm_leverage",
+            self._params(product_symbol=product_symbol, leverage=leverage),
+        )
+
+    async def get_pm_um_position_mode(self) -> dict:
+        """Get Portfolio Margin USD-M hedge or one-way mode."""
+        return await self._native_private("get_pm_um_position_mode", self._params())
+
+    async def get_pm_cm_position_mode(self) -> dict:
+        """Get Portfolio Margin COIN-M hedge or one-way mode."""
+        return await self._native_private("get_pm_cm_position_mode", self._params())
+
+    async def set_pm_um_position_mode(self, dual_side_position: bool) -> dict:
+        """Set Portfolio Margin USD-M hedge or one-way mode."""
+        return await self._native_private(
+            "set_pm_um_position_mode",
+            self._params(dualSidePosition=dual_side_position),
+        )
+
+    async def set_pm_cm_position_mode(self, dual_side_position: bool) -> dict:
+        """Set Portfolio Margin COIN-M hedge or one-way mode."""
+        return await self._native_private(
+            "set_pm_cm_position_mode",
+            self._params(dualSidePosition=dual_side_position),
+        )
+
+    async def get_pm_um_adl_quantile(
+        self,
+        product_symbol: str | None = None,
+    ) -> dict:
+        """Get Portfolio Margin USD-M auto-deleveraging queue positions."""
+        return await self._native_private(
+            "get_pm_um_adl_quantile", self._params(product_symbol=product_symbol)
+        )
+
+    async def repay_pm_margin_debt(
+        self,
+        asset: str,
+        *,
+        amount: str | None = None,
+        specify_repay_assets: str | None = None,
+    ) -> dict:
+        """Repay Portfolio Margin debt with available collateral."""
+        return await self._native_private(
+            "repay_pm_margin_debt",
+            self._params(asset=asset, amount=amount, specifyRepayAssets=specify_repay_assets),
+        )

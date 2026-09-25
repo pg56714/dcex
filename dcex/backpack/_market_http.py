@@ -1,5 +1,8 @@
 """Backpack public market-data HTTP client."""
 
+import base64
+import json
+from collections.abc import Mapping
 from typing import Any
 
 from ..utils.common import Common
@@ -45,6 +48,20 @@ class MarketHTTP(HTTPManager):
     def get_borrow_lend_apy(self, tierId: int | None = None) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack borrow/lend APY rates."""
         return self._native_public("get_borrow_lend_apy", self._native_params(tierId=tierId))
+
+    def get_borrow_lend_liquidation_price(
+        self,
+        borrow: Mapping[str, Any],
+        subaccountId: int | None = None,  # noqa: N803
+    ) -> dict[str, Any] | list[Any] | str:
+        """Estimate liquidation price for a proposed borrow/lend position."""
+        encoded = base64.b64encode(
+            json.dumps(dict(borrow), separators=(",", ":")).encode("utf-8")
+        ).decode("ascii")
+        return self._native_public(
+            "get_borrow_lend_liquidation_price",
+            self._native_params(borrow=encoded, subaccountId=subaccountId),
+        )
 
     def get_markets(
         self,

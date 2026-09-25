@@ -147,6 +147,36 @@ async fn get_candles_requires_interval_and_limit() {
 }
 
 #[tokio::test]
+async fn signed_internal_transfer_uses_user_transfer_route() {
+    let body = serde_json::json!({
+        "fromAccount": 3004,
+        "toAccount": 7349,
+        "amount": "1000",
+        "transferredAsset": "USD",
+        "settlement": {
+            "amount": 1000000000,
+            "assetId": "0x1",
+            "expirationTimestamp": 478932,
+            "nonce": 758978120,
+            "receiverPositionId": 104350,
+            "receiverPublicKey": "0x2",
+            "senderPositionId": 100005,
+            "senderPublicKey": "0x2",
+            "signature": {"r": "abc", "s": "def"}
+        }
+    });
+    let request = private_request(
+        "submit_internal_transfer",
+        vec![("body".into(), body.to_string())],
+    )
+    .await;
+    assert_request_line(&request, "POST /api/v1/user/transfer HTTP/1.1");
+    let sent: serde_json::Value =
+        serde_json::from_str(request.split("\r\n\r\n").nth(1).expect("body")).expect("JSON");
+    assert_eq!(sent, body);
+}
+
+#[tokio::test]
 async fn get_order_uses_plural_order_path() {
     let request = private_request("get_order", vec![("id".to_string(), "123".to_string())]).await;
     assert_request_line(request.as_str(), "GET /api/v1/user/orders/123 HTTP/1.1");
@@ -190,6 +220,17 @@ async fn private_methods_use_documented_paths_and_params() {
         )
         .await,
         "GET /api/v1/user/assetOperations?type=TRANSFER&status=COMPLETED&cursor=123&limit=50 HTTP/1.1",
+    );
+    assert_request_line(
+        private_request(
+            "get_account_health",
+            vec![
+                ("accountId".to_string(), "1000".to_string()),
+                ("accountId".to_string(), "1001".to_string()),
+            ],
+        )
+        .await,
+        "GET /api/v1/portfolio/accounts/health?accountId=1000&accountId=1001 HTTP/1.1",
     );
     assert_request_line(
         private_request("get_rebates", vec![]).await,

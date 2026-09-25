@@ -224,6 +224,22 @@ impl PythonOndoPrivateWebSocketClient {
         })
     }
 
+    fn subscribe_cancel_all_orders_after<'py>(
+        &self,
+        py: Python<'py>,
+        timeout_seconds: u64,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe_cancel_all_orders_after(timeout_seconds)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

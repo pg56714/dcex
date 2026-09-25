@@ -5,6 +5,83 @@ from ._http_manager import HTTPManager
 
 
 class TradeHTTP(HTTPManager):
+    async def place_spread_order(
+        self,
+        sprd_id: str,
+        side: str,
+        order_type: str,
+        size: str,
+        *,
+        price: str | None = None,
+        client_order_id: str | None = None,
+        tag: str | None = None,
+    ) -> dict[str, Any]:
+        """Place an OKX Nitro Spread order."""
+        return await self._native_private(
+            "place_spread_order",
+            self._native_params(
+                sprdId=sprd_id,
+                side=side,
+                ordType=order_type,
+                sz=size,
+                px=price,
+                clOrdId=client_order_id,
+                tag=tag,
+            ),
+        )
+
+    async def cancel_spread_order(
+        self, *, order_id: str | None = None, client_order_id: str | None = None
+    ) -> dict[str, Any]:
+        """Cancel one Nitro Spread order by exchange or client ID."""
+        return await self._native_private(
+            "cancel_spread_order", self._native_params(ordId=order_id, clOrdId=client_order_id)
+        )
+
+    async def cancel_all_spread_orders(self, sprd_id: str | None = None) -> dict[str, Any]:
+        """Cancel Nitro Spread orders, optionally for one spread."""
+        return await self._native_private(
+            "cancel_all_spread_orders", self._native_params(sprdId=sprd_id)
+        )
+
+    async def get_spread_order(
+        self, *, order_id: str | None = None, client_order_id: str | None = None
+    ) -> dict[str, Any]:
+        """Get one Nitro Spread order."""
+        return await self._native_private(
+            "get_spread_order", self._native_params(ordId=order_id, clOrdId=client_order_id)
+        )
+
+    async def get_spread_orders_pending(
+        self, *, sprd_id: str | None = None, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get pending Nitro Spread orders."""
+        return await self._native_private(
+            "get_spread_orders_pending", self._native_params(sprdId=sprd_id, limit=limit)
+        )
+
+    async def get_spread_orders_history(
+        self, *, sprd_id: str | None = None, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get recent Nitro Spread order history."""
+        return await self._native_private(
+            "get_spread_orders_history", self._native_params(sprdId=sprd_id, limit=limit)
+        )
+
+    async def set_spread_cancel_all_after(self, time_out: int) -> dict[str, Any]:
+        """Arm or disarm Nitro Spread's server-side cancel timer."""
+        return await self._native_private(
+            "set_spread_cancel_all_after", self._native_params(timeOut=time_out)
+        )
+
+    async def get_spread_trades(
+        self, *, sprd_id: str | None = None, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get recent Nitro Spread fills."""
+        return await self._native_private(
+            "get_spread_trades", self._native_params(sprdId=sprd_id, limit=limit)
+        )
+
     async def get_easy_convert_currencies(self, source: str | None = None) -> dict[str, Any]:
         """Return currencies eligible for OKX Easy Convert."""
         return await self._native_private(

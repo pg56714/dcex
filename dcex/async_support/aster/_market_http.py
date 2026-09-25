@@ -72,6 +72,15 @@ class MarketHTTP(HTTPManager):
         """Retrieve Aster futures trading specifications."""
         return await self._native_public("get_futures_exchange_info", [])
 
+    async def get_futures_remaining_openable_notional(
+        self, product_symbol: str, leverage: int
+    ) -> dict[str, Any] | list[Any]:
+        """Get the symbol-wide remaining openable notional at a leverage tier."""
+        return await self._native_public(
+            "get_futures_remaining_openable_notional",
+            self._params(product_symbol=self._symbol(product_symbol), leverage=leverage),
+        )
+
     async def get_spot_orderbook(
         self,
         product_symbol: str,

@@ -561,6 +561,29 @@ impl AsterClient {
         .await
     }
 
+    pub async fn get_futures_remaining_openable_notional(
+        &self,
+        product_symbol: &str,
+        leverage: u64,
+    ) -> Result<ValidatedResponse> {
+        if leverage == 0 {
+            return Err(DcexError::InvalidInput(
+                "Aster leverage must be positive".into(),
+            ));
+        }
+        self.request(
+            HttpMethod::Get,
+            AsterMarket::Futures,
+            FUTURES_REMAINING_OPENABLE_NOTIONAL,
+            vec![
+                ("symbol".to_string(), self.exchange_symbol(product_symbol)?),
+                ("leverage".to_string(), leverage.to_string()),
+            ],
+            false,
+        )
+        .await
+    }
+
     pub async fn public_request(
         &self,
         method_name: &str,
@@ -764,6 +787,15 @@ impl AsterClient {
                 })
                 .await
             }
+            "get_futures_remaining_openable_notional" => {
+                self.get_futures_remaining_openable_notional(
+                    params.required("product_symbol")?,
+                    params.u64("leverage")?.ok_or_else(|| {
+                        DcexError::InvalidInput("missing required parameter: leverage".into())
+                    })?,
+                )
+                .await
+            }
             "get_futures_index_references" => {
                 self.get_futures_index_references(params.required("product_symbol")?)
                     .await
@@ -937,6 +969,13 @@ fn validate_public_params(method_name: &str, params: &AsterParams) -> Result<()>
             params.ensure_allowed(&["product_symbol", "startTime", "endTime", "limit"], &[])?;
             params.optional_u64_range("limit", 1, 1000)?;
             params.ensure_time_order("startTime", "endTime")
+        }
+        "get_futures_remaining_openable_notional" => {
+            params.ensure_allowed(&["product_symbol", "leverage"], &[])?;
+            params.required("product_symbol")?;
+            params.required("leverage")?;
+            params.optional_u64_range("leverage", 1, u64::MAX)?;
+            Ok(())
         }
         "get_futures_index_references" => {
             params.ensure_allowed(&["product_symbol"], &[])?;

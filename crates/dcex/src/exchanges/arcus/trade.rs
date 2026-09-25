@@ -4,7 +4,9 @@ use ed25519_dalek::Signer;
 use serde_json::{Value, json};
 
 use super::client::ArcusClient;
-use super::params::{compare_decimals, decimal_product_below, exact_units, required};
+use super::params::{
+    compare_decimals, decimal_parts, decimal_product_below, exact_units, required,
+};
 use super::signing::{legacy_signing_message, timestamp_ns};
 use crate::exchange::ValidatedResponse;
 use crate::http::{HttpMethod, HttpRequest};
@@ -19,17 +21,55 @@ impl ArcusClient {
         if method_name == "submit_internal_transfer" {
             return self.submit_internal_transfer_request(params).await;
         }
-        if matches!(method_name, "cancel_all_orders" | "set_leverage") {
+        if matches!(
+            method_name,
+            "cancel_all_orders"
+                | "set_leverage"
+                | "schedule_cancel"
+                | "disarm_scheduled_cancel"
+                | "adjust_isolated_margin"
+        ) {
             return self.legacy_private_request(method_name, params).await;
         }
+        if matches!(
+            method_name,
+            "batch_place_orders" | "batch_cancel_orders" | "batch_modify_orders"
+        ) {
+            return self.batch_order_request(method_name, params).await;
+        }
+        let address = self.address.as_deref().ok_or_else(|| {
+            DcexError::InvalidInput("Arcus wallet address is required for trading".into())
+        })?;
+        let timestamp = timestamp_ns()?;
+        let values: BTreeMap<_, _> = params.into_iter().collect();
+        let (path, body, signature) = self
+            .signed_order_payload(method_name, &values, timestamp)
+            .await?;
+        let mut request = HttpRequest::new(HttpMethod::Post, &self.base_url, path)
+            .query("address", address)
+            .json(body);
+        request
+            .headers
+            .insert("X-API-Key".into(), self.api_key.clone().unwrap_or_default());
+        request
+            .headers
+            .insert("X-Timestamp".into(), timestamp.to_string());
+        request.headers.insert("X-Signature".into(), signature);
+        self.execute(request).await
+    }
+
+    async fn signed_order_payload(
+        &self,
+        method_name: &str,
+        values: &BTreeMap<String, String>,
+        timestamp: u64,
+    ) -> Result<(&'static str, Value, String)> {
         let address = self.address.as_deref().ok_or_else(|| {
             DcexError::InvalidInput("Arcus wallet address is required for trading".into())
         })?;
         let key = self.signing_key.as_ref().ok_or_else(|| {
             DcexError::InvalidInput("Arcus API signing key is required for trading".into())
         })?;
-        let timestamp = timestamp_ns()?;
-        let values: BTreeMap<_, _> = params.into_iter().collect();
         let market = required(&values, "product_symbol")?;
         let market_info = self.market_info(market).await?;
         let market_id = market_info["marketId"]
@@ -238,16 +278,78 @@ impl ArcusClient {
         let message =
             serde_json::to_vec(&canonical).map_err(|error| DcexError::Decode(error.to_string()))?;
         let signature = hex::encode(key.sign(&message).to_bytes());
-        let mut request = HttpRequest::new(HttpMethod::Post, &self.base_url, path)
+        Ok((path, body, signature))
+    }
+
+    async fn batch_order_request(
+        &self,
+        method_name: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        let address = self.address.as_deref().ok_or_else(|| {
+            DcexError::InvalidInput("Arcus wallet address is required for trading".into())
+        })?;
+        let values: BTreeMap<_, _> = params.into_iter().collect();
+        let (field, single_method, path) = match method_name {
+            "batch_place_orders" => ("orders", "place_order", "/v1/batchPlaceOrders"),
+            "batch_cancel_orders" => ("cancels", "cancel_order", "/v1/batchCancelOrders"),
+            "batch_modify_orders" => ("modifies", "modify_order", "/v1/batchModifyOrders"),
+            _ => unreachable!("batch dispatch is restricted"),
+        };
+        if values.keys().any(|key| key != field) {
+            return Err(DcexError::InvalidInput(format!(
+                "unknown Arcus {method_name} parameter"
+            )));
+        }
+        let raw: Value = serde_json::from_str(required(&values, field)?).map_err(|error| {
+            DcexError::InvalidInput(format!("invalid Arcus {field} JSON: {error}"))
+        })?;
+        let items = raw.as_array().ok_or_else(|| {
+            DcexError::InvalidInput(format!("Arcus {field} must be a JSON array"))
+        })?;
+        if items.is_empty() || items.len() > 100 {
+            return Err(DcexError::InvalidInput(format!(
+                "Arcus {field} must contain between 1 and 100 items"
+            )));
+        }
+        let timestamp = timestamp_ns()?;
+        let mut signed_items = Vec::with_capacity(items.len());
+        let mut first_signature = None;
+        for item in items {
+            let object = item.as_object().ok_or_else(|| {
+                DcexError::InvalidInput(format!("Arcus {field} item must be an object"))
+            })?;
+            let mut order = BTreeMap::new();
+            for (key, value) in object {
+                let scalar = match value {
+                    Value::String(value) => value.clone(),
+                    Value::Number(value) => value.to_string(),
+                    Value::Bool(value) => value.to_string(),
+                    _ => {
+                        return Err(DcexError::InvalidInput(format!(
+                            "Arcus {field} field {key} must be a scalar"
+                        )));
+                    }
+                };
+                order.insert(key.clone(), scalar);
+            }
+            let (_, mut body, signature) = self
+                .signed_order_payload(single_method, &order, timestamp)
+                .await?;
+            body["signature"] = json!(signature);
+            if first_signature.is_none() {
+                first_signature = Some(signature);
+            }
+            signed_items.push(body);
+        }
+        let mut batch_body = serde_json::Map::new();
+        batch_body.insert(field.to_string(), json!(signed_items));
+        let request = HttpRequest::new(HttpMethod::Post, &self.base_url, path)
             .query("address", address)
-            .json(body);
-        request
-            .headers
-            .insert("X-API-Key".into(), self.api_key.clone().unwrap_or_default());
-        request
-            .headers
-            .insert("X-Timestamp".into(), timestamp.to_string());
-        request.headers.insert("X-Signature".into(), signature);
+            .header("X-API-Key", self.api_key.clone().unwrap_or_default())
+            .header("X-Timestamp", timestamp.to_string())
+            .header("X-Signature", first_signature.expect("nonempty batch"))
+            .json(Value::Object(batch_body));
         self.execute(request).await
     }
 
@@ -400,6 +502,69 @@ impl ArcusClient {
                     ));
                 }
                 ("cancelAllOrders", "/v1/cancelAllOrders")
+            }
+            "schedule_cancel" | "disarm_scheduled_cancel" => {
+                if values
+                    .keys()
+                    .any(|key| key != "product_symbol" && key != "time")
+                {
+                    return Err(DcexError::InvalidInput(
+                        "unknown Arcus schedule_cancel parameter".into(),
+                    ));
+                }
+                if let Some(market) = values.get("product_symbol") {
+                    let info = self.market_info(market).await?;
+                    let market_id = info["marketId"]
+                        .as_u64()
+                        .ok_or_else(|| DcexError::Decode("Arcus marketId is missing".into()))?;
+                    body.insert("marketId".into(), json!(market_id));
+                }
+                if method_name == "schedule_cancel" {
+                    let deadline = required(&values, "time")?.parse::<u64>().map_err(|_| {
+                        DcexError::InvalidInput("invalid Arcus deadline epoch microseconds".into())
+                    })?;
+                    let now = timestamp_ns()? / 1_000;
+                    let remaining = deadline.checked_sub(now).ok_or_else(|| {
+                        DcexError::InvalidInput("Arcus deadline must be in the future".into())
+                    })?;
+                    if !(5_000_000..=300_000_000).contains(&remaining) {
+                        return Err(DcexError::InvalidInput(
+                            "Arcus deadline must be 5 seconds to 5 minutes in the future".into(),
+                        ));
+                    }
+                    body.insert("time".into(), json!(deadline));
+                } else if values.contains_key("time") {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus disarm_scheduled_cancel must omit time".into(),
+                    ));
+                }
+                ("scheduleCancel", "/v1/scheduleCancel")
+            }
+            "adjust_isolated_margin" => {
+                if values
+                    .keys()
+                    .any(|key| key != "product_symbol" && key != "amount")
+                {
+                    return Err(DcexError::InvalidInput(
+                        "unknown Arcus adjust_isolated_margin parameter".into(),
+                    ));
+                }
+                let info = self
+                    .market_info(required(&values, "product_symbol")?)
+                    .await?;
+                let market_id = info["marketId"]
+                    .as_u64()
+                    .ok_or_else(|| DcexError::Decode("Arcus marketId is missing".into()))?;
+                let amount = required(&values, "amount")?;
+                let absolute = amount.strip_prefix('-').unwrap_or(amount);
+                if decimal_parts(absolute)?.0 == 0 {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus isolated margin amount must be nonzero".into(),
+                    ));
+                }
+                body.insert("marketId".into(), json!(market_id));
+                body.insert("amount".into(), json!(amount));
+                ("adjustIsolatedMargin", "/v1/adjustIsolatedMargin")
             }
             "set_leverage" => {
                 if values

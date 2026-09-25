@@ -319,6 +319,15 @@ class TradeHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol),
         )
 
+    async def modify_futures_batch_orders(
+        self,
+        batchOrders: list[dict[str, Any]],  # noqa: N803
+    ) -> dict[str, Any] | list[Any]:
+        """Amend up to five futures orders independently."""
+        return await self._native_private(
+            "modify_futures_batch_orders", self._native_params(batchOrders=batchOrders)
+        )
+
     async def cancel_futures_batch_orders(
         self,
         product_symbol: str,

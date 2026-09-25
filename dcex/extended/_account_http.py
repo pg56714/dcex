@@ -1,6 +1,6 @@
 """Extended account HTTP client backed by Rust."""
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from ._http_manager import HTTPManager
@@ -43,6 +43,19 @@ class AccountHTTP(HTTPManager):
                 limit=limit,
             ),
         )
+
+    def submit_internal_transfer(self, body: Mapping[str, Any]) -> Any:  # noqa: ANN401
+        """Submit a pre-signed transfer between subaccounts of the same wallet."""
+        return self._native_private(
+            "submit_internal_transfer", self._native_params(body=dict(body))
+        )
+
+    def get_account_health(
+        self,
+        accountId: int | Sequence[int],  # noqa: N803
+    ) -> Any:  # noqa: ANN401
+        """Get live health and margin metrics for one or more subaccounts."""
+        return self._native_private("get_account_health", self._native_params(accountId=accountId))
 
     def get_spot_balances(
         self,

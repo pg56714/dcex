@@ -1252,3 +1252,410 @@ fn subaccount_transfer_requires_internal_account_fields() {
 
     assert!(error.to_string().contains("asset"));
 }
+
+#[test]
+fn portfolio_margin_routes_signed_account_and_risk_queries() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+
+    block_on(async move { client.get_pm_account().await }).expect("PM account response");
+
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /papi/v1/account?"));
+    assert!(request_line.contains("timestamp="));
+    assert!(request_line.contains("signature="));
+}
+
+#[test]
+fn portfolio_margin_order_validation_rejects_invalid_requests() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .place_pm_um_order("BTCUSDT", "BUY", "LIMIT", "1")
+            .await
+    })
+    .expect_err("LIMIT orders require a price");
+    assert!(error.to_string().contains("price"));
+
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .private_request(
+                "cancel_pm_um_order",
+                vec![("product_symbol".into(), "BTCUSDT".into())],
+            )
+            .await
+    })
+    .expect_err("cancel requires an order identifier");
+    assert!(error.to_string().contains("orderId"));
+}
+
+#[test]
+fn portfolio_margin_algo_order_uses_current_signed_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+
+    block_on(async move {
+        client
+            .place_pm_um_algo_order("BTCUSDT", "SELL", "STOP_MARKET")
+            .quantity("0.01")
+            .param("triggerPrice", "70000")
+            .await
+    })
+    .expect("algo response");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "POST /papi/v1/um/algo/order HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_algo_rejects_conflicting_close_all_fields() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .place_pm_um_algo_order("BTCUSDT", "SELL", "STOP_MARKET")
+            .param("triggerPrice", "70000")
+            .quantity("0.01")
+            .close_position("true")
+            .await
+    })
+    .expect_err("close all cannot include quantity");
+    assert!(error.to_string().contains("closePosition"));
+
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .place_pm_um_algo_order("BTCUSDT", "SELL", "TRAILING_STOP_MARKET")
+            .quantity("0.01")
+            .callback_rate("11")
+            .await
+    })
+    .expect_err("callback rate out of range");
+    assert!(error.to_string().contains("callbackRate"));
+}
+
+#[test]
+fn portfolio_margin_algo_lookup_needs_only_algo_id() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move { client.get_pm_um_algo_order("2146760").await }).expect("algo lookup");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /papi/v1/um/algo/algoOrder?"));
+    assert!(request_line.contains("algoId=2146760"));
+    assert!(!request_line.contains("symbol="));
+}
+
+#[test]
+fn portfolio_margin_cm_order_uses_papi_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move {
+        client
+            .place_pm_cm_order("BTCUSD_PERP", "BUY", "LIMIT", "1")
+            .price("40000")
+            .time_in_force("GTC")
+            .await
+    })
+    .expect("CM order");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "POST /papi/v1/cm/order HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_cm_risk_uses_pair_not_symbol() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move { client.get_pm_cm_position_risk().pair("BTCUSD").await })
+        .expect("CM risk");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /papi/v1/cm/positionRisk?"));
+    assert!(request_line.contains("pair=BTCUSD"));
+    assert!(!request_line.contains("symbol="));
+}
+
+#[test]
+fn portfolio_margin_margin_order_requires_price_and_time_in_force() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .place_pm_margin_order("BTCUSDT", "BUY", "LIMIT", "1")
+            .await
+    })
+    .expect_err("LIMIT price required");
+    assert!(error.to_string().contains("price"));
+}
+
+#[test]
+fn portfolio_margin_modify_order_uses_put_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move {
+        client
+            .modify_pm_um_order("BTCUSDT", "BUY", "123", "0.02", "40000")
+            .await
+    })
+    .expect("modify order");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "PUT /papi/v1/um/order HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_borrow_uses_signed_loan_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move { client.borrow_pm_margin("USDT", "100").await }).expect("borrow");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "POST /papi/v1/marginLoan HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_cm_conditional_requires_trigger_and_uses_route() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .place_pm_cm_conditional_order("BTCUSD_PERP", "SELL", "STOP_MARKET")
+            .await
+    })
+    .expect_err("stop price required");
+    assert!(error.to_string().contains("stopPrice"));
+
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move {
+        client
+            .place_pm_cm_conditional_order("BTCUSD_PERP", "SELL", "STOP_MARKET")
+            .param("stopPrice", "40000")
+            .quantity("1")
+            .await
+    })
+    .expect("CM conditional order");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "POST /papi/v1/cm/conditional/order HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_oco_uses_margin_order_oco_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move {
+        client
+            .place_pm_margin_oco("LTCBTC", "SELL", "1", "100", "90")
+            .await
+    })
+    .expect("OCO order");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "POST /papi/v1/margin/order/oco HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_cm_conditional_lookup_uses_open_order_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move {
+        client
+            .get_pm_cm_conditional_order("BTCUSD_PERP", "456")
+            .await
+    })
+    .expect("CM conditional order");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /papi/v1/cm/conditional/openOrder?"));
+    assert!(request_line.contains("strategyId=456"));
+}
+
+#[test]
+fn portfolio_margin_leverage_validates_range_and_uses_signed_route() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move { client.set_pm_um_leverage("BTCUSDT", 126).await })
+        .expect_err("leverage limit");
+    assert!(error.to_string().contains("leverage"));
+
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move { client.set_pm_cm_leverage("BTCUSD_PERP", 10).await })
+        .expect("CM leverage");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "POST /papi/v1/cm/leverage HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_position_mode_uses_signed_get_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move { client.get_pm_um_position_mode().await }).expect("position mode");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /papi/v1/um/positionSide/dual?"));
+}
+
+#[test]
+fn portfolio_margin_repay_debt_uses_signed_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move {
+        client
+            .repay_pm_margin_debt("USDT")
+            .param("amount", "1")
+            .await
+    })
+    .expect("repay debt");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert_eq!(request_line, "POST /papi/v1/margin/repay-debt HTTP/1.1");
+}
+
+#[test]
+fn portfolio_margin_cm_conditional_history_accepts_symbol_without_id() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move {
+        client
+            .get_pm_cm_conditional_order_history("BTCUSD_PERP")
+            .await
+    })
+    .expect("CM history");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /papi/v1/cm/conditional/orderHistory?"));
+    assert!(!request_line.contains("strategyId="));
+}
+
+#[test]
+fn portfolio_margin_cm_trailing_callback_rate_uses_official_range() {
+    let client = BinanceClient::public(Duration::from_secs(1)).expect("client");
+    let error = block_on(async move {
+        client
+            .place_pm_cm_conditional_order("BTCUSD_PERP", "SELL", "TRAILING_STOP_MARKET")
+            .param("callbackRate", "6")
+            .quantity("1")
+            .await
+    })
+    .expect_err("callback above official maximum");
+    assert!(error.to_string().contains("callbackRate"));
+}
+
+#[test]
+fn portfolio_margin_order_amendments_use_signed_route() {
+    let (spot_base_url, handle) = recording_server_after_time_sync();
+    let client = BinanceClient::with_base_urls(
+        Some("api-key".to_string()),
+        Some("secret".to_string()),
+        Duration::from_secs(2),
+        spot_base_url.clone(),
+        "http://127.0.0.1:9".to_string(),
+    )
+    .expect("client")
+    .with_portfolio_margin_base_url(spot_base_url);
+    block_on(async move { client.get_pm_um_order_amendments("BTCUSDT", "123").await })
+        .expect("amendment history");
+    let request_line = handle.join().expect("server").expect("request line");
+    assert!(request_line.starts_with("GET /papi/v1/um/orderAmendment?"));
+    assert!(request_line.contains("orderId=123"));
+}

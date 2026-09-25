@@ -79,6 +79,12 @@ impl BinanceClient {
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
         if let Some(response) = self
+            .portfolio_margin_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
             .coin_futures_private_request(method_name, &params)
             .await?
         {

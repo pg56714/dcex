@@ -207,3 +207,26 @@ class AccountHTTP(HTTPManager):
             "modify_futures_cross_margin_leverage",
             self._native_params(product_symbol=product_symbol, leverage=leverage),
         )
+
+    def get_uta_positions(
+        self,
+        *,
+        product_symbol: str | None = None,
+        page_number: int | None = None,
+        page_size: int | None = None,
+    ) -> dict[str, Any]:
+        """Get KuCoin UTA V2 futures positions and liquidation risk."""
+        return self._native_private(
+            "get_uta_positions",
+            self._native_params(
+                product_symbol=product_symbol, pageNumber=page_number, pageSize=page_size
+            ),
+        )
+
+    def get_uta_account_balance(self) -> dict[str, Any]:
+        """Get KuCoin UTA V2 asset balances."""
+        return self._native_private("get_uta_account_balance", [])
+
+    def get_uta_account_overview(self) -> dict[str, Any]:
+        """Get KuCoin UTA account-level margin and risk summary (V1 route)."""
+        return self._native_private("get_uta_account_overview", [])

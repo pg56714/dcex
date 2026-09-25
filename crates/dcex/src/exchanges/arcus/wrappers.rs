@@ -13,10 +13,15 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         cancel_all_orders(), set_leverage(product_symbol => "product_symbol", leverage => "leverage"),
+        schedule_cancel(time => "time"), disarm_scheduled_cancel(),
+        adjust_isolated_margin(product_symbol => "product_symbol", amount => "amount"),
         submit_internal_transfer(signed_transfer_json => "signed_transfer_json"),
         place_order(product_symbol => "product_symbol", side => "side", price => "price", quantity => "quantity"),
         modify_order(product_symbol => "product_symbol", side => "side", price => "price", quantity => "quantity", order_id => "order_id", good_til_time => "good_til_time", time_in_force => "time_in_force", reduce_only => "reduce_only"),
-        cancel_order(product_symbol => "product_symbol", order_id => "order_id")
+        cancel_order(product_symbol => "product_symbol", order_id => "order_id"),
+        batch_place_orders(orders => "orders"),
+        batch_cancel_orders(cancels => "cancels"),
+        batch_modify_orders(modifies => "modifies")
     ];
 }
 

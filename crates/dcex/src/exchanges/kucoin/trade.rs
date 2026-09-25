@@ -79,7 +79,74 @@ impl KucoinClient {
         params: &KucoinParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "set_dcp" => {
+                params.ensure_allowed(&["tradeType", "timeout", "symbol"])?;
+                validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])?;
+                let timeout = params.required("timeout")?.parse::<u64>().map_err(|_| {
+                    DcexError::InvalidInput("KuCoin DCP timeout must be an unsigned integer".into())
+                })?;
+                let symbols = params.json_required("symbol")?;
+                let valid_symbols = symbols.as_array().is_some_and(|items| {
+                    !items.is_empty()
+                        && items
+                            .iter()
+                            .all(|item| item.as_str().is_some_and(|value| !value.trim().is_empty()))
+                });
+                if !valid_symbols {
+                    return Err(DcexError::InvalidInput(
+                        "KuCoin DCP symbol must be a nonempty string array".into(),
+                    ));
+                }
+                self.private_post(
+                    KucoinMarket::Spot,
+                    DCP_SET,
+                    serde_json::json!({
+                        "tradeType": params.required("tradeType")?,
+                        "timeout": timeout,
+                        "symbol": symbols,
+                    }),
+                )
+                .await
+            }
+            "get_dcp" => {
+                params.ensure_allowed(&["tradeType"])?;
+                validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])?;
+                self.private_get(
+                    KucoinMarket::Spot,
+                    DCP_QUERY,
+                    vec![("tradeType".into(), params.required("tradeType")?.into())],
+                )
+                .await
+            }
             "place_spot_order" => self.spot_order_from_params(params, None, None, false).await,
+            "test_spot_order" => {
+                self.spot_order_to_path(params, None, None, false, SPOT_TEST_ORDER)
+                    .await
+            }
+            "alter_spot_order" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "orderId",
+                    "clientOid",
+                    "newPrice",
+                    "newSize",
+                ])?;
+                require_exactly_one(params, &["orderId", "clientOid"])?;
+                validate_client_oid(params, "clientOid")?;
+                if params.get("newPrice").is_none() && params.get("newSize").is_none() {
+                    return Err(DcexError::InvalidInput(
+                        "KuCoin alter order requires newPrice or newSize".into(),
+                    ));
+                }
+                validate_positive_number(params, "newPrice")?;
+                validate_positive_number(params, "newSize")?;
+                let mut body =
+                    params.body(&["orderId", "clientOid", "newPrice", "newSize"], &[], &[])?;
+                self.insert_required_body_symbol(&mut body, params, false)?;
+                self.private_post(KucoinMarket::Spot, SPOT_ALTER_ORDER, Value::Object(body))
+                    .await
+            }
             "place_spot_market_order" => {
                 self.spot_order_from_params(params, None, Some("market"), false)
                     .await
@@ -184,6 +251,10 @@ impl KucoinClient {
             }
             "place_futures_order" => {
                 self.futures_order_from_params(params, None, None, false)
+                    .await
+            }
+            "test_futures_order" => {
+                self.futures_order_to_path(params, None, None, false, FUTURES_TEST_ORDER)
                     .await
             }
             "place_futures_market_order" => {
@@ -357,6 +428,24 @@ impl KucoinClient {
         type_override: Option<&str>,
         post_only: bool,
     ) -> Result<ValidatedResponse> {
+        self.spot_order_to_path(
+            params,
+            side_override,
+            type_override,
+            post_only,
+            SPOT_PLACE_ORDER,
+        )
+        .await
+    }
+
+    async fn spot_order_to_path(
+        &self,
+        params: &KucoinParams,
+        side_override: Option<&str>,
+        type_override: Option<&str>,
+        post_only: bool,
+        path: &str,
+    ) -> Result<ValidatedResponse> {
         validate_spot_order(params, side_override, type_override, post_only)?;
         let mut body = params.body(
             SPOT_ORDER_STRING_KEYS,
@@ -375,7 +464,7 @@ impl KucoinClient {
         insert_required_string(&mut body, "side", side);
         insert_required_string(&mut body, "type", order_type);
         insert_truthy_bool(&mut body, "postOnly", post_only);
-        self.private_post(KucoinMarket::Spot, SPOT_PLACE_ORDER, Value::Object(body))
+        self.private_post(KucoinMarket::Spot, path, Value::Object(body))
             .await
     }
 
@@ -458,6 +547,24 @@ impl KucoinClient {
         type_override: Option<&str>,
         post_only: bool,
     ) -> Result<ValidatedResponse> {
+        self.futures_order_to_path(
+            params,
+            side_override,
+            type_override,
+            post_only,
+            FUTURES_PLACE_ORDER,
+        )
+        .await
+    }
+
+    async fn futures_order_to_path(
+        &self,
+        params: &KucoinParams,
+        side_override: Option<&str>,
+        type_override: Option<&str>,
+        post_only: bool,
+        path: &str,
+    ) -> Result<ValidatedResponse> {
         let close_order = bool_param(params, "closeOrder")?.unwrap_or(false);
         validate_futures_order(params, side_override, type_override, post_only, close_order)?;
         let mut body = params.body(
@@ -492,12 +599,8 @@ impl KucoinClient {
         }
         insert_required_string(&mut body, "type", order_type);
         insert_truthy_bool(&mut body, "postOnly", post_only);
-        self.private_post(
-            KucoinMarket::Futures,
-            FUTURES_PLACE_ORDER,
-            Value::Object(body),
-        )
-        .await
+        self.private_post(KucoinMarket::Futures, path, Value::Object(body))
+            .await
     }
 
     fn insert_required_body_symbol(

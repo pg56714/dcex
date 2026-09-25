@@ -10,6 +10,7 @@ mod margin;
 mod market;
 mod options;
 mod params;
+mod portfolio_margin;
 mod private;
 mod signing;
 mod staking;

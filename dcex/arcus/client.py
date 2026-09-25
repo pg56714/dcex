@@ -145,6 +145,20 @@ class Client(BaseHTTPManager):
             "cancel_all_orders", product_symbol=product_symbol, valid_until=valid_until
         )
 
+    def schedule_cancel(self, time: int, product_symbol: str | None = None) -> Any:  # noqa: ANN401
+        """Arm or refresh a cancel-all deadline (absolute epoch microseconds)."""
+        return self.private_request("schedule_cancel", time=time, product_symbol=product_symbol)
+
+    def disarm_scheduled_cancel(self, product_symbol: str | None = None) -> Any:  # noqa: ANN401
+        """Disarm the account-wide or market-scoped cancel-all deadline."""
+        return self.private_request("disarm_scheduled_cancel", product_symbol=product_symbol)
+
+    def adjust_isolated_margin(self, product_symbol: str, amount: str) -> Any:  # noqa: ANN401
+        """Move signed dollar amount between cross collateral and an isolated leg."""
+        return self.private_request(
+            "adjust_isolated_margin", product_symbol=product_symbol, amount=amount
+        )
+
     def set_leverage(
         self, product_symbol: str, leverage: int, *, isolated: bool | None = None
     ) -> Any:  # noqa: ANN401
@@ -218,6 +232,24 @@ class Client(BaseHTTPManager):
         """Submit an order cancellation."""
         return self.private_request(
             "cancel_order", product_symbol=product_symbol, order_id=order_id
+        )
+
+    def batch_place_orders(self, orders: list[dict[str, Any]]) -> Any:  # noqa: ANN401
+        """Place up to 100 individually signed orders in one request."""
+        return self.private_request(
+            "batch_place_orders", orders=json.dumps(orders, separators=(",", ":"))
+        )
+
+    def batch_cancel_orders(self, cancels: list[dict[str, Any]]) -> Any:  # noqa: ANN401
+        """Cancel up to 100 individually signed orders in one request."""
+        return self.private_request(
+            "batch_cancel_orders", cancels=json.dumps(cancels, separators=(",", ":"))
+        )
+
+    def batch_modify_orders(self, modifies: list[dict[str, Any]]) -> Any:  # noqa: ANN401
+        """Modify up to 100 individually signed orders in one request."""
+        return self.private_request(
+            "batch_modify_orders", modifies=json.dumps(modifies, separators=(",", ":"))
         )
 
     def close(self) -> None:

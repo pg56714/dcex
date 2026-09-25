@@ -729,3 +729,149 @@ class TradeHTTP(HTTPManager):
             "set_disconnected_cancel_all",
             self._native_params(timeWindow=timeWindow, product=product),
         )
+
+    def place_spread_order(
+        self,
+        symbol: str,
+        side: str,
+        order_type: str,
+        qty: str,
+        *,
+        price: str | None = None,
+        order_link_id: str | None = None,
+        time_in_force: str | None = None,
+    ) -> dict[str, Any]:
+        """Place a Bybit spread combination order."""
+        return self._native_private(
+            "place_spread_order",
+            self._native_params(
+                symbol=symbol,
+                side=side,
+                orderType=order_type,
+                qty=qty,
+                price=price,
+                orderLinkId=order_link_id,
+                timeInForce=time_in_force,
+            ),
+        )
+
+    def amend_spread_order(
+        self,
+        symbol: str,
+        *,
+        order_id: str | None = None,
+        order_link_id: str | None = None,
+        qty: str | None = None,
+        price: str | None = None,
+    ) -> dict[str, Any]:
+        """Amend a Bybit spread combination order."""
+        return self._native_private(
+            "amend_spread_order",
+            self._native_params(
+                symbol=symbol,
+                orderId=order_id,
+                orderLinkId=order_link_id,
+                qty=qty,
+                price=price,
+            ),
+        )
+
+    def cancel_spread_order(
+        self, *, order_id: str | None = None, order_link_id: str | None = None
+    ) -> dict[str, Any]:
+        """Cancel one Bybit spread combination order."""
+        return self._native_private(
+            "cancel_spread_order",
+            self._native_params(orderId=order_id, orderLinkId=order_link_id),
+        )
+
+    def cancel_all_spread_orders(
+        self, *, symbol: str | None = None, cancel_all: bool | None = None
+    ) -> dict[str, Any]:
+        """Cancel Bybit spread orders for a symbol or the entire account."""
+        return self._native_private(
+            "cancel_all_spread_orders",
+            self._native_params(symbol=symbol, cancelAll=cancel_all),
+        )
+
+    def get_spread_open_orders(
+        self,
+        *,
+        symbol: str | None = None,
+        base_coin: str | None = None,
+        order_id: str | None = None,
+        order_link_id: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """List active Bybit spread orders."""
+        return self._native_private(
+            "get_spread_open_orders",
+            self._native_params(
+                symbol=symbol,
+                baseCoin=base_coin,
+                orderId=order_id,
+                orderLinkId=order_link_id,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_spread_order_history(
+        self,
+        *,
+        symbol: str | None = None,
+        base_coin: str | None = None,
+        order_id: str | None = None,
+        order_link_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """List historical Bybit spread orders."""
+        return self._native_private(
+            "get_spread_order_history",
+            self._native_params(
+                symbol=symbol,
+                baseCoin=base_coin,
+                orderId=order_id,
+                orderLinkId=order_link_id,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_spread_trade_history(
+        self,
+        *,
+        symbol: str | None = None,
+        order_id: str | None = None,
+        order_link_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """List Bybit spread executions."""
+        return self._native_private(
+            "get_spread_trade_history",
+            self._native_params(
+                symbol=symbol,
+                orderId=order_id,
+                orderLinkId=order_link_id,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_spread_max_qty(self, symbol: str, side: str, order_price: str) -> dict[str, Any]:
+        """Get the maximum spread order quantity for a side and price."""
+        return self._native_private(
+            "get_spread_max_qty",
+            self._native_params(symbol=symbol, side=side, orderPrice=order_price),
+        )

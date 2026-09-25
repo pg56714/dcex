@@ -13,6 +13,9 @@ impl OkxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let raw = OkxParams::from_pairs(params);
+        if let Some(result) = self.spread_public_request(method_name, &raw).await? {
+            return Ok(result);
+        }
         let (required, allowed): (&[&str], &[&str]) = match method_name {
             "get_candles_ticks" => (
                 &["product_symbol"],

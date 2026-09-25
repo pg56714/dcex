@@ -290,3 +290,28 @@ class TradeHTTP(HTTPManager):
     ) -> dict[str, Any]:
         """Cancel a TWAP order."""
         return self._native_private("cancel_twap_order", self._native_params(**locals()))
+
+    def transfer_usdc_spot_perp(
+        self,
+        amount: str,
+        to_perp: bool,
+        nonce: int,
+        signature: dict[str, str | int],
+        signature_chain_id: str,
+    ) -> dict[str, Any]:
+        """
+        Submit a wallet-signed USDC transfer between the user's spot and perp accounts.
+
+        The signature must be EIP-712 signed by the user's wallet for this exact
+        usdClassTransfer action and nonce. API agent signatures are not accepted.
+        """
+        return self._native_private(
+            "transfer_usdc_spot_perp",
+            self._native_params(
+                amount=amount,
+                toPerp=to_perp,
+                nonce=nonce,
+                signature=signature,
+                signatureChainId=signature_chain_id,
+            ),
+        )

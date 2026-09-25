@@ -1,6 +1,8 @@
 use serde_json::{Map, Number, Value};
 
+use super::endpoints::EXCHANGE;
 use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
+use crate::http::HttpMethod;
 use crate::{DcexError, Result};
 
 use super::client::HyperliquidClient;
@@ -42,6 +44,7 @@ impl HyperliquidClient {
             "cancel_order_by_cloid" => self.cancel_order_by_cloid_from_params(&params).await,
             "schedule_cancel" => self.schedule_cancel_from_params(&params).await,
             "transfer_between_dexes" => self.transfer_between_dexes_from_params(&params).await,
+            "transfer_usdc_spot_perp" => self.transfer_usdc_spot_perp_from_params(&params).await,
             "modify_order" => self.modify_order_from_params(&params).await,
             "modify_batch_orders" => self.modify_batch_orders_from_params(&params).await,
             "update_leverage" => self.update_leverage_from_params(&params).await,
@@ -206,6 +209,65 @@ impl HyperliquidClient {
         ]);
         let payload = serde_json::json!({"action": action.to_json()});
         self.exchange_payload_at_nonce(payload, encode_msgpack(&action), nonce)
+            .await
+    }
+
+    async fn transfer_usdc_spot_perp_from_params(
+        &self,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        let amount = params.positive_decimal("amount")?;
+        let to_perp = params.required_bool("toPerp")?;
+        let nonce = params.required_u64("nonce")?;
+        let signature_chain_id = params.required("signatureChainId")?;
+        if signature_chain_id.len() <= 2
+            || !signature_chain_id.starts_with("0x")
+            || !signature_chain_id[2..]
+                .chars()
+                .all(|ch| ch.is_ascii_hexdigit())
+        {
+            return Err(DcexError::InvalidInput(
+                "Hyperliquid signatureChainId must be a hexadecimal chain ID".into(),
+            ));
+        }
+        let signature: Value =
+            serde_json::from_str(params.required("signature")?).map_err(|error| {
+                DcexError::InvalidInput(format!("invalid Hyperliquid signature JSON: {error}"))
+            })?;
+        let valid_signature = signature.as_object().is_some_and(|value| {
+            ["r", "s"].iter().all(|key| {
+                value.get(*key).and_then(Value::as_str).is_some_and(|part| {
+                    part.len() == 66
+                        && part.starts_with("0x")
+                        && part[2..].chars().all(|ch| ch.is_ascii_hexdigit())
+                })
+            }) && matches!(value.get("v").and_then(Value::as_u64), Some(27 | 28))
+        });
+        if !valid_signature {
+            return Err(DcexError::InvalidInput(
+                "Hyperliquid signature requires r, s, and v".into(),
+            ));
+        }
+        let chain = if self.is_testnet() {
+            "Testnet"
+        } else {
+            "Mainnet"
+        };
+        let payload = serde_json::json!({
+            "action": {
+                "type": "usdClassTransfer",
+                "hyperliquidChain": chain,
+                "signatureChainId": signature_chain_id,
+                "amount": amount,
+                "toPerp": to_perp,
+                "nonce": nonce,
+            },
+            "nonce": nonce,
+            "signature": signature,
+        });
+        let body =
+            serde_json::to_vec(&payload).map_err(|error| DcexError::Decode(error.to_string()))?;
+        self.request(HttpMethod::Post, EXCHANGE, body, None, false)
             .await
     }
 
@@ -654,6 +716,9 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
         "cancel_order_by_cloid" => &["product_symbol", "cloid", "vaultAddress", "expiresAfter"],
         "schedule_cancel" => &["time", "vaultAddress", "expiresAfter"],
         "transfer_between_dexes" => &["sourceDex", "destinationDex", "token", "amount"],
+        "transfer_usdc_spot_perp" => {
+            &["amount", "toPerp", "nonce", "signature", "signatureChainId"]
+        }
         "modify_order" => &[
             "oid",
             "product_symbol",

@@ -11,6 +11,9 @@ impl KucoinClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = KucoinParams::from_pairs(params);
+        if let Some(result) = self.uta_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
         if let Some(result) = self.account_private_request(method_name, &params).await? {
             return Ok(result);
         }

@@ -237,3 +237,74 @@ fn credentials_must_be_paired_and_addresses_are_validated() {
         .is_err()
     );
 }
+
+#[tokio::test]
+async fn remaining_openable_notional_is_public_and_validates_leverage() {
+    let (base_url, handle) = recording_server();
+    let client = AsterClient::with_base_urls(
+        None,
+        None,
+        None,
+        Duration::from_secs(2),
+        "http://127.0.0.1:9".into(),
+        base_url,
+    )
+    .expect("client");
+    client
+        .public_request(
+            "get_futures_remaining_openable_notional",
+            vec![
+                ("product_symbol".into(), "ASTER-USDT-SWAP".into()),
+                ("leverage".into(), "5".into()),
+            ],
+        )
+        .await
+        .expect("public request");
+    let line = handle.join().expect("server").expect("request");
+    assert!(
+        line.starts_with(
+            "GET /fapi/v3/remainingOpenableNotionalValue?symbol=ASTERUSDT&leverage=5 HTTP/1.1"
+        ),
+        "{line}"
+    );
+
+    let client = AsterClient::public(Duration::from_secs(1)).expect("client");
+    assert!(
+        client
+            .public_request(
+                "get_futures_remaining_openable_notional",
+                vec![
+                    ("product_symbol".into(), "ASTER-USDT-SWAP".into()),
+                    ("leverage".into(), "0".into()),
+                ]
+            )
+            .await
+            .is_err()
+    );
+}
+
+#[test]
+fn batch_amendments_normalize_symbols_and_validate_each_order() {
+    let client = AsterClient::public(Duration::from_secs(1)).expect("client");
+    let params = AsterParams::from_pairs(vec![("batchOrders".into(), json!([
+        {"product_symbol":"ASTER-USDT-SWAP", "orderId":123, "side":"buy", "quantity":"2", "price":"1.2"},
+        {"symbol":"BTCUSDT", "origClientOrderId":"mine", "quantity":"3", "price":"2.1"}
+    ]).to_string())]);
+    let resolved = client
+        .resolve_batch_amendments(&params)
+        .expect("batch amendments");
+    let orders: Value = serde_json::from_str(&resolved).expect("JSON");
+    assert_eq!(orders[0]["symbol"], "ASTERUSDT");
+    assert_eq!(orders[0]["side"], "BUY");
+    assert!(orders[0].get("product_symbol").is_none());
+    assert_eq!(orders[1]["origClientOrderId"], "mine");
+
+    let bad = AsterParams::from_pairs(vec![(
+        "batchOrders".into(),
+        json!([
+            {"symbol":"BTCUSDT", "orderId":123, "quantity":"0", "price":"2"}
+        ])
+        .to_string(),
+    )]);
+    assert!(client.resolve_batch_amendments(&bad).is_err());
+}

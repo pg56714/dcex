@@ -271,3 +271,37 @@ class MarketHTTP(HTTPManager):
             "get_risk_limit",
             self._params(category=category, product_symbol=product_symbol, cursor=cursor),
         )
+
+    async def get_spread_instruments(
+        self,
+        *,
+        symbol: str | None = None,
+        base_coin: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """List Bybit spread combination specifications."""
+        return await self._native_public(
+            "get_spread_instruments",
+            self._native_params(symbol=symbol, baseCoin=base_coin, limit=limit, cursor=cursor),
+        )
+
+    async def get_spread_orderbook(
+        self, symbol: str, *, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get the spread combination order book."""
+        return await self._native_public(
+            "get_spread_orderbook", self._native_params(symbol=symbol, limit=limit)
+        )
+
+    async def get_spread_tickers(self, symbol: str) -> dict[str, Any]:
+        """Get the latest spread combination ticker."""
+        return await self._native_public("get_spread_tickers", self._native_params(symbol=symbol))
+
+    async def get_spread_recent_trades(
+        self, symbol: str, *, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Get recent public spread executions."""
+        return await self._native_public(
+            "get_spread_recent_trades", self._native_params(symbol=symbol, limit=limit)
+        )

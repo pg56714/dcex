@@ -354,6 +354,22 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
+    def amend_spot_order(
+        self,
+        *,
+        txid: str | None = None,
+        cl_ord_id: str | None = None,
+        order_qty: str | None = None,
+        display_qty: str | None = None,
+        limit_price: str | None = None,
+        trigger_price: str | None = None,
+        pair: str | None = None,
+        post_only: bool | None = None,
+        deadline: str | None = None,
+    ) -> dict[str, Any]:
+        """Amend a spot order in place, retaining its identifier where possible."""
+        return self._native_private("amend_spot_order", self._native_params(**locals()))
+
     def cancel_spot_order(
         self,
         txid: str | None = None,
@@ -616,6 +632,22 @@ class TradeHTTP(HTTPManager):
             "get_futures_order_status",
             self._native_params(orderIds=orderIds, cliOrdIds=cliOrdIds),
         )
+
+    def edit_futures_order(
+        self,
+        *,
+        orderId: str | None = None,  # noqa: N803
+        cliOrdId: str | None = None,  # noqa: N803
+        size: int | str | None = None,
+        limitPrice: str | None = None,  # noqa: N803
+        stopPrice: str | None = None,  # noqa: N803
+        trailingStopMaxDeviation: str | None = None,  # noqa: N803
+        trailingStopDeviationUnit: str | None = None,  # noqa: N803
+        qtyMode: str | None = None,  # noqa: N803
+        processBefore: str | None = None,  # noqa: N803
+    ) -> dict[str, Any]:
+        """Edit an open Kraken futures order."""
+        return self._native_private("edit_futures_order", self._native_params(**locals()))
 
     def cancel_futures_order(
         self,

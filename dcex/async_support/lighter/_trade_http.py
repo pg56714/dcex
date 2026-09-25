@@ -8,6 +8,35 @@ from ._http_manager import HTTPManager
 class TradeHTTP(HTTPManager):
     """Async HTTP client for Lighter signed trading APIs."""
 
+    async def create_rfq(
+        self,
+        market_index: int,
+        direction: int,
+        base_amount: str | None = None,
+        quote_amount: str | None = None,
+        metadata: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Create a request for quote."""
+        return await self._native_private("create_rfq", self._native_params(**locals()))
+
+    async def get_rfq(self, rfq_id: int) -> dict[str, Any] | list[Any]:
+        """Get a request for quote by ID."""
+        return await self._native_private("get_rfq", self._native_params(**locals()))
+
+    async def list_rfqs(
+        self,
+        account_index: int | None = None,
+        status: str | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """List requests for quote."""
+        return await self._native_private("list_rfqs", self._native_params(**locals()))
+
+    async def update_rfq(self, rfq_id: int, status: str) -> dict[str, Any] | list[Any]:
+        """Update the status of a request for quote."""
+        return await self._native_private("update_rfq", self._native_params(**locals()))
+
     async def send_tx(
         self,
         tx_type: int,

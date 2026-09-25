@@ -1371,3 +1371,644 @@ class TradeHTTP(HTTPManager):
                 recvWindow=recvWindow,
             ),
         )
+
+    def get_pm_um_open_orders(
+        self, *, product_symbol: str | None = None, recv_window: int | None = None
+    ) -> dict:
+        """Return open Portfolio Margin USD-M orders."""
+        return self._native_private(
+            "get_pm_um_open_orders",
+            self._params(product_symbol=product_symbol, recvWindow=recv_window),
+        )
+
+    def get_pm_um_order(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Look up one Portfolio Margin USD-M order."""
+        return self._native_private(
+            "get_pm_um_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=order_id,
+                origClientOrderId=client_order_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def cancel_pm_um_order(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Cancel one Portfolio Margin USD-M order."""
+        return self._native_private(
+            "cancel_pm_um_order",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=order_id,
+                origClientOrderId=client_order_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def cancel_all_pm_um_orders(
+        self, product_symbol: str, *, recv_window: int | None = None
+    ) -> dict:
+        """Cancel all active Portfolio Margin USD-M orders for a symbol."""
+        return self._native_private(
+            "cancel_all_pm_um_orders",
+            self._params(product_symbol=product_symbol, recvWindow=recv_window),
+        )
+
+    def place_pm_um_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        order_type: str,
+        quantity: str,
+        *,
+        price: str | None = None,
+        time_in_force: str | None = None,
+        position_side: str | None = None,
+        reduce_only: bool | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Place a Portfolio Margin USD-M LIMIT or MARKET order."""
+        return self._native_private(
+            "place_pm_um_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type_=order_type,
+                quantity=quantity,
+                price=price,
+                timeInForce=time_in_force,
+                positionSide=position_side,
+                reduceOnly=reduce_only,
+                newClientOrderId=client_order_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def place_pm_um_algo_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        order_type: str,
+        *,
+        quantity: str | None = None,
+        trigger_price: str | None = None,
+        price: str | None = None,
+        close_position: bool | None = None,
+        position_side: str | None = None,
+        reduce_only: bool | None = None,
+        time_in_force: str | None = None,
+        callback_rate: str | None = None,
+        activate_price: str | None = None,
+        client_algo_id: str | None = None,
+        working_type: str | None = None,
+        price_protect: bool | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Place a Portfolio Margin USD-M conditional order on the current algo route."""
+        return self._native_private(
+            "place_pm_um_algo_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type_=order_type,
+                quantity=quantity,
+                triggerPrice=trigger_price,
+                price=price,
+                closePosition=close_position,
+                positionSide=position_side,
+                reduceOnly=reduce_only,
+                timeInForce=time_in_force,
+                callbackRate=callback_rate,
+                activatePrice=activate_price,
+                clientAlgoId=client_algo_id,
+                workingType=working_type,
+                priceProtect=price_protect,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def get_pm_um_algo_order(
+        self,
+        *,
+        algo_id: int | None = None,
+        client_algo_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Look up a Portfolio Margin USD-M conditional order."""
+        return self._native_private(
+            "get_pm_um_algo_order",
+            self._params(
+                algoId=algo_id,
+                clientAlgoId=client_algo_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def cancel_pm_um_algo_order(
+        self,
+        *,
+        algo_id: int | None = None,
+        client_algo_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Cancel a Portfolio Margin USD-M conditional order."""
+        return self._native_private(
+            "cancel_pm_um_algo_order",
+            self._params(
+                algoId=algo_id,
+                clientAlgoId=client_algo_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def cancel_all_pm_um_algo_orders(
+        self,
+        product_symbol: str,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Cancel all active conditional orders for a Portfolio Margin USD-M symbol."""
+        return self._native_private(
+            "cancel_all_pm_um_algo_orders",
+            self._params(product_symbol=product_symbol, recvWindow=recv_window),
+        )
+
+    def get_pm_um_open_algo_orders(
+        self,
+        product_symbol: str | None = None,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Get open Portfolio Margin USD-M conditional orders."""
+        return self._native_private(
+            "get_pm_um_open_algo_orders",
+            self._params(product_symbol=product_symbol, recvWindow=recv_window),
+        )
+
+    def get_pm_um_algo_order_history(
+        self,
+        product_symbol: str,
+        *,
+        algo_id: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Get Portfolio Margin USD-M conditional order history."""
+        return self._native_private(
+            "get_pm_um_algo_order_history",
+            self._params(
+                product_symbol=product_symbol,
+                algoId=algo_id,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def get_pm_um_all_orders(self, product_symbol: str) -> dict:
+        """Query Binance Portfolio Margin um all orders."""
+        return self._native_private(
+            "get_pm_um_all_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_um_user_trades(self, product_symbol: str) -> dict:
+        """Query Binance Portfolio Margin um user trades."""
+        return self._native_private(
+            "get_pm_um_user_trades", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_cm_open_orders(self, product_symbol: str | None = None) -> dict:
+        """Query Binance Portfolio Margin cm open orders."""
+        return self._native_private(
+            "get_pm_cm_open_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_cm_all_orders(self, product_symbol: str) -> dict:
+        """Query Binance Portfolio Margin cm all orders."""
+        return self._native_private(
+            "get_pm_cm_all_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_cm_user_trades(self, product_symbol: str) -> dict:
+        """Query Binance Portfolio Margin cm user trades."""
+        return self._native_private(
+            "get_pm_cm_user_trades", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_margin_open_orders(self, product_symbol: str | None = None) -> dict:
+        """Query Binance Portfolio Margin margin open orders."""
+        return self._native_private(
+            "get_pm_margin_open_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_margin_all_orders(self, product_symbol: str) -> dict:
+        """Query Binance Portfolio Margin margin all orders."""
+        return self._native_private(
+            "get_pm_margin_all_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_margin_trades(self, product_symbol: str) -> dict:
+        """Query Binance Portfolio Margin margin trades."""
+        return self._native_private(
+            "get_pm_margin_trades", self._params(product_symbol=product_symbol)
+        )
+
+    def place_pm_cm_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        order_type: str,
+        quantity: str,
+        *,
+        price: str | None = None,
+        time_in_force: str | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Place a Portfolio Margin CM LIMIT or MARKET order."""
+        return self._native_private(
+            "place_pm_cm_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type_=order_type,
+                quantity=quantity,
+                price=price,
+                timeInForce=time_in_force,
+                newClientOrderId=client_order_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def get_pm_cm_order(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+    ) -> dict:
+        """Get a Portfolio Margin CM order."""
+        return self._native_private(
+            "get_pm_cm_order",
+            self._params(
+                product_symbol=product_symbol, orderId=order_id, origClientOrderId=client_order_id
+            ),
+        )
+
+    def cancel_pm_cm_order(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+    ) -> dict:
+        """Cancel a Portfolio Margin CM order."""
+        return self._native_private(
+            "cancel_pm_cm_order",
+            self._params(
+                product_symbol=product_symbol, orderId=order_id, origClientOrderId=client_order_id
+            ),
+        )
+
+    def cancel_all_pm_cm_orders(self, product_symbol: str) -> dict:
+        """Cancel all active Portfolio Margin CM orders for a symbol."""
+        return self._native_private(
+            "cancel_all_pm_cm_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_margin_order(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+    ) -> dict:
+        """Get a Portfolio Margin MARGIN order."""
+        return self._native_private(
+            "get_pm_margin_order",
+            self._params(
+                product_symbol=product_symbol, orderId=order_id, origClientOrderId=client_order_id
+            ),
+        )
+
+    def cancel_pm_margin_order(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+    ) -> dict:
+        """Cancel a Portfolio Margin MARGIN order."""
+        return self._native_private(
+            "cancel_pm_margin_order",
+            self._params(
+                product_symbol=product_symbol, orderId=order_id, origClientOrderId=client_order_id
+            ),
+        )
+
+    def cancel_all_pm_margin_orders(self, product_symbol: str) -> dict:
+        """Cancel all active Portfolio Margin MARGIN orders for a symbol."""
+        return self._native_private(
+            "cancel_all_pm_margin_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def place_pm_margin_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        order_type: str,
+        quantity: str,
+        *,
+        price: str | None = None,
+        time_in_force: str | None = None,
+        client_order_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Place a Portfolio Margin MARGIN LIMIT or MARKET order."""
+        return self._native_private(
+            "place_pm_margin_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                type_=order_type,
+                quantity=quantity,
+                price=price,
+                timeInForce=time_in_force,
+                newClientOrderId=client_order_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def modify_pm_um_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        order_id: int,
+        quantity: str,
+        price: str,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Modify a Portfolio Margin USD-M LIMIT order."""
+        return self._native_private(
+            "modify_pm_um_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                orderId=order_id,
+                quantity=quantity,
+                price=price,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def modify_pm_cm_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        order_id: int,
+        quantity: str,
+        price: str,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Modify a Portfolio Margin COIN-M LIMIT order."""
+        return self._native_private(
+            "modify_pm_cm_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                orderId=order_id,
+                quantity=quantity,
+                price=price,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def place_pm_cm_conditional_order(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        strategy_type: str,
+        *,
+        quantity: str | None = None,
+        price: str | None = None,
+        stop_price: str | None = None,
+        callback_rate: str | None = None,
+        position_side: str | None = None,
+        reduce_only: bool | None = None,
+        client_strategy_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Place a Portfolio Margin COIN-M conditional order."""
+        return self._native_private(
+            "place_pm_cm_conditional_order",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                strategyType=strategy_type,
+                quantity=quantity,
+                price=price,
+                stopPrice=stop_price,
+                callbackRate=callback_rate,
+                positionSide=position_side,
+                reduceOnly=reduce_only,
+                newClientStrategyId=client_strategy_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def cancel_pm_cm_conditional_order(
+        self,
+        product_symbol: str,
+        *,
+        strategy_id: int | None = None,
+        client_strategy_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Cancel a Portfolio Margin COIN-M conditional order."""
+        return self._native_private(
+            "cancel_pm_cm_conditional_order",
+            self._params(
+                product_symbol=product_symbol,
+                strategyId=strategy_id,
+                newClientStrategyId=client_strategy_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    def cancel_all_pm_cm_conditional_orders(
+        self,
+        product_symbol: str,
+        *,
+        recv_window: int | None = None,
+    ) -> dict:
+        """Cancel all COIN-M conditional orders for a Portfolio Margin symbol."""
+        return self._native_private(
+            "cancel_all_pm_cm_conditional_orders",
+            self._params(product_symbol=product_symbol, recvWindow=recv_window),
+        )
+
+    def get_pm_cm_conditional_order(
+        self,
+        product_symbol: str,
+        *,
+        strategy_id: int | None = None,
+        client_strategy_id: str | None = None,
+    ) -> dict:
+        """Look up an open Portfolio Margin COIN-M conditional order."""
+        return self._native_private(
+            "get_pm_cm_conditional_order",
+            self._params(
+                product_symbol=product_symbol,
+                strategyId=strategy_id,
+                newClientStrategyId=client_strategy_id,
+            ),
+        )
+
+    def get_pm_cm_conditional_order_history(
+        self,
+        product_symbol: str,
+        *,
+        strategy_id: int | None = None,
+        client_strategy_id: str | None = None,
+    ) -> dict:
+        """Look up Portfolio Margin COIN-M conditional order history."""
+        return self._native_private(
+            "get_pm_cm_conditional_order_history",
+            self._params(
+                product_symbol=product_symbol,
+                strategyId=strategy_id,
+                newClientStrategyId=client_strategy_id,
+            ),
+        )
+
+    def get_pm_cm_open_conditional_orders(
+        self,
+        product_symbol: str | None = None,
+    ) -> dict:
+        """List active Portfolio Margin COIN-M conditional orders."""
+        return self._native_private(
+            "get_pm_cm_open_conditional_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def get_pm_cm_all_conditional_orders(
+        self,
+        product_symbol: str | None = None,
+    ) -> dict:
+        """List Portfolio Margin COIN-M conditional orders."""
+        return self._native_private(
+            "get_pm_cm_all_conditional_orders", self._params(product_symbol=product_symbol)
+        )
+
+    def place_pm_margin_oco(
+        self,
+        product_symbol: str,
+        side: OrderSide | str,
+        quantity: str,
+        price: str,
+        stop_price: str,
+        *,
+        stop_limit_price: str | None = None,
+        stop_limit_time_in_force: str | None = None,
+    ) -> dict:
+        """Place a Portfolio Margin OCO order."""
+        return self._native_private(
+            "place_pm_margin_oco",
+            self._params(
+                product_symbol=product_symbol,
+                side=self._side(side),
+                quantity=quantity,
+                price=price,
+                stopPrice=stop_price,
+                stopLimitPrice=stop_limit_price,
+                stopLimitTimeInForce=stop_limit_time_in_force,
+            ),
+        )
+
+    def get_pm_margin_oco(self, order_list_id: int) -> dict:
+        """Get a Portfolio Margin OCO order list."""
+        return self._native_private("get_pm_margin_oco", self._params(orderListId=order_list_id))
+
+    def cancel_pm_margin_oco(
+        self,
+        product_symbol: str,
+        order_list_id: int,
+    ) -> dict:
+        """Cancel a Portfolio Margin OCO order list."""
+        return self._native_private(
+            "cancel_pm_margin_oco",
+            self._params(product_symbol=product_symbol, orderListId=order_list_id),
+        )
+
+    def get_pm_margin_open_oco(self) -> dict:
+        """List open Portfolio Margin OCO order lists."""
+        return self._native_private("get_pm_margin_open_oco", self._params())
+
+    def get_pm_margin_all_oco(self) -> dict:
+        """List Portfolio Margin OCO order history."""
+        return self._native_private("get_pm_margin_all_oco", self._params())
+
+    def get_pm_um_order_amendments(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict:
+        """Get Portfolio Margin USD-M order amendment history."""
+        return self._native_private(
+            "get_pm_um_order_amendments",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=order_id,
+                origClientOrderId=client_order_id,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+            ),
+        )
+
+    def get_pm_cm_order_amendments(
+        self,
+        product_symbol: str,
+        *,
+        order_id: int | None = None,
+        client_order_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict:
+        """Get Portfolio Margin COIN-M order amendment history."""
+        return self._native_private(
+            "get_pm_cm_order_amendments",
+            self._params(
+                product_symbol=product_symbol,
+                orderId=order_id,
+                origClientOrderId=client_order_id,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+            ),
+        )

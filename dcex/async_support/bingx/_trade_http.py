@@ -154,6 +154,26 @@ class TradeHTTP(HTTPManager):
             self._native_call_params(locals()),
         )
 
+    async def replace_spot_order(
+        self,
+        product_symbol: str,
+        cancelReplaceMode: str,  # noqa: N803
+        side: str,
+        type_: str,
+        cancelOrderId: int | str | None = None,  # noqa: N803
+        cancelClientOrderID: str | None = None,  # noqa: N803
+        cancelRestrictions: str | None = None,  # noqa: N803
+        quantity: float | str | None = None,
+        quoteOrderQty: float | str | None = None,  # noqa: N803
+        price: float | str | None = None,
+        stopPrice: float | str | None = None,  # noqa: N803
+        timeInForce: str | None = None,  # noqa: N803
+        newClientOrderId: str | None = None,  # noqa: N803
+        recvWindow: int | None = None,  # noqa: N803
+    ) -> dict[str, Any]:
+        """Atomically request spot order cancellation and replacement."""
+        return await self._native_private("replace_spot_order", self._native_call_params(locals()))
+
     async def cancel_spot_order(
         self,
         product_symbol: str,
@@ -186,6 +206,17 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "cancel_spot_open_orders",
             self._native_call_params(locals()),
+        )
+
+    async def set_spot_cancel_all_after(
+        self,
+        type_: str,
+        timeOut: int | None = None,  # noqa: N803
+        recvWindow: int | None = None,  # noqa: N803
+    ) -> dict[str, Any]:
+        """Activate or close the spot order dead man's switch."""
+        return await self._native_private(
+            "set_spot_cancel_all_after", self._native_call_params(locals())
         )
 
     async def get_spot_order(

@@ -110,6 +110,10 @@ class PrivateClient(AsyncWebSocketMixin):
     async def subscribe_balance(self) -> None:
         await self.subscribe("balancePerps")
 
+    async def subscribe_cancel_all_orders_after(self, timeout_seconds: int) -> None:
+        """Arm or refresh the perps cancel-all deadline in seconds."""
+        await self._native_client.subscribe_cancel_all_orders_after(timeout_seconds)
+
     async def recv(self) -> dict[str, Any] | list[Any]:
         return _decode_event(await self._native_client.recv())
 

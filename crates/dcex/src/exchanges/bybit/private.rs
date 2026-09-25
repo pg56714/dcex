@@ -10,6 +10,9 @@ impl BybitClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BybitParams::from_pairs(params);
+        if let Some(result) = self.spread_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
         if let Some(result) = self
             .launchpool_private_request(method_name, &params)
             .await?

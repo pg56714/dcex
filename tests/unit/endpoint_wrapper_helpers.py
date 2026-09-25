@@ -485,6 +485,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     name = parameter.name
     method_name = case.method_name
 
+    if name == "body" and method_name == "submit_internal_transfer":
+        return {"amount": "1", "sourceSubaccount": "1", "targetSubaccount": "2"}
     if name == "product_symbol":
         return _product_symbol(case.exchange, method_name)
     if name in {"product_symbols"}:
@@ -554,6 +556,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     if name in {"source"}:
         return "TradingFees"
     if name in {"borrow"}:
+        if method_name == "get_borrow_lend_liquidation_price":
+            return {"symbol": "USDC", "quantity": "1", "side": "Borrow"}
         return "eyJzeW1ib2wiOiJVU0RDIiwicXVhbnRpdHkiOiIxIiwic2lkZSI6IkJvcnJvdyJ9"
     if name in {"orders"} and case.exchange == "backpack":
         return [_sample_order(case.exchange)]

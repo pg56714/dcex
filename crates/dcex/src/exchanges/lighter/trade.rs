@@ -1,11 +1,13 @@
 use serde_json::json;
 
 use crate::exchange::ValidatedResponse;
-use crate::http::block_on;
+use crate::http::{HttpMethod, block_on};
 use crate::{DcexError, Result};
 
 use super::client::LighterClient;
-use super::endpoints::{SEND_TX, SEND_TX_BATCH};
+use super::client::LighterContentType;
+use super::endpoints::{RFQ_CREATE, RFQ_GET, RFQ_LIST, RFQ_UPDATE, SEND_TX, SEND_TX_BATCH};
+use super::market::auth_header_required;
 use super::params::LighterParams;
 use super::signing::{attributes, expiry_ms, order_expiry_ms, sign_payload};
 
@@ -41,6 +43,99 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<Option<ValidatedResponse>> {
         match method_name {
+            "create_rfq" => {
+                params.ensure_allowed(&[
+                    "market_index",
+                    "direction",
+                    "base_amount",
+                    "quote_amount",
+                    "metadata",
+                    "authorization",
+                ])?;
+                params.required_u64("market_index")?;
+                params.required_u64("direction")?;
+                if params.get("base_amount").is_none() && params.get("quote_amount").is_none() {
+                    return Err(DcexError::InvalidInput(
+                        "Lighter RFQ requires base_amount or quote_amount".into(),
+                    ));
+                }
+                for key in ["base_amount", "quote_amount"] {
+                    if let Some(value) = params.get(key) {
+                        let amount = value.parse::<f64>().map_err(|_| {
+                            DcexError::InvalidInput(format!("Lighter RFQ {key} must be positive"))
+                        })?;
+                        if !amount.is_finite() || amount <= 0.0 {
+                            return Err(DcexError::InvalidInput(format!(
+                                "Lighter RFQ {key} must be positive"
+                            )));
+                        }
+                    }
+                }
+                Ok(Some(
+                    self.path_request(
+                        HttpMethod::Post,
+                        RFQ_CREATE,
+                        Vec::new(),
+                        params.query(&[
+                            "market_index",
+                            "direction",
+                            "base_amount",
+                            "quote_amount",
+                            "metadata",
+                        ]),
+                        auth_header_required(self, params)?,
+                        LighterContentType::Form,
+                    )
+                    .await?,
+                ))
+            }
+            "get_rfq" => {
+                params.ensure_allowed(&["rfq_id", "authorization"])?;
+                params.required_u64("rfq_id")?;
+                Ok(Some(
+                    self.get_path(
+                        RFQ_GET,
+                        params.query(&["rfq_id"]),
+                        auth_header_required(self, params)?,
+                    )
+                    .await?,
+                ))
+            }
+            "list_rfqs" => {
+                params.ensure_allowed(&[
+                    "account_index",
+                    "status",
+                    "cursor",
+                    "limit",
+                    "authorization",
+                ])?;
+                params.optional_u64("account_index")?;
+                params.optional_u64("limit")?;
+                Ok(Some(
+                    self.get_path(
+                        RFQ_LIST,
+                        params.query(&["account_index", "status", "cursor", "limit"]),
+                        auth_header_required(self, params)?,
+                    )
+                    .await?,
+                ))
+            }
+            "update_rfq" => {
+                params.ensure_allowed(&["rfq_id", "status", "authorization"])?;
+                params.required_u64("rfq_id")?;
+                params.required("status")?;
+                Ok(Some(
+                    self.path_request(
+                        HttpMethod::Post,
+                        RFQ_UPDATE,
+                        Vec::new(),
+                        params.query(&["rfq_id", "status"]),
+                        auth_header_required(self, params)?,
+                        LighterContentType::Form,
+                    )
+                    .await?,
+                ))
+            }
             "send_tx" => {
                 params.ensure_allowed(&["tx_type", "tx_info", "price_protection"])?;
                 params.required_u64_range("tx_type", 0, u8::MAX.into())?;

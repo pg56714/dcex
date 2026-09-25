@@ -54,7 +54,11 @@ pub(super) const EARN_ACCOUNT_HOLDINGS: &str = "/api/v1/earn/hold-assets";
 pub(super) const STRUCTURED_EARN_ORDERS: &str = "/api/v1/struct-earn/orders";
 pub(super) const DUAL_INVESTMENT_PRODUCTS: &str = "/api/v1/struct-earn/dual/products";
 
+pub(super) const DCP_SET: &str = "/api/ua/v1/dcp/set";
+pub(super) const DCP_QUERY: &str = "/api/ua/v1/dcp/query";
 pub(super) const SPOT_PLACE_ORDER: &str = "/api/v1/hf/orders";
+pub(super) const SPOT_TEST_ORDER: &str = "/api/v1/hf/orders/test";
+pub(super) const SPOT_ALTER_ORDER: &str = "/api/v1/hf/orders/alter";
 pub(super) const SPOT_BATCH_ORDERS: &str = "/api/v1/hf/orders/multi";
 pub(super) const SPOT_CANCEL_ORDER: &str = "/api/v1/hf/orders/{orderId}";
 pub(super) const SPOT_CANCEL_ALL_ORDERS_BY_SYMBOL: &str = "/api/v1/hf/orders";
@@ -78,6 +82,7 @@ pub(super) const FUTURES_CROSS_MARGIN_LEVERAGE: &str = "/api/v2/getCrossUserLeve
 pub(super) const FUTURES_MODIFY_CROSS_MARGIN_LEVERAGE: &str = "/api/v2/changeCrossUserLeverage";
 
 pub(super) const FUTURES_PLACE_ORDER: &str = "/api/v1/orders";
+pub(super) const FUTURES_TEST_ORDER: &str = "/api/v1/orders/test";
 pub(super) const FUTURES_ORDER_LIST: &str = "/api/v1/orders";
 pub(super) const FUTURES_ORDER: &str = "/api/v1/orders/{orderId}";
 pub(super) const FUTURES_ORDER_BY_CLIENT_OID: &str = "/api/v1/orders/byClientOid";
@@ -88,3 +93,14 @@ pub(super) const FUTURES_CANCEL_ALL_ORDERS: &str = "/api/v3/orders";
 pub(super) const FUTURES_OPEN_ORDER_VALUE: &str = "/api/v1/openOrderStatistics";
 pub(super) const FUTURES_TRADE_HISTORY: &str = "/api/v1/fills";
 pub(super) const FUTURES_RECENT_TRADE_HISTORY: &str = "/api/v1/recentFills";
+
+pub(super) const UTA_V2_PLACE_ORDER: &str = "/api/ua/v2/unified/order/place";
+pub(super) const UTA_V2_CANCEL_ORDER: &str = "/api/ua/v2/unified/order/cancel";
+pub(super) const UTA_V2_AMEND_ORDER: &str = "/api/ua/v2/unified/order/amend";
+pub(super) const UTA_V2_ORDER_DETAIL: &str = "/api/ua/v2/unified/order/detail";
+pub(super) const UTA_V2_OPEN_ORDERS: &str = "/api/ua/v2/unified/order/open-list";
+pub(super) const UTA_V2_ORDER_HISTORY: &str = "/api/ua/v2/unified/order/history";
+pub(super) const UTA_V2_EXECUTIONS: &str = "/api/ua/v2/unified/order/execution";
+pub(super) const UTA_V2_POSITIONS: &str = "/api/ua/v2/unified/position/open-list";
+pub(super) const UTA_V2_BALANCE: &str = "/api/ua/v2/unified/account/balance";
+pub(super) const UTA_V1_OVERVIEW: &str = "/api/ua/v1/unified/account/overview";

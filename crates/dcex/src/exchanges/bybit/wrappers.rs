@@ -3,6 +3,11 @@ use super::client::BybitClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     BybitClient;
     public [
+        get_spread_instruments(),
+        get_spread_orderbook(symbol => "symbol"),
+        get_spread_tickers(symbol => "symbol"),
+        get_spread_recent_trades(symbol => "symbol"),
+
         get_adl_alert(),
         get_advanced_earn_products(category => "category"),
         get_advanced_earn_product_quote(category => "category", product_id => "productId"),
@@ -31,6 +36,15 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_tickers(),
     ];
     private [
+        place_spread_order(symbol => "symbol", side => "side", order_type => "orderType", qty => "qty"),
+        amend_spread_order(symbol => "symbol"),
+        cancel_spread_order(),
+        cancel_all_spread_orders(),
+        get_spread_open_orders(),
+        get_spread_order_history(),
+        get_spread_trade_history(),
+        get_spread_max_qty(symbol => "symbol", side => "side", order_price => "orderPrice"),
+
         amend_batch_order(request => "request"),
         amend_order(product_symbol => "product_symbol"),
         cancel_all_orders(),

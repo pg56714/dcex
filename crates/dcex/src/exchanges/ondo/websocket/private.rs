@@ -152,6 +152,28 @@ impl OndoPrivateWebSocket {
         }
     }
 
+    /// Arm or refresh Ondo's authenticated perps cancel-all deadline.
+    /// Call again before expiry to keep the switch armed.
+    pub async fn subscribe_cancel_all_orders_after(&mut self, timeout_seconds: u64) -> Result<()> {
+        if !self.authenticated {
+            return Err(DcexError::InvalidInput(
+                "Ondo private WebSocket is not authenticated; call connect first".to_string(),
+            ));
+        }
+        if timeout_seconds == 0 {
+            return Err(DcexError::InvalidInput(
+                "Ondo dead-man timeout_seconds must be positive".to_string(),
+            ));
+        }
+        self.connection
+            .send_json(&json!({
+                "op": "subscribe",
+                "channel": "cancelAllOrdersAfterPerps",
+                "timeout_seconds": timeout_seconds,
+            }))
+            .await
+    }
+
     pub async fn subscribe_orders(&mut self, markets: Vec<String>) -> Result<()> {
         self.subscribe("ordersPerps", markets).await
     }

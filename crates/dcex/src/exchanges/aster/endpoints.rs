@@ -44,6 +44,8 @@ pub(super) const FUTURES_TICKER_24HR: &str = "/fapi/v3/ticker/24hr";
 pub(super) const FUTURES_TICKER_PRICE: &str = "/fapi/v3/ticker/price";
 pub(super) const FUTURES_BOOK_TICKER: &str = "/fapi/v3/ticker/bookTicker";
 pub(super) const FUTURES_INDEX_REFERENCES: &str = "/fapi/v3/indexreferences";
+pub(super) const FUTURES_REMAINING_OPENABLE_NOTIONAL: &str =
+    "/fapi/v3/remainingOpenableNotionalValue";
 
 pub(super) const FUTURES_POSITION_MODE: &str = "/fapi/v3/positionSide/dual";
 pub(super) const FUTURES_STP_MODE: &str = "/fapi/v3/stpMode";

@@ -916,6 +916,7 @@ impl BinanceClient {
             (BinanceMarket::Futures, true) => FUTURES_TEST_ORDER,
             (BinanceMarket::Options, false) => OPTIONS_ORDER,
             (BinanceMarket::Options, true) => unreachable!("handled above"),
+            (BinanceMarket::PortfolioMargin, _) => unreachable!("explicit PM methods only"),
             (BinanceMarket::Equity, _) => unreachable!("handled above"),
             (BinanceMarket::CoinFutures, _) => {
                 unreachable!("COIN-M uses its dedicated order methods")

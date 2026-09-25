@@ -18,6 +18,7 @@ pub enum BinanceMarket {
     Equity,
     Futures,
     Options,
+    PortfolioMargin,
     Spot,
 }
 
@@ -28,11 +29,15 @@ impl BinanceMarket {
             Self::Equity => SPOT_BASE_URL,
             Self::Futures => FUTURES_BASE_URL,
             Self::Options => OPTIONS_BASE_URL,
+            Self::PortfolioMargin => PORTFOLIO_MARGIN_BASE_URL,
             Self::Spot => SPOT_BASE_URL,
         }
     }
 
     pub fn from_path(path: &str) -> Result<Self> {
+        if path.starts_with("/papi/") {
+            return Ok(Self::PortfolioMargin);
+        }
         if path.starts_with("/dapi/") {
             return Ok(Self::CoinFutures);
         }
@@ -60,6 +65,7 @@ pub struct BinanceClient {
     coin_futures_base_url: String,
     futures_base_url: String,
     options_base_url: String,
+    portfolio_margin_base_url: String,
     spot_base_url: String,
     api_key: Option<String>,
     timestamp_offset_ms: Arc<Mutex<Option<i64>>>,
@@ -127,6 +133,7 @@ impl BinanceClient {
             coin_futures_base_url: COIN_FUTURES_BASE_URL.to_string(),
             futures_base_url,
             options_base_url,
+            portfolio_margin_base_url: PORTFOLIO_MARGIN_BASE_URL.to_string(),
             spot_base_url,
             api_key: api_key_header,
             timestamp_offset_ms,
@@ -136,6 +143,11 @@ impl BinanceClient {
 
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
         self.product_table = Some(Arc::new(product_table));
+        self
+    }
+
+    pub fn with_portfolio_margin_base_url(mut self, base_url: impl Into<String>) -> Self {
+        self.portfolio_margin_base_url = base_url.into();
         self
     }
 
@@ -206,9 +218,15 @@ impl BinanceClient {
             BinanceMarket::Equity => SPOT_SERVER_TIME,
             BinanceMarket::Futures => FUTURES_SERVER_TIME,
             BinanceMarket::Options => OPTIONS_SERVER_TIME,
+            BinanceMarket::PortfolioMargin => SPOT_SERVER_TIME,
             BinanceMarket::Spot => SPOT_SERVER_TIME,
         };
-        let request = self.build_request(HttpMethod::Get, market, path, Vec::new());
+        let time_market = if market == BinanceMarket::PortfolioMargin {
+            BinanceMarket::Spot
+        } else {
+            market
+        };
+        let request = self.build_request(HttpMethod::Get, time_market, path, Vec::new());
         let response = self.inner.execute(request, false).await?;
         let local_end = unix_timestamp_ms()?;
         let server_time = extract_server_time_ms(&response.data).ok_or_else(|| {
@@ -236,6 +254,7 @@ impl BinanceClient {
             BinanceMarket::Equity => &self.spot_base_url,
             BinanceMarket::Futures => &self.futures_base_url,
             BinanceMarket::Options => &self.options_base_url,
+            BinanceMarket::PortfolioMargin => &self.portfolio_margin_base_url,
             BinanceMarket::Spot => &self.spot_base_url,
         };
         match method {

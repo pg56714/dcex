@@ -31,6 +31,8 @@ crate::exchanges::impl_exchange_method_wrappers!(
         get_sub_accounts(),
         get_balance(),
         get_asset_operations(),
+        get_account_health(account_id => "accountId"),
+        submit_internal_transfer(body => "body"),
         get_spot_balances(),
         get_positions(),
         get_positions_history(),

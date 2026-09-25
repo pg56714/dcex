@@ -154,3 +154,17 @@ pub(super) const MARGIN_LIABILITY: &str = "/v5/spot-margin-trade/liability";
 pub(super) const FLEXIBLE_BORROW_INVENTORY: &str =
     "/v5/spot-margin-trade/flexible-available-inventory";
 pub(super) const FIXED_BORROW_INVENTORY: &str = "/v5/spot-margin-trade/fixed-available-inventory";
+
+pub(super) const SPREAD_CREATE_ORDER: &str = "/v5/spread/order/create";
+pub(super) const SPREAD_AMEND_ORDER: &str = "/v5/spread/order/amend";
+pub(super) const SPREAD_CANCEL_ORDER: &str = "/v5/spread/order/cancel";
+pub(super) const SPREAD_CANCEL_ALL_ORDERS: &str = "/v5/spread/order/cancel-all";
+pub(super) const SPREAD_OPEN_ORDERS: &str = "/v5/spread/order/realtime";
+pub(super) const SPREAD_ORDER_HISTORY: &str = "/v5/spread/order/history";
+pub(super) const SPREAD_TRADE_HISTORY: &str = "/v5/spread/execution/list";
+pub(super) const SPREAD_MAX_QTY: &str = "/v5/spread/max-qty";
+
+pub(super) const SPREAD_INSTRUMENTS: &str = "/v5/spread/instrument";
+pub(super) const SPREAD_ORDERBOOK: &str = "/v5/spread/orderbook";
+pub(super) const SPREAD_TICKERS: &str = "/v5/spread/tickers";
+pub(super) const SPREAD_RECENT_TRADES: &str = "/v5/spread/recent-trade";

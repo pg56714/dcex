@@ -7,6 +7,7 @@ mod market;
 mod params;
 mod private;
 mod signing;
+mod spread;
 mod subaccount;
 mod trade;
 pub mod websocket;

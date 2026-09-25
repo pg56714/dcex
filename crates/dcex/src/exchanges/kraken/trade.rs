@@ -112,6 +112,44 @@ impl KrakenClient {
                 self.private_post(KrakenAuth::Spot, SPOT_TRADES_HISTORY, query)
                     .await
             }
+            "amend_spot_order" => {
+                require_one_identifier(params, &["txid", "cl_ord_id"])?;
+                if [
+                    "order_qty",
+                    "display_qty",
+                    "limit_price",
+                    "trigger_price",
+                    "post_only",
+                ]
+                .iter()
+                .all(|key| params.get(key).is_none())
+                {
+                    return Err(crate::DcexError::InvalidInput(
+                        "Kraken amend requires at least one changed field".into(),
+                    ));
+                }
+                if let Some(post_only) = params.get("post_only") {
+                    if !matches!(post_only, "true" | "false") {
+                        return Err(crate::DcexError::InvalidInput(
+                            "Kraken post_only must be true or false".into(),
+                        ));
+                    }
+                }
+                let mut query = params.only(&[
+                    "txid",
+                    "cl_ord_id",
+                    "order_qty",
+                    "display_qty",
+                    "limit_price",
+                    "trigger_price",
+                    "pair",
+                    "post_only",
+                    "deadline",
+                ]);
+                self.push_product_symbol(&mut query, params, "pair", "")?;
+                self.private_post(KrakenAuth::Spot, SPOT_AMEND_ORDER, query)
+                    .await
+            }
             "cancel_spot_order" => {
                 require_one_identifier(params, &["txid", "userref", "cl_ord_id"])?;
                 let mut query = params.only(&["txid", "cl_ord_id"]);
@@ -187,6 +225,45 @@ impl KrakenClient {
                     KrakenAuth::Futures,
                     FUTURES_ORDER_STATUS,
                     params.only(&["orderIds", "cliOrdIds"]),
+                )
+                .await
+            }
+            "edit_futures_order" => {
+                require_one_identifier(params, &["orderId", "cliOrdId"])?;
+                if [
+                    "size",
+                    "limitPrice",
+                    "stopPrice",
+                    "trailingStopMaxDeviation",
+                ]
+                .iter()
+                .all(|key| params.get(key).is_none())
+                {
+                    return Err(crate::DcexError::InvalidInput(
+                        "Kraken futures edit requires at least one changed field".into(),
+                    ));
+                }
+                if let Some(mode) = params.get("qtyMode") {
+                    if !matches!(mode, "ABSOLUTE" | "RELATIVE") {
+                        return Err(crate::DcexError::InvalidInput(
+                            "Kraken qtyMode must be ABSOLUTE or RELATIVE".into(),
+                        ));
+                    }
+                }
+                self.private_post(
+                    KrakenAuth::Futures,
+                    FUTURES_EDIT_ORDER,
+                    params.only(&[
+                        "processBefore",
+                        "orderId",
+                        "cliOrdId",
+                        "size",
+                        "limitPrice",
+                        "stopPrice",
+                        "trailingStopMaxDeviation",
+                        "trailingStopDeviationUnit",
+                        "qtyMode",
+                    ]),
                 )
                 .await
             }
