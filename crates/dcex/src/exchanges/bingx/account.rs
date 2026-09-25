@@ -44,6 +44,12 @@ impl BingxClient {
                 self.private_get(SWAP_ACCOUNT_BALANCE, params.only(&["recvWindow"]))
                     .await
             }
+            "get_swap_commission_rate" => {
+                params.ensure_allowed(&["recvWindow"])?;
+                validate_recv_window(params)?;
+                self.private_get(SWAP_COMMISSION_RATE, params.only(&["recvWindow"]))
+                    .await
+            }
             "get_spot_account_balance" => {
                 params.ensure_allowed(&["recvWindow"])?;
                 validate_recv_window(params)?;

@@ -175,6 +175,132 @@ fn export_sends_resolved_market_id_with_configured_account_index() {
 }
 
 #[test]
+fn new_market_queries_follow_official_paths() {
+    let cases = [
+        (
+            "get_mark_price_candles",
+            vec![
+                ("market_id", "1"),
+                ("resolution", "1h"),
+                ("start_timestamp", "1000"),
+                ("end_timestamp", "2000"),
+                ("count_back", "10"),
+            ],
+            "/api/v1/markPriceCandles?",
+        ),
+        (
+            "get_market_price_charts",
+            vec![("market_ids", "1"), ("market_ids", "2")],
+            "/api/v1/marketPriceCharts?market_ids=1&market_ids=2",
+        ),
+        (
+            "get_synthetic_spot_info",
+            vec![("symbol", "AAPL")],
+            "/api/v1/syntheticSpotInfo?symbol=AAPL",
+        ),
+    ];
+    for (method, params, expected) in cases {
+        let (base_url, handle) = recording_server();
+        let client =
+            LighterClient::with_base_url(Duration::from_secs(1), base_url).expect("client");
+        let params = params
+            .into_iter()
+            .map(|(key, value)| (key.to_string(), value.to_string()))
+            .collect();
+        block_on(async move { client.public_request(method, params).await }).expect("request");
+        let line = handle.join().expect("server").expect("request line");
+        assert!(line.starts_with(&format!("GET {expected}")), "{line}");
+    }
+}
+
+#[test]
+fn account_orders_uses_client_indexes_and_auth_header() {
+    let (base_url, handle) = recording_server();
+    let client = LighterClient::with_base_url_and_credentials(
+        Duration::from_secs(1),
+        base_url,
+        Some(12),
+        None,
+        None,
+    )
+    .expect("client");
+    block_on(async move {
+        client
+            .private_request(
+                "get_account_orders",
+                vec![
+                    ("client_order_indexes".into(), "123,456".into()),
+                    ("authorization".into(), "test-token".into()),
+                ],
+            )
+            .await
+    })
+    .expect("request");
+    let line = handle.join().expect("server").expect("request line");
+    assert!(line.starts_with("GET /api/v1/accountOrders?"), "{line}");
+    assert!(line.contains("account_index=12"), "{line}");
+    assert!(line.contains("client_order_indexes=123%2C456"), "{line}");
+}
+
+#[test]
+fn new_lighter_queries_reject_invalid_parameters_before_network() {
+    let client = LighterClient::with_base_url(Duration::from_secs(1), "http://127.0.0.1:1".into())
+        .expect("client");
+    assert!(block_on({
+        let client = client.clone();
+        async move {
+            client
+                .public_request("get_synthetic_spot_info", vec![])
+                .await
+        }
+    })
+    .is_err());
+    assert!(block_on({
+        let client = client.clone();
+        async move {
+            client
+                .public_request(
+                    "get_market_price_charts",
+                    vec![("market_ids".into(), "-1".into())],
+                )
+                .await
+        }
+    })
+    .is_err());
+    assert!(block_on({
+        let client = client.clone();
+        async move {
+            client
+                .public_request(
+                    "get_mark_price_candles",
+                    vec![
+                        ("market_id".into(), "1".into()),
+                        ("resolution".into(), "1w".into()),
+                        ("start_timestamp".into(), "1".into()),
+                        ("end_timestamp".into(), "2".into()),
+                        ("count_back".into(), "1".into()),
+                    ],
+                )
+                .await
+        }
+    })
+    .is_err());
+    assert!(block_on(async move {
+        client
+            .private_request(
+                "get_account_orders",
+                vec![
+                    ("account_index".into(), "12".into()),
+                    ("client_order_indexes".into(), "1,".into()),
+                    ("authorization".into(), "token".into()),
+                ],
+            )
+            .await
+    })
+    .is_err());
+}
+
+#[test]
 fn auth_token_uses_configured_private_key() {
     let client = LighterClient::with_base_url_and_credentials(
         Duration::from_secs(1),

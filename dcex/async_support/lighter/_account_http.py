@@ -58,6 +58,15 @@ class AccountHTTP(HTTPManager):
             self._native_params(**locals()),
         )
 
+    async def get_account_orders(
+        self,
+        client_order_indexes: str,
+        account_index: int | None = None,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Retrieve orders by comma-separated client order indexes (up to 20)."""
+        return await self._native_private("get_account_orders", self._native_params(**locals()))
+
     async def get_deposit_history(
         self,
         l1_address: str,

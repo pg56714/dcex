@@ -78,6 +78,30 @@ impl LighterClient {
                 )?,
                 BTreeMap::new(),
             ),
+            "get_mark_price_candles" => (
+                MARK_PRICE_CANDLES,
+                self.market_query(
+                    &params,
+                    &[
+                        "market_id",
+                        "resolution",
+                        "start_timestamp",
+                        "end_timestamp",
+                        "count_back",
+                    ],
+                )?,
+                BTreeMap::new(),
+            ),
+            "get_market_price_charts" => (
+                MARKET_PRICE_CHARTS,
+                params.query(&["market_ids"]),
+                BTreeMap::new(),
+            ),
+            "get_synthetic_spot_info" => (
+                SYNTHETIC_SPOT_INFO,
+                params.query(&["symbol"]),
+                BTreeMap::new(),
+            ),
             "get_funding_rates" => (FUNDING_RATES, Vec::new(), BTreeMap::new()),
             "get_fundings" => (
                 FUNDINGS,
@@ -215,6 +239,23 @@ impl LighterClient {
             | "get_withdrawal_delay"
             | "get_system_config"
             | "get_token_list" => params.ensure_allowed(&[]),
+            "get_market_price_charts" => {
+                params.ensure_allowed_with_repeated(&["market_ids"], &["market_ids"])?;
+                for value in params.values("market_ids") {
+                    let id = super::params::parse_i64(value, "market_ids")?;
+                    if !(0..=i16::MAX.into()).contains(&id) {
+                        return Err(DcexError::InvalidInput(
+                            "Lighter market_ids must be non-negative 16-bit integers".into(),
+                        ));
+                    }
+                }
+                Ok(())
+            }
+            "get_synthetic_spot_info" => {
+                params.ensure_allowed(&["symbol"])?;
+                params.required("symbol")?;
+                Ok(())
+            }
             "get_order_book_details" | "get_order_books" => {
                 params.ensure_allowed(&["market_id", "product_symbol", "filter"])?;
                 validate_market_selector(params, false)?;
@@ -302,6 +343,22 @@ impl LighterClient {
                 validate_time_series(params)?;
                 params.optional_bool("set_timestamp_to_end")?;
                 Ok(())
+            }
+            "get_mark_price_candles" => {
+                params.ensure_allowed(&[
+                    "market_id",
+                    "product_symbol",
+                    "resolution",
+                    "start_timestamp",
+                    "end_timestamp",
+                    "count_back",
+                ])?;
+                validate_market_selector(params, true)?;
+                params.required_one_of(
+                    "resolution",
+                    &["1m", "5m", "15m", "30m", "1h", "4h", "12h", "1d"],
+                )?;
+                validate_time_series(params)
             }
             "get_fundings" => {
                 params.ensure_allowed(&[

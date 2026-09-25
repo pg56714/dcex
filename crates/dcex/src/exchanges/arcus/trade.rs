@@ -42,7 +42,13 @@ impl ArcusClient {
         canonical.insert("m", json!(market_id));
         canonical.insert("v", json!(1));
         let (path, body) = match method_name {
-            "place_order" => {
+            "place_order" | "modify_order" => {
+                let is_modify = method_name == "modify_order";
+                if is_modify && values.contains_key("order_type") {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus modify_order does not accept order_type".into(),
+                    ));
+                }
                 let side = required(&values, "side")?.to_ascii_uppercase();
                 let side_number = match side.as_str() {
                     "BUY" => 0,
@@ -63,11 +69,15 @@ impl ArcusClient {
                         "Arcus supports LIMIT or MARKET orders".into(),
                     ));
                 }
-                let time_in_force = values
-                    .get("time_in_force")
-                    .map(String::as_str)
-                    .unwrap_or("GTT")
-                    .to_ascii_uppercase();
+                let time_in_force = if is_modify {
+                    required(&values, "time_in_force")?
+                } else {
+                    values
+                        .get("time_in_force")
+                        .map(String::as_str)
+                        .unwrap_or("GTT")
+                }
+                .to_ascii_uppercase();
                 let tif = match time_in_force.as_str() {
                     "GTT" => 0,
                     "FOK" => 1,
@@ -79,7 +89,7 @@ impl ArcusClient {
                         ))
                     }
                 };
-                if order_type == "MARKET" && tif != 2 {
+                if !is_modify && order_type == "MARKET" && tif != 2 {
                     return Err(DcexError::InvalidInput(
                         "Arcus MARKET orders require IOC".into(),
                     ));
@@ -115,21 +125,29 @@ impl ArcusClient {
                         ));
                     }
                 }
-                let good_til_time = values
-                    .get("good_til_time")
-                    .map(|value| {
-                        value
-                            .parse::<u64>()
-                            .map_err(|_| DcexError::InvalidInput("invalid good_til_time".into()))
-                    })
-                    .transpose()?
-                    .unwrap_or(timestamp / 1_000 + 40 * 86_400 * 1_000_000);
+                let good_til_time = if is_modify {
+                    Some(required(&values, "good_til_time")?)
+                } else {
+                    values.get("good_til_time").map(String::as_str)
+                }
+                .map(|value| {
+                    value
+                        .parse::<u64>()
+                        .map_err(|_| DcexError::InvalidInput("invalid good_til_time".into()))
+                })
+                .transpose()?
+                .unwrap_or(timestamp / 1_000 + 40 * 86_400 * 1_000_000);
                 if good_til_time < timestamp / 1_000 + 31 * 86_400 * 1_000_000 {
                     return Err(DcexError::InvalidInput(
                         "Arcus good_til_time must be at least one month ahead".into(),
                     ));
                 }
                 let reduce_only = match values.get("reduce_only").map(String::as_str) {
+                    None if is_modify => {
+                        return Err(DcexError::InvalidInput(
+                            "Arcus modify_order requires reduce_only".into(),
+                        ))
+                    }
                     None | Some("false") => false,
                     Some("true") => true,
                     _ => {
@@ -142,19 +160,28 @@ impl ArcusClient {
                     DcexError::InvalidInput("Arcus good_til_time overflow".into())
                 })?;
                 canonical.insert("g", json!(good_til_ns));
-                canonical.insert("op", json!(1));
+                canonical.insert("op", json!(if is_modify { 3 } else { 1 }));
                 canonical.insert("p", json!(price_ticks));
                 canonical.insert("q", json!(quantity_quantums));
                 canonical.insert("r", json!(u8::from(reduce_only)));
                 canonical.insert("s", json!(side_number));
                 canonical.insert("t", json!(tif));
-                let mut body = json!({
-                    "address": address, "accountIndex": self.account_index, "marketId": market_id,
-                    "orderSide": side, "orderType": order_type, "quantity": quantity,
-                    "price": price, "timeInForce": time_in_force,
-                    "goodTilTime": good_til_time.to_string(), "timestamp": timestamp,
-                    "reduceOnly": reduce_only,
-                });
+                let mut body = if is_modify {
+                    json!({
+                        "address": address, "accountIndex": self.account_index, "marketId": market_id,
+                        "side": side, "quantity": quantity, "price": price,
+                        "timeInForce": time_in_force, "goodTilTime": good_til_time.to_string(),
+                        "clientTime": timestamp.to_string(), "reduceOnly": reduce_only,
+                    })
+                } else {
+                    json!({
+                        "address": address, "accountIndex": self.account_index, "marketId": market_id,
+                        "orderSide": side, "orderType": order_type, "quantity": quantity,
+                        "price": price, "timeInForce": time_in_force,
+                        "goodTilTime": good_til_time.to_string(), "timestamp": timestamp,
+                        "reduceOnly": reduce_only,
+                    })
+                };
                 if let Some(client_id) = values.get("client_order_id") {
                     if client_id.is_empty()
                         || client_id.len() > 36
@@ -169,7 +196,25 @@ impl ArcusClient {
                     canonical.insert("c", json!(client_id));
                     body["clientId"] = json!(client_id);
                 }
-                ("/v1/placeOrder", body)
+                if is_modify {
+                    let order_id = values.get("order_id");
+                    let client_id = values.get("client_order_id");
+                    if order_id.is_some() == client_id.is_some() {
+                        return Err(DcexError::InvalidInput(
+                            "Arcus modify_order requires exactly one of order_id or client_order_id".into(),
+                        ));
+                    }
+                    if let Some(order_id) = order_id {
+                        if order_id.is_empty() {
+                            return Err(DcexError::InvalidInput("Arcus order_id is empty".into()));
+                        }
+                        canonical.insert("id", json!(order_id));
+                        body["orderId"] = json!(order_id);
+                    }
+                    ("/v1/modifyOrder", body)
+                } else {
+                    ("/v1/placeOrder", body)
+                }
             }
             "cancel_order" => {
                 let order_id = required(&values, "order_id")?;

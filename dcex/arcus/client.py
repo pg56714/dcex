@@ -188,6 +188,33 @@ class Client(BaseHTTPManager):
             client_order_id=client_order_id,
         )
 
+    def modify_order(
+        self,
+        product_symbol: str,
+        side: str,
+        price: str,
+        quantity: str,
+        good_til_time: int,
+        time_in_force: str,
+        reduce_only: bool,
+        *,
+        order_id: str | None = None,
+        client_order_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Modify one Perps order by server or client ID; acknowledgement is not a fill."""
+        return self.private_request(
+            "modify_order",
+            product_symbol=product_symbol,
+            side=side,
+            price=price,
+            quantity=quantity,
+            good_til_time=good_til_time,
+            time_in_force=time_in_force,
+            reduce_only=reduce_only,
+            order_id=order_id,
+            client_order_id=client_order_id,
+        )
+
     def cancel_order(self, product_symbol: str, order_id: str) -> Any:  # noqa: ANN401
         """Submit an order cancellation."""
         return self.private_request(

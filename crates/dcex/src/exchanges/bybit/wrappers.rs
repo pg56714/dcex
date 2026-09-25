@@ -157,8 +157,39 @@ crate::exchanges::impl_exchange_method_wrappers! {
         set_deposit_account(account_type => "accountType"),
         set_disconnected_cancel_all(time_window => "timeWindow"),
         set_leverage(product_symbol => "product_symbol", leverage => "leverage"),
+        add_position_margin(product_symbol => "product_symbol", margin => "margin"),
+        set_auto_add_margin(product_symbol => "product_symbol", auto_add_margin => "autoAddMargin"),
         set_margin_mode(margin_mode => "margin_mode"),
         switch_position_mode(mode => "mode"),
         upgrade_to_unified_trading_account(),
     ];
+}
+
+impl BybitClient {
+    /// Configure at least one take-profit, stop-loss, or trailing-stop field.
+    pub fn set_trading_stop(
+        &self,
+        product_symbol: impl ToString,
+        tpsl_mode: impl ToString,
+        position_idx: i64,
+        take_profit: Option<&str>,
+        stop_loss: Option<&str>,
+        trailing_stop: Option<&str>,
+    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+        let mut params = vec![
+            ("product_symbol".into(), product_symbol.to_string()),
+            ("tpslMode".into(), tpsl_mode.to_string()),
+            ("positionIdx".into(), position_idx.to_string()),
+        ];
+        for (key, value) in [
+            ("takeProfit", take_profit),
+            ("stopLoss", stop_loss),
+            ("trailingStop", trailing_stop),
+        ] {
+            if let Some(value) = value {
+                params.push((key.into(), value.into()));
+            }
+        }
+        crate::exchanges::ExchangeMethodRequest::private(self, "set_trading_stop", params)
+    }
 }

@@ -19,6 +19,10 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_ticker(),
         get_swap_instrument_info(),
         get_ticker(),
+        get_swap_premium_index(),
+        get_swap_funding_rate(),
+        get_swap_book_ticker(product_symbol => "product_symbol"),
+        get_swap_trading_rules(product_symbol => "product_symbol"),
     ];
     private [
         asset_transfer(from_account => "fromAccount", to_account => "toAccount", asset => "asset", amount => "amount"),
@@ -59,6 +63,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_subaccount_transferable_amounts(from_uid => "fromUid", from_account_type => "fromAccountType", to_uid => "toUid", to_account_type => "toAccountType"),
         get_subaccounts(page => "page", limit => "limit"),
         get_swap_account_balance(),
+        get_swap_commission_rate(),
         get_transferable_coins(from_account => "fromAccount", to_account => "toAccount"),
         keep_alive_listen_key(listen_key => "listen_key"),
         place_spot_batch_order(data => "data"),

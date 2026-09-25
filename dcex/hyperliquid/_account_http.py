@@ -36,6 +36,42 @@ class AccountHTTP(HTTPManager):
             self._native_params(user=user, aggregateByTime=aggregateByTime),
         )
 
+    def user_fills_by_time(
+        self,
+        user: str,
+        start_time: int,
+        end_time: int | None = None,
+        aggregate_by_time: bool | None = None,
+    ) -> dict[str, Any]:
+        """Retrieve paginated fills from a millisecond timestamp."""
+        return self._native_public(
+            "user_fills_by_time",
+            self._native_params(
+                user=user,
+                startTime=start_time,
+                endTime=end_time,
+                aggregateByTime=aggregate_by_time,
+            ),
+        )
+
+    def user_funding(
+        self, user: str, start_time: int, end_time: int | None = None
+    ) -> dict[str, Any]:
+        """Retrieve user funding payments within a time range."""
+        return self._native_public(
+            "user_funding",
+            self._native_params(user=user, startTime=start_time, endTime=end_time),
+        )
+
+    def user_non_funding_ledger_updates(
+        self, user: str, start_time: int, end_time: int | None = None
+    ) -> dict[str, Any]:
+        """Retrieve non-funding account ledger entries."""
+        return self._native_public(
+            "user_non_funding_ledger_updates",
+            self._native_params(user=user, startTime=start_time, endTime=end_time),
+        )
+
     def user_rate_limit(self, user: str) -> dict[str, Any]:
         """Get user rate limit information."""
         return self._native_public("user_rate_limit", self._native_params(user=user))

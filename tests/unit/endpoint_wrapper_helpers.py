@@ -731,6 +731,8 @@ def _required_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
 
 def _case_kwargs(case: EndpointCase, method: Any) -> dict[str, Any]:
     kwargs = _required_kwargs(case, method)
+    if case.exchange == "bybit" and case.method_name == "set_auto_add_margin":
+        kwargs["enabled"] = True
     if case.exchange == "aster" and case.method_name in {
         "cancel_futures_order",
         "cancel_spot_order",

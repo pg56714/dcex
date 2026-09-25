@@ -30,6 +30,11 @@ impl LighterClient {
                 self.account_market_query(&params, &["account_index", "market_id", "market_type"])?,
                 auth_header_required(self, &params)?,
             ),
+            "get_account_orders" => (
+                ACCOUNT_ORDERS,
+                self.account_query(&params, &["account_index", "client_order_indexes"])?,
+                auth_header_required(self, &params)?,
+            ),
             "get_account_inactive_orders" => (
                 ACCOUNT_INACTIVE_ORDERS,
                 self.account_market_query(
@@ -311,6 +316,25 @@ impl LighterClient {
                 self.validate_private_account(params)?;
                 validate_market_selector(params, false)?;
                 params.optional_one_of("market_type", &["all", "spot", "perp"])?;
+                validate_optional_nonempty(params, &["authorization"])
+            }
+            "get_account_orders" => {
+                params.ensure_allowed(&[
+                    "account_index",
+                    "client_order_indexes",
+                    "authorization",
+                ])?;
+                self.validate_private_account(params)?;
+                let indexes = params.required("client_order_indexes")?;
+                let parts: Vec<_> = indexes.split(',').collect();
+                if parts.len() > 20 {
+                    return Err(DcexError::InvalidInput(
+                        "Lighter client_order_indexes must contain 1..=20 values".into(),
+                    ));
+                }
+                for part in parts {
+                    super::params::parse_i64(part, "client_order_indexes")?;
+                }
                 validate_optional_nonempty(params, &["authorization"])
             }
             "get_account_inactive_orders" => {

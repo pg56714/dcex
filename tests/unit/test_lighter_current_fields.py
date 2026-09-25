@@ -1,12 +1,111 @@
 # ruff: noqa: D100, D103
 
+import asyncio
 import json
 from enum import Enum
+from unittest.mock import AsyncMock, Mock
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
 
 from tests.unit.native_http_helpers import _http_server
+
+
+def test_lighter_new_python_wrappers_forward_to_native_core() -> None:
+    from dcex.async_support.lighter._account_http import AccountHTTP as AsyncAccountHTTP
+    from dcex.async_support.lighter._market_http import MarketHTTP as AsyncMarketHTTP
+    from dcex.lighter._account_http import AccountHTTP
+    from dcex.lighter._market_http import MarketHTTP
+
+    market = object.__new__(MarketHTTP)
+    market._native_public = Mock(return_value={"ok": True})
+    market.get_mark_price_candles(1, "1h", 1000, 2000, 10)
+    market.get_market_price_charts([1, 2])
+    market.get_synthetic_spot_info("AAPL")
+    assert market._native_public.call_args_list[0].args == (
+        "get_mark_price_candles",
+        [
+            ("market_id", "1"),
+            ("resolution", "1h"),
+            ("start_timestamp", "1000"),
+            ("end_timestamp", "2000"),
+            ("count_back", "10"),
+        ],
+    )
+    assert market._native_public.call_args_list[1].args == (
+        "get_market_price_charts",
+        [("market_ids", "1"), ("market_ids", "2")],
+    )
+    assert market._native_public.call_args_list[2].args == (
+        "get_synthetic_spot_info",
+        [("symbol", "AAPL")],
+    )
+
+    account = object.__new__(AccountHTTP)
+    account._native_private = Mock(return_value={"ok": True})
+    account.get_account_orders("123,456", account_index=12, authorization="token")
+    assert account._native_private.call_args.args == (
+        "get_account_orders",
+        [("client_order_indexes", "123,456"), ("account_index", "12"), ("authorization", "token")],
+    )
+
+    async def check_async() -> None:
+        async_market = object.__new__(AsyncMarketHTTP)
+        async_market._native_public = AsyncMock(return_value={"ok": True})
+        await async_market.get_mark_price_candles(1, "1h", 1000, 2000, 10)
+        await async_market.get_market_price_charts([1, 2])
+        await async_market.get_synthetic_spot_info("AAPL")
+        assert [call.args[0] for call in async_market._native_public.call_args_list] == [
+            "get_mark_price_candles",
+            "get_market_price_charts",
+            "get_synthetic_spot_info",
+        ]
+        async_account = object.__new__(AsyncAccountHTTP)
+        async_account._native_private = AsyncMock(return_value={"ok": True})
+        await async_account.get_account_orders("123,456", authorization="token")
+        assert async_account._native_private.call_args.args == (
+            "get_account_orders",
+            [("client_order_indexes", "123,456"), ("authorization", "token")],
+        )
+
+    asyncio.run(check_async())
+
+
+def test_lighter_new_native_routes_reach_http() -> None:
+    """The Python extension reaches the new Rust routes without live exchange access."""
+    with _http_server({"code": 0}) as (base_url, received):
+        client = _native_client(base_url=base_url)
+        client.public_request_json("get_market_price_charts", [("market_ids", "1")])
+        client.public_request_json("get_synthetic_spot_info", [("symbol", "AAPL")])
+        client.public_request_json(
+            "get_mark_price_candles",
+            [
+                ("market_id", "1"),
+                ("resolution", "1h"),
+                ("start_timestamp", "1000"),
+                ("end_timestamp", "2000"),
+                ("count_back", "10"),
+            ],
+        )
+        client.private_request_json(
+            "get_account_orders",
+            [
+                ("account_index", "12"),
+                ("client_order_indexes", "123,456"),
+                ("authorization", "test-token"),
+            ],
+        )
+    paths = [urlsplit(received.get_nowait()["path"]) for _ in range(4)]
+    assert [path.path for path in paths] == [
+        "/api/v1/marketPriceCharts",
+        "/api/v1/syntheticSpotInfo",
+        "/api/v1/markPriceCandles",
+        "/api/v1/accountOrders",
+    ]
+    assert dict(parse_qsl(paths[3].query)) == {
+        "account_index": "12",
+        "client_order_indexes": "123,456",
+    }
 
 
 def _native_client(*, base_url: str = "http://127.0.0.1:1") -> object:

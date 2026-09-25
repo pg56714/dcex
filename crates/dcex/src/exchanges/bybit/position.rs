@@ -4,7 +4,7 @@ use super::client::BybitClient;
 use super::endpoints::*;
 use super::params::{insert_optional_string, push_optional, require_one_identifier, BybitParams};
 use crate::exchange::ValidatedResponse;
-use crate::Result;
+use crate::{DcexError, Result};
 
 impl BybitClient {
     pub(super) async fn position_private_request(
@@ -27,6 +27,18 @@ impl BybitClient {
                     Value::String(params.required("leverage")?.to_string()),
                 );
                 self.post_request(SET_LEVERAGE, body).await
+            }
+            "set_trading_stop" => {
+                let body = self.trading_stop_body_from_params(params)?;
+                self.post_request(SET_TRADING_STOP, body).await
+            }
+            "add_position_margin" => {
+                let body = self.position_margin_body_from_params(params)?;
+                self.post_request(ADD_POSITION_MARGIN, body).await
+            }
+            "set_auto_add_margin" => {
+                let body = self.auto_add_margin_body_from_params(params)?;
+                self.post_request(SET_AUTO_ADD_MARGIN, body).await
             }
             "switch_position_mode" => {
                 let body = self.switch_position_mode_body_from_params(params)?;
@@ -61,6 +73,129 @@ impl BybitClient {
             self.insert_symbol_category(&mut body, product_symbol)?;
         }
         insert_optional_string(&mut body, "coin", params.get("coin"));
+        Ok(body)
+    }
+
+    fn position_index(params: &BybitParams, required: bool) -> Result<Option<i64>> {
+        let index = if required || params.get("positionIdx").is_some() {
+            Some(params.i64_required("positionIdx")?)
+        } else {
+            None
+        };
+        if index.is_some_and(|index| !(0..=2).contains(&index)) {
+            return Err(DcexError::InvalidInput(
+                "Bybit positionIdx must be 0, 1, or 2".into(),
+            ));
+        }
+        Ok(index)
+    }
+
+    fn trading_stop_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
+        let mut body = Map::new();
+        self.insert_symbol_category(&mut body, params.required("product_symbol")?)?;
+        let mode = params.required("tpslMode")?;
+        if !matches!(mode, "Full" | "Partial") {
+            return Err(DcexError::InvalidInput(
+                "Bybit tpslMode must be Full or Partial".into(),
+            ));
+        }
+        if body.get("category").and_then(Value::as_str) == Some("option") && mode != "Full" {
+            return Err(DcexError::InvalidInput(
+                "Bybit option trading stops require Full mode".into(),
+            ));
+        }
+        if !["takeProfit", "stopLoss", "trailingStop"]
+            .iter()
+            .any(|key| params.get(key).is_some())
+        {
+            return Err(DcexError::InvalidInput(
+                "Bybit trading stop requires a take-profit, stop-loss, or trailing-stop field"
+                    .into(),
+            ));
+        }
+        body.insert("tpslMode".into(), Value::String(mode.into()));
+        body.insert(
+            "positionIdx".into(),
+            Value::Number(
+                Self::position_index(params, true)?
+                    .expect("required")
+                    .into(),
+            ),
+        );
+        for key in [
+            "takeProfit",
+            "stopLoss",
+            "trailingStop",
+            "tpTriggerBy",
+            "slTriggerBy",
+            "activePrice",
+            "tpOrderType",
+            "slOrderType",
+            "tpLimitPrice",
+            "slLimitPrice",
+            "tpSize",
+            "slSize",
+        ] {
+            insert_optional_string(&mut body, key, params.get(key));
+        }
+        Ok(body)
+    }
+
+    fn position_margin_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
+        let mut body = Map::new();
+        self.insert_symbol_category(&mut body, params.required("product_symbol")?)?;
+        if !matches!(
+            body.get("category").and_then(Value::as_str),
+            Some("linear" | "inverse")
+        ) {
+            return Err(DcexError::InvalidInput(
+                "Bybit position margin supports linear or inverse contracts".into(),
+            ));
+        }
+        let margin = params.required("margin")?;
+        let absolute = margin.strip_prefix('-').unwrap_or(margin);
+        let mut parts = absolute.split('.');
+        let whole = parts.next().unwrap_or_default();
+        let decimal = parts.next();
+        if whole.is_empty()
+            || !whole.bytes().all(|byte| byte.is_ascii_digit())
+            || decimal.is_some_and(|value| {
+                value.is_empty()
+                    || value.len() > 4
+                    || !value.bytes().all(|byte| byte.is_ascii_digit())
+            })
+            || parts.next().is_some()
+            || absolute.bytes().all(|byte| byte == b'0' || byte == b'.')
+        {
+            return Err(DcexError::InvalidInput(
+                "Bybit margin must be a nonzero decimal with at most 4 places".into(),
+            ));
+        }
+        body.insert("margin".into(), Value::String(margin.into()));
+        if let Some(index) = Self::position_index(params, false)? {
+            body.insert("positionIdx".into(), Value::Number(index.into()));
+        }
+        Ok(body)
+    }
+
+    fn auto_add_margin_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
+        let mut body = Map::new();
+        self.insert_symbol_category(&mut body, params.required("product_symbol")?)?;
+        if body.get("category").and_then(Value::as_str) != Some("linear") {
+            return Err(DcexError::InvalidInput(
+                "Bybit auto-add margin supports linear contracts only".into(),
+            ));
+        }
+        let enabled = params.i64_required("autoAddMargin")?;
+        if !matches!(enabled, 0 | 1) {
+            return Err(DcexError::InvalidInput(
+                "Bybit autoAddMargin must be 0 or 1".into(),
+            ));
+        }
+        body.insert("autoAddMargin".into(), Value::Number(enabled.into()));
+        if let Some(index) = Self::position_index(params, false)? {
+            body.insert("positionIdx".into(), Value::Number(index.into()));
+        }
         Ok(body)
     }
 
@@ -177,5 +312,73 @@ mod tests {
             body.get("symbol"),
             Some(&Value::String("BTCUSDH23".to_string()))
         );
+    }
+
+    #[test]
+    fn trading_stop_builds_canonical_position_body() {
+        let body = client()
+            .trading_stop_body_from_params(&BybitParams::from_pairs(vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("tpslMode".into(), "Full".into()),
+                ("positionIdx".into(), "0".into()),
+                ("takeProfit".into(), "120000".into()),
+                ("stopLoss".into(), "90000".into()),
+            ]))
+            .expect("body");
+        assert_eq!(body.get("category"), Some(&Value::String("linear".into())));
+        assert_eq!(body.get("symbol"), Some(&Value::String("BTCUSDT".into())));
+        assert_eq!(body.get("positionIdx"), Some(&Value::Number(0.into())));
+        assert_eq!(body.get("stopLoss"), Some(&Value::String("90000".into())));
+        let client = client();
+        let request = client.set_trading_stop(
+            "BTC-USDT-SWAP",
+            "Full",
+            0,
+            Some("120000"),
+            Some("90000"),
+            None,
+        );
+        assert_eq!(request.method_name, "set_trading_stop");
+        assert!(request
+            .params
+            .contains(&("takeProfit".into(), "120000".into())));
+        assert!(request
+            .params
+            .contains(&("stopLoss".into(), "90000".into())));
+    }
+
+    #[test]
+    fn position_margin_and_auto_add_validate_product_scope() {
+        let margin = client()
+            .position_margin_body_from_params(&BybitParams::from_pairs(vec![
+                ("product_symbol".into(), "BTC-USD-SWAP".into()),
+                ("margin".into(), "-10.25".into()),
+                ("positionIdx".into(), "2".into()),
+            ]))
+            .expect("margin body");
+        assert_eq!(
+            margin.get("category"),
+            Some(&Value::String("inverse".into()))
+        );
+        assert_eq!(margin.get("margin"), Some(&Value::String("-10.25".into())));
+        let auto = client()
+            .auto_add_margin_body_from_params(&BybitParams::from_pairs(vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("autoAddMargin".into(), "1".into()),
+            ]))
+            .expect("auto-add body");
+        assert_eq!(auto.get("autoAddMargin"), Some(&Value::Number(1.into())));
+        assert!(client()
+            .auto_add_margin_body_from_params(&BybitParams::from_pairs(vec![
+                ("product_symbol".into(), "BTC-USD-SWAP".into()),
+                ("autoAddMargin".into(), "1".into()),
+            ]))
+            .is_err());
+        assert!(client()
+            .position_margin_body_from_params(&BybitParams::from_pairs(vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("margin".into(), "0.0000".into()),
+            ]))
+            .is_err());
     }
 }

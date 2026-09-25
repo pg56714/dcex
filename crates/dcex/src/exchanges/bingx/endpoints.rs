@@ -3,6 +3,7 @@ pub(super) const BASE_URL: &str = "https://open-api.bingx.com";
 pub(super) const SWAP_ACCOUNT_BALANCE: &str = "/openApi/swap/v3/user/balance";
 pub(super) const SWAP_OPEN_POSITIONS: &str = "/openApi/swap/v2/user/positions";
 pub(super) const SWAP_FUND_FLOW: &str = "/openApi/swap/v2/user/income";
+pub(super) const SWAP_COMMISSION_RATE: &str = "/openApi/swap/v2/user/commissionRate";
 pub(super) const SWAP_LISTEN_KEY: &str = "/openApi/user/auth/userDataStream";
 
 pub(super) const SPOT_ACCOUNT_BALANCE: &str = "/openApi/spot/v1/account/balance";
@@ -56,6 +57,10 @@ pub(super) const SWAP_ORDERBOOK: &str = "/openApi/swap/v2/quote/depth";
 pub(super) const SWAP_PUBLIC_TRADE: &str = "/openApi/swap/v2/quote/trades";
 pub(super) const SWAP_KLINE: &str = "/openApi/swap/v3/quote/klines";
 pub(super) const SWAP_TICKER: &str = "/openApi/swap/v2/quote/ticker";
+pub(super) const SWAP_PREMIUM_INDEX: &str = "/openApi/swap/v2/quote/premiumIndex";
+pub(super) const SWAP_FUNDING_RATE: &str = "/openApi/swap/v2/quote/fundingRate";
+pub(super) const SWAP_BOOK_TICKER: &str = "/openApi/swap/v2/quote/bookTicker";
+pub(super) const SWAP_TRADING_RULES: &str = "/openApi/swap/v1/tradingRules";
 pub(super) const SWAP_OPEN_INTEREST: &str = "/openApi/swap/v2/quote/openInterest";
 pub(super) const SWAP_MARK_PRICE_KLINE: &str = "/openApi/swap/v1/market/markPriceKlines";
 

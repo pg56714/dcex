@@ -67,6 +67,11 @@ impl HyperliquidClient {
                 }
                 payload
             }
+            "user_fills_by_time" => time_range_payload(params, "userFillsByTime", true)?,
+            "user_funding" => time_range_payload(params, "userFunding", false)?,
+            "user_non_funding_ledger_updates" => {
+                time_range_payload(params, "userNonFundingLedgerUpdates", false)?
+            }
             "user_rate_limit" => user_payload(params, "userRateLimit")?,
             "order_status" => {
                 params.ensure_allowed(&["user", "oid"])?;
@@ -96,6 +101,66 @@ fn user_payload(params: &HyperliquidParams, request_type: &str) -> Result<Value>
         "type": request_type,
         "user": params.address("user")?,
     }))
+}
+
+fn time_range_payload(
+    params: &HyperliquidParams,
+    request_type: &str,
+    allow_aggregate: bool,
+) -> Result<Value> {
+    if allow_aggregate {
+        params.ensure_allowed(&["user", "startTime", "endTime", "aggregateByTime"])?;
+    } else {
+        params.ensure_allowed(&["user", "startTime", "endTime"])?;
+    }
+    let start = params.required_u64("startTime")?;
+    let end = params.optional_u64("endTime")?;
+    if end.is_some_and(|end| end < start) {
+        return Err(DcexError::InvalidInput(
+            "Hyperliquid endTime must not precede startTime".into(),
+        ));
+    }
+    let mut payload = json!({
+        "type": request_type,
+        "user": params.address("user")?,
+        "startTime": start,
+    });
+    if let Some(end) = end {
+        payload["endTime"] = json!(end);
+    }
+    if allow_aggregate {
+        if let Some(aggregate) = params.optional_bool("aggregateByTime")? {
+            payload["aggregateByTime"] = json!(aggregate);
+        }
+    }
+    Ok(payload)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn time_range_queries_preserve_official_request_types() {
+        let params = HyperliquidParams::from_pairs(vec![
+            ("user".into(), format!("0x{}", "11".repeat(20))),
+            ("startTime".into(), "1000".into()),
+            ("endTime".into(), "2000".into()),
+            ("aggregateByTime".into(), "true".into()),
+        ]);
+        let fills = time_range_payload(&params, "userFillsByTime", true).expect("fills");
+        assert_eq!(fills["type"], "userFillsByTime");
+        assert_eq!(fills["startTime"], 1000);
+        assert_eq!(fills["endTime"], 2000);
+        assert_eq!(fills["aggregateByTime"], true);
+        assert!(time_range_payload(&params, "userFunding", false).is_err());
+        let funding = HyperliquidParams::from_pairs(vec![
+            ("user".into(), format!("0x{}", "11".repeat(20))),
+            ("startTime".into(), "2000".into()),
+            ("endTime".into(), "1000".into()),
+        ]);
+        assert!(time_range_payload(&funding, "userFunding", false).is_err());
+    }
 }
 
 fn order_id_value(value: &str) -> Result<Value> {

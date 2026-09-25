@@ -59,6 +59,73 @@ class PositionHTTP(HTTPManager):
             ),
         )
 
+    async def set_trading_stop(
+        self,
+        product_symbol: str,
+        tpsl_mode: str,
+        position_idx: int,
+        *,
+        take_profit: str | None = None,
+        stop_loss: str | None = None,
+        trailing_stop: str | None = None,
+        tp_trigger_by: str | None = None,
+        sl_trigger_by: str | None = None,
+        active_price: str | None = None,
+        tp_order_type: str | None = None,
+        sl_order_type: str | None = None,
+        tp_limit_price: str | None = None,
+        sl_limit_price: str | None = None,
+        tp_size: str | None = None,
+        sl_size: str | None = None,
+    ) -> dict[str, Any]:
+        """Set position take-profit, stop-loss, or trailing-stop."""
+        return await self._native_private(
+            "set_trading_stop",
+            self._native_params(
+                product_symbol=product_symbol,
+                tpslMode=tpsl_mode,
+                positionIdx=position_idx,
+                takeProfit=take_profit,
+                stopLoss=stop_loss,
+                trailingStop=trailing_stop,
+                tpTriggerBy=tp_trigger_by,
+                slTriggerBy=sl_trigger_by,
+                activePrice=active_price,
+                tpOrderType=tp_order_type,
+                slOrderType=sl_order_type,
+                tpLimitPrice=tp_limit_price,
+                slLimitPrice=sl_limit_price,
+                tpSize=tp_size,
+                slSize=sl_size,
+            ),
+        )
+
+    async def add_position_margin(
+        self, product_symbol: str, margin: str, position_idx: int | None = None
+    ) -> dict[str, Any]:
+        """Add or reduce isolated-position margin (negative margin reduces it)."""
+        return await self._native_private(
+            "add_position_margin",
+            self._native_params(
+                product_symbol=product_symbol,
+                margin=margin,
+                positionIdx=position_idx,
+            ),
+        )
+
+    async def set_auto_add_margin(
+        self, product_symbol: str, enabled: bool, position_idx: int | None = None
+    ) -> dict[str, Any]:
+        """Enable or disable automatic margin top-ups for a linear position."""
+        return await self._native_private(
+            "set_auto_add_margin",
+            self._native_params(
+                product_symbol=product_symbol,
+                autoAddMargin=int(enabled),
+                positionIdx=position_idx,
+            ),
+        )
+
     async def get_closed_pnl(
         self,
         category: str = "linear",

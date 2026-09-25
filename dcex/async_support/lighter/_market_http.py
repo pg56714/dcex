@@ -90,6 +90,27 @@ class MarketHTTP(HTTPManager):
         """Retrieve Lighter funding rates."""
         return await self._native_public("get_funding_rates", self._native_params(**locals()))
 
+    async def get_mark_price_candles(
+        self,
+        market_id: int,
+        resolution: str,
+        start_timestamp: int,
+        end_timestamp: int,
+        count_back: int,
+    ) -> dict[str, Any] | list[Any]:
+        """Retrieve Lighter mark-price candlesticks."""
+        return await self._native_public("get_mark_price_candles", self._native_params(**locals()))
+
+    async def get_market_price_charts(
+        self, market_ids: list[int] | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """Retrieve hourly price charts for the last 24 hours."""
+        return await self._native_public("get_market_price_charts", self._native_params(**locals()))
+
+    async def get_synthetic_spot_info(self, symbol: str) -> dict[str, Any] | list[Any]:
+        """Retrieve synthetic spot information for an equity symbol."""
+        return await self._native_public("get_synthetic_spot_info", self._native_params(**locals()))
+
     async def get_fundings(
         self,
         market_id: int,

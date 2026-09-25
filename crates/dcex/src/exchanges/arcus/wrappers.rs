@@ -15,6 +15,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         cancel_all_orders(), set_leverage(product_symbol => "product_symbol", leverage => "leverage"),
         submit_internal_transfer(signed_transfer_json => "signed_transfer_json"),
         place_order(product_symbol => "product_symbol", side => "side", price => "price", quantity => "quantity"),
+        modify_order(product_symbol => "product_symbol", side => "side", price => "price", quantity => "quantity", order_id => "order_id", good_til_time => "good_til_time", time_in_force => "time_in_force", reduce_only => "reduce_only"),
         cancel_order(product_symbol => "product_symbol", order_id => "order_id")
     ];
 }

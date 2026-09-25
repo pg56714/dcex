@@ -21,6 +21,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         spot_clearinghouse_state(user => "user"),
         subaccounts(user => "user"),
         user_fills(user => "user"),
+        user_fills_by_time(user => "user", start_time => "startTime"),
+        user_funding(user => "user", start_time => "startTime"),
+        user_non_funding_ledger_updates(user => "user", start_time => "startTime"),
         user_rate_limit(user => "user"),
         user_role(user => "user"),
         user_vault_equities(user => "user")

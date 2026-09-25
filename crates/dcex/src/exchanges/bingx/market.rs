@@ -1,4 +1,4 @@
-use crate::exchange::ValidatedResponse;
+use crate::exchange::{unix_timestamp_ms, ValidatedResponse};
 use crate::{DcexError, Result};
 
 use super::client::BingxClient;
@@ -89,6 +89,41 @@ impl BingxClient {
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, &params)?;
                 self.public_get(SWAP_TICKER, query).await
+            }
+            "get_swap_premium_index" => {
+                params.ensure_allowed(&["product_symbol", "symbol"])?;
+                let mut query = Vec::new();
+                self.push_optional_symbol(&mut query, &params)?;
+                self.public_get(SWAP_PREMIUM_INDEX, query).await
+            }
+            "get_swap_funding_rate" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "symbol",
+                    "start_time",
+                    "end_time",
+                    "limit",
+                ])?;
+                validate_time_range(&params, "start_time", "end_time", None)?;
+                validate_u64_range(&params, "limit", 1, 1000)?;
+                let mut query = Vec::new();
+                self.push_optional_symbol(&mut query, &params)?;
+                push_optional_value(&mut query, "startTime", params.get("start_time"));
+                push_optional_value(&mut query, "endTime", params.get("end_time"));
+                push_optional_value(&mut query, "limit", params.get("limit"));
+                self.public_get(SWAP_FUNDING_RATE, query).await
+            }
+            "get_swap_book_ticker" | "get_swap_trading_rules" => {
+                params.ensure_allowed(&["product_symbol", "symbol"])?;
+                let mut query = Vec::new();
+                self.push_required_symbol(&mut query, &params)?;
+                let path = if method_name == "get_swap_book_ticker" {
+                    SWAP_BOOK_TICKER
+                } else {
+                    query.push(("timestamp".into(), unix_timestamp_ms()?.to_string()));
+                    SWAP_TRADING_RULES
+                };
+                self.public_get(path, query).await
             }
             "get_spot_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;

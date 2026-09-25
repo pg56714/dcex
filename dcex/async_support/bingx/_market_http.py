@@ -215,6 +215,42 @@ class MarketHTTP(HTTPManager):
             self._params(product_symbol=product_symbol),
         )
 
+    async def get_swap_premium_index(self, product_symbol: str | None = None) -> dict[str, Any]:
+        """Get perpetual mark/index prices and premium."""
+        return await self._native_public(
+            "get_swap_premium_index", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_swap_funding_rate(
+        self,
+        product_symbol: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Get perpetual funding rates."""
+        return await self._native_public(
+            "get_swap_funding_rate",
+            self._params(
+                product_symbol=product_symbol,
+                start_time=start_time,
+                end_time=end_time,
+                limit=limit,
+            ),
+        )
+
+    async def get_swap_book_ticker(self, product_symbol: str) -> dict[str, Any]:
+        """Get the perpetual best bid and ask."""
+        return await self._native_public(
+            "get_swap_book_ticker", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_swap_trading_rules(self, product_symbol: str) -> dict[str, Any]:
+        """Get perpetual minimums and price protection rules."""
+        return await self._native_public(
+            "get_swap_trading_rules", self._params(product_symbol=product_symbol)
+        )
+
     async def get_spot_ticker(
         self,
         product_symbol: str | None = None,

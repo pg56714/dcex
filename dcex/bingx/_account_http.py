@@ -20,6 +20,12 @@ class AccountHTTP(HTTPManager):
             self._native_params(recvWindow=recvWindow),
         )
 
+    def get_swap_commission_rate(self, recvWindow: int | None = None) -> dict[str, Any]:
+        """Get current maker/taker fee rates for perpetuals."""
+        return self._native_private(
+            "get_swap_commission_rate", self._native_params(recvWindow=recvWindow)
+        )
+
     def get_spot_account_balance(
         self,
         recvWindow: int | None = None,
