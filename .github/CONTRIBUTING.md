@@ -11,7 +11,7 @@ dcex focuses on market data, account queries, and trading/order APIs for cryptoc
 Current scope notes:
 
 - External withdrawal creation endpoints are not currently wrapped.
-- Options support is limited to exchange-specific APIs and is not normalized by the Product Table Manager.
+- The Product Table Manager includes listed options from Binance, Bybit, and OKX; option trading remains exchange-specific.
 - Examples should stay concise and read-only. Endpoint validation belongs in `tests`.
 
 ## Development Environment
