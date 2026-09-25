@@ -23,9 +23,7 @@ class _Native:
 
 def test_arcus_market_and_account_subscriptions(monkeypatch: pytest.MonkeyPatch) -> None:
     """Market and address-scoped channels carry the official subscription IDs."""
-    monkeypatch.setattr(
-        arcus, "load_native", lambda: SimpleNamespace(ArcusWebSocketClient=_Native)
-    )
+    monkeypatch.setattr(arcus, "load_native", lambda: SimpleNamespace(ArcusWebSocketClient=_Native))
 
     async def check() -> None:
         public = arcus.PublicClient(testnet=True)
@@ -49,3 +47,14 @@ def test_arcus_market_and_account_subscriptions(monkeypatch: pytest.MonkeyPatch)
         ]
 
     asyncio.run(check())
+
+
+def test_arcus_account_websocket_uses_shared_address(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Address-scoped streams use the shared Arcus account address."""
+    monkeypatch.setattr(arcus, "load_native", lambda: SimpleNamespace(ArcusWebSocketClient=_Native))
+    monkeypatch.setenv("ARCUS_ADDRESS", "0x" + "11" * 20)
+    monkeypatch.setenv("ARCUS_TESTNET_ADDRESS", "0x" + "22" * 20)
+    assert arcus.PrivateClient(testnet=True).address == "0x" + "11" * 20
+    assert arcus.PrivateClient(address="0x" + "33" * 20).address == "0x" + "33" * 20

@@ -65,8 +65,7 @@ class PrivateClient(PublicClient):
         self, address: str | None = None, *, testnet: bool = False, timeout: float = 10.0
     ) -> None:
         super().__init__(testnet=testnet, timeout=timeout)
-        prefix = "ARCUS_TESTNET" if testnet else "ARCUS_MAINNET"
-        self.address = address or os.getenv(f"{prefix}_ADDRESS")
+        self.address = address or os.getenv("ARCUS_ADDRESS")
         if not self.address:
             raise ValueError("Arcus account WebSocket requires a wallet address.")
 

@@ -177,7 +177,11 @@ The Arcus app's Ed25519 API key is for the Perps API, not the Spot Router.
 Spot integration partners can pass their separately issued router key as
 `api_key` when constructing a Spot client.
 
-Arcus Perps uses `dcex.arcus(market="perps")` and separate Ed25519 credentials.
+Arcus Perps requires the explicit `dcex.arcus(market="perps")` selection and
+Ed25519 credentials. Set `testnet=True` to select its testnet endpoint. The
+optional `ARCUS_API_KEY`, `ARCUS_API_SIGNING_KEY`, and `ARCUS_ADDRESS`
+environment variables provide one credential set; pass credentials directly
+to clients if using both networks concurrently.
 Market/account queries, single-order placement and cancellation, fills,
 positions, cancel-all, leverage changes, and same-wallet internal transfers
 are implemented. Private Perps execution remains unverified until an account

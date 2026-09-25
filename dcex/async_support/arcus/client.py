@@ -16,7 +16,7 @@ from ...utils.helpers import generate_timestamp
 
 @dataclass
 class Client(BaseHTTPManager):
-    """Arcus perps; pass testnet=True for the independent testnet credentials."""
+    """Arcus perps; pass testnet=True to select the testnet endpoint."""
 
     EXCHANGE = Common.ARCUS
     api_key: str | None = field(default=None, repr=False)
@@ -29,13 +29,12 @@ class Client(BaseHTTPManager):
     _native_client: Any = field(default=None, init=False, repr=False)  # noqa: ANN401
 
     async def async_init(self) -> Self:
-        """Initialize the native client with the selected network credentials."""
-        prefix = "ARCUS_TESTNET" if self.testnet else "ARCUS_MAINNET"
-        self.api_key = self.api_key or os.getenv(f"{prefix}_API_KEY") or None
-        self.api_secret = self.api_secret or os.getenv(f"{prefix}_API_SIGNING_KEY") or None
-        self.address = self.address or os.getenv(f"{prefix}_ADDRESS") or None
+        """Initialize the native client for the selected network."""
+        self.api_key = self.api_key or os.getenv("ARCUS_API_KEY") or None
+        self.api_secret = self.api_secret or os.getenv("ARCUS_API_SIGNING_KEY") or None
+        self.address = self.address or os.getenv("ARCUS_ADDRESS") or None
         if self.account_index is None:
-            self.account_index = int(os.getenv(f"{prefix}_ACCOUNT_INDEX", "0"))
+            self.account_index = 0
         self._native_client = load_native().ArcusHttpClient(
             api_key=self.api_key,
             api_secret=self.api_secret,

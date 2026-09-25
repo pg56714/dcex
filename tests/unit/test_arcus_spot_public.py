@@ -100,7 +100,7 @@ def test_arcus_spot_python_sync_public_methods() -> None:
 def test_arcus_spot_key_is_explicit_and_separate_from_perps(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("ARCUS_MAINNET_API_KEY", "perps-key")
+    monkeypatch.setenv("ARCUS_API_KEY", "perps-key")
     monkeypatch.setenv("ARCUS_SPOT_MAINNET_API_KEY", "old-router-key")
     with _http_server({"ok": True}) as (base_url, received):
         public_client = SyncSpotClient(base_url=base_url)
@@ -190,7 +190,7 @@ def test_arcus_spot_python_async_public_methods() -> None:
 def test_arcus_spot_async_key_is_explicit_and_separate_from_perps(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("ARCUS_TESTNET_API_KEY", "perps-key")
+    monkeypatch.setenv("ARCUS_API_KEY", "perps-key")
     monkeypatch.setenv("ARCUS_SPOT_TESTNET_API_KEY", "old-router-key")
 
     async def check() -> None:

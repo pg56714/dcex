@@ -1,9 +1,61 @@
 """Offline Arcus public-client wiring tests."""
 
 import asyncio
+import importlib
+from types import SimpleNamespace
+
+import pytest
 
 from dcex.arcus.client import Client as SyncClient
 from dcex.async_support.arcus.client import Client as AsyncClient
+
+
+def test_arcus_perps_uses_one_env_credential_set_for_either_network(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Network selection changes the endpoint, not the environment key names."""
+    native = SimpleNamespace(ArcusHttpClient=lambda **kwargs: kwargs)
+    monkeypatch.setattr(importlib.import_module("dcex.arcus.client"), "load_native", lambda: native)
+    monkeypatch.setattr(
+        importlib.import_module("dcex.async_support.arcus.client"), "load_native", lambda: native
+    )
+    monkeypatch.setenv("ARCUS_API_KEY", "configured-key")
+    monkeypatch.setenv("ARCUS_API_SIGNING_KEY", "configured-seed")
+    monkeypatch.setenv("ARCUS_ADDRESS", "0x" + "11" * 20)
+    monkeypatch.setenv("ARCUS_ACCOUNT_INDEX", "2")
+    monkeypatch.setenv("ARCUS_TESTNET_API_KEY", "legacy-key")
+    monkeypatch.setenv("ARCUS_TESTNET_ADDRESS", "0x" + "22" * 20)
+
+    mainnet = SyncClient()
+    testnet = SyncClient(testnet=True)
+    for client in (mainnet, testnet):
+        assert client.api_key == "configured-key"
+        assert client.api_secret == "configured-seed"
+        assert client.address == "0x" + "11" * 20
+        assert client.account_index == 0
+        assert client._native_client["testnet"] is client.testnet
+
+    explicit = SyncClient(
+        api_key="explicit-key",
+        api_secret="explicit-seed",
+        address="0x" + "33" * 20,
+        account_index=3,
+        testnet=True,
+    )
+    assert explicit.api_key == "explicit-key"
+    assert explicit.api_secret == "explicit-seed"
+    assert explicit.address == "0x" + "33" * 20
+    assert explicit.account_index == 3
+
+    async def check() -> None:
+        client = await AsyncClient(testnet=True).async_init()
+        assert client.api_key == "configured-key"
+        assert client.api_secret == "configured-seed"
+        assert client.address == "0x" + "11" * 20
+        assert client.account_index == 0
+        assert client._native_client["testnet"] is True
+
+    asyncio.run(check())
 
 
 class _Native:
