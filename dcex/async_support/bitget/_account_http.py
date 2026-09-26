@@ -272,7 +272,13 @@ class AccountHTTP(HTTPManager):
         longLeverage: int | str | None = None,
         shortLeverage: int | str | None = None,
     ) -> dict[str, Any]:
-        """Set Bitget futures leverage."""
+        """
+        Set Bitget futures leverage.
+
+        Pass ``leverage``, or ``longLeverage``/``shortLeverage`` to set each side separately.
+        """
+        if leverage is None and longLeverage is None and shortLeverage is None:
+            raise ValueError("Specify leverage, longLeverage, or shortLeverage.")
         return await self._native_private(
             "set_futures_leverage",
             self._native_params(
@@ -393,6 +399,8 @@ class AccountHTTP(HTTPManager):
         loanAmount: str | None = None,
     ) -> dict[str, Any]:
         """Borrow using exactly one of collateral amount or desired loan amount."""
+        if (pledgeAmount is None) == (loanAmount is None):
+            raise ValueError("Specify exactly one of pledgeAmount or loanAmount.")
         return await self._native_private(
             "borrow_crypto_loan",
             self._native_params(

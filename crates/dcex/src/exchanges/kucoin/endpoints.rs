@@ -7,7 +7,7 @@ pub(super) const WS_PRIVATE_TOKEN: &str = "/api/v1/bullet-private";
 pub(super) const SPOT_INSTRUMENT_INFO: &str = "/api/v2/symbols";
 pub(super) const SPOT_TICKER: &str = "/api/v1/market/orderbook/level1";
 pub(super) const SPOT_ALL_TICKERS: &str = "/api/v1/market/allTickers";
-pub(super) const SPOT_ORDERBOOK: &str = "/api/v1/market/orderbook/level2_20";
+pub(super) const SPOT_ORDERBOOK: &str = "/api/v1/market/orderbook/level2_";
 pub(super) const SPOT_PUBLIC_TRADES: &str = "/api/v1/market/histories";
 pub(super) const SPOT_KLINE: &str = "/api/v1/market/candles";
 
@@ -21,8 +21,8 @@ pub(super) const FUTURES_SUBACCOUNT_BALANCES: &str = "/api/v1/account-overview-a
 pub(super) const UTA_SUBACCOUNT_LIST: &str = "/api/ua/v2/user/sub-account-list";
 pub(super) const UTA_SUBACCOUNT_CURRENCY_ASSETS: &str = "/api/ua/v2/sub-account/balance";
 pub(super) const SPOT_TRADE_FEES: &str = "/api/v1/trade-fees";
-pub(super) const UTA_FEE_RATES: &str = "/api/ua/v1/user/fee-rate";
-pub(super) const UTA_POSITION_TIERS: &str = "/api/ua/v1/market/position-tiers";
+pub(super) const UTA_FEE_RATES: &str = "/api/ua/v2/user/fee-rate";
+pub(super) const UTA_POSITION_TIERS: &str = "/api/ua/v2/market/position-tiers";
 
 pub(super) const CROSS_MARGIN_SYMBOLS: &str = "/api/v3/margin/symbols";
 pub(super) const ISOLATED_MARGIN_SYMBOLS: &str = "/api/v1/isolated/symbols";
@@ -54,8 +54,8 @@ pub(super) const EARN_ACCOUNT_HOLDINGS: &str = "/api/v1/earn/hold-assets";
 pub(super) const STRUCTURED_EARN_ORDERS: &str = "/api/v1/struct-earn/orders";
 pub(super) const DUAL_INVESTMENT_PRODUCTS: &str = "/api/v1/struct-earn/dual/products";
 
-pub(super) const DCP_SET: &str = "/api/ua/v1/dcp/set";
-pub(super) const DCP_QUERY: &str = "/api/ua/v1/dcp/query";
+pub(super) const DCP_SET: &str = "/api/v1/hf/orders/dead-cancel-all";
+pub(super) const DCP_QUERY: &str = "/api/v1/hf/orders/dead-cancel-all/query";
 pub(super) const SPOT_PLACE_ORDER: &str = "/api/v1/hf/orders";
 pub(super) const SPOT_TEST_ORDER: &str = "/api/v1/hf/orders/test";
 pub(super) const SPOT_ALTER_ORDER: &str = "/api/v1/hf/orders/alter";
@@ -71,7 +71,7 @@ pub(super) const FUTURES_TICKER: &str = "/api/v1/ticker";
 pub(super) const FUTURES_ORDERBOOK: &str = "/api/v1/level2/snapshot";
 pub(super) const FUTURES_PUBLIC_TRADES: &str = "/api/v1/trade/history";
 pub(super) const FUTURES_KLINE: &str = "/api/v1/kline/query";
-pub(super) const FUTURES_OPEN_INTEREST: &str = "/api/ua/v1/market/open-interest";
+pub(super) const FUTURES_OPEN_INTEREST: &str = "/api/ua/v2/market/open-interest";
 
 pub(super) const FUTURES_ACCOUNT_OVERVIEW: &str = "/api/v1/account-overview";
 pub(super) const FUTURES_TRADE_FEES: &str = "/api/v1/trade-fees";
@@ -103,4 +103,4 @@ pub(super) const UTA_V2_ORDER_HISTORY: &str = "/api/ua/v2/unified/order/history"
 pub(super) const UTA_V2_EXECUTIONS: &str = "/api/ua/v2/unified/order/execution";
 pub(super) const UTA_V2_POSITIONS: &str = "/api/ua/v2/unified/position/open-list";
 pub(super) const UTA_V2_BALANCE: &str = "/api/ua/v2/unified/account/balance";
-pub(super) const UTA_V1_OVERVIEW: &str = "/api/ua/v1/unified/account/overview";
+pub(super) const UTA_V2_OVERVIEW: &str = "/api/ua/v2/unified/account/overview";

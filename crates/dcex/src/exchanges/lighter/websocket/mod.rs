@@ -55,9 +55,9 @@ pub(crate) fn normalize_channel(channel: &str) -> Result<String> {
         ["height"] | ["rfq"] => true,
         ["market_stats", "all"] | ["spot_market_stats", "all"] => true,
         [
-            prefix @ ("order_book" | "ticker" | "market_stats" | "trade" | "spot_market_stats"),
+            "order_book" | "ticker" | "market_stats" | "trade" | "spot_market_stats",
             market_id,
-        ] => validate_ws_market(market_id, prefix).is_ok(),
+        ] => validate_ws_market(market_id).is_ok(),
         [prefix, account_id]
             if matches!(
                 *prefix,
@@ -77,13 +77,12 @@ pub(crate) fn normalize_channel(channel: &str) -> Result<String> {
             validate_ws_account(account_id).is_ok()
         }
         [prefix, market_id, resolution] if matches!(*prefix, "candle" | "mark_price_candle") => {
-            validate_ws_market(market_id, prefix).is_ok()
-                && normalize_resolution(resolution).is_ok()
+            validate_ws_market(market_id).is_ok() && normalize_resolution(resolution).is_ok()
         }
         [prefix, market_id, account_id]
             if matches!(*prefix, "account_market" | "account_orders") =>
         {
-            validate_ws_market(market_id, prefix).is_ok() && validate_ws_account(account_id).is_ok()
+            validate_ws_market(market_id).is_ok() && validate_ws_account(account_id).is_ok()
         }
         _ => false,
     };
@@ -95,14 +94,11 @@ pub(crate) fn normalize_channel(channel: &str) -> Result<String> {
     Ok(channel.to_string())
 }
 
-fn validate_ws_market(value: &str, prefix: &str) -> Result<u64> {
+fn validate_ws_market(value: &str) -> Result<u64> {
+    // lighter-go: market ids span 0..=MaxMarketIndex (32767) with 255 as the nil sentinel.
+    // Ids are no longer range-partitioned by market type, so spot/perp is not inferred here.
     let value = parse_ws_index(value, "market_id")?;
-    let valid = match prefix {
-        "market_stats" => value <= 254,
-        "spot_market_stats" => (2048..=4094).contains(&value),
-        _ => value <= 254 || (2048..=4094).contains(&value),
-    };
-    if !valid {
+    if value > (1 << 15) - 1 || value == 255 {
         return Err(DcexError::InvalidInput(
             "Lighter WebSocket market_id is outside the valid range".to_string(),
         ));
@@ -204,6 +200,14 @@ mod tests {
             "market_stats/all",
             "market_stats/254",
             "trade/4094",
+            // Live mainnet perp STONK; ids are no longer range-partitioned by type.
+            "trade/4095",
+            "order_book/4095",
+            "market_stats/4095",
+            "account_orders/4095/1",
+            "candle/32767/1m",
+            "market_stats/2048",
+            "spot_market_stats/254",
             "candle/0/1m",
             "mark_price_candle/2048/1d",
             "account_all/0",
@@ -226,9 +230,8 @@ mod tests {
         }
         for channel in [
             "order_book/255",
-            "market_stats/2048",
-            "spot_market_stats/254",
-            "trade/4095",
+            "trade/32768",
+            "account_market/255/1",
             "candle/0/2m",
             "account_all/281474976710655",
             "unknown/0",

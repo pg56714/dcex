@@ -3,9 +3,9 @@ use std::time::Duration;
 
 use serde_json::Value;
 
+use crate::Result;
 use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
-use crate::{DcexError, Result};
 
 use super::{
     all_mids_subscription, candle_subscription, coin_subscription, l2_book_subscription,
@@ -150,24 +150,6 @@ impl HyperliquidPublicWebSocket {
     }
 
     fn coin(&self, product_symbol: &str) -> Result<String> {
-        if super::is_canonical_product_symbol(product_symbol) {
-            if let Some(table) = &self.product_table {
-                let exchange_symbol = table.get_exchange_symbol("hyperliquid", product_symbol)?;
-                let value: Value = serde_json::from_str(&exchange_symbol).map_err(|error| {
-                    DcexError::InvalidInput(format!("invalid Hyperliquid exchange symbol: {error}"))
-                })?;
-                return value
-                    .as_array()
-                    .and_then(|values| values.first())
-                    .and_then(Value::as_str)
-                    .map(str::to_string)
-                    .ok_or_else(|| {
-                        DcexError::InvalidInput(
-                            "Hyperliquid exchange symbol must contain a coin".to_string(),
-                        )
-                    });
-            }
-        }
-        Ok(product_symbol.to_string())
+        super::resolve_coin(self.product_table.as_deref(), product_symbol)
     }
 }

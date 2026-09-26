@@ -31,6 +31,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         get_account(),
+        update_account(),
         get_max_borrow_quantity(symbol => "symbol"),
         get_max_order_quantity(symbol => "symbol", side => "side"),
         get_max_withdrawal_quantity(symbol => "symbol"),

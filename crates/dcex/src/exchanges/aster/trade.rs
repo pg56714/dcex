@@ -80,7 +80,7 @@ impl AsterClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
-        let params = AsterParams::from_pairs(params);
+        let params = AsterParams::from_pairs(normalize_order_side(method_name, params));
         validate_private_params(method_name, &params)?;
         if let Some(response) = self.account_private_request(method_name, &params).await? {
             return Ok(response);
@@ -976,6 +976,25 @@ fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()
         }
         _ => Ok(()),
     }
+}
+
+/// Uppercases `side` for single-order placements before validation, matching
+/// the batch and strategy paths, which normalize each order object first.
+fn normalize_order_side(
+    method_name: &str,
+    mut params: Vec<(String, String)>,
+) -> Vec<(String, String)> {
+    if matches!(
+        method_name,
+        "place_spot_order" | "place_futures_order" | "place_futures_chase_order"
+    ) {
+        for (key, value) in &mut params {
+            if key == "side" {
+                value.make_ascii_uppercase();
+            }
+        }
+    }
+    params
 }
 
 fn validate_symbol_alias(params: &AsterParams, required: bool) -> Result<()> {

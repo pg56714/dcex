@@ -9,6 +9,9 @@ use crate::{DcexError, Result};
 use super::super::client::BinanceClient;
 use super::super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL};
 
+/// USD-M user data streams connect at `<base>/ws/<listenKey>` per the official
+/// User Data Streams "Connect" page (the `/private/ws?listenKey=...&events=...`
+/// form in the WebSocket change notice is an alternative event-filtered mode).
 const FUTURES_PRIVATE_WS_BASE_URL: &str = "wss://fstream.binance.com/private";
 
 pub struct BinancePrivateWebSocket {
@@ -95,22 +98,18 @@ impl BinancePrivateWebSocket {
     }
 
     pub async fn keep_alive(&self) -> Result<()> {
-        let listen_key = self.listen_key.as_deref().ok_or_else(|| {
-            DcexError::InvalidInput(
+        if self.listen_key.is_none() {
+            return Err(DcexError::InvalidInput(
                 "Binance listen key is not available; call connect first.".to_string(),
-            )
-        })?;
-        self.http_client
-            .keep_alive_futures_listen_key(listen_key)
-            .await?;
+            ));
+        }
+        self.http_client.keep_alive_futures_listen_key().await?;
         Ok(())
     }
 
     pub async fn close_listen_key(&mut self) -> Result<()> {
-        if let Some(listen_key) = self.listen_key.take() {
-            self.http_client
-                .close_futures_listen_key(&listen_key)
-                .await?;
+        if self.listen_key.take().is_some() {
+            self.http_client.close_futures_listen_key().await?;
         }
         Ok(())
     }

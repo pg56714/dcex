@@ -57,6 +57,35 @@ pub(crate) fn normalize_subscription(subscription: Value) -> Result<Map<String, 
     Ok(subscription)
 }
 
+/// Resolves a canonical product symbol to the official coin through the product table.
+///
+/// Raw coins (and canonical symbols when no table is loaded) pass through unchanged and
+/// are normalized later by [`coin_subscription`].
+pub(crate) fn resolve_coin(
+    product_table: Option<&crate::product_table::ProductTable>,
+    product_symbol: &str,
+) -> Result<String> {
+    if is_canonical_product_symbol(product_symbol)
+        && let Some(table) = product_table
+    {
+        let exchange_symbol = table.get_exchange_symbol("hyperliquid", product_symbol)?;
+        let value: Value = serde_json::from_str(&exchange_symbol).map_err(|error| {
+            DcexError::InvalidInput(format!("invalid Hyperliquid exchange symbol: {error}"))
+        })?;
+        return value
+            .as_array()
+            .and_then(|values| values.first())
+            .and_then(Value::as_str)
+            .map(str::to_string)
+            .ok_or_else(|| {
+                DcexError::InvalidInput(
+                    "Hyperliquid exchange symbol must contain a coin".to_string(),
+                )
+            });
+    }
+    Ok(product_symbol.to_string())
+}
+
 pub(crate) fn coin_subscription(subscription_type: &str, coin: String) -> Result<Value> {
     validate_token(subscription_type, "subscription type")?;
     let coin = normalize_coin(&coin)?;

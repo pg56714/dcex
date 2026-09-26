@@ -169,7 +169,10 @@ def test_sync_bingx_public_wrapper_uses_native_dispatcher() -> None:
     client.close()
     assert result == {"code": 0, "data": []}
     assert client.last_response_headers["x-response"] == "native"
-    assert received.get_nowait()["path"] == ("/openApi/swap/v2/quote/depth?limit=5&symbol=BTC-USDT")
+    # BingX also requires a timestamp here; its value varies, so compare the stable prefix.
+    assert received.get_nowait()["path"].startswith(
+        "/openApi/swap/v2/quote/depth?limit=5&symbol=BTC-USDT"
+    )
 
 
 @pytest.mark.asyncio
@@ -181,7 +184,7 @@ async def test_async_bingx_public_wrapper_uses_native_dispatcher() -> None:
         await client.async_init()
         result = await client.get_spot_orderbook_v2(
             "ETH-USDT-SPOT",
-            limit=10,
+            depth=10,
             type_="step1",
         )
 

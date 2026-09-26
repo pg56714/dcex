@@ -171,6 +171,15 @@ impl ExtendedClient {
                 params.ensure_allowed(&["market"], &["market"])?;
                 self.private_get(LEVERAGE, params.only(&["market"])).await
             }
+            "update_leverage" => {
+                params.ensure_allowed(&["market", "leverage"], &[])?;
+                params.required_positive_decimal("leverage")?;
+                let body = serde_json::json!({
+                    "market": params.required("market")?,
+                    "leverage": params.required("leverage")?,
+                });
+                self.private_patch_value(LEVERAGE, body, Vec::new()).await
+            }
             "get_fees" => {
                 params.ensure_allowed(&["market", "builderId"], &["market"])?;
                 params.optional_u64_range("builderId", 1, u64::MAX)?;

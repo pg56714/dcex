@@ -47,8 +47,7 @@ class _FakeNativeBitgetPublicWebSocketClient:
 
     async def recv(self) -> bytes:
         return (
-            b'{"event":"subscribe",'
-            b'"arg":{"instType":"SPOT","channel":"trade","instId":"BTCUSDT"}}'
+            b'{"event":"subscribe","arg":{"instType":"SPOT","channel":"trade","instId":"BTCUSDT"}}'
         )
 
 
@@ -104,36 +103,44 @@ class _FakeNativeBitgetPrivateWebSocketClient:
     ) -> None:
         self.subscriptions.remove((inst_type, channel, inst_id, coin))
 
+    def _inst_type(self, inst_type: str | None) -> str:
+        # Mirrors the native default: UTA on the V3 private endpoint, else USDT-FUTURES.
+        if inst_type is not None:
+            return inst_type
+        if self.base_url and self.base_url.endswith("/v3/ws/private"):
+            return "UTA"
+        return "USDT-FUTURES"
+
     async def subscribe_orders(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         inst_id: str | None = None,
     ) -> None:
-        await self.subscribe_channel(inst_type, "orders", inst_id)
+        await self.subscribe_channel(self._inst_type(inst_type), "orders", inst_id)
 
     async def subscribe_fills(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         inst_id: str | None = None,
     ) -> None:
-        await self.subscribe_channel(inst_type, "fill", inst_id)
+        await self.subscribe_channel(self._inst_type(inst_type), "fill", inst_id)
 
     async def subscribe_positions(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         inst_id: str | None = None,
     ) -> None:
-        await self.subscribe_channel(inst_type, "positions", inst_id)
+        await self.subscribe_channel(self._inst_type(inst_type), "positions", inst_id)
 
     async def subscribe_account(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         coin: str | None = None,
     ) -> None:
-        await self.subscribe_channel(inst_type, "account", coin=coin)
+        await self.subscribe_channel(self._inst_type(inst_type), "account", coin=coin)
 
-    async def subscribe_equity(self, inst_type: str = "USDT-FUTURES") -> None:
-        await self.subscribe_channel(inst_type, "equity")
+    async def subscribe_equity(self, inst_type: str | None = None) -> None:
+        await self.subscribe_channel(self._inst_type(inst_type), "equity")
 
     def is_logged_in(self) -> bool:
         return self.logged_in
@@ -251,3 +258,37 @@ async def test_bitget_private_ws_wrapper(monkeypatch: pytest.MonkeyPatch) -> Non
     }
     assert native_client.closed is True
     assert ws.is_logged_in() is False
+
+
+@pytest.mark.asyncio
+async def test_bitget_uta_private_ws_defaults_to_uta_topics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import bitget
+
+    monkeypatch.setattr(bitget, "_native", _FakeNative)
+
+    ws = bitget.uta_private("api-key", "api-secret", "passphrase", timeout=2)
+    native_client = ws._native_client
+    assert native_client.base_url == "wss://ws.bitget.com/v3/ws/private"
+    assert native_client.timeout == 2
+
+    await ws.subscribe_orders()
+    await ws.subscribe_fills()
+    await ws.subscribe_positions()
+    await ws.subscribe_account()
+
+    assert [entry[0] for entry in native_client.subscriptions] == ["UTA"] * 4
+
+
+def test_bitget_uta_public_ws_uses_v3_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import bitget
+
+    monkeypatch.setattr(bitget, "_native", _FakeNative)
+
+    ws = bitget.uta_public(inst_type="USDT-FUTURES", timeout=3)
+    assert ws._native_client.base_url == "wss://ws.bitget.com/v3/ws/public"
+    assert ws._native_client.inst_type == "USDT-FUTURES"
+    assert ws._native_client.timeout == 3

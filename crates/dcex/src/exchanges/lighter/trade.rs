@@ -249,12 +249,8 @@ impl LighterClient {
         let explicit_nonce = validate_nonce(params)?;
         let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
-        let order_expiry = match params.optional_i64("order_expiry")? {
-            Some(-1) | None => order_expiry_ms()? as i64,
-            Some(value) => value,
-        };
         let market_index = self.market_index(params)?;
-        validate_order_market_index(market_index)?;
+        validate_market_index(market_index)?;
         let client_order_index =
             required_i64_range(params, "client_order_index", 0, (1_i64 << 48) - 1)?;
         let base_amount = required_i64_range(params, "base_amount", 0, (1_i64 << 48) - 1)?;
@@ -262,11 +258,15 @@ impl LighterClient {
         let is_ask = params.required_bool("is_ask")?;
         let order_type = required_i64_range(params, "order_type", 0, 6)?;
         let time_in_force = required_i64_range(params, "time_in_force", 0, 2)?;
+        let order_expiry = match params.optional_i64("order_expiry")? {
+            Some(-1) | None => default_order_expiry(order_type, time_in_force)?,
+            Some(value) => value,
+        };
         let reduce_only = params.optional_bool("reduce_only")?.unwrap_or(false);
         let trigger_price =
             optional_i64_range(params, "trigger_price", 0, u32::MAX.into())?.unwrap_or(0);
         validate_create_order(
-            market_index,
+            self.is_known_spot_market(market_index),
             base_amount,
             order_type,
             time_in_force,
@@ -345,7 +345,7 @@ impl LighterClient {
         let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
-        validate_order_market_index(market_index)?;
+        validate_market_index(market_index)?;
         let order_index = required_i64_range(params, "order_index", 1, (1_i64 << 60) - 1)?;
         let attrs = attributes(
             0,
@@ -404,7 +404,7 @@ impl LighterClient {
         let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
-        validate_order_market_index(market_index)?;
+        validate_market_index(market_index)?;
         let order_index = required_i64_range(params, "order_index", 1, (1_i64 << 60) - 1)?;
         let base_amount = required_i64_range(params, "base_amount", 0, (1_i64 << 48) - 1)?;
         let price = required_i64_range(params, "price", 1, u32::MAX.into())?;
@@ -526,7 +526,7 @@ impl LighterClient {
         let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
-        validate_perps_market_index(market_index)?;
+        self.validate_perps_market_index(market_index)?;
         let fraction = required_i64_range(params, "fraction", 1, 10_000)?;
         let margin_mode = required_i64_range(params, "margin_mode", 0, 1)?;
         let attrs = attributes(
@@ -581,7 +581,7 @@ impl LighterClient {
         let nonce = self.next_nonce(explicit_nonce, Some(api_key_index)).await?;
         let expired_at = expiry_ms()?;
         let market_index = self.market_index(params)?;
-        validate_perps_market_index(market_index)?;
+        self.validate_perps_market_index(market_index)?;
         let usdc_amount = params.required_i64("usdc_amount")?;
         let amount_magnitude = usdc_amount.checked_abs().ok_or_else(|| {
             DcexError::InvalidInput("Lighter usdc_amount is outside the valid range".to_string())
@@ -663,6 +663,16 @@ impl LighterClient {
         params.required_i64("market_index")
     }
 
+    fn validate_perps_market_index(&self, market_index: i64) -> Result<()> {
+        validate_market_index(market_index)?;
+        if self.is_known_spot_market(market_index) {
+            return Err(DcexError::InvalidInput(
+                "Lighter leverage and margin updates require a perpetual market".to_string(),
+            ));
+        }
+        Ok(())
+    }
+
     fn signing_api_key_index(&self, params: &LighterParams) -> Result<u64> {
         let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
         if api_key_index > 254 {
@@ -716,28 +726,34 @@ fn optional_i64_range(
     Ok(value)
 }
 
-fn validate_order_market_index(market_index: i64) -> Result<()> {
-    if (0..=254).contains(&market_index) || (2048..=4094).contains(&market_index) {
+/// lighter-go `txtypes`: `MaxMarketIndex = (1 << 15) - 1`.
+pub(super) const MAX_MARKET_INDEX: i64 = (1 << 15) - 1;
+/// lighter-go `txtypes`: `NilMarketIndex = 255` ("no market").
+pub(super) const NIL_MARKET_INDEX: i64 = 255;
+
+/// Market ids are no longer range-partitioned by type, so only the lighter-go bounds apply.
+pub(super) fn validate_market_index(market_index: i64) -> Result<()> {
+    if (0..=MAX_MARKET_INDEX).contains(&market_index) && market_index != NIL_MARKET_INDEX {
         Ok(())
     } else {
-        Err(DcexError::InvalidInput(
-            "Lighter order market_index must identify a perpetual or spot market".to_string(),
-        ))
+        Err(DcexError::InvalidInput(format!(
+            "Lighter market_index must be between 0 and {MAX_MARKET_INDEX} and not {NIL_MARKET_INDEX}"
+        )))
     }
 }
 
-fn validate_perps_market_index(market_index: i64) -> Result<()> {
-    if (0..=254).contains(&market_index) {
-        Ok(())
+/// Mirrors lighter-python: market and IOC orders use `DEFAULT_IOC_EXPIRY = 0`; resting
+/// and trigger orders use the 28-day default.
+fn default_order_expiry(order_type: i64, time_in_force: i64) -> Result<i64> {
+    if order_type == 1 || (order_type == 0 && time_in_force == 0) {
+        Ok(0)
     } else {
-        Err(DcexError::InvalidInput(
-            "Lighter margin market_index must be between 0 and 254".to_string(),
-        ))
+        Ok(order_expiry_ms()? as i64)
     }
 }
 
 fn validate_create_order(
-    market_index: i64,
+    is_spot: bool,
     base_amount: i64,
     order_type: i64,
     time_in_force: i64,
@@ -745,7 +761,6 @@ fn validate_create_order(
     trigger_price: i64,
     order_expiry: i64,
 ) -> Result<()> {
-    let is_spot = (2048..=4094).contains(&market_index);
     if !reduce_only && base_amount == 0 {
         return Err(DcexError::InvalidInput(
             "Lighter base_amount must be positive unless reduce_only is true".to_string(),
@@ -787,12 +802,12 @@ fn validate_cancel_all(
     timestamp_ms: i64,
     cancel_all_market_index: u64,
 ) -> Result<()> {
-    if cancel_all_market_index > 255 {
-        return Err(DcexError::InvalidInput(
-            "Lighter cancel_all_market_index must be between 0 and 255".to_string(),
-        ));
+    if cancel_all_market_index > MAX_MARKET_INDEX as u64 {
+        return Err(DcexError::InvalidInput(format!(
+            "Lighter cancel_all_market_index must be between 0 and {MAX_MARKET_INDEX}"
+        )));
     }
-    if cancel_all_market_index != 255 && time_in_force != 0 {
+    if cancel_all_market_index != NIL_MARKET_INDEX as u64 && time_in_force != 0 {
         return Err(DcexError::InvalidInput(
             "Lighter market-specific cancel-all must use immediate time-in-force".to_string(),
         ));

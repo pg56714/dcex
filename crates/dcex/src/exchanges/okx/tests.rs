@@ -36,3 +36,6 @@ fn signature_matches_python_vector() {
         Some("Ls74ct2P5Xi0SXq7smDS5O2D8cy4VmItOq3VDxnTQYE=")
     );
 }
+
+#[path = "endpoint_route_tests.rs"]
+mod endpoint_routes;

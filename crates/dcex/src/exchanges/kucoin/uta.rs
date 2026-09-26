@@ -29,8 +29,23 @@ const UTA_ORDER_FIELDS: &[&str] = &[
     "tpTriggerPriceType",
     "slTriggerPrice",
     "slTriggerPriceType",
+    "stp",
 ];
+const UTA_ORDER_INTEGER_FIELDS: &[&str] = &["cancelAfter"];
 const UTA_ORDER_BOOL_FIELDS: &[&str] = &["postOnly", "reduceOnly", "closeOrder"];
+const UTA_AMEND_FIELDS: &[&str] = &[
+    "orderId",
+    "clientOid",
+    "newPrice",
+    "newSize",
+    "sizeUnit",
+    "tpTriggerPrice",
+    "tpTriggerPriceType",
+    "slTriggerPrice",
+    "slTriggerPriceType",
+];
+const UTA_AMEND_CHANGE_FIELDS: &[&str] =
+    &["newPrice", "newSize", "tpTriggerPrice", "slTriggerPrice"];
 const UTA_LIST_FIELDS: &[&str] = &[
     "tradeType",
     "side",
@@ -53,6 +68,7 @@ impl KucoinClient {
         let result = match method_name {
             "place_uta_order" => {
                 let mut allowed = UTA_ORDER_FIELDS.to_vec();
+                allowed.extend_from_slice(UTA_ORDER_INTEGER_FIELDS);
                 allowed.extend_from_slice(UTA_ORDER_BOOL_FIELDS);
                 allowed.extend_from_slice(&["product_symbol", "symbol"]);
                 params.ensure_allowed(&allowed)?;
@@ -62,12 +78,19 @@ impl KucoinClient {
                 params.required("side")?;
                 let order_type = params.required("orderType")?;
                 params.required("size")?;
+                params.required("sizeUnit")?;
+                validate_enum(params, "sizeUnit", &["BASECCY", "QUOTECCY", "UNIT"])?;
+                validate_enum(params, "stp", &["DC", "CO", "CN", "CB"])?;
                 validate_positive_number(params, "size")?;
                 validate_positive_number(params, "price")?;
                 if order_type == "LIMIT" {
                     params.required("price")?;
                 }
-                let mut body = params.body(UTA_ORDER_FIELDS, &[], UTA_ORDER_BOOL_FIELDS)?;
+                let mut body = params.body(
+                    UTA_ORDER_FIELDS,
+                    UTA_ORDER_INTEGER_FIELDS,
+                    UTA_ORDER_BOOL_FIELDS,
+                )?;
                 self.uta_insert_symbol(&mut body, params)?;
                 if !body.contains_key("clientOid") {
                     body.insert("clientOid".into(), Value::String(generate_client_oid()));
@@ -91,28 +114,32 @@ impl KucoinClient {
                     .await
             }
             "amend_uta_order" => {
-                params.ensure_allowed(&[
-                    "product_symbol",
-                    "symbol",
-                    "orderId",
-                    "clientOid",
-                    "newPrice",
-                    "newSize",
-                ])?;
+                let mut allowed = UTA_AMEND_FIELDS.to_vec();
+                allowed.extend_from_slice(&["product_symbol", "symbol", "cxlOnFail"]);
+                params.ensure_allowed(&allowed)?;
                 require_exactly_one(params, &["orderId", "clientOid"])?;
-                if !["newPrice", "newSize"]
+                if !UTA_AMEND_CHANGE_FIELDS
                     .iter()
                     .any(|key| params.get(key).is_some())
                 {
                     return Err(DcexError::InvalidInput(
-                        "KuCoin UTA amend requires a new price or size".into(),
+                        "KuCoin UTA amend requires a new price, size, or TP/SL trigger price"
+                            .into(),
                     ));
                 }
-                for key in ["newPrice", "newSize"] {
+                for key in UTA_AMEND_CHANGE_FIELDS {
                     validate_positive_number(params, key)?;
                 }
-                let mut body =
-                    params.body(&["orderId", "clientOid", "newPrice", "newSize"], &[], &[])?;
+                validate_enum(params, "sizeUnit", &["BASECCY", "UNIT"])?;
+                validate_enum(params, "tpTriggerPriceType", &["TP", "IP", "MP"])?;
+                validate_enum(params, "slTriggerPriceType", &["TP", "IP", "MP"])?;
+                let symbol = params.required_any(&["product_symbol", "symbol"])?;
+                if is_spot_symbol(symbol) {
+                    return Err(DcexError::InvalidInput(format!(
+                        "KuCoin UTA amend supports futures only, got spot symbol {symbol}"
+                    )));
+                }
+                let mut body = params.body(UTA_AMEND_FIELDS, &[], &["cxlOnFail"])?;
                 self.uta_insert_symbol_with_mode(&mut body, params, true)?;
                 self.private_post(KucoinMarket::Spot, UTA_V2_AMEND_ORDER, Value::Object(body))
                     .await
@@ -160,7 +187,7 @@ impl KucoinClient {
             }
             "get_uta_account_overview" => {
                 params.ensure_allowed(&[])?;
-                self.private_get(KucoinMarket::Spot, UTA_V1_OVERVIEW, Vec::new())
+                self.private_get(KucoinMarket::Spot, UTA_V2_OVERVIEW, Vec::new())
                     .await
             }
             _ => return Ok(None),
@@ -194,6 +221,13 @@ impl KucoinClient {
 fn validate_trade_type(params: &KucoinParams) -> Result<()> {
     params.required("tradeType")?;
     validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])
+}
+
+/// Canonical spot product symbols end in `-SPOT`; raw KuCoin spot pairs are
+/// `BASE-QUOTE`, while raw futures contracts (e.g. `XBTUSDTM`) have no dash.
+fn is_spot_symbol(symbol: &str) -> bool {
+    let parts: Vec<&str> = symbol.split('-').collect();
+    parts.len() == 2 || parts.get(2) == Some(&"SPOT")
 }
 
 fn uta_is_futures(params: &KucoinParams) -> bool {

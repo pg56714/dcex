@@ -274,6 +274,8 @@ fn validate_signing_params(params: &ExtendedParams) -> Result<()> {
         "builderFee",
         "builder_id",
         "builderId",
+        "market_json",
+        "marketJson",
     ];
     params.ensure_allowed(ALLOWED, &[])?;
     params.ensure_exactly_one(&["market", "product_symbol"])?;
@@ -289,6 +291,7 @@ fn validate_signing_params(params: &ExtendedParams) -> Result<()> {
         &["id", "external_id", "externalId", "order_external_id"],
         &["builder_fee", "builderFee"],
         &["builder_id", "builderId"],
+        &["market_json", "marketJson"],
     ] {
         params.ensure_at_most_one(group)?;
     }

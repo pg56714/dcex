@@ -381,3 +381,5 @@ Content-Length: 15\r\nConnection: close\r\n\r\n{\"status\":\"OK\"}",
     });
     (format!("http://{address}"), handle)
 }
+
+mod endpoint_coverage;

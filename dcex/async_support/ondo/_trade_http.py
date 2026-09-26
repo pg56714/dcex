@@ -14,6 +14,8 @@ class TradeHTTP(HTTPManager):
         status: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
     ) -> Any:
         return await self._native_private(
             "get_orders",
@@ -21,6 +23,8 @@ class TradeHTTP(HTTPManager):
             status=status,
             limit=limit,
             cursor=cursor,
+            startTime=startTime,
+            endTime=endTime,
         )
 
     async def get_open_orders(self, market: str | None = None) -> Any:
@@ -163,10 +167,14 @@ class TradeHTTP(HTTPManager):
         market: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        startTime: int | None = None,
+        endTime: int | None = None,
     ) -> Any:
         return await self._native_private(
             "get_fills",
             market=market,
             limit=limit,
             cursor=cursor,
+            startTime=startTime,
+            endTime=endTime,
         )

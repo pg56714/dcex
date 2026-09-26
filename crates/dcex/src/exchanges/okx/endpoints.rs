@@ -72,6 +72,7 @@ pub(super) const ACCOUNT_SPOT_BORROW_REPAY_HISTORY: &str =
 pub(super) const ACCOUNT_SET_AUTO_EARN: &str = "/api/v5/account/set-auto-earn";
 pub(super) const SAVINGS_BALANCE: &str = "/api/v5/finance/savings/balance";
 pub(super) const SAVINGS_PURCHASE_REDEMPT: &str = "/api/v5/finance/savings/purchase-redempt";
+/// Deprecated: no longer listed in the OKX v5 API docs; kept for backward compatibility.
 pub(super) const SAVINGS_SET_LENDING_RATE: &str = "/api/v5/finance/savings/set-lending-rate";
 pub(super) const SAVINGS_LENDING_HISTORY: &str = "/api/v5/finance/savings/lending-history";
 pub(super) const SAVINGS_PUBLIC_BORROW_INFO: &str = "/api/v5/finance/savings/lending-rate-summary";
@@ -141,6 +142,7 @@ pub(super) const SUBACCOUNT_FUNDING_BALANCE: &str = "/api/v5/asset/subaccount/ba
 pub(super) const SUBACCOUNT_BILLS: &str = "/api/v5/asset/subaccount/bills";
 pub(super) const SUBACCOUNT_TRANSFER: &str = "/api/v5/asset/subaccount/transfer";
 pub(super) const ENTRUSTED_SUBACCOUNT_LIST: &str = "/api/v5/users/entrust-subaccount-list";
+/// Deprecated: no longer listed in the OKX v5 API docs; kept for backward compatibility.
 pub(super) const SUBACCOUNT_INTEREST_LIMITS: &str = "/api/v5/account/subaccount/interest-limits";
 pub(super) const ASSET_BILLS: &str = "/api/v5/asset/bills";
 pub(super) const ASSET_DEPOSIT_ADDRESS: &str = "/api/v5/asset/deposit-address";

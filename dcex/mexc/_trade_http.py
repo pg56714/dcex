@@ -433,13 +433,19 @@ class TradeHTTP(HTTPManager):
         side: int,
         price: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
         reduceOnly: bool | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract limit order."""
+        """
+        Place a MEXC Contract limit order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_limit_order",
             self._native_params(
@@ -460,12 +466,18 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         price: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract limit buy order."""
+        """
+        Place a MEXC Contract limit buy order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_limit_buy_order",
             self._native_params(
@@ -484,12 +496,18 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         price: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract limit sell order."""
+        """
+        Place a MEXC Contract limit sell order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_limit_sell_order",
             self._native_params(
@@ -509,13 +527,19 @@ class TradeHTTP(HTTPManager):
         side: int,
         price: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
         reduceOnly: bool | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract post-only order."""
+        """
+        Place a MEXC Contract post-only order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_post_only_order",
             self._native_params(
@@ -536,12 +560,18 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         price: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract post-only buy order."""
+        """
+        Place a MEXC Contract post-only buy order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_post_only_buy_order",
             self._native_params(
@@ -560,12 +590,18 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         price: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract post-only sell order."""
+        """
+        Place a MEXC Contract post-only sell order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_post_only_sell_order",
             self._native_params(
@@ -584,13 +620,19 @@ class TradeHTTP(HTTPManager):
         product_symbol: str,
         side: int,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
         reduceOnly: bool | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract market order."""
+        """
+        Place a MEXC Contract market order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_market_order",
             self._native_params(
@@ -609,12 +651,18 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract market buy order."""
+        """
+        Place a MEXC Contract market buy order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_market_buy_order",
             self._native_params(
@@ -631,12 +679,18 @@ class TradeHTTP(HTTPManager):
         self,
         product_symbol: str,
         vol: int | str,
-        leverage: int | None = 50,
+        leverage: int | None = None,
         openType: int = 2,
         externalOid: str | None = None,
         positionMode: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Place a MEXC Contract market sell order."""
+        """
+        Place a MEXC Contract market sell order.
+
+        ``leverage`` has no default: MEXC requires it when opening a position
+        (side 1 or 3), and the native layer rejects opening orders without it.
+        Closing orders (side 2 or 4) may omit it.
+        """
         return self._native_private(
             "place_contract_market_sell_order",
             self._native_params(

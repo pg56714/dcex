@@ -24,7 +24,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_margin_loan_market_interest_rate(currency => "currency"),
     ];
     private [
-        place_uta_order(trade_type => "tradeType", product_symbol => "product_symbol", side => "side", order_type => "orderType", size => "size"),
+        place_uta_order(trade_type => "tradeType", product_symbol => "product_symbol", side => "side", order_type => "orderType", size => "size", size_unit => "sizeUnit"),
         cancel_uta_order(trade_type => "tradeType", product_symbol => "product_symbol"),
         amend_uta_order(product_symbol => "product_symbol"),
         get_uta_order_detail(trade_type => "tradeType", product_symbol => "product_symbol"),
@@ -42,8 +42,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         cancel_futures_order(order_id => "orderId"),
         cancel_futures_order_by_client_oid(client_oid => "clientOid", product_symbol => "product_symbol"),
         cancel_spot_all_orders(),
-        set_dcp(trade_type => "tradeType", timeout => "timeout", symbol => "symbol"),
-        get_dcp(trade_type => "tradeType"),
+        set_dcp(timeout => "timeout"),
+        get_dcp(),
         cancel_spot_all_orders_by_symbol(product_symbol => "product_symbol"),
         cancel_spot_order(order_id => "orderId", product_symbol => "product_symbol"),
         flex_transfer(currency => "currency", amount => "amount", from_account_type => "fromAccountType", to_account_type => "toAccountType"),

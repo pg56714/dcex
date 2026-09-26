@@ -110,6 +110,9 @@ def test_sync_bybit_transferable_amount_validates_and_sends_coins() -> None:
     assert captured["method_name"] == "get_transferable_amount"
     assert captured["params"] == [("coins", "BTC,ETH")]
 
+    manager.get_transferable_amount("USDT")
+    assert captured["params"] == [("coins", "USDT")]
+
     with pytest.raises(ValueError, match="at least one"):
         manager.get_transferable_amount([])
     with pytest.raises(ValueError, match="no more than 20"):
@@ -165,6 +168,9 @@ async def test_async_bybit_transferable_amount_validates_and_sends_coins() -> No
     await manager.get_transferable_amount(["BTC", "ETH"])
     assert captured["method_name"] == "get_transferable_amount"
     assert captured["params"] == [("coins", "BTC,ETH")]
+
+    await manager.get_transferable_amount("USDT")
+    assert captured["params"] == [("coins", "USDT")]
 
     with pytest.raises(ValueError, match="at least one"):
         await manager.get_transferable_amount([])
@@ -403,3 +409,13 @@ def test_sync_bybit_universal_transfer_fields_are_forwarded() -> None:
     )
     assert dict(captured["params"])["fromMemberId"] == "111"
     assert dict(captured["params"])["toMemberId"] == "222"
+
+
+def test_bybit_spot_asset_info_is_documented_as_deprecated() -> None:
+    from dcex.async_support.bybit._asset_http import AssetHTTP as AsyncAssetHTTP
+    from dcex.bybit._asset_http import AssetHTTP
+
+    for cls in (AssetHTTP, AsyncAssetHTTP):
+        doc = inspect.getdoc(cls.get_spot_asset_info) or ""
+        assert "deprecated" in doc
+        assert "classic accounts only" in doc

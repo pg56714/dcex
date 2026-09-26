@@ -254,6 +254,16 @@ impl BackpackClient {
             .await
     }
 
+    pub(super) async fn private_patch_value(
+        &self,
+        path: &str,
+        body: Value,
+        instruction: &str,
+    ) -> Result<ValidatedResponse> {
+        self.private_body_request(HttpMethod::Patch, path, body, instruction, BTreeMap::new())
+            .await
+    }
+
     pub(super) async fn private_delete_value(
         &self,
         path: &str,

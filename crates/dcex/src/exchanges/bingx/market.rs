@@ -7,6 +7,27 @@ use super::params::{
     BingxParams, push_optional_value, validate_enum, validate_time_range, validate_u64_range,
 };
 
+/// Public market paths whose official request tables mark `timestamp` as required.
+/// Spot v2 depth, spot price ticker and spot book ticker do not list it.
+const TIMESTAMP_REQUIRED_PATHS: &[&str] = &[
+    SWAP_INSTRUMENT_INFO,
+    SWAP_ORDERBOOK,
+    SWAP_PUBLIC_TRADE,
+    SWAP_KLINE,
+    SWAP_TICKER,
+    SWAP_PREMIUM_INDEX,
+    SWAP_FUNDING_RATE,
+    SWAP_BOOK_TICKER,
+    SWAP_TRADING_RULES,
+    SWAP_OPEN_INTEREST,
+    SWAP_MARK_PRICE_KLINE,
+    SPOT_SYMBOLS,
+    SPOT_ORDERBOOK,
+    SPOT_PUBLIC_TRADE,
+    SPOT_KLINE_V2,
+    SPOT_TICKER,
+];
+
 const KLINE_INTERVALS: &[&str] = &[
     "1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "8h", "12h", "1d", "3d", "1w", "1M",
 ];
@@ -23,13 +44,13 @@ impl BingxClient {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, &params)?;
-                self.public_get(SWAP_INSTRUMENT_INFO, query).await
+                self.market_get(SWAP_INSTRUMENT_INFO, query).await
             }
             "get_spot_instrument_info" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, &params)?;
-                self.public_get(SPOT_SYMBOLS, query).await
+                self.market_get(SPOT_SYMBOLS, query).await
             }
             "get_orderbook" => self.depth_get(SWAP_ORDERBOOK, &params, "limit", None).await,
             "get_spot_orderbook" => self.depth_get(SPOT_ORDERBOOK, &params, "limit", None).await,
@@ -60,7 +81,7 @@ impl BingxClient {
                 self.push_required_spot_v2_depth_symbol(&mut query, &params)?;
                 query.push(("depth".to_string(), depth.to_string()));
                 query.push(("type".to_string(), type_));
-                self.public_get(SPOT_ORDERBOOK_V2, query).await
+                self.market_get(SPOT_ORDERBOOK_V2, query).await
             }
             "get_public_trades" => {
                 self.depth_get(SWAP_PUBLIC_TRADE, &params, "limit", None)
@@ -72,29 +93,29 @@ impl BingxClient {
                 self.push_required_symbol(&mut query, &params)?;
                 validate_u64_range(&params, "limit", 1, 500)?;
                 push_optional_value(&mut query, "limit", params.get("limit"));
-                self.public_get(SPOT_PUBLIC_TRADE, query).await
+                self.market_get(SPOT_PUBLIC_TRADE, query).await
             }
             "get_kline" => self.kline_get(SWAP_KLINE, &params).await,
-            "get_spot_kline" => self.kline_get(SPOT_KLINE, &params).await,
-            "get_spot_kline_v2" => self.kline_get(SPOT_KLINE_V2, &params).await,
+            // BingX only documents the v2 spot kline route; keep both names on it.
+            "get_spot_kline" | "get_spot_kline_v2" => self.kline_get(SPOT_KLINE_V2, &params).await,
             "get_open_interest" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_required_symbol(&mut query, &params)?;
-                self.public_get(SWAP_OPEN_INTEREST, query).await
+                self.market_get(SWAP_OPEN_INTEREST, query).await
             }
             "get_mark_price_kline" => self.kline_get(SWAP_MARK_PRICE_KLINE, &params).await,
             "get_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, &params)?;
-                self.public_get(SWAP_TICKER, query).await
+                self.market_get(SWAP_TICKER, query).await
             }
             "get_swap_premium_index" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, &params)?;
-                self.public_get(SWAP_PREMIUM_INDEX, query).await
+                self.market_get(SWAP_PREMIUM_INDEX, query).await
             }
             "get_swap_funding_rate" => {
                 params.ensure_allowed(&[
@@ -111,7 +132,7 @@ impl BingxClient {
                 push_optional_value(&mut query, "startTime", params.get("start_time"));
                 push_optional_value(&mut query, "endTime", params.get("end_time"));
                 push_optional_value(&mut query, "limit", params.get("limit"));
-                self.public_get(SWAP_FUNDING_RATE, query).await
+                self.market_get(SWAP_FUNDING_RATE, query).await
             }
             "get_swap_book_ticker" | "get_swap_trading_rules" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
@@ -120,28 +141,27 @@ impl BingxClient {
                 let path = if method_name == "get_swap_book_ticker" {
                     SWAP_BOOK_TICKER
                 } else {
-                    query.push(("timestamp".into(), unix_timestamp_ms()?.to_string()));
                     SWAP_TRADING_RULES
                 };
-                self.public_get(path, query).await
+                self.market_get(path, query).await
             }
             "get_spot_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_optional_symbol(&mut query, &params)?;
-                self.public_get(SPOT_TICKER, query).await
+                self.market_get(SPOT_TICKER, query).await
             }
             "get_spot_book_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_required_symbol(&mut query, &params)?;
-                self.public_get(SPOT_BOOK_TICKER, query).await
+                self.market_get(SPOT_BOOK_TICKER, query).await
             }
             "get_spot_price_ticker" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 let mut query = Vec::new();
                 self.push_required_symbol(&mut query, &params)?;
-                self.public_get(SPOT_PRICE_TICKER, query).await
+                self.market_get(SPOT_PRICE_TICKER, query).await
             }
             _ => Err(DcexError::InvalidInput(format!(
                 "unsupported BingX public method: {method_name}"
@@ -176,7 +196,7 @@ impl BingxClient {
             query.push(("type".to_string(), type_.to_string()));
         }
         push_optional_value(&mut query, limit_key, params.get("limit"));
-        self.public_get(path, query).await
+        self.market_get(path, query).await
     }
 
     async fn kline_get(&self, path: &str, params: &BingxParams) -> Result<ValidatedResponse> {
@@ -200,6 +220,18 @@ impl BingxClient {
         push_optional_value(&mut query, "startTime", params.get("start_time"));
         push_optional_value(&mut query, "endTime", params.get("end_time"));
         push_optional_value(&mut query, "limit", params.get("limit"));
+        self.market_get(path, query).await
+    }
+
+    /// Public GET that adds `timestamp` where the BingX docs mark it required.
+    async fn market_get(
+        &self,
+        path: &str,
+        mut query: Vec<(String, String)>,
+    ) -> Result<ValidatedResponse> {
+        if TIMESTAMP_REQUIRED_PATHS.contains(&path) {
+            push_timestamp(&mut query)?;
+        }
         self.public_get(path, query).await
     }
 
@@ -213,4 +245,10 @@ impl BingxClient {
         query.push(("symbol".to_string(), symbol));
         Ok(())
     }
+}
+
+/// BingX documents `timestamp` as a required query field on these public endpoints.
+fn push_timestamp(query: &mut Vec<(String, String)>) -> Result<()> {
+    query.push(("timestamp".to_string(), unix_timestamp_ms()?.to_string()));
+    Ok(())
 }

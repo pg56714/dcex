@@ -189,7 +189,7 @@ impl BackpackClient {
                 self.private_get(POSITION, query, "positionQuery").await
             }
             "get_funding_payments" => {
-                let mut query = params.only(&["subaccountId", "limit", "offset", "sortDirection"]);
+                let mut query = params.only(&["limit", "offset", "sortDirection"]);
                 self.push_optional_symbol(&mut query, params)?;
                 self.private_get(FUNDING, query, "fundingHistoryQueryAll")
                     .await
@@ -318,7 +318,6 @@ impl BackpackClient {
                     &[
                         "product_symbol",
                         "symbol",
-                        "subaccountId",
                         "limit",
                         "offset",
                         "sortDirection",
@@ -326,7 +325,6 @@ impl BackpackClient {
                     &[],
                 )?;
                 super::market::validate_symbol_selector(params, false)?;
-                params.optional_u64_range("subaccountId", 0, u16::MAX.into())?;
                 validate_history_params(params)
             }
             "get_position_history" => {

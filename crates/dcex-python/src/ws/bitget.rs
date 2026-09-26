@@ -343,8 +343,8 @@ impl PythonBitgetPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let inst_type = default_private_inst_type(inst_type);
             let mut client = client.lock().await;
+            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
             if let Some(inst_id) = inst_id {
                 client
                     .subscribe_orders_for_inst_id(&inst_type, &inst_id)
@@ -365,8 +365,8 @@ impl PythonBitgetPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let inst_type = default_private_inst_type(inst_type);
             let mut client = client.lock().await;
+            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
             if let Some(inst_id) = inst_id {
                 client
                     .subscribe_fills_for_inst_id(&inst_type, &inst_id)
@@ -387,8 +387,8 @@ impl PythonBitgetPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let inst_type = default_private_inst_type(inst_type);
             let mut client = client.lock().await;
+            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
             if let Some(inst_id) = inst_id {
                 client
                     .subscribe_positions_for_inst_id(&inst_type, &inst_id)
@@ -409,8 +409,8 @@ impl PythonBitgetPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let inst_type = default_private_inst_type(inst_type);
             let mut client = client.lock().await;
+            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
             if let Some(coin) = coin {
                 client.subscribe_account_for_coin(&inst_type, &coin).await
             } else {
@@ -428,10 +428,9 @@ impl PythonBitgetPrivateWebSocketClient {
     ) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            let inst_type = default_private_inst_type(inst_type);
+            let mut client = client.lock().await;
+            let inst_type = default_private_inst_type(inst_type, client.is_uta_v3());
             client
-                .lock()
-                .await
                 .subscribe_equity(&inst_type)
                 .await
                 .map_err(to_py_runtime_error)
@@ -497,6 +496,7 @@ pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PythonBitgetPrivateWebSocketClient>()
 }
 
-fn default_private_inst_type(inst_type: Option<String>) -> String {
-    inst_type.unwrap_or_else(|| "USDT-FUTURES".to_string())
+/// Defaults to the UTA topic family on a V3 private endpoint, else classic USDT futures.
+fn default_private_inst_type(inst_type: Option<String>, uta_v3: bool) -> String {
+    inst_type.unwrap_or_else(|| if uta_v3 { "UTA" } else { "USDT-FUTURES" }.to_string())
 }

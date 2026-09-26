@@ -17,6 +17,7 @@ const PUBLIC_LINEAR_WS_URL: &str = "wss://stream.bybit.com/v5/public/linear";
 const PUBLIC_INVERSE_WS_URL: &str = "wss://stream.bybit.com/v5/public/inverse";
 const PUBLIC_OPTION_WS_URL: &str = "wss://stream.bybit.com/v5/public/option";
 const PUBLIC_RFQ_WS_URL: &str = "wss://stream.bybit.com/v5/public/rfq";
+const PUBLIC_SPREAD_WS_URL: &str = "wss://stream.bybit.com/v5/public/spread";
 
 pub struct BybitPublicWebSocket {
     connection: WebSocketConnection,
@@ -123,6 +124,11 @@ impl BybitPublicWebSocket {
         product_symbol: &str,
         interval: &str,
     ) -> Result<String> {
+        if self.category == "spread" {
+            return Err(DcexError::InvalidInput(
+                "Bybit spread WebSocket does not provide kline streams.".to_string(),
+            ));
+        }
         let topic = format!(
             "kline.{}.{}",
             bybit_timeframe(interval)?,
@@ -140,6 +146,9 @@ impl BybitPublicWebSocket {
     }
 
     fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
+        if self.category == "spread" {
+            return normalize_spread_symbol(product_symbol);
+        }
         if let Some(table) = &self.product_table {
             if is_canonical_product_symbol(product_symbol) {
                 return table.get_exchange_symbol("bybit", product_symbol);
@@ -178,7 +187,7 @@ impl BybitPublicWebSocket {
         };
         let topics = topics
             .into_iter()
-            .map(|topic| normalize_topic(&topic))
+            .map(|topic| normalize_topic(&self.category, &topic))
             .collect::<Result<Vec<_>>>()?;
         if json!(&topics).to_string().len() > 21_000 {
             return Err(DcexError::InvalidInput(
@@ -230,6 +239,7 @@ fn category_url(category: &str) -> &'static str {
         "inverse" => PUBLIC_INVERSE_WS_URL,
         "option" => PUBLIC_OPTION_WS_URL,
         "rfq" => PUBLIC_RFQ_WS_URL,
+        "spread" => PUBLIC_SPREAD_WS_URL,
         _ => PUBLIC_LINEAR_WS_URL,
     }
 }
@@ -237,7 +247,7 @@ fn category_url(category: &str) -> &'static str {
 fn normalize_category(category: &str) -> Result<String> {
     let category = category.trim().to_ascii_lowercase();
     match category.as_str() {
-        "spot" | "linear" | "inverse" | "option" | "rfq" => Ok(category),
+        "spot" | "linear" | "inverse" | "option" | "rfq" | "spread" => Ok(category),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bybit WebSocket category: {category}"
         ))),
@@ -276,17 +286,34 @@ fn normalize_option_symbol(symbol: &str) -> Result<String> {
     Ok(symbol.to_ascii_uppercase())
 }
 
-fn normalize_topic(topic: &str) -> Result<String> {
+/// Spread symbols combine two legs, e.g. `SOLUSDT_SOL/USDT`.
+fn is_spread_symbol_char(character: char) -> bool {
+    character.is_ascii_alphanumeric() || matches!(character, '-' | '_' | '/')
+}
+
+fn normalize_spread_symbol(symbol: &str) -> Result<String> {
+    let symbol = symbol.trim();
+    if symbol.is_empty() || !symbol.chars().all(is_spread_symbol_char) {
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported Bybit spread symbol: {symbol}"
+        )));
+    }
+    Ok(symbol.to_ascii_uppercase())
+}
+
+fn normalize_topic(category: &str, topic: &str) -> Result<String> {
     let topic = topic.trim();
     if topic.is_empty() {
         return Err(DcexError::InvalidInput(
             "Bybit WebSocket topic must not be empty.".to_string(),
         ));
     }
-    if !topic
-        .chars()
-        .all(|character| character.is_ascii_alphanumeric() || character == '.' || character == '-')
-    {
+    let is_spread = category == "spread";
+    if !topic.chars().all(|character| {
+        character.is_ascii_alphanumeric()
+            || matches!(character, '.' | '-')
+            || (is_spread && is_spread_symbol_char(character))
+    }) {
         return Err(DcexError::InvalidInput(format!(
             "unsupported Bybit WebSocket topic: {topic}"
         )));
@@ -298,6 +325,7 @@ fn validate_orderbook_depth(category: &str, depth: u32) -> Result<()> {
     let is_supported = match category {
         "spot" | "linear" | "inverse" => matches!(depth, 1 | 50 | 200 | 1_000),
         "option" => matches!(depth, 25 | 100),
+        "spread" => depth == 25,
         _ => false,
     };
     if is_supported {
@@ -333,8 +361,9 @@ mod tests {
     #[test]
     fn rejects_invalid_symbol_and_topic() {
         assert!(normalize_symbol("BTC-USDT").is_err());
-        assert!(normalize_topic("publicTrade/BTCUSDT").is_err());
-        assert!(normalize_topic("tickers.BTC-22JAN23-17500-C").is_ok());
+        assert!(normalize_topic("linear", "publicTrade/BTCUSDT").is_err());
+        assert!(normalize_topic("linear", "tickers.SOLUSDT_SOL/USDT").is_err());
+        assert!(normalize_topic("option", "tickers.BTC-22JAN23-17500-C").is_ok());
     }
 
     #[test]
@@ -351,6 +380,37 @@ mod tests {
                 .trade_topic_symbol("BTC-22JAN23-17500-C")
                 .expect("trade symbol"),
             "BTC"
+        );
+    }
+
+    #[test]
+    fn spread_category_uses_spread_url_and_leg_symbols() {
+        assert_eq!(normalize_category("SPREAD").expect("spread"), "spread");
+        assert_eq!(category_url("spread"), PUBLIC_SPREAD_WS_URL);
+        let client = BybitPublicWebSocket::new("spread", Duration::from_secs(1)).expect("client");
+        assert_eq!(
+            client.exchange_symbol("SOLUSDT_SOL/USDT").expect("symbol"),
+            "SOLUSDT_SOL/USDT"
+        );
+        assert!(client.exchange_symbol("SOLUSDT SOL").is_err());
+        assert_eq!(
+            normalize_topic("spread", "orderbook.25.SOLUSDT_SOL/USDT").expect("topic"),
+            "orderbook.25.SOLUSDT_SOL/USDT"
+        );
+        assert!(normalize_topic("spread", "tickers.SOL USDT").is_err());
+        assert!(validate_orderbook_depth("spread", 25).is_ok());
+        assert!(validate_orderbook_depth("spread", 50).is_err());
+    }
+
+    #[tokio::test]
+    async fn spread_rejects_klines_before_transport() {
+        let mut client =
+            BybitPublicWebSocket::new("spread", Duration::from_secs(1)).expect("client");
+        assert!(
+            client
+                .subscribe_klines("SOLUSDT_SOL/USDT", "1m")
+                .await
+                .is_err()
         );
     }
 

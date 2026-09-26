@@ -5,6 +5,8 @@ use crate::http::{HttpMethod, RequestBody};
 use super::client::BitgetClient;
 use super::params::BitgetParams;
 
+mod route_coverage;
+
 #[test]
 fn signed_batch_uses_exact_body() {
     let client = BitgetClient::new(

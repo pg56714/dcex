@@ -9,6 +9,8 @@ use crate::product_table::{MarketInfo, ProductTable};
 use super::endpoints::CONTRACT_DETAIL;
 use super::*;
 
+mod routes;
+
 fn client() -> MexcClient {
     MexcClient::new(
         Some("api-key".to_string()),
@@ -20,7 +22,7 @@ fn client() -> MexcClient {
 
 #[test]
 fn contract_details_uses_documented_endpoint() {
-    assert_eq!(CONTRACT_DETAIL, "/api/v1/contract/detail");
+    assert_eq!(CONTRACT_DETAIL, "/api/v1/contract/detail/country");
 }
 
 #[tokio::test]

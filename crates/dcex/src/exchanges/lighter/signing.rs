@@ -112,9 +112,10 @@ pub(super) fn attributes(
             "Lighter skip_nonce must be 0 or 1".to_string(),
         ));
     }
-    if cancel_all_market_index > 255 {
+    // lighter-go tx_attributes: CancelAllMarketIndex spans 0..=MaxMarketIndex, nil 255.
+    if cancel_all_market_index > (1 << 15) - 1 {
         return Err(DcexError::InvalidInput(
-            "Lighter cancel_all_market_index must be between 0 and 255".to_string(),
+            "Lighter cancel_all_market_index must be between 0 and 32767".to_string(),
         ));
     }
     if self_trade_behavior_mode > 3 {

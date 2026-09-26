@@ -252,3 +252,5 @@ async fn stateful_account_requests_are_validated_before_transport() {
         .expect_err("invalid IP address");
     assert!(error.to_string().contains("IPv4"));
 }
+
+mod endpoint_coverage;

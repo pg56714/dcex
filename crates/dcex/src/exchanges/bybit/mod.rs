@@ -17,6 +17,8 @@ mod rfq;
 mod rwa_earn;
 mod signing;
 mod spread;
+#[cfg(test)]
+mod tests;
 mod trade;
 pub mod websocket;
 mod wrappers;

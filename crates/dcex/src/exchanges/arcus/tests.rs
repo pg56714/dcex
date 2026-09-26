@@ -477,3 +477,5 @@ fn batch_cancel_signs_each_element_with_shared_timestamp() {
             .expect("element signature");
     }
 }
+
+mod endpoint_coverage;

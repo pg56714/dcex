@@ -744,12 +744,21 @@ pub(super) fn extract_market_from_param(
     };
     let value = serde_json::from_str::<Value>(market_json)
         .map_err(|error| DcexError::InvalidInput(format!("invalid market_json: {error}")))?;
-    if value.get("data").is_some() || value.as_array().is_some() {
-        return extract_market_from_response(&value, market_name).map(Some);
+    let market: ExtendedMarket = if value.get("data").is_some() || value.as_array().is_some() {
+        extract_market_from_response(&value, market_name)?
+    } else {
+        serde_json::from_value(value)
+            .map_err(|error| DcexError::InvalidInput(format!("invalid market_json: {error}")))?
+    };
+    // Caller-supplied market config must describe the order's market; signing
+    // with another market's asset ids would produce a wrong settlement.
+    if market.name != market_name {
+        return Err(DcexError::InvalidInput(format!(
+            "market_json describes {}, not the order market {market_name}",
+            market.name
+        )));
     }
-    serde_json::from_value(value)
-        .map(Some)
-        .map_err(|error| DcexError::InvalidInput(format!("invalid market_json: {error}")))
+    Ok(Some(market))
 }
 
 pub(super) fn signed_order_response(

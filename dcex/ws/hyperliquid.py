@@ -106,6 +106,7 @@ class PrivateClient(AsyncWebSocketMixin):
         testnet: bool = False,
         timeout: float = 10.0,
         base_url: str | None = None,
+        preload_product_table: bool = False,
     ) -> None:
         """Create a Hyperliquid private WebSocket client."""
         self._native_client = _native.HyperliquidPrivateWebSocketClient(
@@ -114,6 +115,9 @@ class PrivateClient(AsyncWebSocketMixin):
             timeout=timeout,
             base_url=base_url,
         )
+        if preload_product_table:
+            table = ProductTableManager.get_instance(Common.HYPERLIQUID)
+            self._native_client.set_product_table(table._native_table)
 
     def user(self) -> str:
         """Return the normalized user address."""
@@ -232,9 +236,16 @@ def private(
     testnet: bool = False,
     timeout: float = 10.0,
     base_url: str | None = None,
+    preload_product_table: bool = False,
 ) -> PrivateClient:
     """Create an async Hyperliquid private user WebSocket client."""
-    return PrivateClient(user=user, testnet=testnet, timeout=timeout, base_url=base_url)
+    return PrivateClient(
+        user=user,
+        testnet=testnet,
+        timeout=timeout,
+        base_url=base_url,
+        preload_product_table=preload_product_table,
+    )
 
 
 __all__ = ["PrivateClient", "PublicClient", "private", "public"]

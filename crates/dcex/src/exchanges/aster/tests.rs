@@ -308,3 +308,5 @@ fn batch_amendments_normalize_symbols_and_validate_each_order() {
     )]);
     assert!(client.resolve_batch_amendments(&bad).is_err());
 }
+
+mod endpoint_coverage;

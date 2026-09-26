@@ -9,6 +9,8 @@ use crate::product_table::{MarketInfo, ProductTable};
 
 use super::*;
 
+mod endpoint_coverage;
+
 fn recording_server() -> (String, JoinHandle<Option<String>>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
     listener.set_nonblocking(true).expect("nonblocking");

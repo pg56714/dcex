@@ -95,6 +95,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_borrow_repay_history(),
         get_saving_balance(),
         purchase_redeem_savings(ccy => "ccy", amt => "amt", side => "side"),
+        // Deprecated: set-lending-rate is no longer in the OKX v5 docs.
         set_savings_lending_rate(ccy => "ccy", rate => "rate"),
         get_savings_lending_history(),
         set_auto_earn(ccy => "ccy", action => "action"),
@@ -121,6 +122,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_subaccount_bills(sub_account => "subAcct"),
         transfer_between_subaccounts(ccy => "ccy", amt => "amt", from_account => "from_account", to_account => "to_account", from_subaccount => "fromSubAccount", to_subaccount => "toSubAccount"),
         get_entrusted_subaccount_list(),
+        // Deprecated: subaccount/interest-limits is no longer in the OKX v5 docs.
         get_subaccount_interest_limits(sub_account => "subAcct"),
         get_flexible_loan_borrow_currencies(),
         get_flexible_loan_collateral_assets(),

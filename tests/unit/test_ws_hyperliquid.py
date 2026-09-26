@@ -272,3 +272,26 @@ async def test_hyperliquid_ws_rejects_unexpected_payload(
     ws = hyperliquid.public()
     with pytest.raises(RuntimeError, match="Unexpected Hyperliquid WebSocket event payload"):
         await ws.recv()
+
+
+def test_hyperliquid_private_ws_preloads_product_table(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("dcex._native")
+    from dcex.ws import hyperliquid
+
+    class _TableAwarePrivateClient(_FakeNativeHyperliquidPrivateWebSocketClient):
+        def set_product_table(self, table: object) -> None:
+            self.product_table = table
+
+    class _Native(_FakeNative):
+        HyperliquidPrivateWebSocketClient = _TableAwarePrivateClient
+
+    class _Table:
+        _native_table = object()
+
+    monkeypatch.setattr(hyperliquid, "_native", _Native)
+    monkeypatch.setattr(hyperliquid.ProductTableManager, "get_instance", lambda _: _Table)
+    user = "0x0000000000000000000000000000000000000001"
+
+    ws = hyperliquid.private(user=user, preload_product_table=True)
+    assert ws._native_client.product_table is _Table._native_table
+    assert not hasattr(hyperliquid.private(user=user)._native_client, "product_table")

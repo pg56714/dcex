@@ -116,6 +116,7 @@ impl KucoinClient {
                 let fields = [
                     "currency",
                     "isIsolated",
+                    "product_symbol",
                     "symbol",
                     "startTime",
                     "endTime",
@@ -123,7 +124,6 @@ impl KucoinClient {
                     "pageSize",
                 ];
                 params.ensure_allowed(&fields)?;
-                params.required("status")?;
                 self.private_get(
                     KucoinMarket::Spot,
                     MARGIN_INTEREST,

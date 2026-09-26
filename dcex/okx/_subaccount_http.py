@@ -95,6 +95,13 @@ class SubaccountHTTP(HTTPManager):
     def get_subaccount_interest_limits(
         self, subAcct: str, *, ccy: str | None = None
     ) -> dict[str, Any]:
+        """
+        Get a sub-account's borrow interest and limit.
+
+        Deprecated: ``GET /api/v5/account/subaccount/interest-limits`` is no longer
+        listed in the OKX v5 API docs. Kept for backward compatibility and may be
+        rejected by OKX.
+        """
         return self._native_private(
             "get_subaccount_interest_limits",
             self._native_params(subAcct=subAcct, ccy=ccy),

@@ -12,6 +12,19 @@ class AccountHTTP(HTTPManager):
         """Retrieve Backpack account settings and limits."""
         return await self._native_private("get_account", [])
 
+    async def update_account(
+        self,
+        leverageLimit: str | None = None,
+        autoLend: bool | None = None,
+        autoRepayBorrows: bool | None = None,
+        autoBorrowSettlements: bool | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Update Backpack account settings (the only way to set perps leverage)."""
+        return await self._native_private(
+            "update_account",
+            self._native_params(**locals()),
+        )
+
     async def get_max_borrow_quantity(self, symbol: str) -> dict[str, Any] | list[Any] | str:
         """Retrieve Backpack max borrow quantity."""
         return await self._native_private(

@@ -14,9 +14,16 @@ class AccountHTTP(HTTPManager):
 
     async def get_transferable_amount(
         self,
-        coins: list[str],
+        coins: str | list[str],
     ) -> dict[str, Any]:
-        """Get transferable amount for specified coins."""
+        """
+        Get transferable amount for specified coins.
+
+        Args:
+            coins: A single coin name (e.g. ``"USDT"``) or a list of up to 20 coins.
+        """
+        if isinstance(coins, str):
+            coins = [coins] if coins else []
         if not coins:
             raise ValueError("coins must contain at least one coin.")
         if len(coins) > 20:

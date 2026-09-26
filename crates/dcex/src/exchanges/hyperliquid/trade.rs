@@ -40,15 +40,22 @@ impl HyperliquidClient {
                 self.place_order_from_params(&params, Some(false), Some(false))
                     .await
             }
+            "place_batch_orders" => self.place_batch_orders_from_params(&params).await,
             "cancel_order" => self.cancel_order_from_params(&params).await,
             "cancel_order_by_cloid" => self.cancel_order_by_cloid_from_params(&params).await,
+            "cancel_batch_orders" => self.cancel_batch_orders_from_params(&params).await,
+            "cancel_batch_orders_by_cloid" => {
+                self.cancel_batch_orders_by_cloid_from_params(&params).await
+            }
             "schedule_cancel" => self.schedule_cancel_from_params(&params).await,
             "transfer_between_dexes" => self.transfer_between_dexes_from_params(&params).await,
             "transfer_usdc_spot_perp" => self.transfer_usdc_spot_perp_from_params(&params).await,
             "modify_order" => self.modify_order_from_params(&params).await,
             "modify_batch_orders" => self.modify_batch_orders_from_params(&params).await,
             "update_leverage" => self.update_leverage_from_params(&params).await,
-            "update_isolate_margin" => self.update_isolate_margin_from_params(&params).await,
+            "update_isolate_margin" | "update_isolated_margin" => {
+                self.update_isolate_margin_from_params(&params).await
+            }
             "place_twap_order" => self.place_twap_order_from_params(&params).await,
             "cancel_twap_order" => self.cancel_twap_order_from_params(&params).await,
             _ => Err(DcexError::InvalidInput(format!(
@@ -91,13 +98,16 @@ impl HyperliquidClient {
                 "Hyperliquid slippage must be finite and at least 0 but less than 1".to_string(),
             ));
         }
-        let (mid_price, sz_decimals) = self.mid_price(product_symbol).await?;
+        let (mid_price, sz_decimals, is_spot) = self.mid_price(product_symbol).await?;
         let slippage_multiplier = if is_buy {
             1.0 + slippage
         } else {
             1.0 - slippage
         };
-        let max_price_decimals = 6_u32.saturating_sub(sz_decimals);
+        // Hyperliquid tick rules (and SDK `_slippage_price`): perps allow 6 - szDecimals
+        // price decimals, spot allows 8 - szDecimals.
+        let max_decimals = if is_spot { 8_u32 } else { 6_u32 };
+        let max_price_decimals = max_decimals.saturating_sub(sz_decimals);
         let price =
             format_market_order_price(mid_price * slippage_multiplier, is_buy, max_price_decimals);
         let mut params = params.with_overrides(vec![
@@ -117,6 +127,88 @@ impl HyperliquidClient {
             params.push("isMarket", "true");
         }
         self.place_order_from_params(&params, None, None).await
+    }
+
+    /// Places several orders in one `order` action, like hyperliquid-python-sdk `bulk_orders`.
+    ///
+    /// `orders` is a JSON array of objects using the `place_order` keys (`product_symbol`,
+    /// `isBuy`, `price`, `size`, `reduceOnly`, `tif` or `isMarket`/`triggerPx`/`tpsl`,
+    /// `cloid`). `grouping` applies to the whole action, so `normalTpsl`/`positionTpsl`
+    /// can carry an entry order together with its TP/SL children.
+    async fn place_batch_orders_from_params(
+        &self,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        const BATCH_ORDER_FIELDS: &[&str] = &[
+            "product_symbol",
+            "isBuy",
+            "price",
+            "size",
+            "reduceOnly",
+            "tif",
+            "isMarket",
+            "triggerPx",
+            "tpsl",
+            "cloid",
+        ];
+        let orders = batch_items(params, "orders", BATCH_ORDER_FIELDS)?
+            .iter()
+            .map(|order| {
+                let reduce_only = order.optional_bool("reduceOnly")?.unwrap_or(false);
+                self.order_value_from_params(order, None, Some(reduce_only))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let action = self.order_action(orders, params)?;
+        self.submit_action(action, params).await
+    }
+
+    /// Cancels several orders by `oid` in one `cancel` action (SDK `bulk_cancel`).
+    async fn cancel_batch_orders_from_params(
+        &self,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        let cancels = batch_items(params, "cancels", &["product_symbol", "oid"])?
+            .iter()
+            .map(|cancel| {
+                Ok(object(vec![
+                    (
+                        "a",
+                        uint(self.asset_id(cancel.required("product_symbol")?)?),
+                    ),
+                    ("o", uint(cancel.required_u64("oid")?)),
+                ]))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let action = object(vec![
+            ("type", string("cancel")),
+            ("cancels", array(cancels)),
+        ]);
+        self.submit_action(action, params).await
+    }
+
+    /// Cancels several orders by `cloid` in one `cancelByCloid` action
+    /// (SDK `bulk_cancel_by_cloid`).
+    async fn cancel_batch_orders_by_cloid_from_params(
+        &self,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        let cancels = batch_items(params, "cancels", &["product_symbol", "cloid"])?
+            .iter()
+            .map(|cancel| {
+                Ok(object(vec![
+                    (
+                        "asset",
+                        uint(self.asset_id(cancel.required("product_symbol")?)?),
+                    ),
+                    ("cloid", string(&cancel.cloid("cloid")?)),
+                ]))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let action = object(vec![
+            ("type", string("cancelByCloid")),
+            ("cancels", array(cancels)),
+        ]);
+        self.submit_action(action, params).await
     }
 
     async fn cancel_order_from_params(
@@ -373,16 +465,18 @@ impl HyperliquidClient {
         is_buy_override: Option<bool>,
         reduce_only_override: Option<bool>,
     ) -> Result<OrderedValue> {
+        let order = self.order_value_from_params(params, is_buy_override, reduce_only_override)?;
+        self.order_action(vec![order], params)
+    }
+
+    fn order_action(
+        &self,
+        orders: Vec<OrderedValue>,
+        params: &HyperliquidParams,
+    ) -> Result<OrderedValue> {
         let mut fields = vec![
             ("type", string("order")),
-            (
-                "orders",
-                array(vec![self.order_value_from_params(
-                    params,
-                    is_buy_override,
-                    reduce_only_override,
-                )?]),
-            ),
+            ("orders", array(orders)),
             (
                 "grouping",
                 string(match params.get("grouping") {
@@ -508,8 +602,18 @@ impl HyperliquidClient {
             .await
     }
 
-    async fn mid_price(&self, product_symbol: &str) -> Result<(f64, u32)> {
+    /// Returns `(mid price, szDecimals, is_spot)` for a market order.
+    async fn mid_price(&self, product_symbol: &str) -> Result<(f64, u32, bool)> {
         let coin = self.coin(product_symbol)?;
+        let spot_asset = self
+            .symbol_parts(product_symbol)
+            .ok()
+            .map(|(_, asset)| asset)
+            .filter(|asset| (SPOT_ASSET_OFFSET..HIP3_ASSET_OFFSET).contains(asset));
+        if spot_asset.is_some() || coin.starts_with('@') || coin.contains('/') {
+            let (mid_price, sz_decimals) = self.spot_mid_price(&coin, spot_asset).await?;
+            return Ok((mid_price, sz_decimals, true));
+        }
         let dex = coin.split_once(':').map(|(dex, _)| dex);
         let response = self.get_meta_and_asset_ctxs_raw(dex).await?;
         let values = response.data.as_array().ok_or_else(|| {
@@ -548,21 +652,96 @@ impl HyperliquidClient {
                 "Hyperliquid asset context index out of range: {asset_index}"
             ))
         })?;
-        let mid_price = context.get("midPx").ok_or_else(|| {
-            DcexError::Decode("Hyperliquid asset context missing midPx".to_string())
+        Ok((parse_mid_price(context)?, sz_decimals, false))
+    }
+
+    /// Reads a spot mid price and base-token szDecimals from `spotMetaAndAssetCtxs`.
+    async fn spot_mid_price(&self, coin: &str, asset: Option<u64>) -> Result<(f64, u32)> {
+        let response = self
+            .info_payload(serde_json::json!({"type": "spotMetaAndAssetCtxs"}))
+            .await?;
+        let invalid =
+            || DcexError::Decode("Hyperliquid spotMetaAndAssetCtxs response is invalid".into());
+        let values = response.data.as_array().ok_or_else(invalid)?;
+        let meta = values.first().ok_or_else(invalid)?;
+        let universe = meta
+            .get("universe")
+            .and_then(Value::as_array)
+            .ok_or_else(invalid)?;
+        let spot_index = asset.map(|asset| asset - SPOT_ASSET_OFFSET);
+        let position = universe
+            .iter()
+            .position(|pair| pair.get("name").and_then(Value::as_str) == Some(coin))
+            .or_else(|| {
+                let index = spot_index?;
+                universe
+                    .iter()
+                    .position(|pair| pair.get("index").and_then(Value::as_u64) == Some(index))
+            })
+            .ok_or_else(|| {
+                DcexError::InvalidInput(format!(
+                    "Hyperliquid spotMetaAndAssetCtxs does not contain coin {coin}"
+                ))
+            })?;
+        let pair = &universe[position];
+        let name = pair.get("name").and_then(Value::as_str).unwrap_or(coin);
+        let base_token = pair
+            .get("tokens")
+            .and_then(Value::as_array)
+            .and_then(|tokens| tokens.first())
+            .and_then(Value::as_u64)
+            .ok_or_else(invalid)?;
+        let sz_decimals = meta
+            .get("tokens")
+            .and_then(Value::as_array)
+            .and_then(|tokens| {
+                tokens
+                    .iter()
+                    .find(|token| token.get("index").and_then(Value::as_u64) == Some(base_token))
+            })
+            .and_then(|token| token.get("szDecimals"))
+            .and_then(Value::as_u64)
+            .ok_or_else(|| {
+                DcexError::Decode("Hyperliquid spot token missing szDecimals".to_string())
+            })?;
+        let sz_decimals = u32::try_from(sz_decimals).map_err(|error| {
+            DcexError::Decode(format!("invalid Hyperliquid szDecimals: {error}"))
         })?;
-        let mid_price = match mid_price {
-            Value::String(value) => value
-                .parse::<f64>()
-                .map_err(|error| DcexError::Decode(error.to_string())),
-            Value::Number(value) => value
-                .as_f64()
-                .ok_or_else(|| DcexError::Decode("invalid Hyperliquid midPx".to_string())),
-            _ => Err(DcexError::Decode(
-                "invalid Hyperliquid midPx type".to_string(),
-            )),
-        }?;
-        Ok((mid_price, sz_decimals))
+        let contexts = values
+            .get(1)
+            .and_then(Value::as_array)
+            .ok_or_else(invalid)?;
+        let context = contexts
+            .iter()
+            .find(|context| context.get("coin").and_then(Value::as_str) == Some(name))
+            .or_else(|| contexts.get(position))
+            .ok_or_else(|| {
+                DcexError::InvalidInput(format!(
+                    "Hyperliquid spot asset context not found for {name}"
+                ))
+            })?;
+        Ok((parse_mid_price(context)?, sz_decimals))
+    }
+}
+
+/// Spot asset ids are `10000 + spot index`; HIP-3 perp dex ids start at 100000.
+const SPOT_ASSET_OFFSET: u64 = 10_000;
+const HIP3_ASSET_OFFSET: u64 = 100_000;
+
+fn parse_mid_price(context: &Value) -> Result<f64> {
+    let mid_price = context
+        .get("midPx")
+        .ok_or_else(|| DcexError::Decode("Hyperliquid asset context missing midPx".to_string()))?;
+    match mid_price {
+        Value::String(value) => value
+            .parse::<f64>()
+            .map_err(|error| DcexError::Decode(error.to_string())),
+        Value::Number(value) => value
+            .as_f64()
+            .ok_or_else(|| DcexError::Decode("invalid Hyperliquid midPx".to_string())),
+        _ => Err(DcexError::Decode(
+            "invalid Hyperliquid midPx type".to_string(),
+        )),
     }
 }
 
@@ -712,6 +891,17 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
             "vaultAddress",
             "expiresAfter",
         ],
+        "place_batch_orders" => &[
+            "orders",
+            "grouping",
+            "builder_address",
+            "fee_ten_bp",
+            "vaultAddress",
+            "expiresAfter",
+        ],
+        "cancel_batch_orders" | "cancel_batch_orders_by_cloid" => {
+            &["cancels", "vaultAddress", "expiresAfter"]
+        }
         "cancel_order" => &["product_symbol", "oid", "vaultAddress", "expiresAfter"],
         "cancel_order_by_cloid" => &["product_symbol", "cloid", "vaultAddress", "expiresAfter"],
         "schedule_cancel" => &["time", "vaultAddress", "expiresAfter"],
@@ -742,7 +932,7 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
             "vaultAddress",
             "expiresAfter",
         ],
-        "update_isolate_margin" => &[
+        "update_isolate_margin" | "update_isolated_margin" => &[
             "product_symbol",
             "isBuy",
             "ntli",
@@ -763,6 +953,54 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
         _ => return Ok(()),
     };
     params.ensure_allowed(allowed)
+}
+
+/// Parses a non-empty JSON array of flat objects into per-item params.
+///
+/// Values must be strings, booleans or integers; floats are rejected so prices and sizes
+/// stay exact decimal strings on the wire. `null` values are treated as absent.
+fn batch_items(
+    params: &HyperliquidParams,
+    key: &str,
+    allowed: &[&str],
+) -> Result<Vec<HyperliquidParams>> {
+    let value: Value = serde_json::from_str(params.required(key)?).map_err(|error| {
+        DcexError::InvalidInput(format!("invalid JSON parameter {key}: {error}"))
+    })?;
+    let items = value.as_array().ok_or_else(|| {
+        DcexError::InvalidInput(format!("Hyperliquid {key} must be a JSON array"))
+    })?;
+    if items.is_empty() {
+        return Err(DcexError::InvalidInput(format!(
+            "Hyperliquid {key} must not be empty"
+        )));
+    }
+    items
+        .iter()
+        .map(|item| {
+            let fields = item.as_object().ok_or_else(|| {
+                DcexError::InvalidInput(format!("Hyperliquid {key} items must be JSON objects"))
+            })?;
+            let mut pairs = Vec::with_capacity(fields.len());
+            for (field, value) in fields {
+                let value = match value {
+                    Value::Null => continue,
+                    Value::String(value) => value.clone(),
+                    Value::Bool(value) => value.to_string(),
+                    Value::Number(value) if value.is_i64() || value.is_u64() => value.to_string(),
+                    _ => {
+                        return Err(DcexError::InvalidInput(format!(
+                            "Hyperliquid {key} field {field} must be a string, boolean or integer"
+                        )));
+                    }
+                };
+                pairs.push((field.clone(), value));
+            }
+            let item = HyperliquidParams::from_pairs(pairs);
+            item.ensure_allowed(allowed)?;
+            Ok(item)
+        })
+        .collect()
 }
 
 fn normalize_batch_modifies(value: OrderedValue) -> Result<OrderedValue> {

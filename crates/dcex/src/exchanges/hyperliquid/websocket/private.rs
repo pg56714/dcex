@@ -1,17 +1,21 @@
+use std::sync::Arc;
 use std::time::Duration;
 
 use serde_json::Value;
 
 use crate::Result;
+use crate::product_table::ProductTable;
 use crate::ws::{WebSocketConfig, WebSocketConnection};
 
 use super::{
-    coin_subscription, normalize_user, subscription_payload, user_subscription, websocket_url,
+    coin_subscription, normalize_user, resolve_coin, subscription_payload, user_subscription,
+    websocket_url,
 };
 
 pub struct HyperliquidPrivateWebSocket {
     connection: WebSocketConnection,
     user: String,
+    product_table: Option<Arc<ProductTable>>,
 }
 
 impl HyperliquidPrivateWebSocket {
@@ -23,7 +27,13 @@ impl HyperliquidPrivateWebSocket {
         Ok(Self {
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             user: normalize_user(&user)?,
+            product_table: None,
         })
+    }
+
+    /// Resolves canonical product symbols (for example `BTC-USDC-SWAP`) like the public client.
+    pub fn set_product_table(&mut self, product_table: ProductTable) {
+        self.product_table = Some(Arc::new(product_table));
     }
 
     pub fn user(&self) -> &str {
@@ -163,10 +173,13 @@ impl HyperliquidPrivateWebSocket {
     }
 
     pub async fn subscribe_active_asset_data(&mut self, product_symbol: &str) -> Result<()> {
-        let mut subscription = coin_subscription("activeAssetData", product_symbol.to_string())?
-            .as_object()
-            .expect("coin subscription object")
-            .clone();
+        let mut subscription = coin_subscription(
+            "activeAssetData",
+            resolve_coin(self.product_table.as_deref(), product_symbol)?,
+        )?
+        .as_object()
+        .expect("coin subscription object")
+        .clone();
         subscription.insert("user".to_string(), Value::String(self.user.clone()));
         self.subscribe(Value::Object(subscription)).await
     }

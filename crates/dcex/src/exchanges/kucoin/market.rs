@@ -29,7 +29,12 @@ impl KucoinClient {
             "get_spot_all_tickers" => (KucoinMarket::Spot, SPOT_ALL_TICKERS.to_string(), false),
             "get_spot_orderbook" => {
                 self.normalize_symbol_query(&mut params, false)?;
-                (KucoinMarket::Spot, SPOT_ORDERBOOK.to_string(), false)
+                let depth = take_param(&mut params, "depth").unwrap_or_else(|| "20".to_string());
+                (
+                    KucoinMarket::Spot,
+                    format!("{SPOT_ORDERBOOK}{depth}"),
+                    false,
+                )
             }
             "get_spot_public_trades" => {
                 self.normalize_symbol_query(&mut params, false)?;
@@ -190,7 +195,12 @@ impl KucoinClient {
         let params = KucoinParams::from_pairs(raw_params.to_vec());
         match method_name {
             "get_spot_instrument_info" => params.ensure_allowed(&["market"]),
-            "get_spot_ticker" | "get_spot_orderbook" | "get_spot_public_trades" => {
+            "get_spot_orderbook" => {
+                params.ensure_allowed(&["product_symbol", "symbol", "depth"])?;
+                params.required_any(&["product_symbol", "symbol"])?;
+                validate_enum(&params, "depth", &["20", "100"])
+            }
+            "get_spot_ticker" | "get_spot_public_trades" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;
                 params.required_any(&["product_symbol", "symbol"])?;
                 Ok(())

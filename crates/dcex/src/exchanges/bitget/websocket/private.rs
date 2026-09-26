@@ -11,6 +11,7 @@ const PRIVATE_WS_URL: &str = "wss://ws.bitget.com/v2/ws/private";
 const UTA_PRIVATE_WS_URL: &str = "wss://ws.bitget.com/v3/ws/private";
 const LOGIN_METHOD: &str = "GET";
 const LOGIN_PATH: &str = "/user/verify";
+const UTA_INST_TYPE: &str = "UTA";
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BitgetPrivateWebSocketArg {
@@ -60,6 +61,20 @@ impl BitgetPrivateWebSocketArg {
         let channel = normalize_channel(&channel.into())?;
         let inst_id = inst_id.map(|value| normalize_inst_id(&value)).transpose()?;
         let coin = coin.map(|value| normalize_coin(&value)).transpose()?;
+        if inst_type == UTA_INST_TYPE {
+            if inst_id.is_some() || coin.is_some() {
+                return Err(DcexError::InvalidInput(
+                    "Bitget UTA private topics cover all products and do not support instId or coin filters."
+                        .to_string(),
+                ));
+            }
+            return Ok(Self {
+                inst_type,
+                channel,
+                inst_id,
+                coin,
+            });
+        }
         if channel == "positions"
             && (inst_type == "SPOT" || inst_id.as_deref() != Some("default") || coin.is_some())
         {
@@ -92,7 +107,19 @@ impl BitgetPrivateWebSocketArg {
         })
     }
 
+    /// Builds a UTA V3 private topic such as `order`, `fill`, `position` or `account`.
+    pub fn uta(topic: impl Into<String>) -> Result<Self> {
+        Self::new(UTA_INST_TYPE, topic)
+    }
+
+    pub fn is_uta(&self) -> bool {
+        self.inst_type == UTA_INST_TYPE
+    }
+
     fn to_json(&self) -> Value {
+        if self.is_uta() {
+            return json!({"instType": UTA_INST_TYPE, "topic": self.channel});
+        }
         let mut arg = serde_json::Map::new();
         arg.insert(
             "instType".to_string(),
@@ -174,6 +201,11 @@ impl BitgetPrivateWebSocket {
 
     pub fn is_logged_in(&self) -> bool {
         self.logged_in
+    }
+
+    /// Whether this client targets the UTA V3 private endpoint (`instType=UTA` topics).
+    pub fn is_uta_v3(&self) -> bool {
+        self.uta_v3
     }
 
     pub async fn connect(&mut self) -> Result<()> {
@@ -302,7 +334,12 @@ impl BitgetPrivateWebSocket {
         .await
     }
 
+    /// Subscribes to order updates. With `inst_type = "UTA"` this sends the V3
+    /// `{"instType":"UTA","topic":"order"}` subscription covering every product.
     pub async fn subscribe_orders(&mut self, inst_type: &str) -> Result<()> {
+        if is_uta_inst_type(inst_type) {
+            return self.subscribe_channel(inst_type, "order").await;
+        }
         self.subscribe_channel_with_inst_id(inst_type, "orders", "default")
             .await
     }
@@ -317,6 +354,9 @@ impl BitgetPrivateWebSocket {
     }
 
     pub async fn subscribe_fills(&mut self, inst_type: &str) -> Result<()> {
+        if is_uta_inst_type(inst_type) {
+            return self.subscribe_channel(inst_type, "fill").await;
+        }
         self.subscribe_channel_with_inst_id(inst_type, "fill", "default")
             .await
     }
@@ -331,6 +371,9 @@ impl BitgetPrivateWebSocket {
     }
 
     pub async fn subscribe_positions(&mut self, inst_type: &str) -> Result<()> {
+        if is_uta_inst_type(inst_type) {
+            return self.subscribe_channel(inst_type, "position").await;
+        }
         self.subscribe_channel_with_inst_id(inst_type, "positions", "default")
             .await
     }
@@ -345,6 +388,9 @@ impl BitgetPrivateWebSocket {
     }
 
     pub async fn subscribe_account(&mut self, inst_type: &str) -> Result<()> {
+        if is_uta_inst_type(inst_type) {
+            return self.subscribe_channel(inst_type, "account").await;
+        }
         self.subscribe_channel_with_coin(inst_type, "account", "default")
             .await
     }
@@ -355,6 +401,12 @@ impl BitgetPrivateWebSocket {
     }
 
     pub async fn subscribe_equity(&mut self, inst_type: &str) -> Result<()> {
+        if is_uta_inst_type(inst_type) {
+            return Err(DcexError::InvalidInput(
+                "Bitget UTA has no equity topic; subscribe to the UTA account topic instead."
+                    .to_string(),
+            ));
+        }
         self.subscribe_channel(inst_type, "equity").await
     }
 
@@ -408,12 +460,21 @@ impl BitgetPrivateWebSocket {
                 )));
             }
         };
-        let payload = json!({
-            "op": op,
-            "args": args.iter().map(BitgetPrivateWebSocketArg::to_json).collect::<Vec<_>>(),
-        });
+        let payload = subscription_payload(op, self.uta_v3, &args)?;
         self.connection.send_json(&payload).await
     }
+}
+
+fn subscription_payload(
+    op: &str,
+    uta_v3: bool,
+    args: &[BitgetPrivateWebSocketArg],
+) -> Result<Value> {
+    validate_subscription_endpoint(uta_v3, args)?;
+    Ok(json!({
+        "op": op,
+        "args": args.iter().map(BitgetPrivateWebSocketArg::to_json).collect::<Vec<_>>(),
+    }))
 }
 
 fn login_signature(api_secret: &str, timestamp: &str) -> Result<String> {
@@ -428,12 +489,30 @@ fn websocket_timestamp(timestamp_ms: u64) -> String {
 fn normalize_inst_type(inst_type: &str) -> Result<String> {
     let inst_type = inst_type.trim().to_ascii_uppercase();
     match inst_type.as_str() {
-        "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" => Ok(inst_type),
+        "SPOT" | "USDT-FUTURES" | "COIN-FUTURES" | "USDC-FUTURES" | UTA_INST_TYPE => Ok(inst_type),
         "MIX" | "SWAP" | "FUTURES" => Ok("USDT-FUTURES".to_string()),
         _ => Err(DcexError::InvalidInput(format!(
             "unsupported Bitget WebSocket instrument type: {inst_type}"
         ))),
     }
+}
+
+fn is_uta_inst_type(inst_type: &str) -> bool {
+    inst_type.trim().eq_ignore_ascii_case(UTA_INST_TYPE)
+}
+
+fn validate_subscription_endpoint(uta_v3: bool, args: &[BitgetPrivateWebSocketArg]) -> Result<()> {
+    for arg in args {
+        if arg.is_uta() != uta_v3 {
+            let message = if uta_v3 {
+                "Bitget UTA V3 private WebSocket only accepts instType=UTA topics."
+            } else {
+                "Bitget instType=UTA topics require the UTA V3 private WebSocket (/v3/ws/private)."
+            };
+            return Err(DcexError::InvalidInput(message.to_string()));
+        }
+    }
+    Ok(())
 }
 
 fn normalize_channel(channel: &str) -> Result<String> {
@@ -580,6 +659,53 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    #[test]
+    fn builds_uta_private_topic_arg() {
+        for topic in ["order", "fill", "position", "account"] {
+            let arg = BitgetPrivateWebSocketArg::new("uta", topic).expect("uta arg");
+            assert!(arg.is_uta());
+            assert_eq!(arg.to_json(), json!({"instType": "UTA", "topic": topic}));
+        }
+        assert_eq!(
+            BitgetPrivateWebSocketArg::uta("order").expect("uta"),
+            BitgetPrivateWebSocketArg::new("UTA", "order").expect("uta")
+        );
+        assert!(BitgetPrivateWebSocketArg::with_inst_id("UTA", "order", "default").is_err());
+        assert!(BitgetPrivateWebSocketArg::with_coin("UTA", "account", "default").is_err());
+    }
+
+    #[test]
+    fn uta_topics_require_v3_endpoint_and_classic_requires_v2() {
+        let uta = vec![BitgetPrivateWebSocketArg::uta("position").expect("uta")];
+        let classic = vec![
+            BitgetPrivateWebSocketArg::with_inst_id("USDT-FUTURES", "orders", "default")
+                .expect("classic"),
+        ];
+        assert_eq!(
+            subscription_payload("subscribe", true, &uta).expect("payload"),
+            json!({"op": "subscribe", "args": [{"instType": "UTA", "topic": "position"}]})
+        );
+        assert_eq!(
+            subscription_payload("subscribe", false, &classic).expect("payload"),
+            json!({"op": "subscribe", "args": [
+                {"instType": "USDT-FUTURES", "channel": "orders", "instId": "default"}
+            ]})
+        );
+        assert!(subscription_payload("subscribe", false, &uta).is_err());
+        assert!(subscription_payload("subscribe", true, &classic).is_err());
+    }
+
+    #[test]
+    fn detects_uta_v3_private_url() {
+        let timeout = std::time::Duration::from_secs(1);
+        let uta = BitgetPrivateWebSocket::new_uta("k".into(), "s".into(), "p".into(), timeout)
+            .expect("uta client");
+        assert!(uta.is_uta_v3());
+        let classic = BitgetPrivateWebSocket::new("k".into(), "s".into(), "p".into(), timeout)
+            .expect("classic client");
+        assert!(!classic.is_uta_v3());
     }
 
     #[test]

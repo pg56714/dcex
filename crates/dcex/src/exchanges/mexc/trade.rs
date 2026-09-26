@@ -402,17 +402,18 @@ impl MexcClient {
                     "pageIndex",
                     "pageSize",
                 ])?;
-                params.required("states")?;
+                // Documented as List<int>; MEXC GET list filters take comma-separated values.
+                let states = comma_separated(params.required("states")?);
                 validate_u64_range(params, "pageIndex", 1, u64::MAX)?;
                 validate_u64_range(params, "pageSize", 1, 100)?;
-                let mut query = params.only(&[
-                    "states",
+                let mut query = vec![("states".to_string(), states)];
+                query.extend(params.only(&[
                     "side",
                     "start_time",
                     "end_time",
                     "pageIndex",
                     "pageSize",
-                ]);
+                ]));
                 self.push_product_symbol(&mut query, params, "_")?;
                 self.contract_get(CONTRACT_TRACK_LIST, query).await
             }
@@ -701,7 +702,7 @@ impl MexcClient {
             }
             "get_contract_orders" => {
                 params.ensure_allowed(&["order_ids"])?;
-                let order_ids = joined_order_ids(params.required("order_ids")?)?;
+                let order_ids = comma_separated(params.required("order_ids")?);
                 if order_ids.split(',').count() > 50 {
                     return Err(DcexError::InvalidInput(
                         "MEXC batch order query supports at most 50 order IDs".to_string(),
@@ -1143,8 +1144,12 @@ impl MexcClient {
         validate_enum(params, "priceProtect", &["0", "1"])?;
         validate_enum(params, "bboTypeNum", &["0", "1", "2", "3", "4"])?;
         validate_enum(params, "stpMode", &["0", "1", "2", "3"])?;
-        if matches!(side.as_str(), "1" | "3") {
-            params.required("leverage")?;
+        // MEXC requires leverage when opening (side 1/3); never substitute a default.
+        if matches!(side.as_str(), "1" | "3") && params.get("leverage").is_none_or(str::is_empty) {
+            return Err(DcexError::InvalidInput(
+                "missing required parameter: leverage (required for MEXC Contract opening orders, side 1 or 3)"
+                    .to_string(),
+            ));
         }
         if order_type != "5" {
             params.required("price")?;
@@ -1216,15 +1221,17 @@ impl MexcClient {
     }
 }
 
-fn joined_order_ids(value: &str) -> Result<String> {
+/// Joins a JSON array (as produced by the Python layer) into MEXC's comma-separated
+/// query format; other values pass through unchanged.
+fn comma_separated(value: &str) -> String {
     if let Ok(Value::Array(values)) = serde_json::from_str::<Value>(value) {
-        return Ok(values
+        return values
             .iter()
             .map(json_value_string)
             .collect::<Vec<_>>()
-            .join(","));
+            .join(",");
     }
-    Ok(value.to_string())
+    value.to_string()
 }
 
 #[cfg(test)]

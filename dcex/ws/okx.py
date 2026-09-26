@@ -31,17 +31,50 @@ class PublicClient(AsyncWebSocketMixin):
         self,
         channel: str,
         product_symbol: str | None = None,
+        *,
+        inst_type: str | None = None,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
     ) -> None:
-        """Subscribe to an OKX public channel."""
-        await self._native_client.subscribe_channel(channel, product_symbol)
+        """
+        Subscribe to an OKX public channel.
+
+        ``inst_type`` / ``inst_family`` are sent as ``instType`` / ``instFamily`` for
+        channels such as ``instruments``, ``liquidation-orders``, ``adl-warning``,
+        ``opt-summary``, ``estimated-price`` and ``option-trades``. ``sprd_id`` is
+        sent as ``sprdId`` for spread channels (``sprd-books5``, ``sprd-tickers``...).
+        """
+        if inst_type is None and inst_family is None and sprd_id is None:
+            await self._native_client.subscribe_channel(channel, product_symbol)
+        elif sprd_id is None:
+            await self._native_client.subscribe_channel(
+                channel, product_symbol, inst_type, inst_family
+            )
+        else:
+            await self._native_client.subscribe_channel(
+                channel, product_symbol, inst_type, inst_family, sprd_id=sprd_id
+            )
 
     async def unsubscribe_channel(
         self,
         channel: str,
         product_symbol: str | None = None,
+        *,
+        inst_type: str | None = None,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
     ) -> None:
         """Unsubscribe from an OKX public channel."""
-        await self._native_client.unsubscribe_channel(channel, product_symbol)
+        if inst_type is None and inst_family is None and sprd_id is None:
+            await self._native_client.unsubscribe_channel(channel, product_symbol)
+        elif sprd_id is None:
+            await self._native_client.unsubscribe_channel(
+                channel, product_symbol, inst_type, inst_family
+            )
+        else:
+            await self._native_client.unsubscribe_channel(
+                channel, product_symbol, inst_type, inst_family, sprd_id=sprd_id
+            )
 
     async def subscribe_trades(self, product_symbol: str) -> None:
         """Subscribe to trade events for a product."""
@@ -110,9 +143,26 @@ class PrivateClient(AsyncWebSocketMixin):
         inst_type: str | None = None,
         inst_id: str | None = None,
         ccy: str | None = None,
+        *,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
     ) -> None:
-        """Subscribe to an OKX private channel."""
-        await self._native_client.subscribe_channel(channel, inst_type, inst_id, ccy)
+        """
+        Subscribe to an OKX private channel.
+
+        ``inst_family`` is sent as ``instFamily`` (e.g. ``orders``, ``positions``,
+        ``orders-algo``); ``sprd_id`` as ``sprdId`` (``sprd-orders``, ``sprd-trades``).
+        """
+        if inst_family is None and sprd_id is None:
+            await self._native_client.subscribe_channel(channel, inst_type, inst_id, ccy)
+        elif sprd_id is None:
+            await self._native_client.subscribe_channel(
+                channel, inst_type, inst_id, ccy, inst_family
+            )
+        else:
+            await self._native_client.subscribe_channel(
+                channel, inst_type, inst_id, ccy, inst_family, sprd_id=sprd_id
+            )
 
     async def unsubscribe_channel(
         self,
@@ -120,17 +170,39 @@ class PrivateClient(AsyncWebSocketMixin):
         inst_type: str | None = None,
         inst_id: str | None = None,
         ccy: str | None = None,
+        *,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
     ) -> None:
         """Unsubscribe from an OKX private channel."""
-        await self._native_client.unsubscribe_channel(channel, inst_type, inst_id, ccy)
+        if inst_family is None and sprd_id is None:
+            await self._native_client.unsubscribe_channel(channel, inst_type, inst_id, ccy)
+        elif sprd_id is None:
+            await self._native_client.unsubscribe_channel(
+                channel, inst_type, inst_id, ccy, inst_family
+            )
+        else:
+            await self._native_client.unsubscribe_channel(
+                channel, inst_type, inst_id, ccy, inst_family, sprd_id=sprd_id
+            )
 
     async def subscribe_orders(
         self,
         inst_type: str | None = None,
         inst_id: str | None = None,
+        *,
+        inst_family: str | None = None,
     ) -> None:
-        """Subscribe to order update events."""
-        await self._native_client.subscribe_orders(inst_type, inst_id)
+        """
+        Subscribe to order update events.
+
+        ``inst_family`` filters by ``instFamily`` (FUTURES/SWAP/OPTION); ``inst_type``
+        defaults to ``ANY`` when omitted.
+        """
+        if inst_family is None:
+            await self._native_client.subscribe_orders(inst_type, inst_id)
+        else:
+            await self._native_client.subscribe_orders(inst_type, inst_id, inst_family)
 
     async def subscribe_account(self, ccy: str | None = None) -> None:
         """Subscribe to account balance events."""

@@ -237,7 +237,13 @@ class MarketHTTP(HTTPManager):
         endTime: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Retrieve Aster futures index-price candlesticks."""
+        """
+        Retrieve Aster futures index-price candlesticks.
+
+        The official Aster V3 docs flag this path as unverified against the
+        current server and mention an undocumented ``/fapi/v3/marketKlines``
+        alternative; confirm availability before relying on it.
+        """
         return await self._native_public(
             "get_futures_index_price_klines",
             self._params(
@@ -257,7 +263,13 @@ class MarketHTTP(HTTPManager):
         endTime: int | None = None,
         limit: int | None = None,
     ) -> dict[str, Any] | list[Any]:
-        """Retrieve Aster futures mark-price candlesticks."""
+        """
+        Retrieve Aster futures mark-price candlesticks.
+
+        The official Aster V3 docs flag this path as unverified against the
+        current server and mention an undocumented ``/fapi/v3/marketKlines``
+        alternative; confirm availability before relying on it.
+        """
         return await self._native_public(
             "get_futures_mark_price_klines",
             self._params(

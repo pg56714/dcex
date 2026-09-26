@@ -17,7 +17,13 @@ class AssetHTTP(HTTPManager):
         return self._native_private("get_sub_uid", [])
 
     def get_spot_asset_info(self, coin: str | None = None) -> dict[str, Any]:
-        """Get spot asset information."""
+        """
+        Get spot asset information (classic accounts only; deprecated).
+
+        Bybit lists ``GET /v5/asset/transfer/query-asset-info`` under "Abandoned
+        Endpoints" and it applies only to classic accounts. For unified accounts use
+        ``get_coins_balance`` or ``get_wallet_balance`` instead.
+        """
         return self._native_private("get_spot_asset_info", self._native_params(coin=coin))
 
     def get_coins_balance(

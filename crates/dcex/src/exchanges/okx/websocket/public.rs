@@ -31,29 +31,85 @@ impl OkxWebSocketRoute {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct OkxWebSocketArg {
     pub channel: String,
+    pub inst_type: Option<String>,
+    pub inst_family: Option<String>,
     pub inst_id: Option<String>,
+    pub sprd_id: Option<String>,
 }
 
 impl OkxWebSocketArg {
     pub fn new(channel: impl Into<String>) -> Result<Self> {
-        Self::with_inst_id_optional(channel, None)
+        Self::with_filters(channel, None, None, None)
     }
 
     pub fn with_inst_id(channel: impl Into<String>, inst_id: impl Into<String>) -> Result<Self> {
-        Self::with_inst_id_optional(channel, Some(inst_id.into()))
+        Self::with_filters(channel, None, None, Some(inst_id.into()))
     }
 
-    fn with_inst_id_optional(channel: impl Into<String>, inst_id: Option<String>) -> Result<Self> {
-        let channel = normalize_channel(&channel.into())?;
-        let inst_id = inst_id.map(|value| normalize_inst_id(&value)).transpose()?;
-        Ok(Self { channel, inst_id })
+    /// Builds an arg for channels keyed by `instType`, e.g. `instruments` or
+    /// `liquidation-orders`.
+    pub fn with_inst_type(
+        channel: impl Into<String>,
+        inst_type: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(channel, Some(inst_type.into()), None, None)
+    }
+
+    /// Builds an arg for channels keyed by `instFamily`, e.g. `opt-summary`.
+    pub fn with_inst_family(
+        channel: impl Into<String>,
+        inst_family: impl Into<String>,
+    ) -> Result<Self> {
+        Self::with_filters(channel, None, Some(inst_family.into()), None)
+    }
+
+    /// Builds an arg with any combination of the documented public filters
+    /// (`instType`, `instFamily`, `instId`).
+    pub fn with_filters(
+        channel: impl Into<String>,
+        inst_type: Option<String>,
+        inst_family: Option<String>,
+        inst_id: Option<String>,
+    ) -> Result<Self> {
+        Ok(Self {
+            channel: normalize_channel(&channel.into())?,
+            inst_type: inst_type
+                .map(|value| normalize_token(&value, "instType"))
+                .transpose()?,
+            inst_family: inst_family
+                .map(|value| normalize_token(&value, "instFamily"))
+                .transpose()?,
+            inst_id: inst_id.map(|value| normalize_inst_id(&value)).transpose()?,
+            sprd_id: None,
+        })
+    }
+
+    /// Builds an arg for spread channels keyed by `sprdId`, e.g. `sprd-books5`.
+    pub fn with_sprd_id(channel: impl Into<String>, sprd_id: impl Into<String>) -> Result<Self> {
+        Self::new(channel)?.and_sprd_id(sprd_id)
+    }
+
+    /// Adds a `sprdId` filter (spread IDs such as `BTC-USDT_BTC-USDT-SWAP`
+    /// contain `_`, which `instId` does not accept).
+    pub fn and_sprd_id(mut self, sprd_id: impl Into<String>) -> Result<Self> {
+        self.sprd_id = Some(normalize_token(&sprd_id.into(), "sprdId")?);
+        Ok(self)
     }
 
     fn to_json(&self) -> Value {
         let mut arg = serde_json::Map::new();
         arg.insert("channel".to_string(), Value::String(self.channel.clone()));
+        if let Some(inst_type) = &self.inst_type {
+            arg.insert("instType".to_string(), Value::String(inst_type.clone()));
+        }
+        if let Some(inst_family) = &self.inst_family {
+            arg.insert("instFamily".to_string(), Value::String(inst_family.clone()));
+        }
         if let Some(inst_id) = &self.inst_id {
             arg.insert("instId".to_string(), Value::String(inst_id.clone()));
+        }
+        if let Some(sprd_id) = &self.sprd_id {
+            arg.insert("sprdId".to_string(), Value::String(sprd_id.clone()));
         }
         Value::Object(arg)
     }
@@ -141,6 +197,31 @@ impl OkxPublicWebSocket {
         let inst_id = self.exchange_symbol(product_symbol)?;
         self.subscribe(vec![OkxWebSocketArg::with_inst_id(channel, inst_id)?])
             .await
+    }
+
+    /// Builds a subscription arg, resolving `product_symbol` to an OKX `instId`
+    /// through the product table when one is configured.
+    pub fn channel_arg(
+        &self,
+        channel: &str,
+        product_symbol: Option<&str>,
+        inst_type: Option<&str>,
+        inst_family: Option<&str>,
+        sprd_id: Option<&str>,
+    ) -> Result<OkxWebSocketArg> {
+        let inst_id = product_symbol
+            .map(|symbol| self.exchange_symbol(symbol))
+            .transpose()?;
+        let arg = OkxWebSocketArg::with_filters(
+            channel,
+            inst_type.map(str::to_string),
+            inst_family.map(str::to_string),
+            inst_id,
+        )?;
+        match sprd_id {
+            Some(sprd_id) => arg.and_sprd_id(sprd_id),
+            None => Ok(arg),
+        }
     }
 
     pub async fn unsubscribe_channel(&mut self, channel: &str) -> Result<()> {
@@ -320,6 +401,24 @@ fn normalize_inst_id(inst_id: &str) -> Result<String> {
     Ok(inst_id.to_ascii_uppercase())
 }
 
+fn normalize_token(value: &str, label: &str) -> Result<String> {
+    let value = value.trim();
+    if value.is_empty() {
+        return Err(DcexError::InvalidInput(format!(
+            "OKX {label} must not be empty."
+        )));
+    }
+    if !value
+        .chars()
+        .all(|character| character.is_ascii_alphanumeric() || character == '-' || character == '_')
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported OKX {label}: {value}"
+        )));
+    }
+    Ok(value.to_ascii_uppercase())
+}
+
 fn normalize_interval(interval: &str) -> Result<String> {
     let interval = interval.trim();
     let supported = matches!(
@@ -361,6 +460,8 @@ fn normalize_interval(interval: &str) -> Result<String> {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
@@ -410,6 +511,123 @@ mod tests {
             OkxWebSocketRoute::Public
         );
         assert!(subscription_route(&[candle, trades]).is_err());
+    }
+
+    #[test]
+    fn builds_inst_type_and_inst_family_args() {
+        let instruments = OkxWebSocketArg::with_inst_type("instruments", "spot").expect("arg");
+        assert_eq!(
+            instruments.to_json(),
+            json!({"channel": "instruments", "instType": "SPOT"})
+        );
+        let summary = OkxWebSocketArg::with_inst_family("opt-summary", "btc-usd").expect("arg");
+        assert_eq!(
+            summary.to_json(),
+            json!({"channel": "opt-summary", "instFamily": "BTC-USD"})
+        );
+        let option_trades = OkxWebSocketArg::with_filters(
+            "option-trades",
+            Some("OPTION".to_string()),
+            Some("BTC-USD".to_string()),
+            None,
+        )
+        .expect("arg");
+        assert_eq!(
+            option_trades.to_json(),
+            json!({"channel": "option-trades", "instType": "OPTION", "instFamily": "BTC-USD"})
+        );
+        for (channel, inst_type) in [
+            ("liquidation-orders", "SWAP"),
+            ("adl-warning", "FUTURES"),
+            ("estimated-price", "OPTION"),
+        ] {
+            let arg = OkxWebSocketArg::with_inst_type(channel, inst_type).expect("arg");
+            assert_eq!(arg.to_json()["instType"], inst_type);
+            assert!(arg.to_json().get("instId").is_none());
+        }
+        assert!(OkxWebSocketArg::with_inst_type("instruments", " ").is_err());
+        assert!(OkxWebSocketArg::with_inst_family("opt-summary", "BTC/USD").is_err());
+    }
+
+    #[test]
+    fn channel_arg_resolves_product_symbol_with_filters() {
+        let client = OkxPublicWebSocket::new(Duration::from_secs(1)).expect("client");
+        let arg = client
+            .channel_arg(
+                "estimated-price",
+                Some("BTC-USD-SWAP"),
+                Some("swap"),
+                None,
+                None,
+            )
+            .expect("arg");
+        assert_eq!(
+            arg.to_json(),
+            json!({"channel": "estimated-price", "instType": "SWAP", "instId": "BTC-USD-SWAP"})
+        );
+        let bare = client
+            .channel_arg("adl-warning", None, Some("SWAP"), Some("BTC-USDT"), None)
+            .expect("arg");
+        assert_eq!(
+            bare.to_json(),
+            json!({"channel": "adl-warning", "instType": "SWAP", "instFamily": "BTC-USDT"})
+        );
+    }
+
+    #[test]
+    fn builds_spread_args_with_sprd_id() {
+        let books =
+            OkxWebSocketArg::with_sprd_id("sprd-books5", "btc-usdt_btc-usdt-swap").expect("arg");
+        assert_eq!(
+            books.to_json(),
+            json!({"channel": "sprd-books5", "sprdId": "BTC-USDT_BTC-USDT-SWAP"})
+        );
+        assert_eq!(
+            subscription_route(std::slice::from_ref(&books)).expect("route"),
+            OkxWebSocketRoute::Business
+        );
+        let client = OkxPublicWebSocket::new(Duration::from_secs(1)).expect("client");
+        let tickers = client
+            .channel_arg(
+                "sprd-tickers",
+                None,
+                None,
+                None,
+                Some("BTC-USDT_BTC-USDT-SWAP"),
+            )
+            .expect("arg");
+        assert_eq!(
+            tickers.to_json(),
+            json!({"channel": "sprd-tickers", "sprdId": "BTC-USDT_BTC-USDT-SWAP"})
+        );
+        assert!(OkxWebSocketArg::with_sprd_id("sprd-books5", "BTC/USDT").is_err());
+        assert!(OkxWebSocketArg::with_sprd_id("sprd-books5", " ").is_err());
+        // instId validation stays strict for non-spread channels.
+        assert!(OkxWebSocketArg::with_inst_id("trades", "BTC-USDT_BTC-USDT-SWAP").is_err());
+    }
+
+    #[test]
+    fn routes_spread_and_other_documented_business_channels() {
+        for channel in [
+            "sprd-books5",
+            "sprd-books-l2-tbt",
+            "sprd-bbo-tbt",
+            "sprd-public-trades",
+            "sprd-tickers",
+            "sprd-candle1m",
+        ] {
+            let arg = OkxWebSocketArg::new(channel).expect("arg");
+            assert_eq!(
+                subscription_route(&[arg]).expect("route"),
+                OkxWebSocketRoute::Business,
+                "{channel}"
+            );
+        }
+        let instruments = OkxWebSocketArg::with_inst_type("instruments", "SPOT").expect("arg");
+        assert_eq!(
+            subscription_route(&[instruments]).expect("route"),
+            OkxWebSocketRoute::Public
+        );
     }
 
     #[test]

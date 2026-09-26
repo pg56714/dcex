@@ -81,18 +81,16 @@ class MarketHTTP(HTTPManager):
     async def get_spot_orderbook_v2(
         self,
         product_symbol: str,
-        limit: int | None = None,
+        depth: int,
         type_: str = "step0",
-        depth: int | None = None,
     ) -> dict:
-        """Get spot v2 order book data."""
+        """Get spot v2 aggregated order book data; BingX requires ``depth``."""
         return await self._native_public(
             "get_spot_orderbook_v2",
             self._params(
                 product_symbol=product_symbol,
-                limit=limit,
-                type_=type_,
                 depth=depth,
+                type_=type_,
             ),
         )
 

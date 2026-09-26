@@ -188,14 +188,9 @@ impl BinanceClient {
                 .await
             }
             "create_futures_listen_key" => self.create_futures_listen_key().await,
-            "keep_alive_futures_listen_key" => {
-                self.keep_alive_futures_listen_key(params.required("listenKey")?)
-                    .await
-            }
-            "close_futures_listen_key" => {
-                self.close_futures_listen_key(params.required("listenKey")?)
-                    .await
-            }
+            // A caller-supplied `listenKey` is ignored: these endpoints take no parameters.
+            "keep_alive_futures_listen_key" => self.keep_alive_futures_listen_key().await,
+            "close_futures_listen_key" => self.close_futures_listen_key().await,
             "set_leverage" => {
                 self.set_leverage(
                     params.required("product_symbol")?,

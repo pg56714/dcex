@@ -452,15 +452,18 @@ impl LighterClient {
         self.post_form(super::endpoints::SEND_TX, body).await
     }
 
+    const fn product_table_exchange(&self) -> &'static str {
+        match self.network {
+            Some(LighterNetwork::Robinhood | LighterNetwork::RobinhoodTestnet) => {
+                "lighter_robinhood"
+            }
+            _ => "lighter",
+        }
+    }
+
     pub(super) fn market_id(&self, product_symbol: &str) -> Result<String> {
         if let Some(table) = &self.product_table {
-            let exchange = match self.network {
-                Some(LighterNetwork::Robinhood | LighterNetwork::RobinhoodTestnet) => {
-                    "lighter_robinhood"
-                }
-                _ => "lighter",
-            };
-            return table.get_exchange_symbol(exchange, product_symbol);
+            return table.get_exchange_symbol(self.product_table_exchange(), product_symbol);
         }
         if product_symbol.contains('-') {
             return Err(DcexError::InvalidInput(
@@ -468,6 +471,23 @@ impl LighterClient {
             ));
         }
         Ok(product_symbol.to_string())
+    }
+
+    /// Returns whether market metadata identifies `market_index` as a spot market.
+    ///
+    /// Lighter market ids are no longer range-partitioned by market type (see lighter-go
+    /// `txtypes`), so the type comes only from the product table built from
+    /// `orderBookDetails`. Unknown markets return `false` and are left to the exchange.
+    pub(super) fn is_known_spot_market(&self, market_index: i64) -> bool {
+        self.product_table.as_ref().is_some_and(|table| {
+            table
+                .get_product_type(
+                    self.product_table_exchange(),
+                    None,
+                    Some(&market_index.to_string()),
+                )
+                .is_ok_and(|product_type| product_type.eq_ignore_ascii_case("spot"))
+        })
     }
 
     #[allow(clippy::too_many_arguments)]

@@ -10,18 +10,21 @@ class TradeHTTP(HTTPManager):
 
     def set_dcp(
         self,
-        tradeType: str,
         timeout: int,
-        symbol: list[str],  # noqa: N803
+        symbols: list[str] | str | None = None,
     ) -> dict[str, Any]:
-        """Arm or refresh the disconnection protection for selected markets."""
+        """
+        Arm, refresh, or unset (timeout=-1) the spot disconnection protection.
+
+        ``symbols`` lists up to 50 pairs; omitted or empty means all pairs.
+        """
         return self._native_private(
-            "set_dcp", self._native_params(tradeType=tradeType, timeout=timeout, symbol=symbol)
+            "set_dcp", self._native_params(timeout=timeout, symbols=symbols)
         )
 
-    def get_dcp(self, tradeType: str) -> dict[str, Any]:  # noqa: N803
-        """Read the active disconnection protection deadline."""
-        return self._native_private("get_dcp", self._native_params(tradeType=tradeType))
+    def get_dcp(self) -> dict[str, Any]:
+        """Read the active spot disconnection protection settings."""
+        return self._native_private("get_dcp", [])
 
     def place_spot_order(
         self,
@@ -689,8 +692,8 @@ class TradeHTTP(HTTPManager):
         order_type: str,
         size: str,
         *,
+        size_unit: str,
         price: str | None = None,
-        size_unit: str | None = None,
         client_oid: str | None = None,
         time_in_force: str | None = None,
         margin_mode: str | None = None,
@@ -701,8 +704,15 @@ class TradeHTTP(HTTPManager):
         trigger_direction: str | None = None,
         trigger_price_type: str | None = None,
         trigger_price: str | None = None,
+        stp: str | None = None,
+        cancel_after: int | None = None,
     ) -> dict[str, Any]:
-        """Place a KuCoin UTA V2 spot, margin, or futures order."""
+        """
+        Place a KuCoin UTA V2 spot, margin, or futures order.
+
+        ``size_unit`` is required by KuCoin: ``BASECCY`` or ``QUOTECCY`` (spot
+        market), ``BASECCY`` (spot limit), ``BASECCY`` or ``UNIT`` (futures).
+        """
         return self._native_private(
             "place_uta_order",
             self._native_params(
@@ -723,6 +733,8 @@ class TradeHTTP(HTTPManager):
                 triggerDirection=trigger_direction,
                 triggerPriceType=trigger_price_type,
                 triggerPrice=trigger_price,
+                stp=stp,
+                cancelAfter=cancel_after,
             ),
         )
 
@@ -753,8 +765,14 @@ class TradeHTTP(HTTPManager):
         client_oid: str | None = None,
         new_price: str | None = None,
         new_size: str | None = None,
+        size_unit: str | None = None,
+        cxl_on_fail: bool | None = None,
+        tp_trigger_price: str | None = None,
+        tp_trigger_price_type: str | None = None,
+        sl_trigger_price: str | None = None,
+        sl_trigger_price_type: str | None = None,
     ) -> dict[str, Any]:
-        """Amend a KuCoin UTA V2 futures order."""
+        """Amend a KuCoin UTA V2 futures order (KuCoin supports futures only)."""
         return self._native_private(
             "amend_uta_order",
             self._native_params(
@@ -763,6 +781,12 @@ class TradeHTTP(HTTPManager):
                 clientOid=client_oid,
                 newPrice=new_price,
                 newSize=new_size,
+                sizeUnit=size_unit,
+                cxlOnFail=cxl_on_fail,
+                tpTriggerPrice=tp_trigger_price,
+                tpTriggerPriceType=tp_trigger_price_type,
+                slTriggerPrice=sl_trigger_price,
+                slTriggerPriceType=sl_trigger_price_type,
             ),
         )
 

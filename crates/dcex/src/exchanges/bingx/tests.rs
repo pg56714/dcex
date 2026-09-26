@@ -9,6 +9,8 @@ use super::client::BingxClient;
 use super::endpoints::BASE_URL;
 use super::signing::BingxSigner;
 
+mod route_coverage;
+
 #[test]
 fn signer_uses_unescaped_sorted_payload() {
     let signer = BingxSigner {

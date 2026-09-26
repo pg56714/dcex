@@ -514,7 +514,7 @@ async fn subaccount_balance_uses_path_and_query() {
 }
 
 #[tokio::test]
-async fn dcp_uses_signed_uta_routes_and_symbol_array() {
+async fn dcp_uses_spot_dead_cancel_all_routes_and_symbols_string() {
     let (base_url, server_handle) = server();
     let client = KucoinClient::with_base_urls(
         Some("key".into()),
@@ -529,20 +529,20 @@ async fn dcp_uses_signed_uta_routes_and_symbol_array() {
         .private_request(
             "set_dcp",
             vec![
-                ("tradeType".into(), "SPOT".into()),
                 ("timeout".into(), "10".into()),
-                ("symbol".into(), r#"["BTC-USDT","ETH-USDT"]"#.into()),
+                ("symbols".into(), r#"["BTC-USDT","ETH-USDT"]"#.into()),
             ],
         )
         .await
         .expect("set DCP");
     let request = server_handle.join().expect("server");
-    assert!(request.starts_with("POST /api/ua/v1/dcp/set HTTP/1.1"));
+    assert!(request.starts_with("POST /api/v1/hf/orders/dead-cancel-all HTTP/1.1"));
     let body: serde_json::Value =
         serde_json::from_str(request.split("\r\n\r\n").nth(1).expect("body")).expect("JSON");
-    assert_eq!(body["tradeType"], "SPOT");
-    assert_eq!(body["timeout"], 10);
-    assert_eq!(body["symbol"], serde_json::json!(["BTC-USDT", "ETH-USDT"]));
+    assert_eq!(
+        body,
+        serde_json::json!({"timeout": 10, "symbols": "BTC-USDT,ETH-USDT"})
+    );
 
     let (base_url, server_handle) = server();
     let client = KucoinClient::with_base_urls(
@@ -555,11 +555,11 @@ async fn dcp_uses_signed_uta_routes_and_symbol_array() {
     )
     .expect("client");
     client
-        .private_request("get_dcp", vec![("tradeType".into(), "SPOT".into())])
+        .private_request("get_dcp", Vec::new())
         .await
         .expect("get DCP");
     let request = server_handle.join().expect("server");
-    assert!(request.starts_with("GET /api/ua/v1/dcp/query?tradeType=SPOT HTTP/1.1"));
+    assert!(request.starts_with("GET /api/v1/hf/orders/dead-cancel-all/query HTTP/1.1"));
 }
 
 #[tokio::test]
@@ -681,7 +681,7 @@ async fn uta_v2_order_uses_signed_unified_route_and_normalized_symbol() {
     .expect("client");
 
     client
-        .place_uta_order("FUTURES", "BTC-USDT-SWAP", "BUY", "LIMIT", "1")
+        .place_uta_order("FUTURES", "BTC-USDT-SWAP", "BUY", "LIMIT", "1", "UNIT")
         .price("30000")
         .await
         .expect("response");
@@ -695,16 +695,17 @@ async fn uta_v2_order_uses_signed_unified_route_and_normalized_symbol() {
     assert_eq!(body["symbol"], "XBTUSDTM");
     assert_eq!(body["price"], "30000");
     assert_eq!(body["size"], "1");
+    assert_eq!(body["sizeUnit"], "UNIT");
     assert!(body["clientOid"].as_str().is_some());
 }
 
 #[tokio::test]
-async fn uta_v2_positions_and_v1_risk_overview_use_documented_paths() {
+async fn uta_v2_positions_and_risk_overview_use_documented_paths() {
     for (method, path) in [
         ("get_uta_positions", "/api/ua/v2/unified/position/open-list"),
         (
             "get_uta_account_overview",
-            "/api/ua/v1/unified/account/overview",
+            "/api/ua/v2/unified/account/overview",
         ),
     ] {
         let (base_url, handle) = server();
@@ -735,3 +736,5 @@ async fn uta_v2_order_identifier_is_required_before_network() {
         .expect_err("order id is required");
     assert!(error.to_string().contains("orderId"));
 }
+
+mod endpoint_coverage;

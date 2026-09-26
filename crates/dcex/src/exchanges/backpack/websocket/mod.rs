@@ -51,10 +51,15 @@ pub(crate) fn normalize_stream(stream: &str) -> Result<String> {
             "Backpack WebSocket stream must not be empty.".to_string(),
         ));
     }
+    // `account.balanceUpdate` cannot be scoped to a single asset.
+    if stream == "account.balanceUpdate" {
+        return Ok(stream.to_string());
+    }
     for prefix in [
         "account.orderUpdate",
         "account.positionUpdate",
         "account.rfqUpdate",
+        "account.rfq",
     ] {
         if stream == prefix {
             return Ok(stream.to_string());
@@ -92,8 +97,12 @@ pub(crate) fn normalize_stream(stream: &str) -> Result<String> {
         }
         return Ok(format!("depth.{}", stream_symbol(remainder.to_string())?));
     }
+    if let Some(ticker) = stream.strip_prefix("stockPrice.") {
+        return Ok(format!("stockPrice.{}", stock_ticker(ticker)?));
+    }
     for prefix in [
         "bookTicker",
+        "externalTicker",
         "liquidation",
         "markPrice",
         "ticker",
@@ -128,6 +137,26 @@ pub(crate) fn stream_symbol(symbol: String) -> Result<String> {
         )));
     }
     Ok(symbol.to_ascii_uppercase())
+}
+
+/// `stockPrice` takes a bare stock ticker (class shares keep their dot, e.g.
+/// `BRK.B`); exchange symbols such as `AAPL.US` and market symbols such as
+/// `AAPL.US_USDC` are not accepted by Backpack.
+fn stock_ticker(ticker: &str) -> Result<String> {
+    let ticker = ticker.trim().to_ascii_uppercase();
+    if ticker.is_empty()
+        || !ticker
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || character == '.')
+        || ticker.starts_with('.')
+        || ticker.ends_with('.')
+        || ticker.ends_with(".US")
+    {
+        return Err(DcexError::InvalidInput(format!(
+            "unsupported Backpack stock ticker: {ticker} (use a bare ticker such as AAPL)"
+        )));
+    }
+    Ok(ticker)
 }
 
 pub(crate) fn validate_kline_interval(interval: &str) -> Result<String> {

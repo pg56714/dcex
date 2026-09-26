@@ -80,43 +80,25 @@ impl KucoinClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "set_dcp" => {
-                params.ensure_allowed(&["tradeType", "timeout", "symbol"])?;
-                validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])?;
-                let timeout = params.required("timeout")?.parse::<u64>().map_err(|_| {
-                    DcexError::InvalidInput("KuCoin DCP timeout must be an unsigned integer".into())
+                params.ensure_allowed(&["timeout", "symbols"])?;
+                let timeout = params.required("timeout")?.parse::<i64>().map_err(|_| {
+                    DcexError::InvalidInput("KuCoin DCP timeout must be an integer".into())
                 })?;
-                let symbols = params.json_required("symbol")?;
-                let valid_symbols = symbols.as_array().is_some_and(|items| {
-                    !items.is_empty()
-                        && items
-                            .iter()
-                            .all(|item| item.as_str().is_some_and(|value| !value.trim().is_empty()))
-                });
-                if !valid_symbols {
+                if timeout != -1 && !(5..=86_400).contains(&timeout) {
                     return Err(DcexError::InvalidInput(
-                        "KuCoin DCP symbol must be a nonempty string array".into(),
+                        "KuCoin DCP timeout must be -1 or between 5 and 86400".into(),
                     ));
                 }
-                self.private_post(
-                    KucoinMarket::Spot,
-                    DCP_SET,
-                    serde_json::json!({
-                        "tradeType": params.required("tradeType")?,
-                        "timeout": timeout,
-                        "symbol": symbols,
-                    }),
-                )
-                .await
+                let mut body = serde_json::json!({ "timeout": timeout });
+                if let Some(symbols) = params.get("symbols") {
+                    body["symbols"] = Value::String(dcp_symbols(symbols)?);
+                }
+                self.private_post(KucoinMarket::Spot, DCP_SET, body).await
             }
             "get_dcp" => {
-                params.ensure_allowed(&["tradeType"])?;
-                validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])?;
-                self.private_get(
-                    KucoinMarket::Spot,
-                    DCP_QUERY,
-                    vec![("tradeType".into(), params.required("tradeType")?.into())],
-                )
-                .await
+                params.ensure_allowed(&[])?;
+                self.private_get(KucoinMarket::Spot, DCP_QUERY, Vec::new())
+                    .await
             }
             "place_spot_order" => self.spot_order_from_params(params, None, None, false).await,
             "test_spot_order" => {
@@ -647,13 +629,19 @@ fn validate_spot_order(
         "clientTimestamp",
     ])?;
     params.required_any(&["product_symbol", "symbol"])?;
-    let side = side_override.unwrap_or(params.required("side")?);
+    let side = match side_override {
+        Some(side) => side,
+        None => params.required("side")?,
+    };
     if !matches!(side, "buy" | "sell") {
         return Err(DcexError::InvalidInput(format!(
             "unsupported KuCoin side: {side}"
         )));
     }
-    let order_type = type_override.unwrap_or(params.required("type")?);
+    let order_type = match type_override {
+        Some(order_type) => order_type,
+        None => params.required("type")?,
+    };
     if !matches!(order_type, "limit" | "market") {
         return Err(DcexError::InvalidInput(format!(
             "unsupported KuCoin type: {order_type}"
@@ -818,7 +806,10 @@ fn validate_futures_order(
             ));
         }
     } else {
-        let side = side_override.unwrap_or(params.required("side")?);
+        let side = match side_override {
+            Some(side) => side,
+            None => params.required("side")?,
+        };
         if !matches!(side, "buy" | "sell") {
             return Err(DcexError::InvalidInput(format!(
                 "unsupported KuCoin side: {side}"
@@ -883,4 +874,27 @@ fn bool_param(params: &KucoinParams, key: &str) -> Result<Option<bool>> {
             })
         })
         .transpose()
+}
+
+/// KuCoin's spot DCP takes a comma-separated `symbols` string (at most 50
+/// pairs); an empty value means all pairs. Accepts that string or a JSON array.
+fn dcp_symbols(raw: &str) -> Result<String> {
+    let symbols: Vec<String> = if raw.trim_start().starts_with('[') {
+        serde_json::from_str(raw).map_err(|_| {
+            DcexError::InvalidInput("KuCoin DCP symbols must be a string array".into())
+        })?
+    } else {
+        raw.split(',').map(str::to_string).collect()
+    };
+    let symbols: Vec<&str> = symbols
+        .iter()
+        .map(|symbol| symbol.trim())
+        .filter(|symbol| !symbol.is_empty())
+        .collect();
+    if symbols.len() > 50 {
+        return Err(DcexError::InvalidInput(
+            "KuCoin DCP supports at most 50 symbols".into(),
+        ));
+    }
+    Ok(symbols.join(","))
 }

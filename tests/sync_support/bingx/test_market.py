@@ -56,7 +56,7 @@ def test_get_spot_orderbook(client):
 
 
 def test_get_spot_orderbook_v2(client):
-    res = client.get_spot_orderbook_v2("BTC-USDT-SPOT", limit=10)
+    res = client.get_spot_orderbook_v2("BTC-USDT-SPOT", depth=10)
     assert res is not None
 
 

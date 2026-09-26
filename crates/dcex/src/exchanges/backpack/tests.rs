@@ -289,3 +289,6 @@ mod tests {
         assert!(error.to_string().contains("require quantity"));
     }
 }
+
+#[cfg(test)]
+mod endpoint_coverage;

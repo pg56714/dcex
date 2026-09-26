@@ -8,6 +8,9 @@ from ._base import AsyncWebSocketMixin
 
 _native = load_native()
 
+UTA_PUBLIC_WS_URL = "wss://ws.bitget.com/v3/ws/public"
+UTA_PRIVATE_WS_URL = "wss://ws.bitget.com/v3/ws/private"
+
 
 class PublicClient(AsyncWebSocketMixin):
     """Async Bitget public market WebSocket client."""
@@ -71,7 +74,14 @@ class PublicClient(AsyncWebSocketMixin):
 
 
 class PrivateClient(AsyncWebSocketMixin):
-    """Async Bitget private WebSocket client."""
+    """
+    Async Bitget private WebSocket client.
+
+    On the classic V2 endpoint ``inst_type`` defaults to ``USDT-FUTURES``. On the
+    UTA V3 endpoint (see :func:`uta_private`) it defaults to ``UTA`` and the
+    order/fill/position/account helpers send ``{"instType": "UTA", "topic": ...}``
+    subscriptions that cover every product type.
+    """
 
     def __init__(
         self,
@@ -128,7 +138,7 @@ class PrivateClient(AsyncWebSocketMixin):
 
     async def subscribe_orders(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         inst_id: str | None = None,
     ) -> None:
         """Subscribe to order update events."""
@@ -136,7 +146,7 @@ class PrivateClient(AsyncWebSocketMixin):
 
     async def subscribe_fills(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         inst_id: str | None = None,
     ) -> None:
         """Subscribe to fill update events."""
@@ -144,7 +154,7 @@ class PrivateClient(AsyncWebSocketMixin):
 
     async def subscribe_positions(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         inst_id: str | None = None,
     ) -> None:
         """Subscribe to position update events."""
@@ -152,13 +162,13 @@ class PrivateClient(AsyncWebSocketMixin):
 
     async def subscribe_account(
         self,
-        inst_type: str = "USDT-FUTURES",
+        inst_type: str | None = None,
         coin: str | None = None,
     ) -> None:
         """Subscribe to account balance events."""
         await self._native_client.subscribe_account(inst_type, coin)
 
-    async def subscribe_equity(self, inst_type: str = "USDT-FUTURES") -> None:
+    async def subscribe_equity(self, inst_type: str | None = None) -> None:
         """Subscribe to equity update events."""
         await self._native_client.subscribe_equity(inst_type)
 
@@ -209,6 +219,30 @@ def private(
     )
 
 
+def uta_public(
+    inst_type: str = "SPOT",
+    timeout: float = 10.0,
+) -> PublicClient:
+    """Create an async Bitget UTA V3 public WebSocket client (``topic``/``symbol`` args)."""
+    return PublicClient(inst_type=inst_type, timeout=timeout, base_url=UTA_PUBLIC_WS_URL)
+
+
+def uta_private(
+    api_key: str,
+    api_secret: str,
+    passphrase: str,
+    timeout: float = 10.0,
+) -> PrivateClient:
+    """Create an async Bitget UTA V3 private WebSocket client (``instType=UTA`` topics)."""
+    return PrivateClient(
+        api_key=api_key,
+        api_secret=api_secret,
+        passphrase=passphrase,
+        timeout=timeout,
+        base_url=UTA_PRIVATE_WS_URL,
+    )
+
+
 def reality_private(
     api_key: str,
     api_secret: str,
@@ -221,8 +255,16 @@ def reality_private(
         api_secret,
         passphrase,
         timeout,
-        "wss://ws.bitget.com/v3/ws/private",
+        UTA_PRIVATE_WS_URL,
     )
 
 
-__all__ = ["PrivateClient", "PublicClient", "private", "public", "reality_private"]
+__all__ = [
+    "PrivateClient",
+    "PublicClient",
+    "private",
+    "public",
+    "reality_private",
+    "uta_private",
+    "uta_public",
+]

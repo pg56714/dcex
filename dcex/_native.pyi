@@ -840,9 +840,21 @@ class OkxPublicWebSocketClient:
     def set_product_table(self, table: ProductTable) -> None: ...
     async def connect(self) -> None: ...
     async def close(self) -> None: ...
-    async def subscribe_channel(self, channel: str, product_symbol: str | None = None) -> None: ...
+    async def subscribe_channel(
+        self,
+        channel: str,
+        product_symbol: str | None = None,
+        inst_type: str | None = None,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
+    ) -> None: ...
     async def unsubscribe_channel(
-        self, channel: str, product_symbol: str | None = None
+        self,
+        channel: str,
+        product_symbol: str | None = None,
+        inst_type: str | None = None,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
     ) -> None: ...
     async def subscribe_trades(self, product_symbol: str) -> None: ...
     async def subscribe_ticker(self, product_symbol: str) -> None: ...
@@ -869,6 +881,8 @@ class OkxPrivateWebSocketClient:
         inst_type: str | None = None,
         inst_id: str | None = None,
         ccy: str | None = None,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
     ) -> None: ...
     async def unsubscribe_channel(
         self,
@@ -876,9 +890,14 @@ class OkxPrivateWebSocketClient:
         inst_type: str | None = None,
         inst_id: str | None = None,
         ccy: str | None = None,
+        inst_family: str | None = None,
+        sprd_id: str | None = None,
     ) -> None: ...
     async def subscribe_orders(
-        self, inst_type: str | None = None, inst_id: str | None = None
+        self,
+        inst_type: str | None = None,
+        inst_id: str | None = None,
+        inst_family: str | None = None,
     ) -> None: ...
     async def subscribe_account(self, ccy: str | None = None) -> None: ...
     async def subscribe_positions(self, inst_type: str | None = None) -> None: ...

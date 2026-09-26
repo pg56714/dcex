@@ -1,6 +1,9 @@
 use super::msgpack::{OrderedValue, encode_msgpack};
 use super::*;
 
+mod endpoint_coverage;
+mod websocket_coverage;
+
 #[test]
 fn signature_matches_python_vector() {
     let action = hex::decode("82a474797065a56f72646572a16101").expect("msgpack");

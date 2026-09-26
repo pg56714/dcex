@@ -44,6 +44,7 @@ crate::exchanges::impl_exchange_method_wrappers!(
         get_trades_history(),
         get_funding_payments(start_time => "startTime"),
         get_leverage(),
+        update_leverage(market => "market", leverage => "leverage"),
         get_fees(),
         get_rebates(),
         get_builder_dashboard(),

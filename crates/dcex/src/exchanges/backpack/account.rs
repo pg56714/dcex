@@ -1,11 +1,14 @@
 use serde_json::Value;
 
-use crate::Result;
 use crate::exchange::ValidatedResponse;
+use crate::{DcexError, Result};
 
 use super::client::BackpackClient;
 use super::endpoints::*;
 use super::params::BackpackParams;
+
+const UPDATE_ACCOUNT_BOOL_FIELDS: &[&str] =
+    &["autoBorrowSettlements", "autoLend", "autoRepayBorrows"];
 
 impl BackpackClient {
     pub(super) async fn account_private_request(
@@ -16,6 +19,7 @@ impl BackpackClient {
         if !matches!(
             method_name,
             "get_account"
+                | "update_account"
                 | "get_max_borrow_quantity"
                 | "get_max_order_quantity"
                 | "get_max_withdrawal_quantity"
@@ -37,6 +41,14 @@ impl BackpackClient {
         self.validate_account_params(method_name, params)?;
         let response = match method_name {
             "get_account" => self.private_get(ACCOUNT, Vec::new(), "accountQuery").await,
+            "update_account" => {
+                self.private_patch_value(
+                    ACCOUNT,
+                    Value::Object(params.body(&["leverageLimit"], &[], UPDATE_ACCOUNT_BOOL_FIELDS)),
+                    "accountUpdate",
+                )
+                .await
+            }
             "get_max_borrow_quantity" => {
                 self.private_get(
                     MAX_BORROW_QUANTITY,
@@ -184,6 +196,29 @@ impl BackpackClient {
             | "get_borrow_lend_positions"
             | "get_balances"
             | "get_private_collateral" => params.ensure_allowed(&[], &[]),
+            "update_account" => {
+                let mut allowed = vec!["leverageLimit"];
+                allowed.extend_from_slice(UPDATE_ACCOUNT_BOOL_FIELDS);
+                params.ensure_allowed(&allowed, &[])?;
+                if allowed.iter().all(|key| params.get(key).is_none()) {
+                    return Err(DcexError::InvalidInput(
+                        "Backpack update_account requires at least one setting".to_string(),
+                    ));
+                }
+                for key in UPDATE_ACCOUNT_BOOL_FIELDS {
+                    params.optional_bool(key)?;
+                }
+                if let Some(limit) = params.get("leverageLimit")
+                    && !limit
+                        .parse::<f64>()
+                        .is_ok_and(|value| value.is_finite() && value > 0.0)
+                {
+                    return Err(DcexError::InvalidInput(format!(
+                        "invalid Backpack leverageLimit: {limit}"
+                    )));
+                }
+                Ok(())
+            }
             "get_max_borrow_quantity" | "convert_dust" => {
                 params.ensure_allowed(&["symbol"], &[])?;
                 params.required("symbol")?;

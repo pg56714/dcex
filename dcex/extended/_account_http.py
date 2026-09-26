@@ -129,6 +129,13 @@ class AccountHTTP(HTTPManager):
     def get_leverage(self, market: str | Sequence[str] | None = None) -> Any:  # noqa: ANN401
         return self._native_private("get_leverage", self._native_params(market=market))
 
+    def update_leverage(self, market: str, leverage: str | int) -> Any:  # noqa: ANN401
+        """Update the leverage for one market (``PATCH /api/v1/user/leverage``)."""
+        return self._native_private(
+            "update_leverage",
+            self._native_params(market=market, leverage=leverage),
+        )
+
     def get_fees(
         self,
         market: str | Sequence[str] | None = None,

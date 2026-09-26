@@ -542,6 +542,8 @@ fn rust_direct_clients_expose_python_method_names() {
 
     assert_methods!(
         HyperliquidClient:
+        cancel_batch_orders,
+        cancel_batch_orders_by_cloid,
         cancel_order,
         cancel_order_by_cloid,
         cancel_twap_order,
@@ -561,6 +563,7 @@ fn rust_direct_clients_expose_python_method_names() {
         modify_order,
         open_orders,
         order_status,
+        place_batch_orders,
         place_future_limit_buy_order,
         place_future_limit_order,
         place_future_limit_sell_order,
@@ -574,6 +577,7 @@ fn rust_direct_clients_expose_python_method_names() {
         spot_clearinghouse_state,
         subaccounts,
         update_isolate_margin,
+        update_isolated_margin,
         update_leverage,
         user_fills,
         user_rate_limit,

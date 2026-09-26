@@ -581,24 +581,28 @@ async def test_contract_stateful_order_lifecycle(client):
                 CONTRACT_SYMBOL,
                 buy_price,
                 contract_vol,
+                leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=_client_id(),
             ),
             lambda: client.place_contract_limit_sell_order(
                 CONTRACT_SYMBOL,
                 sell_price,
                 contract_vol,
+                leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=_client_id(),
             ),
             lambda: client.place_contract_post_only_buy_order(
                 CONTRACT_SYMBOL,
                 buy_price,
                 contract_vol,
+                leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=_client_id(),
             ),
             lambda: client.place_contract_post_only_sell_order(
                 CONTRACT_SYMBOL,
                 sell_price,
                 contract_vol,
+                leverage=CONTRACT_TEST_LEVERAGE,
                 externalOid=_client_id(),
             ),
         ):

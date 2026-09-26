@@ -158,7 +158,7 @@ class HTTPManager(BaseHTTPManager):
         """Convert optional Python arguments into native string pairs."""
         params: list[tuple[str, str]] = []
         for key, value in kwargs.items():
-            if value is None:
+            if key == "self" or value is None:
                 continue
             if key == "from_":
                 key = "from"

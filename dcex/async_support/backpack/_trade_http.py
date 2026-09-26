@@ -413,7 +413,6 @@ class TradeHTTP(HTTPManager):
     async def get_funding_payments(
         self,
         product_symbol: str | None = None,
-        subaccountId: int | None = None,
         limit: int | None = None,
         offset: int | None = None,
         sortDirection: str | None = None,

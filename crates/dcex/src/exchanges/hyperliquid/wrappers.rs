@@ -29,11 +29,14 @@ crate::exchanges::impl_exchange_method_wrappers! {
         user_vault_equities(user => "user")
     ];
     private [
+        cancel_batch_orders(cancels => "cancels"),
+        cancel_batch_orders_by_cloid(cancels => "cancels"),
         cancel_order(product_symbol => "product_symbol", oid => "oid"),
         cancel_order_by_cloid(product_symbol => "product_symbol", cloid => "cloid"),
         cancel_twap_order(product_symbol => "product_symbol", twap_id => "twap_id"),
         modify_batch_orders(modifies => "modifies"),
         modify_order(oid => "oid", product_symbol => "product_symbol", is_buy => "isBuy", price => "price", size => "size", reduce_only => "reduceOnly"),
+        place_batch_orders(orders => "orders"),
         place_future_limit_buy_order(product_symbol => "product_symbol", price => "price", size => "size", tif => "tif"),
         place_future_limit_order(product_symbol => "product_symbol", is_buy => "isBuy", price => "price", size => "size", tif => "tif"),
         place_future_limit_sell_order(product_symbol => "product_symbol", price => "price", size => "size", tif => "tif"),
@@ -46,6 +49,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         transfer_between_dexes(source_dex => "sourceDex", destination_dex => "destinationDex", token => "token", amount => "amount"),
         transfer_usdc_spot_perp(amount => "amount", to_perp => "toPerp", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
         update_isolate_margin(product_symbol => "product_symbol", is_buy => "isBuy", ntli => "ntli"),
+        update_isolated_margin(product_symbol => "product_symbol", is_buy => "isBuy", ntli => "ntli"),
         update_leverage(product_symbol => "product_symbol", is_cross => "isCross", leverage => "leverage")
     ];
 }

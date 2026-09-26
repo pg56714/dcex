@@ -68,7 +68,7 @@ async def test_get_spot_orderbook(client):
 
 @pytest.mark.asyncio
 async def test_get_spot_orderbook_v2(client):
-    res = await client.get_spot_orderbook_v2("BTC-USDT-SPOT", limit=10)
+    res = await client.get_spot_orderbook_v2("BTC-USDT-SPOT", depth=10)
     assert res is not None
 
 

@@ -1000,6 +1000,36 @@ fn margin_market_data_uses_spot_base_url_and_api_key() {
 }
 
 #[test]
+fn futures_listen_key_keepalive_and_close_send_no_parameters() {
+    for (name, method) in [
+        ("keep_alive_futures_listen_key", "PUT"),
+        ("close_futures_listen_key", "DELETE"),
+    ] {
+        let (futures_base_url, handle) = recording_server();
+        let client = BinanceClient::with_base_urls(
+            Some("api-key".to_string()),
+            None,
+            Duration::from_secs(2),
+            "http://127.0.0.1:9".to_string(),
+            futures_base_url,
+        )
+        .expect("client");
+
+        block_on(async move {
+            client
+                .private_request(name, vec![("listenKey".to_string(), "k".to_string())])
+                .await
+        })
+        .expect("response");
+
+        assert_eq!(
+            handle.join().expect("server"),
+            Some(format!("{method} /fapi/v1/listenKey HTTP/1.1"))
+        );
+    }
+}
+
+#[test]
 fn margin_order_uses_signed_margin_path() {
     let (spot_base_url, handle) = recording_server_after_time_sync();
     let client = BinanceClient::with_base_urls(
@@ -1659,3 +1689,5 @@ fn portfolio_margin_order_amendments_use_signed_route() {
     assert!(request_line.starts_with("GET /papi/v1/um/orderAmendment?"));
     assert!(request_line.contains("orderId=123"));
 }
+
+mod endpoint_coverage;
