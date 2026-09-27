@@ -18,6 +18,37 @@ impl HyperliquidClient {
         let params = HyperliquidParams::from_pairs(params);
         validate_private_params(method_name, &params)?;
         match method_name {
+            "reserve_request_weight" => {
+                let weight = params.required_u64("weight")?;
+                if weight == 0 {
+                    return Err(DcexError::InvalidInput("weight must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("reserveRequestWeight")),
+                        ("weight", uint(weight)),
+                    ]),
+                    &params,
+                )
+                .await
+            }
+            "set_agent_abstraction" => {
+                let mode = params.required_one_of("abstraction", &["i", "u", "p"])?;
+                self.submit_action(
+                    object(vec![
+                        ("type", string("agentSetAbstraction")),
+                        ("abstraction", string(mode)),
+                    ]),
+                    &params,
+                )
+                .await
+            }
+            "set_user_abstraction" => self.set_user_abstraction_from_params(&params).await,
+            "noop" => {
+                params.required_u64("nonce")?;
+                self.submit_action(object(vec![("type", string("noop"))]), &params)
+                    .await
+            }
             "place_order" => self.place_order_from_params(&params, None, None).await,
             "place_future_market_order" => self.place_market_order_from_params(&params, None).await,
             "place_future_market_buy_order" => {
@@ -363,6 +394,48 @@ impl HyperliquidClient {
             .await
     }
 
+    async fn set_user_abstraction_from_params(
+        &self,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        let user = params.address("user")?;
+        let abstraction = params.required_one_of(
+            "abstraction",
+            &["disabled", "unifiedAccount", "portfolioMargin"],
+        )?;
+        let nonce = params.required_u64("nonce")?;
+        let chain_id = params.required("signatureChainId")?;
+        if !chain_id.starts_with("0x")
+            || chain_id.len() <= 2
+            || !chain_id[2..].bytes().all(|b| b.is_ascii_hexdigit())
+        {
+            return Err(DcexError::InvalidInput(
+                "signatureChainId must be a hexadecimal chain ID".into(),
+            ));
+        }
+        let signature: Value = serde_json::from_str(params.required("signature")?)
+            .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+        if !signature.as_object().is_some_and(|s| {
+            s.len() == 3
+                && ["r", "s"].iter().all(|k| {
+                    s.get(*k).and_then(Value::as_str).is_some_and(|v| {
+                        v.len() == 66
+                            && v.starts_with("0x")
+                            && v[2..].bytes().all(|b| b.is_ascii_hexdigit())
+                    })
+                })
+                && matches!(s.get("v").and_then(Value::as_u64), Some(27 | 28))
+        }) {
+            return Err(DcexError::InvalidInput(
+                "signature requires 32-byte r/s and v 27 or 28".into(),
+            ));
+        }
+        let payload = serde_json::json!({"action":{"type":"userSetAbstraction","hyperliquidChain":if self.is_testnet(){"Testnet"}else{"Mainnet"},"signatureChainId":chain_id,"user":user,"abstraction":abstraction,"nonce":nonce},"nonce":nonce,"signature":signature});
+        let body = serde_json::to_vec(&payload).map_err(|e| DcexError::Decode(e.to_string()))?;
+        self.request(HttpMethod::Post, EXCHANGE, body, None, false)
+            .await
+    }
+
     async fn modify_order_from_params(
         &self,
         params: &HyperliquidParams,
@@ -598,8 +671,13 @@ impl HyperliquidClient {
                 Value::Number(Number::from(expires_after)),
             );
         }
-        self.exchange_payload(Value::Object(payload), action_msgpack)
-            .await
+        if let Some(nonce) = params.optional_u64("nonce")? {
+            self.exchange_payload_at_nonce(Value::Object(payload), action_msgpack, nonce)
+                .await
+        } else {
+            self.exchange_payload(Value::Object(payload), action_msgpack)
+                .await
+        }
     }
 
     /// Returns `(mid price, szDecimals, is_spot)` for a market order.
@@ -905,6 +983,16 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
         "cancel_order" => &["product_symbol", "oid", "vaultAddress", "expiresAfter"],
         "cancel_order_by_cloid" => &["product_symbol", "cloid", "vaultAddress", "expiresAfter"],
         "schedule_cancel" => &["time", "vaultAddress", "expiresAfter"],
+        "noop" => &["nonce", "vaultAddress", "expiresAfter"],
+        "reserve_request_weight" => &["weight", "expiresAfter"],
+        "set_agent_abstraction" => &["abstraction"],
+        "set_user_abstraction" => &[
+            "user",
+            "abstraction",
+            "nonce",
+            "signature",
+            "signatureChainId",
+        ],
         "transfer_between_dexes" => &["sourceDex", "destinationDex", "token", "amount"],
         "transfer_usdc_spot_perp" => {
             &["amount", "toPerp", "nonce", "signature", "signatureChainId"]

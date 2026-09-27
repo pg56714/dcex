@@ -116,6 +116,76 @@ class PrivateClient(AsyncWebSocketMixin):
         """Send an application-level ping."""
         await self._native_client.ping()
 
+    async def trade_request(
+        self,
+        request_id: str,
+        topic: str,
+        args: list[dict[str, Any]],
+        *,
+        category: str | None = None,
+        request_time: int | None = None,
+    ) -> None:
+        """
+        Send a UTA trade frame; read the ACK and every per-order result with recv.
+
+        Symbols and argument keys follow the official exchange schema. Decimal
+        quantities/prices are strings. Request IDs must be unique among pending
+        requests. A successful ACK does not confirm execution. On timeout, query
+        order status before retrying to avoid duplicate orders.
+        """
+        await self._native_client.trade_request(
+            request_id, topic, json.dumps(args, allow_nan=False), category, request_time
+        )
+
+    async def classic_trade_request(
+        self, request_id: str, inst_type: str, inst_id: str, channel: str, params: dict[str, Any]
+    ) -> None:
+        """Send a V2 order operation using the exchange-native instrument ID."""
+        await self._native_client.classic_trade_request(
+            request_id, inst_type, inst_id, channel, json.dumps(params, allow_nan=False)
+        )
+
+    async def place_order(
+        self,
+        request_id: str,
+        order: dict[str, Any],
+        *,
+        category: str | None = None,
+        request_time: int | None = None,
+    ) -> None:
+        """Send UTA place-order; receive the acknowledgement with recv."""
+        await self.trade_request(
+            request_id, "place-order", [order], category=category, request_time=request_time
+        )
+
+    async def modify_order(
+        self, request_id: str, order: dict[str, Any], *, category: str | None = None
+    ) -> None:
+        """Send UTA modify-order; receive the acknowledgement with recv."""
+        await self.trade_request(request_id, "modify-order", [order], category=category)
+
+    async def cancel_order(
+        self, request_id: str, order: dict[str, Any], *, category: str | None = None
+    ) -> None:
+        """Send UTA cancel-order; receive the acknowledgement with recv."""
+        await self.trade_request(request_id, "cancel-order", [order], category=category)
+
+    async def place_batch_orders(
+        self, request_id: str, orders: list[dict[str, Any]], *, category: str | None = None
+    ) -> None:
+        """Send UTA batch-place; receive the acknowledgement with recv."""
+        await self.trade_request(request_id, "batch-place", orders, category=category)
+
+    async def modify_batch_orders(
+        self, request_id: str, orders: list[dict[str, Any]], *, category: str | None = None
+    ) -> None:
+        """Send UTA batch-modify; receive the acknowledgement with recv."""
+        await self.trade_request(request_id, "batch-modify", orders, category=category)
+
+    async def cancel_batch_orders(self, request_id: str, orders: list[dict[str, Any]]) -> None:
+        """Send UTA batch-cancel; receive the acknowledgement with recv."""
+        await self.trade_request(request_id, "batch-cancel", orders)
+
     async def subscribe_channel(
         self,
         inst_type: str,

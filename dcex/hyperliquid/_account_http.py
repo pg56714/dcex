@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Exchange responses retain their native, heterogeneous JSON schemas.
 """Account-related HTTP API client for Hyperliquid exchange backed by Rust."""
 
 from typing import Any
@@ -98,3 +100,19 @@ class AccountHTTP(HTTPManager):
     def portfolio(self, user: str) -> dict[str, Any]:
         """Get portfolio information for a user."""
         return self._native_public("portfolio", self._native_params(user=user))
+
+    def frontend_open_orders(self, user: str, dex: str | None = None) -> dict[str, Any] | list[Any]:
+        """Get open orders including trigger and other frontend information."""
+        return self._native_public("frontend_open_orders", self._native_params(user=user, dex=dex))
+
+    def get_user_dex_abstraction(self, *, user: str) -> Any:
+        """Query userDexAbstraction using POST /info."""
+        return self._native_public("get_user_dex_abstraction", self._native_params(user=user))
+
+    def get_user_abstraction(self, *, user: str) -> Any:
+        """Query userAbstraction using POST /info."""
+        return self._native_public("get_user_abstraction", self._native_params(user=user))
+
+    def get_borrow_lend_user_state(self, *, user: str) -> Any:
+        """Query borrowLendUserState using POST /info."""
+        return self._native_public("get_borrow_lend_user_state", self._native_params(user=user))

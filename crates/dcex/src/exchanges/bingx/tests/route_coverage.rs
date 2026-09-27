@@ -16,6 +16,7 @@ struct Recorded {
     path: String,
     query: Vec<(String, String)>,
     api_key_header: bool,
+    body: serde_json::Value,
 }
 
 impl Recorded {
@@ -84,6 +85,7 @@ fn recording_server() -> (String, mpsc::Receiver<Recorded>) {
                 path,
                 query,
                 api_key_header,
+                body: serde_json::from_slice(&body).unwrap_or(serde_json::Value::Null),
             };
             if sender.send(recorded).is_err() {
                 break;
@@ -1043,4 +1045,1029 @@ fn invalid_parameters_fail_before_transport() {
             "{name} must be rejected"
         );
     }
+}
+
+#[tokio::test]
+async fn swap_trading_controls_use_documented_parameters() {
+    let (url, receiver) = recording_server();
+    let client = signed_client(url);
+    client
+        .private_request(
+            "set_swap_cancel_all_after",
+            vec![
+                ("type_".into(), "ACTIVATE".into()),
+                ("timeOut".into(), "30".into()),
+            ],
+        )
+        .await
+        .expect("set_swap_cancel_all_after");
+    let request = next(&receiver, "set_swap_cancel_all_after");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("POST", "/openApi/swap/v2/trade/cancelAllAfter", true)
+    );
+    assert!(request.query.contains(&("type".into(), "ACTIVATE".into())));
+    assert!(request.query.contains(&("timeOut".into(), "30".into())));
+    client
+        .private_request(
+            "get_swap_open_order",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("orderId".into(), "123".into()),
+            ],
+        )
+        .await
+        .expect("get_swap_open_order");
+    let request = next(&receiver, "get_swap_open_order");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v2/trade/openOrder", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(request.query.contains(&("orderId".into(), "123".into())));
+    client
+        .private_request("get_swap_force_orders", vec![])
+        .await
+        .expect("get_swap_force_orders");
+    let request = next(&receiver, "get_swap_force_orders");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v2/trade/forceOrders", true)
+    );
+    client
+        .private_request(
+            "get_swap_trade_fills",
+            vec![
+                ("tradingUnit".into(), "COIN".into()),
+                ("startTs".into(), "1700000000000".into()),
+                ("endTs".into(), "1700000100000".into()),
+            ],
+        )
+        .await
+        .expect("get_swap_trade_fills");
+    let request = next(&receiver, "get_swap_trade_fills");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v2/trade/allFillOrders", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("tradingUnit".into(), "COIN".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("startTs".into(), "1700000000000".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("endTs".into(), "1700000100000".into()))
+    );
+    client
+        .private_request(
+            "adjust_swap_position_margin",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("amount".into(), "2".into()),
+                ("type_".into(), "2".into()),
+                ("positionSide".into(), "LONG".into()),
+            ],
+        )
+        .await
+        .expect("adjust_swap_position_margin");
+    let request = next(&receiver, "adjust_swap_position_margin");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("POST", "/openApi/swap/v2/trade/positionMargin", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(request.query.contains(&("amount".into(), "2".into())));
+    assert!(request.query.contains(&("type".into(), "2".into())));
+    assert!(
+        request
+            .query
+            .contains(&("positionSide".into(), "LONG".into()))
+    );
+    client
+        .private_request(
+            "amend_swap_order",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("quantity".into(), "1".into()),
+                ("clientOrderId".into(), "amend-me".into()),
+            ],
+        )
+        .await
+        .expect("amend_swap_order");
+    let request = next(&receiver, "amend_swap_order");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("POST", "/openApi/swap/v1/trade/amend", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(request.query.contains(&("quantity".into(), "1".into())));
+    assert!(
+        request
+            .query
+            .contains(&("clientOrderId".into(), "amend-me".into()))
+    );
+    client
+        .private_request(
+            "place_swap_twap_order",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("side".into(), "BUY".into()),
+                ("positionSide".into(), "LONG".into()),
+                ("priceType".into(), "constant".into()),
+                ("priceVariance".into(), "1".into()),
+                ("triggerPrice".into(), "60000".into()),
+                ("interval".into(), "10".into()),
+                ("amountPerOrder".into(), "1".into()),
+                ("totalAmount".into(), "5".into()),
+            ],
+        )
+        .await
+        .expect("place_swap_twap_order");
+    let request = next(&receiver, "place_swap_twap_order");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("POST", "/openApi/swap/v1/twap/order", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(request.query.contains(&("side".into(), "BUY".into())));
+    assert!(
+        request
+            .query
+            .contains(&("positionSide".into(), "LONG".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("priceType".into(), "constant".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("priceVariance".into(), "1".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("triggerPrice".into(), "60000".into()))
+    );
+    assert!(request.query.contains(&("interval".into(), "10".into())));
+    assert!(
+        request
+            .query
+            .contains(&("amountPerOrder".into(), "1".into()))
+    );
+    assert!(request.query.contains(&("totalAmount".into(), "5".into())));
+    client
+        .private_request(
+            "cancel_swap_twap_order",
+            vec![("mainOrderId".into(), "123".into())],
+        )
+        .await
+        .expect("cancel_swap_twap_order");
+    let request = next(&receiver, "cancel_swap_twap_order");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("POST", "/openApi/swap/v1/twap/cancelOrder", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("mainOrderId".into(), "123".into()))
+    );
+    client
+        .private_request("get_swap_open_twap_orders", vec![])
+        .await
+        .expect("get_swap_open_twap_orders");
+    let request = next(&receiver, "get_swap_open_twap_orders");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/twap/openOrders", true)
+    );
+    client
+        .private_request(
+            "get_swap_twap_order_history",
+            vec![
+                ("pageIndex".into(), "1".into()),
+                ("pageSize".into(), "20".into()),
+                ("startTime".into(), "1700000000000".into()),
+                ("endTime".into(), "1700000100000".into()),
+            ],
+        )
+        .await
+        .expect("get_swap_twap_order_history");
+    let request = next(&receiver, "get_swap_twap_order_history");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/twap/historyOrders", true)
+    );
+    assert!(request.query.contains(&("pageIndex".into(), "1".into())));
+    assert!(request.query.contains(&("pageSize".into(), "20".into())));
+    assert!(
+        request
+            .query
+            .contains(&("startTime".into(), "1700000000000".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("endTime".into(), "1700000100000".into()))
+    );
+    client
+        .private_request(
+            "get_swap_twap_order",
+            vec![("mainOrderId".into(), "123".into())],
+        )
+        .await
+        .expect("get_swap_twap_order");
+    let request = next(&receiver, "get_swap_twap_order");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/twap/orderDetail", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("mainOrderId".into(), "123".into()))
+    );
+    client
+        .private_request("get_swap_asset_mode", vec![])
+        .await
+        .expect("get_swap_asset_mode");
+    let request = next(&receiver, "get_swap_asset_mode");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/trade/assetMode", true)
+    );
+    client
+        .private_request(
+            "set_swap_asset_mode",
+            vec![("assetMode".into(), "multiAssetsMode".into())],
+        )
+        .await
+        .expect("set_swap_asset_mode");
+    let request = next(&receiver, "set_swap_asset_mode");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("POST", "/openApi/swap/v1/trade/assetMode", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("assetMode".into(), "multiAssetsMode".into()))
+    );
+    client
+        .private_request("get_swap_multi_asset_rules", vec![])
+        .await
+        .expect("get_swap_multi_asset_rules");
+    let request = next(&receiver, "get_swap_multi_asset_rules");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/trade/multiAssetsRules", true)
+    );
+    client
+        .private_request("get_swap_margin_assets", vec![])
+        .await
+        .expect("get_swap_margin_assets");
+    let request = next(&receiver, "get_swap_margin_assets");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/user/marginAssets", true)
+    );
+    client
+        .private_request("get_swap_full_orders", vec![("limit".into(), "20".into())])
+        .await
+        .expect("get_swap_full_orders");
+    let request = next(&receiver, "get_swap_full_orders");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/trade/fullOrder", true)
+    );
+    assert!(request.query.contains(&("limit".into(), "20".into())));
+    client
+        .private_request(
+            "get_swap_fill_history",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("startTs".into(), "1700000000000".into()),
+                ("endTs".into(), "1700000100000".into()),
+            ],
+        )
+        .await
+        .expect("get_swap_fill_history");
+    let request = next(&receiver, "get_swap_fill_history");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v2/trade/fillHistory", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("startTs".into(), "1700000000000".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("endTs".into(), "1700000100000".into()))
+    );
+    client
+        .private_request(
+            "get_swap_position_history",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("startTs".into(), "1700000000000".into()),
+                ("endTs".into(), "1700000100000".into()),
+            ],
+        )
+        .await
+        .expect("get_swap_position_history");
+    let request = next(&receiver, "get_swap_position_history");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/trade/positionHistory", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("startTs".into(), "1700000000000".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("endTs".into(), "1700000100000".into()))
+    );
+    client
+        .private_request(
+            "get_swap_margin_history",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("positionId".into(), "123".into()),
+                ("startTime".into(), "1700000000000".into()),
+                ("endTime".into(), "1700000100000".into()),
+                ("pageIndex".into(), "1".into()),
+                ("pageSize".into(), "20".into()),
+            ],
+        )
+        .await
+        .expect("get_swap_margin_history");
+    let request = next(&receiver, "get_swap_margin_history");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/positionMargin/history", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(request.query.contains(&("positionId".into(), "123".into())));
+    assert!(
+        request
+            .query
+            .contains(&("startTime".into(), "1700000000000".into()))
+    );
+    assert!(
+        request
+            .query
+            .contains(&("endTime".into(), "1700000100000".into()))
+    );
+    assert!(request.query.contains(&("pageIndex".into(), "1".into())));
+    assert!(request.query.contains(&("pageSize".into(), "20".into())));
+    client
+        .private_request(
+            "get_swap_maintenance_margin_ratios",
+            vec![("product_symbol".into(), "BTC-USDT-SWAP".into())],
+        )
+        .await
+        .expect("get_swap_maintenance_margin_ratios");
+    let request = next(&receiver, "get_swap_maintenance_margin_ratios");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("GET", "/openApi/swap/v1/maintMarginRatio", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    client
+        .private_request(
+            "set_swap_auto_add_margin",
+            vec![
+                ("product_symbol".into(), "BTC-USDT-SWAP".into()),
+                ("positionId".into(), "123".into()),
+                ("functionSwitch".into(), "true".into()),
+            ],
+        )
+        .await
+        .expect("set_swap_auto_add_margin");
+    let request = next(&receiver, "set_swap_auto_add_margin");
+    assert_eq!(
+        (
+            request.method.as_str(),
+            request.path.as_str(),
+            request.api_key_header
+        ),
+        ("POST", "/openApi/swap/v1/trade/autoAddMargin", true)
+    );
+    assert!(
+        request
+            .query
+            .contains(&("symbol".into(), "BTC-USDT".into()))
+    );
+    assert!(request.query.contains(&("positionId".into(), "123".into())));
+    assert!(
+        request
+            .query
+            .contains(&("functionSwitch".into(), "true".into()))
+    );
+}
+
+#[test]
+fn coin_swap_and_oco_routes_match_official_paths() {
+    let (url, receiver) = recording_server();
+    let client = BingxClient::with_base_url(
+        Some("api-key".into()),
+        Some("api-secret".into()),
+        Duration::from_secs(5),
+        url,
+    )
+    .unwrap();
+    let cases: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
+        (
+            true,
+            "get_spot_historical_trades",
+            &[("product_symbol", "BTC-USDT-SPOT")],
+            "GET",
+            "/openApi/market/his/v1/trade",
+        ),
+        (
+            false,
+            "get_coin_network_config",
+            &[],
+            "GET",
+            "/openApi/wallets/v1/capital/config/getall",
+        ),
+        (
+            false,
+            "get_deposit_addresses",
+            &[("coin", "USDT")],
+            "GET",
+            "/openApi/wallets/v1/capital/deposit/address",
+        ),
+        (
+            false,
+            "get_deposit_risk_records",
+            &[],
+            "GET",
+            "/openApi/wallets/v1/capital/deposit/riskRecords",
+        ),
+        (
+            true,
+            "get_swap_historical_trades",
+            &[("product_symbol", "BTC-USDT-SWAP")],
+            "GET",
+            "/openApi/swap/v1/market/historicalTrades",
+        ),
+        (
+            false,
+            "reverse_swap_position",
+            &[("type_", "Reverse"), ("product_symbol", "BTC-USDT-SWAP")],
+            "POST",
+            "/openApi/swap/v1/trade/reverse",
+        ),
+        (
+            false,
+            "adjust_simulated_trading_balance",
+            &[],
+            "POST",
+            "/openApi/swap/v2/trade/getVst",
+        ),
+        (
+            false,
+            "get_standard_futures_positions",
+            &[],
+            "GET",
+            "/openApi/contract/v1/allPosition",
+        ),
+        (
+            false,
+            "get_standard_futures_orders",
+            &[("product_symbol", "BTC-USDT-SWAP")],
+            "GET",
+            "/openApi/contract/v1/allOrders",
+        ),
+        (
+            false,
+            "get_standard_futures_balance",
+            &[],
+            "GET",
+            "/openApi/contract/v1/balance",
+        ),
+        (
+            false,
+            "get_api_permissions",
+            &[],
+            "GET",
+            "/openApi/v1/account/apiPermissions",
+        ),
+        (
+            false,
+            "create_sub_account",
+            &[("subAccountString", "trader123")],
+            "POST",
+            "/openApi/subAccount/v1/create",
+        ),
+        (
+            false,
+            "set_sub_account_frozen",
+            &[("subUid", "123"), ("freeze", "true")],
+            "POST",
+            "/openApi/subAccount/v1/updateStatus",
+        ),
+        (
+            false,
+            "create_sub_account_api_key",
+            &[
+                ("subUid", "123"),
+                ("note", "trading"),
+                ("permissions", "[1,2,3]"),
+            ],
+            "POST",
+            "/openApi/subAccount/v1/apiKey/create",
+        ),
+        (
+            false,
+            "modify_sub_account_api_key",
+            &[
+                ("subUid", "123"),
+                ("apiKey", "query-key"),
+                ("note", "trading"),
+                ("permissions", "[1,2,3]"),
+            ],
+            "POST",
+            "/openApi/subAccount/v1/apiKey/edit",
+        ),
+        (
+            false,
+            "delete_sub_account_api_key",
+            &[("subUid", "123"), ("apiKey", "query-key")],
+            "POST",
+            "/openApi/subAccount/v1/apiKey/del",
+        ),
+        (
+            false,
+            "set_sub_account_transfer_authorization",
+            &[("subUids", "123"), ("transferable", "true")],
+            "POST",
+            "/openApi/account/v1/innerTransfer/authorizeSubAccount",
+        ),
+        (
+            false,
+            "get_sub_account_deposit_addresses",
+            &[("coin", "USDT"), ("subUid", "123")],
+            "GET",
+            "/openApi/wallets/v1/capital/subAccount/deposit/address",
+        ),
+        (
+            false,
+            "get_sub_account_deposit_history",
+            &[],
+            "GET",
+            "/openApi/wallets/v1/capital/deposit/subHisrec",
+        ),
+        (
+            false,
+            "get_api_restrictions",
+            &[],
+            "GET",
+            "/openApi/v1/account/apiRestrictions",
+        ),
+        (
+            false,
+            "create_sub_account_deposit_address",
+            &[
+                ("coin", "USDT"),
+                ("subUid", "123"),
+                ("network", "TRC20"),
+                ("walletType", "1"),
+            ],
+            "POST",
+            "/openApi/wallets/v1/capital/deposit/createSubAddress",
+        ),
+        (
+            true,
+            "get_swap_server_time",
+            &[],
+            "GET",
+            "/openApi/swap/v2/server/time",
+        ),
+        (
+            true,
+            "get_swap_price_ticker",
+            &[("product_symbol", "BTC-USDT-SWAP")],
+            "GET",
+            "/openApi/swap/v1/ticker/price",
+        ),
+        (
+            true,
+            "get_coin_swap_contracts",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/market/contracts",
+        ),
+        (
+            true,
+            "get_coin_swap_orderbook",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/market/depth",
+        ),
+        (
+            true,
+            "get_coin_swap_kline",
+            &[("product_symbol", "BTC-USD-SWAP"), ("interval", "1m")],
+            "GET",
+            "/openApi/cswap/v1/market/klines",
+        ),
+        (
+            true,
+            "get_coin_swap_premium_index",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/market/premiumIndex",
+        ),
+        (
+            true,
+            "get_coin_swap_open_interest",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/market/openInterest",
+        ),
+        (
+            true,
+            "get_coin_swap_ticker",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/market/ticker",
+        ),
+        (
+            false,
+            "place_coin_swap_order",
+            &[
+                ("product_symbol", "BTC-USD-SWAP"),
+                ("side", "SELL"),
+                ("type_", "MARKET"),
+                ("quantity", "1"),
+            ],
+            "POST",
+            "/openApi/cswap/v1/trade/order",
+        ),
+        (
+            false,
+            "cancel_coin_swap_order",
+            &[("product_symbol", "BTC-USD-SWAP"), ("orderId", "1")],
+            "DELETE",
+            "/openApi/cswap/v1/trade/cancelOrder",
+        ),
+        (
+            false,
+            "cancel_coin_swap_all_orders",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "POST",
+            "/openApi/cswap/v1/trade/allOpenOrders",
+        ),
+        (
+            false,
+            "close_coin_swap_all_positions",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "POST",
+            "/openApi/cswap/v1/trade/closeAllPositions",
+        ),
+        (
+            false,
+            "get_coin_swap_open_orders",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/trade/openOrders",
+        ),
+        (
+            false,
+            "get_coin_swap_order",
+            &[("product_symbol", "BTC-USD-SWAP"), ("orderId", "1")],
+            "GET",
+            "/openApi/cswap/v1/trade/orderDetail",
+        ),
+        (
+            false,
+            "get_coin_swap_order_history",
+            &[("limit", "20"), ("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/trade/orderHistory",
+        ),
+        (
+            false,
+            "get_coin_swap_fills",
+            &[("orderId", "1")],
+            "GET",
+            "/openApi/cswap/v1/trade/allFillOrders",
+        ),
+        (
+            false,
+            "get_coin_swap_force_orders",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/trade/forceOrders",
+        ),
+        (
+            false,
+            "get_coin_swap_leverage",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/trade/leverage",
+        ),
+        (
+            false,
+            "set_coin_swap_leverage",
+            &[
+                ("product_symbol", "BTC-USD-SWAP"),
+                ("side", "LONG"),
+                ("leverage", "5"),
+            ],
+            "POST",
+            "/openApi/cswap/v1/trade/leverage",
+        ),
+        (
+            false,
+            "get_coin_swap_margin_type",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/trade/marginType",
+        ),
+        (
+            false,
+            "set_coin_swap_margin_type",
+            &[
+                ("product_symbol", "BTC-USD-SWAP"),
+                ("marginType", "ISOLATED"),
+            ],
+            "POST",
+            "/openApi/cswap/v1/trade/marginType",
+        ),
+        (
+            false,
+            "adjust_coin_swap_position_margin",
+            &[
+                ("product_symbol", "BTC-USD-SWAP"),
+                ("positionSide", "LONG"),
+                ("amount", "1"),
+                ("type_", "1"),
+            ],
+            "POST",
+            "/openApi/cswap/v1/trade/positionMargin",
+        ),
+        (
+            false,
+            "get_coin_swap_commission_rate",
+            &[],
+            "GET",
+            "/openApi/cswap/v1/user/commissionRate",
+        ),
+        (
+            false,
+            "get_coin_swap_balance",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/user/balance",
+        ),
+        (
+            false,
+            "get_coin_swap_positions",
+            &[("product_symbol", "BTC-USD-SWAP")],
+            "GET",
+            "/openApi/cswap/v1/user/positions",
+        ),
+        (
+            true,
+            "get_spot_historical_kline",
+            &[("product_symbol", "BTC-USDT-SPOT"), ("interval", "1m")],
+            "GET",
+            "/openApi/market/his/v1/kline",
+        ),
+        (
+            false,
+            "place_spot_oco",
+            &[
+                ("product_symbol", "BTC-USDT-SPOT"),
+                ("side", "SELL"),
+                ("quantity", "1"),
+                ("limitPrice", "120"),
+                ("triggerPrice", "90"),
+                ("orderPrice", "89"),
+            ],
+            "POST",
+            "/openApi/spot/v1/oco/order",
+        ),
+        (
+            false,
+            "cancel_spot_oco",
+            &[("orderId", "1")],
+            "POST",
+            "/openApi/spot/v1/oco/cancel",
+        ),
+        (
+            false,
+            "get_spot_oco",
+            &[("orderListId", "1")],
+            "GET",
+            "/openApi/spot/v1/oco/orderList",
+        ),
+        (
+            false,
+            "get_spot_open_oco",
+            &[("pageIndex", "1"), ("pageSize", "20")],
+            "GET",
+            "/openApi/spot/v1/oco/openOrderList",
+        ),
+        (
+            false,
+            "get_spot_oco_history",
+            &[("pageIndex", "1"), ("pageSize", "20")],
+            "GET",
+            "/openApi/spot/v1/oco/historyOrderList",
+        ),
+        (
+            false,
+            "get_deposit_history",
+            &[],
+            "GET",
+            "/openApi/api/v3/capital/deposit/hisrec",
+        ),
+    ];
+    for (public, name, params, verb, path) in cases {
+        let client = client.clone();
+        let name_owned = name.to_string();
+        let params = owned(params);
+        let public = *public;
+        block_on(async move {
+            if public {
+                client.public_request(&name_owned, params).await
+            } else {
+                client.private_request(&name_owned, params).await
+            }
+        })
+        .expect(name);
+        let request = next(&receiver, name);
+        assert_eq!(request.method, *verb);
+        assert_eq!(request.path, *path);
+        assert_eq!(
+            request.get("signature").is_some() || request.body.get("signature").is_some(),
+            !public
+        );
+        if path.contains("/cswap/") && request.get("symbol").is_some() {
+            assert_eq!(request.get("symbol"), Some("BTC-USD"));
+        }
+    }
+}
+
+#[test]
+fn batch_replacement_keeps_json_number_quantity_for_conditional_close() {
+    let (url, receiver) = recording_server();
+    let client = BingxClient::with_base_url(
+        Some("api-key".into()),
+        Some("api-secret".into()),
+        Duration::from_secs(5),
+        url,
+    )
+    .unwrap();
+    let orders = r#"[{"product_symbol":"BTC-USDT-SWAP","cancelOrderId":"1","side":"SELL","positionSide":"BOTH","type":"STOP_MARKET","stopPrice":90,"quantity":1,"closePosition":"true","cancelReplaceMode":"STOP_ON_FAILURE"}]"#;
+    block_on(async move {
+        client
+            .private_request(
+                "replace_swap_batch_orders",
+                vec![("batchOrders".into(), orders.into())],
+            )
+            .await
+    })
+    .unwrap();
+    let request = next(&receiver, "replace_swap_batch_orders");
+    assert_eq!(request.path, "/openApi/swap/v1/trade/batchCancelReplace");
+    let batch: serde_json::Value =
+        serde_json::from_str(request.get("batchOrders").unwrap()).unwrap();
+    assert_eq!(batch[0]["quantity"], 1);
+    assert_eq!(batch[0]["symbol"], "BTC-USDT");
+    assert_eq!(batch[0]["closePosition"], "true");
+    assert!(request.get("signature").is_some());
 }

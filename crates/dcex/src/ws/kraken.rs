@@ -1,1 +1,3 @@
-pub use crate::exchanges::kraken::{KrakenPrivateWebSocket, KrakenPublicWebSocket};
+pub use crate::exchanges::kraken::{
+    KrakenFuturesWebSocket, KrakenPrivateWebSocket, KrakenPublicWebSocket,
+};

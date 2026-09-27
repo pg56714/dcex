@@ -9,7 +9,7 @@ use super::params::{
 };
 use super::signing::{legacy_signing_message, timestamp_ns};
 use crate::exchange::ValidatedResponse;
-use crate::http::{HttpMethod, HttpRequest};
+use crate::http::{HttpMethod, HttpRequest, RequestBody};
 use crate::{DcexError, Result};
 
 impl ArcusClient {
@@ -18,8 +18,58 @@ impl ArcusClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if matches!(
+            method_name,
+            "create_api_key_signed" | "revoke_api_key_signed"
+        ) {
+            return self.onboarding_request(method_name, params).await;
+        }
         if method_name == "submit_internal_transfer" {
             return self.submit_internal_transfer_request(params).await;
+        }
+        let request = self.build_private_request(method_name, params).await?;
+        self.execute(request).await
+    }
+
+    /// Builds a signed WebSocket trading frame using the same validation and signing as REST.
+    /// May fetch market metadata, but never submits the trading request.
+    pub async fn sign_websocket_request(
+        &self,
+        id: u64,
+        method_name: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<Value> {
+        let request = self.build_private_request(method_name, params).await?;
+        let RequestBody::Json(mut payload) = request.body else {
+            return Err(DcexError::Decode(
+                "Arcus signed request must have a JSON body".into(),
+            ));
+        };
+        // REST carries address in the URL; the WebSocket payload carries it in the body.
+        payload["address"] = json!(
+            self.address
+                .as_deref()
+                .ok_or_else(|| DcexError::InvalidInput("Arcus address is required".into()))?
+        );
+        Ok(json!({"type":"post","id":id,"request":{
+            "type":request.path.trim_start_matches("/v1/"),"payload":payload,
+            "apiKey":request.headers["X-API-Key"],"timestamp":request.headers["X-Timestamp"],"signature":request.headers["X-Signature"]
+        }}))
+    }
+
+    async fn build_private_request(
+        &self,
+        method_name: &str,
+        params: Vec<(String, String)>,
+    ) -> Result<HttpRequest> {
+        if method_name == "place_order"
+            && params
+                .iter()
+                .any(|(key, _)| matches!(key.as_str(), "tpsl_type" | "stop_price"))
+        {
+            return Err(DcexError::InvalidInput(
+                "Arcus TP/SL orders require batch_place_orders and its grouping field".into(),
+            ));
         }
         if matches!(
             method_name,
@@ -43,7 +93,7 @@ impl ArcusClient {
         let timestamp = timestamp_ns()?;
         let values: BTreeMap<_, _> = params.into_iter().collect();
         let (path, body, signature) = self
-            .signed_order_payload(method_name, &values, timestamp)
+            .signed_order_payload(method_name, &values, timestamp, false)
             .await?;
         let mut request = HttpRequest::new(HttpMethod::Post, &self.base_url, path)
             .query("address", address)
@@ -55,7 +105,7 @@ impl ArcusClient {
             .headers
             .insert("X-Timestamp".into(), timestamp.to_string());
         request.headers.insert("X-Signature".into(), signature);
-        self.execute(request).await
+        Ok(request)
     }
 
     async fn signed_order_payload(
@@ -63,6 +113,7 @@ impl ArcusClient {
         method_name: &str,
         values: &BTreeMap<String, String>,
         timestamp: u64,
+        position_tpsl: bool,
     ) -> Result<(&'static str, Value, String)> {
         let address = self.address.as_deref().ok_or_else(|| {
             DcexError::InvalidInput("Arcus wallet address is required for trading".into())
@@ -76,7 +127,7 @@ impl ArcusClient {
             .as_u64()
             .ok_or_else(|| DcexError::Decode("Arcus marketId is missing".into()))?;
         let mut canonical = BTreeMap::new();
-        canonical.insert("ad", json!(address));
+        canonical.insert("ad", json!(address.to_ascii_lowercase()));
         canonical.insert("ai", json!(self.account_index));
         canonical.insert("ct", json!(timestamp));
         canonical.insert("m", json!(market_id));
@@ -84,6 +135,17 @@ impl ArcusClient {
         let (path, body) = match method_name {
             "place_order" | "modify_order" => {
                 let is_modify = method_name == "modify_order";
+                let tpsl = values.get("tpsl_type").map(String::as_str);
+                if tpsl.is_some_and(|kind| !["STOP_LOSS", "TAKE_PROFIT"].contains(&kind))
+                    || is_modify && tpsl.is_some()
+                {
+                    return Err(DcexError::InvalidInput("invalid Arcus tpsl_type".into()));
+                }
+                if values.contains_key("stop_price") != tpsl.is_some() {
+                    return Err(DcexError::InvalidInput(
+                        "Arcus tpsl_type and stop_price must be supplied together".into(),
+                    ));
+                }
                 if is_modify && values.contains_key("order_type") {
                     return Err(DcexError::InvalidInput(
                         "Arcus modify_order does not accept order_type".into(),
@@ -143,9 +205,18 @@ impl ArcusClient {
                     .as_str()
                     .ok_or_else(|| DcexError::Decode("Arcus stepSize is missing".into()))?;
                 let price_ticks = exact_units(price, tick)?;
-                let quantity_quantums = exact_units(quantity, step)?;
+                let quantity_quantums = if position_tpsl {
+                    if compare_decimals(quantity, "0")? != 0 {
+                        return Err(DcexError::InvalidInput(
+                            "Arcus positionTpsl requires quantity zero".into(),
+                        ));
+                    }
+                    0
+                } else {
+                    exact_units(quantity, step)?
+                };
                 if let Some(min_size) = market_info["minOrderSize"].as_str() {
-                    if compare_decimals(quantity, min_size)? < 0 {
+                    if !position_tpsl && compare_decimals(quantity, min_size)? < 0 {
                         return Err(DcexError::InvalidInput(
                             "Arcus quantity is below minOrderSize".into(),
                         ));
@@ -159,7 +230,7 @@ impl ArcusClient {
                     }
                 }
                 if let Some(min_notional) = market_info["minOrderNotional"].as_str() {
-                    if decimal_product_below(price, quantity, min_notional)? {
+                    if !position_tpsl && decimal_product_below(price, quantity, min_notional)? {
                         return Err(DcexError::InvalidInput(
                             "Arcus order is below minOrderNotional".into(),
                         ));
@@ -200,7 +271,16 @@ impl ArcusClient {
                     DcexError::InvalidInput("Arcus good_til_time overflow".into())
                 })?;
                 canonical.insert("g", json!(good_til_ns));
-                canonical.insert("op", json!(if is_modify { 3 } else { 1 }));
+                canonical.insert(
+                    "op",
+                    json!(if is_modify {
+                        3
+                    } else if tpsl.is_some() {
+                        4
+                    } else {
+                        1
+                    }),
+                );
                 canonical.insert("p", json!(price_ticks));
                 canonical.insert("q", json!(quantity_quantums));
                 canonical.insert("r", json!(u8::from(reduce_only)));
@@ -222,6 +302,17 @@ impl ArcusClient {
                         "reduceOnly": reduce_only,
                     })
                 };
+                if let Some(kind) = tpsl {
+                    if !reduce_only {
+                        return Err(DcexError::InvalidInput(
+                            "Arcus TPSL legs require reduce_only=true".into(),
+                        ));
+                    }
+                    let stop = required(values, "stop_price")?;
+                    exact_units(stop, tick)?;
+                    body["tpslType"] = json!(kind);
+                    body["stopPrice"] = json!(stop);
+                }
                 if let Some(client_id) = values.get("client_order_id") {
                     if client_id.is_empty()
                         || client_id.len() > 36
@@ -285,7 +376,7 @@ impl ArcusClient {
         &self,
         method_name: &str,
         params: Vec<(String, String)>,
-    ) -> Result<ValidatedResponse> {
+    ) -> Result<HttpRequest> {
         let address = self.address.as_deref().ok_or_else(|| {
             DcexError::InvalidInput("Arcus wallet address is required for trading".into())
         })?;
@@ -296,7 +387,10 @@ impl ArcusClient {
             "batch_modify_orders" => ("modifies", "modify_order", "/v1/batchModifyOrders"),
             _ => unreachable!("batch dispatch is restricted"),
         };
-        if values.keys().any(|key| key != field) {
+        if values
+            .keys()
+            .any(|key| key != field && !(method_name == "batch_place_orders" && key == "grouping"))
+        {
             return Err(DcexError::InvalidInput(format!(
                 "unknown Arcus {method_name} parameter"
             )));
@@ -311,6 +405,47 @@ impl ArcusClient {
             return Err(DcexError::InvalidInput(format!(
                 "Arcus {field} must contain between 1 and 100 items"
             )));
+        }
+        let grouping = values.get("grouping").map(String::as_str);
+        if let Some(grouping) = grouping {
+            if !["partialTpsl", "positionTpsl", "entryTpsl"].contains(&grouping) {
+                return Err(DcexError::InvalidInput("unsupported Arcus grouping".into()));
+            }
+            let entry = usize::from(grouping == "entryTpsl");
+            if !(1 + entry..=2 + entry).contains(&items.len()) {
+                return Err(DcexError::InvalidInput(
+                    "Arcus grouping requires one or two TPSL legs and optional entry".into(),
+                ));
+            }
+            let mut kinds = std::collections::BTreeSet::new();
+            for (index, item) in items.iter().enumerate() {
+                if entry == 1 && index == 0 {
+                    if item.get("tpsl_type").is_some() {
+                        return Err(DcexError::InvalidInput(
+                            "Arcus entry must precede TPSL children".into(),
+                        ));
+                    }
+                } else {
+                    let kind = item
+                        .get("tpsl_type")
+                        .and_then(Value::as_str)
+                        .ok_or_else(|| {
+                            DcexError::InvalidInput("Arcus TPSL leg requires tpsl_type".into())
+                        })?;
+                    if !kinds.insert(kind) {
+                        return Err(DcexError::InvalidInput(
+                            "Arcus TPSL legs must have distinct trigger types".into(),
+                        ));
+                    }
+                }
+            }
+        } else if items
+            .iter()
+            .any(|item| item.get("tpsl_type").is_some() || item.get("stop_price").is_some())
+        {
+            return Err(DcexError::InvalidInput(
+                "Arcus TPSL orders require grouping".into(),
+            ));
         }
         let timestamp = timestamp_ns()?;
         let mut signed_items = Vec::with_capacity(items.len());
@@ -334,7 +469,12 @@ impl ArcusClient {
                 order.insert(key.clone(), scalar);
             }
             let (_, mut body, signature) = self
-                .signed_order_payload(single_method, &order, timestamp)
+                .signed_order_payload(
+                    single_method,
+                    &order,
+                    timestamp,
+                    grouping == Some("positionTpsl"),
+                )
                 .await?;
             body["signature"] = json!(signature);
             if first_signature.is_none() {
@@ -344,13 +484,16 @@ impl ArcusClient {
         }
         let mut batch_body = serde_json::Map::new();
         batch_body.insert(field.to_string(), json!(signed_items));
+        if let Some(grouping) = grouping {
+            batch_body.insert("grouping".into(), json!(grouping));
+        }
         let request = HttpRequest::new(HttpMethod::Post, &self.base_url, path)
             .query("address", address)
             .header("X-API-Key", self.api_key.clone().unwrap_or_default())
             .header("X-Timestamp", timestamp.to_string())
             .header("X-Signature", first_signature.expect("nonempty batch"))
             .json(Value::Object(batch_body));
-        self.execute(request).await
+        Ok(request)
     }
 
     async fn submit_internal_transfer_request(
@@ -467,7 +610,7 @@ impl ArcusClient {
         &self,
         method_name: &str,
         params: Vec<(String, String)>,
-    ) -> Result<ValidatedResponse> {
+    ) -> Result<HttpRequest> {
         let address = self.address.as_deref().ok_or_else(|| {
             DcexError::InvalidInput("Arcus wallet address is required for trading".into())
         })?;
@@ -616,6 +759,6 @@ impl ArcusClient {
             .header("X-Timestamp", timestamp.to_string())
             .header("X-Signature", signature)
             .json(json!(body));
-        self.execute(request).await
+        Ok(request)
     }
 }

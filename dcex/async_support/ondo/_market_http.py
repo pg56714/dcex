@@ -80,3 +80,25 @@ class MarketHTTP(HTTPManager):
             from_time=from_time,
             to_time=to_time,
         )
+
+    async def hello(self) -> Any:
+        """Get the public service greeting and health response."""
+        return await self._native_public("hello")
+
+    async def ping(self) -> Any:
+        """Alias for the public /hello service check."""
+        return await self._native_public("ping")
+
+    async def get_login_challenge(self, wallet_address: str, chain_id: str) -> Any:
+        """Request a SIWE challenge for Ethereum (1) or Avalanche (43114)."""
+        return await self._native_public(
+            "get_login_challenge", walletAddress=wallet_address, chainId=chain_id
+        )
+
+    async def complete_login_challenge(
+        self, id: str, signature: str, source: str | None = None
+    ) -> Any:
+        """Exchange a caller-signed SIWE challenge for a JWT."""
+        return await self._native_public(
+            "complete_login_challenge", id=id, signature=signature, source=source
+        )

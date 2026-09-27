@@ -1128,3 +1128,257 @@ fn signed_spot_request_omits_user() {
     assert!(!line.contains("user="), "{line}");
     assert!(line.contains(&format!("signer={SIGNER}")), "{line}");
 }
+
+#[test]
+fn nonce_controls_preserve_the_original_nonce() {
+    assert_cases(&[
+        private(
+            "noop_spot",
+            &[("nonce", "1700000000000123")],
+            "POST",
+            "/api/v3/noop",
+            &["nonce=1700000000000123"],
+        ),
+        private(
+            "noop_futures",
+            &[("nonce", "1700000000000123")],
+            "POST",
+            "/fapi/v3/noop",
+            &["nonce=1700000000000123"],
+        ),
+        private(
+            "guarded_cancel_futures_order",
+            &[
+                ("product_symbol", SWAP),
+                ("nonce", "1700000000000123"),
+                ("orderId", "123"),
+            ],
+            "DELETE",
+            "/fapi/v3/guardedCancelOrder",
+            &["symbol=BTCUSDT", "orderId=123", "nonce=1700000000000123"],
+        ),
+        private(
+            "guarded_cancel_futures_batch_orders",
+            &[
+                ("product_symbol", SWAP),
+                ("nonce", "1700000000000123"),
+                ("orderIdList", "[123, 456]"),
+            ],
+            "DELETE",
+            "/fapi/v3/guardedBatchOrders",
+            &["nonce=1700000000000123", "orderIdList=%5B123%2C456%5D"],
+        ),
+        private(
+            "transfer_sub_account",
+            &[
+                ("toAccountAddress", USER),
+                ("asset", "USDT"),
+                ("amount", "10"),
+                ("kindType", "FUTURE_FUTURE"),
+            ],
+            "POST",
+            "/fapi/v3/subAccountTransfer",
+            &["kindType=FUTURE_FUTURE", "amount=10"],
+        ),
+    ]);
+    for name in [
+        "noop_spot",
+        "noop_futures",
+        "guarded_cancel_futures_order",
+        "guarded_cancel_futures_batch_orders",
+    ] {
+        assert_rejected_offline(Kind::Private, name, &[]);
+        assert_rejected_offline(Kind::Private, name, &[("nonce", "0")]);
+    }
+    assert_rejected_offline(
+        Kind::Private,
+        "guarded_cancel_futures_batch_orders",
+        &[
+            ("product_symbol", SWAP),
+            ("nonce", "123"),
+            ("orderIdList", "[]"),
+        ],
+    );
+    for name in ["place_spot_order", "place_futures_order"] {
+        let (result, requests) = run(
+            Kind::Private,
+            name,
+            &[
+                ("symbol", "BTCUSDT"),
+                ("side", "BUY"),
+                ("type", "MARKET"),
+                ("quantity", "1"),
+                ("nonce", "1700000000000123"),
+            ],
+        );
+        result.expect("explicit placement nonce");
+        assert_eq!(requests[0].matches("nonce=1700000000000123").count(), 1);
+    }
+}
+
+#[test]
+fn sub_account_transfer_signs_the_agent_identity_and_field_order() {
+    let (result, requests) = run(
+        Kind::Private,
+        "transfer_sub_account",
+        &[
+            ("toAccountAddress", USER),
+            ("asset", "USDT"),
+            ("amount", "10"),
+            ("kindType", "FUTURE_FUTURE"),
+            ("fromAccountAddress", USER),
+        ],
+    );
+    result.expect("internal transfer");
+    let body = requests[0].split_once("\r\n\r\n").expect("body").1;
+    let pairs: Vec<_> = url::form_urlencoded::parse(body.as_bytes())
+        .into_owned()
+        .collect();
+    assert_eq!(
+        pairs
+            .iter()
+            .map(|(key, _)| key.as_str())
+            .collect::<Vec<_>>(),
+        [
+            "toAccountAddress",
+            "asset",
+            "amount",
+            "kindType",
+            "nonce",
+            "signer",
+            "fromAccountAddress",
+            "signature"
+        ]
+    );
+    let (message, signature) = body.rsplit_once("&signature=").expect("signature");
+    assert_eq!(
+        signature,
+        super::super::signing::sign_message(message, &[0x11; 32]).expect("agent signature")
+    );
+}
+
+#[test]
+fn additional_account_routes() {
+    assert_cases(&[
+        public(
+            "get_asset_logos",
+            &[],
+            "GET",
+            "/fapi/v3/common/asset/all-asset-logo",
+            &[],
+        ),
+        private(
+            "exchange_futures_assets",
+            &[],
+            "POST",
+            "/fapi/v3/assetExchange",
+            &[],
+        ),
+        private(
+            "get_sub_accounts",
+            &[],
+            "GET",
+            "/fapi/v3/getSubAccountList",
+            &[],
+        ),
+        private(
+            "get_direct_announcements",
+            &[],
+            "GET",
+            "/fapi/v3/announcement/direct",
+            &[],
+        ),
+        private(
+            "get_direct_announcement",
+            &[("id", "1")],
+            "GET",
+            "/fapi/v3/announcement/directById",
+            &[],
+        ),
+        private(
+            "create_sub_account_signed",
+            &[
+                ("subAccountName", "desk"),
+                (
+                    "subSourceAddr",
+                    "0x0000000000000000000000000000000000000002",
+                ),
+                ("nonce", "1700000000000123"),
+                ("user", "0x0000000000000000000000000000000000000001"),
+                ("signer", "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"),
+                (
+                    "childSignature",
+                    "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
+                ),
+                (
+                    "signature",
+                    "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+                ),
+            ],
+            "POST",
+            "/fapi/v3/createSubAccount",
+            &[],
+        ),
+        private(
+            "update_sub_account_signed",
+            &[
+                (
+                    "subSourceAddr",
+                    "0x0000000000000000000000000000000000000002",
+                ),
+                ("nonce", "1700000000000123"),
+                ("user", "0x0000000000000000000000000000000000000001"),
+                ("signer", "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a"),
+                (
+                    "signature",
+                    "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+                ),
+                ("status", "FROZEN"),
+            ],
+            "POST",
+            "/fapi/v3/updateSubAccount",
+            &[],
+        ),
+        private(
+            "bind_sub_account_signed",
+            &[
+                ("childAddress", "0x0000000000000000000000000000000000000002"),
+                ("name", "desk"),
+                ("nonce", "1700000000000123"),
+                ("user", "0x0000000000000000000000000000000000000001"),
+                (
+                    "childSignature",
+                    "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
+                ),
+                (
+                    "signature",
+                    "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+                ),
+            ],
+            "POST",
+            "/fapi/v3/sub-accounts/bind",
+            &[],
+        ),
+        private(
+            "register_agent_signed",
+            &[
+                ("user", "0x0000000000000000000000000000000000000001"),
+                ("nonce", "1700000000000123"),
+                ("agentName", "trader"),
+                ("agentAddress", "0x0000000000000000000000000000000000000003"),
+                ("expired", "1800000000000"),
+                ("signatureChainId", "56"),
+                ("canSpotTrade", "true"),
+                ("canPerpTrade", "true"),
+                ("canWithdraw", "false"),
+                (
+                    "signature",
+                    "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+                ),
+            ],
+            "POST",
+            "/fapi/v3/registerAndApproveAgent",
+            &[],
+        ),
+    ]);
+}

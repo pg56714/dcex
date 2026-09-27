@@ -246,3 +246,55 @@ class MarketHTTP(HTTPManager):
     async def get_token_list(self) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter token list."""
         return await self._native_public("get_token_list", self._native_params(**locals()))
+
+    async def get_transaction(self, *, by: str, value: str) -> dict[str, Any] | list[Any]:
+        """
+
+        GET /api/v1/tx.
+
+        Source:
+        https://github.com/elliottech/lighter-python/blob/main/lighter/api/transaction_api.py
+
+        """
+        return await self._native_public("get_transaction", self._native_params(by=by, value=value))
+
+    async def get_transaction_by_l1_hash(self, *, hash: str) -> dict[str, Any] | list[Any]:
+        """
+
+        GET /api/v1/txFromL1TxHash.
+
+        Source:
+        https://github.com/elliottech/lighter-python/blob/main/lighter/api/transaction_api.py
+
+        """
+        return await self._native_public(
+            "get_transaction_by_l1_hash", self._native_params(hash=hash)
+        )
+
+    async def create_deposit_intent_address(
+        self, *, chain_id: str, from_addr: str, amount: str, is_external_deposit: bool | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/createIntentAddress.
+
+        Source: https://github.com/elliottech/lighter-python/blob/main/lighter/api/bridge_api.py
+        """
+        return await self._native_public(
+            "create_deposit_intent_address",
+            self._native_params(
+                chain_id=chain_id,
+                from_addr=from_addr,
+                amount=amount,
+                is_external_deposit=is_external_deposit,
+            ),
+        )
+
+    async def get_latest_deposit(self, *, l1_address: str) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/deposit/latest.
+
+        Source: https://github.com/elliottech/lighter-python/blob/main/lighter/api/bridge_api.py
+        """
+        return await self._native_public(
+            "get_latest_deposit", self._native_params(l1_address=l1_address)
+        )

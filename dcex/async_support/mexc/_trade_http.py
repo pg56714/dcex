@@ -1198,3 +1198,185 @@ class TradeHTTP(HTTPManager):
                 profitTrend=profitTrend,
             ),
         )
+
+    async def cancel_spot_all_orders(self, recvWindow: int | None = None) -> dict[str, Any]:
+        """Cancel all open Spot orders across the account."""
+        return await self._native_private(
+            "cancel_spot_all_orders", self._native_params(recvWindow=recvWindow)
+        )
+
+    async def get_contract_open_stop_orders(
+        self, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Get current contract take-profit/stop-loss orders."""
+        return await self._native_private(
+            "get_contract_open_stop_orders", self._native_params(product_symbol=product_symbol)
+        )
+
+    async def cancel_contract_batch_orders_by_external_id(
+        self, *, orders: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """
+        POST /api/v1/private/order/batch_cancel_with_external. Preserve item-level results for
+        batch operations.
+        """
+        return await self._native_private(
+            "cancel_contract_batch_orders_by_external_id", self._native_params(orders=orders)
+        )
+
+    async def get_contract_batch_orders_by_external_id(
+        self, *, orders: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """
+        POST /api/v1/private/order/batch_query_with_external. Preserve item-level results for
+        batch operations.
+        """
+        return await self._native_private(
+            "get_contract_batch_orders_by_external_id", self._native_params(orders=orders)
+        )
+
+    async def get_contract_closed_orders(
+        self,
+        *,
+        product_symbol: str,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page_num: int | None = None,
+        page_size: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v1/private/order/list/close_orders. Preserve item-level results for batch
+        operations.
+        """
+        return await self._native_private(
+            "get_contract_closed_orders",
+            self._native_params(
+                product_symbol=product_symbol,
+                start_time=start_time,
+                end_time=end_time,
+                page_num=page_num,
+                page_size=page_size,
+            ),
+        )
+
+    async def get_contract_fee_details(
+        self,
+        *,
+        product_symbol: str,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page_num: int | None = None,
+        page_size: int | None = None,
+        ids: list[int] | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v1/private/order/fee_details. Preserve item-level results for batch operations.
+        """
+        return await self._native_private(
+            "get_contract_fee_details",
+            self._native_params(
+                product_symbol=product_symbol,
+                start_time=start_time,
+                end_time=end_time,
+                page_num=page_num,
+                page_size=page_size,
+                ids=(",".join(str(v) for v in ids) if ids is not None else None),
+            ),
+        )
+
+    async def get_contract_30_day_fee_statistics(self) -> dict[str, Any]:
+        """
+        GET /api/v1/private/account/asset_book/order_deal_fee/total. Preserve item-level results
+        for batch operations.
+        """
+        return await self._native_private(
+            "get_contract_30_day_fee_statistics", self._native_params()
+        )
+
+    async def get_uid(self) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/uid. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private("get_uid", self._native_params())
+
+    async def get_api_key_info(self, *, access_key: str) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/apiKeyInfo. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private(
+            "get_api_key_info", self._native_params(accessKey=access_key)
+        )
+
+    async def set_api_key_ip_whitelist(
+        self, *, api_key: str, ip_whitelist: str, note: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/apiKeyInfo. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private(
+            "set_api_key_ip_whitelist",
+            self._native_params(apiKey=api_key, ipWhiteList=ip_whitelist, note=note),
+        )
+
+    async def get_convertible_assets(self) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/capital/convert/list. Timestamps use milliseconds; asset/IP lists use
+        commas.
+        """
+        return await self._native_private("get_convertible_assets", self._native_params())
+
+    async def convert_dust(self, *, assets: str) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/capital/convert. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private("convert_dust", self._native_params(asset=assets))
+
+    async def get_dust_conversion_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/capital/convert. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private(
+            "get_dust_conversion_history",
+            self._native_params(startTime=start_time, endTime=end_time, page=page, limit=limit),
+        )
+
+    async def create_sub_account(
+        self, *, sub_account: str, note: str, recv_window: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v3/sub-account/virtualSubAccount. Timestamps use milliseconds; asset/IP lists
+        use commas.
+        """
+        return await self._native_private(
+            "create_sub_account",
+            self._native_params(subAccount=sub_account, note=note, recvWindow=recv_window),
+        )
+
+    async def get_contract_profit_rate(self, *, period_type: int) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/private/account/profit_rate/{type}. Timestamps use milliseconds; asset/IP
+        lists use commas.
+        """
+        return await self._native_private(
+            "get_contract_profit_rate", self._native_params(type=period_type)
+        )
+
+    async def get_contract_fee_deduction_config(self) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/private/account/feeDeductConfigs. Timestamps use milliseconds; asset/IP
+        lists use commas.
+        """
+        return await self._native_private(
+            "get_contract_fee_deduction_config", self._native_params()
+        )
+
+    async def get_contract_fee_discount_config(self) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/private/account/config/contractFeeDiscountConfig. Timestamps use
+        milliseconds; asset/IP lists use commas.
+        """
+        return await self._native_private("get_contract_fee_discount_config", self._native_params())
+
+    async def get_contract_discount_usage(self) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/private/account/discountType. Timestamps use milliseconds; asset/IP lists
+        use commas.
+        """
+        return await self._native_private("get_contract_discount_usage", self._native_params())

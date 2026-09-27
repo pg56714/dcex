@@ -1624,6 +1624,16 @@ macro_rules! impl_exchange_method_wrappers {
             }
         }
 
+        crate::exchanges::impl_exchange_method_wrappers! {@extend; $client;
+            public [$($public_method($($public_param => $public_key),*)),*];
+            private [$($private_method($($private_param => $private_key),*)),*];
+        }
+    };
+    (@extend;
+        $client:ty;
+        public [$($public_method:ident($($public_param:ident => $public_key:literal),*)),* $(,)?];
+        private [$($private_method:ident($($private_param:ident => $private_key:literal),*)),* $(,)?] $(;)?
+    ) => {
         impl $client {
             $(
                 #[allow(clippy::too_many_arguments)]

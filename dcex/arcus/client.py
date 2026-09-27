@@ -1,8 +1,10 @@
+# ruff: noqa: ANN401
+# Exchange responses retain their native, heterogeneous JSON schemas.
 """Synchronous Arcus perpetuals REST client."""
 
 import json
 import os
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -71,6 +73,26 @@ class Client(BaseHTTPManager):
     def private_request(self, method_name: str, **params: object) -> Any:  # noqa: ANN401
         """Call a named signed Arcus order endpoint."""
         return self._call("private_request", method_name, _params(**params))
+
+    def sign_websocket_request(
+        self, request_id: int, method_name: str, **params: object
+    ) -> dict[str, Any]:
+        """
+        Build a signed WS frame using the named REST method and its parameters.
+
+        Does not submit an order. May fetch public market metadata for tick/step
+        conversion. Batch fields (orders, cancels, modifies) accept lists.
+        """
+        encoded = {
+            k: json.dumps(v, allow_nan=False) if isinstance(v, (list, dict)) else v
+            for k, v in params.items()
+        }
+        result = json.loads(
+            self._native_client.sign_websocket_request(request_id, method_name, _params(**encoded))
+        )
+        if not isinstance(result, dict):
+            raise TypeError("Unexpected Arcus signed WebSocket frame")
+        return result
 
     def get_markets(self) -> Any:  # noqa: ANN401
         """Get all perpetual markets."""
@@ -234,10 +256,19 @@ class Client(BaseHTTPManager):
             "cancel_order", product_symbol=product_symbol, order_id=order_id
         )
 
-    def batch_place_orders(self, orders: list[dict[str, Any]]) -> Any:  # noqa: ANN401
-        """Place up to 100 individually signed orders in one request."""
+    def batch_place_orders(
+        self, orders: list[dict[str, Any]], *, grouping: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Place orders, optionally grouped as partialTpsl, positionTpsl, or entryTpsl.
+
+        TPSL legs use tpsl_type, stop_price, and reduce_only=True.
+        positionTpsl legs require quantity="0"; entryTpsl starts with the entry.
+        """
         return self.private_request(
-            "batch_place_orders", orders=json.dumps(orders, separators=(",", ":"))
+            "batch_place_orders",
+            orders=json.dumps(orders, separators=(",", ":")),
+            grouping=grouping,
         )
 
     def batch_cancel_orders(self, cancels: list[dict[str, Any]]) -> Any:  # noqa: ANN401
@@ -255,3 +286,340 @@ class Client(BaseHTTPManager):
     def close(self) -> None:
         """Release the native client."""
         self._native_client = None
+
+    def get_trade(self, *, trade_id: str, market: str) -> Any:  # noqa: ANN401
+        """
+        GET /v1/trade/{tradeId}; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-a-single-trade-by-id.md
+        """
+        return self.public_request("get_trade", **{"trade_id": trade_id, "market": market})
+
+    def get_account_stats(
+        self,
+        *,
+        address: str | None = None,
+        include: str | Sequence[str] | None = None,
+        windows: str | Sequence[str] | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/account/stats; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-account-stats.md
+        """
+        return self.public_request(
+            "get_account_stats",
+            **{
+                "address": address or self.address,
+                "include": include
+                if isinstance(include, str) or include is None
+                else ",".join(include),
+                "windows": windows
+                if isinstance(windows, str) or windows is None
+                else ",".join(windows),
+            },
+        )
+
+    def get_mid_prices(self, *, market: str | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /v1/mids; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-all-mid-prices.md
+        """
+        return self.public_request("get_mid_prices", **{"market": market})
+
+    def get_compliance(self, *, address: str | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /v1/compliance; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-compliance-status.md
+        """
+        return self.public_request("get_compliance", **{"address": address or self.address})
+
+    def get_rate_limit(
+        self, *, address: str | None = None, account_index: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/rateLimit; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-current-rate-limit-usage.md
+        """
+        return self.public_request(
+            "get_rate_limit",
+            **{
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+            },
+        )
+
+    def get_time(self) -> Any:  # noqa: ANN401
+        """
+        GET /v1/time; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-current-server-time.md
+        """
+        return self.public_request("get_time", **{})
+
+    def get_fill(
+        self, *, trade_id: str, address: str | None = None, account_index: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/fill/{tradeId}; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-fill-by-id.md
+        """
+        return self.public_request(
+            "get_fill",
+            **{
+                "trade_id": trade_id,
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+            },
+        )
+
+    def get_funding(
+        self,
+        *,
+        address: str | None = None,
+        account_index: int | None = None,
+        market: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/funding; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-funding-payments.md
+        """
+        return self.public_request(
+            "get_funding",
+            **{
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+                "market": market,
+                "from": start_time,
+                "to": end_time,
+                "limit": limit,
+            },
+        )
+
+    def get_interest(
+        self,
+        *,
+        address: str | None = None,
+        account_index: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/interest; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-interest-payments.md
+        """
+        return self.public_request(
+            "get_interest",
+            **{
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+                "from": start_time,
+                "to": end_time,
+                "limit": limit,
+            },
+        )
+
+    def get_live_prices(self, *, market: str | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /v1/prices; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-live-prices-for-all-markets.md
+        """
+        return self.public_request("get_live_prices", **{"market": market})
+
+    def get_funding_rates(
+        self,
+        *,
+        market: str,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/fundingRates; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-market-funding-rates.md
+        """
+        return self.public_request(
+            "get_funding_rates",
+            **{"market": market, "from": start_time, "to": end_time, "limit": limit},
+        )
+
+    def get_candles(
+        self,
+        *,
+        market: str,
+        timeframe: str,
+        end_time: int,
+        start_time: int | None = None,
+        countback: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/candles; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-ohlcv-candles.md
+        """
+        return self.public_request(
+            "get_candles",
+            **{
+                "market": market,
+                "timeframe": timeframe,
+                "to": end_time,
+                "from": start_time,
+                "countback": countback,
+            },
+        )
+
+    def get_order_history(
+        self,
+        *,
+        address: str | None = None,
+        account_index: int | None = None,
+        market: str | None = None,
+        side: str | None = None,
+        status: str | Sequence[str] | None = None,
+        limit: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/orders; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-order-history.md
+        """
+        return self.public_request(
+            "get_order_history",
+            **{
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+                "market": market,
+                "side": side,
+                "status": status if isinstance(status, str) or status is None else ",".join(status),
+                "limit": limit,
+                "from": start_time,
+                "to": end_time,
+            },
+        )
+
+    def get_portfolio_history(
+        self, *, address: str | None = None, account_index: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/portfolio; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-portfolio-history.md
+        """
+        return self.public_request(
+            "get_portfolio_history",
+            **{
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+            },
+        )
+
+    def get_trades(
+        self,
+        *,
+        market: str,
+        limit: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/trades; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-recent-public-trades.md
+        """
+        return self.public_request(
+            "get_trades", **{"market": market, "limit": limit, "from": start_time, "to": end_time}
+        )
+
+    def get_spot_fills(
+        self,
+        *,
+        address: str | None = None,
+        account_index: int | None = None,
+        limit: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/spotFills; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-spot-fills.md
+        """
+        return self.public_request(
+            "get_spot_fills",
+            **{
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+                "limit": limit,
+                "from": start_time,
+                "to": end_time,
+            },
+        )
+
+    def get_spot_positions(
+        self, *, address: str | None = None, account_index: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /v1/spotPositions; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/get-spot-positions.md
+        """
+        return self.public_request(
+            "get_spot_positions",
+            **{
+                "address": address or self.address,
+                "accountIndex": self.account_index if account_index is None else account_index,
+            },
+        )
+
+    def health(self) -> Any:  # noqa: ANN401
+        """
+        GET /health; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/health-check.md
+        """
+        return self.public_request("health", **{})
+
+    def get_service_info(self) -> Any:  # noqa: ANN401
+        """
+        GET /; time bounds use epoch microseconds.
+
+        Source: https://docs.arcus.xyz/api-reference/public/service-info.md
+        """
+        return self.public_request("get_service_info", **{})
+
+    def get_api_keys(self, *, address: str | None = None, account_index: int | None = None) -> Any:
+        """List API keys; omitting account_index lists every subaccount scope."""
+        return self.public_request(
+            "get_api_keys", address=address or self.address, accountIndex=account_index
+        )
+
+    def create_api_key_signed(self, body: dict[str, Any]) -> Any:
+        """
+        Submit a caller wallet-authorized API key creation body unchanged.
+
+        Sign the EIP-712 payload specified by the Arcus onboarding documentation.
+        The trading API key cannot authorize this wallet operation.
+        """
+        return self.private_request(
+            "create_api_key_signed", body=json.dumps(body, separators=(",", ":"), allow_nan=False)
+        )
+
+    def revoke_api_key_signed(self, body: dict[str, Any]) -> Any:
+        """Revoke an API key with a caller wallet-authorized signed body."""
+        return self.private_request(
+            "revoke_api_key_signed", body=json.dumps(body, separators=(",", ":"), allow_nan=False)
+        )

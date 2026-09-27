@@ -69,10 +69,17 @@ impl ResponseValidator for BinanceResponseValidator {
                         .unwrap_or("Unknown error");
                     return Err(DcexError::HttpStatus {
                         status: response.status,
-                        message: format!(
-                            "BINANCE API Error: [{}] {message}",
-                            json_value_string(code)
-                        ),
+                        message: if object.get("data").is_some_and(|v| {
+                            v.get("cancelResult").is_some() || v.get("newOrderResult").is_some()
+                        }) {
+                            format!(
+                                "BINANCE API Error: [{}] {message}; outcomes: {}",
+                                json_value_string(code),
+                                object["data"]
+                            )
+                        } else {
+                            format!("BINANCE API Error: [{}] {message}", json_value_string(code))
+                        },
                         headers: response
                             .headers
                             .iter()
@@ -112,4 +119,32 @@ pub(super) fn extract_server_time_ms(data: &Value) -> Option<u64> {
             Value::String(value) => value.parse().ok(),
             _ => None,
         })
+}
+
+#[cfg(test)]
+mod partial_order_tests {
+    use super::*;
+    #[test]
+    fn cancel_replace_partial_failure_retains_both_results() {
+        let outcomes = serde_json::json!({"cancelResult":"SUCCESS","newOrderResult":"FAILURE","cancelResponse":{"orderId":123,"status":"CANCELED"},"newOrderResponse":{"code":-2010,"msg":"insufficient balance"}});
+        let response=HttpResponse{status:409,headers:std::collections::BTreeMap::from([("x-mbx-used-weight-1m".into(),"12".into())]),body:serde_json::to_vec(&serde_json::json!({"code":-2021,"msg":"Order cancel-replace partially failed.","data":outcomes})).unwrap()};
+        let error = BinanceResponseValidator.validate(&response).unwrap_err();
+        let DcexError::HttpStatus {
+            status,
+            message,
+            headers,
+        } = error
+        else {
+            panic!("expected exchange error");
+        };
+        assert_eq!(status, 409);
+        let retained: Value =
+            serde_json::from_str(message.split_once("; outcomes: ").unwrap().1).unwrap();
+        assert_eq!(retained, outcomes);
+        assert!(
+            headers
+                .iter()
+                .any(|(key, value)| key == "x-mbx-used-weight-1m" && value == "12")
+        );
+    }
 }

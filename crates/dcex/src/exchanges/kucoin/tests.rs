@@ -738,3 +738,36 @@ async fn uta_v2_order_identifier_is_required_before_network() {
 }
 
 mod endpoint_coverage;
+
+#[test]
+fn delete_batch_cancel_preserves_body_and_signs_exact_bytes() {
+    let client = KucoinClient::new(
+        Some("key".into()),
+        Some("secret".into()),
+        Some("passphrase".into()),
+        Duration::from_secs(1),
+    )
+    .expect("client");
+    let body = br#"{"orderIdsList":["123","456"]}"#.to_vec();
+    let request = client
+        .build_request(
+            HttpMethod::Delete,
+            KucoinMarket::Futures,
+            "/api/v1/orders/multi-cancel",
+            Vec::new(),
+            Some(body.clone()),
+            true,
+            "1700000000000",
+        )
+        .expect("request");
+    assert_eq!(request.path, "/api/v1/orders/multi-cancel");
+    match request.body {
+        crate::http::RequestBody::Raw(actual) => assert_eq!(actual, body),
+        _ => panic!("DELETE must carry the caller's JSON bytes"),
+    }
+    // Independently generated with Python hashlib/hmac, including the JSON body.
+    assert_eq!(
+        request.headers.get("KC-API-SIGN").map(String::as_str),
+        Some("nkl3PqCb1JDeDputCiNgxNFASteKlyViBGKdX62mv9k=")
+    );
+}

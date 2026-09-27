@@ -97,6 +97,74 @@ def _action(
 
 
 WRAPPER_CASES = [
+    _action("reserve_request_weight", (100,), [("weight", "100")], "reserveRequestWeight"),
+    _action("set_agent_abstraction", ("u",), [("abstraction", "u")], "agentSetAbstraction"),
+    _action(
+        "set_user_abstraction",
+        (USER, "portfolioMargin", 1700000000000, SIGNATURE, "0xa4b1"),
+        [
+            ("user", USER),
+            ("abstraction", "portfolioMargin"),
+            ("nonce", "1700000000000"),
+            ("signature", json.dumps(SIGNATURE, separators=(",", ":"))),
+            ("signatureChainId", "0xa4b1"),
+        ],
+        "userSetAbstraction",
+    ),
+    _info(
+        "get_perps_at_open_interest_cap", (), [("dex", "xyz")], "perpsAtOpenInterestCap", dex="xyz"
+    ),
+    _info("get_perp_dex_limits", (), [("dex", "xyz")], "perpDexLimits", dex="xyz"),
+    _info("get_perp_dex_status", (), [("dex", "")], "perpDexStatus", dex=""),
+    _info("get_all_perp_metas", (), [], "allPerpMetas"),
+    _info(
+        "get_perp_annotation",
+        (),
+        [("product_symbol", '["ETH",1]')],
+        "perpAnnotation",
+        product_symbol='["ETH",1]',
+    ),
+    _info("get_perp_categories", (), [], "perpCategories"),
+    _info("get_perp_concise_annotations", (), [], "perpConciseAnnotations"),
+    _info(
+        "get_token_details",
+        (),
+        [("tokenId", "0x00000000000000000000000000000000")],
+        "tokenDetails",
+        token_id="0x00000000000000000000000000000000",
+    ),
+    _info(
+        "get_user_dex_abstraction",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "userDexAbstraction",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info(
+        "get_user_abstraction",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "userAbstraction",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info(
+        "get_borrow_lend_user_state",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "borrowLendUserState",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info("get_borrow_lend_reserve_state", (), [("token", "0")], "borrowLendReserveState", token=0),
+    _info("get_all_borrow_lend_reserve_states", (), [], "allBorrowLendReserveStates"),
+    _info("get_predicted_fundings", (), [], "predictedFundings"),
+    _info(
+        "frontend_open_orders",
+        (USER,),
+        [("user", USER), ("dex", "xyz")],
+        "frontendOpenOrders",
+        dex="xyz",
+    ),
+    _action("noop", (1700000000123,), [("nonce", "1700000000123")], "noop"),
     _info("get_spot_fee_rates", (USER,), [("user", USER)], "userFees"),
     _info("get_futures_fee_rates", (USER,), [("user", USER)], "userFees"),
     _info("get_meta", (), [("dex", "xyz")], "meta", dex="xyz"),
@@ -456,10 +524,13 @@ def test_wrapper_params_reach_official_wire_type(case: WrapperCase) -> None:
         return
     assert last["path"] == "/exchange"
     assert payload["action"]["type"] == case.wire_type
-    if case.wire_type == "usdClassTransfer":
+    if case.wire_type in {"usdClassTransfer", "userSetAbstraction"}:
         assert payload["signature"] == SIGNATURE
         assert payload["action"]["nonce"] == payload["nonce"] == 1700000000000
         assert payload["action"]["hyperliquidChain"] == "Mainnet"
+        if case.wire_type == "userSetAbstraction":
+            assert payload["action"]["user"] == USER
+            assert payload["action"]["abstraction"] == "portfolioMargin"
     else:
         assert payload["signature"]["v"] in {27, 28}
     if case.method.startswith("place_future_market"):

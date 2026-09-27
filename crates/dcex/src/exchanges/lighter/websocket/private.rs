@@ -119,6 +119,23 @@ impl LighterPrivateWebSocket {
         self.connection.send_ping(Vec::new()).await
     }
 
+    /// Sends a signed transaction. Receive the acknowledgement separately.
+    pub async fn send_tx(&mut self, id: &str, tx_type: u64, tx_info: &str) -> Result<()> {
+        let frame = super::trading::single(id, tx_type, tx_info, self.account_index)?;
+        self.connection.send_json(&frame).await
+    }
+
+    /// Sends up to 15 signed transactions without changing their nonces or signatures.
+    pub async fn send_tx_batch(
+        &mut self,
+        id: &str,
+        tx_types: Vec<u64>,
+        tx_infos: Vec<String>,
+    ) -> Result<()> {
+        let frame = super::trading::batch(id, &tx_types, &tx_infos, self.account_index)?;
+        self.connection.send_json(&frame).await
+    }
+
     pub fn create_auth_token(&self) -> Result<String> {
         self.client.create_auth_token()
     }

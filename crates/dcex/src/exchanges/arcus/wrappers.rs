@@ -5,6 +5,27 @@ use super::{ArcusClient, ArcusSpotClient};
 crate::exchanges::impl_exchange_method_wrappers! {
     ArcusClient;
     public [
+        get_api_keys(),
+        get_trade(trade_id => "trade_id", market => "market"),
+        get_account_stats(),
+        get_mid_prices(),
+        get_compliance(),
+        get_rate_limit(),
+        get_time(),
+        get_fill(trade_id => "trade_id"),
+        get_funding(),
+        get_interest(),
+        get_live_prices(),
+        get_funding_rates(market => "market"),
+        get_candles(market => "market", timeframe => "timeframe", end_time => "to"),
+        get_order_history(),
+        get_portfolio_history(),
+        get_trades(market => "market"),
+        get_spot_fills(),
+        get_spot_positions(),
+        health(),
+        get_service_info(),
+
         get_markets(), get_spot_assets(), get_fee_tiers(),
         get_account(), get_bbo(market => "market"),
         get_l2_orderbook(market => "market"), get_positions(),
@@ -12,6 +33,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_fills(), get_transfer_updates(), get_leverages()
     ];
     private [
+        create_api_key_signed(body => "body"), revoke_api_key_signed(body => "body"),
         cancel_all_orders(), set_leverage(product_symbol => "product_symbol", leverage => "leverage"),
         schedule_cancel(time => "time"), disarm_scheduled_cancel(),
         adjust_isolated_margin(product_symbol => "product_symbol", amount => "amount"),

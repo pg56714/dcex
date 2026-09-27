@@ -3,6 +3,21 @@ use super::HyperliquidClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     HyperliquidClient;
     public [
+get_perps_at_open_interest_cap(),
+get_perp_dex_limits(dex => "dex"),
+get_perp_dex_status(dex => "dex"),
+get_all_perp_metas(),
+get_perp_annotation(product_symbol => "product_symbol"),
+get_perp_categories(),
+get_perp_concise_annotations(),
+get_token_details(token_id => "tokenId"),
+get_user_dex_abstraction(user => "user"),
+get_user_abstraction(user => "user"),
+get_borrow_lend_user_state(user => "user"),
+get_borrow_lend_reserve_state(token => "token"),
+get_all_borrow_lend_reserve_states(),
+        get_predicted_fundings(),
+        frontend_open_orders(user => "user"),
         get_futures_fee_rates(user => "user"),
         get_spot_fee_rates(user => "user"),
         clearinghouse_state(user => "user"),
@@ -29,6 +44,10 @@ crate::exchanges::impl_exchange_method_wrappers! {
         user_vault_equities(user => "user")
     ];
     private [
+reserve_request_weight(weight => "weight"),
+set_agent_abstraction(abstraction => "abstraction"),
+set_user_abstraction(user => "user", abstraction => "abstraction", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
+        noop(nonce => "nonce"),
         cancel_batch_orders(cancels => "cancels"),
         cancel_batch_orders_by_cloid(cancels => "cancels"),
         cancel_order(product_symbol => "product_symbol", oid => "oid"),

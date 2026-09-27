@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use dcex::ws::binance::{BinanceEquityWebSocket, BinancePrivateWebSocket, BinancePublicWebSocket};
+use dcex::ws::binance::{
+    BinanceEquityWebSocket, BinancePrivateWebSocket, BinancePublicWebSocket, BinanceWebSocketApi,
+    BinanceWebSocketApiMarket,
+};
 use tokio::sync::Mutex;
 
 use super::*;
@@ -390,7 +393,83 @@ impl PythonBinancePrivateWebSocketClient {
 }
 
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<PythonBinanceWebSocketApiClient>()?;
     m.add_class::<PythonBinancePublicWebSocketClient>()?;
     m.add_class::<PythonBinancePrivateWebSocketClient>()?;
     m.add_class::<PythonBinanceEquityWebSocketClient>()
+}
+
+#[pyclass(name = "BinanceWebSocketApiClient")]
+struct PythonBinanceWebSocketApiClient {
+    client: Arc<BinanceWebSocketApi>,
+}
+
+#[pymethods]
+impl PythonBinanceWebSocketApiClient {
+    #[new]
+    #[pyo3(signature = (market="spot", api_key=None, api_secret=None, ed25519_seed=None, timeout=10.0, base_url=None))]
+    fn new(
+        market: &str,
+        api_key: Option<String>,
+        api_secret: Option<String>,
+        ed25519_seed: Option<String>,
+        timeout: f64,
+        base_url: Option<String>,
+    ) -> PyResult<Self> {
+        let market = match market {
+            "spot" => BinanceWebSocketApiMarket::Spot,
+            "futures" => BinanceWebSocketApiMarket::Futures,
+            "coin_futures" => BinanceWebSocketApiMarket::CoinFutures,
+            _ => {
+                return Err(PyValueError::new_err(
+                    "market must be spot, futures or coin_futures",
+                ));
+            }
+        };
+        let timeout = websocket_timeout(timeout)?;
+        let client = if let Some(url) = base_url {
+            BinanceWebSocketApi::with_url(market, api_key, api_secret, ed25519_seed, timeout, url)
+        } else {
+            BinanceWebSocketApi::new(market, api_key, api_secret, ed25519_seed, timeout)
+        }
+        .map_err(to_py_runtime_error)?;
+        Ok(Self {
+            client: Arc::new(client),
+        })
+    }
+    fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client.connect().await.map_err(to_py_runtime_error)
+        })
+    }
+    fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client.close().await.map_err(to_py_runtime_error)
+        })
+    }
+    fn request<'py>(
+        &self,
+        py: Python<'py>,
+        method: String,
+        params_json: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        let params =
+            serde_json::from_str(&params_json).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .request(&method, params)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let body = client.recv_bytes().await.map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+        })
+    }
 }

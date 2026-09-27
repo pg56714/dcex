@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Exchange responses retain their native, heterogeneous JSON schemas.
 """Market-related HTTP API client for Hyperliquid exchange backed by Rust."""
 
 from typing import Any
@@ -91,3 +93,51 @@ class MarketHTTP(HTTPManager):
                 endTime=endTime,
             ),
         )
+
+    def get_predicted_fundings(self) -> dict[str, Any] | list[Any]:
+        """Get predicted funding rates across venues for the first perpetual DEX."""
+        return self._native_public("get_predicted_fundings", [])
+
+    def get_perps_at_open_interest_cap(self, *, dex: str | None = None) -> Any:
+        """Query perpsAtOpenInterestCap using POST /info."""
+        return self._native_public("get_perps_at_open_interest_cap", self._native_params(dex=dex))
+
+    def get_perp_dex_limits(self, *, dex: str) -> Any:
+        """Query perpDexLimits using POST /info."""
+        return self._native_public("get_perp_dex_limits", self._native_params(dex=dex))
+
+    def get_perp_dex_status(self, *, dex: str) -> Any:
+        """Query perpDexStatus using POST /info. An empty dex selects the first perpetual DEX."""
+        return self._native_public("get_perp_dex_status", self._native_params(dex=dex))
+
+    def get_all_perp_metas(self) -> Any:
+        """Query allPerpMetas using POST /info."""
+        return self._native_public("get_all_perp_metas", self._native_params())
+
+    def get_perp_annotation(self, *, product_symbol: str) -> Any:
+        """Query perpAnnotation using POST /info."""
+        return self._native_public(
+            "get_perp_annotation", self._native_params(product_symbol=product_symbol)
+        )
+
+    def get_perp_categories(self) -> Any:
+        """Query perpCategories using POST /info."""
+        return self._native_public("get_perp_categories", self._native_params())
+
+    def get_perp_concise_annotations(self) -> Any:
+        """Query perpConciseAnnotations using POST /info."""
+        return self._native_public("get_perp_concise_annotations", self._native_params())
+
+    def get_token_details(self, *, token_id: str) -> Any:
+        """Query tokenDetails using POST /info."""
+        return self._native_public("get_token_details", self._native_params(tokenId=token_id))
+
+    def get_borrow_lend_reserve_state(self, *, token: int) -> Any:
+        """Query borrowLendReserveState using POST /info."""
+        return self._native_public(
+            "get_borrow_lend_reserve_state", self._native_params(token=token)
+        )
+
+    def get_all_borrow_lend_reserve_states(self) -> Any:
+        """Query allBorrowLendReserveStates using POST /info."""
+        return self._native_public("get_all_borrow_lend_reserve_states", self._native_params())

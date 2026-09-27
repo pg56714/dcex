@@ -63,6 +63,704 @@ def post(
 
 
 CASES: tuple[Case, ...] = (
+    Case("get_bill_types", "GET", "/api/v5/account/subtypes", kwargs={}, signed=True, query={}),
+    Case(
+        "simulate_positions",
+        "POST",
+        "/api/v5/account/position-builder",
+        kwargs={},
+        signed=True,
+        body={},
+    ),
+    Case(
+        "get_position_margin_graph",
+        "POST",
+        "/api/v5/account/position-builder-graph",
+        kwargs={"type_": "mmr", "mmr_config": {"acctLv": "4"}},
+        signed=True,
+        body={"type": "mmr", "mmrConfig": {"acctLv": "4"}},
+    ),
+    Case(
+        "move_positions",
+        "POST",
+        "/api/v5/account/move-positions",
+        kwargs={
+            "from_acct": "0",
+            "to_acct": "subacct1",
+            "legs": [{"from": {"posId": "1", "sz": "1", "side": "buy"}, "to": {}}],
+            "client_id": "move1",
+        },
+        signed=True,
+        body={
+            "fromAcct": "0",
+            "toAcct": "subacct1",
+            "legs": [{"from": {"posId": "1", "sz": "1", "side": "buy"}, "to": {}}],
+            "clientId": "move1",
+        },
+    ),
+    Case(
+        "get_move_positions_history",
+        "GET",
+        "/api/v5/account/move-positions-history",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    Case(
+        "adjust_demo_balance",
+        "POST",
+        "/api/v5/account/demo-adjust-balance",
+        kwargs={"type_": "increase", "adjustments": [{"ccy": "BTC", "amt": "0.1"}]},
+        signed=True,
+        body={"type": "increase", "adjustments": [{"ccy": "BTC", "amt": "0.1"}]},
+    ),
+    Case(
+        "get_books_rpi",
+        "GET",
+        "/api/v5/market/books-rpi",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_platform_24_volume",
+        "GET",
+        "/api/v5/market/platform-24-volume",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "get_call_auction_details",
+        "GET",
+        "/api/v5/market/call-auction-details",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "rfq_create_rfq",
+        "POST",
+        "/api/v5/rfq/create-rfq",
+        kwargs={
+            "counterparties": ["maker1"],
+            "legs": [{"instId": "BTC-USDT-SWAP", "sz": "1", "side": "buy"}],
+        },
+        signed=True,
+        body={
+            "counterparties": ["maker1"],
+            "legs": [{"instId": "BTC-USDT-SWAP", "sz": "1", "side": "buy"}],
+        },
+    ),
+    Case(
+        "get_rfq_counterparties",
+        "GET",
+        "/api/v5/rfq/counterparties",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    Case(
+        "rfq_cancel_rfq",
+        "POST",
+        "/api/v5/rfq/cancel-rfq",
+        kwargs={"rfq_id": "1"},
+        signed=True,
+        body={"rfqId": "1"},
+    ),
+    Case(
+        "rfq_cancel_batch_rfqs",
+        "POST",
+        "/api/v5/rfq/cancel-batch-rfqs",
+        kwargs={"rfq_ids": ["1"]},
+        signed=True,
+        body={"rfqIds": ["1"]},
+    ),
+    Case(
+        "rfq_cancel_all_rfqs",
+        "POST",
+        "/api/v5/rfq/cancel-all-rfqs",
+        kwargs={},
+        signed=True,
+        body={},
+    ),
+    Case(
+        "rfq_execute_quote",
+        "POST",
+        "/api/v5/rfq/execute-quote",
+        kwargs={"rfq_id": "1", "quote_id": "1"},
+        signed=True,
+        body={"rfqId": "1", "quoteId": "1"},
+    ),
+    Case("get_rfq_rfqs", "GET", "/api/v5/rfq/rfqs", kwargs={}, signed=True, query={}),
+    Case("get_rfq_quotes", "GET", "/api/v5/rfq/quotes", kwargs={}, signed=True, query={}),
+    Case("get_rfq_trades", "GET", "/api/v5/rfq/trades", kwargs={}, signed=True, query={}),
+    Case(
+        "get_block_tickers",
+        "GET",
+        "/api/v5/market/block-tickers",
+        kwargs={"inst_type": "SWAP"},
+        signed=False,
+        query={"instType": "SWAP"},
+    ),
+    Case(
+        "get_block_ticker",
+        "GET",
+        "/api/v5/market/block-ticker",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_rfq_public_trades",
+        "GET",
+        "/api/v5/rfq/public-trades",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "get_block_trades",
+        "GET",
+        "/api/v5/public/block-trades",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_estimated_settlement_info",
+        "GET",
+        "/api/v5/public/estimated-settlement-info",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_settlement_history",
+        "GET",
+        "/api/v5/public/settlement-history",
+        kwargs={"inst_family": "BTC-USDT"},
+        signed=False,
+        query={"instFamily": "BTC-USDT"},
+    ),
+    Case(
+        "get_insurance_fund",
+        "GET",
+        "/api/v5/public/insurance-fund",
+        kwargs={"inst_type": "SWAP", "inst_family": "BTC-USDT"},
+        signed=False,
+        query={"instType": "SWAP", "instFamily": "BTC-USDT"},
+    ),
+    Case(
+        "get_premium_history",
+        "GET",
+        "/api/v5/public/premium-history",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_index_candles",
+        "GET",
+        "/api/v5/market/index-candles",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_history_index_candles",
+        "GET",
+        "/api/v5/market/history-index-candles",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_history_mark_price_candles",
+        "GET",
+        "/api/v5/market/history-mark-price-candles",
+        kwargs={"inst_id": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_exchange_rate",
+        "GET",
+        "/api/v5/market/exchange-rate",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "get_index_components",
+        "GET",
+        "/api/v5/market/index-components",
+        kwargs={"index": "BTC-USDT"},
+        signed=False,
+        query={"index": "BTC-USDT"},
+    ),
+    Case(
+        "get_economic_calendar",
+        "GET",
+        "/api/v5/public/economic-calendar",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "get_market_data_history",
+        "GET",
+        "/api/v5/public/market-data-history",
+        kwargs={
+            "module": "1",
+            "inst_type": "SWAP",
+            "date_aggr_type": "daily",
+            "begin": "1700000000000",
+            "end": "1700000001000",
+            "inst_family_list": "BTC-USDT",
+        },
+        signed=False,
+        query={
+            "module": "1",
+            "instType": "SWAP",
+            "dateAggrType": "daily",
+            "begin": "1700000000000",
+            "end": "1700000001000",
+            "instFamilyList": "BTC-USDT",
+        },
+    ),
+    Case(
+        "get_delta_hedge_currencies",
+        "GET",
+        "/api/v5/public/delta-hedge-currencies",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "get_loan_ratio",
+        "GET",
+        "/api/v5/rubik/stat/margin/loan-ratio",
+        kwargs={"ccy": "BTC"},
+        signed=False,
+        query={"ccy": "BTC"},
+    ),
+    Case(
+        "get_non_tradable_assets",
+        "GET",
+        "/api/v5/asset/non-tradable-assets",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    Case(
+        "create_sub_account",
+        "POST",
+        "/api/v5/users/subaccount/create-subaccount",
+        kwargs={"sub_acct": "subacct1", "type_": "1"},
+        signed=True,
+        body={"subAcct": "subacct1", "type": "1"},
+    ),
+    Case(
+        "create_sub_account_api_key",
+        "POST",
+        "/api/v5/users/subaccount/apikey",
+        kwargs={"sub_acct": "subacct1", "label": "trading", "passphrase": "Trader123!"},
+        signed=True,
+        body={"subAcct": "subacct1", "label": "trading", "passphrase": "Trader123!"},
+    ),
+    Case(
+        "get_sub_account_api_keys",
+        "GET",
+        "/api/v5/users/subaccount/apikey",
+        kwargs={"sub_acct": "subacct1"},
+        signed=True,
+        query={"subAcct": "subacct1"},
+    ),
+    Case(
+        "modify_sub_account_api_key",
+        "POST",
+        "/api/v5/users/subaccount/modify-apikey",
+        kwargs={"sub_acct": "subacct1", "api_key": "api-key"},
+        signed=True,
+        body={"subAcct": "subacct1", "apiKey": "api-key"},
+    ),
+    Case(
+        "delete_sub_account_api_key",
+        "POST",
+        "/api/v5/users/subaccount/delete-apikey",
+        kwargs={"sub_acct": "subacct1", "api_key": "api-key"},
+        signed=True,
+        body={"subAcct": "subacct1", "apiKey": "api-key"},
+    ),
+    Case(
+        "set_sub_account_transfer_out",
+        "POST",
+        "/api/v5/users/subaccount/set-transfer-out",
+        kwargs={"sub_acct": "subacct1"},
+        signed=True,
+        body={"subAcct": "subacct1"},
+    ),
+    Case(
+        "get_announcements",
+        "GET",
+        "/api/v5/support/announcements",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "get_announcement_types",
+        "GET",
+        "/api/v5/support/announcement-types",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "set_fee_type",
+        "POST",
+        "/api/v5/account/set-fee-type",
+        kwargs={"fee_type": "1"},
+        signed=True,
+        body={"feeType": "1"},
+    ),
+    Case(
+        "set_risk_offset_amount",
+        "POST",
+        "/api/v5/account/set-riskOffset-amt",
+        kwargs={"ccy": "BTC", "cl_spot_in_use_amt": "0"},
+        signed=True,
+        body={"ccy": "BTC", "clSpotInUseAmt": "0"},
+    ),
+    Case(
+        "activate_options",
+        "POST",
+        "/api/v5/account/activate-option",
+        kwargs={},
+        signed=True,
+        body={},
+    ),
+    Case(
+        "set_auto_loan",
+        "POST",
+        "/api/v5/account/set-auto-loan",
+        kwargs={"auto_loan": False},
+        signed=True,
+        body={"autoLoan": False},
+    ),
+    Case(
+        "preset_account_level_switch",
+        "POST",
+        "/api/v5/account/account-level-switch-preset",
+        kwargs={"acct_lv": "2", "lever": "5"},
+        signed=True,
+        body={"acctLv": "2", "lever": "5"},
+    ),
+    Case(
+        "precheck_account_level_switch",
+        "GET",
+        "/api/v5/account/set-account-switch-precheck",
+        kwargs={"acct_lv": "3"},
+        signed=True,
+        query={"acctLv": "3"},
+    ),
+    Case(
+        "set_collateral_assets",
+        "POST",
+        "/api/v5/account/set-collateral-assets",
+        kwargs={"type_": "custom", "collateral_enabled": True, "ccy_list": ["BTC", "ETH"]},
+        signed=True,
+        body={"type": "custom", "collateralEnabled": True, "ccyList": ["BTC", "ETH"]},
+    ),
+    Case(
+        "set_settlement_currency",
+        "POST",
+        "/api/v5/account/set-settle-currency",
+        kwargs={"settle_ccy": "USDC"},
+        signed=True,
+        body={"settleCcy": "USDC"},
+    ),
+    Case(
+        "set_trading_config",
+        "POST",
+        "/api/v5/account/set-trading-config",
+        kwargs={"type_": "stgyType", "stgy_type": "1"},
+        signed=True,
+        body={"type": "stgyType", "stgyType": "1"},
+    ),
+    Case(
+        "precheck_delta_neutral",
+        "GET",
+        "/api/v5/account/precheck-set-delta-neutral",
+        kwargs={"stgy_type": "1"},
+        signed=True,
+        query={"stgyType": "1"},
+    ),
+    Case(
+        "get_repayment_currencies",
+        "GET",
+        "/api/v5/trade/one-click-repay-currency-list-v2",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    Case(
+        "repay_debt",
+        "POST",
+        "/api/v5/trade/one-click-repay-v2",
+        kwargs={"debt_ccy": "USDT", "repay_ccy_list": ["USDC", "BTC"]},
+        signed=True,
+        body={"debtCcy": "USDT", "repayCcyList": ["USDC", "BTC"]},
+    ),
+    Case(
+        "get_repayment_history",
+        "GET",
+        "/api/v5/trade/one-click-repay-history-v2",
+        kwargs={"limit": "100"},
+        signed=True,
+        query={"limit": "100"},
+    ),
+    Case(
+        "get_spread_order_history_archive",
+        "GET",
+        "/api/v5/sprd/orders-history-archive",
+        kwargs={"inst_type": "SWAP", "limit": "100"},
+        signed=True,
+        query={"instType": "SWAP", "limit": "100"},
+    ),
+    Case("get_server_time", "GET", "/api/v5/public/time", kwargs={}, signed=False, query={}),
+    Case(
+        "set_isolated_mode",
+        "POST",
+        "/api/v5/account/set-isolated-mode",
+        kwargs={"iso_mode": "automatic", "type_": "MARGIN"},
+        signed=True,
+        body={"isoMode": "automatic", "type": "MARGIN"},
+    ),
+    Case(
+        "get_account_risk_state",
+        "GET",
+        "/api/v5/account/risk-state",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    Case("get_greeks", "GET", "/api/v5/account/greeks", kwargs={}, signed=True, query={}),
+    Case(
+        "get_pm_position_tiers",
+        "GET",
+        "/api/v5/account/position-tiers",
+        kwargs={"inst_type": "SWAP", "inst_family": "BTC-USDT"},
+        signed=True,
+        query={"instType": "SWAP", "instFamily": "BTC-USDT"},
+    ),
+    Case(
+        "set_account_level",
+        "POST",
+        "/api/v5/account/set-account-level",
+        kwargs={"acct_lv": "3"},
+        signed=True,
+        body={"acctLv": "3"},
+    ),
+    Case(
+        "get_collateral_assets",
+        "GET",
+        "/api/v5/account/collateral-assets",
+        kwargs={"ccy": "BTC,ETH", "collateral_enabled": False},
+        signed=True,
+        query={"ccy": "BTC,ETH", "collateralEnabled": "false"},
+    ),
+    Case(
+        "get_ticker",
+        "GET",
+        "/api/v5/market/ticker",
+        kwargs={"product_symbol": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_full_orderbook",
+        "GET",
+        "/api/v5/market/books-full",
+        kwargs={"product_symbol": "BTC-USDT-SWAP", "sz": "5000"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP", "sz": "5000"},
+    ),
+    Case(
+        "get_candles_history",
+        "GET",
+        "/api/v5/market/history-candles",
+        kwargs={"product_symbol": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_trades_history",
+        "GET",
+        "/api/v5/market/history-trades",
+        kwargs={"product_symbol": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "amend_spread_order",
+        "POST",
+        "/api/v5/sprd/amend-order",
+        kwargs={"ord_id": "1", "new_px": "-0.5"},
+        signed=True,
+        body={"ordId": "1", "newPx": "-0.5"},
+    ),
+    Case(
+        "get_estimated_delivery_price",
+        "GET",
+        "/api/v5/public/estimated-price",
+        kwargs={"product_symbol": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_discount_rates",
+        "GET",
+        "/api/v5/public/discount-rate-interest-free-quota",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    Case(
+        "convert_contract_coin",
+        "GET",
+        "/api/v5/public/convert-contract-coin",
+        kwargs={"product_symbol": "BTC-USDT-SWAP", "sz": "1"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP", "sz": "1"},
+    ),
+    Case(
+        "get_index_tickers",
+        "GET",
+        "/api/v5/market/index-tickers",
+        kwargs={"quote_ccy": "USDT"},
+        signed=False,
+        query={"quoteCcy": "USDT"},
+    ),
+    Case(
+        "get_mark_price_candles",
+        "GET",
+        "/api/v5/market/mark-price-candles",
+        kwargs={"product_symbol": "BTC-USDT-SWAP"},
+        signed=False,
+        query={"instId": "BTC-USDT-SWAP"},
+    ),
+    Case(
+        "get_asset_bill_history",
+        "GET",
+        "/api/v5/asset/bills-history",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    Case(
+        "get_convert_currency_pair",
+        "GET",
+        "/api/v5/asset/convert/currency-pair",
+        kwargs={"from_ccy": "USDT", "to_ccy": "BTC"},
+        signed=True,
+        query={"fromCcy": "USDT", "toCcy": "BTC"},
+    ),
+    Case(
+        "estimate_convert_quote",
+        "POST",
+        "/api/v5/asset/convert/estimate-quote",
+        kwargs={
+            "base_ccy": "BTC",
+            "quote_ccy": "USDT",
+            "side": "buy",
+            "rfq_sz": "1",
+            "rfq_sz_ccy": "BTC",
+        },
+        signed=True,
+        body={"baseCcy": "BTC", "quoteCcy": "USDT", "side": "buy", "rfqSz": "1", "rfqSzCcy": "BTC"},
+    ),
+    Case(
+        "execute_convert_trade",
+        "POST",
+        "/api/v5/asset/convert/trade",
+        kwargs={
+            "quote_id": "quote1",
+            "base_ccy": "BTC",
+            "quote_ccy": "USDT",
+            "side": "buy",
+            "sz": "1",
+            "sz_ccy": "BTC",
+        },
+        signed=True,
+        body={
+            "quoteId": "quote1",
+            "baseCcy": "BTC",
+            "quoteCcy": "USDT",
+            "side": "buy",
+            "sz": "1",
+            "szCcy": "BTC",
+        },
+    ),
+    Case("get_system_status", "GET", "/api/v5/system/status", kwargs={}, signed=False, query={}),
+    pub("get_price_limit", "/api/v5/public/price-limit", SWAP, query={"instId": SWAP}),
+    pub("get_mark_price", "/api/v5/public/mark-price", "SWAP", query={"instType": "SWAP"}),
+    post(
+        "place_algo_order",
+        "/api/v5/trade/order-algo",
+        SWAP,
+        "cross",
+        "sell",
+        "conditional",
+        sz="1",
+        sl_trigger_px="50000",
+        sl_ord_px="-1",
+        reduce_only=True,
+        body={
+            "instId": SWAP,
+            "tdMode": "cross",
+            "side": "sell",
+            "ordType": "conditional",
+            "sz": "1",
+            "slTriggerPx": "50000",
+            "slOrdPx": "-1",
+            "reduceOnly": True,
+        },
+    ),
+    post(
+        "amend_algo_order",
+        "/api/v5/trade/amend-algos",
+        SWAP,
+        algo_id="42",
+        new_sl_trigger_px="49000",
+        cancel_on_fail=True,
+        body={"instId": SWAP, "algoId": "42", "newSlTriggerPx": "49000", "cxlOnFail": True},
+    ),
+    post("cancel_algo_orders", "/api/v5/trade/cancel-algos", [{"instId": SWAP, "algoId": "42"}]),
+    get("get_algo_order", "/api/v5/trade/order-algo", algo_id="42", query={"algoId": "42"}),
+    get(
+        "get_pending_algo_orders",
+        "/api/v5/trade/orders-algo-pending",
+        "conditional,oco",
+        query={"ordType": "conditional,oco"},
+    ),
+    get(
+        "get_algo_order_history",
+        "/api/v5/trade/orders-algo-history",
+        "trigger",
+        state="effective",
+        query={"ordType": "trigger", "state": "effective"},
+    ),
+    post(
+        "adjust_position_margin",
+        "/api/v5/account/position/margin-balance",
+        SWAP,
+        "net",
+        "add",
+        "1",
+        body={"instId": SWAP, "posSide": "net", "type": "add", "amt": "1"},
+    ),
     # Market data.
     pub(
         "get_candles_ticks",
@@ -598,7 +1296,9 @@ def okx_server() -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
     received: queue.Queue[dict[str, Any]] = queue.Queue()
     handler = type("Handler", (_Handler,), {"received": received})
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread = threading.Thread(
+        target=server.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True
+    )
     thread.start()
     try:
         host, port = server.server_address[:2]
@@ -635,6 +1335,8 @@ def _assert_request(case: Case, request: dict[str, Any]) -> None:
         assert query.get(key) == value, (case.name, key, query)
     if case.method == "POST":
         body = json.loads(request["body"])
+        if case.name == "cancel_algo_orders":
+            assert body == [{"instId": SWAP, "algoId": "42"}]
         for key, value in case.body.items():
             assert body.get(key) == value, (case.name, key, body)
     else:
@@ -687,7 +1389,7 @@ def test_case_table_covers_every_sync_and_async_wrapper() -> None:
     sync_names = _public_wrapper_names(ROOT / "dcex" / "okx")
     async_names = _public_wrapper_names(ROOT / "dcex" / "async_support" / "okx")
     assert sync_names == async_names
-    assert sync_names == set(case_names)
+    assert sync_names == set(case_names) | {"get_sbe_orderbook"}
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
@@ -762,7 +1464,9 @@ def test_sync_cancel_all_orders_batches_only_matching_pending_orders() -> None:
         do_POST = _handle  # noqa: N815
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread = threading.Thread(
+        target=server.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True
+    )
     thread.start()
     try:
         host, port = server.server_address[:2]
@@ -808,3 +1512,104 @@ def test_undocumented_okx_wrappers_are_marked_deprecated(
     method = getattr(getattr(importlib.import_module(module_name), class_name), method_name)
     assert method.__doc__ is not None
     assert "Deprecated" in method.__doc__
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["sync", "async"])
+@pytest.mark.parametrize(
+    "method,kwargs",
+    [
+        (
+            "place_algo_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "trade_mode": "cross",
+                "side": "sell",
+                "order_type": "trigger",
+                "sz": "1",
+                "trigger_px": "100",
+            },
+        ),
+        (
+            "place_algo_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "trade_mode": "cross",
+                "side": "sell",
+                "order_type": "move_order_stop",
+                "sz": "1",
+                "callback_ratio": "0.01",
+                "callback_spread": "1",
+            },
+        ),
+        (
+            "place_algo_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "trade_mode": "cross",
+                "side": "sell",
+                "order_type": "conditional",
+                "close_fraction": "1",
+                "sl_trigger_px": "100",
+                "sl_ord_px": "-1",
+            },
+        ),
+        (
+            "place_algo_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "trade_mode": "cross",
+                "side": "sell",
+                "order_type": "conditional",
+                "sz": "1",
+                "sl_trigger_px": "100",
+                "sl_ord_px": "NaN",
+            },
+        ),
+        ("cancel_algo_orders", {"orders": []}),
+        (
+            "cancel_algo_orders",
+            {
+                "orders": [
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "0"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "1"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "2"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "3"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "4"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "5"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "6"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "7"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "8"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "9"},
+                    {"product_symbol": "BTC-USDT-SWAP", "algoId": "10"},
+                ]
+            },
+        ),
+    ],
+)
+async def test_new_risk_controls_reject_invalid_input_before_transport(
+    method: str, kwargs: dict[str, Any], mode: str
+) -> None:
+    """Invalid trading parameters fail locally in both public Python interfaces."""
+    import importlib
+
+    module = importlib.import_module(
+        ("dcex.async_support." if mode == "async" else "dcex.") + "okx.client"
+    )
+    client = module.Client(**_client_kwargs("http://127.0.0.1:1"))
+    try:
+        if mode == "async":
+            await client.async_init()
+        with pytest.raises(
+            ValueError,
+            match="(?i)(invalid|required|must|requires|outside|unsupported|expected|between|specify|limit)",
+        ):
+            if mode == "async":
+                await getattr(client, method)(**kwargs)
+            else:
+                getattr(client, method)(**kwargs)
+    finally:
+        if mode == "async":
+            await client.close()
+        else:
+            client.close()

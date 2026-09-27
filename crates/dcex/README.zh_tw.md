@@ -50,7 +50,7 @@ cargo add tokio --features macros,rt-multi-thread
 | Ondo | 支援 | 支援 | 支援 |
 | Arcus | 支援 | 支援 | 支援 |
 
-私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Bybit 另提供可進行訂單操作的驗證交易 WebSocket。
+私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。
 
 Lighter 支援 Mainnet 與 Robinhood，兩者使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet。Ondo 僅支援永續合約。Arcus Spot 使用獨立的 RFQ router，送出報價時須由外部錢包簽章；Arcus Perps 使用另一個客戶端，其私人交易流程尚未經實際環境驗證。
 
@@ -150,3 +150,5 @@ cargo run -p dcex --example binance_ws_public
 ```
 
 私人範例需相應憑證或使用者地址。[Python 套件 README](https://github.com/pg56714/dcex/blob/main/README.zh_tw.md) 說明 Python 用法。此 crate 採用 [MIT 授權](https://github.com/pg56714/dcex/blob/main/LICENSE)；其他授權資訊見[第三方聲明](https://github.com/pg56714/dcex/blob/main/THIRD_PARTY_NOTICES.md)。
+
+[端點覆蓋、限制與驗證紀錄](https://github.com/pg56714/dcex/blob/main/docs/endpoint-audit.zh_tw.md)。

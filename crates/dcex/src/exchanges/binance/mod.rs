@@ -1,4 +1,5 @@
 mod account;
+mod batch;
 mod client;
 mod coin_futures;
 mod convert;
@@ -17,6 +18,7 @@ mod staking;
 mod stream;
 mod subaccount;
 mod trade;
+mod trading_controls;
 pub mod websocket;
 
 #[cfg(test)]
@@ -51,3 +53,8 @@ impl crate::exchanges::ExchangeMethodRequestClient for BinanceClient {
         Box::pin(async move { self.private_request(method_name, params).await })
     }
 }
+
+mod order_lists;
+mod risk;
+mod risk_endpoints;
+mod risk_wrappers;

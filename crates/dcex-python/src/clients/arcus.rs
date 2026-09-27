@@ -157,6 +157,41 @@ impl PythonArcusHttpClient {
         Ok(Self { client })
     }
 
+    fn sign_websocket_request(
+        &self,
+        py: Python<'_>,
+        id: u64,
+        method_name: String,
+        params: Vec<(String, String)>,
+    ) -> PyResult<String> {
+        let client = self.client.clone();
+        py.allow_threads(move || {
+            dcex::http::block_on(async move {
+                client
+                    .sign_websocket_request(id, &method_name, params)
+                    .await
+            })
+        })
+        .map(|v| v.to_string())
+        .map_err(to_py_runtime_error)
+    }
+    fn sign_websocket_request_async<'py>(
+        &self,
+        py: Python<'py>,
+        id: u64,
+        method_name: String,
+        params: Vec<(String, String)>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .sign_websocket_request(id, &method_name, params)
+                .await
+                .map(|v| v.to_string())
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     #[pyo3(signature = (method_name, params=None))]
     fn public_request_json(
         &self,

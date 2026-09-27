@@ -98,6 +98,24 @@ impl PythonExtendedPublicWebSocketClient {
         })
     }
 
+    #[pyo3(signature = (market=None, depth=None))]
+    fn subscribe_rfq_orderbook<'py>(
+        &self,
+        py: Python<'py>,
+        market: Option<String>,
+        depth: Option<u8>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe_rfq_orderbook(market.as_deref(), depth)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     #[pyo3(signature = (market=None))]
     fn subscribe_funding<'py>(
         &self,

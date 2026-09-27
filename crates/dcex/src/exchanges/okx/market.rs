@@ -13,10 +13,18 @@ impl OkxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let raw = OkxParams::from_pairs(params);
+        if let Some(result) = self.risk_request(method_name, &raw, true).await? {
+            return Ok(result);
+        }
         if let Some(result) = self.spread_public_request(method_name, &raw).await? {
             return Ok(result);
         }
         let (required, allowed): (&[&str], &[&str]) = match method_name {
+            "get_price_limit" => (&["product_symbol"], &["product_symbol", "instId"]),
+            "get_mark_price" => (
+                &["instType"],
+                &["instType", "instFamily", "instId", "product_symbol"],
+            ),
             "get_candles_ticks" => (
                 &["product_symbol"],
                 &[
@@ -133,6 +141,21 @@ impl OkxClient {
         }
         let mut params = raw.only(allowed);
         let path = match method_name {
+            "get_price_limit" => {
+                normalize_inst_id_query(&mut params);
+                "/api/v5/public/price-limit"
+            }
+            "get_mark_price" => {
+                if !["MARGIN", "SWAP", "FUTURES", "OPTION", "EVENTS"]
+                    .contains(&raw.required("instType")?)
+                {
+                    return Err(DcexError::InvalidInput(
+                        "unsupported mark-price instType".into(),
+                    ));
+                }
+                normalize_inst_id_query(&mut params);
+                "/api/v5/public/mark-price"
+            }
             "get_candles_ticks" => {
                 normalize_inst_id_query(&mut params);
                 MARKET_CANDLES

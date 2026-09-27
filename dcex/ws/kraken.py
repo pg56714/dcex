@@ -162,6 +162,38 @@ class PrivateClient(AsyncWebSocketMixin):
             return event
         raise RuntimeError(f"Unexpected Kraken WebSocket event payload: {event!r}")
 
+    async def trade_request(self, method: str, params: dict[str, Any]) -> int:
+        """Send a Spot v2 trade request using native JSON fields; correlate recv() by req_id."""
+        return int(await self._native_client.trade_request(method, json.dumps(params)))
+
+    async def add_order(self, params: dict[str, Any]) -> int:
+        """Send add_order; numeric order fields must be JSON numbers and symbols use BTC/USD."""
+        return await self.trade_request("add_order", params)
+
+    async def amend_order(self, params: dict[str, Any]) -> int:
+        """Send amend_order; numeric order fields must be JSON numbers and symbols use BTC/USD."""
+        return await self.trade_request("amend_order", params)
+
+    async def cancel_order(self, params: dict[str, Any]) -> int:
+        """Send cancel_order; numeric order fields must be JSON numbers and symbols use BTC/USD."""
+        return await self.trade_request("cancel_order", params)
+
+    async def batch_add(self, params: dict[str, Any]) -> int:
+        """Send batch_add; numeric order fields must be JSON numbers and symbols use BTC/USD."""
+        return await self.trade_request("batch_add", params)
+
+    async def batch_cancel(self, params: dict[str, Any]) -> int:
+        """Send batch_cancel; numeric order fields must be JSON numbers and symbols use BTC/USD."""
+        return await self.trade_request("batch_cancel", params)
+
+    async def cancel_all(self) -> int:
+        """Cancel all open Spot orders."""
+        return await self.trade_request("cancel_all", {})
+
+    async def cancel_after(self, timeout: int) -> int:  # noqa: ASYNC109 - exchange cancel timer
+        """Set the cancel timer in seconds; zero disables it, refresh before expiry."""
+        return await self.trade_request("cancel_after", {"timeout": timeout})
+
 
 def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
     """Create an async Kraken Spot public market WebSocket client."""
@@ -186,3 +218,158 @@ def private(
 
 
 __all__ = ["PrivateClient", "PublicClient", "private", "public"]
+
+
+class FuturesPublicClient(AsyncWebSocketMixin):
+    """Kraken Derivatives streaming; ping every 60 seconds and resubscribe after reconnect."""
+
+    def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
+        """Create a public derivatives stream client."""
+        self._native_client = _native.KrakenFuturesWebSocketClient(
+            timeout=timeout, base_url=base_url
+        )
+
+    async def connect(self) -> None:
+        """Open the WebSocket connection."""
+        await self._native_client.connect()
+
+    async def close(self) -> None:
+        """Close the connection."""
+        await self._native_client.close()
+
+    async def ping(self) -> None:
+        """Send a WebSocket ping frame."""
+        await self._native_client.ping()
+
+    async def subscribe(self, feed: str, product_ids: list[str] | None = None) -> None:
+        """
+        Subscribe; canonical SWAP symbols map to PF_ contracts, other contracts use native IDs.
+        """
+        await self._native_client.subscribe(feed, product_ids)
+
+    async def unsubscribe(self, feed: str, product_ids: list[str] | None = None) -> None:
+        """Remove a feed subscription."""
+        await self._native_client.unsubscribe(feed, product_ids)
+
+    async def recv(self) -> dict[str, Any]:
+        """Receive one event, including subscription errors and sequence fields unchanged."""
+        event = json.loads(bytes(await self._native_client.recv()))
+        if not isinstance(event, dict):
+            raise TypeError("Unexpected Kraken futures event")
+        return event
+
+    async def subscribe_orderbook(self, product_ids: list[str]) -> None:
+        """Subscribe to the book feed."""
+        await self.subscribe("book", product_ids)
+
+    async def subscribe_ticker(self, product_ids: list[str]) -> None:
+        """Subscribe to the ticker feed."""
+        await self.subscribe("ticker", product_ids)
+
+    async def subscribe_ticker_lite(self, product_ids: list[str]) -> None:
+        """Subscribe to the ticker_lite feed."""
+        await self.subscribe("ticker_lite", product_ids)
+
+    async def subscribe_trades(self, product_ids: list[str]) -> None:
+        """Subscribe to the trade feed."""
+        await self.subscribe("trade", product_ids)
+
+    async def subscribe_heartbeat(self) -> None:
+        """Subscribe to exchange heartbeat events."""
+        await self.subscribe("heartbeat")
+
+
+class FuturesPrivateClient(FuturesPublicClient):
+    """Kraken Derivatives account streams with signed-challenge authentication."""
+
+    def __init__(
+        self, api_key: str, api_secret: str, timeout: float = 10.0, base_url: str | None = None
+    ) -> None:
+        """Create a private derivatives client with a Base64 API secret."""
+        self._native_client = _native.KrakenFuturesWebSocketClient(
+            timeout=timeout, base_url=base_url, api_key=api_key, api_secret=api_secret
+        )
+
+    async def subscribe_fills(self, product_ids: list[str] | None = None) -> None:
+        """Subscribe to executions, optionally filtered by contract."""
+        await self.subscribe("fills", product_ids)
+
+    async def subscribe_open_orders(self) -> None:
+        """Subscribe to the open_orders account feed."""
+        await self.subscribe("open_orders")
+
+    async def subscribe_open_orders_verbose(self) -> None:
+        """Subscribe to the open_orders_verbose account feed."""
+        await self.subscribe("open_orders_verbose")
+
+    async def subscribe_positions(self) -> None:
+        """Subscribe to the open_position account feed."""
+        await self.subscribe("open_position")
+
+    async def subscribe_balances(self) -> None:
+        """Subscribe to the balances account feed."""
+        await self.subscribe("balances")
+
+    async def subscribe_account_log(self) -> None:
+        """Subscribe to the account_log account feed."""
+        await self.subscribe("account_log")
+
+    async def subscribe_notifications(self) -> None:
+        """Subscribe to the notifications account feed."""
+        await self.subscribe("notifications")
+
+
+class Level3Client(AsyncWebSocketMixin):
+    """
+    Kraken authenticated L3 feed at ws-l3.kraken.com/v2.
+
+    Returns raw snapshots, updates, checksums and per-symbol acknowledgements.
+    Maintain book state and verify checksums in the consuming trading system.
+    Subscription rate and the 200-symbol connection limit are enforced by Kraken.
+    """
+
+    def __init__(
+        self,
+        api_key: str,
+        api_secret: str,
+        timeout: float = 10.0,
+        spot_http_base_url: str | None = None,
+        ws_base_url: str | None = None,
+    ) -> None:
+        """Create a dedicated L3 connection using a REST WebSocket token."""
+        self._native_client = _native.KrakenPrivateWebSocketClient(
+            api_key=api_key,
+            api_secret=api_secret,
+            timeout=timeout,
+            spot_http_base_url=spot_http_base_url,
+            ws_base_url=ws_base_url or "wss://ws-l3.kraken.com/v2",
+        )
+
+    async def connect(self) -> str:
+        """Fetch a token and connect to the L3 service."""
+        return str(await self._native_client.connect())
+
+    async def close(self) -> None:
+        """Close the connection."""
+        await self._native_client.close()
+
+    async def ping(self) -> int:
+        """Send an application ping."""
+        return int(await self._native_client.ping())
+
+    async def subscribe_level3(
+        self, product_symbols: list[str], depth: int = 10, snapshot: bool = True
+    ) -> int:
+        """Subscribe to depth 10, 100 or 1000; read acknowledgements with recv."""
+        return int(await self._native_client.subscribe_level3(product_symbols, depth, snapshot))
+
+    async def unsubscribe_level3(self, product_symbols: list[str], depth: int = 10) -> int:
+        """Cancel subscriptions at their original depth."""
+        return int(await self._native_client.unsubscribe_level3(product_symbols, depth))
+
+    async def recv(self) -> dict[str, Any]:
+        """Return one complete event, retaining order IDs and checksum."""
+        event = json.loads(bytes(await self._native_client.recv()))
+        if not isinstance(event, dict):
+            raise TypeError("Unexpected Kraken L3 event")
+        return event

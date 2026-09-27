@@ -9,6 +9,413 @@ use super::{KrakenClient, SECRET};
 /// Rows: (public, method name, params, HTTP method, path).
 #[allow(clippy::type_complexity)]
 const ROUTE_CASES: &[(bool, &str, &[(&str, &str)], &str, &str)] = &[
+    (
+        false,
+        "delete_spot_export_report",
+        &[("id", "report1"), ("type", "cancel")],
+        "POST",
+        "/0/private/RemoveExport",
+    ),
+    (
+        false,
+        "get_spot_export_status",
+        &[("report", "trades")],
+        "POST",
+        "/0/private/ExportStatus",
+    ),
+    (
+        false,
+        "request_spot_export_report",
+        &[
+            ("report", "trades"),
+            ("format", "CSV"),
+            ("description", "history"),
+            ("starttm", "1700000000"),
+            ("endtm", "1700000060"),
+        ],
+        "POST",
+        "/0/private/AddExport",
+    ),
+    (
+        false,
+        "simulate_futures_portfolio",
+        &[(
+            "json",
+            "{\"positions\":[{\"instrument\":\"PF_XBTUSD\",\"size\":-1.25,\"entryPrice\":60000.25}]}",
+        )],
+        "POST",
+        "/derivatives/api/v3/portfolio-margining/simulate",
+    ),
+    (
+        true,
+        "get_futures_market_analytics",
+        &[
+            ("symbol", "PF_XBTUSD"),
+            ("analytics_type", "open-interest"),
+            ("since", "1700000000"),
+            ("interval", "60"),
+        ],
+        "GET",
+        "/api/charts/v1/analytics/PF_XBTUSD/open-interest",
+    ),
+    (
+        false,
+        "check_futures_api_key",
+        &[],
+        "GET",
+        "/api/auth/v1/api-keys/v3/check",
+    ),
+    (
+        true,
+        "get_futures_ticker",
+        &[("symbol", "PF_XBTUSD")],
+        "GET",
+        "/derivatives/api/v3/tickers/PF_XBTUSD",
+    ),
+    (
+        false,
+        "get_futures_pnl_preferences",
+        &[],
+        "GET",
+        "/derivatives/api/v3/pnlpreferences",
+    ),
+    (
+        false,
+        "set_futures_pnl_preference",
+        &[("symbol", "PF_XBTUSD"), ("pnlPreference", "USD")],
+        "PUT",
+        "/derivatives/api/v3/pnlpreferences",
+    ),
+    (
+        false,
+        "create_spot_subaccount",
+        &[("username", "trader1"), ("email", "trader@example.com")],
+        "POST",
+        "/0/private/CreateSubaccount",
+    ),
+    (
+        false,
+        "get_futures_subaccounts",
+        &[],
+        "GET",
+        "/derivatives/api/v3/subaccounts",
+    ),
+    (
+        true,
+        "get_spot_post_trade_data",
+        &[("symbol", "BTC/USD")],
+        "GET",
+        "/0/public/PostTrade",
+    ),
+    (
+        true,
+        "get_spot_pre_trade_data",
+        &[("symbol", "BTC/USD")],
+        "GET",
+        "/0/public/PreTrade",
+    ),
+    (
+        false,
+        "get_spot_api_key_info",
+        &[],
+        "POST",
+        "/0/private/GetApiKeyInfo",
+    ),
+    (
+        false,
+        "get_spot_credit_lines",
+        &[("rebase_multiplier", "base")],
+        "POST",
+        "/0/private/CreditLines",
+    ),
+    (
+        false,
+        "get_spot_order_amends",
+        &[("order_id", "OID-1"), ("rebase_multiplier", "base")],
+        "POST",
+        "/0/private/OrderAmends",
+    ),
+    (
+        false,
+        "get_spot_wallet_accounts",
+        &[],
+        "POST",
+        "/0/private/ListWalletAccounts",
+    ),
+    (
+        false,
+        "get_spot_ledger_entries",
+        &[
+            ("id", "ledger1,ledger2"),
+            ("trades", "true"),
+            ("rebase_multiplier", "base"),
+        ],
+        "POST",
+        "/0/private/QueryLedgers",
+    ),
+    (
+        false,
+        "get_futures_portfolio_margin_parameters",
+        &[],
+        "GET",
+        "/derivatives/api/v3/portfolio-margining/parameters",
+    ),
+    (
+        false,
+        "get_futures_unwind_queue",
+        &[],
+        "GET",
+        "/derivatives/api/v3/unwindqueue",
+    ),
+    (
+        false,
+        "get_futures_notifications",
+        &[],
+        "GET",
+        "/derivatives/api/v3/notifications",
+    ),
+    (
+        true,
+        "get_spot_grouped_orderbook",
+        &[
+            ("product_symbol", "BTC-USD-SPOT"),
+            ("depth", "25"),
+            ("grouping", "100"),
+        ],
+        "GET",
+        "/0/public/GroupedBook",
+    ),
+    (
+        true,
+        "get_spot_maintenance_schedule",
+        &[],
+        "GET",
+        "/0/public/MaintenanceSchedule",
+    ),
+    (
+        false,
+        "get_futures_self_trade_strategy",
+        &[],
+        "GET",
+        "/derivatives/api/v3/self-trade-strategy",
+    ),
+    (
+        false,
+        "set_futures_self_trade_strategy",
+        &[("strategy", "CANCEL_MAKER_SELF")],
+        "PUT",
+        "/derivatives/api/v3/self-trade-strategy",
+    ),
+    (
+        false,
+        "get_futures_trading_instruments",
+        &[("contractType", "[\"futures_inverse\",\"flexible_futures\"]")],
+        "GET",
+        "/derivatives/api/v3/trading/instruments",
+    ),
+    (
+        false,
+        "get_futures_subaccount_trading_status",
+        &[("subaccountUid", "abcd-1234")],
+        "GET",
+        "/derivatives/api/v3/subaccount/abcd-1234/trading-enabled",
+    ),
+    (
+        false,
+        "set_futures_subaccount_trading_status",
+        &[("subaccountUid", "abcd-1234"), ("tradingEnabled", "false")],
+        "PUT",
+        "/derivatives/api/v3/subaccount/abcd-1234/trading-enabled",
+    ),
+    (
+        false,
+        "get_spot_trades_info",
+        &[
+            ("txid", "trade-1,trade-2"),
+            ("trades", "true"),
+            ("rebase_multiplier", "base"),
+        ],
+        "POST",
+        "/0/private/QueryTrades",
+    ),
+    (
+        false,
+        "get_futures_account_log_csv",
+        &[("conversion_details", "true")],
+        "GET",
+        "/api/history/v3/accountlogcsv",
+    ),
+    (
+        false,
+        "get_futures_account_log",
+        &[
+            ("since", "1000"),
+            ("before", "2000"),
+            ("count", "10"),
+            ("conversion_details", "true"),
+            ("info", "[\"futures trade\",\"funding rate change\"]"),
+        ],
+        "GET",
+        "/api/history/v3/account-log",
+    ),
+    (
+        false,
+        "get_futures_execution_events",
+        &[("since", "1000"), ("before", "2000"), ("count", "10")],
+        "GET",
+        "/api/history/v3/executions",
+    ),
+    (
+        false,
+        "get_futures_order_events",
+        &[("since", "1000"), ("before", "2000"), ("count", "10")],
+        "GET",
+        "/api/history/v3/orders",
+    ),
+    (
+        false,
+        "get_futures_position_events",
+        &[("since", "1000"), ("before", "2000"), ("count", "10")],
+        "GET",
+        "/api/history/v3/positions",
+    ),
+    (
+        false,
+        "get_futures_trigger_events",
+        &[("since", "1000"), ("before", "2000"), ("count", "10")],
+        "GET",
+        "/api/history/v3/triggers",
+    ),
+    (
+        false,
+        "get_spot_deposit_addresses",
+        &[("asset", "XBT"), ("method", "Bitcoin")],
+        "POST",
+        "/0/private/DepositAddresses",
+    ),
+    (
+        false,
+        "get_spot_deposit_methods",
+        &[("asset", "XBT")],
+        "POST",
+        "/0/private/DepositMethods",
+    ),
+    (
+        true,
+        "get_futures_instrument_status",
+        &[("product_symbol", "BTC-USD-SWAP")],
+        "GET",
+        "/derivatives/api/v3/instruments/PF_XBTUSD/status",
+    ),
+    (
+        true,
+        "get_futures_instrument_statuses",
+        &[("contractType", "[\"futures_inverse\",\"flexible_futures\"]")],
+        "GET",
+        "/derivatives/api/v3/instruments/status",
+    ),
+    (
+        false,
+        "transfer_spot_sub_account",
+        &[
+            ("asset", "XBT"),
+            ("amount", "1.25"),
+            ("from", "master-id"),
+            ("to", "sub-id"),
+        ],
+        "POST",
+        "/0/private/AccountTransfer",
+    ),
+    (
+        false,
+        "transfer_futures_sub_account",
+        &[
+            ("fromUser", "master-id"),
+            ("toUser", "sub-id"),
+            ("fromAccount", "cash"),
+            ("toAccount", "flex"),
+            ("unit", "USD"),
+            ("amount", "1.25"),
+        ],
+        "POST",
+        "/derivatives/api/v3/transfer/subaccount",
+    ),
+    (
+        false,
+        "get_spot_deposit_status",
+        &[("cursor", "true"), ("limit", "10")],
+        "POST",
+        "/0/private/DepositStatus",
+    ),
+    (
+        false,
+        "get_spot_level3_orderbook",
+        &[("product_symbol", "BTC-USD-SPOT"), ("depth", "0")],
+        "POST",
+        "/0/private/Level3",
+    ),
+    (
+        false,
+        "manage_futures_batch_orders",
+        &[(
+            "orders",
+            r#"[{"order":"send","order_tag":"1","orderType":"lmt","product_symbol":"BTC-USD-SWAP","side":"buy","size":1,"limitPrice":100},{"order":"cancel","cliOrdId":"c-2"}]"#,
+        )],
+        "POST",
+        "/derivatives/api/v3/batchorder",
+    ),
+    (
+        true,
+        "get_futures_funding_history",
+        &[("product_symbol", "BTC-USD-SWAP")],
+        "GET",
+        "/derivatives/api/v3/historical-funding-rates",
+    ),
+    (
+        false,
+        "place_spot_batch_orders",
+        &[
+            ("product_symbol", "BTC-USD-SPOT"),
+            (
+                "orders",
+                "[{\"type\":\"buy\",\"ordertype\":\"limit\",\"price\":\"100\",\"volume\":\"1\"},{\"type\":\"sell\",\"ordertype\":\"market\",\"volume\":\"1\"}]",
+            ),
+            ("validate", "true"),
+        ],
+        "POST",
+        "/0/private/AddOrderBatch",
+    ),
+    (
+        false,
+        "cancel_spot_batch_orders",
+        &[
+            ("orders", "[\"OABC\",42]"),
+            ("cl_ord_ids", "[\"client-a\"]"),
+        ],
+        "POST",
+        "/0/private/CancelOrderBatch",
+    ),
+    (
+        false,
+        "get_spot_extended_balance",
+        &[("rebase_multiplier", "base")],
+        "POST",
+        "/0/private/BalanceEx",
+    ),
+    (
+        false,
+        "get_futures_leverage_preferences",
+        &[],
+        "GET",
+        "/derivatives/api/v3/leveragepreferences",
+    ),
+    (
+        false,
+        "set_futures_leverage_preference",
+        &[("product_symbol", "BTC-USD-SWAP"), ("maxLeverage", "3")],
+        "PUT",
+        "/derivatives/api/v3/leveragepreferences",
+    ),
     (true, "get_server_time", &[], "GET", "/0/public/Time"),
     (
         true,
@@ -662,21 +1069,29 @@ fn route_cases_cover_every_dispatch_name() {
         include_str!("../account.rs"),
         include_str!("../earn.rs"),
         include_str!("../trade.rs"),
+        include_str!("../trading_controls.rs"),
     ]
     .join("\n");
     let mut names = BTreeSet::new();
+    let mut depth = 0_i32;
     for line in source.lines() {
-        let trimmed = line.trim_start();
-        if !trimmed.starts_with('"') || !trimmed.contains("=>") {
+        if depth == 0 {
+            if line.contains("match method_name {") || line.contains("match name {") {
+                depth = 1;
+            }
             continue;
         }
-        let arm = trimmed.split("=>").next().unwrap_or_default();
-        for part in arm.split('|') {
-            let name = part.trim().trim_matches('"');
-            if !name.is_empty() && name.chars().all(|c| c.is_ascii_lowercase() || c == '_') {
-                names.insert(name.to_string());
+        let trimmed = line.trim_start();
+        if depth == 1 && trimmed.starts_with('"') && trimmed.contains("=>") {
+            let arm = trimmed.split("=>").next().unwrap_or_default();
+            for part in arm.split('|') {
+                let name = part.trim().trim_matches('"');
+                if !name.is_empty() && name.chars().all(|c| c.is_ascii_lowercase() || c == '_') {
+                    names.insert(name.to_string());
+                }
             }
         }
+        depth += line.matches('{').count() as i32 - line.matches('}').count() as i32;
     }
     let covered: BTreeSet<String> = ROUTE_CASES
         .iter()
@@ -787,4 +1202,25 @@ fn unknown_dispatch_names_are_rejected_before_transport() {
             .to_string()
             .contains("unsupported Kraken private method")
     );
+}
+
+#[test]
+fn history_csv_preserves_text_and_uses_futures_authentication() {
+    let csv = "id,info,amount\r\n1,fee,-0.02\r\n";
+    let (url, server) = serve_one("{}", csv);
+    let client = client_for(url);
+    let response = crate::http::block_on(async move {
+        client
+            .private_request(
+                "get_futures_account_log_csv",
+                pairs(&[("conversion_details", "true")]),
+            )
+            .await
+    })
+    .unwrap();
+    assert_eq!(response.data.as_str(), Some(csv));
+    let (head, _) = server.join().unwrap();
+    assert!(head.contains("GET /api/history/v3/accountlogcsv?conversion_details=true"));
+    assert!(head.to_ascii_lowercase().contains("accept: text/csv"));
+    assert!(head.to_ascii_lowercase().contains("authent:"));
 }

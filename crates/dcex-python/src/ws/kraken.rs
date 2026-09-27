@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use dcex::ws::kraken::{KrakenPrivateWebSocket, KrakenPublicWebSocket};
+use dcex::ws::kraken::{KrakenFuturesWebSocket, KrakenPrivateWebSocket, KrakenPublicWebSocket};
 use tokio::sync::Mutex;
 
 use super::*;
@@ -194,6 +194,41 @@ impl PythonKrakenPublicWebSocketClient {
 
 #[pymethods]
 impl PythonKrakenPrivateWebSocketClient {
+    #[pyo3(signature = (product_symbols, depth=10, snapshot=true))]
+    fn subscribe_level3<'py>(
+        &self,
+        py: Python<'py>,
+        product_symbols: Vec<String>,
+        depth: u32,
+        snapshot: bool,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe_level3(product_symbols, depth, snapshot)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    #[pyo3(signature = (product_symbols, depth=10))]
+    fn unsubscribe_level3<'py>(
+        &self,
+        py: Python<'py>,
+        product_symbols: Vec<String>,
+        depth: u32,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .unsubscribe_level3(product_symbols, depth)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
     #[new]
     #[pyo3(signature = (
         api_key,
@@ -250,6 +285,24 @@ impl PythonKrakenPrivateWebSocketClient {
         })
     }
 
+    fn trade_request<'py>(
+        &self,
+        py: Python<'py>,
+        method: String,
+        params: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let params: serde_json::Value = serde_json::from_str(&params)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .trade_request(&method, params)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
@@ -374,7 +427,126 @@ impl PythonKrakenPrivateWebSocketClient {
     }
 }
 
+#[pyclass(name = "KrakenFuturesWebSocketClient")]
+struct PythonKrakenFuturesWebSocketClient {
+    client: Arc<Mutex<KrakenFuturesWebSocket>>,
+}
+
+#[pymethods]
+impl PythonKrakenFuturesWebSocketClient {
+    #[new]
+    #[pyo3(signature=(timeout=10.0, base_url=None, api_key=None, api_secret=None))]
+    fn new(
+        timeout: f64,
+        base_url: Option<String>,
+        api_key: Option<String>,
+        api_secret: Option<String>,
+    ) -> PyResult<Self> {
+        let timeout = websocket_timeout(timeout)?;
+        let client = if let Some(url) = base_url {
+            KrakenFuturesWebSocket::with_url(url, timeout)
+        } else {
+            KrakenFuturesWebSocket::new(timeout)
+        }
+        .map_err(to_py_runtime_error)?;
+        let client = match (api_key, api_secret) {
+            (None, None) => client,
+            (Some(key), Some(secret)) => client
+                .with_credentials(key, secret)
+                .map_err(to_py_runtime_error)?,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(
+                    "provide both api_key and api_secret",
+                ));
+            }
+        };
+        Ok(Self {
+            client: Arc::new(Mutex::new(client)),
+        })
+    }
+    fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .connect()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .close()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .ping()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    #[pyo3(signature=(feed,product_ids=None))]
+    fn subscribe<'py>(
+        &self,
+        py: Python<'py>,
+        feed: String,
+        product_ids: Option<Vec<String>>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe(&feed, product_ids)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    #[pyo3(signature=(feed,product_ids=None))]
+    fn unsubscribe<'py>(
+        &self,
+        py: Python<'py>,
+        feed: String,
+        product_ids: Option<Vec<String>>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .unsubscribe(&feed, product_ids)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let body = client
+                .lock()
+                .await
+                .recv()
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+        })
+    }
+}
+
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<PythonKrakenFuturesWebSocketClient>()?;
     m.add_class::<PythonKrakenPublicWebSocketClient>()?;
     m.add_class::<PythonKrakenPrivateWebSocketClient>()
 }

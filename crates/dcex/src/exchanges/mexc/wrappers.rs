@@ -32,6 +32,13 @@ crate::exchanges::impl_exchange_method_wrappers! {
         ping(),
     ];
     private [
+cancel_contract_batch_orders_by_external_id(orders => "orders"),
+get_contract_batch_orders_by_external_id(orders => "orders"),
+get_contract_closed_orders(product_symbol => "product_symbol"),
+get_contract_fee_details(product_symbol => "product_symbol"),
+get_contract_30_day_fee_statistics(),
+        cancel_spot_all_orders(),
+        get_contract_open_stop_orders(),
         cancel_all_contract_orders(),
         amend_contract_limit_order(order_id => "orderId", price => "price", vol => "vol"),
         chase_contract_limit_order(order_id => "orderId"),
@@ -127,3 +134,21 @@ crate::exchanges::impl_exchange_method_wrappers! {
         user_universal_transfer(from_account_type => "fromAccountType", to_account_type => "toAccountType", asset => "asset", amount => "amount"),
     ];
 }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; MexcClient; public [
+get_spot_offline_symbols(),
+get_announcements(),
+get_contract_supported_currencies(),
+]; private [
+get_uid(),
+get_api_key_info(access_key => "accessKey"),
+set_api_key_ip_whitelist(api_key => "apiKey",ip_whitelist => "ipWhiteList"),
+get_convertible_assets(),
+convert_dust(assets => "asset"),
+get_dust_conversion_history(),
+create_sub_account(sub_account => "subAccount",note => "note"),
+get_contract_profit_rate(period_type => "type"),
+get_contract_fee_deduction_config(),
+get_contract_fee_discount_config(),
+get_contract_discount_usage(),
+]; }

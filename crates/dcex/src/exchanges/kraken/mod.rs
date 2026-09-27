@@ -7,6 +7,7 @@ mod params;
 mod private;
 mod signing;
 mod trade;
+mod trading_controls;
 mod websocket;
 mod wrappers;
 
@@ -14,4 +15,7 @@ mod wrappers;
 mod tests;
 
 pub use client::{KrakenAuth, KrakenClient};
-pub use websocket::{KrakenPrivateWebSocket, KrakenPublicWebSocket};
+pub use websocket::{KrakenFuturesWebSocket, KrakenPrivateWebSocket, KrakenPublicWebSocket};
+
+mod risk;
+mod risk_endpoints;

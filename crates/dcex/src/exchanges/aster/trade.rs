@@ -81,6 +81,9 @@ impl AsterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = AsterParams::from_pairs(normalize_order_side(method_name, params));
+        if let Some(response) = self.additional_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
         validate_private_params(method_name, &params)?;
         if let Some(response) = self.account_private_request(method_name, &params).await? {
             return Ok(response);
@@ -99,6 +102,49 @@ impl AsterClient {
         params: &AsterParams,
     ) -> Result<Option<ValidatedResponse>> {
         let response = match method_name {
+            "noop_spot" | "noop_futures" => {
+                let (market, path) = if method_name == "noop_spot" {
+                    (AsterMarket::Spot, "/api/v3/noop")
+                } else {
+                    (AsterMarket::Futures, "/fapi/v3/noop")
+                };
+                self.signed_at_nonce(
+                    HttpMethod::Post,
+                    market,
+                    path,
+                    Vec::new(),
+                    params.u64("nonce")?,
+                )
+                .await
+            }
+            "guarded_cancel_futures_order" | "guarded_cancel_futures_batch_orders" => {
+                let batch = method_name == "guarded_cancel_futures_batch_orders";
+                let mut query = if batch {
+                    let mut query = Vec::new();
+                    for key in ["orderIdList", "origClientOrderIdList"] {
+                        if params.get(key).is_some() {
+                            query.push((key.to_string(), params.json_required(key)?.to_string()));
+                        }
+                    }
+                    query
+                } else {
+                    params.only(&["orderId", "origClientOrderId"])
+                };
+                self.push_required_symbol(&mut query, params)?;
+                self.signed_at_nonce(
+                    HttpMethod::Delete,
+                    AsterMarket::Futures,
+                    if batch {
+                        "/fapi/v3/guardedBatchOrders"
+                    } else {
+                        "/fapi/v3/guardedCancelOrder"
+                    },
+                    query,
+                    params.u64("nonce")?,
+                )
+                .await
+            }
+            "transfer_sub_account" => self.sub_account_transfer(params).await,
             "place_spot_order" => {
                 let mut query = params.only(&[
                     "type",
@@ -111,8 +157,14 @@ impl AsterClient {
                 ]);
                 self.push_required_symbol(&mut query, params)?;
                 self.push_required_side(&mut query, params)?;
-                self.signed(HttpMethod::Post, AsterMarket::Spot, SPOT_ORDER, query)
-                    .await
+                self.signed_at_nonce(
+                    HttpMethod::Post,
+                    AsterMarket::Spot,
+                    SPOT_ORDER,
+                    query,
+                    params.u64("nonce")?,
+                )
+                .await
             }
             "cancel_spot_order" => {
                 ensure_order_lookup(params)?;
@@ -169,8 +221,14 @@ impl AsterClient {
                 let mut query = params.only(FUTURES_ORDER_KEYS);
                 self.push_required_symbol(&mut query, params)?;
                 self.push_required_side(&mut query, params)?;
-                self.signed(HttpMethod::Post, AsterMarket::Futures, FUTURES_ORDER, query)
-                    .await
+                self.signed_at_nonce(
+                    HttpMethod::Post,
+                    AsterMarket::Futures,
+                    FUTURES_ORDER,
+                    query,
+                    params.u64("nonce")?,
+                )
+                .await
             }
             "modify_futures_order" => {
                 ensure_order_lookup(params)?;
@@ -198,7 +256,7 @@ impl AsterClient {
                     .await
             }
             "place_futures_batch_orders" => {
-                self.signed(
+                self.signed_at_nonce(
                     HttpMethod::Post,
                     AsterMarket::Futures,
                     FUTURES_BATCH_ORDERS,
@@ -206,6 +264,7 @@ impl AsterClient {
                         "batchOrders".to_string(),
                         self.resolve_batch_orders(params)?,
                     )],
+                    params.u64("nonce")?,
                 )
                 .await
             }
@@ -554,6 +613,52 @@ fn ensure_order_lookup(params: &AsterParams) -> Result<()> {
 
 fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()> {
     match method_name {
+        "noop_spot" | "noop_futures" => {
+            params.ensure_allowed(&["nonce"], &[])?;
+            params.required_u64_range("nonce", 1, u64::MAX)
+        }
+        "guarded_cancel_futures_order" | "guarded_cancel_futures_batch_orders" => {
+            let batch = method_name == "guarded_cancel_futures_batch_orders";
+            let keys = if batch {
+                ["orderIdList", "origClientOrderIdList"]
+            } else {
+                ["orderId", "origClientOrderId"]
+            };
+            params.ensure_allowed(
+                &["product_symbol", "symbol", "nonce", keys[0], keys[1]],
+                &[],
+            )?;
+            validate_symbol_alias(params, true)?;
+            params.required_u64_range("nonce", 1, u64::MAX)?;
+            if batch {
+                params.ensure_exactly_one(&keys)?;
+                validate_optional_id_list(params, keys[0], false, Some(10))?;
+                validate_optional_id_list(params, keys[1], true, Some(10))
+            } else {
+                ensure_order_lookup(params)?;
+                params.u64("orderId")?;
+                Ok(())
+            }
+        }
+        "transfer_sub_account" => {
+            params.ensure_allowed(
+                &[
+                    "toAccountAddress",
+                    "asset",
+                    "amount",
+                    "kindType",
+                    "fromAccountAddress",
+                ],
+                &[],
+            )?;
+            params.required("toAccountAddress")?;
+            params.required("asset")?;
+            params.required_positive_decimal("amount")?;
+            params.required_one_of(
+                "kindType",
+                &["FUTURE_FUTURE", "FUTURE_SPOT", "SPOT_FUTURE", "SPOT_SPOT"],
+            )
+        }
         "get_spot_account"
         | "get_futures_position_mode"
         | "get_futures_stp_mode"
@@ -746,6 +851,7 @@ fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()
         "place_spot_order" => {
             params.ensure_allowed(
                 &[
+                    "nonce",
                     "product_symbol",
                     "symbol",
                     "side",
@@ -760,6 +866,7 @@ fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()
                 &[],
             )?;
             validate_symbol_alias(params, true)?;
+            params.optional_u64_range("nonce", 1, u64::MAX)?;
             validate_spot_order(params)
         }
         "cancel_spot_order"
@@ -833,10 +940,11 @@ fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()
             validate_trade_history(params)
         }
         "place_futures_order" => {
-            let mut allowed = vec!["product_symbol", "symbol", "side"];
+            let mut allowed = vec!["product_symbol", "symbol", "side", "nonce"];
             allowed.extend_from_slice(FUTURES_ORDER_KEYS);
             params.ensure_allowed(&allowed, &[])?;
             validate_symbol_alias(params, true)?;
+            params.optional_u64_range("nonce", 1, u64::MAX)?;
             validate_futures_order(params, false)
         }
         "modify_futures_order" => {
@@ -897,7 +1005,8 @@ fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()
             Ok(())
         }
         "place_futures_batch_orders" => {
-            params.ensure_allowed(&["batchOrders"], &[])?;
+            params.ensure_allowed(&["batchOrders", "nonce"], &[])?;
+            params.optional_u64_range("nonce", 1, u64::MAX)?;
             params.required("batchOrders")?;
             Ok(())
         }

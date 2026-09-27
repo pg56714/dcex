@@ -1,4 +1,5 @@
 mod account;
+mod additional;
 mod client;
 mod endpoints;
 mod market;
@@ -6,6 +7,7 @@ mod params;
 mod private;
 mod signing;
 mod trade;
+mod trading_controls;
 mod websocket;
 mod wrappers;
 

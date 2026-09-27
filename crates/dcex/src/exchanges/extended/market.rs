@@ -12,6 +12,9 @@ impl ExtendedClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = ExtendedParams::from_pairs(params);
+        if let Some(response) = self.risk_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
         let response = match method_name {
             "get_markets" => {
                 params.ensure_allowed(&["market", "product_symbol"], &["market"])?;

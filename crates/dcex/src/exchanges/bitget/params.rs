@@ -21,6 +21,17 @@ impl BitgetParams {
             .ok_or_else(|| DcexError::InvalidInput(format!("missing required parameter: {key}")))
     }
 
+    pub(super) fn ensure_allowed(&self, keys: &[&str], allow_product_symbol: bool) -> Result<()> {
+        for (key, _) in &self.0 {
+            if !keys.contains(&key.as_str()) && !(allow_product_symbol && key == "product_symbol") {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported parameter: {key}"
+                )));
+            }
+        }
+        Ok(())
+    }
+
     pub(super) fn only(&self, keys: &[&str]) -> Vec<(String, String)> {
         self.0
             .iter()

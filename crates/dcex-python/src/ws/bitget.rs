@@ -238,6 +238,50 @@ impl PythonBitgetPrivateWebSocketClient {
         })
     }
 
+    #[pyo3(signature = (id, topic, args, category=None, request_time=None))]
+    fn trade_request<'py>(
+        &self,
+        py: Python<'py>,
+        id: String,
+        topic: String,
+        args: String,
+        category: Option<String>,
+        request_time: Option<u64>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let args: serde_json::Value = serde_json::from_str(&args)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .trade_request(&id, &topic, category.as_deref(), args, request_time)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn classic_trade_request<'py>(
+        &self,
+        py: Python<'py>,
+        id: String,
+        inst_type: String,
+        inst_id: String,
+        channel: String,
+        params: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let params: serde_json::Value = serde_json::from_str(&params)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .classic_trade_request(&id, &inst_type, &inst_id, &channel, params)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

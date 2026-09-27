@@ -437,3 +437,133 @@ class TradeHTTP(HTTPManager):
             "get_position_history",
             self._native_params(**locals()),
         )
+
+    async def create_strategy(
+        self,
+        product_symbol: str,
+        side: str,
+        *,
+        strategy_type: str = "Scheduled",
+        quantity: str | None = None,
+        price: str | None = None,
+        duration: int | None = None,
+        interval: int | None = None,
+        client_strategy_id: int | None = None,
+        randomized_interval_quantity: bool | None = None,
+        time_in_force: str | None = None,
+        post_only: bool | None = None,
+        reduce_only: bool | None = None,
+        self_trade_prevention: str | None = None,
+        slippage_tolerance: str | None = None,
+        slippage_tolerance_type: str | None = None,
+        auto_lend: bool | None = None,
+        auto_lend_redeem: bool | None = None,
+        auto_borrow: bool | None = None,
+        auto_borrow_repay: bool | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Create strategy using the dedicated Strategy API instruction."""
+        return await self._native_private(
+            "create_strategy",
+            self._native_params(
+                product_symbol=product_symbol,
+                side=side,
+                strategyType=strategy_type,
+                quantity=quantity,
+                price=price,
+                duration=duration,
+                interval=interval,
+                clientStrategyId=client_strategy_id,
+                randomizedIntervalQuantity=randomized_interval_quantity,
+                timeInForce=time_in_force,
+                postOnly=post_only,
+                reduceOnly=reduce_only,
+                selfTradePrevention=self_trade_prevention,
+                slippageTolerance=slippage_tolerance,
+                slippageToleranceType=slippage_tolerance_type,
+                autoLend=auto_lend,
+                autoLendRedeem=auto_lend_redeem,
+                autoBorrow=auto_borrow,
+                autoBorrowRepay=auto_borrow_repay,
+            ),
+        )
+
+    async def get_open_strategy(
+        self,
+        product_symbol: str,
+        *,
+        strategy_id: str | None = None,
+        client_strategy_id: int | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Get open strategy using the dedicated Strategy API instruction."""
+        return await self._native_private(
+            "get_open_strategy",
+            self._native_params(
+                product_symbol=product_symbol,
+                strategyId=strategy_id,
+                clientStrategyId=client_strategy_id,
+            ),
+        )
+
+    async def cancel_strategy(
+        self,
+        product_symbol: str,
+        *,
+        strategy_id: str | None = None,
+        client_strategy_id: int | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Cancel strategy using the dedicated Strategy API instruction."""
+        return await self._native_private(
+            "cancel_strategy",
+            self._native_params(
+                product_symbol=product_symbol,
+                strategyId=strategy_id,
+                clientStrategyId=client_strategy_id,
+            ),
+        )
+
+    async def get_open_strategies(
+        self,
+        product_symbol: str | None = None,
+        *,
+        market_type: str | None = None,
+        strategy_type: str | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Get open strategies using the dedicated Strategy API instruction."""
+        return await self._native_private(
+            "get_open_strategies",
+            self._native_params(
+                product_symbol=product_symbol, marketType=market_type, strategyType=strategy_type
+            ),
+        )
+
+    async def cancel_open_strategies(
+        self, product_symbol: str | None = None, *, strategy_type: str | None = None
+    ) -> dict[str, Any] | list[Any] | str:
+        """Cancel open strategies using the dedicated Strategy API instruction."""
+        return await self._native_private(
+            "cancel_open_strategies",
+            self._native_params(product_symbol=product_symbol, strategyType=strategy_type),
+        )
+
+    async def get_strategy_history(
+        self,
+        product_symbol: str | None = None,
+        *,
+        strategy_id: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        market_type: list[str] | None = None,
+        sort_direction: str | None = None,
+    ) -> dict[str, Any] | list[Any] | str:
+        """Get strategy history using the dedicated Strategy API instruction."""
+        return await self._native_private(
+            "get_strategy_history",
+            self._native_params(
+                product_symbol=product_symbol,
+                strategyId=strategy_id,
+                limit=limit,
+                offset=offset,
+                marketType=market_type,
+                sortDirection=sort_direction,
+            ),
+        )

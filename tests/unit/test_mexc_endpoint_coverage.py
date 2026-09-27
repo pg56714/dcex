@@ -33,6 +33,102 @@ SWAP = "BTC-USDT-SWAP"
 
 # method name -> (kwargs, HTTP method, official path, signed?)
 CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
+    "get_spot_offline_symbols": ({}, "GET", "/api/v3/symbol/offline", False),
+    "get_announcements": (
+        {"language": "en-US", "page": 1, "limit": 20},
+        "GET",
+        "/api/v3/announcements",
+        False,
+    ),
+    "get_contract_supported_currencies": ({}, "GET", "/api/v1/contract/support_currencies", False),
+    "get_uid": ({}, "GET", "/api/v3/uid", True),
+    "get_api_key_info": ({"access_key": "query-key"}, "GET", "/api/v3/apiKeyInfo", True),
+    "set_api_key_ip_whitelist": (
+        {"api_key": "query-key", "ip_whitelist": "127.0.0.1,192.0.2.1", "note": "trading"},
+        "POST",
+        "/api/v3/apiKeyInfo",
+        True,
+    ),
+    "get_convertible_assets": ({}, "GET", "/api/v3/capital/convert/list", True),
+    "convert_dust": ({"assets": "BTC,ETH"}, "POST", "/api/v3/capital/convert", True),
+    "get_dust_conversion_history": (
+        {"start_time": 1700000000000, "end_time": 1700000010000, "page": 1, "limit": 100},
+        "GET",
+        "/api/v3/capital/convert",
+        True,
+    ),
+    "create_sub_account": (
+        {"sub_account": "sub1", "note": "trading", "recv_window": 5000},
+        "POST",
+        "/api/v3/sub-account/virtualSubAccount",
+        True,
+    ),
+    "get_contract_profit_rate": (
+        {"period_type": 1},
+        "GET",
+        "/api/v1/private/account/profit_rate/1",
+        True,
+    ),
+    "get_contract_fee_deduction_config": (
+        {},
+        "GET",
+        "/api/v1/private/account/feeDeductConfigs",
+        True,
+    ),
+    "get_contract_fee_discount_config": (
+        {},
+        "GET",
+        "/api/v1/private/account/config/contractFeeDiscountConfig",
+        True,
+    ),
+    "get_contract_discount_usage": ({}, "GET", "/api/v1/private/account/discountType", True),
+    "cancel_contract_batch_orders_by_external_id": (
+        {
+            "orders": [
+                {"product_symbol": "BTC-USDT-SWAP", "externalOid": "1"},
+                {"product_symbol": "ETH-USDT-SWAP", "externalOid": "2"},
+            ]
+        },
+        "POST",
+        "/api/v1/private/order/batch_cancel_with_external",
+        True,
+    ),
+    "get_contract_batch_orders_by_external_id": (
+        {
+            "orders": [
+                {"product_symbol": "BTC-USDT-SWAP", "externalOid": "1"},
+                {"product_symbol": "ETH-USDT-SWAP", "externalOid": "2"},
+            ]
+        },
+        "POST",
+        "/api/v1/private/order/batch_query_with_external",
+        True,
+    ),
+    "get_contract_closed_orders": (
+        {"product_symbol": "BTC-USDT-SWAP", "page_size": 10},
+        "GET",
+        "/api/v1/private/order/list/close_orders",
+        True,
+    ),
+    "get_contract_fee_details": (
+        {"product_symbol": "BTC-USDT-SWAP", "page_size": 10, "ids": [11, 12]},
+        "GET",
+        "/api/v1/private/order/fee_details",
+        True,
+    ),
+    "get_contract_30_day_fee_statistics": (
+        {},
+        "GET",
+        "/api/v1/private/account/asset_book/order_deal_fee/total",
+        True,
+    ),
+    "cancel_spot_all_orders": ({}, "DELETE", "/api/v3/order/all", True),
+    "get_contract_open_stop_orders": (
+        {"product_symbol": "BTC-USDT-SWAP"},
+        "GET",
+        "/api/v1/private/stoporder/open_orders",
+        True,
+    ),
     # Spot market data
     "ping": ({}, "GET", "/api/v3/ping", False),
     "get_spot_time": ({}, "GET", "/api/v3/time", False),
@@ -846,3 +942,21 @@ def test_mexc_contract_trailing_orders_send_comma_separated_states() -> None:
     # Requires the rebuilt native extension (Rust joins JSON arrays with commas).
     request = _single_request("get_contract_trailing_orders", states=[0, 1])
     assert dict(parse_qsl(urlsplit(request["path"]).query))["states"] == "0,1"
+
+
+@pytest.mark.parametrize(
+    "method",
+    ["cancel_contract_batch_orders_by_external_id", "get_contract_batch_orders_by_external_id"],
+)
+def test_external_order_batches_keep_root_array_and_each_symbol(method: str) -> None:
+    request = _single_request(
+        method,
+        orders=[
+            {"product_symbol": "BTC-USDT-SWAP", "externalOid": "001"},
+            {"product_symbol": "ETH-USDT-SWAP", "externalOid": "002"},
+        ],
+    )
+    assert json.loads(request["body"]) == [
+        {"symbol": "BTC_USDT", "externalOid": "001"},
+        {"symbol": "ETH_USDT", "externalOid": "002"},
+    ]

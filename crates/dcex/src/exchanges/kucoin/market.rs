@@ -17,6 +17,21 @@ impl KucoinClient {
         method_name: &str,
         mut params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if matches!(
+            method_name,
+            "get_futures_current_funding_rate" | "get_futures_public_funding_history"
+        ) {
+            return self
+                .classic_trading_request(method_name, &KucoinParams::from_pairs(params))
+                .await?
+                .ok_or_else(|| DcexError::InvalidInput("unsupported funding endpoint".into()));
+        }
+        if let Some(response) = self
+            .risk_request(method_name, &KucoinParams::from_pairs(params.clone()), true)
+            .await?
+        {
+            return Ok(response);
+        }
         self.validate_public_params(method_name, &params)?;
         let (market, path, signed) = match method_name {
             "get_spot_instrument_info" => {

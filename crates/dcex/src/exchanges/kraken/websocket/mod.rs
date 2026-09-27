@@ -1,3 +1,6 @@
+mod futures;
+mod trading;
+pub use futures::KrakenFuturesWebSocket;
 mod private;
 mod public;
 

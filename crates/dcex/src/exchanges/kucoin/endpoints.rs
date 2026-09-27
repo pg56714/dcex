@@ -104,3 +104,14 @@ pub(super) const UTA_V2_EXECUTIONS: &str = "/api/ua/v2/unified/order/execution";
 pub(super) const UTA_V2_POSITIONS: &str = "/api/ua/v2/unified/position/open-list";
 pub(super) const UTA_V2_BALANCE: &str = "/api/ua/v2/unified/account/balance";
 pub(super) const UTA_V2_OVERVIEW: &str = "/api/ua/v2/unified/account/overview";
+pub(super) const UTA_V2_CANCEL_BATCH: &str = "/api/ua/v2/unified/order/cancel-batch";
+pub(super) const UTA_V2_CANCEL_ALL: &str = "/api/ua/v2/unified/order/cancel-all";
+pub(super) const UTA_V2_MARGIN_MODE: &str = "/api/ua/v2/unified/position/margin-mode";
+pub(super) const UTA_V2_MODIFY_MARGIN: &str = "/api/ua/v2/unified/position/modify-margin";
+pub(super) const UTA_V2_MAX_ORDER_QUANTITY: &str = "/api/ua/v2/order/max-order-quantity";
+pub(super) const UTA_V2_LEVERAGE: &str = "/api/ua/v2/unified/account/leverage";
+pub(super) const UTA_V2_MODIFY_LEVERAGE: &str = "/api/ua/v2/unified/account/modify-leverage";
+pub(super) const UTA_V2_MODIFY_MARGIN_LEVERAGE: &str =
+    "/api/ua/v2/unified/account/modify-leverage-margin-cross";
+pub(super) const UTA_V2_POSITION_HISTORY: &str = "/api/ua/v2/position/history";
+pub(super) const UTA_V2_FUNDING_HISTORY: &str = "/api/ua/v2/position/funding-history";

@@ -6,7 +6,7 @@ use std::net::TcpListener;
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 
-use serde_json::Value;
+use serde_json::{Value, json};
 
 use crate::Result;
 use crate::http::block_on;
@@ -1391,6 +1391,276 @@ fn default_order_expiry_matches_order_type_and_time_in_force() {
                 .as_i64()
                 .is_some_and(|value| value > 1_700_000_000_000),
             "{extra:?}"
+        );
+    }
+}
+
+#[test]
+fn grouped_orders_sign_and_submit_one_transaction() {
+    for grouping in [1, 2, 3] {
+        let sl = serde_json::json!({"market_index":1,"client_order_index":11,"base_amount":if grouping==2 {1000} else {0},"price":240000,"is_ask":true,"order_type":2,"time_in_force":0,"reduce_only":true,"trigger_price":240000,"order_expiry":1900000000000_i64});
+        let mut tp = sl.clone();
+        tp["client_order_index"] = 12.into();
+        tp["order_type"] = 4.into();
+        tp["trigger_price"] = 260000.into();
+        let parent = serde_json::json!({"market_index":1,"client_order_index":10,"base_amount":1000,"price":250000,"is_ask":false,"order_type":1,"time_in_force":0,"order_expiry":0});
+        let orders = match grouping {
+            1 => serde_json::json!([parent, sl]),
+            2 => serde_json::json!([sl, tp]),
+            _ => serde_json::json!([parent, sl, tp]),
+        };
+        let (base, server) = serve(vec!["{\"code\":200}"]);
+        let client = signing_client(base);
+        block_on(async move {
+            client
+                .private_request(
+                    "create_grouped_orders",
+                    vec![
+                        ("grouping_type".into(), grouping.to_string()),
+                        ("orders".into(), orders.to_string()),
+                        ("nonce".into(), "5".into()),
+                    ],
+                )
+                .await
+        })
+        .expect("grouped transaction");
+        let records = server.join().unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].path, "/api/v1/sendTx");
+        assert_eq!(records[0].form_value("tx_type").as_deref(), Some("28"));
+        let tx: Value = serde_json::from_str(&records[0].form_value("tx_info").unwrap()).unwrap();
+        assert_eq!(tx["GroupingType"], grouping);
+        assert_eq!(tx["Nonce"], 5);
+        assert!(tx["Sig"].is_string());
+        assert_eq!(
+            tx["Orders"].as_array().unwrap().len(),
+            if grouping == 3 { 3 } else { 2 }
+        );
+    }
+}
+
+#[test]
+fn grouped_orders_validate_relationships_before_nonce_lookup() {
+    let valid = serde_json::json!({"market_index":1,"client_order_index":11,"base_amount":1000,"price":240000,"is_ask":true,"order_type":2,"time_in_force":0,"reduce_only":true,"trigger_price":240000,"order_expiry":1900000000000_i64});
+    let mut second = valid.clone();
+    second["client_order_index"] = 12.into();
+    second["order_type"] = 4.into();
+    let client = signing_client("http://127.0.0.1:9".into());
+    for (field, value) in [
+        ("client_order_index", 11.into()),
+        ("market_index", 2.into()),
+        ("reduce_only", false.into()),
+        ("order_expiry", 1800000000000_i64.into()),
+        ("order_type", 2.into()),
+        ("is_ask", false.into()),
+    ] {
+        let mut bad = second.clone();
+        bad[field] = value;
+        let orders = serde_json::json!([valid, bad]);
+        let error = block_on({
+            let client = client.clone();
+            async move {
+                client
+                    .sign_request(
+                        "sign_create_grouped_orders",
+                        vec![
+                            ("grouping_type".into(), "2".into()),
+                            ("orders".into(), orders.to_string()),
+                        ],
+                    )
+                    .await
+            }
+        })
+        .unwrap_err();
+        assert!(
+            matches!(error, crate::DcexError::InvalidInput(_)),
+            "{field}: {error}"
+        );
+    }
+}
+
+#[test]
+fn account_config_transactions_have_correct_types_and_signed_fields() {
+    for (method, params, tx_type, expected) in [
+        (
+            "update_account_config",
+            vec![("account_trading_mode", "1"), ("nonce", "5")],
+            41,
+            json!({"AccountTradingMode":1}),
+        ),
+        (
+            "update_account_asset_config",
+            vec![
+                ("asset_index", "62"),
+                ("asset_margin_mode", "0"),
+                ("nonce", "5"),
+            ],
+            42,
+            json!({"AssetIndex":62,"AssetMarginMode":0}),
+        ),
+    ] {
+        let (base, server) = serve(vec!["{\"code\":200}"]);
+        let client = signing_client(base);
+        let params = pairs(&params);
+        block_on(async move { client.private_request(method, params).await }).expect(method);
+        let requests = server.join().unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].form_value("tx_type"), Some(tx_type.to_string()));
+        let tx: Value = serde_json::from_str(&requests[0].form_value("tx_info").unwrap()).unwrap();
+        for (key, value) in expected.as_object().unwrap() {
+            assert_eq!(&tx[key], value);
+        }
+        assert_eq!(tx["Nonce"], 5);
+        assert!(tx["Sig"].as_str().is_some_and(|s| !s.is_empty()));
+    }
+}
+
+#[test]
+fn account_config_rejects_invalid_modes_before_nonce_lookup() {
+    let client = signing_client("http://127.0.0.1:1".into());
+    for (method, params) in [
+        (
+            "sign_update_account_config",
+            vec![("account_trading_mode", "2")],
+        ),
+        (
+            "sign_update_account_config",
+            vec![("account_trading_mode", "-1")],
+        ),
+        (
+            "sign_update_account_asset_config",
+            vec![("asset_index", "0"), ("asset_margin_mode", "1")],
+        ),
+        (
+            "sign_update_account_asset_config",
+            vec![("asset_index", "63"), ("asset_margin_mode", "1")],
+        ),
+        (
+            "sign_update_account_asset_config",
+            vec![("asset_index", "1"), ("asset_margin_mode", "2")],
+        ),
+    ] {
+        let error = sign(&client, method, &params).unwrap_err();
+        assert!(
+            matches!(error, crate::DcexError::InvalidInput(_)),
+            "{method}: {error}"
+        );
+    }
+}
+
+#[test]
+fn additional_account_and_deposit_routes_preserve_form_and_authorization() {
+    let cases: &[(&str, bool, &str, &str, &[(&str, &str)])] = &[
+        (
+            "change_account_tier",
+            false,
+            "POST",
+            "/api/v1/changeAccountTier",
+            &[
+                ("account_index", "12"),
+                ("new_tier", "premium"),
+                ("authorization", "test-token"),
+            ],
+        ),
+        (
+            "create_read_only_token",
+            false,
+            "POST",
+            "/api/v1/tokens/create",
+            &[
+                ("name", "reporting"),
+                ("account_index", "12"),
+                ("expiry", "1800000000"),
+                ("sub_account_access", "false"),
+                ("authorization", "test-token"),
+            ],
+        ),
+        (
+            "revoke_read_only_token",
+            false,
+            "POST",
+            "/api/v1/tokens/revoke",
+            &[
+                ("token_id", "1"),
+                ("account_index", "12"),
+                ("authorization", "test-token"),
+            ],
+        ),
+        (
+            "get_transaction",
+            true,
+            "GET",
+            "/api/v1/tx",
+            &[("by", "hash"), ("value", "abc")],
+        ),
+        (
+            "get_transaction_by_l1_hash",
+            true,
+            "GET",
+            "/api/v1/txFromL1TxHash",
+            &[(
+                "hash",
+                "0x1111111111111111111111111111111111111111111111111111111111111111",
+            )],
+        ),
+        (
+            "acknowledge_notification",
+            false,
+            "POST",
+            "/api/v1/notification/ack",
+            &[
+                ("notif_id", "notification-1"),
+                ("account_index", "12"),
+                ("authorization", "test-token"),
+            ],
+        ),
+        (
+            "create_deposit_intent_address",
+            true,
+            "POST",
+            "/api/v1/createIntentAddress",
+            &[
+                ("chain_id", "42161"),
+                ("from_addr", "0x2222222222222222222222222222222222222222"),
+                ("amount", "1"),
+            ],
+        ),
+        (
+            "get_latest_deposit",
+            true,
+            "GET",
+            "/api/v1/deposit/latest",
+            &[("l1_address", "0x2222222222222222222222222222222222222222")],
+        ),
+    ];
+    for (name, public, method, path, params) in cases {
+        let (url, server) = serve(vec!["{\"code\":200}"]);
+        let client = account_client(url);
+        block_on(async move {
+            if *public {
+                client.public_request(name, pairs(params)).await
+            } else {
+                client.private_request(name, pairs(params)).await
+            }
+        })
+        .expect(name);
+        let request = server.join().expect("server").pop().expect("request");
+        assert_eq!(request.method, *method);
+        assert_eq!(request.path, *path);
+        let actual = if *method == "POST" {
+            request.form()
+        } else {
+            request.query.clone()
+        };
+        let expected: Vec<_> = params
+            .iter()
+            .filter(|(k, _)| *k != "authorization")
+            .map(|(k, v)| ((*k).to_string(), (*v).to_string()))
+            .collect();
+        assert_eq!(actual, expected);
+        assert_eq!(
+            request.headers.get("authorization").map(String::as_str),
+            if *public { None } else { Some(TOKEN) }
         );
     }
 }

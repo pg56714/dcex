@@ -83,6 +83,128 @@ OCO_LEGS = [
 ]
 
 CASES = [
+    pub("get_asset_logos", "/fapi/v3/common/asset/all-asset-logo", {}, **{}),
+    priv("exchange_futures_assets", "/fapi/v3/assetExchange", {}, **{}),
+    priv("get_sub_accounts", "/fapi/v3/getSubAccountList", {}, **{}),
+    priv("get_direct_announcements", "/fapi/v3/announcement/direct", {}, **{}),
+    priv("get_direct_announcement", "/fapi/v3/announcement/directById", {"id": "1"}, **{"id": 1}),
+    priv(
+        "create_sub_account_signed",
+        "/fapi/v3/createSubAccount",
+        {
+            "subAccountName": "desk",
+            "subSourceAddr": "0x0000000000000000000000000000000000000002",
+            "nonce": "1700000000000123",
+            "user": "0x0000000000000000000000000000000000000001",
+            "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+            "childSignature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+        },
+        **{
+            "sub_account_name": "desk",
+            "sub_source_addr": "0x0000000000000000000000000000000000000002",
+            "nonce": 1700000000000123,
+            "user": "0x0000000000000000000000000000000000000001",
+            "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+            "child_signature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+        },
+    ),
+    priv(
+        "update_sub_account_signed",
+        "/fapi/v3/updateSubAccount",
+        {
+            "subSourceAddr": "0x0000000000000000000000000000000000000002",
+            "nonce": "1700000000000123",
+            "user": "0x0000000000000000000000000000000000000001",
+            "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "status": "FROZEN",
+        },
+        **{
+            "sub_source_addr": "0x0000000000000000000000000000000000000002",
+            "nonce": 1700000000000123,
+            "user": "0x0000000000000000000000000000000000000001",
+            "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "status": "FROZEN",
+        },
+    ),
+    priv(
+        "bind_sub_account_signed",
+        "/fapi/v3/sub-accounts/bind",
+        {
+            "childAddress": "0x0000000000000000000000000000000000000002",
+            "name": "desk",
+            "nonce": "1700000000000123",
+            "user": "0x0000000000000000000000000000000000000001",
+            "childSignature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+        },
+        **{
+            "child_address": "0x0000000000000000000000000000000000000002",
+            "name": "desk",
+            "nonce": 1700000000000123,
+            "user": "0x0000000000000000000000000000000000000001",
+            "child_signature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+        },
+    ),
+    priv(
+        "register_agent_signed",
+        "/fapi/v3/registerAndApproveAgent",
+        {
+            "user": "0x0000000000000000000000000000000000000001",
+            "nonce": "1700000000000123",
+            "agentName": "trader",
+            "agentAddress": "0x0000000000000000000000000000000000000003",
+            "expired": "1800000000000",
+            "signatureChainId": "56",
+            "canSpotTrade": "true",
+            "canPerpTrade": "true",
+            "canWithdraw": "false",
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+        },
+        **{
+            "user": "0x0000000000000000000000000000000000000001",
+            "nonce": 1700000000000123,
+            "agent_name": "trader",
+            "agent_address": "0x0000000000000000000000000000000000000003",
+            "expired": 1800000000000,
+            "signature_chain_id": 56,
+            "can_spot_trade": True,
+            "can_perp_trade": True,
+            "can_withdraw": False,
+            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+        },
+    ),
+    priv("noop_spot", "/api/v3/noop", {"nonce": "1700000000000123"}, nonce=1700000000000123),
+    priv("noop_futures", "/fapi/v3/noop", {"nonce": "1700000000000123"}, nonce=1700000000000123),
+    priv(
+        "guarded_cancel_futures_order",
+        "/fapi/v3/guardedCancelOrder",
+        {"symbol": "BTCUSDT", "nonce": "1700000000000123", "orderId": "123"},
+        product_symbol=SWAP,
+        nonce=1700000000000123,
+        orderId=123,
+    ),
+    priv(
+        "guarded_cancel_futures_batch_orders",
+        "/fapi/v3/guardedBatchOrders",
+        {"symbol": "BTCUSDT", "nonce": "1700000000000123", "orderIdList": "[123,456]"},
+        product_symbol=SWAP,
+        nonce=1700000000000123,
+        orderIdList=[123, 456],
+    ),
+    priv(
+        "transfer_sub_account",
+        "/fapi/v3/subAccountTransfer",
+        {"toAccountAddress": USER, "asset": "USDT", "amount": "10", "kindType": "FUTURE_FUTURE"},
+        to_account_address=USER,
+        asset="USDT",
+        amount="10",
+        kind_type="FUTURE_FUTURE",
+    ),
     # Spot market data
     pub("ping_spot", "/api/v3/ping"),
     pub("get_spot_server_time", "/api/v3/time"),
@@ -607,13 +729,13 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> list[dict[str, Any]]:
     return requests
 
 
-def _skip_if_native_is_stale(case: WireCase, error: ValueError) -> None:
-    """Skip when the prebuilt extension predates a dispatch name present in source."""
+def _fail_if_native_is_stale(case: WireCase, error: ValueError) -> None:
+    """Fail when the prebuilt extension predates a dispatch name present in source."""
     if "unsupported Aster" not in str(error):
         raise error
     if f'"{case.method}"' not in RUST_SOURCE:
         raise error
-    pytest.skip(f"installed dcex._native predates Rust dispatch {case.method!r}; rebuild needed")
+    pytest.fail(f"installed dcex._native predates Rust dispatch {case.method!r}; rebuild needed")
 
 
 def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
@@ -624,11 +746,15 @@ def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
     pairs = dict(parse_qsl(query or request["body"], keep_blank_values=True))
     for key, value in case.params.items():
         assert pairs.get(key) == value, (key, pairs)
-    if case.signed:
+    if case.method.endswith("_signed"):
+        assert pairs == case.params
+    elif case.signed:
         assert pairs["signer"] == SIGNER
         assert pairs["signature"].startswith("0x")
         assert "nonce" in pairs
-        assert ("user" in pairs) is path.startswith("/fapi/")
+        assert ("user" in pairs) is (
+            path.startswith("/fapi/") and case.method != "transfer_sub_account"
+        )
     else:
         assert "signature" not in pairs
     if case.method in BATCH_PATH_METHODS:
@@ -666,7 +792,7 @@ def test_sync_wrapper_reaches_documented_route(
     try:
         result = getattr(client, case.method)(**case.kwargs)
     except ValueError as error:
-        _skip_if_native_is_stale(case, error)
+        _fail_if_native_is_stale(case, error)
     finally:
         client.close()
     assert result in ({"ok": True}, {"serverTime": 1})
@@ -685,7 +811,7 @@ async def test_async_wrapper_reaches_documented_route(
     try:
         result = await getattr(client, case.method)(**case.kwargs)
     except ValueError as error:
-        _skip_if_native_is_stale(case, error)
+        _fail_if_native_is_stale(case, error)
     finally:
         await client.close()
     assert result in ({"ok": True}, {"serverTime": 1})
@@ -766,3 +892,56 @@ def test_cancel_without_order_identifier_raises_locally(
         client.cancel_futures_order(product_symbol=SWAP)
     client.close()
     assert _drain(received) == []
+
+
+@pytest.mark.parametrize(
+    "method", ["place_spot_order", "place_futures_order", "place_futures_batch_orders"]
+)
+def test_explicit_placement_nonce_is_preserved(
+    method: str, server: tuple[str, queue.Queue[dict[str, Any]]]
+) -> None:
+    base_url, received = server
+    _drain(received)
+    client = Client(**_client_kwargs(base_url))
+    kwargs: dict[str, Any] = {
+        "product_symbol": SWAP,
+        "side": "BUY",
+        "type_": "MARKET",
+        "quantity": "1",
+    }
+    if method == "place_futures_batch_orders":
+        kwargs = {
+            "batchOrders": [{"symbol": "BTCUSDT", "side": "BUY", "type": "MARKET", "quantity": "1"}]
+        }
+    try:
+        getattr(client, method)(nonce=1700000000000123, **kwargs)
+    finally:
+        client.close()
+    (request,) = _drain(received)
+    pairs = parse_qsl(request["body"])
+    assert [value for key, value in pairs if key == "nonce"] == ["1700000000000123"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+async def test_asset_exchange_accepts_empty_success_response(asynchronous: bool) -> None:
+    """The documented empty asset-exchange response is successful, not invalid JSON."""
+    from dcex.aster.client import Client
+    from dcex.async_support.aster.client import Client as AsyncClient
+
+    with _http_server(response_bytes=b"") as (base, received):
+        client = (AsyncClient if asynchronous else Client)(**_client_kwargs(base))
+        try:
+            if asynchronous:
+                await client.async_init()
+                assert await client.exchange_futures_assets() == {}
+            else:
+                assert client.exchange_futures_assets() == {}
+        finally:
+            if asynchronous:
+                await client.close()
+            else:
+                client.close()
+        request = received.get_nowait()
+        assert request["path"].split("?", 1)[0] == "/fapi/v3/assetExchange"
+        assert request["method"] == "POST"

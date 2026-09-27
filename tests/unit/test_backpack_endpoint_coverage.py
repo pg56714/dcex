@@ -51,6 +51,56 @@ class Case:
 
 
 CASES: tuple[Case, ...] = (
+    Case(
+        "create_strategy",
+        {
+            "product_symbol": "BTC-USDC-SWAP",
+            "side": "Bid",
+            "strategy_type": "Scheduled",
+            "quantity": "1",
+            "duration": 60000,
+            "interval": 10000,
+        },
+        "POST /api/v1/strategy",
+        body={
+            "symbol": "BTC_USDC_PERP",
+            "side": "Bid",
+            "strategyType": "Scheduled",
+            "quantity": "1",
+            "duration": 60000,
+            "interval": 10000,
+        },
+    ),
+    Case(
+        "get_open_strategy",
+        {"product_symbol": "BTC-USDC-SWAP", "strategy_id": "100"},
+        "GET /api/v1/strategy",
+        query={"symbol": "BTC_USDC_PERP", "strategyId": "100"},
+    ),
+    Case(
+        "cancel_strategy",
+        {"product_symbol": "BTC-USDC-SWAP", "client_strategy_id": 7},
+        "DELETE /api/v1/strategy",
+        body={"symbol": "BTC_USDC_PERP", "clientStrategyId": 7},
+    ),
+    Case(
+        "get_open_strategies",
+        {"product_symbol": "BTC-USDC-SWAP", "strategy_type": "Scheduled"},
+        "GET /api/v1/strategies",
+        query={"symbol": "BTC_USDC_PERP", "strategyType": "Scheduled"},
+    ),
+    Case(
+        "cancel_open_strategies",
+        {"product_symbol": "BTC-USDC-SWAP"},
+        "DELETE /api/v1/strategies",
+        body={"symbol": "BTC_USDC_PERP"},
+    ),
+    Case(
+        "get_strategy_history",
+        {"limit": 10, "market_type": ["PERP"]},
+        "GET /wapi/v1/history/strategies",
+        query={"limit": "10", "marketType": "PERP"},
+    ),
     # Public market data.
     Case("get_assets", {}, "GET /api/v1/assets", signed=False),
     Case("get_collateral", {}, "GET /api/v1/collateral", signed=False),
@@ -433,11 +483,11 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
     }
 
 
-def _skip_if_native_is_stale(exc: ValueError, case: Case) -> None:
-    """Skip when the installed ``dcex._native`` build predates this dispatch name."""
+def _fail_if_native_is_stale(exc: ValueError, case: Case) -> None:
+    """Fail when the installed ``dcex._native`` build predates this dispatch name."""
     message = str(exc)
     if "unsupported Backpack" in message and "method" in message:
-        pytest.skip(
+        pytest.fail(
             f"installed dcex._native does not know {case.method_name!r}; "
             "rebuild the extension (maturin develop) to exercise it"
         )
@@ -500,7 +550,7 @@ def test_sync_backpack_wrapper_hits_documented_route(case: Case) -> None:
         try:
             result = getattr(client, case.method_name)(**case.kwargs)
         except ValueError as exc:
-            _skip_if_native_is_stale(exc, case)
+            _fail_if_native_is_stale(exc, case)
         finally:
             client.close()
         assert result == {}
@@ -518,7 +568,7 @@ async def test_async_backpack_wrapper_hits_documented_route(case: Case) -> None:
         try:
             result = await getattr(client, case.method_name)(**case.kwargs)
         except ValueError as exc:
-            _skip_if_native_is_stale(exc, case)
+            _fail_if_native_is_stale(exc, case)
         finally:
             await client.close()
         assert result == {}
@@ -563,3 +613,57 @@ def test_get_funding_payments_has_no_undocumented_subaccount_id() -> None:
 
     for client_cls in (Client, AsyncClient):
         assert "subaccountId" not in inspect.signature(client_cls.get_funding_payments).parameters
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["sync", "async"])
+@pytest.mark.parametrize(
+    "method,kwargs",
+    [
+        (
+            "create_strategy",
+            {"product_symbol": "BTC-USDC-SWAP", "side": "Ask", "duration": 61, "interval": 10},
+        ),
+        (
+            "create_strategy",
+            {
+                "product_symbol": "BTC-USDC-SWAP",
+                "side": "Ask",
+                "post_only": True,
+                "time_in_force": "IOC",
+            },
+        ),
+        (
+            "create_strategy",
+            {"product_symbol": "BTC-USDC-SWAP", "side": "Ask", "client_strategy_id": 4294967296},
+        ),
+        ("create_strategy", {"product_symbol": "BTC-USDC-SWAP", "side": "Ask", "quantity": "NaN"}),
+        ("cancel_strategy", {"product_symbol": "BTC-USDC-SWAP"}),
+    ],
+)
+async def test_new_risk_controls_reject_invalid_input_before_transport(
+    method: str, kwargs: dict[str, Any], mode: str
+) -> None:
+    """Invalid trading parameters fail locally in both public Python interfaces."""
+    import importlib
+
+    module = importlib.import_module(
+        ("dcex.async_support." if mode == "async" else "dcex.") + "backpack.client"
+    )
+    client = module.Client(**_client_kwargs("http://127.0.0.1:1"))
+    try:
+        if mode == "async":
+            await client.async_init()
+        with pytest.raises(
+            ValueError,
+            match="(?i)(invalid|required|must|requires|outside|unsupported|expected|between|specify|limit)",
+        ):
+            if mode == "async":
+                await getattr(client, method)(**kwargs)
+            else:
+                getattr(client, method)(**kwargs)
+    finally:
+        if mode == "async":
+            await client.close()
+        else:
+            client.close()

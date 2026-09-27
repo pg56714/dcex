@@ -444,3 +444,371 @@ class MarketHTTP(HTTPManager):
                 cursor=cursor,
             ),
         )
+
+    def get_futures_symbol_price(self, product_symbol: str, product_type: str) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/symbol-price``."""
+        return self._native_public(
+            "get_futures_symbol_price",
+            self._params(product_symbol=product_symbol, productType=product_type),
+        )
+
+    def get_uta_open_interest(
+        self, category: str, *, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/open-interest``."""
+        return self._native_public(
+            "get_uta_open_interest", self._params(category=category, product_symbol=product_symbol)
+        )
+
+    def get_uta_current_funding_rate(
+        self, *, category: str | None = None, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/current-fund-rate``."""
+        return self._native_public(
+            "get_uta_current_funding_rate",
+            self._params(category=category, product_symbol=product_symbol),
+        )
+
+    def get_futures_trade_history(
+        self,
+        product_symbol: str,
+        product_type: str,
+        *,
+        limit: int | None = None,
+        id_less_than: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/fills-history``."""
+        return self._native_public(
+            "get_futures_trade_history",
+            self._params(
+                product_symbol=product_symbol,
+                productType=product_type,
+                limit=limit,
+                idLessThan=id_less_than,
+                startTime=start_time,
+                endTime=end_time,
+            ),
+        )
+
+    def get_futures_index_candle_history(
+        self,
+        product_symbol: str,
+        product_type: str,
+        granularity: str,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/history-index-candles``."""
+        return self._native_public(
+            "get_futures_index_candle_history",
+            self._params(
+                product_symbol=product_symbol,
+                productType=product_type,
+                granularity=granularity,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+            ),
+        )
+
+    def get_futures_mark_candle_history(
+        self,
+        product_symbol: str,
+        product_type: str,
+        granularity: str,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/history-mark-candles``."""
+        return self._native_public(
+            "get_futures_mark_candle_history",
+            self._params(
+                product_symbol=product_symbol,
+                productType=product_type,
+                granularity=granularity,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+            ),
+        )
+
+    def get_futures_next_funding_time(
+        self, product_symbol: str, product_type: str
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/funding-time``."""
+        return self._native_public(
+            "get_futures_next_funding_time",
+            self._params(product_symbol=product_symbol, productType=product_type),
+        )
+
+    def get_futures_open_interest_limit(
+        self, product_type: str, *, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/oi-limit``."""
+        return self._native_public(
+            "get_futures_open_interest_limit",
+            self._params(productType=product_type, product_symbol=product_symbol),
+        )
+
+    def get_futures_position_tiers(self, product_type: str, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/query-position-lever``."""
+        return self._native_public(
+            "get_futures_position_tiers",
+            self._params(productType=product_type, product_symbol=product_symbol),
+        )
+
+    def get_futures_discount_rates(self) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/discount-rate``."""
+        return self._native_public("get_futures_discount_rates", self._params())
+
+    def get_futures_interest_exchange_rates(self) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/exchange-rate``."""
+        return self._native_public("get_futures_interest_exchange_rates", self._params())
+
+    def get_futures_interest_rate_history(self, coin: str) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/union-interest-rate-history``."""
+        return self._native_public("get_futures_interest_rate_history", self._params(coin=coin))
+
+    def get_futures_vip_fee_rates(self) -> dict[str, Any]:
+        """Call ``GET /api/v2/mix/market/vip-fee-rate``."""
+        return self._native_public("get_futures_vip_fee_rates", self._params())
+
+    def get_uta_funding_rate_history(
+        self,
+        category: str,
+        product_symbol: str,
+        *,
+        cursor: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/history-fund-rate``."""
+        return self._native_public(
+            "get_uta_funding_rate_history",
+            self._params(
+                category=category, product_symbol=product_symbol, cursor=cursor, limit=limit
+            ),
+        )
+
+    def get_uta_index_components(self, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/index-components``."""
+        return self._native_public(
+            "get_uta_index_components", self._params(product_symbol=product_symbol)
+        )
+
+    def get_uta_margin_loan_rates(self, coin: str, *, level: str | None = None) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/margin-loans``."""
+        return self._native_public(
+            "get_uta_margin_loan_rates", self._params(coin=coin, level=level)
+        )
+
+    def get_uta_position_tiers(
+        self, category: str, *, product_symbol: str | None = None, coin: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/position-tier``."""
+        return self._native_public(
+            "get_uta_position_tiers",
+            self._params(category=category, product_symbol=product_symbol, coin=coin),
+        )
+
+    def get_uta_open_interest_limit(
+        self, category: str, *, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/oi-limit``."""
+        return self._native_public(
+            "get_uta_open_interest_limit",
+            self._params(product_symbol=product_symbol, category=category),
+        )
+
+    def get_uta_discount_rates(self) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/discount-rate``."""
+        return self._native_public("get_uta_discount_rates", self._params())
+
+    def get_uta_rpi_orderbook(
+        self, category: str, product_symbol: str, *, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/rpi-orderbook``."""
+        return self._native_public(
+            "get_uta_rpi_orderbook",
+            self._params(category=category, product_symbol=product_symbol, limit=limit),
+        )
+
+    def get_uta_rpi_symbols(self) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/rpi-symbols``."""
+        return self._native_public("get_uta_rpi_symbols", self._params())
+
+    def get_server_time(self) -> dict[str, Any]:
+        """Call ``GET /api/v2/public/time``."""
+        return self._native_public("get_server_time", self._params())
+
+    def get_uta_cash_dividend_records(
+        self,
+        product_symbol: str,
+        type_: str,
+        *,
+        cursor: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/cash-dividend-records``."""
+        return self._native_public(
+            "get_uta_cash_dividend_records",
+            self._params(product_symbol=product_symbol, type=type_, cursor=cursor, limit=limit),
+        )
+
+    def get_uta_risk_reserve(
+        self, category: str, product_symbol: str, *, margin_coin: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/risk-reserve``."""
+        return self._native_public(
+            "get_uta_risk_reserve",
+            self._params(category=category, product_symbol=product_symbol, marginCoin=margin_coin),
+        )
+
+    def get_uta_all_risk_reserves(self, category: str) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/risk-reserve-all``."""
+        return self._native_public("get_uta_all_risk_reserves", self._params(category=category))
+
+    def get_uta_hourly_risk_reserve(
+        self, category: str, product_symbol: str, *, margin_coin: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/risk-reserve-hour``."""
+        return self._native_public(
+            "get_uta_hourly_risk_reserve",
+            self._params(category=category, product_symbol=product_symbol, marginCoin=margin_coin),
+        )
+
+    def get_uta_split_records(self) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/split-records``."""
+        return self._native_public("get_uta_split_records", self._params())
+
+    def get_uta_futures_long_short_ratio(
+        self, product_symbol: str, *, period: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/futures-account-long-short``."""
+        return self._native_public(
+            "get_uta_futures_long_short_ratio",
+            self._params(product_symbol=product_symbol, period=period),
+        )
+
+    def get_uta_spot_whale_flow(self, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/spot-whale-flow``."""
+        return self._native_public(
+            "get_uta_spot_whale_flow", self._params(product_symbol=product_symbol)
+        )
+
+    def get_classic_interest_rate_record(self, coin: str) -> dict[str, Any]:
+        """Call ``GET /api/v2/margin/interest-rate-record``."""
+        return self._native_public("get_classic_interest_rate_record", self._params(coin=coin))
+
+    def get_classic_margin_currencies(self) -> dict[str, Any]:
+        """Call ``GET /api/v2/margin/currencies``."""
+        return self._native_public("get_classic_margin_currencies", self._params())
+
+    def get_classic_convert_currencies(self) -> dict[str, Any]:
+        """Call ``GET /api/v2/convert/currencies``."""
+        return self._native_public("get_classic_convert_currencies", self._params())
+
+    def get_classic_merge_depth(
+        self, product_symbol: str, *, precision: str | None = None, limit: int | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v2/spot/market/merge-depth``."""
+        return self._native_public(
+            "get_classic_merge_depth",
+            self._params(product_symbol=product_symbol, precision=precision, limit=limit),
+        )
+
+    def get_classic_auction(self, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/v2/spot/market/auction``."""
+        return self._native_public(
+            "get_classic_auction", self._params(product_symbol=product_symbol)
+        )
+
+    def get_classic_vip_fee_rate(self) -> dict[str, Any]:
+        """Call ``GET /api/v2/spot/market/vip-fee-rate``."""
+        return self._native_public("get_classic_vip_fee_rate", self._params())
+
+    def get_uta_proof_of_reserves(self) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/proof-of-reserves``."""
+        return self._native_public("get_uta_proof_of_reserves", self._params())
+
+    def get_uta_score_weights(self, *, category: str | None = None) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/score-weights``."""
+        return self._native_public("get_uta_score_weights", self._params(category=category))
+
+    def get_uta_fee_group(self, category: str, *, group: str | None = None) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/fee-group``."""
+        return self._native_public(
+            "get_uta_fee_group", self._params(category=category, group=group)
+        )
+
+    def get_uta_spot_fund_flow(
+        self, product_symbol: str, *, period: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/spot-fund-flow``."""
+        return self._native_public(
+            "get_uta_spot_fund_flow", self._params(product_symbol=product_symbol, period=period)
+        )
+
+    def get_uta_spot_net_flow(self, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/spot-net-flow``."""
+        return self._native_public(
+            "get_uta_spot_net_flow", self._params(product_symbol=product_symbol)
+        )
+
+    def get_uta_margin_long_short(
+        self, product_symbol: str, *, period: str | None = None, coin: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/margin-long-short``."""
+        return self._native_public(
+            "get_uta_margin_long_short",
+            self._params(product_symbol=product_symbol, period=period, coin=coin),
+        )
+
+    def get_uta_margin_loan_growth(
+        self, product_symbol: str, *, period: str | None = None, coin: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/margin-loan-growth``."""
+        return self._native_public(
+            "get_uta_margin_loan_growth",
+            self._params(product_symbol=product_symbol, period=period, coin=coin),
+        )
+
+    def get_uta_margin_isolated_borrow(
+        self, product_symbol: str, *, period: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/margin-isolated-borrow``."""
+        return self._native_public(
+            "get_uta_margin_isolated_borrow",
+            self._params(product_symbol=product_symbol, period=period),
+        )
+
+    def get_uta_futures_active_buy_sell(
+        self, product_symbol: str, *, period: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/futures-active-buy-sell``."""
+        return self._native_public(
+            "get_uta_futures_active_buy_sell",
+            self._params(product_symbol=product_symbol, period=period),
+        )
+
+    def get_uta_futures_long_short(
+        self, product_symbol: str, *, period: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/futures-long-short``."""
+        return self._native_public(
+            "get_uta_futures_long_short", self._params(product_symbol=product_symbol, period=period)
+        )
+
+    def get_uta_futures_position_long_short(
+        self, product_symbol: str, *, period: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/v3/market/futures-position-long-short``."""
+        return self._native_public(
+            "get_uta_futures_position_long_short",
+            self._params(product_symbol=product_symbol, period=period),
+        )

@@ -31,6 +31,58 @@ LISTEN_KEY = "/openApi/user/auth/userDataStream"
 
 # Python wrapper name -> (HTTP method, documented path).
 ROUTES: dict[str, tuple[str, str]] = {
+    "replace_swap_batch_orders": ("POST", "/openApi/swap/v1/trade/batchCancelReplace"),
+    "get_coin_swap_contracts": ("GET", "/openApi/cswap/v1/market/contracts"),
+    "get_coin_swap_orderbook": ("GET", "/openApi/cswap/v1/market/depth"),
+    "get_coin_swap_kline": ("GET", "/openApi/cswap/v1/market/klines"),
+    "get_coin_swap_premium_index": ("GET", "/openApi/cswap/v1/market/premiumIndex"),
+    "get_coin_swap_open_interest": ("GET", "/openApi/cswap/v1/market/openInterest"),
+    "get_coin_swap_ticker": ("GET", "/openApi/cswap/v1/market/ticker"),
+    "place_coin_swap_order": ("POST", "/openApi/cswap/v1/trade/order"),
+    "cancel_coin_swap_order": ("DELETE", "/openApi/cswap/v1/trade/cancelOrder"),
+    "cancel_coin_swap_all_orders": ("POST", "/openApi/cswap/v1/trade/allOpenOrders"),
+    "close_coin_swap_all_positions": ("POST", "/openApi/cswap/v1/trade/closeAllPositions"),
+    "get_coin_swap_open_orders": ("GET", "/openApi/cswap/v1/trade/openOrders"),
+    "get_coin_swap_order": ("GET", "/openApi/cswap/v1/trade/orderDetail"),
+    "get_coin_swap_order_history": ("GET", "/openApi/cswap/v1/trade/orderHistory"),
+    "get_coin_swap_fills": ("GET", "/openApi/cswap/v1/trade/allFillOrders"),
+    "get_coin_swap_force_orders": ("GET", "/openApi/cswap/v1/trade/forceOrders"),
+    "get_coin_swap_leverage": ("GET", "/openApi/cswap/v1/trade/leverage"),
+    "set_coin_swap_leverage": ("POST", "/openApi/cswap/v1/trade/leverage"),
+    "get_coin_swap_margin_type": ("GET", "/openApi/cswap/v1/trade/marginType"),
+    "set_coin_swap_margin_type": ("POST", "/openApi/cswap/v1/trade/marginType"),
+    "adjust_coin_swap_position_margin": ("POST", "/openApi/cswap/v1/trade/positionMargin"),
+    "get_coin_swap_commission_rate": ("GET", "/openApi/cswap/v1/user/commissionRate"),
+    "get_coin_swap_balance": ("GET", "/openApi/cswap/v1/user/balance"),
+    "get_coin_swap_positions": ("GET", "/openApi/cswap/v1/user/positions"),
+    "get_spot_historical_kline": ("GET", "/openApi/market/his/v1/kline"),
+    "place_spot_oco": ("POST", "/openApi/spot/v1/oco/order"),
+    "cancel_spot_oco": ("POST", "/openApi/spot/v1/oco/cancel"),
+    "get_spot_oco": ("GET", "/openApi/spot/v1/oco/orderList"),
+    "get_spot_open_oco": ("GET", "/openApi/spot/v1/oco/openOrderList"),
+    "get_spot_oco_history": ("GET", "/openApi/spot/v1/oco/historyOrderList"),
+    "get_deposit_history": ("GET", "/openApi/api/v3/capital/deposit/hisrec"),
+    "set_swap_cancel_all_after": ("POST", "/openApi/swap/v2/trade/cancelAllAfter"),
+    "get_swap_open_order": ("GET", "/openApi/swap/v2/trade/openOrder"),
+    "get_swap_force_orders": ("GET", "/openApi/swap/v2/trade/forceOrders"),
+    "get_swap_trade_fills": ("GET", "/openApi/swap/v2/trade/allFillOrders"),
+    "adjust_swap_position_margin": ("POST", "/openApi/swap/v2/trade/positionMargin"),
+    "amend_swap_order": ("POST", "/openApi/swap/v1/trade/amend"),
+    "place_swap_twap_order": ("POST", "/openApi/swap/v1/twap/order"),
+    "cancel_swap_twap_order": ("POST", "/openApi/swap/v1/twap/cancelOrder"),
+    "get_swap_open_twap_orders": ("GET", "/openApi/swap/v1/twap/openOrders"),
+    "get_swap_twap_order_history": ("GET", "/openApi/swap/v1/twap/historyOrders"),
+    "get_swap_twap_order": ("GET", "/openApi/swap/v1/twap/orderDetail"),
+    "get_swap_asset_mode": ("GET", "/openApi/swap/v1/trade/assetMode"),
+    "set_swap_asset_mode": ("POST", "/openApi/swap/v1/trade/assetMode"),
+    "get_swap_multi_asset_rules": ("GET", "/openApi/swap/v1/trade/multiAssetsRules"),
+    "get_swap_margin_assets": ("GET", "/openApi/swap/v1/user/marginAssets"),
+    "get_swap_full_orders": ("GET", "/openApi/swap/v1/trade/fullOrder"),
+    "get_swap_fill_history": ("GET", "/openApi/swap/v2/trade/fillHistory"),
+    "get_swap_position_history": ("GET", "/openApi/swap/v1/trade/positionHistory"),
+    "get_swap_margin_history": ("GET", "/openApi/swap/v1/positionMargin/history"),
+    "get_swap_maintenance_margin_ratios": ("GET", "/openApi/swap/v1/maintMarginRatio"),
+    "set_swap_auto_add_margin": ("POST", "/openApi/swap/v1/trade/autoAddMargin"),
     # Market data.
     "get_swap_instrument_info": ("GET", "/openApi/swap/v2/quote/contracts"),
     "get_spot_instrument_info": ("GET", "/openApi/spot/v1/common/symbols"),
@@ -142,6 +194,20 @@ MARKET_FILE_METHODS = {
     if name.startswith(("get_swap_", "get_spot_", "get_orderbook", "get_public_", "get_kline"))
 } | {"get_open_interest", "get_mark_price_kline", "get_ticker"}
 PUBLIC_METHODS = MARKET_FILE_METHODS - {
+    "get_swap_asset_mode",
+    "get_swap_fill_history",
+    "get_swap_force_orders",
+    "get_swap_full_orders",
+    "get_swap_maintenance_margin_ratios",
+    "get_swap_margin_assets",
+    "get_swap_margin_history",
+    "get_swap_multi_asset_rules",
+    "get_swap_open_order",
+    "get_swap_open_twap_orders",
+    "get_swap_position_history",
+    "get_swap_trade_fills",
+    "get_swap_twap_order",
+    "get_swap_twap_order_history",
     "get_swap_account_balance",
     "get_swap_commission_rate",
     "get_spot_account_balance",
@@ -229,13 +295,120 @@ EXTRA: dict[str, dict[str, Any]] = {
 STALE_NATIVE_MARKER = "unsupported BingX private method"
 
 
-def _call_or_skip_stale(name: str, call: Any) -> Any:  # noqa: ANN401
+def _call_checked_native(name: str, call: Any) -> Any:  # noqa: ANN401
     try:
         return call()
     except ValueError as exc:
         if STALE_NATIVE_MARKER in str(exc):
-            pytest.skip(f"installed dcex._native predates {name}; rebuild the extension")
+            pytest.fail(f"installed dcex._native predates {name}; rebuild the extension")
         raise
+
+
+CONTROL_CASES = [
+    (
+        "set_swap_cancel_all_after",
+        {"type_": "ACTIVATE", "timeOut": 30},
+        "POST",
+        "/openApi/swap/v2/trade/cancelAllAfter",
+    ),
+    (
+        "get_swap_open_order",
+        {"product_symbol": "BTC-USDT-SWAP", "orderId": 123},
+        "GET",
+        "/openApi/swap/v2/trade/openOrder",
+    ),
+    ("get_swap_force_orders", {}, "GET", "/openApi/swap/v2/trade/forceOrders"),
+    (
+        "get_swap_trade_fills",
+        {"tradingUnit": "COIN", "startTs": 1700000000000, "endTs": 1700000100000},
+        "GET",
+        "/openApi/swap/v2/trade/allFillOrders",
+    ),
+    (
+        "adjust_swap_position_margin",
+        {"product_symbol": "BTC-USDT-SWAP", "amount": "2", "type_": 2, "positionSide": "LONG"},
+        "POST",
+        "/openApi/swap/v2/trade/positionMargin",
+    ),
+    (
+        "amend_swap_order",
+        {"product_symbol": "BTC-USDT-SWAP", "quantity": "1", "clientOrderId": "amend-me"},
+        "POST",
+        "/openApi/swap/v1/trade/amend",
+    ),
+    (
+        "place_swap_twap_order",
+        {
+            "product_symbol": "BTC-USDT-SWAP",
+            "side": "BUY",
+            "positionSide": "LONG",
+            "priceType": "constant",
+            "priceVariance": "1",
+            "triggerPrice": "60000",
+            "interval": 10,
+            "amountPerOrder": "1",
+            "totalAmount": "5",
+        },
+        "POST",
+        "/openApi/swap/v1/twap/order",
+    ),
+    ("cancel_swap_twap_order", {"mainOrderId": "123"}, "POST", "/openApi/swap/v1/twap/cancelOrder"),
+    ("get_swap_open_twap_orders", {}, "GET", "/openApi/swap/v1/twap/openOrders"),
+    (
+        "get_swap_twap_order_history",
+        {"pageIndex": 1, "pageSize": 20, "startTime": 1700000000000, "endTime": 1700000100000},
+        "GET",
+        "/openApi/swap/v1/twap/historyOrders",
+    ),
+    ("get_swap_twap_order", {"mainOrderId": "123"}, "GET", "/openApi/swap/v1/twap/orderDetail"),
+    ("get_swap_asset_mode", {}, "GET", "/openApi/swap/v1/trade/assetMode"),
+    (
+        "set_swap_asset_mode",
+        {"assetMode": "multiAssetsMode"},
+        "POST",
+        "/openApi/swap/v1/trade/assetMode",
+    ),
+    ("get_swap_multi_asset_rules", {}, "GET", "/openApi/swap/v1/trade/multiAssetsRules"),
+    ("get_swap_margin_assets", {}, "GET", "/openApi/swap/v1/user/marginAssets"),
+    ("get_swap_full_orders", {"limit": 20}, "GET", "/openApi/swap/v1/trade/fullOrder"),
+    (
+        "get_swap_fill_history",
+        {"product_symbol": "BTC-USDT-SWAP", "startTs": 1700000000000, "endTs": 1700000100000},
+        "GET",
+        "/openApi/swap/v2/trade/fillHistory",
+    ),
+    (
+        "get_swap_position_history",
+        {"product_symbol": "BTC-USDT-SWAP", "startTs": 1700000000000, "endTs": 1700000100000},
+        "GET",
+        "/openApi/swap/v1/trade/positionHistory",
+    ),
+    (
+        "get_swap_margin_history",
+        {
+            "product_symbol": "BTC-USDT-SWAP",
+            "positionId": "123",
+            "startTime": 1700000000000,
+            "endTime": 1700000100000,
+            "pageIndex": 1,
+            "pageSize": 20,
+        },
+        "GET",
+        "/openApi/swap/v1/positionMargin/history",
+    ),
+    (
+        "get_swap_maintenance_margin_ratios",
+        {"product_symbol": "BTC-USDT-SWAP"},
+        "GET",
+        "/openApi/swap/v1/maintMarginRatio",
+    ),
+    (
+        "set_swap_auto_add_margin",
+        {"product_symbol": "BTC-USDT-SWAP", "positionId": "123", "functionSwitch": "true"},
+        "POST",
+        "/openApi/swap/v1/trade/autoAddMargin",
+    ),
+]
 
 
 def _wrapper_names(mode: str) -> set[str]:
@@ -250,7 +423,8 @@ def _wrapper_names(mode: str) -> set[str]:
                 if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and not (
                     node.name.startswith("_")
                 ):
-                    names.add(node.name)
+                    if node.name != "export_swap_income":  # Binary export has separate coverage.
+                        names.add(node.name)
     return names
 
 
@@ -259,8 +433,7 @@ class _Recorder(BaseHTTPRequestHandler):
 
     def _handle(self) -> None:
         length = int(self.headers.get("Content-Length", "0"))
-        if length:
-            self.rfile.read(length)
+        body = self.rfile.read(length) if length else b""
         split = urlsplit(self.path)
         self.received.put(
             {
@@ -268,6 +441,7 @@ class _Recorder(BaseHTTPRequestHandler):
                 "path": split.path,
                 "query": dict(parse_qsl(split.query)),
                 "api_key": self.headers.get("X-BX-APIKEY"),
+                "body": body,
             }
         )
         payload = json.dumps({"code": 0, "msg": "", "data": {}, "listenKey": "k"}).encode()
@@ -289,7 +463,9 @@ def server() -> Iterator[tuple[str, "queue.Queue[dict[str, Any]]"]]:
     received: queue.Queue[dict[str, Any]] = queue.Queue()
     handler = type("Handler", (_Recorder,), {"received": received})
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread = threading.Thread(
+        target=httpd.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True
+    )
     thread.start()
     try:
         host, port = httpd.server_address[:2]
@@ -309,7 +485,474 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
     }
 
 
+ADDITIONAL_CASES = [
+    (
+        "get_coin_swap_contracts",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/market/contracts",
+    ),
+    (
+        "get_coin_swap_orderbook",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/market/depth",
+    ),
+    (
+        "get_coin_swap_kline",
+        {"product_symbol": "BTC-USD-SWAP", "interval": "1m"},
+        "GET",
+        "/openApi/cswap/v1/market/klines",
+    ),
+    (
+        "get_coin_swap_premium_index",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/market/premiumIndex",
+    ),
+    (
+        "get_coin_swap_open_interest",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/market/openInterest",
+    ),
+    (
+        "get_coin_swap_ticker",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/market/ticker",
+    ),
+    (
+        "place_coin_swap_order",
+        {"product_symbol": "BTC-USD-SWAP", "side": "SELL", "type_": "MARKET", "quantity": "1"},
+        "POST",
+        "/openApi/cswap/v1/trade/order",
+    ),
+    (
+        "cancel_coin_swap_order",
+        {"product_symbol": "BTC-USD-SWAP", "order_id": 1},
+        "DELETE",
+        "/openApi/cswap/v1/trade/cancelOrder",
+    ),
+    (
+        "cancel_coin_swap_all_orders",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "POST",
+        "/openApi/cswap/v1/trade/allOpenOrders",
+    ),
+    (
+        "close_coin_swap_all_positions",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "POST",
+        "/openApi/cswap/v1/trade/closeAllPositions",
+    ),
+    (
+        "get_coin_swap_open_orders",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/trade/openOrders",
+    ),
+    (
+        "get_coin_swap_order",
+        {"product_symbol": "BTC-USD-SWAP", "order_id": 1},
+        "GET",
+        "/openApi/cswap/v1/trade/orderDetail",
+    ),
+    (
+        "get_coin_swap_order_history",
+        {"limit": 20, "product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/trade/orderHistory",
+    ),
+    ("get_coin_swap_fills", {"order_id": "1"}, "GET", "/openApi/cswap/v1/trade/allFillOrders"),
+    (
+        "get_coin_swap_force_orders",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/trade/forceOrders",
+    ),
+    (
+        "get_coin_swap_leverage",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/trade/leverage",
+    ),
+    (
+        "set_coin_swap_leverage",
+        {"product_symbol": "BTC-USD-SWAP", "side": "LONG", "leverage": "5"},
+        "POST",
+        "/openApi/cswap/v1/trade/leverage",
+    ),
+    (
+        "get_coin_swap_margin_type",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/trade/marginType",
+    ),
+    (
+        "set_coin_swap_margin_type",
+        {"product_symbol": "BTC-USD-SWAP", "margin_type": "ISOLATED"},
+        "POST",
+        "/openApi/cswap/v1/trade/marginType",
+    ),
+    (
+        "adjust_coin_swap_position_margin",
+        {"product_symbol": "BTC-USD-SWAP", "position_side": "LONG", "amount": "1", "type_": 1},
+        "POST",
+        "/openApi/cswap/v1/trade/positionMargin",
+    ),
+    ("get_coin_swap_commission_rate", {}, "GET", "/openApi/cswap/v1/user/commissionRate"),
+    (
+        "get_coin_swap_balance",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/user/balance",
+    ),
+    (
+        "get_coin_swap_positions",
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/openApi/cswap/v1/user/positions",
+    ),
+    (
+        "get_spot_historical_kline",
+        {"product_symbol": "BTC-USDT-SPOT", "interval": "1m"},
+        "GET",
+        "/openApi/market/his/v1/kline",
+    ),
+    (
+        "place_spot_oco",
+        {
+            "product_symbol": "BTC-USDT-SPOT",
+            "side": "SELL",
+            "quantity": "1",
+            "limit_price": "120",
+            "trigger_price": "90",
+            "order_price": "89",
+        },
+        "POST",
+        "/openApi/spot/v1/oco/order",
+    ),
+    ("cancel_spot_oco", {"order_id": "1"}, "POST", "/openApi/spot/v1/oco/cancel"),
+    ("get_spot_oco", {"order_list_id": "1"}, "GET", "/openApi/spot/v1/oco/orderList"),
+    (
+        "get_spot_open_oco",
+        {"page_index": 1, "page_size": 20},
+        "GET",
+        "/openApi/spot/v1/oco/openOrderList",
+    ),
+    (
+        "get_spot_oco_history",
+        {"page_index": 1, "page_size": 20},
+        "GET",
+        "/openApi/spot/v1/oco/historyOrderList",
+    ),
+    ("get_deposit_history", {}, "GET", "/openApi/api/v3/capital/deposit/hisrec"),
+]
+ADDITIONAL_FIELDS = {
+    "get_coin_swap_contracts": {"symbol": "BTC-USD"},
+    "get_coin_swap_orderbook": {"symbol": "BTC-USD"},
+    "get_coin_swap_kline": {"symbol": "BTC-USD", "interval": "1m"},
+    "get_coin_swap_premium_index": {"symbol": "BTC-USD"},
+    "get_coin_swap_open_interest": {"symbol": "BTC-USD"},
+    "get_coin_swap_ticker": {"symbol": "BTC-USD"},
+    "place_coin_swap_order": {
+        "symbol": "BTC-USD",
+        "side": "SELL",
+        "type": "MARKET",
+        "quantity": "1",
+    },
+    "cancel_coin_swap_order": {"symbol": "BTC-USD", "orderId": "1"},
+    "cancel_coin_swap_all_orders": {"symbol": "BTC-USD"},
+    "close_coin_swap_all_positions": {"symbol": "BTC-USD"},
+    "get_coin_swap_open_orders": {"symbol": "BTC-USD"},
+    "get_coin_swap_order": {"symbol": "BTC-USD", "orderId": "1"},
+    "get_coin_swap_order_history": {"limit": "20", "symbol": "BTC-USD"},
+    "get_coin_swap_fills": {"orderId": "1"},
+    "get_coin_swap_force_orders": {"symbol": "BTC-USD"},
+    "get_coin_swap_leverage": {"symbol": "BTC-USD"},
+    "set_coin_swap_leverage": {"symbol": "BTC-USD", "side": "LONG", "leverage": "5"},
+    "get_coin_swap_margin_type": {"symbol": "BTC-USD"},
+    "set_coin_swap_margin_type": {"symbol": "BTC-USD", "marginType": "ISOLATED"},
+    "adjust_coin_swap_position_margin": {
+        "symbol": "BTC-USD",
+        "positionSide": "LONG",
+        "amount": "1",
+        "type": "1",
+    },
+    "get_coin_swap_commission_rate": {},
+    "get_coin_swap_balance": {"symbol": "BTC-USD"},
+    "get_coin_swap_positions": {"symbol": "BTC-USD"},
+    "get_spot_historical_kline": {"symbol": "BTC-USDT", "interval": "1m"},
+    "place_spot_oco": {
+        "symbol": "BTC-USDT",
+        "side": "SELL",
+        "quantity": "1",
+        "limitPrice": "120",
+        "triggerPrice": "90",
+        "orderPrice": "89",
+    },
+    "cancel_spot_oco": {"orderId": "1"},
+    "get_spot_oco": {"orderListId": "1"},
+    "get_spot_open_oco": {"pageIndex": "1", "pageSize": "20"},
+    "get_spot_oco_history": {"pageIndex": "1", "pageSize": "20"},
+    "get_deposit_history": {},
+}
+PUBLIC_METHODS.difference_update(
+    [
+        "place_coin_swap_order",
+        "cancel_coin_swap_order",
+        "cancel_coin_swap_all_orders",
+        "close_coin_swap_all_positions",
+        "get_coin_swap_open_orders",
+        "get_coin_swap_order",
+        "get_coin_swap_order_history",
+        "get_coin_swap_fills",
+        "get_coin_swap_force_orders",
+        "get_coin_swap_leverage",
+        "set_coin_swap_leverage",
+        "get_coin_swap_margin_type",
+        "set_coin_swap_margin_type",
+        "adjust_coin_swap_position_margin",
+        "get_coin_swap_commission_rate",
+        "get_coin_swap_balance",
+        "get_coin_swap_positions",
+        "place_spot_oco",
+        "cancel_spot_oco",
+        "get_spot_oco",
+        "get_spot_open_oco",
+        "get_spot_oco_history",
+        "get_deposit_history",
+    ]
+)
+PUBLIC_METHODS.update(
+    [
+        "get_coin_swap_contracts",
+        "get_coin_swap_orderbook",
+        "get_coin_swap_kline",
+        "get_coin_swap_premium_index",
+        "get_coin_swap_open_interest",
+        "get_coin_swap_ticker",
+        "get_spot_historical_kline",
+    ]
+)
+
+ADDITIONAL_CASES.extend(
+    [
+        ("get_swap_server_time", {}, "GET", "/openApi/swap/v2/server/time"),
+        (
+            "get_swap_price_ticker",
+            {"product_symbol": "BTC-USDT-SWAP"},
+            "GET",
+            "/openApi/swap/v1/ticker/price",
+        ),
+    ]
+)
+ADDITIONAL_FIELDS.update(
+    {"get_swap_server_time": {}, "get_swap_price_ticker": {"symbol": "BTC-USDT"}}
+)
+ROUTES.update(
+    {
+        "get_swap_server_time": ("GET", "/openApi/swap/v2/server/time"),
+        "get_swap_price_ticker": ("GET", "/openApi/swap/v1/ticker/price"),
+    }
+)
+PUBLIC_METHODS.update(["get_swap_server_time", "get_swap_price_ticker"])
+
+BATCH_REPLACEMENT = [
+    {
+        "product_symbol": "BTC-USDT-SWAP",
+        "cancelOrderId": "1",
+        "side": "SELL",
+        "positionSide": "BOTH",
+        "type": "STOP_MARKET",
+        "stopPrice": 90,
+        "quantity": 1,
+        "closePosition": "true",
+        "cancelReplaceMode": "STOP_ON_FAILURE",
+    }
+]
+
+ADDITIONAL_CASES.extend(
+    [
+        (
+            "get_spot_historical_trades",
+            {"product_symbol": "BTC-USDT-SPOT"},
+            "GET",
+            "/openApi/market/his/v1/trade",
+        ),
+        ("get_coin_network_config", {}, "GET", "/openApi/wallets/v1/capital/config/getall"),
+        (
+            "get_deposit_addresses",
+            {"coin": "USDT"},
+            "GET",
+            "/openApi/wallets/v1/capital/deposit/address",
+        ),
+        ("get_deposit_risk_records", {}, "GET", "/openApi/wallets/v1/capital/deposit/riskRecords"),
+        (
+            "get_swap_historical_trades",
+            {"product_symbol": "BTC-USDT-SWAP"},
+            "GET",
+            "/openApi/swap/v1/market/historicalTrades",
+        ),
+        (
+            "reverse_swap_position",
+            {"type_": "Reverse", "product_symbol": "BTC-USDT-SWAP"},
+            "POST",
+            "/openApi/swap/v1/trade/reverse",
+        ),
+        ("adjust_simulated_trading_balance", {}, "POST", "/openApi/swap/v2/trade/getVst"),
+        ("get_standard_futures_positions", {}, "GET", "/openApi/contract/v1/allPosition"),
+        (
+            "get_standard_futures_orders",
+            {"product_symbol": "BTC-USDT-SWAP"},
+            "GET",
+            "/openApi/contract/v1/allOrders",
+        ),
+        ("get_standard_futures_balance", {}, "GET", "/openApi/contract/v1/balance"),
+        ("get_api_permissions", {}, "GET", "/openApi/v1/account/apiPermissions"),
+        (
+            "create_sub_account",
+            {"sub_account_string": "trader123"},
+            "POST",
+            "/openApi/subAccount/v1/create",
+        ),
+        (
+            "set_sub_account_frozen",
+            {"sub_uid": 123, "freeze": True},
+            "POST",
+            "/openApi/subAccount/v1/updateStatus",
+        ),
+        (
+            "create_sub_account_api_key",
+            {"sub_uid": 123, "note": "trading", "permissions": [1, 2, 3]},
+            "POST",
+            "/openApi/subAccount/v1/apiKey/create",
+        ),
+        (
+            "modify_sub_account_api_key",
+            {"sub_uid": 123, "api_key": "query-key", "note": "trading", "permissions": [1, 2, 3]},
+            "POST",
+            "/openApi/subAccount/v1/apiKey/edit",
+        ),
+        (
+            "delete_sub_account_api_key",
+            {"sub_uid": 123, "api_key": "query-key"},
+            "POST",
+            "/openApi/subAccount/v1/apiKey/del",
+        ),
+        (
+            "set_sub_account_transfer_authorization",
+            {"sub_uids": "123", "transferable": True},
+            "POST",
+            "/openApi/account/v1/innerTransfer/authorizeSubAccount",
+        ),
+        (
+            "get_sub_account_deposit_addresses",
+            {"coin": "USDT", "sub_uid": 123},
+            "GET",
+            "/openApi/wallets/v1/capital/subAccount/deposit/address",
+        ),
+        (
+            "get_sub_account_deposit_history",
+            {},
+            "GET",
+            "/openApi/wallets/v1/capital/deposit/subHisrec",
+        ),
+        ("get_api_restrictions", {}, "GET", "/openApi/v1/account/apiRestrictions"),
+        (
+            "create_sub_account_deposit_address",
+            {"coin": "USDT", "sub_uid": 123, "network": "TRC20", "wallet_type": 1},
+            "POST",
+            "/openApi/wallets/v1/capital/deposit/createSubAddress",
+        ),
+    ]
+)
+ADDITIONAL_FIELDS.update(
+    {
+        "get_spot_historical_trades": {"symbol": "BTC-USDT"},
+        "get_coin_network_config": {},
+        "get_deposit_addresses": {"coin": "USDT"},
+        "get_deposit_risk_records": {},
+        "get_swap_historical_trades": {"symbol": "BTC-USDT"},
+        "reverse_swap_position": {"type": "Reverse", "symbol": "BTC-USDT"},
+        "adjust_simulated_trading_balance": {},
+        "get_standard_futures_positions": {},
+        "get_standard_futures_orders": {"symbol": "BTC-USDT"},
+        "get_standard_futures_balance": {},
+        "get_api_permissions": {},
+        "create_sub_account": {"subAccountString": "trader123"},
+        "set_sub_account_frozen": {"subUid": "123", "freeze": "true"},
+        "create_sub_account_api_key": {
+            "subUid": "123",
+            "note": "trading",
+            "permissions": "[1,2,3]",
+        },
+        "modify_sub_account_api_key": {
+            "subUid": "123",
+            "apiKey": "query-key",
+            "note": "trading",
+            "permissions": "[1,2,3]",
+        },
+        "delete_sub_account_api_key": {"subUid": "123", "apiKey": "query-key"},
+        "set_sub_account_transfer_authorization": {"subUids": "123", "transferable": "true"},
+        "get_sub_account_deposit_addresses": {"coin": "USDT", "subUid": "123"},
+        "get_sub_account_deposit_history": {},
+        "get_api_restrictions": {},
+        "create_sub_account_deposit_address": {
+            "coin": "USDT",
+            "subUid": "123",
+            "network": "TRC20",
+            "walletType": "1",
+        },
+    }
+)
+ROUTES.update(
+    {
+        "get_spot_historical_trades": ("GET", "/openApi/market/his/v1/trade"),
+        "get_coin_network_config": ("GET", "/openApi/wallets/v1/capital/config/getall"),
+        "get_deposit_addresses": ("GET", "/openApi/wallets/v1/capital/deposit/address"),
+        "get_deposit_risk_records": ("GET", "/openApi/wallets/v1/capital/deposit/riskRecords"),
+        "get_swap_historical_trades": ("GET", "/openApi/swap/v1/market/historicalTrades"),
+        "reverse_swap_position": ("POST", "/openApi/swap/v1/trade/reverse"),
+        "adjust_simulated_trading_balance": ("POST", "/openApi/swap/v2/trade/getVst"),
+        "get_standard_futures_positions": ("GET", "/openApi/contract/v1/allPosition"),
+        "get_standard_futures_orders": ("GET", "/openApi/contract/v1/allOrders"),
+        "get_standard_futures_balance": ("GET", "/openApi/contract/v1/balance"),
+        "get_api_permissions": ("GET", "/openApi/v1/account/apiPermissions"),
+        "create_sub_account": ("POST", "/openApi/subAccount/v1/create"),
+        "set_sub_account_frozen": ("POST", "/openApi/subAccount/v1/updateStatus"),
+        "create_sub_account_api_key": ("POST", "/openApi/subAccount/v1/apiKey/create"),
+        "modify_sub_account_api_key": ("POST", "/openApi/subAccount/v1/apiKey/edit"),
+        "delete_sub_account_api_key": ("POST", "/openApi/subAccount/v1/apiKey/del"),
+        "set_sub_account_transfer_authorization": (
+            "POST",
+            "/openApi/account/v1/innerTransfer/authorizeSubAccount",
+        ),
+        "get_sub_account_deposit_addresses": (
+            "GET",
+            "/openApi/wallets/v1/capital/subAccount/deposit/address",
+        ),
+        "get_sub_account_deposit_history": ("GET", "/openApi/wallets/v1/capital/deposit/subHisrec"),
+        "get_api_restrictions": ("GET", "/openApi/v1/account/apiRestrictions"),
+        "create_sub_account_deposit_address": (
+            "POST",
+            "/openApi/wallets/v1/capital/deposit/createSubAddress",
+        ),
+    }
+)
+PUBLIC_METHODS.update(["get_spot_historical_trades", "get_swap_historical_trades"])
+
+
 def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
+    if name == "replace_swap_batch_orders":
+        return {"orders": BATCH_REPLACEMENT}
+    for case_name, kwargs, *_ in ADDITIONAL_CASES:
+        if name == case_name:
+            return kwargs.copy()
+    for case_name, kwargs, *_ in CONTROL_CASES:
+        if name == case_name:
+            return kwargs.copy()
     kwargs: dict[str, Any] = {}
     for parameter in inspect.signature(method).parameters.values():
         if parameter.kind in {inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD}:
@@ -335,7 +978,47 @@ def _drain(received: "queue.Queue[dict[str, Any]]") -> None:
 
 def _assert_route(name: str, request: dict[str, Any]) -> None:
     assert (request["method"], request["path"]) == ROUTES[name], name
-    signed = "signature" in request["query"]
+    fields = request["query"]
+    if request["body"]:
+        import hashlib
+        import hmac
+
+        assert fields == {}
+        body = json.loads(request["body"])
+        signature = body.pop("signature")
+        assert isinstance(body["timestamp"], int)
+
+        def signing_text(value: Any) -> str:
+            if isinstance(value, list):
+                return ",".join(signing_text(item) for item in value)
+            if isinstance(value, bool):
+                return str(value).lower()
+            return str(value)
+
+        canonical = "&".join(f"{key}={signing_text(value)}" for key, value in sorted(body.items()))
+        assert signature == hmac.new(b"api-secret", canonical.encode(), hashlib.sha256).hexdigest()
+        fields = {
+            key: json.dumps(value, separators=(",", ":"))
+            if isinstance(value, (list, bool))
+            else str(value)
+            for key, value in body.items()
+        }
+        fields["signature"] = signature
+        if "subUid" in body:
+            assert isinstance(body["subUid"], int)
+        if "freeze" in body:
+            assert isinstance(body["freeze"], bool)
+    if name in ADDITIONAL_FIELDS:
+        assert {
+            key: value for key, value in fields.items() if key not in {"signature", "timestamp"}
+        } == ADDITIONAL_FIELDS[name]
+    if name == "replace_swap_batch_orders":
+        batch = json.loads(request["query"]["batchOrders"])
+        assert batch[0]["symbol"] == "BTC-USDT"
+        assert batch[0]["quantity"] == 1
+        assert batch[0]["closePosition"] == "true"
+        assert batch[0]["cancelOrderId"] == "1"
+    signed = "signature" in fields
     if name in PUBLIC_METHODS:
         assert not signed, name
     elif name in UNSIGNED_PRIVATE:
@@ -345,6 +1028,21 @@ def _assert_route(name: str, request: dict[str, Any]) -> None:
         assert signed, name
         assert request["api_key"] == "api-key", name
     assert "type_" not in request["query"], name
+    for case_name, kwargs, *_ in CONTROL_CASES:
+        if case_name == name:
+            expected = {
+                "symbol"
+                if key == "product_symbol"
+                else "type"
+                if key == "type_"
+                else key: "BTC-USDT" if key == "product_symbol" else str(value)
+                for key, value in kwargs.items()
+            }
+            assert {
+                key: value
+                for key, value in request["query"].items()
+                if key not in {"signature", "timestamp"}
+            } == expected
 
 
 def test_route_table_matches_python_surface() -> None:
@@ -366,7 +1064,7 @@ def test_sync_wrapper_reaches_documented_route(
     _drain(received)
     client = Client(**_client_kwargs(base_url))
     method = getattr(client, name)
-    assert _call_or_skip_stale(name, lambda: method(**_kwargs(method, name))) is not None
+    assert _call_checked_native(name, lambda: method(**_kwargs(method, name))) is not None
     _assert_route(name, received.get(timeout=5))
 
 
@@ -385,7 +1083,7 @@ def test_async_wrapper_reaches_documented_route(
             method = getattr(client, name)
             return await method(**_kwargs(method, name))
 
-    assert _call_or_skip_stale(name, lambda: asyncio.run(call())) is not None
+    assert _call_checked_native(name, lambda: asyncio.run(call())) is not None
     _assert_route(name, received.get(timeout=5))
 
 
@@ -427,6 +1125,7 @@ def test_spot_orderbook_v2_requires_depth() -> None:
 
 # Official request tables list no timestamp only for these public spot routes.
 PUBLIC_WITHOUT_TIMESTAMP = {
+    "get_swap_server_time",
     "get_spot_orderbook_v2",
     "get_spot_price_ticker",
     "get_spot_book_ticker",
@@ -444,10 +1143,79 @@ def test_public_routes_send_documented_timestamp(
     _drain(received)
     client = Client(**_client_kwargs(base_url))
     method = getattr(client, name)
-    _call_or_skip_stale(name, lambda: method(**_kwargs(method, name)))
+    _call_checked_native(name, lambda: method(**_kwargs(method, name)))
     query = received.get(timeout=5)["query"]
     if name in PUBLIC_WITHOUT_TIMESTAMP:
         assert "timestamp" not in query, name
     else:
         assert query.get("timestamp", "").isdigit(), name
     assert "signature" not in query, name
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["sync", "async"])
+@pytest.mark.parametrize(
+    "method,kwargs",
+    [
+        (
+            "place_swap_twap_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "side": "BUY",
+                "positionSide": "LONG",
+                "priceType": "constant",
+                "priceVariance": "1",
+                "triggerPrice": "100",
+                "interval": 4,
+                "amountPerOrder": "1",
+                "totalAmount": "10",
+            },
+        ),
+        (
+            "place_swap_twap_order",
+            {
+                "product_symbol": "BTC-USDT-SWAP",
+                "side": "BUY",
+                "positionSide": "LONG",
+                "priceType": "constant",
+                "priceVariance": "1",
+                "triggerPrice": "100",
+                "interval": 10,
+                "amountPerOrder": "11",
+                "totalAmount": "10",
+            },
+        ),
+        ("amend_swap_order", {"product_symbol": "BTC-USDT-SWAP", "quantity": "1"}),
+        (
+            "get_swap_position_history",
+            {"product_symbol": "BTC-USDT-SWAP", "startTs": 1, "endTs": 8000000000},
+        ),
+        ("set_swap_asset_mode", {"assetMode": "invalid"}),
+    ],
+)
+async def test_new_risk_controls_reject_invalid_input_before_transport(
+    method: str, kwargs: dict[str, Any], mode: str
+) -> None:
+    """Invalid trading parameters fail locally in both public Python interfaces."""
+    import importlib
+
+    module = importlib.import_module(
+        ("dcex.async_support." if mode == "async" else "dcex.") + "bingx.client"
+    )
+    client = module.Client(**_client_kwargs("http://127.0.0.1:1"))
+    try:
+        if mode == "async":
+            await client.async_init()
+        with pytest.raises(
+            ValueError,
+            match="(?i)(invalid|required|must|requires|outside|unsupported|expected|between|specify|limit)",
+        ):
+            if mode == "async":
+                await getattr(client, method)(**kwargs)
+            else:
+                getattr(client, method)(**kwargs)
+    finally:
+        if mode == "async":
+            await client.close()
+        else:
+            client.close()

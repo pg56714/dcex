@@ -107,7 +107,193 @@ def _series(market_id: int = 1, resolution: str = "1h") -> list[tuple[str, str]]
     ]
 
 
+GROUP_ORDERS = [
+    {
+        "market_index": 1,
+        "client_order_index": 100 + i,
+        "base_amount": 1000,
+        "price": 250000,
+        "is_ask": True,
+        "order_type": kind,
+        "time_in_force": 0,
+        "reduce_only": True,
+        "trigger_price": trigger,
+        "order_expiry": 1900000000000,
+    }
+    for i, (kind, trigger) in enumerate([(2, 240000), (4, 260000)])
+]
+GROUP_PARAMS = [
+    ("grouping_type", "2"),
+    *ORDER_DEFAULTS[3:],
+    ("nonce", "5"),
+    ("orders", json.dumps(GROUP_ORDERS, separators=(",", ":"))),
+]
+
 WRAPPER_CASES = [
+    _case("private", "create_sub_account", (), [("skip_nonce", "0"), ("nonce", "5")], 9, nonce=5),
+    _case("sign", "sign_create_sub_account", (), [("skip_nonce", "0"), ("nonce", "5")], 9, nonce=5),
+    _case(
+        "private",
+        "change_api_key_signed",
+        (
+            "01000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b",
+            5,
+        ),
+        [
+            (
+                "new_pubkey",
+                "01000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            ),
+            (
+                "l1_signature",
+                "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b",
+            ),
+            ("nonce", "5"),
+            ("skip_nonce", "0"),
+        ],
+        8,
+    ),
+    _case(
+        "sign",
+        "sign_change_api_key_signed",
+        (
+            "01000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b",
+            5,
+        ),
+        [
+            (
+                "new_pubkey",
+                "01000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            ),
+            (
+                "l1_signature",
+                "0x111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111b",
+            ),
+            ("nonce", "5"),
+            ("skip_nonce", "0"),
+        ],
+        8,
+    ),
+    _case(
+        "private",
+        "change_account_tier",
+        (),
+        [("account_index", "12"), ("new_tier", "premium"), ("authorization", "test-token")],
+        "/api/v1/changeAccountTier",
+        **{"account_index": 12, "new_tier": "premium", "authorization": "test-token"},
+    ),
+    _case(
+        "private",
+        "create_read_only_token",
+        (),
+        [
+            ("name", "reporting"),
+            ("account_index", "12"),
+            ("expiry", "1800000000"),
+            ("sub_account_access", "false"),
+            ("authorization", "test-token"),
+        ],
+        "/api/v1/tokens/create",
+        **{
+            "name": "reporting",
+            "account_index": 12,
+            "expiry": 1800000000,
+            "sub_account_access": False,
+            "authorization": "test-token",
+        },
+    ),
+    _case(
+        "private",
+        "revoke_read_only_token",
+        (),
+        [("token_id", "1"), ("account_index", "12"), ("authorization", "test-token")],
+        "/api/v1/tokens/revoke",
+        **{"token_id": 1, "account_index": 12, "authorization": "test-token"},
+    ),
+    _case(
+        "public",
+        "get_transaction",
+        (),
+        [("by", "hash"), ("value", "abc")],
+        "/api/v1/tx",
+        **{"by": "hash", "value": "abc"},
+    ),
+    _case(
+        "public",
+        "get_transaction_by_l1_hash",
+        (),
+        [("hash", "0x1111111111111111111111111111111111111111111111111111111111111111")],
+        "/api/v1/txFromL1TxHash",
+        **{"hash": "0x1111111111111111111111111111111111111111111111111111111111111111"},
+    ),
+    _case(
+        "private",
+        "acknowledge_notification",
+        (),
+        [("notif_id", "notification-1"), ("account_index", "12"), ("authorization", "test-token")],
+        "/api/v1/notification/ack",
+        **{"notif_id": "notification-1", "account_index": 12, "authorization": "test-token"},
+    ),
+    _case(
+        "public",
+        "create_deposit_intent_address",
+        (),
+        [
+            ("chain_id", "42161"),
+            ("from_addr", "0x2222222222222222222222222222222222222222"),
+            ("amount", "1"),
+        ],
+        "/api/v1/createIntentAddress",
+        **{
+            "chain_id": "42161",
+            "from_addr": "0x2222222222222222222222222222222222222222",
+            "amount": "1",
+        },
+    ),
+    _case(
+        "public",
+        "get_latest_deposit",
+        (),
+        [("l1_address", "0x2222222222222222222222222222222222222222")],
+        "/api/v1/deposit/latest",
+        **{"l1_address": "0x2222222222222222222222222222222222222222"},
+    ),
+    _case(
+        "private",
+        "update_account_config",
+        (1,),
+        [("account_trading_mode", "1"), ("skip_nonce", "0"), ("nonce", "5")],
+        41,
+        nonce=5,
+    ),
+    _case(
+        "sign",
+        "sign_update_account_config",
+        (1,),
+        [("account_trading_mode", "1"), ("skip_nonce", "0"), ("nonce", "5")],
+        41,
+        nonce=5,
+    ),
+    _case(
+        "private",
+        "update_account_asset_config",
+        (1, 1),
+        [("asset_index", "1"), ("asset_margin_mode", "1"), ("skip_nonce", "0"), ("nonce", "5")],
+        42,
+        nonce=5,
+    ),
+    _case(
+        "sign",
+        "sign_update_account_asset_config",
+        (1, 1),
+        [("asset_index", "1"), ("asset_margin_mode", "1"), ("skip_nonce", "0"), ("nonce", "5")],
+        42,
+        nonce=5,
+    ),
+    _case("sign", "sign_create_grouped_orders", (2, GROUP_ORDERS), GROUP_PARAMS, 28, nonce=5),
+    _case("private", "create_grouped_orders", (2, GROUP_ORDERS), GROUP_PARAMS, 28, nonce=5),
     # Public market and account data.
     _case("public", "get_status", (), [], "/"),
     _case("public", "get_info", (), [], "/info"),

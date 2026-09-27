@@ -12,6 +12,15 @@ impl BitgetClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BitgetParams::from_pairs(params);
+        if let Some(response) = self.risk_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
+        if let Some(result) = self
+            .trading_controls_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(result);
+        }
         match method_name {
             "get_spot_coins" => self.public_get(SPOT_COINS, params.only(&["coin"])).await,
             "get_spot_symbols" => {

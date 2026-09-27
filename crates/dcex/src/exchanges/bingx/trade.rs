@@ -546,6 +546,77 @@ impl BingxClient {
                     .await
             }
             "replace_swap_order" => self.replace_swap_order_from_params(params).await,
+            "replace_swap_batch_orders" => {
+                params.ensure_allowed(&["batchOrders", "recvWindow"])?;
+                validate_u64_range(params, "recvWindow", 1, 5000)?;
+                let orders: serde_json::Value =
+                    serde_json::from_str(params.required("batchOrders")?).map_err(|_| {
+                        crate::DcexError::InvalidInput("invalid batchOrders JSON".into())
+                    })?;
+                let orders = orders.as_array().filter(|v| !v.is_empty()).ok_or_else(|| {
+                    crate::DcexError::InvalidInput("batchOrders requires a nonempty array".into())
+                })?;
+                let mut normalized = Vec::new();
+                for order in orders {
+                    let object = order.as_object().ok_or_else(|| {
+                        crate::DcexError::InvalidInput("batch order must be an object".into())
+                    })?;
+                    if object.contains_key("recvWindow") || object.contains_key("timestamp") {
+                        return Err(crate::DcexError::InvalidInput(
+                            "batch timing belongs on the outer request".into(),
+                        ));
+                    }
+                    let pairs = object
+                        .iter()
+                        .map(|(k, v)| {
+                            (
+                                if k == "type" {
+                                    "type_".into()
+                                } else {
+                                    k.clone()
+                                },
+                                v.as_str()
+                                    .map(str::to_string)
+                                    .unwrap_or_else(|| v.to_string()),
+                            )
+                        })
+                        .collect();
+                    let query = self.swap_replacement_query(&BingxParams::from_pairs(pairs))?;
+                    let mut output = serde_json::Map::new();
+                    for (k, v) in query {
+                        let value = if [
+                            "quantity",
+                            "quoteOrderQty",
+                            "price",
+                            "stopPrice",
+                            "priceRate",
+                            "activationPrice",
+                        ]
+                        .contains(&k.as_str())
+                        {
+                            serde_json::from_str::<serde_json::Number>(&v)
+                                .map(serde_json::Value::Number)
+                                .map_err(|_| {
+                                    crate::DcexError::InvalidInput(
+                                        "batch prices and quantities must be JSON numbers".into(),
+                                    )
+                                })?
+                        } else {
+                            serde_json::Value::String(v)
+                        };
+                        output.insert(k, value);
+                    }
+                    normalized.push(serde_json::Value::Object(output));
+                }
+                let mut query = vec![(
+                    "batchOrders".into(),
+                    serde_json::to_string(&normalized)
+                        .map_err(|e| crate::DcexError::Decode(e.to_string()))?,
+                )];
+                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
+                self.private_post("/openApi/swap/v1/trade/batchCancelReplace", query)
+                    .await
+            }
             "close_swap_position" => {
                 params.ensure_allowed(&["positionId", "recvWindow"])?;
                 validate_u64_range(params, "recvWindow", 1, 5000)?;
@@ -791,6 +862,11 @@ impl BingxClient {
         &self,
         params: &BingxParams,
     ) -> Result<ValidatedResponse> {
+        self.private_post(SWAP_REPLACE_ORDER, self.swap_replacement_query(params)?)
+            .await
+    }
+
+    fn swap_replacement_query(&self, params: &BingxParams) -> Result<Vec<(String, String)>> {
         params.ensure_allowed(&[
             "product_symbol",
             "symbol",
@@ -831,7 +907,7 @@ impl BingxClient {
             &["ONLY_NEW", "ONLY_PENDING", "ONLY_PARTIALLY_FILLED"],
         )?;
         validate_client_id(params, "cancelClientOrderId", false)?;
-        validate_swap_order(params, params.required("type_")?)?;
+        validate_swap_order_rules(params, params.required("type_")?, true)?;
         let mut query = params.only(SWAP_REPLACE_OPTIONAL_KEYS);
         self.push_required_symbol(&mut query, params)?;
         query.push((
@@ -859,7 +935,7 @@ impl BingxClient {
             ));
         }
         normalize_bool_fields(&mut query);
-        self.private_post(SWAP_REPLACE_ORDER, query).await
+        Ok(query)
     }
 }
 
@@ -913,6 +989,14 @@ fn validate_spot_order(params: &BingxParams, order_type: &str) -> Result<()> {
 }
 
 fn validate_swap_order(params: &BingxParams, order_type: &str) -> Result<()> {
+    validate_swap_order_rules(params, order_type, false)
+}
+
+fn validate_swap_order_rules(
+    params: &BingxParams,
+    order_type: &str,
+    replacement: bool,
+) -> Result<()> {
     if !SWAP_ORDER_TYPES.contains(&order_type) {
         return Err(crate::DcexError::InvalidInput(format!(
             "unsupported BingX type: {order_type}"
@@ -958,7 +1042,9 @@ fn validate_swap_order(params: &BingxParams, order_type: &str) -> Result<()> {
         .get("closePosition")
         .is_some_and(|value| value.eq_ignore_ascii_case("true"));
     if close_position {
-        if params.get("quantity").is_some() || params.get("quoteOrderQty").is_some() {
+        if !replacement
+            && (params.get("quantity").is_some() || params.get("quoteOrderQty").is_some())
+        {
             return Err(crate::DcexError::InvalidInput(
                 "BingX closePosition cannot be used with quantity or quoteOrderQty".to_string(),
             ));
@@ -972,6 +1058,9 @@ fn validate_swap_order(params: &BingxParams, order_type: &str) -> Result<()> {
         return Err(crate::DcexError::InvalidInput(
             "one of quantity, quoteOrderQty is required".to_string(),
         ));
+    }
+    if replacement && matches!(order_type, "STOP_MARKET" | "TAKE_PROFIT_MARKET") {
+        params.required("quantity")?;
     }
     if matches!(
         order_type,

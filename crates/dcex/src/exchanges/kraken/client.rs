@@ -184,8 +184,14 @@ impl KrakenClient {
             KrakenAuth::Futures => &self.futures_base_url,
             KrakenAuth::Spot => &self.spot_base_url,
         };
-        let mut request =
-            HttpRequest::new(method, base_url, &path).header("Accept", "application/json");
+        let mut request = HttpRequest::new(method, base_url, &path).header(
+            "Accept",
+            if path == "/api/history/v3/accountlogcsv" {
+                "text/csv"
+            } else {
+                "application/json"
+            },
+        );
 
         if !signed {
             if !encoded_query.is_empty() {
@@ -214,6 +220,34 @@ impl KrakenClient {
                     ));
                 }
                 let (api_key, api_secret) = self.spot_credentials()?;
+                if let Some(json_body) = json_body {
+                    if !params.is_empty() {
+                        return Err(DcexError::InvalidInput(
+                            "Kraken JSON requests cannot also contain form parameters".into(),
+                        ));
+                    }
+                    let mut payload: serde_json::Value = serde_json::from_slice(&json_body)
+                        .map_err(|error| DcexError::InvalidInput(error.to_string()))?;
+                    let object = payload.as_object_mut().ok_or_else(|| {
+                        DcexError::InvalidInput("Kraken JSON body must be an object".into())
+                    })?;
+                    let number = nonce
+                        .parse::<u64>()
+                        .map_err(|error| DcexError::InvalidInput(error.to_string()))?;
+                    object.insert("nonce".into(), number.into());
+                    let encoded = serde_json::to_string(&payload)
+                        .map_err(|error| DcexError::Decode(error.to_string()))?;
+                    request.headers.insert("API-Key".into(), api_key.into());
+                    request.headers.insert(
+                        "API-Sign".into(),
+                        spot_signature(&path, nonce, &encoded, api_secret)?,
+                    );
+                    request
+                        .headers
+                        .insert("Content-Type".into(), "application/json".into());
+                    request.body = RequestBody::Raw(encoded.into_bytes());
+                    return Ok(request);
+                }
                 let mut payload = vec![("nonce".to_string(), nonce.to_string())];
                 payload.extend(params);
                 let encoded_payload = encode_params(&payload);

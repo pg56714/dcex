@@ -221,7 +221,10 @@ impl KucoinClient {
         } else {
             format!("{path}?{signing_query}")
         };
-        let body = if matches!(method, HttpMethod::Post | HttpMethod::Put) {
+        let body = if matches!(
+            method,
+            HttpMethod::Post | HttpMethod::Put | HttpMethod::Delete
+        ) {
             body.unwrap_or_default()
         } else {
             Vec::new()
@@ -232,7 +235,7 @@ impl KucoinClient {
         };
         let mut request = HttpRequest::new(method, base_url, &request_path)
             .header("Content-Type", "application/json");
-        if matches!(method, HttpMethod::Post | HttpMethod::Put) && !body.is_empty() {
+        if !body.is_empty() {
             request.body = RequestBody::Raw(body.clone());
         }
 

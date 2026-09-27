@@ -33,6 +33,15 @@ pub struct BingxPrivateWebSocket {
 }
 
 impl BingxPrivateWebSocket {
+    pub fn new_coin_swap(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
+        Self::with_swap_urls(
+            api_key,
+            api_secret,
+            timeout,
+            BASE_URL.to_string(),
+            "wss://open-api-cswap-ws.bingx.com/market".to_string(),
+        )
+    }
     pub fn new(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
         Self::with_spot_urls(
             api_key,
@@ -350,7 +359,7 @@ fn validate_listen_key(listen_key: &str) -> Result<String> {
 }
 
 fn market_for_url(url: &str) -> BingxPrivateMarket {
-    if url.contains("swap-market") {
+    if url.contains("swap-market") || url.contains("open-api-cswap-ws.bingx.com") {
         BingxPrivateMarket::Swap
     } else {
         BingxPrivateMarket::Spot

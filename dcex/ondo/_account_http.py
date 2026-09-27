@@ -259,3 +259,7 @@ class AccountHTTP(HTTPManager):
 
     def get_portfolio_summary_graph(self, range_: str | None = None) -> Any:
         return self._native_private("get_portfolio_summary_graph", range_=range_)
+
+    def invalidate_jwt(self) -> Any:
+        """Invalidate all JWT sessions for this account using API key authentication."""
+        return self._native_private("invalidate_jwt")

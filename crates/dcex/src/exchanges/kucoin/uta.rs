@@ -66,6 +66,195 @@ impl KucoinClient {
         params: &KucoinParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "batch_cancel_uta_orders" => {
+                params.ensure_allowed(&["tradeType", "cancelOrderList"])?;
+                validate_trade_type(params)?;
+                let mut orders = params.json_required("cancelOrderList")?;
+                let items = orders
+                    .as_array_mut()
+                    .filter(|items| !items.is_empty() && items.len() <= 20)
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput(
+                            "KuCoin UTA batch cancel requires 1 to 20 orders".into(),
+                        )
+                    })?;
+                for item in items {
+                    let object = item.as_object_mut().ok_or_else(|| {
+                        DcexError::InvalidInput("KuCoin cancel order must be an object".into())
+                    })?;
+                    if object
+                        .keys()
+                        .any(|key| !["symbol", "orderId", "clientOid"].contains(&key.as_str()))
+                    {
+                        return Err(DcexError::InvalidInput(
+                            "unsupported KuCoin batch cancel order field".into(),
+                        ));
+                    }
+                    if !["orderId", "clientOid"].iter().any(|key| {
+                        object
+                            .get(*key)
+                            .and_then(Value::as_str)
+                            .is_some_and(|v| !v.trim().is_empty())
+                    }) {
+                        return Err(DcexError::InvalidInput(
+                            "KuCoin batch cancel requires orderId or clientOid".into(),
+                        ));
+                    }
+                    for key in ["orderId", "clientOid"] {
+                        if object.get(key).is_some_and(|v| !v.is_string()) {
+                            return Err(DcexError::InvalidInput(format!(
+                                "KuCoin {key} must be a string"
+                            )));
+                        }
+                    }
+                    let symbol = object
+                        .get("symbol")
+                        .and_then(Value::as_str)
+                        .filter(|s| !s.trim().is_empty())
+                        .ok_or_else(|| {
+                            DcexError::InvalidInput("KuCoin batch cancel requires symbol".into())
+                        })?;
+                    let symbol = self.exchange_symbol(symbol, uta_is_futures(params))?;
+                    object.insert("symbol".into(), Value::String(symbol));
+                }
+                let mut body = params.body(&["tradeType"], &[], &[])?;
+                body.insert("cancelOrderList".into(), orders);
+                self.private_post(KucoinMarket::Spot, UTA_V2_CANCEL_BATCH, Value::Object(body))
+                    .await
+            }
+            "cancel_uta_orders_by_symbol" => {
+                params.ensure_allowed(&[
+                    "tradeType",
+                    "symbol",
+                    "product_symbol",
+                    "marginMode",
+                    "orderFilter",
+                ])?;
+                validate_trade_type(params)?;
+                params.required("orderFilter")?;
+                validate_enum(params, "orderFilter", &["NORMAL", "ADVANCED"])?;
+                validate_enum(params, "marginMode", &["CROSS", "ISOLATED"])?;
+                let mut body =
+                    params.body(&["tradeType", "marginMode", "orderFilter"], &[], &[])?;
+                self.uta_insert_symbol(&mut body, params)?;
+                self.private_post(KucoinMarket::Spot, UTA_V2_CANCEL_ALL, Value::Object(body))
+                    .await
+            }
+            "get_uta_margin_mode" => {
+                params.ensure_allowed(&["symbol", "product_symbol"])?;
+                let mut query = Vec::new();
+                self.push_optional_symbol(&mut query, params, true)?;
+                self.private_get(KucoinMarket::Spot, UTA_V2_MARGIN_MODE, query)
+                    .await
+            }
+            "set_uta_margin_mode" => {
+                params.ensure_allowed(&["symbol", "product_symbol", "marginMode"])?;
+                params.required("marginMode")?;
+                validate_enum(params, "marginMode", &["CROSS", "ISOLATED"])?;
+                let mut body = params.body(&["marginMode"], &[], &[])?;
+                self.uta_insert_symbol_with_mode(&mut body, params, true)?;
+                self.private_post(KucoinMarket::Spot, UTA_V2_MARGIN_MODE, Value::Object(body))
+                    .await
+            }
+            "modify_uta_position_margin" => {
+                params.ensure_allowed(&[
+                    "symbol",
+                    "product_symbol",
+                    "type",
+                    "amount",
+                    "tradeType",
+                ])?;
+                params.required("type")?;
+                validate_enum(params, "type", &["DEPOSIT", "WITHDRAW"])?;
+                validate_enum(params, "tradeType", &["FUTURES"])?;
+                params.required("amount")?;
+                validate_positive_number(params, "amount")?;
+                let amount = params.json_required("amount")?;
+                if !amount.is_number() {
+                    return Err(DcexError::InvalidInput(
+                        "KuCoin margin amount must be a JSON number".into(),
+                    ));
+                }
+                let mut body = params.body(&["type"], &[], &[])?;
+                self.uta_insert_symbol_with_mode(&mut body, params, true)?;
+                body.insert("tradeType".into(), Value::String("FUTURES".into()));
+                body.insert("amount".into(), amount);
+                self.private_post(
+                    KucoinMarket::Spot,
+                    UTA_V2_MODIFY_MARGIN,
+                    Value::Object(body),
+                )
+                .await
+            }
+            "get_uta_max_order_quantity" => {
+                params.ensure_allowed(&["tradeType", "symbol", "product_symbol", "price"])?;
+                validate_trade_type(params)?;
+                validate_positive_number(params, "price")?;
+                let mut query = params.only(&["tradeType", "price"]);
+                self.push_required_symbol(&mut query, params, uta_is_futures(params))?;
+                self.private_get(KucoinMarket::Spot, UTA_V2_MAX_ORDER_QUANTITY, query)
+                    .await
+            }
+            "get_uta_leverage" => {
+                params.ensure_allowed(&[
+                    "tradeType",
+                    "symbol",
+                    "product_symbol",
+                    "currency",
+                    "marginMode",
+                ])?;
+                params.required("tradeType")?;
+                validate_enum(params, "tradeType", &["FUTURES", "MARGIN"])?;
+                validate_enum(params, "marginMode", &["CROSS", "ISOLATED"])?;
+                let mut query = params.only(&["tradeType", "currency", "marginMode"]);
+                self.push_optional_symbol(&mut query, params, true)?;
+                self.private_get(KucoinMarket::Spot, UTA_V2_LEVERAGE, query)
+                    .await
+            }
+            "modify_uta_futures_leverage" => {
+                params.ensure_allowed(&["symbol", "product_symbol", "leverage"])?;
+                params.required("leverage")?;
+                validate_positive_number(params, "leverage")?;
+                let mut body = params.body(&["leverage"], &[], &[])?;
+                self.uta_insert_symbol_with_mode(&mut body, params, true)?;
+                self.private_post(
+                    KucoinMarket::Spot,
+                    UTA_V2_MODIFY_LEVERAGE,
+                    Value::Object(body),
+                )
+                .await
+            }
+            "modify_uta_cross_margin_leverage" => {
+                params.ensure_allowed(&["currency", "leverage"])?;
+                params.required("leverage")?;
+                validate_positive_number(params, "leverage")?;
+                let body = params.body(&["currency", "leverage"], &[], &[])?;
+                self.private_post(
+                    KucoinMarket::Spot,
+                    UTA_V2_MODIFY_MARGIN_LEVERAGE,
+                    Value::Object(body),
+                )
+                .await
+            }
+            "get_uta_position_history" | "get_uta_funding_history" => {
+                params.ensure_allowed(&[
+                    "symbol",
+                    "product_symbol",
+                    "startAt",
+                    "endAt",
+                    "lastId",
+                    "pageSize",
+                ])?;
+                params.body(&[], &["startAt", "endAt", "lastId", "pageSize"], &[])?;
+                let mut query = params.only(&["startAt", "endAt", "lastId", "pageSize"]);
+                self.push_optional_symbol(&mut query, params, true)?;
+                let path = if method_name == "get_uta_position_history" {
+                    UTA_V2_POSITION_HISTORY
+                } else {
+                    UTA_V2_FUNDING_HISTORY
+                };
+                self.private_get(KucoinMarket::Spot, path, query).await
+            }
             "place_uta_order" => {
                 let mut allowed = UTA_ORDER_FIELDS.to_vec();
                 allowed.extend_from_slice(UTA_ORDER_INTEGER_FIELDS);

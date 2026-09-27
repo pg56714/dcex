@@ -411,6 +411,41 @@ impl PythonLighterPrivateWebSocketClient {
         })
     }
 
+    fn send_tx<'py>(
+        &self,
+        py: Python<'py>,
+        id: String,
+        tx_type: u64,
+        tx_info: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .send_tx(&id, tx_type, &tx_info)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn send_tx_batch<'py>(
+        &self,
+        py: Python<'py>,
+        id: String,
+        tx_types: Vec<u64>,
+        tx_infos: Vec<String>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .send_tx_batch(&id, tx_types, tx_infos)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {

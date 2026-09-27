@@ -12,6 +12,27 @@ impl KrakenClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if let Some(result) = self
+            .risk_request(method_name, &KrakenParams::from_pairs(params.clone()), true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if method_name == "get_futures_funding_history" {
+            let params = KrakenParams::from_pairs(params);
+            params.ensure_allowed(&["product_symbol"])?;
+            let symbol = self.exchange_symbol(params.required("product_symbol")?, "PF_")?;
+            return self
+                .request(
+                    HttpMethod::Get,
+                    KrakenAuth::Futures,
+                    "/derivatives/api/v3/historical-funding-rates",
+                    vec![("symbol".into(), symbol)],
+                    None,
+                    false,
+                )
+                .await;
+        }
         let mut params = KrakenParams::from_pairs(params).into_inner();
         if matches!(
             method_name,

@@ -1,5 +1,6 @@
 """Lighter async signed trading HTTP client backed by Rust."""
 
+from json import dumps
 from typing import Any
 
 from ._http_manager import HTTPManager
@@ -245,3 +246,257 @@ class TradeHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any]:
         """Update Lighter isolated margin."""
         return await self._native_private("update_margin", self._native_params(**locals()))
+
+    async def sign_create_grouped_orders(
+        self,
+        grouping_type: int,
+        orders: list[dict[str, Any]],
+        *,
+        integrator_account_index: int = 0,
+        integrator_taker_fee: int = 0,
+        integrator_maker_fee: int = 0,
+        self_trade_behavior_mode: int = 0,
+        self_trade_equality_mode: int = 0,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """
+        Sign OTO (1), OCO (2), or OTOCO (3) as one type-28 transaction.
+
+        Orders use the snake_case fields of create_order. Child orders are
+        reduce-only TP/SL orders; OTO/OTOCO children use base_amount=0.
+        """
+        params = self._native_params(
+            **{key: value for key, value in locals().items() if key != "orders"}
+        )
+        params.append(("orders", dumps(orders, separators=(",", ":"))))
+        return await self._native_sign("sign_create_grouped_orders", params)
+
+    async def create_grouped_orders(
+        self,
+        grouping_type: int,
+        orders: list[dict[str, Any]],
+        *,
+        integrator_account_index: int = 0,
+        integrator_taker_fee: int = 0,
+        integrator_maker_fee: int = 0,
+        self_trade_behavior_mode: int = 0,
+        self_trade_equality_mode: int = 0,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Submit OTO (1), OCO (2), or OTOCO (3) as one type-28 transaction.
+
+        Orders use the snake_case fields of create_order. Child orders are
+        reduce-only TP/SL orders; OTO/OTOCO children use base_amount=0.
+        """
+        params = self._native_params(
+            **{key: value for key, value in locals().items() if key != "orders"}
+        )
+        params.append(("orders", dumps(orders, separators=(",", ":"))))
+        return await self._native_private("create_grouped_orders", params)
+
+    async def update_account_config(
+        self,
+        account_trading_mode: int,
+        *,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+
+        Submit account trading mode (0 or 1) as transaction 41.
+
+        Source:
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/update_account_config.go
+
+        """
+        return await self._native_private("update_account_config", self._native_params(**locals()))
+
+    async def sign_update_account_config(
+        self,
+        account_trading_mode: int,
+        *,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """
+
+        Sign account trading mode (0 or 1) as transaction 41.
+
+        Source:
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/update_account_config.go
+
+        """
+        return await self._native_sign(
+            "sign_update_account_config", self._native_params(**locals())
+        )
+
+    async def update_account_asset_config(
+        self,
+        asset_index: int,
+        asset_margin_mode: int,
+        *,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+
+        Submit account asset margin mode (0 disabled, 1 enabled) as transaction 42.
+
+        Source:
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/update_account_asset_config.go
+
+        """
+        return await self._native_private(
+            "update_account_asset_config", self._native_params(**locals())
+        )
+
+    async def sign_update_account_asset_config(
+        self,
+        asset_index: int,
+        asset_margin_mode: int,
+        *,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """
+
+        Sign account asset margin mode (0 disabled, 1 enabled) as transaction 42.
+
+        Source:
+        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/update_account_asset_config.go
+
+        """
+        return await self._native_sign(
+            "sign_update_account_asset_config", self._native_params(**locals())
+        )
+
+    async def change_account_tier(
+        self, *, account_index: int, new_tier: str, authorization: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/changeAccountTier.
+
+        Source: https://github.com/elliottech/lighter-python/blob/main/lighter/api/account_api.py
+        """
+        return await self._native_private(
+            "change_account_tier",
+            self._native_params(
+                account_index=account_index, new_tier=new_tier, authorization=authorization
+            ),
+        )
+
+    async def create_read_only_token(
+        self,
+        *,
+        name: str,
+        account_index: int,
+        expiry: int,
+        sub_account_access: bool,
+        authorization: str | None = None,
+        scopes: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/tokens/create.
+
+        Source: https://github.com/elliottech/lighter-python/blob/main/lighter/api/account_api.py
+        """
+        return await self._native_private(
+            "create_read_only_token",
+            self._native_params(
+                name=name,
+                account_index=account_index,
+                expiry=expiry,
+                sub_account_access=sub_account_access,
+                authorization=authorization,
+                scopes=scopes,
+            ),
+        )
+
+    async def revoke_read_only_token(
+        self, *, token_id: int, account_index: int, authorization: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v1/tokens/revoke.
+
+        Source: https://github.com/elliottech/lighter-python/blob/main/lighter/api/account_api.py
+        """
+        return await self._native_private(
+            "revoke_read_only_token",
+            self._native_params(
+                token_id=token_id, account_index=account_index, authorization=authorization
+            ),
+        )
+
+    async def acknowledge_notification(
+        self, *, notif_id: str, account_index: int, authorization: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+
+        POST /api/v1/notification/ack.
+
+        Source:
+        https://github.com/elliottech/lighter-python/blob/main/lighter/api/notification_api.py
+
+        """
+        return await self._native_private(
+            "acknowledge_notification",
+            self._native_params(
+                notif_id=notif_id, account_index=account_index, authorization=authorization
+            ),
+        )
+
+    async def create_sub_account(
+        self, *, skip_nonce: int = 0, nonce: int | None = None, api_key_index: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """Sign/submit creation of a subaccount by its master account."""
+        return await self._native_private("create_sub_account", self._native_params(**locals()))
+
+    async def sign_create_sub_account(
+        self, *, skip_nonce: int = 0, nonce: int | None = None, api_key_index: int | None = None
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign/submit creation of a subaccount by its master account."""
+        return await self._native_sign("sign_create_sub_account", self._native_params(**locals()))
+
+    async def change_api_key_signed(
+        self,
+        new_pubkey: str,
+        l1_signature: str,
+        nonce: int,
+        *,
+        skip_nonce: int = 0,
+        api_key_index: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Sign/submit key rotation with an explicit nonce and caller-signed L1 authorization.
+        Recreate the client with the new key after confirmation.
+        """
+        return await self._native_private("change_api_key_signed", self._native_params(**locals()))
+
+    async def sign_change_api_key_signed(
+        self,
+        new_pubkey: str,
+        l1_signature: str,
+        nonce: int,
+        *,
+        skip_nonce: int = 0,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """
+        Sign/submit key rotation with an explicit nonce and caller-signed L1 authorization.
+        Recreate the client with the new key after confirmation.
+        """
+        return await self._native_sign(
+            "sign_change_api_key_signed", self._native_params(**locals())
+        )

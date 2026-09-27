@@ -19,6 +19,70 @@ pub struct KrakenPrivateWebSocket {
 }
 
 impl KrakenPrivateWebSocket {
+    /// Create a token-authenticated connection to the dedicated L3 feed.
+    pub fn new_level3(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
+        Self::with_urls(
+            api_key,
+            api_secret,
+            timeout,
+            SPOT_HTTP_BASE_URL,
+            "wss://ws-l3.kraken.com/v2",
+        )
+    }
+
+    /// Subscribe on an L3 connection. Read per-symbol acknowledgements with recv.
+    pub async fn subscribe_level3(
+        &mut self,
+        product_symbols: Vec<String>,
+        depth: u32,
+        snapshot: bool,
+    ) -> Result<u64> {
+        self.level3_subscription("subscribe", product_symbols, depth, Some(snapshot))
+            .await
+    }
+    pub async fn unsubscribe_level3(
+        &mut self,
+        product_symbols: Vec<String>,
+        depth: u32,
+    ) -> Result<u64> {
+        self.level3_subscription("unsubscribe", product_symbols, depth, None)
+            .await
+    }
+    async fn level3_subscription(
+        &mut self,
+        method: &str,
+        product_symbols: Vec<String>,
+        depth: u32,
+        snapshot: Option<bool>,
+    ) -> Result<u64> {
+        if ![10, 100, 1000].contains(&depth) || !(1..=200).contains(&product_symbols.len()) {
+            return Err(DcexError::InvalidInput(
+                "Kraken L3 requires 1..=200 symbols and depth 10, 100 or 1000".into(),
+            ));
+        }
+        let symbols: Vec<String> = product_symbols
+            .iter()
+            .map(|s| super::public::normalize_symbol(s))
+            .collect::<Result<_>>()?;
+        let unique: std::collections::BTreeSet<_> = symbols.iter().collect();
+        if unique.len() != symbols.len()
+            || symbols
+                .iter()
+                .any(|s| s.split('/').count() != 2 || s.starts_with('/') || s.ends_with('/'))
+        {
+            return Err(DcexError::InvalidInput(
+                "Kraken L3 requires distinct BASE/QUOTE pairs".into(),
+            ));
+        }
+        let mut extra = serde_json::Map::new();
+        extra.insert("symbol".into(), json!(symbols));
+        extra.insert("depth".into(), depth.into());
+        if let Some(snapshot) = snapshot {
+            extra.insert("snapshot".into(), snapshot.into());
+        }
+        self.send_private_subscription(method, "level3", Some(extra))
+            .await
+    }
     pub fn new(api_key: String, api_secret: String, timeout: Duration) -> Result<Self> {
         Self::with_urls(
             api_key,
@@ -144,6 +208,45 @@ impl KrakenPrivateWebSocket {
             .await
     }
 
+    /// Send a Spot v2 trading request and return its req_id. Read the outcome with recv.
+    pub async fn trade_request(&mut self, method: &str, mut params: Value) -> Result<u64> {
+        super::trading::validate(method, &params)?;
+        let token = self
+            .token
+            .as_ref()
+            .ok_or_else(|| {
+                DcexError::InvalidInput("Kraken WebSocket token is missing; connect first".into())
+            })?
+            .clone();
+        params["token"] = token.into();
+        let request_id = self.next_request_id();
+        self.connection
+            .send_json(&json!({"method":method,"params":params,"req_id":request_id}))
+            .await?;
+        Ok(request_id)
+    }
+    pub async fn add_order(&mut self, params: Value) -> Result<u64> {
+        self.trade_request("add_order", params).await
+    }
+    pub async fn amend_order(&mut self, params: Value) -> Result<u64> {
+        self.trade_request("amend_order", params).await
+    }
+    pub async fn cancel_order(&mut self, params: Value) -> Result<u64> {
+        self.trade_request("cancel_order", params).await
+    }
+    pub async fn batch_add(&mut self, params: Value) -> Result<u64> {
+        self.trade_request("batch_add", params).await
+    }
+    pub async fn batch_cancel(&mut self, params: Value) -> Result<u64> {
+        self.trade_request("batch_cancel", params).await
+    }
+    pub async fn cancel_all(&mut self) -> Result<u64> {
+        self.trade_request("cancel_all", json!({})).await
+    }
+    pub async fn cancel_after(&mut self, timeout: u64) -> Result<u64> {
+        self.trade_request("cancel_after", json!({"timeout":timeout}))
+            .await
+    }
     pub async fn recv(&mut self) -> Result<Value> {
         self.connection.recv_json().await
     }
@@ -211,7 +314,7 @@ fn normalize_method(method: &str) -> Result<&'static str> {
 
 fn normalize_channel(channel: &str) -> Result<String> {
     match channel.trim() {
-        channel @ ("balances" | "executions") => Ok(channel.to_string()),
+        channel @ ("balances" | "executions" | "level3") => Ok(channel.to_string()),
         channel => Err(DcexError::InvalidInput(format!(
             "unsupported Kraken private WebSocket channel: {channel}"
         ))),

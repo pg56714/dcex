@@ -30,6 +30,12 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_historical_trades(product_symbol => "product_symbol")
     ];
     private [
+        create_strategy(product_symbol => "product_symbol", side => "side", strategy_type => "strategyType"),
+        get_open_strategy(product_symbol => "product_symbol"),
+        cancel_strategy(product_symbol => "product_symbol"),
+        get_open_strategies(),
+        cancel_open_strategies(),
+        get_strategy_history(),
         get_account(),
         update_account(),
         get_max_borrow_quantity(symbol => "symbol"),

@@ -1,0 +1,337 @@
+//! Market data, account risk and margin order-list queries.
+use super::client::{BinanceClient, BinanceMarket};
+use super::params::PublicParams;
+use super::risk_endpoints::ENDPOINTS;
+use crate::exchange::ValidatedResponse;
+use crate::http::HttpMethod;
+use crate::{DcexError, Result};
+
+pub(super) struct Field {
+    pub key: &'static str,
+    pub kind: char,
+    pub required: bool,
+    pub choices: &'static [&'static str],
+}
+pub(super) struct Endpoint {
+    pub name: &'static str,
+    pub market: BinanceMarket,
+    pub symbol_market: BinanceMarket,
+    pub method: HttpMethod,
+    pub path: &'static str,
+    pub public: bool,
+    pub api_key: bool,
+    pub allowed: &'static [&'static str],
+    pub fields: &'static [Field],
+}
+fn invalid(message: impl std::fmt::Display) -> DcexError {
+    DcexError::InvalidInput(format!("Binance: {message}"))
+}
+
+impl BinanceClient {
+    pub(super) async fn risk_request(
+        &self,
+        name: &str,
+        params: &PublicParams,
+        public: bool,
+    ) -> Result<Option<ValidatedResponse>> {
+        let Some(endpoint) = ENDPOINTS
+            .iter()
+            .find(|e| e.name == name && e.public == public)
+        else {
+            return Ok(None);
+        };
+        params.ensure_allowed(endpoint.allowed)?;
+        let keys: std::collections::BTreeSet<_> = params.0.iter().map(|(k, _)| k).collect();
+        if keys.len() != params.0.len() {
+            return Err(invalid("duplicate parameter"));
+        }
+        if params.get("product_symbol").is_some() && params.get("symbol").is_some() {
+            return Err(invalid("use product_symbol or symbol, exclusively"));
+        }
+        let mut query = Vec::new();
+        for field in endpoint.fields {
+            let canonical = if field.key == "symbol" {
+                params.get("product_symbol")
+            } else {
+                None
+            };
+            let Some(value) = canonical.or_else(|| params.get(field.key)) else {
+                if field.required {
+                    return Err(invalid(format!("{} is required", field.key)));
+                }
+                continue;
+            };
+            if value.trim().is_empty() {
+                return Err(invalid(format!("{} cannot be empty", field.key)));
+            }
+            if !field.choices.is_empty() && !field.choices.contains(&value) {
+                return Err(invalid(format!("invalid {}", field.key)));
+            }
+            match field.kind {
+                'i' => {
+                    value.parse::<u64>().map_err(|_| {
+                        invalid(format!("{} must be a nonnegative integer", field.key))
+                    })?;
+                }
+                'd' => {
+                    if !value.parse::<f64>().is_ok_and(|n| n.is_finite() && n > 0.0) {
+                        return Err(invalid(format!("{} must be positive", field.key)));
+                    }
+                }
+                'b' => {
+                    value
+                        .parse::<bool>()
+                        .map_err(|_| invalid(format!("{} must be true or false", field.key)))?;
+                }
+                'a' => {
+                    let values: Vec<String> = serde_json::from_str(value)
+                        .map_err(|_| invalid("symbols must be a JSON string array"))?;
+                    if values.is_empty() || values.iter().any(|s| s.trim().is_empty()) {
+                        return Err(invalid("symbols must not be empty"));
+                    }
+                }
+                _ => {}
+            }
+            let value = if let Some(canonical) = canonical {
+                if self.market_for_product_symbol(canonical)? != endpoint.symbol_market {
+                    return Err(invalid("product_symbol has the wrong market type"));
+                }
+                self.exchange_symbol(canonical)?
+            } else {
+                value.to_string()
+            };
+            if field.key == "symbol"
+                && endpoint.symbol_market == BinanceMarket::CoinFutures
+                && !value
+                    .bytes()
+                    .all(|b| b.is_ascii_uppercase() || b.is_ascii_digit() || b == b'_')
+            {
+                return Err(invalid(
+                    "COIN-M requires a native symbol such as BTCUSD_PERP",
+                ));
+            }
+            query.push((field.key.to_string(), value));
+        }
+        validate(endpoint, params)?;
+        let response = if endpoint.api_key {
+            self.api_key_request(endpoint.method, endpoint.market, endpoint.path, query)
+                .await?
+        } else {
+            self.request(
+                endpoint.method,
+                endpoint.market,
+                endpoint.path,
+                query,
+                !public,
+            )
+            .await?
+        };
+        Ok(Some(response))
+    }
+}
+
+fn validate(endpoint: &Endpoint, p: &PublicParams) -> Result<()> {
+    super::order_lists::validate(endpoint.path, p)?;
+    p.ensure_time_order("startTime", "endTime")?;
+    for key in ["limit", "size", "current", "page"] {
+        if p.u64(key)? == Some(0) {
+            return Err(invalid(format!("{key} must be positive")));
+        }
+    }
+    if let Some(value) = p.get("recvWindow") {
+        if !value
+            .parse::<f64>()
+            .is_ok_and(|n| n.is_finite() && n > 0.0 && n <= 60_000.0)
+            || value
+                .split_once('.')
+                .is_some_and(|(_, fraction)| fraction.len() > 3)
+        {
+            return Err(invalid(
+                "recvWindow must be at most 60000 milliseconds with up to three decimals",
+            ));
+        }
+    }
+    let path = endpoint.path;
+    if path.starts_with("/sapi/v1/algo/") {
+        if endpoint.method == HttpMethod::Delete
+            && p.get("algoId").is_none()
+            && p.get("clientAlgoId").is_none()
+        {
+            return Err(invalid("algoId or clientAlgoId is required"));
+        }
+        if let Some(duration) = p.u64("duration")? {
+            if path.contains("/futures/") && !(300..=86_400).contains(&duration) {
+                return Err(invalid("futures TWAP duration must be 300..86400 seconds"));
+            }
+        }
+        if p.get("positionSide")
+            .is_some_and(|s| matches!(s, "LONG" | "SHORT"))
+            && p.get("reduceOnly").is_some()
+        {
+            return Err(invalid("reduceOnly cannot be supplied in hedge mode"));
+        }
+        if p.u64("pageSize")? == Some(0) {
+            return Err(invalid("pageSize must be positive"));
+        }
+    }
+    if path.ends_with("/openOrder")
+        && p.get("orderId").is_none()
+        && p.get("origClientOrderId").is_none()
+    {
+        return Err(invalid("orderId or origClientOrderId is required"));
+    }
+    if path.ends_with("/convert/getQuote") {
+        if p.get("fromAmount").is_some() == p.get("toAmount").is_some() {
+            return Err(invalid(
+                "exactly one of fromAmount and toAmount is required",
+            ));
+        }
+        p.optional_one_of("validTime", &["10s"])?;
+        if p.get("fromAsset") == p.get("toAsset") {
+            return Err(invalid("conversion assets must differ"));
+        }
+    }
+    if path.ends_with("/convert/orderStatus")
+        && p.get("orderId").is_none()
+        && p.get("quoteId").is_none()
+    {
+        return Err(invalid("orderId or quoteId is required"));
+    }
+    if path.ends_with("/manual-liquidation") && p.get("type") == Some("ISOLATED") {
+        p.required("symbol")?;
+    }
+    if path.ends_with("/max-leverage") {
+        p.optional_one_of("maxLeverage", &["3", "5", "10", "20"])?;
+    }
+    if path == "/sapi/v1/margin/myPreventedMatches" {
+        if p.get("orderId").is_some() == p.get("preventedMatchId").is_some() {
+            return Err(invalid(
+                "exactly one of orderId and preventedMatchId is required",
+            ));
+        }
+        if p.get("fromPreventedMatchId").is_some() && p.get("orderId").is_none() {
+            return Err(invalid("fromPreventedMatchId requires orderId"));
+        }
+    }
+    if path.ends_with("/feeBurn") {
+        p.optional_one_of("feeBurn", &["true", "false"])?;
+    }
+    if path == "/sapi/v1/bnbBurn" && endpoint.method == HttpMethod::Post {
+        if p.get("spotBNBBurn").is_none() && p.get("interestBNBBurn").is_none() {
+            return Err(invalid("spotBNBBurn or interestBNBBurn is required"));
+        }
+        p.optional_one_of("spotBNBBurn", &["true", "false"])?;
+        p.optional_one_of("interestBNBBurn", &["true", "false"])?;
+    }
+    if path == "/sapi/v1/capital/deposit/credit-apply"
+        && p.get("depositId").is_none()
+        && p.get("txId").is_none()
+    {
+        return Err(invalid("depositId or txId is required"));
+    }
+    if path.starts_with("/sapi/v1/asset/dust") {
+        p.optional_one_of("accountType", &["SPOT", "MARGIN"])?;
+    }
+    if path.starts_with("/api/v3/sor/order") {
+        if p.get("type") == Some("LIMIT") {
+            p.required("price")?;
+            p.required("timeInForce")?;
+        }
+        if p.get("icebergQty").is_some() && p.get("timeInForce") != Some("GTC") {
+            return Err(invalid("icebergQty requires GTC"));
+        }
+        if p.u64("strategyType")?.is_some_and(|n| n < 1_000_000) {
+            return Err(invalid("strategyType must be at least 1000000"));
+        }
+    }
+    let symbol = p.get("product_symbol").or_else(|| p.get("symbol"));
+    if symbol.is_some() && (p.get("symbols").is_some() || p.get("pair").is_some()) {
+        return Err(invalid("symbol cannot be combined with symbols or pair"));
+    }
+    if path.ends_with("/multiAssetsMargin") {
+        p.optional_one_of("multiAssetsMargin", &["true", "false"])?;
+    }
+    if path.ends_with("/positionMargin") {
+        p.optional_one_of("type", &["1", "2"])?;
+        p.optional_one_of("positionSide", &["BOTH", "LONG", "SHORT"])?;
+    }
+    if path.ends_with("/aggTrades") && endpoint.market != BinanceMarket::Spot {
+        if p.get("fromId").is_some() && (p.get("startTime").is_some() || p.get("endTime").is_some())
+        {
+            return Err(invalid(
+                "aggregate trades require fromId or time filters, exclusively",
+            ));
+        }
+        if let (Some(start), Some(end)) = (p.u64("startTime")?, p.u64("endTime")?) {
+            if end - start >= 3_600_000 {
+                return Err(invalid(
+                    "aggregate trade time range must be less than one hour",
+                ));
+            }
+        }
+    }
+    let max_days = match path {
+        "/papi/v1/cm/income"
+        | "/dapi/v1/continuousKlines"
+        | "/dapi/v1/indexPriceKlines"
+        | "/dapi/v1/markPriceKlines" => Some(200),
+        "/papi/v1/margin/marginInterestHistory"
+        | "/papi/v1/margin/marginLoan"
+        | "/papi/v1/margin/repayLoan" => Some(30),
+        "/sapi/v1/margin/capital-flow" => Some(7),
+        _ => None,
+    };
+    if let (Some(days), Some(start), Some(end)) = (max_days, p.u64("startTime")?, p.u64("endTime")?)
+    {
+        if end - start > days * 86_400_000 {
+            return Err(invalid(
+                "time range exceeds this endpoint's documented limit",
+            ));
+        }
+    }
+    if path == "/sapi/v1/capital/deposit/hisrec" {
+        if let (Some(start), Some(end)) = (p.u64("startTime")?, p.u64("endTime")?) {
+            if end - start >= 90 * 86_400_000 {
+                return Err(invalid("deposit history range must be less than 90 days"));
+            }
+        }
+    }
+    if path == "/sapi/v1/capital/deposit/address" && p.get("network") == Some("LIGHTNING") {
+        p.required("amount")?;
+    }
+    if matches!(
+        path,
+        "/papi/v1/margin/marginLoan" | "/papi/v1/margin/repayLoan"
+    ) && p.get("txId").is_none()
+        && p.get("startTime").is_none()
+    {
+        return Err(invalid("txId or startTime is required"));
+    }
+    if matches!(
+        path,
+        "/sapi/v1/margin/orderList"
+            | "/sapi/v1/margin/allOrderList"
+            | "/sapi/v1/margin/openOrderList"
+    ) && p.get("isIsolated") == Some("TRUE")
+        && symbol.is_none()
+    {
+        return Err(invalid("isolated order-list requests require symbol"));
+    }
+    if path == "/sapi/v1/margin/orderList" {
+        let client_key = if endpoint.method == HttpMethod::Delete {
+            "listClientOrderId"
+        } else {
+            "origClientOrderId"
+        };
+        if p.get("orderListId").is_none() && p.get(client_key).is_none() {
+            return Err(invalid(format!("orderListId or {client_key} is required")));
+        }
+    }
+    if path == "/sapi/v1/margin/allOrderList"
+        && p.get("fromId").is_some()
+        && (p.get("startTime").is_some() || p.get("endTime").is_some())
+    {
+        return Err(invalid("fromId cannot be combined with time filters"));
+    }
+    Ok(())
+}

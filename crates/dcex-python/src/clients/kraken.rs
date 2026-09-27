@@ -7,6 +7,30 @@ struct PythonKrakenHttpClient {
 
 #[pymethods]
 impl PythonKrakenHttpClient {
+    fn retrieve_spot_export(&self, py: Python<'_>, id: String) -> PyResult<Py<PyBytes>> {
+        let client = self.client.clone();
+        let bytes = py
+            .allow_threads(move || {
+                dcex::http::block_on(async move { client.retrieve_spot_export(id).await })
+            })
+            .map_err(to_py_runtime_error)?;
+        Ok(PyBytes::new(py, &bytes).unbind())
+    }
+    fn retrieve_spot_export_async<'py>(
+        &self,
+        py: Python<'py>,
+        id: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let bytes = client
+                .retrieve_spot_export(id)
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+        })
+    }
+
     #[new]
     #[pyo3(signature = (
         spot_api_key=None,

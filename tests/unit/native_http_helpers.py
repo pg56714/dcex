@@ -13,6 +13,8 @@ from typing import Any
 def _http_server(
     response_payload: dict[str, Any] | None = None,
     response_status: int = 200,
+    response_bytes: bytes | None = None,
+    content_type: str = "application/json",
 ) -> Iterator[tuple[str, queue.Queue[dict[str, Any]]]]:
     received: queue.Queue[dict[str, Any]] = queue.Queue()
     response_payload = response_payload or {"ok": True}
@@ -21,6 +23,7 @@ def _http_server(
         def _handle(self) -> None:
             request = {
                 "path": self.path,
+                "method": self.command,
                 "header": self.headers.get("X-Test"),
                 "api_key": self.headers.get("X-MBX-APIKEY"),
             }
@@ -91,12 +94,17 @@ def _http_server(
             received.put(request)
             payload = (
                 {"serverTime": 1}
-                if self.path.split("?", 1)[0] in {"/api/v3/time", "/fapi/v1/time"}
+                if self.path.split("?", 1)[0]
+                in {"/api/v3/time", "/fapi/v1/time", "/dapi/v1/time", "/eapi/v1/time"}
                 else response_payload
             )
-            body = json.dumps(payload, separators=(",", ":")).encode()
+            body = (
+                response_bytes
+                if response_bytes is not None
+                else json.dumps(payload, separators=(",", ":")).encode()
+            )
             self.send_response(response_status)
-            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Type", content_type)
             self.send_header("X-Response", "native")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
@@ -118,7 +126,9 @@ def _http_server(
             return
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread = threading.Thread(
+        target=server.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True
+    )
     thread.start()
     try:
         host, port = server.server_address

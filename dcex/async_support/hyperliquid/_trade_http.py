@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Exchange responses retain their native, heterogeneous JSON schemas.
 """Trading-related HTTP API client for Hyperliquid exchange backed by Rust."""
 
 from typing import Any
@@ -366,6 +368,57 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 amount=amount,
                 toPerp=to_perp,
+                nonce=nonce,
+                signature=signature,
+                signatureChainId=signature_chain_id,
+            ),
+        )
+
+    async def noop(
+        self, nonce: int, *, vault_address: str | None = None, expires_after: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Attempt to invalidate a pending request by signing the same nonce; success is not
+        guaranteed.
+        """
+        return await self._native_private(
+            "noop",
+            self._native_params(
+                nonce=nonce, vaultAddress=vault_address, expiresAfter=expires_after
+            ),
+        )
+
+    async def reserve_request_weight(self, weight: int, *, expires_after: int | None = None) -> Any:
+        """Reserve actions for this account at 0.0005 USDC each, paid from its perps balance."""
+        return await self._native_private(
+            "reserve_request_weight", self._native_params(weight=weight, expiresAfter=expires_after)
+        )
+
+    async def set_agent_abstraction(self, abstraction: str) -> Any:
+        """Set account mode using agent signing: i=disabled, u=unified, p=portfolio margin."""
+        return await self._native_private(
+            "set_agent_abstraction", self._native_params(abstraction=abstraction)
+        )
+
+    async def set_user_abstraction(
+        self,
+        user: str,
+        abstraction: str,
+        nonce: int,
+        signature: dict[str, str | int],
+        signature_chain_id: str,
+    ) -> Any:
+        """
+        Submit a wallet-signed userSetAbstraction action for this user or its subaccount.
+
+        Modes: disabled, unifiedAccount, portfolioMargin. Sign the exact action,
+        chain and nonce with the wallet; an API-agent signature is insufficient.
+        """
+        return await self._native_private(
+            "set_user_abstraction",
+            self._native_params(
+                user=user,
+                abstraction=abstraction,
                 nonce=nonce,
                 signature=signature,
                 signatureChainId=signature_chain_id,

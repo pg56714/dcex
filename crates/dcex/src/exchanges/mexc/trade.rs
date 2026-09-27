@@ -80,6 +80,157 @@ impl MexcClient {
         params: &MexcParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "cancel_contract_batch_orders_by_external_id"
+            | "get_contract_batch_orders_by_external_id" => {
+                params.ensure_allowed(&["orders"])?;
+                let mut orders = params.json_required("orders")?;
+                let items = orders
+                    .as_array_mut()
+                    .filter(|v| !v.is_empty())
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput("orders requires a nonempty JSON array".into())
+                    })?;
+                let mut seen = std::collections::HashSet::new();
+                for item in items {
+                    let object = item
+                        .as_object_mut()
+                        .ok_or_else(|| DcexError::InvalidInput("order must be an object".into()))?;
+                    if object.keys().any(|key| {
+                        !["product_symbol", "symbol", "externalOid"].contains(&key.as_str())
+                    }) || object.contains_key("symbol") && object.contains_key("product_symbol")
+                    {
+                        return Err(DcexError::InvalidInput(
+                            "invalid external order fields".into(),
+                        ));
+                    }
+                    let raw = object
+                        .remove("product_symbol")
+                        .or_else(|| object.remove("symbol"))
+                        .ok_or_else(|| DcexError::InvalidInput("symbol is required".into()))?;
+                    let symbol =
+                        raw.as_str()
+                            .filter(|s| !s.trim().is_empty())
+                            .ok_or_else(|| {
+                                DcexError::InvalidInput("symbol must be a nonempty string".into())
+                            })?;
+                    let symbol = self.exchange_symbol(symbol, "_")?;
+                    let id = object
+                        .get("externalOid")
+                        .and_then(Value::as_str)
+                        .filter(|s| !s.trim().is_empty())
+                        .ok_or_else(|| {
+                            DcexError::InvalidInput("externalOid must be a nonempty string".into())
+                        })?;
+                    if !seen.insert((symbol.clone(), id.to_string())) {
+                        return Err(DcexError::InvalidInput(
+                            "duplicate external order identifier".into(),
+                        ));
+                    }
+                    object.insert("symbol".into(), symbol.into());
+                }
+                self.contract_post_json(
+                    if method_name.starts_with("cancel_") {
+                        "/api/v1/private/order/batch_cancel_with_external"
+                    } else {
+                        "/api/v1/private/order/batch_query_with_external"
+                    },
+                    orders,
+                )
+                .await
+            }
+            "get_contract_closed_orders" | "get_contract_fee_details" => {
+                let fees = method_name == "get_contract_fee_details";
+                params.ensure_allowed(if fees {
+                    &[
+                        "product_symbol",
+                        "symbol",
+                        "ids",
+                        "start_time",
+                        "end_time",
+                        "page_num",
+                        "page_size",
+                    ]
+                } else {
+                    &[
+                        "product_symbol",
+                        "symbol",
+                        "start_time",
+                        "end_time",
+                        "page_num",
+                        "page_size",
+                    ]
+                })?;
+                if params.get("product_symbol").is_some() && params.get("symbol").is_some() {
+                    return Err(DcexError::InvalidInput(
+                        "symbol and product_symbol are mutually exclusive".into(),
+                    ));
+                }
+                if params
+                    .get("product_symbol")
+                    .or_else(|| params.get("symbol"))
+                    .is_none_or(|s| s.trim().is_empty())
+                {
+                    return Err(DcexError::InvalidInput("symbol is required".into()));
+                }
+                validate_u64_range(params, "page_num", 1, u64::MAX)?;
+                validate_u64_range(params, "page_size", 1, if fees { 100 } else { 1000 })?;
+                for key in ["start_time", "end_time"] {
+                    validate_u64_range(params, key, 0, u64::MAX)?;
+                }
+                if let (Some(start), Some(end)) = (params.get("start_time"), params.get("end_time"))
+                {
+                    let start = start.parse::<u64>().unwrap();
+                    let end = end.parse::<u64>().unwrap();
+                    if end < start || fees && end - start > 90 * 86_400_000 {
+                        return Err(DcexError::InvalidInput("invalid time range".into()));
+                    }
+                }
+                if let Some(ids) = params.get("ids") {
+                    let ids: Vec<_> = ids.split(',').collect();
+                    if ids.len() > 20 || ids.iter().any(|v| !v.parse::<u64>().is_ok_and(|v| v > 0))
+                    {
+                        return Err(DcexError::InvalidInput(
+                            "ids requires 1 to 20 positive deal IDs".into(),
+                        ));
+                    }
+                }
+                let mut query =
+                    params.only(&["ids", "start_time", "end_time", "page_num", "page_size"]);
+                self.push_product_symbol(&mut query, params, "_")?;
+                self.contract_get(
+                    if fees {
+                        "/api/v1/private/order/fee_details"
+                    } else {
+                        "/api/v1/private/order/list/close_orders"
+                    },
+                    query,
+                )
+                .await
+            }
+            "get_contract_30_day_fee_statistics" => {
+                params.ensure_allowed(&[])?;
+                self.contract_get(
+                    "/api/v1/private/account/asset_book/order_deal_fee/total",
+                    Vec::new(),
+                )
+                .await
+            }
+            "cancel_spot_all_orders" => {
+                params.ensure_allowed(&["recvWindow"])?;
+                self.spot_private(
+                    HttpMethod::Delete,
+                    "/api/v3/order/all",
+                    params.only(&["recvWindow"]),
+                )
+                .await
+            }
+            "get_contract_open_stop_orders" => {
+                params.ensure_allowed(&["product_symbol", "symbol"])?;
+                let mut query = Vec::new();
+                self.push_product_symbol(&mut query, params, "_")?;
+                self.contract_get("/api/v1/private/stoporder/open_orders", query)
+                    .await
+            }
             "test_spot_order" => {
                 self.spot_order_from_params(SPOT_TEST_ORDER, params, None, None, None)
                     .await

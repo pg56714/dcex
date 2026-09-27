@@ -138,6 +138,128 @@ def priv(
 PRESIGNED = _presigned_order()
 
 CASES = [
+    priv(
+        "get_account_equity_history",
+        "/api/v1/portfolio/charts/equities?accountId=1000&accountId=1001&interval=WEEK",
+        account_id=[1000, 1001],
+        interval="WEEK",
+    ),
+    priv(
+        "get_account_pnl_history",
+        "/api/v1/portfolio/charts/pnl?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&instrumentType=SPOT",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        pnl_type="TOTAL_PNL",
+        instrument_type="SPOT",
+    ),
+    priv(
+        "get_account_pnl_percentage_history",
+        "/api/v1/portfolio/charts/pnl/percentage?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&priceMarket=BTC-USD&priceMarket=ETH-USD&instrumentType=SPOT",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        pnl_type="TOTAL_PNL",
+        price_market=["BTC-USD", "ETH-USD"],
+        instrument_type="SPOT",
+    ),
+    priv(
+        "get_cumulative_account_pnl_history",
+        "/api/v1/portfolio/charts/pnl/cumulative?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&instrumentType=SPOT",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        pnl_type="TOTAL_PNL",
+        instrument_type="SPOT",
+    ),
+    priv(
+        "get_cumulative_account_pnl_percentage_history",
+        "/api/v1/portfolio/charts/pnl/cumulative/percentage?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&priceMarket=BTC-USD&priceMarket=ETH-USD&instrumentType=SPOT",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        pnl_type="TOTAL_PNL",
+        price_market=["BTC-USD", "ETH-USD"],
+        instrument_type="SPOT",
+    ),
+    priv(
+        "get_account_vault_equity_history",
+        "/api/v1/portfolio/charts/vault-equities?accountId=1000&accountId=1001&interval=WEEK",
+        account_id=[1000, 1001],
+        interval="WEEK",
+    ),
+    priv(
+        "get_account_max_drawdown_history",
+        "/api/v1/portfolio/charts/max-drawdown?accountId=1000&accountId=1001&interval=WEEK",
+        account_id=[1000, 1001],
+        interval="WEEK",
+    ),
+    priv(
+        "get_account_funding_chart",
+        "/api/v1/portfolio/charts/funding?accountId=1000&accountId=1001&interval=WEEK&market=BTC-USD&market=ETH-USD",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        market=["BTC-USD", "ETH-USD"],
+    ),
+    priv(
+        "get_account_portfolio_summary",
+        "/api/v1/portfolio/accounts/summary?accountId=1000&accountId=1001&interval=WEEK&instrumentType=SPOT",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        instrument_type="SPOT",
+    ),
+    priv(
+        "get_account_performance",
+        "/api/v1/portfolio/accounts/performance?accountId=1000&accountId=1001&interval=WEEK&marketType=PERPS",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        market_type="PERPS",
+    ),
+    priv(
+        "get_account_funding_stats",
+        "/api/v1/portfolio/funding/stats?accountId=1000&accountId=1001&interval=WEEK&market=BTC-USD&market=ETH-USD",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        market=["BTC-USD", "ETH-USD"],
+    ),
+    priv(
+        "get_account_funding_history",
+        "/api/v1/portfolio/funding/history?accountId=1000&accountId=1001&interval=WEEK&market=BTC-USD&market=ETH-USD&cursor=1&limit=50",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        market=["BTC-USD", "ETH-USD"],
+        cursor=1,
+        limit=50,
+    ),
+    pub(
+        "get_interest_rate_curves_history",
+        "/api/v1/interest/info/rate-curves?interval=WEEK",
+        interval="WEEK",
+    ),
+    pub(
+        "get_latest_interest_rate_curve",
+        "/api/v1/interest/info/latest-rate-curves",
+    ),
+    priv(
+        "get_interest_key_metrics",
+        "/api/v1/interest/key-metrics?accountId=1000&accountId=1001",
+        account_id=[1000, 1001],
+    ),
+    priv(
+        "get_interest_daily_metrics",
+        "/api/v1/interest/daily-metrics?accountId=1000&accountId=1001&interval=WEEK",
+        account_id=[1000, 1001],
+        interval="WEEK",
+    ),
+    priv(
+        "get_interest_payment_chart",
+        "/api/v1/interest/payment-chart?accountId=1000&accountId=1001&interval=WEEK&bucket=DAILY",
+        account_id=[1000, 1001],
+        interval="WEEK",
+        bucket="DAILY",
+    ),
+    priv(
+        "get_interest_payments_history",
+        "/api/v1/interest/payments?accountId=1000&accountId=1001&interval=WEEK",
+        account_id=[1000, 1001],
+        interval="WEEK",
+    ),
     pub(
         "get_markets",
         "/api/v1/info/markets?market=BTC-USD&market=ETH-USD",
@@ -292,10 +414,10 @@ def _drain(received: queue.Queue[dict[str, Any]]) -> list[dict[str, Any]]:
     return requests
 
 
-def _skip_if_native_is_stale(method: str, error: Exception) -> None:
+def _fail_if_native_is_stale(method: str, error: Exception) -> None:
     if "unsupported Extended" not in str(error) or f'"{method}"' not in RUST_SOURCE:
         raise error
-    pytest.skip(f"installed dcex._native predates Rust dispatch {method!r}; rebuild needed")
+    pytest.fail(f"installed dcex._native predates Rust dispatch {method!r}; rebuild needed")
 
 
 def _assert_request(case: WireCase, requests: list[dict[str, Any]]) -> None:
@@ -342,7 +464,7 @@ def test_sync_wrapper_reaches_documented_route(
     try:
         result = getattr(client, case.method)(**case.kwargs)
     except (ValueError, FailedRequestError) as error:
-        _skip_if_native_is_stale(case.method, error)
+        _fail_if_native_is_stale(case.method, error)
     finally:
         client.close()
     assert result == PAYLOAD
@@ -361,7 +483,7 @@ async def test_async_wrapper_reaches_documented_route(
     try:
         result = await getattr(client, case.method)(**case.kwargs)
     except (ValueError, FailedRequestError) as error:
-        _skip_if_native_is_stale(case.method, error)
+        _fail_if_native_is_stale(case.method, error)
     finally:
         await client.close()
     assert result == PAYLOAD
@@ -499,7 +621,9 @@ def _patch_server() -> Iterator[tuple[str, list[dict[str, Any]]]]:
             return
 
     httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
-    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread = threading.Thread(
+        target=httpd.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True
+    )
     thread.start()
     try:
         host, port = httpd.server_address
@@ -526,7 +650,7 @@ def test_sync_update_leverage_patches_documented_body() -> None:
         try:
             result = client.update_leverage(market="BTC-USD", leverage=10)
         except (ValueError, FailedRequestError) as error:
-            _skip_if_native_is_stale("update_leverage", error)
+            _fail_if_native_is_stale("update_leverage", error)
         finally:
             client.close()
         _assert_update_leverage(result, received)
@@ -540,7 +664,50 @@ async def test_async_update_leverage_patches_documented_body() -> None:
         try:
             result = await client.update_leverage(market="BTC-USD", leverage="10")
         except (ValueError, FailedRequestError) as error:
-            _skip_if_native_is_stale("update_leverage", error)
+            _fail_if_native_is_stale("update_leverage", error)
         finally:
             await client.close()
         _assert_update_leverage(result, received)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["sync", "async"])
+@pytest.mark.parametrize(
+    "method,kwargs",
+    [
+        ("get_account_equity_history", {"account_id": [], "interval": "WEEK"}),
+        ("get_account_equity_history", {"account_id": [1, -1], "interval": "WEEK"}),
+        ("get_account_pnl_history", {"account_id": [1], "interval": "WEEK", "pnl_type": "INVALID"}),
+        ("get_account_funding_history", {"account_id": [1], "interval": "WEEK", "limit": 501}),
+        (
+            "get_interest_payment_chart",
+            {"account_id": [1], "interval": "WEEK", "bucket": "MONTHLY"},
+        ),
+    ],
+)
+async def test_new_risk_controls_reject_invalid_input_before_transport(
+    method: str, kwargs: dict[str, Any], mode: str
+) -> None:
+    """Invalid trading parameters fail locally in both public Python interfaces."""
+    import importlib
+
+    module = importlib.import_module(
+        ("dcex.async_support." if mode == "async" else "dcex.") + "extended.client"
+    )
+    client = module.Client(**_client_kwargs("http://127.0.0.1:1"))
+    try:
+        if mode == "async":
+            await client.async_init()
+        with pytest.raises(
+            ValueError,
+            match="(?i)(invalid|required|must|requires|outside|unsupported|expected|between|specify|limit)",
+        ):
+            if mode == "async":
+                await getattr(client, method)(**kwargs)
+            else:
+                getattr(client, method)(**kwargs)
+    finally:
+        if mode == "async":
+            await client.close()
+        else:
+            client.close()

@@ -7,6 +7,7 @@ mod market;
 mod params;
 mod rfq;
 mod signing;
+mod strategy;
 mod tests;
 mod trade;
 pub mod websocket;

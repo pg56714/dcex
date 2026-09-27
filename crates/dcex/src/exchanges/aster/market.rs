@@ -596,6 +596,9 @@ impl AsterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = AsterParams::from_pairs(params);
+        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
         validate_public_params(method_name, &params)?;
         match method_name {
             "ping_spot" => self.ping_spot().await,

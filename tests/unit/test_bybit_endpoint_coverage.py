@@ -64,6 +64,595 @@ def _post(
 
 
 CASES: tuple[RouteCase, ...] = (
+    RouteCase(
+        "get_all_api_rate_limits", "GET", "/v5/apilimit/query-all", kwargs={}, signed=True, query={}
+    ),
+    RouteCase(
+        "get_api_rate_limit_cap", "GET", "/v5/apilimit/query-cap", kwargs={}, signed=True, query={}
+    ),
+    RouteCase(
+        "get_api_rate_limits",
+        "GET",
+        "/v5/apilimit/query",
+        kwargs={"uids": "2"},
+        signed=True,
+        query={"uids": "2"},
+    ),
+    RouteCase(
+        "set_api_rate_limits",
+        "POST",
+        "/v5/apilimit/set",
+        kwargs={"list": [{"uids": "2", "bizType": "DERIVATIVES", "rate": 10}]},
+        signed=True,
+        body={"list": [{"uids": "2", "bizType": "DERIVATIVES", "rate": 10}]},
+    ),
+    RouteCase(
+        "submit_deposit_information",
+        "POST",
+        "/v5/asset/travel-rule/deposit/submit",
+        kwargs={"deposit_id": 123, "questionnaire": '{"test":"fixture"}'},
+        signed=True,
+        body={"depositId": 123, "questionnaire": '{"test":"fixture"}'},
+    ),
+    RouteCase(
+        "get_announcements",
+        "GET",
+        "/v5/announcements/index",
+        kwargs={"locale": "en-US"},
+        signed=False,
+        query={"locale": "en-US"},
+    ),
+    RouteCase(
+        "execute_small_balance_quote",
+        "POST",
+        "/v5/asset/covert/small-balance-execute",
+        kwargs={"quote_id": "quote-1"},
+        signed=True,
+        body={"quoteId": "quote-1"},
+    ),
+    RouteCase(
+        "get_small_balance_history",
+        "GET",
+        "/v5/asset/covert/small-balance-history",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    RouteCase(
+        "request_small_balance_quote",
+        "POST",
+        "/v5/asset/covert/get-quote",
+        kwargs={
+            "account_type": "eb_convert_uta",
+            "from_coin_list": ["BTC", "ETH"],
+            "to_coin": "USDC",
+        },
+        signed=True,
+        body={"accountType": "eb_convert_uta", "fromCoinList": ["BTC", "ETH"], "toCoin": "USDC"},
+    ),
+    RouteCase(
+        "get_small_balance_coins",
+        "GET",
+        "/v5/asset/covert/small-balance-list",
+        kwargs={"account_type": "eb_convert_uta"},
+        signed=True,
+        query={"accountType": "eb_convert_uta"},
+    ),
+    RouteCase(
+        "get_convert_coins",
+        "GET",
+        "/v5/asset/exchange/query-coin-list",
+        kwargs={"account_type": "eb_convert_uta"},
+        signed=True,
+        query={"accountType": "eb_convert_uta"},
+    ),
+    RouteCase(
+        "get_convert_history",
+        "GET",
+        "/v5/asset/exchange/query-convert-history",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    RouteCase(
+        "get_sub_account_deposit_address",
+        "GET",
+        "/v5/asset/deposit/query-sub-member-address",
+        kwargs={"coin": "USDT", "chain_type": "ETH", "sub_member_id": "2"},
+        signed=True,
+        query={"coin": "USDT", "chainType": "ETH", "subMemberId": "2"},
+    ),
+    RouteCase(
+        "get_exchange_order_records",
+        "GET",
+        "/v5/asset/exchange/order-record",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    RouteCase(
+        "get_fee_group_info",
+        "GET",
+        "/v5/market/fee-group-info",
+        kwargs={"product_type": "contract"},
+        signed=False,
+        query={"productType": "contract"},
+    ),
+    RouteCase(
+        "get_index_price_components",
+        "GET",
+        "/v5/market/index-price-components",
+        kwargs={"index_name": "BTCUSDT"},
+        signed=False,
+        query={"indexName": "BTCUSDT"},
+    ),
+    RouteCase(
+        "get_option_delivery_prices",
+        "GET",
+        "/v5/market/new-delivery-price",
+        kwargs={"category": "option", "base_coin": "BTC"},
+        signed=False,
+        query={"category": "option", "baseCoin": "BTC"},
+    ),
+    RouteCase(
+        "get_option_base_coins",
+        "GET",
+        "/v5/market/option-base-coins",
+        kwargs={},
+        signed=False,
+        query={},
+    ),
+    RouteCase(
+        "get_pre_upgrade_closed_pnl",
+        "GET",
+        "/v5/pre-upgrade/position/closed-pnl",
+        kwargs={"category": "linear", "symbol": "BTCUSDT"},
+        signed=True,
+        query={"category": "linear", "symbol": "BTCUSDT"},
+    ),
+    RouteCase(
+        "get_pre_upgrade_delivery_records",
+        "GET",
+        "/v5/pre-upgrade/asset/delivery-record",
+        kwargs={"category": "option"},
+        signed=True,
+        query={"category": "option"},
+    ),
+    RouteCase(
+        "get_pre_upgrade_executions",
+        "GET",
+        "/v5/pre-upgrade/execution/list",
+        kwargs={"category": "linear"},
+        signed=True,
+        query={"category": "linear"},
+    ),
+    RouteCase(
+        "get_pre_upgrade_order_history",
+        "GET",
+        "/v5/pre-upgrade/order/history",
+        kwargs={"category": "linear"},
+        signed=True,
+        query={"category": "linear"},
+    ),
+    RouteCase(
+        "get_pre_upgrade_settlement_records",
+        "GET",
+        "/v5/pre-upgrade/asset/settlement-record",
+        kwargs={"category": "linear"},
+        signed=True,
+        query={"category": "linear"},
+    ),
+    RouteCase(
+        "get_pre_upgrade_transaction_log",
+        "GET",
+        "/v5/pre-upgrade/account/transaction-log",
+        kwargs={"category": "linear"},
+        signed=True,
+        query={"category": "linear"},
+    ),
+    RouteCase(
+        "get_margin_currency_data",
+        "GET",
+        "/v5/spot-margin-trade/currency-data",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    RouteCase(
+        "create_sub_account_api_key",
+        "POST",
+        "/v5/user/create-sub-api",
+        kwargs={"subuid": 2, "read_only": 1, "permissions": {"Spot": ["SpotTrade"]}},
+        signed=True,
+        body={"subuid": 2, "readOnly": 1, "permissions": {"Spot": ["SpotTrade"]}},
+    ),
+    RouteCase(
+        "create_sub_account",
+        "POST",
+        "/v5/user/create-sub-member",
+        kwargs={"username": "trader123", "member_type": 1},
+        signed=True,
+        body={"username": "trader123", "memberType": 1},
+    ),
+    RouteCase(
+        "set_sub_account_frozen",
+        "POST",
+        "/v5/user/frozen-sub-member",
+        kwargs={"subuid": 2, "frozen": 1},
+        signed=True,
+        body={"subuid": 2, "frozen": 1},
+    ),
+    RouteCase(
+        "get_sub_account_api_keys",
+        "GET",
+        "/v5/user/sub-apikeys",
+        kwargs={"sub_member_id": "2"},
+        signed=True,
+        query={"subMemberId": "2"},
+    ),
+    RouteCase("modify_api_key", "POST", "/v5/user/update-api", kwargs={}, signed=True, body={}),
+    RouteCase(
+        "modify_sub_account_api_key",
+        "POST",
+        "/v5/user/update-sub-api",
+        kwargs={},
+        signed=True,
+        body={},
+    ),
+    RouteCase(
+        "get_sub_accounts_paginated", "GET", "/v5/user/submembers", kwargs={}, signed=True, query={}
+    ),
+    RouteCase("delete_api_key", "POST", "/v5/user/delete-api", kwargs={}, signed=True, body={}),
+    RouteCase(
+        "delete_sub_account_api_key",
+        "POST",
+        "/v5/user/delete-sub-api",
+        kwargs={},
+        signed=True,
+        body={},
+    ),
+    RouteCase(
+        "delete_sub_account",
+        "POST",
+        "/v5/user/del-submember",
+        kwargs={"sub_member_id": "2"},
+        signed=True,
+        body={"subMemberId": "2"},
+    ),
+    RouteCase(
+        "sign_trading_agreement",
+        "POST",
+        "/v5/user/agreement",
+        kwargs={"category_v2": 1, "agree": True},
+        signed=True,
+        body={"categoryV2": 1, "agree": True},
+    ),
+    RouteCase(
+        "get_sub_accounts", "GET", "/v5/user/query-sub-members", kwargs={}, signed=True, query={}
+    ),
+    RouteCase(
+        "get_member_wallet_types",
+        "GET",
+        "/v5/user/get-member-type",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    RouteCase("get_smp_group", "GET", "/v5/account/smp-group", kwargs={}, query={}),
+    RouteCase(
+        "get_trade_behavior_config", "GET", "/v5/account/user-setting-config", kwargs={}, query={}
+    ),
+    RouteCase(
+        "set_delta_mode",
+        "POST",
+        "/v5/account/set-delta-mode",
+        kwargs={"delta_enable": "1"},
+        body={"deltaEnable": "1"},
+    ),
+    RouteCase(
+        "set_spot_hedging",
+        "POST",
+        "/v5/account/set-hedging-mode",
+        kwargs={"mode": "ON"},
+        body={"setHedgingMode": "ON"},
+    ),
+    RouteCase(
+        "set_price_limit_behavior",
+        "POST",
+        "/v5/account/set-limit-px-action",
+        kwargs={"category": "spot", "modify_enable": True},
+        body={"category": "spot", "modifyEnable": True},
+    ),
+    RouteCase(
+        "get_closed_option_positions",
+        "GET",
+        "/v5/position/get-closed-positions",
+        kwargs={"category": "option", "limit": 100},
+        query={"category": "option", "limit": "100"},
+    ),
+    RouteCase(
+        "get_move_position_history",
+        "GET",
+        "/v5/position/move-history",
+        kwargs={"category": "option", "limit": 200, "status": "Filled"},
+        query={"category": "option", "status": "Filled", "limit": "200"},
+    ),
+    RouteCase(
+        "move_positions",
+        "POST",
+        "/v5/position/move-positions",
+        kwargs={
+            "from_uid": "1",
+            "to_uid": "2",
+            "legs": [
+                {
+                    "category": "linear",
+                    "symbol": "BTCUSDT",
+                    "side": "Sell",
+                    "qty": "0.01",
+                    "price": "50000",
+                }
+            ],
+        },
+        body={
+            "fromUid": "1",
+            "toUid": "2",
+            "list": [
+                {
+                    "category": "linear",
+                    "symbol": "BTCUSDT",
+                    "side": "Sell",
+                    "qty": "0.01",
+                    "price": "50000",
+                }
+            ],
+        },
+    ),
+    RouteCase(
+        "get_account_instruments",
+        "GET",
+        "/v5/account/instruments-info",
+        kwargs={"category": "linear"},
+        signed=True,
+        query={"category": "linear"},
+    ),
+    RouteCase(
+        "get_dcp_info", "GET", "/v5/account/query-dcp-info", kwargs={}, signed=True, query={}
+    ),
+    RouteCase("get_coin_greeks", "GET", "/v5/asset/coin-greeks", kwargs={}, signed=True, query={}),
+    RouteCase(
+        "repay_liability", "POST", "/v5/account/quick-repayment", kwargs={}, signed=True, body={}
+    ),
+    RouteCase(
+        "set_collateral_coin",
+        "POST",
+        "/v5/account/set-collateral-switch",
+        kwargs={"coin": "BTC", "collateral_switch": "ON"},
+        signed=True,
+        body={"coin": "BTC", "collateralSwitch": "ON"},
+    ),
+    RouteCase(
+        "batch_set_collateral_coins",
+        "POST",
+        "/v5/account/set-collateral-switch-batch",
+        kwargs={"request": [{"coin": "BTC", "collateralSwitch": "ON"}]},
+        signed=True,
+        body={"request": [{"coin": "BTC", "collateralSwitch": "ON"}]},
+    ),
+    RouteCase(
+        "get_asset_overview", "GET", "/v5/asset/asset-overview", kwargs={}, signed=True, query={}
+    ),
+    RouteCase(
+        "get_delivery_records",
+        "GET",
+        "/v5/asset/delivery-record",
+        kwargs={
+            "category": "linear",
+            "start_time": 1700000000000,
+            "end_time": 1700000060000,
+            "limit": 10,
+        },
+        signed=True,
+        query={
+            "category": "linear",
+            "startTime": "1700000000000",
+            "endTime": "1700000060000",
+            "limit": "10",
+        },
+    ),
+    RouteCase(
+        "get_settlement_records",
+        "GET",
+        "/v5/asset/settlement-record",
+        kwargs={
+            "category": "linear",
+            "start_time": 1700000000000,
+            "end_time": 1700000060000,
+            "limit": 10,
+        },
+        signed=True,
+        query={
+            "category": "linear",
+            "startTime": "1700000000000",
+            "endTime": "1700000060000",
+            "limit": "10",
+        },
+    ),
+    RouteCase(
+        "get_funding_account_history",
+        "GET",
+        "/v5/asset/fundinghistory",
+        kwargs={"create_time_from": "1700000000", "create_time_to": "1700000600", "limit": "10"},
+        signed=True,
+        query={"createTimeFrom": "1700000000", "createTimeTo": "1700000600", "limit": "10"},
+    ),
+    RouteCase(
+        "request_convert_quote",
+        "POST",
+        "/v5/asset/exchange/quote-apply",
+        kwargs={
+            "account_type": "eb_convert_funding",
+            "from_coin": "ETH",
+            "to_coin": "BTC",
+            "request_coin": "ETH",
+            "request_amount": "0.1",
+        },
+        signed=True,
+        body={
+            "accountType": "eb_convert_funding",
+            "fromCoin": "ETH",
+            "toCoin": "BTC",
+            "requestCoin": "ETH",
+            "requestAmount": "0.1",
+        },
+    ),
+    RouteCase(
+        "execute_convert_quote",
+        "POST",
+        "/v5/asset/exchange/convert-execute",
+        kwargs={"quote_tx_id": "quote-1"},
+        signed=True,
+        body={"quoteTxId": "quote-1"},
+    ),
+    RouteCase(
+        "get_convert_result",
+        "GET",
+        "/v5/asset/exchange/convert-result-query",
+        kwargs={"quote_tx_id": "quote-1", "account_type": "eb_convert_funding"},
+        signed=True,
+        query={"quoteTxId": "quote-1", "accountType": "eb_convert_funding"},
+    ),
+    RouteCase(
+        "get_full_orderbook",
+        "GET",
+        "/v5/market/full_orderbook",
+        kwargs={"category": "linear", "product_symbol": "BTCUSDT"},
+        signed=False,
+        query={"category": "linear", "symbol": "BTCUSDT"},
+    ),
+    RouteCase(
+        "get_rpi_orderbook",
+        "GET",
+        "/v5/market/rpi_orderbook",
+        kwargs={"product_symbol": "BTCUSDT", "limit": 10},
+        signed=False,
+        query={"symbol": "BTCUSDT", "limit": "10"},
+    ),
+    RouteCase(
+        "confirm_pending_mmr",
+        "POST",
+        "/v5/position/confirm-pending-mmr",
+        kwargs={"category": "linear", "product_symbol": "BTCUSDT"},
+        signed=True,
+        body={"category": "linear", "symbol": "BTCUSDT"},
+    ),
+    RouteCase(
+        "get_position_symbol_info",
+        "GET",
+        "/v5/position/symbol-info",
+        kwargs={"category": "linear"},
+        signed=True,
+        query={"category": "linear"},
+    ),
+    RouteCase("get_system_status", "GET", "/v5/system/status", kwargs={}, signed=False, query={}),
+    RouteCase("get_api_key_info", "GET", "/v5/user/query-api", kwargs={}, signed=True, query={}),
+    RouteCase(
+        "get_option_asset_info",
+        "GET",
+        "/v5/account/option-asset-info",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    RouteCase(
+        "get_portfolio_margin_info",
+        "GET",
+        "/v5/asset/portfolio-margin",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    RouteCase(
+        "get_repayment_info", "GET", "/v5/account/pay-info", kwargs={}, signed=True, query={}
+    ),
+    RouteCase(
+        "get_trade_analysis",
+        "GET",
+        "/v5/account/trade-info-for-analysis",
+        kwargs={"product_symbol": "BTCUSDT"},
+        signed=True,
+        query={"symbol": "BTCUSDT"},
+    ),
+    RouteCase(
+        "get_total_members_assets",
+        "GET",
+        "/v5/asset/total-members-assets",
+        kwargs={},
+        signed=True,
+        query={},
+    ),
+    _get(
+        "get_mark_price_kline",
+        "/v5/market/mark-price-kline",
+        LINEAR,
+        "1m",
+        signed=False,
+        query={"symbol": "BTCUSDT", "category": "linear", "interval": "1"},
+    ),
+    _get(
+        "get_index_price_kline",
+        "/v5/market/index-price-kline",
+        LINEAR,
+        "1m",
+        signed=False,
+        query={"symbol": "BTCUSDT", "category": "linear", "interval": "1"},
+    ),
+    _get(
+        "get_premium_index_price_kline",
+        "/v5/market/premium-index-price-kline",
+        LINEAR,
+        "1m",
+        signed=False,
+        query={"symbol": "BTCUSDT", "category": "linear", "interval": "1"},
+    ),
+    _post(
+        "set_spot_margin_leverage",
+        "/v5/spot-margin-trade/set-leverage",
+        "4",
+        currency="USDT",
+        body={"leverage": "4", "currency": "USDT"},
+    ),
+    _post(
+        "set_spot_margin_mode",
+        "/v5/spot-margin-trade/switch-mode",
+        "1",
+        body={"spotMarginMode": "1"},
+    ),
+    _post(
+        "create_strategy",
+        "/v5/strategy/create",
+        "UTA_USDT",
+        LINEAR,
+        "Buy",
+        "twap",
+        size="1",
+        duration=600,
+        interval=30,
+        reduce_only=False,
+        body={
+            "category": "UTA_USDT",
+            "symbol": "BTCUSDT",
+            "side": "Buy",
+            "strategyType": "twap",
+            "size": "1",
+            "duration": 600,
+            "interval": 30,
+            "reduceOnly": False,
+        },
+    ),
+    _post("stop_strategy", "/v5/strategy/stop", "s1", body={"strategyId": "s1"}),
+    _get("get_strategy_list", "/v5/strategy/list", page_size=50, query={"pageSize": "50"}),
+    _get("get_strategy_orders", "/v5/strategy/order-list", "s1", query={"strategyId": "s1"}),
     # Market data (public)
     _get(
         "get_instruments_info",
@@ -712,10 +1301,10 @@ def _native_client(base_url: str) -> Any:
     )
 
 
-def _skip_if_native_is_stale(exc: ValueError) -> None:
+def _fail_if_native_is_stale(exc: ValueError) -> None:
     # The installed extension can lag the Rust source until it is rebuilt with maturin.
     if str(exc).startswith(("unsupported Bybit public method", "unsupported Bybit private method")):
-        pytest.skip(f"installed dcex._native predates this route: {exc}")
+        pytest.fail(f"installed dcex._native predates this route: {exc}")
     raise exc
 
 
@@ -760,7 +1349,7 @@ def test_sync_bybit_wrapper_hits_official_route(case: RouteCase) -> None:
         try:
             getattr(client, case.method_name)(*case.args, **case.kwargs)
         except ValueError as exc:
-            _skip_if_native_is_stale(exc)
+            _fail_if_native_is_stale(exc)
         finally:
             client.close()
         _assert_route(case, received)
@@ -788,7 +1377,7 @@ def test_async_bybit_wrapper_hits_official_route(case: RouteCase) -> None:
         try:
             asyncio.run(run(base_url))
         except ValueError as exc:
-            _skip_if_native_is_stale(exc)
+            _fail_if_native_is_stale(exc)
         _assert_route(case, received)
 
 

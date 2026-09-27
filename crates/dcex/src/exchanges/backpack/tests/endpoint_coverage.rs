@@ -149,6 +149,55 @@ const PUBLIC_CASES: &[Case] = &[
 ];
 
 const PRIVATE_CASES: &[Case] = &[
+    private(
+        "create_strategy",
+        "strategyCreate",
+        &[
+            ("product_symbol", "BTC-USDC-SWAP"),
+            ("side", "Bid"),
+            ("strategyType", "Scheduled"),
+            ("quantity", "1"),
+            ("duration", "60000"),
+            ("interval", "10000"),
+        ],
+        "POST /api/v1/strategy",
+    ),
+    private(
+        "get_open_strategy",
+        "strategyQuery",
+        &[("product_symbol", "BTC-USDC-SWAP"), ("strategyId", "100")],
+        "GET /api/v1/strategy",
+    ),
+    private(
+        "cancel_strategy",
+        "strategyCancel",
+        &[
+            ("product_symbol", "BTC-USDC-SWAP"),
+            ("clientStrategyId", "7"),
+        ],
+        "DELETE /api/v1/strategy",
+    ),
+    private(
+        "get_open_strategies",
+        "strategyQueryAll",
+        &[
+            ("product_symbol", "BTC-USDC-SWAP"),
+            ("strategyType", "Scheduled"),
+        ],
+        "GET /api/v1/strategies",
+    ),
+    private(
+        "cancel_open_strategies",
+        "strategyCancelAll",
+        &[("product_symbol", "BTC-USDC-SWAP")],
+        "DELETE /api/v1/strategies",
+    ),
+    private(
+        "get_strategy_history",
+        "strategyHistoryQueryAll",
+        &[("limit", "10"), ("marketType", "PERP")],
+        "GET /wapi/v1/history/strategies",
+    ),
     // Account.
     private("get_account", "accountQuery", &[], "GET /api/v1/account"),
     private(

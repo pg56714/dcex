@@ -39,6 +39,10 @@ class PublicClient(AsyncWebSocketMixin):
         """Open the WebSocket connection."""
         await self._native_client.connect()
 
+    async def post_info(self, request_id: int, payload: dict[str, Any]) -> None:
+        """Send an info request; read the response with recv and match its id."""
+        await self._native_client.post_info(request_id, json.dumps(payload, allow_nan=False))
+
     async def close(self) -> None:
         """Close the WebSocket connection."""
         await self._native_client.close()
@@ -126,6 +130,19 @@ class PrivateClient(AsyncWebSocketMixin):
     async def connect(self) -> None:
         """Open the WebSocket connection."""
         await self._native_client.connect()
+
+    async def post_info(self, request_id: int, payload: dict[str, Any]) -> None:
+        """Send an info request; read the response with recv and match its id."""
+        await self._native_client.post_info(request_id, json.dumps(payload, allow_nan=False))
+
+    async def post_action(self, request_id: int, payload: dict[str, Any]) -> None:
+        """
+        Send a signed action unchanged; read the post response with recv.
+
+        Sign the complete payload for the correct network before calling. Use a
+        unique request ID. On timeout, query status before retrying.
+        """
+        await self._native_client.post_action(request_id, json.dumps(payload, allow_nan=False))
 
     async def close(self) -> None:
         """Close the WebSocket connection."""

@@ -1,1 +1,1 @@
-pub use crate::exchanges::mexc::{MexcPrivateWebSocket, MexcPublicWebSocket};
+pub use crate::exchanges::mexc::{MexcFuturesWebSocket, MexcPrivateWebSocket, MexcPublicWebSocket};

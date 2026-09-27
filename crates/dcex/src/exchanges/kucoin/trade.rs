@@ -101,6 +101,33 @@ impl KucoinClient {
                     .await
             }
             "place_spot_order" => self.spot_order_from_params(params, None, None, false).await,
+            "place_spot_order_sync" => {
+                self.spot_order_to_path(params, None, None, false, "/api/v1/hf/orders/sync")
+                    .await
+            }
+            "place_spot_batch_orders_sync" => {
+                self.spot_batch_orders_to_path(params, None, "/api/v1/hf/orders/multi/sync")
+                    .await
+            }
+            "cancel_spot_order_sync" | "cancel_spot_order_by_client_oid_sync" => {
+                let by_client = method_name == "cancel_spot_order_by_client_oid_sync";
+                let key = if by_client { "clientOid" } else { "orderId" };
+                params.ensure_allowed(&["product_symbol", "symbol", key])?;
+                if by_client {
+                    validate_client_oid(params, key)?;
+                }
+                let id: String =
+                    url::form_urlencoded::byte_serialize(params.required(key)?.as_bytes())
+                        .collect();
+                let path = if by_client {
+                    format!("/api/v1/hf/orders/sync/client-order/{id}")
+                } else {
+                    format!("/api/v1/hf/orders/sync/{id}")
+                };
+                let mut query = Vec::new();
+                self.push_required_symbol(&mut query, params, false)?;
+                self.private_delete(KucoinMarket::Spot, path, query).await
+            }
             "test_spot_order" => {
                 self.spot_order_to_path(params, None, None, false, SPOT_TEST_ORDER)
                     .await
@@ -455,6 +482,17 @@ impl KucoinClient {
         params: &KucoinParams,
         type_override: Option<&str>,
     ) -> Result<ValidatedResponse> {
+        self.spot_batch_orders_to_path(params, type_override, SPOT_BATCH_ORDERS)
+            .await
+    }
+
+    async fn spot_batch_orders_to_path(
+        &self,
+        params: &KucoinParams,
+        type_override: Option<&str>,
+        path: &str,
+    ) -> Result<ValidatedResponse> {
+        params.ensure_allowed(&["orders"])?;
         let orders = params.json_required("orders")?;
         let orders = orders.as_array().ok_or_else(|| {
             DcexError::InvalidInput("KuCoin orders must be a JSON array.".to_string())
@@ -518,7 +556,7 @@ impl KucoinClient {
         }
         let mut body = Map::new();
         body.insert("orderList".to_string(), Value::Array(order_list));
-        self.private_post(KucoinMarket::Spot, SPOT_BATCH_ORDERS, Value::Object(body))
+        self.private_post(KucoinMarket::Spot, path, Value::Object(body))
             .await
     }
 
@@ -547,6 +585,19 @@ impl KucoinClient {
         post_only: bool,
         path: &str,
     ) -> Result<ValidatedResponse> {
+        let body =
+            self.build_futures_order_body(params, side_override, type_override, post_only)?;
+        self.private_post(KucoinMarket::Futures, path, Value::Object(body))
+            .await
+    }
+
+    pub(super) fn build_futures_order_body(
+        &self,
+        params: &KucoinParams,
+        side_override: Option<&str>,
+        type_override: Option<&str>,
+        post_only: bool,
+    ) -> Result<Map<String, Value>> {
         let close_order = bool_param(params, "closeOrder")?.unwrap_or(false);
         validate_futures_order(params, side_override, type_override, post_only, close_order)?;
         let mut body = params.body(
@@ -581,8 +632,7 @@ impl KucoinClient {
         }
         insert_required_string(&mut body, "type", order_type);
         insert_truthy_bool(&mut body, "postOnly", post_only);
-        self.private_post(KucoinMarket::Futures, path, Value::Object(body))
-            .await
+        Ok(body)
     }
 
     fn insert_required_body_symbol(

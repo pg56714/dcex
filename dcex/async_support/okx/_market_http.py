@@ -150,3 +150,471 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_option_family_trades", self._params(instFamily=instFamily)
         )
+
+    async def get_price_limit(self, product_symbol: str) -> dict[str, Any]:
+        """Get the current highest buy and lowest sell limit prices."""
+        return await self._native_public(
+            "get_price_limit", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_mark_price(
+        self,
+        instrument_type: str,
+        *,
+        product_symbol: str | None = None,
+        instrument_family: str | None = None,
+    ) -> dict[str, Any]:
+        """Get mark prices for MARGIN, SWAP, FUTURES, OPTION or EVENTS instruments."""
+        return await self._native_public(
+            "get_mark_price",
+            self._params(
+                instType=instrument_type,
+                product_symbol=product_symbol,
+                instFamily=instrument_family,
+            ),
+        )
+
+    async def get_server_time(self) -> dict[str, Any]:
+        """Get server time through ``GET /api/v5/public/time``."""
+        return await self._native_public("get_server_time", self._params())
+
+    async def get_ticker(self, product_symbol: str) -> dict[str, Any]:
+        """Get ticker through ``GET /api/v5/market/ticker``."""
+        return await self._native_public("get_ticker", self._params(product_symbol=product_symbol))
+
+    async def get_full_orderbook(
+        self, product_symbol: str, sz: str | None = None
+    ) -> dict[str, Any]:
+        """Get full orderbook through ``GET /api/v5/market/books-full``."""
+        return await self._native_public(
+            "get_full_orderbook", self._params(product_symbol=product_symbol, sz=sz)
+        )
+
+    async def get_candles_history(
+        self,
+        product_symbol: str,
+        after: str | None = None,
+        before: str | None = None,
+        bar: str | None = None,
+        limit: str | None = None,
+        adjust: str | None = None,
+    ) -> dict[str, Any]:
+        """Get candles history through ``GET /api/v5/market/history-candles``."""
+        return await self._native_public(
+            "get_candles_history",
+            self._params(
+                product_symbol=product_symbol,
+                after=after,
+                before=before,
+                bar=bar,
+                limit=limit,
+                adjust=adjust,
+            ),
+        )
+
+    async def get_trades_history(
+        self,
+        product_symbol: str,
+        type_: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """Get trades history through ``GET /api/v5/market/history-trades``."""
+        return await self._native_public(
+            "get_trades_history",
+            self._params(
+                product_symbol=product_symbol, type=type_, after=after, before=before, limit=limit
+            ),
+        )
+
+    async def get_estimated_delivery_price(self, product_symbol: str) -> dict[str, Any]:
+        """Get estimated delivery price through ``GET /api/v5/public/estimated-price``."""
+        return await self._native_public(
+            "get_estimated_delivery_price", self._params(product_symbol=product_symbol)
+        )
+
+    async def get_discount_rates(self, ccy: str | None = None) -> dict[str, Any]:
+        """Get discount rates through ``GET /api/v5/public/discount-rate-interest-free-quota``."""
+        return await self._native_public("get_discount_rates", self._params(ccy=ccy))
+
+    async def convert_contract_coin(
+        self,
+        product_symbol: str,
+        sz: str,
+        type_: str | None = None,
+        px: str | None = None,
+        unit: str | None = None,
+        op_type: str | None = None,
+    ) -> dict[str, Any]:
+        """Convert contract coin through ``GET /api/v5/public/convert-contract-coin``."""
+        return await self._native_public(
+            "convert_contract_coin",
+            self._params(
+                product_symbol=product_symbol, sz=sz, type=type_, px=px, unit=unit, opType=op_type
+            ),
+        )
+
+    async def get_index_tickers(
+        self, quote_ccy: str | None = None, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Get index tickers through ``GET /api/v5/market/index-tickers``."""
+        return await self._native_public(
+            "get_index_tickers", self._params(quoteCcy=quote_ccy, product_symbol=product_symbol)
+        )
+
+    async def get_mark_price_candles(
+        self,
+        product_symbol: str,
+        after: str | None = None,
+        before: str | None = None,
+        bar: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """Get mark price candles through ``GET /api/v5/market/mark-price-candles``."""
+        return await self._native_public(
+            "get_mark_price_candles",
+            self._params(
+                product_symbol=product_symbol, after=after, before=before, bar=bar, limit=limit
+            ),
+        )
+
+    async def get_system_status(self, state: str | None = None) -> dict[str, Any]:
+        """Get system status through ``GET /api/v5/system/status``."""
+        return await self._native_public("get_system_status", self._params(state=state))
+
+    async def get_books_rpi(self, *, inst_id: str, sz: str | None = None) -> dict[str, Any]:
+        """
+        GET /api/v5/market/books-rpi. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-rpi-order-book
+        """
+        return await self._native_public(
+            "get_books_rpi", self._native_params(instId=inst_id, sz=sz)
+        )
+
+    async def get_platform_24_volume(self) -> dict[str, Any]:
+        """
+        GET /api/v5/market/platform-24-volume. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-24h-total-volume
+        """
+        return await self._native_public("get_platform_24_volume", self._native_params())
+
+    async def get_call_auction_details(self, *, inst_id: str) -> dict[str, Any]:
+        """
+
+        GET /api/v5/market/call-auction-details. Use native instrument IDs.
+
+        Source:
+        https://www.okx.com/docs-v5/en/#order-book-trading-market-data-get-call-auction-details
+
+        """
+        return await self._native_public(
+            "get_call_auction_details", self._native_params(instId=inst_id)
+        )
+
+    async def get_block_tickers(
+        self, *, inst_type: str, inst_family: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/market/block-tickers. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-block-tickers
+        """
+        return await self._native_public(
+            "get_block_tickers", self._native_params(instType=inst_type, instFamily=inst_family)
+        )
+
+    async def get_block_ticker(self, *, inst_id: str) -> dict[str, Any]:
+        """
+        GET /api/v5/market/block-ticker. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-block-ticker
+        """
+        return await self._native_public("get_block_ticker", self._native_params(instId=inst_id))
+
+    async def get_rfq_public_trades(
+        self, *, begin_id: str | None = None, end_id: str | None = None, limit: str | None = None
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v5/rfq/public-trades. Use native instrument IDs.
+
+        Source:
+        https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-public-multi-leg-transactions-of-block-trades
+
+        """
+        return await self._native_public(
+            "get_rfq_public_trades",
+            self._native_params(beginId=begin_id, endId=end_id, limit=limit),
+        )
+
+    async def get_block_trades(self, *, inst_id: str) -> dict[str, Any]:
+        """
+
+        GET /api/v5/public/block-trades. Use native instrument IDs.
+
+        Source:
+        https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-public-single-leg-transactions-of-block-trades
+
+        """
+        return await self._native_public("get_block_trades", self._native_params(instId=inst_id))
+
+    async def get_estimated_settlement_info(self, *, inst_id: str) -> dict[str, Any]:
+        """
+
+        GET /api/v5/public/estimated-settlement-info. Use native instrument IDs.
+
+        Source:
+        https://www.okx.com/docs-v5/en/#public-data-rest-api-get-estimated-future-settlement-price
+
+        """
+        return await self._native_public(
+            "get_estimated_settlement_info", self._native_params(instId=inst_id)
+        )
+
+    async def get_settlement_history(
+        self,
+        *,
+        inst_family: str,
+        after: str | None = None,
+        before: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/public/settlement-history. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-futures-settlement-history
+        """
+        return await self._native_public(
+            "get_settlement_history",
+            self._native_params(instFamily=inst_family, after=after, before=before, limit=limit),
+        )
+
+    async def get_insurance_fund(
+        self,
+        *,
+        inst_type: str,
+        type_: str | None = None,
+        inst_family: str | None = None,
+        ccy: str | None = None,
+        before: str | None = None,
+        after: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/public/insurance-fund. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-security-fund
+        """
+        return await self._native_public(
+            "get_insurance_fund",
+            self._native_params(
+                instType=inst_type,
+                type=type_,
+                instFamily=inst_family,
+                ccy=ccy,
+                before=before,
+                after=after,
+                limit=limit,
+            ),
+        )
+
+    async def get_premium_history(
+        self,
+        *,
+        inst_id: str,
+        after: str | None = None,
+        before: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/public/premium-history. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-premium-history
+        """
+        return await self._native_public(
+            "get_premium_history",
+            self._native_params(instId=inst_id, after=after, before=before, limit=limit),
+        )
+
+    async def get_index_candles(
+        self,
+        *,
+        inst_id: str,
+        after: str | None = None,
+        before: str | None = None,
+        bar: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/market/index-candles. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-candlesticks
+        """
+        return await self._native_public(
+            "get_index_candles",
+            self._native_params(instId=inst_id, after=after, before=before, bar=bar, limit=limit),
+        )
+
+    async def get_history_index_candles(
+        self,
+        *,
+        inst_id: str,
+        after: str | None = None,
+        before: str | None = None,
+        bar: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/market/history-index-candles. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-candlesticks-history
+        """
+        return await self._native_public(
+            "get_history_index_candles",
+            self._native_params(instId=inst_id, after=after, before=before, bar=bar, limit=limit),
+        )
+
+    async def get_history_mark_price_candles(
+        self,
+        *,
+        inst_id: str,
+        after: str | None = None,
+        before: str | None = None,
+        bar: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v5/market/history-mark-price-candles. Use native instrument IDs.
+
+        Source:
+        https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mark-price-candlesticks-history
+
+        """
+        return await self._native_public(
+            "get_history_mark_price_candles",
+            self._native_params(instId=inst_id, after=after, before=before, bar=bar, limit=limit),
+        )
+
+    async def get_exchange_rate(self) -> dict[str, Any]:
+        """
+        GET /api/v5/market/exchange-rate. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-exchange-rate
+        """
+        return await self._native_public("get_exchange_rate", self._native_params())
+
+    async def get_index_components(self, *, index: str) -> dict[str, Any]:
+        """
+        GET /api/v5/market/index-components. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-components
+        """
+        return await self._native_public("get_index_components", self._native_params(index=index))
+
+    async def get_economic_calendar(
+        self,
+        *,
+        region: str | None = None,
+        importance: str | None = None,
+        before: str | None = None,
+        after: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/public/economic-calendar. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-economic-calendar-data
+        """
+        return await self._native_public(
+            "get_economic_calendar",
+            self._native_params(
+                region=region, importance=importance, before=before, after=after, limit=limit
+            ),
+        )
+
+    async def get_market_data_history(
+        self,
+        *,
+        module: str,
+        inst_type: str,
+        date_aggr_type: str,
+        begin: str,
+        end: str,
+        inst_id_list: str | None = None,
+        inst_family_list: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/public/market-data-history. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-historical-market-data
+        """
+        return await self._native_public(
+            "get_market_data_history",
+            self._native_params(
+                module=module,
+                instType=inst_type,
+                instIdList=inst_id_list,
+                instFamilyList=inst_family_list,
+                dateAggrType=date_aggr_type,
+                begin=begin,
+                end=end,
+            ),
+        )
+
+    async def get_delta_hedge_currencies(self, *, ccy: str | None = None) -> dict[str, Any]:
+        """
+        GET /api/v5/public/delta-hedge-currencies. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-delta-hedge-currencies
+        """
+        return await self._native_public("get_delta_hedge_currencies", self._native_params(ccy=ccy))
+
+    async def get_loan_ratio(
+        self,
+        *,
+        ccy: str,
+        begin: str | None = None,
+        end: str | None = None,
+        period: str | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v5/rubik/stat/margin/loan-ratio. Use native instrument IDs.
+
+        Source:
+        https://www.okx.com/docs-v5/en/#trading-statistics-rest-api-get-margin-long-short-ratio
+
+        """
+        return await self._native_public(
+            "get_loan_ratio", self._native_params(ccy=ccy, begin=begin, end=end, period=period)
+        )
+
+    async def get_announcements(
+        self, *, ann_type: str | None = None, page: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /api/v5/support/announcements. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#announcement-get-announcements
+        """
+        return await self._native_public(
+            "get_announcements", self._native_params(annType=ann_type, page=page)
+        )
+
+    async def get_announcement_types(self) -> dict[str, Any]:
+        """
+        GET /api/v5/support/announcement-types. Use native instrument IDs.
+
+        Source: https://www.okx.com/docs-v5/en/#announcement-get-announcement-types
+        """
+        return await self._native_public("get_announcement_types", self._native_params())
+
+    async def get_sbe_orderbook(self, inst_id_code: int) -> bytes:
+        """Fetch raw SBE snapshot bytes; decode with OKX's versioned SBE XML schema."""
+        if self._native_client is None:
+            raise RuntimeError("OKX native client is required.")
+        return await self._native_client.get_sbe_orderbook_async(inst_id_code)

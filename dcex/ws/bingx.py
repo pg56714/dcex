@@ -17,7 +17,7 @@ def _decode_event(body: bytes | bytearray | memoryview) -> dict[str, Any] | list
 
 
 class PublicClient(AsyncWebSocketMixin):
-    """Async BingX public market WebSocket client."""
+    """BingX streams for market="spot", "swap", or "coin_swap"."""
 
     def __init__(
         self,
@@ -51,6 +51,18 @@ class PublicClient(AsyncWebSocketMixin):
     async def unsubscribe(self, data_type: str) -> str:
         """Unsubscribe from a raw BingX dataType."""
         return str(await self._native_client.unsubscribe(data_type))
+
+    async def subscribe_book_ticker(self, product_symbol: str) -> str:
+        """Subscribe to best bid and ask events."""
+        return str(await self._native_client.subscribe_book_ticker(product_symbol))
+
+    async def subscribe_mark_price(self, product_symbol: str) -> str:
+        """Subscribe to mark price events."""
+        return str(await self._native_client.subscribe_mark_price(product_symbol))
+
+    async def subscribe_last_price(self, product_symbol: str) -> str:
+        """Subscribe to latest trade price events."""
+        return str(await self._native_client.subscribe_last_price(product_symbol))
 
     async def subscribe_ticker(self, product_symbol: str) -> str:
         """Subscribe to ticker events."""
@@ -90,7 +102,7 @@ class PrivateClient(AsyncWebSocketMixin):
         ws_base_url: str | None = None,
         market: str = "spot",
     ) -> None:
-        """Create a BingX private WebSocket client."""
+        """Create spot, swap, or coin_swap streams; derivative events are pushed automatically."""
         self._native_client = _native.BingxPrivateWebSocketClient(
             api_key=api_key,
             api_secret=api_secret,

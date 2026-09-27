@@ -1,4 +1,5 @@
 mod account;
+mod additional;
 pub mod chains;
 mod client;
 mod credentials;

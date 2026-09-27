@@ -15,7 +15,26 @@ impl ArcusClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
-        let mut params: BTreeMap<_, _> = params.into_iter().collect();
+        if method_name == "get_api_keys" {
+            return self.onboarding_request(method_name, params).await;
+        }
+        let mut collected: BTreeMap<String, String> = BTreeMap::new();
+        for (key, value) in params {
+            if let Some(previous) = collected.get_mut(&key) {
+                if method_name == "get_order_history" && key == "status" {
+                    previous.push(',');
+                    previous.push_str(&value);
+                } else {
+                    return Err(DcexError::InvalidInput(format!(
+                        "duplicate Arcus parameter: {key}"
+                    )));
+                }
+            } else {
+                collected.insert(key, value);
+            }
+        }
+        let mut params = collected;
+        super::query_validation::validate(method_name, &params)?;
         let path = public_path(method_name)?;
         let path = if matches!(method_name, "get_bbo" | "get_l2_orderbook") {
             let market = required(&params, "market")?;

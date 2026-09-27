@@ -1,3 +1,6 @@
+mod config;
+mod grouped;
+
 use serde_json::json;
 
 use crate::exchange::ValidatedResponse;
@@ -43,6 +46,28 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<Option<ValidatedResponse>> {
         match method_name {
+            "create_sub_account" | "change_api_key_signed" => Ok(Some(
+                self.submit_signed_tx(
+                    self.sign_account_admin_from_params(
+                        params,
+                        method_name == "change_api_key_signed",
+                    )
+                    .await?,
+                    params.optional_bool("price_protection")?,
+                )
+                .await?,
+            )),
+            "update_account_config" | "update_account_asset_config" => Ok(Some(
+                self.submit_signed_tx(
+                    self.sign_account_config_from_params(
+                        params,
+                        method_name == "update_account_asset_config",
+                    )
+                    .await?,
+                    params.optional_bool("price_protection")?,
+                )
+                .await?,
+            )),
             "create_rfq" => {
                 params.ensure_allowed(&[
                     "market_index",
@@ -154,6 +179,13 @@ impl LighterClient {
                         .await?,
                 ))
             }
+            "create_grouped_orders" => Ok(Some(
+                self.submit_signed_tx(
+                    self.sign_grouped_orders_from_params(params).await?,
+                    params.optional_bool("price_protection")?,
+                )
+                .await?,
+            )),
             "create_order" | "place_order" => Ok(Some(
                 self.submit_signed_tx(
                     self.sign_create_order_from_params(params).await?,
@@ -206,6 +238,20 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
         match method_name {
+            "sign_create_sub_account" | "sign_change_api_key_signed" => {
+                self.sign_account_admin_from_params(
+                    params,
+                    method_name == "sign_change_api_key_signed",
+                )
+                .await
+            }
+            "sign_create_grouped_orders" => self.sign_grouped_orders_from_params(params).await,
+            "sign_update_account_config" => {
+                self.sign_account_config_from_params(params, false).await
+            }
+            "sign_update_account_asset_config" => {
+                self.sign_account_config_from_params(params, true).await
+            }
             "sign_create_order" => self.sign_create_order_from_params(params).await,
             "sign_cancel_order" => self.sign_cancel_order_from_params(params).await,
             "sign_modify_order" => self.sign_modify_order_from_params(params).await,

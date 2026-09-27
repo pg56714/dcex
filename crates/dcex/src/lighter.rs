@@ -836,3 +836,55 @@ mod tests {
         );
     }
 }
+
+/// Hash each order to four field elements, then fold in submission order.
+/// Matches lighter-go `L2CreateGroupedOrdersTxInfo.Hash` (HashNoPad/HashNToOne).
+pub(crate) fn grouped_order_hash(orders: &[[u64; 10]]) -> Result<[u64; 4]> {
+    let mut orders = orders.iter();
+    let first = orders.next().ok_or_else(|| {
+        DcexError::InvalidInput("Lighter grouped orders must not be empty".into())
+    })?;
+    let mut hash = poseidon_hash(first, 4);
+    for order in orders {
+        hash.extend(poseidon_hash(order, 4));
+        hash = poseidon_hash(&hash, 4);
+    }
+    Ok(hash.try_into().expect("four field elements"))
+}
+
+#[cfg(test)]
+mod grouped_order_vectors {
+    #[test]
+    fn matches_official_go_poseidon_v0_0_15() {
+        // Generated independently with lighter-go's order folding and poseidon_crypto v0.0.15.
+        let orders = [
+            [1, 42, 1000, 250000, 0, 0, 1, 0, 0, 1800000000000],
+            [1, 43, 0, 240000, 1, 2, 0, 1, 245000, 1800000000000],
+            [1, 44, 0, 270000, 1, 4, 0, 1, 265000, 1800000000000],
+        ];
+        let folded = super::grouped_order_hash(&orders).unwrap();
+        assert_eq!(
+            folded,
+            [
+                5400670057121935099,
+                3896468889462594814,
+                10398233550992208621,
+                9978647018434565302
+            ]
+        );
+        let mut values = vec![304, 28, 5, 1700000600000, 12, 3, 3];
+        values.extend(folded.map(i128::from));
+        let expected = [
+            7156653514492034847_u64,
+            8362786800291750934,
+            5593140061375059301,
+            5344044269466840264,
+            6528189259389496168,
+        ];
+        let expected_bytes: Vec<u8> = expected.into_iter().flat_map(u64::to_le_bytes).collect();
+        assert_eq!(
+            super::transaction_hash(&values, &[]).to_vec(),
+            expected_bytes
+        );
+    }
+}

@@ -102,3 +102,21 @@ class MarketHTTP(HTTPManager):
                 limit=limit,
             ),
         )
+
+    def get_interest_rate_curves_history(self, *, interval: str) -> Any:  # noqa: ANN401
+        """
+        Get interest rate curves history.
+
+        Source: https://api.docs.extended.exchange/#get-interest-rate-curves-history
+        """
+        return self._native_public(
+            "get_interest_rate_curves_history", self._native_params(interval=interval)
+        )
+
+    def get_latest_interest_rate_curve(self) -> Any:  # noqa: ANN401
+        """
+        Get latest interest rate curve.
+
+        Source: https://api.docs.extended.exchange/#get-latest-interest-rate-curve
+        """
+        return self._native_public("get_latest_interest_rate_curve", self._native_params())

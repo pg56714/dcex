@@ -39,6 +39,10 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_withdrawal_delay()
     ];
     private [
+        create_sub_account(), change_api_key_signed(new_pubkey => "new_pubkey", l1_signature => "l1_signature", nonce => "nonce"),
+        update_account_config(account_trading_mode => "account_trading_mode"),
+        update_account_asset_config(asset_index => "asset_index", asset_margin_mode => "asset_margin_mode"),
+        create_grouped_orders(grouping_type => "grouping_type", orders => "orders"),
         cancel_all_orders(time_in_force => "time_in_force", timestamp_ms => "timestamp_ms"),
         create_rfq(market_index => "market_index", direction => "direction"),
         get_rfq(rfq_id => "rfq_id"),
@@ -75,6 +79,29 @@ crate::exchanges::impl_exchange_method_wrappers! {
 }
 
 impl LighterClient {
+    pub async fn sign_update_account_config(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_update_account_config", params)
+            .await
+    }
+
+    pub async fn sign_update_account_asset_config(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_update_account_asset_config", params)
+            .await
+    }
+    pub async fn sign_create_grouped_orders(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_create_grouped_orders", params)
+            .await
+    }
+
     pub async fn sign_create_order(
         &self,
         params: Vec<(String, String)>,
@@ -115,5 +142,33 @@ impl LighterClient {
         params: Vec<(String, String)>,
     ) -> Result<LighterSignedTransaction> {
         self.sign_request("sign_update_margin", params).await
+    }
+}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public [
+get_transaction(by => "by",value => "value"),
+get_transaction_by_l1_hash(hash => "hash"),
+create_deposit_intent_address(chain_id => "chain_id",from_addr => "from_addr",amount => "amount"),
+get_latest_deposit(l1_address => "l1_address"),]; private [
+change_account_tier(account_index => "account_index",new_tier => "new_tier"),
+create_read_only_token(name => "name",account_index => "account_index",expiry => "expiry",sub_account_access => "sub_account_access"),
+revoke_read_only_token(token_id => "token_id",account_index => "account_index"),
+acknowledge_notification(notif_id => "notif_id",account_index => "account_index"),];}
+
+impl LighterClient {
+    /// Sign a type-9 subaccount creation without broadcasting it.
+    pub async fn sign_create_sub_account(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_create_sub_account", params).await
+    }
+    /// Sign type 8 with a caller-supplied L1 wallet signature and explicit nonce.
+    pub async fn sign_change_api_key_signed(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_change_api_key_signed", params)
+            .await
     }
 }

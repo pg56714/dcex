@@ -1,3 +1,4 @@
+mod post;
 mod private;
 mod public;
 

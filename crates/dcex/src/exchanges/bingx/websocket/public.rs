@@ -12,11 +12,13 @@ use super::{
 
 const SPOT_WS_URL: &str = "wss://open-api-ws.bingx.com/market";
 const SWAP_WS_URL: &str = "wss://open-api-swap.bingx.com/swap-market";
+const COIN_SWAP_WS_URL: &str = "wss://open-api-cswap-ws.bingx.com/market";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum BingxPublicMarket {
     Spot,
     Swap,
+    CoinSwap,
 }
 
 pub struct BingxPublicWebSocket {
@@ -26,6 +28,13 @@ pub struct BingxPublicWebSocket {
 }
 
 impl BingxPublicWebSocket {
+    pub fn new_coin_swap(timeout: Duration) -> Result<Self> {
+        Self::with_coin_swap_url(COIN_SWAP_WS_URL, timeout)
+    }
+
+    pub fn with_coin_swap_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
+        Self::with_url_and_market(url.into(), timeout, BingxPublicMarket::CoinSwap)
+    }
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_spot_url(SPOT_WS_URL.to_string(), timeout)
     }
@@ -86,6 +95,21 @@ impl BingxPublicWebSocket {
         self.send_subscription("unsub", data_type).await
     }
 
+    pub async fn subscribe_book_ticker(&mut self, product_symbol: &str) -> Result<String> {
+        let symbol = self.symbol_for_connection(product_symbol)?;
+        self.subscribe(&format!("{symbol}@bookTicker")).await
+    }
+
+    pub async fn subscribe_mark_price(&mut self, product_symbol: &str) -> Result<String> {
+        let symbol = self.symbol_for_connection(product_symbol)?;
+        self.subscribe(&format!("{symbol}@markPrice")).await
+    }
+
+    pub async fn subscribe_last_price(&mut self, product_symbol: &str) -> Result<String> {
+        let symbol = self.symbol_for_connection(product_symbol)?;
+        self.subscribe(&format!("{symbol}@lastPrice")).await
+    }
+
     pub async fn subscribe_ticker(&mut self, product_symbol: &str) -> Result<String> {
         let symbol = self.symbol_for_connection(product_symbol)?;
         self.subscribe(&format!("{symbol}@ticker")).await
@@ -106,6 +130,14 @@ impl BingxPublicWebSocket {
         let depth = normalize_orderbook_depth(depth)?;
         match self.market {
             BingxPublicMarket::Spot => self.subscribe(&format!("{symbol}@depth{depth}")).await,
+            BingxPublicMarket::CoinSwap => {
+                if speed != "500ms" {
+                    return Err(DcexError::InvalidInput(
+                        "Coin-M depth has no configurable speed; use the default".into(),
+                    ));
+                }
+                self.subscribe(&format!("{symbol}@depth{depth}")).await
+            }
             BingxPublicMarket::Swap => {
                 let speed = normalize_orderbook_speed(speed)?;
                 if speed == "200ms" && !matches!(symbol.as_str(), "BTC-USDT" | "ETH-USDT") {
@@ -185,6 +217,11 @@ impl BingxPublicWebSocket {
 
     fn symbol_for_connection(&self, product_symbol: &str) -> Result<String> {
         let (symbol, market) = normalize_product_symbol(product_symbol)?;
+        if self.market == BingxPublicMarket::CoinSwap && !symbol.ends_with("-USD") {
+            return Err(DcexError::InvalidInput(
+                "BingX Coin-M requires a BASE-USD symbol".into(),
+            ));
+        }
         if let Some(market) = market {
             if market != self.market {
                 return Err(DcexError::InvalidInput(format!(
@@ -236,7 +273,7 @@ fn normalize_interval(interval: &str, market: BingxPublicMarket) -> Result<Strin
             "3d", "1w", "1M",
         ]
         .contains(&normalized.as_str()),
-        BingxPublicMarket::Swap => [
+        BingxPublicMarket::Swap | BingxPublicMarket::CoinSwap => [
             "1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "8h", "12h", "1d", "3d", "1w",
             "1M",
         ]
@@ -268,7 +305,11 @@ fn normalize_product_symbol(product_symbol: &str) -> Result<(String, Option<Bing
         [base, quote, kind]
             if !base.is_empty() && !quote.is_empty() && kind.eq_ignore_ascii_case("SWAP") =>
         {
-            Some(BingxPublicMarket::Swap)
+            Some(if quote.eq_ignore_ascii_case("USD") {
+                BingxPublicMarket::CoinSwap
+            } else {
+                BingxPublicMarket::Swap
+            })
         }
         _ => {
             return Err(DcexError::InvalidInput(format!(
@@ -298,7 +339,9 @@ fn normalize_product_symbol(product_symbol: &str) -> Result<(String, Option<Bing
 }
 
 fn market_for_url(url: &str) -> BingxPublicMarket {
-    if url.contains("swap-market") {
+    if url.contains("open-api-cswap-ws.bingx.com") {
+        BingxPublicMarket::CoinSwap
+    } else if url.contains("swap-market") {
         BingxPublicMarket::Swap
     } else {
         BingxPublicMarket::Spot

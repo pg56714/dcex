@@ -97,6 +97,22 @@ class FakeSyncResponse:
 
 
 class FakeSyncNativePublicClient:
+    def export_swap_income(self, params: list[tuple[str, str]]) -> bytes:
+        self.calls.append(
+            {"method": "NATIVE_BYTES", "path": "export_swap_income", "params": params}
+        )
+        return b"binary-response"
+
+    def retrieve_spot_export(self, id: str) -> bytes:
+        self.calls.append({"method": "NATIVE_BYTES", "path": "retrieve_spot_export", "params": id})
+        return b"binary-response"
+
+    def get_sbe_orderbook(self, inst_id_code: int) -> bytes:
+        self.calls.append(
+            {"method": "NATIVE_BYTES", "path": "get_sbe_orderbook", "params": inst_id_code}
+        )
+        return b"binary-response"
+
     def __init__(self, calls: list[dict[str, Any]]) -> None:
         self.calls = calls
 
@@ -150,6 +166,22 @@ class FakeSyncNativePublicClient:
 
 
 class FakeAsyncNativePublicClient:
+    async def export_swap_income_async(self, params: list[tuple[str, str]]) -> bytes:
+        self.calls.append(
+            {"method": "NATIVE_BYTES", "path": "export_swap_income", "params": params}
+        )
+        return b"binary-response"
+
+    async def retrieve_spot_export_async(self, id: str) -> bytes:
+        self.calls.append({"method": "NATIVE_BYTES", "path": "retrieve_spot_export", "params": id})
+        return b"binary-response"
+
+    async def get_sbe_orderbook_async(self, inst_id_code: int) -> bytes:
+        self.calls.append(
+            {"method": "NATIVE_BYTES", "path": "get_sbe_orderbook", "params": inst_id_code}
+        )
+        return b"binary-response"
+
     def __init__(self, calls: list[dict[str, Any]]) -> None:
         self.calls = calls
 

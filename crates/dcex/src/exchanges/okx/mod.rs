@@ -1,4 +1,5 @@
 mod account;
+mod algo;
 mod asset;
 mod client;
 mod endpoints;
@@ -6,6 +7,7 @@ mod finance;
 mod market;
 mod params;
 mod private;
+mod risk;
 mod signing;
 mod spread;
 mod subaccount;

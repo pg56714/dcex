@@ -738,9 +738,7 @@ def test_native_bybit_margin_lifecycle_uses_official_paths_and_payloads() -> Non
             timeout=2,
             base_url=base_url,
         )
-        client.private_request_json(
-            "manual_borrow", [("coin", "USDT"), ("amount", "1")]
-        )
+        client.private_request_json("manual_borrow", [("coin", "USDT"), ("amount", "1")])
         client.private_request_json(
             "manual_repay_without_conversion",
             [
@@ -749,9 +747,7 @@ def test_native_bybit_margin_lifecycle_uses_official_paths_and_payloads() -> Non
                 ("repaymentType", "FLEXIBLE"),
             ],
         )
-        client.private_request_json(
-            "get_margin_liability", [("currency", "USDT")]
-        )
+        client.private_request_json("get_margin_liability", [("currency", "USDT")])
         client.private_request_json(
             "borrow_fixed_rate",
             [
@@ -784,3 +780,23 @@ def test_native_bybit_margin_lifecycle_uses_official_paths_and_payloads() -> Non
         "annualRate": "0.02",
         "term": "7",
     }
+
+
+@pytest.mark.asyncio
+async def test_async_bingx_manager_sends_unsigned_json_body() -> None:
+    from dcex.async_support.bingx.client import Client
+
+    with _http_server() as (base_url, received):
+        manager = Client(base_url=base_url, preload_product_table=False)
+        try:
+            await manager.async_init()
+            result = await manager._request(
+                "POST", "/test", {"symbol": "BTCUSDT", "limit": 1}, signed=False
+            )
+        finally:
+            await manager.close()
+    request = received.get_nowait()
+    assert result == {"ok": True}
+    assert request["path"] == "/test"
+    assert request["body"] == '{"symbol":"BTCUSDT","limit":1}'
+    assert "bingx_api_key" not in request

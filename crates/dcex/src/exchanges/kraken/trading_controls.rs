@@ -1,0 +1,474 @@
+//! Additional batch trading, available balances and margin preferences.
+use super::client::{KrakenAuth, KrakenClient};
+use super::params::KrakenParams;
+use crate::exchange::ValidatedResponse;
+use crate::http::HttpMethod;
+use crate::{DcexError, Result};
+use serde_json::{Value, json};
+
+fn invalid(message: &str) -> DcexError {
+    DcexError::InvalidInput(format!("Kraken: {message}"))
+}
+fn parse_bool(params: &KrakenParams, key: &str) -> Result<Option<bool>> {
+    params
+        .get(key)
+        .map(|value| {
+            value
+                .parse::<bool>()
+                .map_err(|_| invalid("expected boolean"))
+        })
+        .transpose()
+}
+fn array(params: &KrakenParams, key: &str) -> Result<Vec<Value>> {
+    let value: Value =
+        serde_json::from_str(params.required(key)?).map_err(|e| invalid(&e.to_string()))?;
+    value
+        .as_array()
+        .cloned()
+        .ok_or_else(|| invalid("expected JSON array"))
+}
+
+impl KrakenClient {
+    pub(super) async fn trading_controls_request(
+        &self,
+        name: &str,
+        params: &KrakenParams,
+    ) -> Result<Option<ValidatedResponse>> {
+        let result = match name {
+            "manage_futures_batch_orders" => {
+                params.ensure_allowed(&["orders", "processBefore"])?;
+                let mut orders = array(params, "orders")?;
+                if !(1..=500).contains(&orders.len()) {
+                    return Err(invalid("batch requires 1..=500 instructions"));
+                }
+                for order in &mut orders {
+                    let object = order
+                        .as_object_mut()
+                        .ok_or_else(|| invalid("batch instruction must be an object"))?;
+                    if let Some(symbol) = object.remove("product_symbol") {
+                        if object.contains_key("symbol") {
+                            return Err(invalid("use symbol or product_symbol, exclusively"));
+                        }
+                        let symbol = self.exchange_symbol(
+                            symbol
+                                .as_str()
+                                .ok_or_else(|| invalid("product_symbol must be a string"))?,
+                            "PF_",
+                        )?;
+                        object.insert("symbol".into(), symbol.into());
+                    }
+                    validate_futures_instruction(order)?;
+                }
+                let mut payload = vec![("json".into(), json!({"batchOrder":orders}).to_string())];
+                if let Some(before) = params.get("processBefore") {
+                    if before.is_empty() {
+                        return Err(invalid("processBefore cannot be empty"));
+                    }
+                    payload.push(("processBefore".into(), before.into()));
+                }
+                self.private_post(
+                    KrakenAuth::Futures,
+                    "/derivatives/api/v3/batchorder",
+                    payload,
+                )
+                .await?
+            }
+            "get_spot_extended_balance" => {
+                params.ensure_allowed(&["rebase_multiplier"])?;
+                if params
+                    .get("rebase_multiplier")
+                    .is_some_and(|v| !["base", "rebased"].contains(&v))
+                {
+                    return Err(invalid("rebase_multiplier must be base or rebased"));
+                }
+                self.private_post(
+                    KrakenAuth::Spot,
+                    "/0/private/BalanceEx",
+                    params.only(&["rebase_multiplier"]),
+                )
+                .await?
+            }
+            "get_futures_leverage_preferences" => {
+                params.ensure_allowed(&[])?;
+                self.private_get(
+                    KrakenAuth::Futures,
+                    "/derivatives/api/v3/leveragepreferences",
+                    vec![],
+                )
+                .await?
+            }
+            "set_futures_leverage_preference" => {
+                params.ensure_allowed(&["product_symbol", "maxLeverage"])?;
+                let symbol = self.exchange_symbol(params.required("product_symbol")?, "PF_")?;
+                let mut query = params.only(&["maxLeverage"]);
+                if params
+                    .get("maxLeverage")
+                    .is_some_and(|v| !v.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0))
+                {
+                    return Err(invalid(
+                        "maxLeverage must be positive; omit it for cross margin",
+                    ));
+                }
+                query.push(("symbol".into(), symbol));
+                self.request(
+                    HttpMethod::Put,
+                    KrakenAuth::Futures,
+                    "/derivatives/api/v3/leveragepreferences",
+                    query,
+                    None,
+                    true,
+                )
+                .await?
+            }
+            "place_spot_batch_orders" => {
+                params.ensure_allowed(&[
+                    "product_symbol",
+                    "orders",
+                    "validate",
+                    "deadline",
+                    "asset_class",
+                ])?;
+                let orders = array(params, "orders")?;
+                if !(2..=15).contains(&orders.len()) {
+                    return Err(invalid("batch must contain 2..=15 orders"));
+                }
+                for order in &orders {
+                    validate_batch_order(order)?;
+                }
+                let mut body = json!({"pair":self.exchange_symbol(params.required("product_symbol")?,"")?,"orders":orders});
+                if let Some(value) = parse_bool(params, "validate")? {
+                    body["validate"] = value.into();
+                }
+                if let Some(value) = params.get("deadline") {
+                    body["deadline"] = value.into();
+                }
+                let asset = params
+                    .get("asset_class")
+                    .map(str::to_string)
+                    .or(self.spot_asset_class(params.required("product_symbol")?)?);
+                if let Some(asset) = asset {
+                    if asset != "tokenized_asset" {
+                        return Err(invalid("unsupported asset_class"));
+                    }
+                    body["asset_class"] = asset.into();
+                }
+                self.request(
+                    HttpMethod::Post,
+                    KrakenAuth::Spot,
+                    "/0/private/AddOrderBatch",
+                    vec![],
+                    Some(body.to_string().into_bytes()),
+                    true,
+                )
+                .await?
+            }
+            "cancel_spot_batch_orders" => {
+                params.ensure_allowed(&["orders", "cl_ord_ids"])?;
+                let mut body = json!({});
+                let mut count = 0;
+                for key in ["orders", "cl_ord_ids"] {
+                    if params.get(key).is_some() {
+                        let values = array(params, key)?;
+                        if values.is_empty() {
+                            return Err(invalid("explicit cancellation lists must not be empty"));
+                        }
+                        for value in &values {
+                            if !value.as_str().is_some_and(|s| !s.is_empty())
+                                && !(key == "orders"
+                                    && value.as_i64().is_some_and(|v| i32::try_from(v).is_ok()))
+                            {
+                                return Err(invalid(
+                                    "orders require txid strings or int32 userrefs; cl_ord_ids require strings",
+                                ));
+                            }
+                        }
+                        count += values.len();
+                        body[key] = values.into();
+                    }
+                }
+                if !(1..=50).contains(&count) {
+                    return Err(invalid("batch cancellation requires 1..=50 identifiers"));
+                }
+                self.request(
+                    HttpMethod::Post,
+                    KrakenAuth::Spot,
+                    "/0/private/CancelOrderBatch",
+                    vec![],
+                    Some(body.to_string().into_bytes()),
+                    true,
+                )
+                .await?
+            }
+            _ => return Ok(None),
+        };
+        Ok(Some(result))
+    }
+}
+
+fn validate_batch_order(value: &Value) -> Result<()> {
+    let object = value
+        .as_object()
+        .ok_or_else(|| invalid("batch order must be an object"))?;
+    let allowed = [
+        "userref",
+        "cl_ord_id",
+        "ordertype",
+        "type",
+        "volume",
+        "displayvol",
+        "price",
+        "price2",
+        "trigger",
+        "leverage",
+        "reduce_only",
+        "stptype",
+        "oflags",
+        "timeinforce",
+        "starttm",
+        "expiretm",
+        "close",
+    ];
+    if object.keys().any(|key| !allowed.contains(&key.as_str())) {
+        return Err(invalid("unsupported batch order field"));
+    }
+    for key in ["ordertype", "type", "volume"] {
+        if !value[key].as_str().is_some_and(|s| !s.is_empty()) {
+            return Err(invalid("ordertype, type and volume are required strings"));
+        }
+    }
+    if !["buy", "sell"].contains(&value["type"].as_str().unwrap()) {
+        return Err(invalid("invalid order side"));
+    }
+    let kind = value["ordertype"].as_str().unwrap();
+    if ![
+        "market",
+        "limit",
+        "iceberg",
+        "stop-loss",
+        "take-profit",
+        "stop-loss-limit",
+        "take-profit-limit",
+        "trailing-stop",
+        "trailing-stop-limit",
+        "settle-position",
+    ]
+    .contains(&kind)
+    {
+        return Err(invalid("unsupported ordertype"));
+    }
+    let volume = value["volume"]
+        .as_str()
+        .unwrap()
+        .parse::<f64>()
+        .map_err(|_| invalid("invalid volume"))?;
+    if !volume.is_finite()
+        || volume < 0.0
+        || volume == 0.0 && value["reduce_only"] != true && kind != "settle-position"
+    {
+        return Err(invalid("zero volume is reserved for closing margin orders"));
+    }
+    if object.contains_key("userref") && object.contains_key("cl_ord_id") {
+        return Err(invalid("userref and cl_ord_id are mutually exclusive"));
+    }
+    if object.get("reduce_only").is_some_and(|v| !v.is_boolean()) {
+        return Err(invalid("reduce_only must be a JSON boolean"));
+    }
+    if !["market", "settle-position"].contains(&kind)
+        && !value["price"].as_str().is_some_and(|s| !s.is_empty())
+    {
+        return Err(invalid("price is required for this order type"));
+    }
+    if [
+        "stop-loss-limit",
+        "take-profit-limit",
+        "trailing-stop-limit",
+    ]
+    .contains(&kind)
+        && !value["price2"].as_str().is_some_and(|s| !s.is_empty())
+    {
+        return Err(invalid("price2 is required"));
+    }
+    if kind == "iceberg"
+        && !value["displayvol"].as_str().is_some_and(|s| {
+            s.parse::<f64>()
+                .is_ok_and(|v| v.is_finite() && v > 0.0 && v <= volume && v * 15.0 >= volume)
+        })
+    {
+        return Err(invalid("displayvol must be between volume/15 and volume"));
+    }
+    if value["timeinforce"] == "GTD" && !object.contains_key("expiretm") {
+        return Err(invalid("GTD requires expiretm"));
+    }
+    Ok(())
+}
+
+fn validate_futures_instruction(value: &Value) -> Result<()> {
+    let object = value
+        .as_object()
+        .ok_or_else(|| invalid("instruction must be an object"))?;
+    let order = value["order"]
+        .as_str()
+        .ok_or_else(|| invalid("order instruction is required"))?;
+    let allowed: &[&str] = match order {
+        "send" => &[
+            "order",
+            "order_tag",
+            "orderType",
+            "symbol",
+            "side",
+            "size",
+            "limitPrice",
+            "stopPrice",
+            "cliOrdId",
+            "triggerSignal",
+            "reduceOnly",
+            "trailingStopMaxDeviation",
+            "trailingStopDeviationUnit",
+        ],
+        "edit" => &[
+            "order",
+            "order_id",
+            "cliOrdId",
+            "size",
+            "limitPrice",
+            "stopPrice",
+            "trailingStopMaxDeviation",
+            "trailingStopDeviationUnit",
+            "qtyMode",
+        ],
+        "cancel" => &["order", "order_id", "cliOrdId"],
+        _ => return Err(invalid("order must be send, edit or cancel")),
+    };
+    if object.keys().any(|k| !allowed.contains(&k.as_str())) {
+        return Err(invalid("unsupported batch instruction field"));
+    }
+    for k in [
+        "size",
+        "limitPrice",
+        "stopPrice",
+        "trailingStopMaxDeviation",
+    ] {
+        if let Some(v) = object.get(k) {
+            if !v.as_f64().is_some_and(|v| v.is_finite() && v > 0.0) {
+                return Err(invalid(
+                    "batch price and size fields require positive JSON numbers",
+                ));
+            }
+        }
+    }
+    for k in [
+        "order_tag",
+        "orderType",
+        "symbol",
+        "side",
+        "cliOrdId",
+        "order_id",
+        "triggerSignal",
+        "trailingStopDeviationUnit",
+        "qtyMode",
+    ] {
+        if let Some(v) = object.get(k) {
+            if !v.as_str().is_some_and(|v| !v.trim().is_empty()) {
+                return Err(invalid(
+                    "batch identifiers and enums must be nonempty strings",
+                ));
+            }
+        }
+    }
+    if value
+        .get("cliOrdId")
+        .and_then(Value::as_str)
+        .is_some_and(|v| v.len() > 100)
+    {
+        return Err(invalid("cliOrdId exceeds 100 characters"));
+    }
+    if object.get("reduceOnly").is_some_and(|v| !v.is_boolean()) {
+        return Err(invalid("reduceOnly must be a JSON boolean"));
+    }
+    for (k, allowed) in [
+        ("side", &["buy", "sell"][..]),
+        (
+            "orderType",
+            &[
+                "lmt",
+                "post",
+                "ioc",
+                "mkt",
+                "stp",
+                "take_profit",
+                "trailing_stop",
+                "fok",
+            ][..],
+        ),
+        ("triggerSignal", &["mark", "index", "last"][..]),
+        (
+            "trailingStopDeviationUnit",
+            &["PERCENT", "QUOTE_CURRENCY"][..],
+        ),
+        ("qtyMode", &["ABSOLUTE", "RELATIVE"][..]),
+    ] {
+        if let Some(v) = object.get(k) {
+            if !v.as_str().is_some_and(|v| allowed.contains(&v)) {
+                return Err(invalid("unsupported batch enum"));
+            }
+        }
+    }
+    if order == "send" {
+        for k in ["symbol", "order_tag", "side", "size", "orderType"] {
+            if !object.contains_key(k) {
+                return Err(invalid("send instruction is missing a required field"));
+            }
+        }
+        match value["orderType"].as_str().unwrap_or_default() {
+            "lmt" | "post" | "ioc" | "fok" => {
+                if !object.contains_key("limitPrice") {
+                    return Err(invalid("limit order requires limitPrice"));
+                }
+            }
+            "stp" | "take_profit" => {
+                if !object.contains_key("stopPrice") || !object.contains_key("limitPrice") {
+                    return Err(invalid(
+                        "conditional batch order requires stopPrice and limitPrice",
+                    ));
+                }
+            }
+            "trailing_stop" => {
+                if !object.contains_key("trailingStopMaxDeviation")
+                    || !object.contains_key("trailingStopDeviationUnit")
+                    || object.contains_key("limitPrice")
+                    || object.contains_key("stopPrice")
+                {
+                    return Err(invalid(
+                        "trailing_stop requires deviation fields and no explicit prices",
+                    ));
+                }
+            }
+            _ => {}
+        }
+    } else {
+        if object.contains_key("order_id") == object.contains_key("cliOrdId") {
+            return Err(invalid("provide exactly one of order_id and cliOrdId"));
+        }
+        if order == "edit"
+            && ![
+                "size",
+                "limitPrice",
+                "stopPrice",
+                "trailingStopMaxDeviation",
+                "trailingStopDeviationUnit",
+            ]
+            .iter()
+            .any(|k| object.contains_key(*k))
+        {
+            return Err(invalid("edit requires at least one change"));
+        }
+    }
+    if value["trailingStopDeviationUnit"] == "PERCENT"
+        && !value["trailingStopMaxDeviation"]
+            .as_f64()
+            .is_some_and(|v| (0.1..=50.0).contains(&v))
+    {
+        return Err(invalid("trailing percentage must be 0.1..=50"));
+    }
+    Ok(())
+}

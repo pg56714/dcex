@@ -59,6 +59,12 @@ class PublicClient(AsyncWebSocketMixin):
         """Connect to the public trades stream."""
         await self._native_client.subscribe_trades(market)
 
+    async def subscribe_rfq_orderbook(
+        self, market: str | None = None, depth: int | None = None
+    ) -> None:
+        """Subscribe to resting RFQ orders, with optional best-bid/ask depth 1."""
+        await self._native_client.subscribe_rfq_orderbook(market, depth)
+
     async def subscribe_funding(self, market: str | None = None) -> None:
         """Connect to the perpetual funding stream."""
         await self._native_client.subscribe_funding(market)

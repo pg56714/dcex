@@ -59,7 +59,7 @@ cargo add dcex
 | Ondo | 支援 | 支援 | 支援 | 支援 |
 | Arcus | 支援 | 支援 | 支援 | 支援 |
 
-私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Bybit 另提供可進行訂單操作的驗證交易 WebSocket。Lighter Mainnet 與 Robinhood 使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet；參閱 [.env.example](.env.example) 與 [Lighter 範例](examples/async/lighter_private_readonly.py)。Ondo 目前僅支援永續合約。
+私人 WebSocket 包含需驗證身分或指定地址的使用者資料流；Binance、Bybit、Bitget 與 Kraken 現貨提供交易 WebSocket；Hyperliquid 與 Lighter 可提交已簽名操作，Arcus 提供簽名請求建立介面。Lighter Mainnet 與 Robinhood 使用不同憑證；可逐一為客戶端選擇網路，預設為 Mainnet；參閱 [.env.example](.env.example) 與 [Lighter 範例](examples/async/lighter_private_readonly.py)。Ondo 目前僅支援永續合約。
 
 ## Python 快速開始
 
@@ -137,3 +137,5 @@ cargo run -p dcex --example binance_ws_public
 直接使用 Rust 的說明見 [crate README](crates/dcex/README.zh_tw.md)。預設測試套件可透過 `uv run pytest` 離線執行；即時測試須自行啟用。開發與測試詳情見[貢獻指南](.github/CONTRIBUTING.md)。
 
 本專案採用 [MIT 授權](LICENSE)；其他授權資訊見[第三方聲明](THIRD_PARTY_NOTICES.md)。
+
+[端點覆蓋、限制與驗證紀錄](docs/endpoint-audit.zh_tw.md)。

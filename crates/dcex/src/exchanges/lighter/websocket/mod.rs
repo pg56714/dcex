@@ -1,5 +1,6 @@
 mod private;
 mod public;
+mod trading;
 
 pub use private::LighterPrivateWebSocket;
 pub use public::LighterPublicWebSocket;

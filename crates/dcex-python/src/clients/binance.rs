@@ -14,7 +14,9 @@ impl PythonBinanceHttpClient {
         timeout=10.0,
         spot_base_url=None,
         futures_base_url=None,
-        options_base_url=None
+        options_base_url=None,
+        coin_futures_base_url=None,
+        portfolio_margin_base_url=None
     ))]
     fn new(
         api_key: Option<String>,
@@ -23,6 +25,8 @@ impl PythonBinanceHttpClient {
         spot_base_url: Option<String>,
         futures_base_url: Option<String>,
         options_base_url: Option<String>,
+        coin_futures_base_url: Option<String>,
+        portfolio_margin_base_url: Option<String>,
     ) -> PyResult<Self> {
         let timeout = http_timeout(timeout)?;
         Ok(Self {
@@ -34,7 +38,13 @@ impl PythonBinanceHttpClient {
                 futures_base_url.unwrap_or_else(|| "https://fapi.binance.com".to_string()),
                 options_base_url.unwrap_or_else(|| "https://eapi.binance.com".to_string()),
             )
-            .map_err(to_py_runtime_error)?,
+            .map_err(to_py_runtime_error)?
+            .with_coin_futures_base_url(
+                coin_futures_base_url.unwrap_or_else(|| "https://dapi.binance.com".into()),
+            )
+            .with_portfolio_margin_base_url(
+                portfolio_margin_base_url.unwrap_or_else(|| "https://papi.binance.com".into()),
+            ),
         })
     }
 

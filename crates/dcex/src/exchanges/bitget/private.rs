@@ -11,6 +11,18 @@ impl BitgetClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BitgetParams::from_pairs(params);
+        if let Some(response) = self.batch_controls_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.risk_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(result) = self
+            .trading_controls_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(result);
+        }
         if let Some(result) = self.account_private_request(method_name, &params).await? {
             return Ok(result);
         }

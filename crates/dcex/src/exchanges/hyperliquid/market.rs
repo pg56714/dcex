@@ -14,6 +14,100 @@ impl HyperliquidClient {
     ) -> Result<ValidatedResponse> {
         let params = HyperliquidParams::from_pairs(params);
         let payload = match method_name {
+            "get_perps_at_open_interest_cap" => {
+                params.ensure_allowed(&["dex"])?;
+                let mut payload = json!({"type":"perpsAtOpenInterestCap"});
+                if let Some(value) = params.get("dex") {
+                    payload["dex"] = value.into();
+                }
+                payload
+            }
+            "get_perp_dex_limits" => {
+                params.ensure_allowed(&["dex"])?;
+                let mut payload = json!({"type":"perpDexLimits"});
+                payload["dex"] = params.required("dex")?.into();
+                payload
+            }
+            "get_perp_dex_status" => {
+                params.ensure_allowed(&["dex"])?;
+                let mut payload = json!({"type":"perpDexStatus"});
+                payload["dex"] = params
+                    .get("dex")
+                    .ok_or_else(|| {
+                        DcexError::InvalidInput("dex is required; empty means the first DEX".into())
+                    })?
+                    .into();
+                payload
+            }
+            "get_all_perp_metas" => {
+                params.ensure_allowed(&[])?;
+                let payload = json!({"type":"allPerpMetas"});
+                payload
+            }
+            "get_perp_annotation" => {
+                params.ensure_allowed(&["product_symbol"])?;
+                let mut payload = json!({"type":"perpAnnotation"});
+                payload["coin"] = self.coin(params.required("product_symbol")?)?.into();
+                payload
+            }
+            "get_perp_categories" => {
+                params.ensure_allowed(&[])?;
+                let payload = json!({"type":"perpCategories"});
+                payload
+            }
+            "get_perp_concise_annotations" => {
+                params.ensure_allowed(&[])?;
+                let payload = json!({"type":"perpConciseAnnotations"});
+                payload
+            }
+            "get_token_details" => {
+                params.ensure_allowed(&["tokenId"])?;
+                let mut payload = json!({"type":"tokenDetails"});
+                let id = params.required("tokenId")?;
+                if id.len() != 34
+                    || !id.starts_with("0x")
+                    || !id[2..].bytes().all(|b| b.is_ascii_hexdigit())
+                {
+                    return Err(DcexError::InvalidInput(
+                        "tokenId must be a 16-byte hex ID".into(),
+                    ));
+                }
+                payload["tokenId"] = id.to_ascii_lowercase().into();
+                payload
+            }
+            "get_user_dex_abstraction" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"userDexAbstraction"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_user_abstraction" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"userAbstraction"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_borrow_lend_user_state" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"borrowLendUserState"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_borrow_lend_reserve_state" => {
+                params.ensure_allowed(&["token"])?;
+                let mut payload = json!({"type":"borrowLendReserveState"});
+                payload["token"] = params.required_u64("token")?.into();
+                payload
+            }
+            "get_all_borrow_lend_reserve_states" => {
+                params.ensure_allowed(&[])?;
+                let payload = json!({"type":"allBorrowLendReserveStates"});
+                payload
+            }
+            "get_predicted_fundings" => {
+                params.ensure_allowed(&[])?;
+                json!({"type":"predictedFundings"})
+            }
             "get_meta" => {
                 params.ensure_allowed(&["dex"])?;
                 let mut payload = json!({"type": "meta"});

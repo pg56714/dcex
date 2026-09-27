@@ -1,3 +1,5 @@
+from json import dumps
+
 """Bybit trade HTTP client backed by Rust."""
 
 from typing import Any
@@ -874,4 +876,119 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "get_spread_max_qty",
             self._native_params(symbol=symbol, side=side, orderPrice=order_price),
+        )
+
+    def create_strategy(
+        self,
+        category: str,
+        product_symbol: str,
+        side: str,
+        strategy_type: str,
+        *,
+        size: str | None = None,
+        position_value: str | None = None,
+        duration: int | None = None,
+        interval: int | None = None,
+        reduce_only: bool | None = None,
+        position_idx: int | None = None,
+        leverage_type: int | None = None,
+        is_random: bool | None = None,
+        trigger_price: str | None = None,
+        max_chase_price: str | None = None,
+        chase_distance: str | None = None,
+        chase_percent_e4: int | None = None,
+        sub_size: str | None = None,
+        sub_position_value: str | None = None,
+        order_count: int | None = None,
+        post_only: int | None = None,
+        limit_price: str | None = None,
+        pov_params: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Create a TWAP, chase, iceberg or POV strategy; category uses UTA_* values."""
+        return self._native_private(
+            "create_strategy",
+            self._native_params(
+                category=category,
+                product_symbol=product_symbol,
+                side=side,
+                strategyType=strategy_type,
+                size=size,
+                positionValue=position_value,
+                duration=duration,
+                interval=interval,
+                reduceOnly=reduce_only,
+                positionIdx=position_idx,
+                leverageType=leverage_type,
+                isRandom=is_random,
+                triggerPrice=trigger_price,
+                maxChasePrice=max_chase_price,
+                chaseDistance=chase_distance,
+                chasePercentE4=chase_percent_e4,
+                subSize=sub_size,
+                subPositionValue=sub_position_value,
+                orderCount=order_count,
+                postOnly=post_only,
+                limitPrice=limit_price,
+                povParams=dumps(pov_params) if pov_params is not None else None,
+            ),
+        )
+
+    def stop_strategy(self, strategy_id: str) -> dict[str, Any]:
+        """Stop a strategy and cancel its unfilled child orders."""
+        return self._native_private("stop_strategy", self._native_params(strategyId=strategy_id))
+
+    def get_strategy_list(
+        self,
+        *,
+        strategy_id: str | None = None,
+        category: str | None = None,
+        product_symbol: str | None = None,
+        status: str | None = None,
+        strategy_type: str | None = None,
+        begin_time: int | None = None,
+        end_time: int | None = None,
+        page_size: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Query strategies; begin_time and end_time are Unix seconds."""
+        return self._native_private(
+            "get_strategy_list",
+            self._native_params(
+                strategyId=strategy_id,
+                category=category,
+                product_symbol=product_symbol,
+                status=status,
+                strategyType=strategy_type,
+                beginTimeE0=begin_time,
+                endTimeE0=end_time,
+                pageSize=page_size,
+                cursor=cursor,
+            ),
+        )
+
+    def get_strategy_orders(
+        self,
+        strategy_id: str,
+        *,
+        product_symbol: str | None = None,
+        status: str | None = None,
+        strategy_type: str | None = None,
+        begin_time: int | None = None,
+        end_time: int | None = None,
+        page_size: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Query strategy child orders; times are Unix seconds."""
+        return self._native_private(
+            "get_strategy_orders",
+            self._native_params(
+                strategyId=strategy_id,
+                product_symbol=product_symbol,
+                status=status,
+                strategyType=strategy_type,
+                beginTimeE0=begin_time,
+                endTimeE0=end_time,
+                pageSize=page_size,
+                cursor=cursor,
+            ),
         )

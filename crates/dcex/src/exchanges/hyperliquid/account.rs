@@ -40,10 +40,10 @@ impl HyperliquidClient {
                     "user": params.address("user")?,
                 })
             }
-            "open_orders" => {
+            "open_orders" | "frontend_open_orders" => {
                 params.ensure_allowed(&["user", "dex"])?;
                 let mut payload = json!({
-                    "type": "openOrders",
+                    "type": if method_name=="frontend_open_orders" {"frontendOpenOrders"} else {"openOrders"},
                     "user": params.address("user")?,
                 });
                 insert_optional_string(

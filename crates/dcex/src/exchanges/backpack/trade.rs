@@ -48,6 +48,9 @@ impl BackpackClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BackpackParams::from_pairs(params);
+        if let Some(response) = self.strategy_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.account_private_request(method_name, &params).await? {
             return Ok(response);
         }

@@ -13,6 +13,35 @@ impl BybitClient {
         params: &BybitParams,
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
+            "set_spot_margin_leverage" => {
+                if !params
+                    .required("leverage")?
+                    .parse::<u32>()
+                    .is_ok_and(|v| (2..=10).contains(&v))
+                {
+                    return Err(DcexError::InvalidInput(
+                        "spot margin leverage must be an integer from 2 to 10".into(),
+                    ));
+                }
+                let mut body = Map::new();
+                insert_optional_string(&mut body, "leverage", params.get("leverage"));
+                insert_optional_string(&mut body, "currency", params.get("currency"));
+                self.post_request("/v5/spot-margin-trade/set-leverage", body)
+                    .await
+            }
+            "set_spot_margin_mode" => {
+                let mode = params.required("spotMarginMode")?;
+                if !["0", "1"].contains(&mode) {
+                    return Err(DcexError::InvalidInput(
+                        "spotMarginMode must be 0 or 1".into(),
+                    ));
+                }
+                let mut body = Map::new();
+                body.insert("spotMarginMode".into(), Value::String(mode.into()));
+                self.post_request("/v5/spot-margin-trade/switch-mode", body)
+                    .await
+            }
+
             "get_wallet_balance" => {
                 let mut query = vec![("accountType".to_string(), "UNIFIED".to_string())];
                 push_optional(&mut query, "coin", params.get("coin"));

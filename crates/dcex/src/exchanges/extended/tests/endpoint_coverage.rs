@@ -845,3 +845,200 @@ fn market_json_for_another_market_or_duplicated_is_rejected_offline() {
         ),
     );
 }
+
+#[test]
+fn portfolio_and_interest_routes_preserve_account_filters() {
+    assert_cases(&[
+        private(
+            "get_account_equity_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/equities?accountId=1000&accountId=1001&interval=WEEK",
+        ),
+        private(
+            "get_account_pnl_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("pnlType", "TOTAL_PNL"),
+                ("instrumentType", "SPOT"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/pnl?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&instrumentType=SPOT",
+        ),
+        private(
+            "get_account_pnl_percentage_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("pnlType", "TOTAL_PNL"),
+                ("priceMarket", "BTC-USD"),
+                ("priceMarket", "ETH-USD"),
+                ("instrumentType", "SPOT"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/pnl/percentage?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&priceMarket=BTC-USD&priceMarket=ETH-USD&instrumentType=SPOT",
+        ),
+        private(
+            "get_cumulative_account_pnl_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("pnlType", "TOTAL_PNL"),
+                ("instrumentType", "SPOT"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/pnl/cumulative?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&instrumentType=SPOT",
+        ),
+        private(
+            "get_cumulative_account_pnl_percentage_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("pnlType", "TOTAL_PNL"),
+                ("priceMarket", "BTC-USD"),
+                ("priceMarket", "ETH-USD"),
+                ("instrumentType", "SPOT"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/pnl/cumulative/percentage?accountId=1000&accountId=1001&interval=WEEK&pnlType=TOTAL_PNL&priceMarket=BTC-USD&priceMarket=ETH-USD&instrumentType=SPOT",
+        ),
+        private(
+            "get_account_vault_equity_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/vault-equities?accountId=1000&accountId=1001&interval=WEEK",
+        ),
+        private(
+            "get_account_max_drawdown_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/max-drawdown?accountId=1000&accountId=1001&interval=WEEK",
+        ),
+        private(
+            "get_account_funding_chart",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("market", "BTC-USD"),
+                ("market", "ETH-USD"),
+            ],
+            "GET",
+            "/api/v1/portfolio/charts/funding?accountId=1000&accountId=1001&interval=WEEK&market=BTC-USD&market=ETH-USD",
+        ),
+        private(
+            "get_account_portfolio_summary",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("instrumentType", "SPOT"),
+            ],
+            "GET",
+            "/api/v1/portfolio/accounts/summary?accountId=1000&accountId=1001&interval=WEEK&instrumentType=SPOT",
+        ),
+        private(
+            "get_account_performance",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("marketType", "PERPS"),
+            ],
+            "GET",
+            "/api/v1/portfolio/accounts/performance?accountId=1000&accountId=1001&interval=WEEK&marketType=PERPS",
+        ),
+        private(
+            "get_account_funding_stats",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("market", "BTC-USD"),
+                ("market", "ETH-USD"),
+            ],
+            "GET",
+            "/api/v1/portfolio/funding/stats?accountId=1000&accountId=1001&interval=WEEK&market=BTC-USD&market=ETH-USD",
+        ),
+        private(
+            "get_account_funding_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("market", "BTC-USD"),
+                ("market", "ETH-USD"),
+                ("cursor", "1"),
+                ("limit", "50"),
+            ],
+            "GET",
+            "/api/v1/portfolio/funding/history?accountId=1000&accountId=1001&interval=WEEK&market=BTC-USD&market=ETH-USD&cursor=1&limit=50",
+        ),
+        public(
+            "get_interest_rate_curves_history",
+            &[("interval", "WEEK")],
+            "GET",
+            "/api/v1/interest/info/rate-curves?interval=WEEK",
+        ),
+        public(
+            "get_latest_interest_rate_curve",
+            &[],
+            "GET",
+            "/api/v1/interest/info/latest-rate-curves",
+        ),
+        private(
+            "get_interest_key_metrics",
+            &[("accountId", "1000"), ("accountId", "1001")],
+            "GET",
+            "/api/v1/interest/key-metrics?accountId=1000&accountId=1001",
+        ),
+        private(
+            "get_interest_daily_metrics",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+            ],
+            "GET",
+            "/api/v1/interest/daily-metrics?accountId=1000&accountId=1001&interval=WEEK",
+        ),
+        private(
+            "get_interest_payment_chart",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+                ("bucket", "DAILY"),
+            ],
+            "GET",
+            "/api/v1/interest/payment-chart?accountId=1000&accountId=1001&interval=WEEK&bucket=DAILY",
+        ),
+        private(
+            "get_interest_payments_history",
+            &[
+                ("accountId", "1000"),
+                ("accountId", "1001"),
+                ("interval", "WEEK"),
+            ],
+            "GET",
+            "/api/v1/interest/payments?accountId=1000&accountId=1001&interval=WEEK",
+        ),
+    ]);
+}

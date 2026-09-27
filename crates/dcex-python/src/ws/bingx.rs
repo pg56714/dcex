@@ -22,13 +22,15 @@ impl PythonBingxPublicWebSocketClient {
     fn new(timeout: f64, base_url: Option<String>, market: &str) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
         let market = market.to_ascii_lowercase();
-        if !matches!(market.as_str(), "spot" | "swap") {
+        if !matches!(market.as_str(), "spot" | "swap" | "coin_swap") {
             return Err(PyValueError::new_err(
-                "BingX public WebSocket market must be 'spot' or 'swap'",
+                "BingX public WebSocket market must be 'spot', 'swap', or 'coin_swap'",
             ));
         }
         let client = if let Some(base_url) = base_url {
-            if market == "swap" {
+            if market == "coin_swap" {
+                BingxPublicWebSocket::with_coin_swap_url(base_url, timeout)
+            } else if market == "swap" {
                 BingxPublicWebSocket::with_swap_url(base_url, timeout)
             } else {
                 BingxPublicWebSocket::with_spot_url(base_url, timeout)
@@ -37,6 +39,7 @@ impl PythonBingxPublicWebSocketClient {
             match market.as_str() {
                 "spot" => BingxPublicWebSocket::new(timeout),
                 "swap" => BingxPublicWebSocket::new_swap(timeout),
+                "coin_swap" => BingxPublicWebSocket::new_coin_swap(timeout),
                 _ => unreachable!("market was validated above"),
             }
         }
@@ -101,6 +104,54 @@ impl PythonBingxPublicWebSocketClient {
                 .lock()
                 .await
                 .unsubscribe(&data_type)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn subscribe_book_ticker<'py>(
+        &self,
+        py: Python<'py>,
+        product_symbol: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe_book_ticker(&product_symbol)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn subscribe_mark_price<'py>(
+        &self,
+        py: Python<'py>,
+        product_symbol: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe_mark_price(&product_symbol)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn subscribe_last_price<'py>(
+        &self,
+        py: Python<'py>,
+        product_symbol: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe_last_price(&product_symbol)
                 .await
                 .map_err(to_py_runtime_error)
         })
@@ -210,27 +261,32 @@ impl PythonBingxPrivateWebSocketClient {
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
         let market = market.to_ascii_lowercase();
-        if !matches!(market.as_str(), "spot" | "swap") {
+        if !matches!(market.as_str(), "spot" | "swap" | "coin_swap") {
             return Err(PyValueError::new_err(
-                "BingX private WebSocket market must be 'spot' or 'swap'",
+                "BingX private WebSocket market must be 'spot', 'swap', or 'coin_swap'",
             ));
         }
         let client = match (http_base_url, ws_base_url) {
             (None, None) if market == "spot" => {
                 BingxPrivateWebSocket::new(api_key, api_secret, timeout)
             }
+            (None, None) if market == "coin_swap" => {
+                BingxPrivateWebSocket::new_coin_swap(api_key, api_secret, timeout)
+            }
             (None, None) => BingxPrivateWebSocket::new_swap(api_key, api_secret, timeout),
             (http_base_url, ws_base_url) => {
                 let http_base_url =
                     http_base_url.unwrap_or_else(|| "https://open-api.bingx.com".to_string());
                 let ws_base_url = ws_base_url.unwrap_or_else(|| {
-                    if market == "swap" {
+                    if market == "coin_swap" {
+                        "wss://open-api-cswap-ws.bingx.com/market".to_string()
+                    } else if market == "swap" {
                         "wss://open-api-swap.bingx.com/swap-market".to_string()
                     } else {
                         "wss://open-api-ws.bingx.com/market".to_string()
                     }
                 });
-                if market == "swap" {
+                if market != "spot" {
                     BingxPrivateWebSocket::with_swap_urls(
                         api_key,
                         api_secret,

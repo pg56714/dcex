@@ -20,6 +20,9 @@ impl ExtendedClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = ExtendedParams::from_pairs(params);
+        if let Some(response) = self.risk_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.account_private_request(method_name, &params).await? {
             return Ok(response);
         }

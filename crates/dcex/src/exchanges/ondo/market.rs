@@ -13,6 +13,47 @@ impl OndoClient {
     ) -> Result<ValidatedResponse> {
         let params = OndoParams::from_pairs(params);
         let response = match method_name {
+            "get_login_challenge" | "complete_login_challenge" => {
+                let (path, allowed, required): (&str, &[&str], &[&str]) =
+                    if method_name == "get_login_challenge" {
+                        (
+                            "/v1/auth/erc-4361/login/get_challenge",
+                            &["walletAddress", "chainId"],
+                            &["walletAddress", "chainId"],
+                        )
+                    } else {
+                        (
+                            "/v1/auth/erc-4361/login/complete_challenge",
+                            &["id", "signature", "source"],
+                            &["id", "signature"],
+                        )
+                    };
+                let body = params.body(allowed, required, &[], &[], &[])?;
+                if body.as_object().is_some_and(|o| {
+                    o.values()
+                        .any(|v| !v.as_str().is_some_and(|s| !s.trim().is_empty()))
+                }) {
+                    return Err(DcexError::InvalidInput(
+                        "Ondo login fields must be nonempty strings".into(),
+                    ));
+                }
+                if method_name == "get_login_challenge"
+                    && !["1", "43114"].contains(&body["chainId"].as_str().unwrap_or_default())
+                {
+                    return Err(DcexError::InvalidInput(
+                        "Ondo login chainId must be 1 or 43114".into(),
+                    ));
+                }
+                self.request(
+                    crate::http::HttpMethod::Post,
+                    path,
+                    vec![],
+                    Some(serde_json::to_vec(&body).map_err(|e| DcexError::Decode(e.to_string()))?),
+                    false,
+                    std::collections::BTreeMap::new(),
+                )
+                .await
+            }
             "get_status" => {
                 params.ensure_allowed(&[])?;
                 self.public_get(STATUS, Vec::new()).await

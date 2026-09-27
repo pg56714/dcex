@@ -4,6 +4,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
     AsterClient;
     public [];
     private [
+        noop_spot(nonce => "nonce"),
+        noop_futures(nonce => "nonce"),
+        guarded_cancel_futures_order(product_symbol => "product_symbol", nonce => "nonce"),
+        guarded_cancel_futures_batch_orders(product_symbol => "product_symbol", nonce => "nonce"),
+        transfer_sub_account(to_account_address => "toAccountAddress", asset => "asset", amount => "amount", kind_type => "kindType"),
         get_spot_account(),
         get_spot_transaction_history(),
         transfer_spot_futures(amount => "amount", asset => "asset", client_tran_id => "clientTranId", kind_type => "kindType"),
@@ -64,3 +69,14 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_futures_strategy_history_order(strategy_type => "strategyType")
     ];
 }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; AsterClient; public [
+get_asset_logos(),];private [
+exchange_futures_assets(),
+get_sub_accounts(),
+get_direct_announcements(),
+get_direct_announcement(id => "id"),
+create_sub_account_signed(sub_account_name => "subAccountName",sub_source_addr => "subSourceAddr",nonce => "nonce",user => "user",signer => "signer",child_signature => "childSignature",signature => "signature"),
+update_sub_account_signed(sub_source_addr => "subSourceAddr",nonce => "nonce",user => "user",signer => "signer",signature => "signature"),
+bind_sub_account_signed(child_address => "childAddress",name => "name",nonce => "nonce",user => "user",child_signature => "childSignature",signature => "signature"),
+register_agent_signed(user => "user",nonce => "nonce",agent_name => "agentName",agent_address => "agentAddress",expired => "expired",signature_chain_id => "signatureChainId",can_spot_trade => "canSpotTrade",can_perp_trade => "canPerpTrade",can_withdraw => "canWithdraw",signature => "signature"),];}

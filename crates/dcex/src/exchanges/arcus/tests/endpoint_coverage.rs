@@ -202,11 +202,19 @@ const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
         &[("market", "BTC-USD"), ("limit", "10")],
         "/v1/trades?limit=10&market=BTC-USD",
     ),
-    ("get_trade", &[("trade_id", "t-1")], "/v1/trade/t-1"),
+    (
+        "get_trade",
+        &[("trade_id", "123"), ("market", "BTC-USD")],
+        "/v1/trade/123?market=BTC-USD",
+    ),
     (
         "get_candles",
-        &[("market", "BTC-USD"), ("resolution", "1m")],
-        "/v1/candles?market=BTC-USD&resolution=1m",
+        &[
+            ("market", "BTC-USD"),
+            ("timeframe", "1m"),
+            ("to", "1700000000000000"),
+        ],
+        "/v1/candles?market=BTC-USD&timeframe=1m&to=1700000000000000",
     ),
     (
         "get_account",
@@ -248,7 +256,11 @@ const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
         &[("address", ADDRESS)],
         "/v1/fills?address=0x4444444444444444444444444444444444444444",
     ),
-    ("get_fill", &[("trade_id", "t-2")], "/v1/fill/t-2"),
+    (
+        "get_fill",
+        &[("trade_id", "123"), ("address", ADDRESS)],
+        "/v1/fill/123?address=0x4444444444444444444444444444444444444444",
+    ),
     (
         "get_transfer_updates",
         &[("address", ADDRESS)],
@@ -274,7 +286,11 @@ const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
         &[("address", ADDRESS)],
         "/v1/portfolio?address=0x4444444444444444444444444444444444444444",
     ),
-    ("get_rate_limit", &[], "/v1/rateLimit"),
+    (
+        "get_rate_limit",
+        &[("address", ADDRESS)],
+        "/v1/rateLimit?address=0x4444444444444444444444444444444444444444",
+    ),
     (
         "get_spot_positions",
         &[("address", ADDRESS)],
@@ -318,8 +334,16 @@ fn assert_signed_post(request: &str, path: &str) -> Value {
     assert!(header(request, "x-timestamp").is_some_and(|value| value.parse::<u64>().is_ok()));
     assert!(header(request, "x-signature").is_some_and(|value| value.len() == 128));
     let sent = body(request);
-    assert_eq!(sent["address"], ADDRESS);
-    assert_eq!(sent["accountIndex"], 0);
+    if let Some(orders) = sent["orders"].as_array() {
+        assert!(!orders.is_empty());
+        for order in orders {
+            assert_eq!(order["address"], ADDRESS);
+            assert_eq!(order["accountIndex"], 0);
+        }
+    } else {
+        assert_eq!(sent["address"], ADDRESS);
+        assert_eq!(sent["accountIndex"], 0);
+    }
     sent
 }
 
@@ -647,4 +671,119 @@ fn unsafe_orders_are_rejected_before_any_state_changing_request() {
     // Withdrawals are intentionally unsupported.
     assert_rejected_offline(Kind::Private, "withdraw", Vec::new());
     assert_rejected_offline(Kind::Public, "get_unknown", Vec::new());
+}
+
+#[test]
+fn tpsl_groupings_sign_each_leg_with_the_documented_operation() {
+    for grouping in ["partialTpsl", "positionTpsl", "entryTpsl"] {
+        let quantity = if grouping == "positionTpsl" {
+            "0"
+        } else {
+            "0.01"
+        };
+        let mut orders = vec![
+            json!({"product_symbol":"BTC-USD","side":"SELL","price":"100","quantity":quantity,"tpsl_type":"TAKE_PROFIT","stop_price":"110","reduce_only":true}),
+            json!({"product_symbol":"BTC-USD","side":"SELL","price":"100","quantity":quantity,"tpsl_type":"STOP_LOSS","stop_price":"90","reduce_only":true}),
+        ];
+        if grouping == "entryTpsl" {
+            orders.insert(
+                0,
+                json!({"product_symbol":"BTC-USD","side":"BUY","price":"100","quantity":"0.01"}),
+            );
+        }
+        let (result, requests) = run(
+            Kind::Private,
+            "batch_place_orders",
+            vec![
+                ("orders".into(), serde_json::to_string(&orders).unwrap()),
+                ("grouping".into(), grouping.into()),
+            ],
+        );
+        result.expect(grouping);
+        let sent = assert_signed_post(requests.last().unwrap(), "/v1/batchPlaceOrders");
+        assert_eq!(sent["grouping"], grouping);
+        let key = SigningKey::from_bytes(&[5; 32]).verifying_key();
+        for (index, order) in sent["orders"].as_array().unwrap().iter().enumerate() {
+            let entry = grouping == "entryTpsl" && index == 0;
+            let canonical = json!({"ad":ADDRESS,"ai":0,"ct":order["timestamp"],
+                "g":order["goodTilTime"].as_str().unwrap().parse::<u64>().unwrap()*1000,
+                "m":7,"op":if entry {1} else {4},"p":1000,
+                "q":if grouping == "positionTpsl" {0} else {10},
+                "r":if entry {0} else {1},"s":if entry {0} else {1},"t":0,"v":1});
+            let signature = ed25519_dalek::Signature::from_slice(
+                &hex::decode(order["signature"].as_str().unwrap()).unwrap(),
+            )
+            .unwrap();
+            key.verify_strict(&serde_json::to_vec(&canonical).unwrap(), &signature)
+                .expect("typed signature");
+            if !entry {
+                assert_eq!(order["quantity"], quantity);
+                assert!(order["stopPrice"].is_string());
+            }
+        }
+    }
+}
+
+#[test]
+fn invalid_tpsl_groups_never_submit_orders() {
+    assert_rejected_offline(
+        Kind::Private,
+        "place_order",
+        pairs(&[
+            ("product_symbol", "BTC-USD"),
+            ("side", "SELL"),
+            ("price", "100"),
+            ("quantity", "0.01"),
+            ("tpsl_type", "STOP_LOSS"),
+            ("stop_price", "90"),
+        ]),
+    );
+    let leg = json!({"product_symbol":"BTC-USD","side":"SELL","price":"100","quantity":"0.01","tpsl_type":"STOP_LOSS","stop_price":"90","reduce_only":true});
+    for (group, orders) in [
+        ("positionTpsl", json!([leg.clone()])),
+        ("partialTpsl", json!([leg.clone(), leg.clone()])),
+        ("entryTpsl", json!([leg.clone()])),
+        ("orderTpsl", json!([leg])),
+    ] {
+        assert_rejected_offline(
+            Kind::Private,
+            "batch_place_orders",
+            vec![
+                ("orders".into(), orders.to_string()),
+                ("grouping".into(), group.into()),
+            ],
+        );
+    }
+}
+
+#[test]
+fn wallet_key_administration_preserves_scope_and_caller_signature() {
+    let signed = serde_json::json!({"address":format!("0x{}","44".repeat(20)),"publicKey":"33".repeat(32),"apiWalletName":"trade","accountIndex":255,"nonce":"nonce1","signature":{"r":"11".repeat(32),"s":"22".repeat(32),"v":"1b"}});
+    for (name, path) in [
+        ("create_api_key_signed", "/v1/createApiKey"),
+        ("revoke_api_key_signed", "/v1/revokeApiKey"),
+    ] {
+        let (result, requests) = run(
+            Kind::Private,
+            name,
+            vec![("body".into(), signed.to_string())],
+        );
+        assert!(result.is_ok(), "{result:?}");
+        assert_eq!(requests.len(), 1);
+        assert_eq!(line(&requests[0]), format!("POST {path} HTTP/1.1"));
+        assert_eq!(body(&requests[0]), signed);
+        assert!(header(&requests[0], "x-api-key").is_none());
+        assert!(header(&requests[0], "x-signature").is_none());
+    }
+    let (result, requests) = run(Kind::Public, "get_api_keys", vec![]);
+    assert!(result.is_ok(), "{result:?}");
+    assert!(!line(&requests[0]).contains("accountIndex"));
+    assert!(header(&requests[0], "x-api-key").is_none());
+    let (result, requests) = run(
+        Kind::Public,
+        "get_api_keys",
+        pairs(&[("accountIndex", "255")]),
+    );
+    assert!(result.is_err());
+    assert!(requests.is_empty());
 }

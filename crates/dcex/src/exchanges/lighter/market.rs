@@ -14,6 +14,9 @@ impl LighterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = LighterParams::from_pairs(params);
+        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
         self.validate_public_params(method_name, &params)?;
         let (path, mut query, mut headers) = match method_name {
             "get_info" => (INFO, Vec::new(), BTreeMap::new()),

@@ -158,6 +158,22 @@ class PrivateClient(AsyncWebSocketMixin):
         """Open the WebSocket connection."""
         await self._native_client.connect()
 
+    async def send_tx(self, request_id: str, tx_type: int, tx_info: str) -> None:
+        """
+        Send a signed transaction from a REST client's sign_* method.
+
+        Read the acknowledgement with recv. A timeout is not a rejection: check
+        the signed transaction hash before retrying. This method does not allocate
+        nonces; coordinate nonce allocation across all transports for the API key.
+        """
+        await self._native_client.send_tx(request_id, tx_type, tx_info)
+
+    async def send_tx_batch(
+        self, request_id: str, tx_types: list[int], tx_infos: list[str]
+    ) -> None:
+        """Send 1..15 signed transactions, retaining nonce order and signatures."""
+        await self._native_client.send_tx_batch(request_id, tx_types, tx_infos)
+
     async def close(self) -> None:
         """Close the WebSocket connection."""
         await self._native_client.close()

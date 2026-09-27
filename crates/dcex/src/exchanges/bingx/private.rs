@@ -11,6 +11,12 @@ impl BingxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BingxParams::from_pairs(params);
+        if let Some(response) = self.additional_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(result) = self.trading_controls_request(method_name, &params).await? {
+            return Ok(result);
+        }
         if let Some(result) = self.account_private_request(method_name, &params).await? {
             return Ok(result);
         }

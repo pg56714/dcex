@@ -242,6 +242,42 @@ impl BitgetPrivateWebSocket {
         self.connection.send_text("ping").await
     }
 
+    /// Sends a UTA trade frame. Read acknowledgements and per-order results with `recv`.
+    pub async fn trade_request(
+        &mut self,
+        id: &str,
+        topic: &str,
+        category: Option<&str>,
+        args: Value,
+        request_time: Option<u64>,
+    ) -> Result<()> {
+        let payload = super::trading::uta(id, topic, category, args, request_time)?;
+        if !self.uta_v3 || !self.logged_in {
+            return Err(DcexError::InvalidInput(
+                "Bitget UTA trading requires a logged-in V3 private connection.".into(),
+            ));
+        }
+        self.connection.send_json(&payload).await
+    }
+
+    /// Sends a classic V2 order operation using an exchange-native instrument ID.
+    pub async fn classic_trade_request(
+        &mut self,
+        id: &str,
+        inst_type: &str,
+        inst_id: &str,
+        channel: &str,
+        params: Value,
+    ) -> Result<()> {
+        let payload = super::trading::classic(id, inst_type, inst_id, channel, params)?;
+        if self.uta_v3 || !self.logged_in {
+            return Err(DcexError::InvalidInput(
+                "Bitget classic trading requires a logged-in V2 private connection.".into(),
+            ));
+        }
+        self.connection.send_json(&payload).await
+    }
+
     pub async fn subscribe(&mut self, args: Vec<BitgetPrivateWebSocketArg>) -> Result<()> {
         self.send_subscription("subscribe", args).await
     }

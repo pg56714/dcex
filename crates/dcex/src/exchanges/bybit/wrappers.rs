@@ -3,6 +3,13 @@ use super::client::BybitClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     BybitClient;
     public [
+        get_full_orderbook(category => "category", product_symbol => "product_symbol"),
+        get_rpi_orderbook(product_symbol => "product_symbol", limit => "limit"),
+        get_system_status(),
+        get_mark_price_kline(product_symbol => "product_symbol", interval => "interval"),
+        get_index_price_kline(product_symbol => "product_symbol", interval => "interval"),
+        get_premium_index_price_kline(product_symbol => "product_symbol", interval => "interval"),
+
         get_spread_instruments(),
         get_spread_orderbook(symbol => "symbol"),
         get_spread_tickers(symbol => "symbol"),
@@ -36,6 +43,42 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_tickers(),
     ];
     private [
+get_smp_group(),
+get_trade_behavior_config(),
+set_delta_mode(delta_enable => "deltaEnable"),
+set_spot_hedging(mode => "setHedgingMode"),
+set_price_limit_behavior(category => "category",modify_enable => "modifyEnable"),
+get_closed_option_positions(category => "category"),
+get_move_position_history(),
+move_positions(from_uid => "fromUid",to_uid => "toUid",legs => "list"),
+
+        get_account_instruments(category => "category"),
+        get_dcp_info(),
+        get_coin_greeks(),
+        repay_liability(),
+        set_collateral_coin(coin => "coin", collateral_switch => "collateralSwitch"),
+        batch_set_collateral_coins(request => "request"),
+        get_asset_overview(),
+        get_delivery_records(category => "category"),
+        get_settlement_records(category => "category"),
+        get_funding_account_history(),
+        request_convert_quote(account_type => "accountType", from_coin => "fromCoin", to_coin => "toCoin", request_coin => "requestCoin", request_amount => "requestAmount"),
+        execute_convert_quote(quote_tx_id => "quoteTxId"),
+        get_convert_result(quote_tx_id => "quoteTxId", account_type => "accountType"),
+        confirm_pending_mmr(category => "category", product_symbol => "product_symbol"),
+        get_position_symbol_info(category => "category"),
+        get_api_key_info(),
+        get_option_asset_info(),
+        get_portfolio_margin_info(),
+        get_repayment_info(),
+        get_trade_analysis(product_symbol => "product_symbol"),
+        get_total_members_assets(),
+        create_strategy(category => "category", product_symbol => "product_symbol", side => "side", strategy_type => "strategyType"),
+        stop_strategy(strategy_id => "strategyId"),
+        get_strategy_list(),
+        get_strategy_orders(strategy_id => "strategyId"),
+        set_spot_margin_leverage(leverage => "leverage"),
+        set_spot_margin_mode(spot_margin_mode => "spotMarginMode"),
         place_spread_order(symbol => "symbol", side => "side", order_type => "orderType", qty => "qty"),
         amend_spread_order(symbol => "symbol"),
         cancel_spread_order(),
@@ -207,3 +250,50 @@ impl BybitClient {
         crate::exchanges::ExchangeMethodRequest::private(self, "set_trading_stop", params)
     }
 }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BybitClient; public [
+get_announcements(locale => "locale"),
+get_fee_group_info(product_type => "productType"),
+get_index_price_components(index_name => "indexName"),
+get_option_delivery_prices(category => "category",base_coin => "baseCoin"),
+get_option_base_coins(),
+]; private [
+execute_small_balance_quote(quote_id => "quoteId"),
+get_small_balance_history(),
+request_small_balance_quote(account_type => "accountType",from_coin_list => "fromCoinList",to_coin => "toCoin"),
+get_small_balance_coins(account_type => "accountType"),
+get_convert_coins(account_type => "accountType"),
+get_convert_history(),
+get_sub_account_deposit_address(coin => "coin",chain_type => "chainType",sub_member_id => "subMemberId"),
+get_exchange_order_records(),
+get_pre_upgrade_closed_pnl(category => "category",symbol => "symbol"),
+get_pre_upgrade_delivery_records(category => "category"),
+get_pre_upgrade_executions(category => "category"),
+get_pre_upgrade_order_history(category => "category"),
+get_pre_upgrade_settlement_records(category => "category"),
+get_pre_upgrade_transaction_log(category => "category"),
+get_margin_currency_data(),
+create_sub_account_api_key(subuid => "subuid",read_only => "readOnly",permissions => "permissions"),
+create_sub_account(username => "username",member_type => "memberType"),
+set_sub_account_frozen(subuid => "subuid",frozen => "frozen"),
+get_sub_account_api_keys(sub_member_id => "subMemberId"),
+modify_api_key(),
+modify_sub_account_api_key(),
+get_sub_accounts_paginated(),
+delete_api_key(),
+delete_sub_account_api_key(),
+delete_sub_account(sub_member_id => "subMemberId"),
+sign_trading_agreement(category_v2 => "categoryV2",agree => "agree"),
+get_sub_accounts(),
+get_member_wallet_types(),
+]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BybitClient; public [
+
+]; private [
+get_all_api_rate_limits(),
+get_api_rate_limit_cap(),
+get_api_rate_limits(uids => "uids"),
+set_api_rate_limits(list => "list"),
+submit_deposit_information(deposit_id => "depositId",questionnaire => "questionnaire"),
+]; }

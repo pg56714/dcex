@@ -54,6 +54,24 @@ def case(method: str, target: str, body: dict[str, Any] | None = None, **kwargs:
 
 
 CASES = [
+    case(
+        "get_login_challenge",
+        "/v1/auth/erc-4361/login/get_challenge",
+        {"walletAddress": "0x" + "11" * 20, "chainId": "1"},
+        wallet_address="0x" + "11" * 20,
+        chain_id="1",
+    ),
+    case(
+        "complete_login_challenge",
+        "/v1/auth/erc-4361/login/complete_challenge",
+        {"id": "challenge1", "signature": "11" * 65, "source": "api"},
+        id="challenge1",
+        signature="11" * 65,
+        source="api",
+    ),
+    case("invalidate_jwt", "/v1/auth/invalidate_jwt"),
+    case("hello", "/hello"),
+    case("ping", "/hello"),
     # Market data
     case("get_status", "/status"),
     case("get_markets", "/v1/markets"),

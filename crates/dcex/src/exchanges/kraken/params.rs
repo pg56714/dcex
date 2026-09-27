@@ -23,6 +23,14 @@ impl KrakenParams {
             .ok_or_else(|| DcexError::InvalidInput(format!("missing required parameter: {key}")))
     }
 
+    pub(super) fn ensure_allowed(&self, keys: &[&str]) -> Result<()> {
+        if let Some((key, _)) = self.0.iter().find(|(key, _)| !keys.contains(&key.as_str())) {
+            return Err(DcexError::InvalidInput(format!(
+                "unsupported Kraken parameter: {key}"
+            )));
+        }
+        Ok(())
+    }
     pub(super) fn only(&self, keys: &[&str]) -> Vec<(String, String)> {
         self.0
             .iter()

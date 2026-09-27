@@ -241,3 +241,26 @@ fn spot_cancel_all_after_validates_timeout_and_uses_signed_route() {
         .is_err()
     );
 }
+
+#[test]
+fn unsigned_post_json_does_not_duplicate_fields_in_query() {
+    let client = BingxClient::public(Duration::from_secs(1)).expect("client");
+    let body = serde_json::json!({"symbol": "BTCUSDT", "limit": 1});
+    let request = client.build_request(
+        HttpMethod::Post,
+        "/test",
+        vec![
+            ("symbol".into(), "BTCUSDT".into()),
+            ("limit".into(), "1".into()),
+        ],
+        false,
+        Vec::new(),
+        Some(body.clone()),
+    );
+    assert!(request.query.is_empty());
+    assert!(!request.headers.contains_key("X-BX-APIKEY"));
+    match request.body {
+        crate::http::RequestBody::Json(actual) => assert_eq!(actual, body),
+        _ => panic!("unsigned POST must preserve its JSON body"),
+    }
+}

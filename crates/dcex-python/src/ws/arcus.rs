@@ -13,12 +13,16 @@ struct PythonArcusWebSocketClient {
 #[pymethods]
 impl PythonArcusWebSocketClient {
     #[new]
-    #[pyo3(signature = (testnet=false, timeout=10.0))]
-    fn new(testnet: bool, timeout: f64) -> PyResult<Self> {
+    #[pyo3(signature = (testnet=false, timeout=10.0, base_url=None))]
+    fn new(testnet: bool, timeout: f64, base_url: Option<String>) -> PyResult<Self> {
         Ok(Self {
             client: Arc::new(Mutex::new(
-                ArcusWebSocket::new(testnet, websocket_timeout(timeout)?)
-                    .map_err(to_py_runtime_error)?,
+                if let Some(url) = base_url {
+                    ArcusWebSocket::with_url(url, websocket_timeout(timeout)?)
+                } else {
+                    ArcusWebSocket::new(testnet, websocket_timeout(timeout)?)
+                }
+                .map_err(to_py_runtime_error)?,
             )),
         })
     }
@@ -38,6 +42,39 @@ impl PythonArcusWebSocketClient {
                 .lock()
                 .await
                 .connect()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn get_request<'py>(
+        &self,
+        py: Python<'py>,
+        id: u64,
+        method: String,
+        payload: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let payload: serde_json::Value = serde_json::from_str(&payload)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .get_request(id, &method, payload)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn post_request<'py>(&self, py: Python<'py>, frame: String) -> PyResult<Bound<'py, PyAny>> {
+        let frame: serde_json::Value = serde_json::from_str(&frame)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .post_request(frame)
                 .await
                 .map_err(to_py_runtime_error)
         })

@@ -20,11 +20,13 @@ class TradeHTTP(HTTPManager):
         timeInForce: str | None = None,
         newClientOrderId: str | None = None,
         stopPrice: str | None = None,
+        nonce: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place an Aster spot order."""
         return await self._native_private(
             "place_spot_order",
             self._native_params(
+                nonce=nonce,
                 product_symbol=product_symbol,
                 side=side,
                 type_=type_,
@@ -180,11 +182,13 @@ class TradeHTTP(HTTPManager):
         pegPriceType: str | None = None,
         pegOffset: str | None = None,
         stpMode: str | None = None,
+        nonce: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place an Aster futures order."""
         return await self._native_private(
             "place_futures_order",
             self._native_params(
+                nonce=nonce,
                 product_symbol=product_symbol,
                 side=side,
                 positionSide=positionSide,
@@ -266,11 +270,12 @@ class TradeHTTP(HTTPManager):
     async def place_futures_batch_orders(
         self,
         batchOrders: list[dict[str, Any]],
+        nonce: int | None = None,
     ) -> dict[str, Any] | list[Any]:
         """Place multiple Aster futures orders."""
         return await self._native_private(
             "place_futures_batch_orders",
-            self._native_params(batchOrders=batchOrders),
+            self._native_params(batchOrders=batchOrders, nonce=nonce),
         )
 
     async def get_futures_order(
@@ -496,5 +501,222 @@ class TradeHTTP(HTTPManager):
                 startTime=startTime,
                 endTime=endTime,
                 limit=limit,
+            ),
+        )
+
+    async def noop_spot(self, nonce: int) -> dict[str, Any] | list[Any]:
+        """
+        Attempt to invalidate a pending request using its original nonce.
+
+        Success is not guaranteed if the original request has already executed.
+        """
+        return await self._native_private("noop_spot", self._native_params(nonce=nonce))
+
+    async def noop_futures(self, nonce: int) -> dict[str, Any] | list[Any]:
+        """
+        Attempt to invalidate a pending request using its original nonce.
+
+        Success is not guaranteed if the original request has already executed.
+        """
+        return await self._native_private("noop_futures", self._native_params(nonce=nonce))
+
+    async def guarded_cancel_futures_order(
+        self,
+        product_symbol: str,
+        nonce: int,
+        *,
+        orderId: int | None = None,
+        origClientOrderId: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Cancel using the nonce of the original order placement."""
+        return await self._native_private(
+            "guarded_cancel_futures_order",
+            self._native_params(
+                product_symbol=product_symbol,
+                nonce=nonce,
+                orderId=orderId,
+                origClientOrderId=origClientOrderId,
+            ),
+        )
+
+    async def guarded_cancel_futures_batch_orders(
+        self,
+        product_symbol: str,
+        nonce: int,
+        *,
+        orderIdList: list[int] | None = None,
+        origClientOrderIdList: list[str] | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Cancel using the nonce of the original batch placement."""
+        return await self._native_private(
+            "guarded_cancel_futures_batch_orders",
+            self._native_params(
+                product_symbol=product_symbol,
+                nonce=nonce,
+                orderIdList=orderIdList,
+                origClientOrderIdList=origClientOrderIdList,
+            ),
+        )
+
+    async def transfer_sub_account(
+        self,
+        to_account_address: str,
+        asset: str,
+        amount: str,
+        kind_type: str,
+        *,
+        from_account_address: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        Transfer within one master/sub-account family using the approved agent.
+
+        Aster enforces account-family membership; external transfers are not supported.
+        """
+        return await self._native_private(
+            "transfer_sub_account",
+            self._native_params(
+                toAccountAddress=to_account_address,
+                asset=asset,
+                amount=amount,
+                kindType=kind_type,
+                fromAccountAddress=from_account_address,
+            ),
+        )
+
+    async def exchange_futures_assets(self) -> dict[str, Any] | list[Any]:
+        """POST /fapi/v3/assetExchange."""
+        return await self._native_private("exchange_futures_assets", self._native_params())
+
+    async def get_sub_accounts(self) -> dict[str, Any] | list[Any]:
+        """GET /fapi/v3/getSubAccountList."""
+        return await self._native_private("get_sub_accounts", self._native_params())
+
+    async def get_direct_announcements(
+        self, *, page: int | None = None, size: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /fapi/v3/announcement/direct."""
+        return await self._native_private(
+            "get_direct_announcements", self._native_params(page=page, size=size)
+        )
+
+    async def get_direct_announcement(self, *, id: int) -> dict[str, Any] | list[Any]:
+        """GET /fapi/v3/announcement/directById."""
+        return await self._native_private("get_direct_announcement", self._native_params(id=id))
+
+    async def create_sub_account_signed(
+        self,
+        *,
+        sub_account_name: str,
+        sub_source_addr: str,
+        nonce: int,
+        user: str,
+        signer: str,
+        child_signature: str,
+        signature: str,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /fapi/v3/createSubAccount. Supply wallet signatures created exactly as documented
+        by Aster; the nonce and signatures are forwarded unchanged.
+        """
+        return await self._native_private(
+            "create_sub_account_signed",
+            self._native_params(
+                subAccountName=sub_account_name,
+                subSourceAddr=sub_source_addr,
+                nonce=nonce,
+                user=user,
+                signer=signer,
+                childSignature=child_signature,
+                signature=signature,
+            ),
+        )
+
+    async def update_sub_account_signed(
+        self,
+        *,
+        sub_source_addr: str,
+        nonce: int,
+        user: str,
+        signer: str,
+        signature: str,
+        sub_account_name: str | None = None,
+        status: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /fapi/v3/updateSubAccount. Supply wallet signatures created exactly as documented
+        by Aster; the nonce and signatures are forwarded unchanged.
+        """
+        return await self._native_private(
+            "update_sub_account_signed",
+            self._native_params(
+                subSourceAddr=sub_source_addr,
+                nonce=nonce,
+                user=user,
+                signer=signer,
+                subAccountName=sub_account_name,
+                status=status,
+                signature=signature,
+            ),
+        )
+
+    async def bind_sub_account_signed(
+        self,
+        *,
+        child_address: str,
+        name: str,
+        nonce: int,
+        user: str,
+        child_signature: str,
+        signature: str,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /fapi/v3/sub-accounts/bind. Supply wallet signatures created exactly as documented
+        by Aster; the nonce and signatures are forwarded unchanged.
+        """
+        return await self._native_private(
+            "bind_sub_account_signed",
+            self._native_params(
+                childAddress=child_address,
+                name=name,
+                nonce=nonce,
+                user=user,
+                childSignature=child_signature,
+                signature=signature,
+            ),
+        )
+
+    async def register_agent_signed(
+        self,
+        *,
+        user: str,
+        nonce: int,
+        agent_name: str,
+        agent_address: str,
+        expired: int,
+        signature_chain_id: int,
+        can_spot_trade: bool,
+        can_perp_trade: bool,
+        can_withdraw: bool,
+        signature: str,
+        ip_whitelist: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /fapi/v3/registerAndApproveAgent. Supply wallet signatures created exactly as
+        documented by Aster; the nonce and signatures are forwarded unchanged.
+        """
+        return await self._native_private(
+            "register_agent_signed",
+            self._native_params(
+                user=user,
+                nonce=nonce,
+                agentName=agent_name,
+                agentAddress=agent_address,
+                expired=expired,
+                signatureChainId=signature_chain_id,
+                canSpotTrade=can_spot_trade,
+                canPerpTrade=can_perp_trade,
+                canWithdraw=can_withdraw,
+                ipWhitelist=ip_whitelist,
+                signature=signature,
             ),
         )

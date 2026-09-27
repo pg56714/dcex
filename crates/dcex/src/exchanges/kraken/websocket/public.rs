@@ -241,7 +241,7 @@ fn normalize_channel(channel: &str) -> Result<String> {
     }
 }
 
-fn normalize_symbol(symbol: &str) -> Result<String> {
+pub(super) fn normalize_symbol(symbol: &str) -> Result<String> {
     let symbol = symbol.trim();
     if symbol.is_empty() {
         return Err(DcexError::InvalidInput(

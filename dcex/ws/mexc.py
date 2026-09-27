@@ -168,3 +168,106 @@ def private(
 
 
 __all__ = ["PrivateClient", "PublicClient", "private", "public"]
+
+
+class FuturesPublicClient(AsyncWebSocketMixin):
+    """Contract JSON streams. Call ping every 10..20 seconds while connected."""
+
+    def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
+        """Create a contract market data connection."""
+        self._native_client = _native.MexcFuturesWebSocketClient(timeout=timeout, base_url=base_url)
+
+    async def connect(self) -> None:
+        """Connect to the contract endpoint."""
+        await self._native_client.connect()
+
+    async def close(self) -> None:
+        """Close the connection."""
+        await self._native_client.close()
+
+    async def ping(self) -> None:
+        """Send the contract protocol heartbeat."""
+        await self._native_client.ping()
+
+    async def recv(self) -> dict[str, Any] | list[Any] | bytes:
+        """Receive the next contract event, including subscription acknowledgements."""
+        return _decode_event(await self._native_client.recv())
+
+    async def subscribe(
+        self,
+        channel: str,
+        product_symbol: str | None = None,
+        *,
+        interval: str | None = None,
+        step: str | None = None,
+    ) -> None:
+        """Subscribe using a channel suffix such as depth, funding.rate or kline."""
+        await self._native_client.subscribe(channel, product_symbol, interval, step)
+
+    async def unsubscribe(
+        self,
+        channel: str,
+        product_symbol: str | None = None,
+        *,
+        interval: str | None = None,
+        step: str | None = None,
+    ) -> None:
+        """Unsubscribe from a contract market channel."""
+        await self._native_client.unsubscribe(channel, product_symbol, interval, step)
+
+    async def subscribe_tickers(self) -> None:
+        """Subscribe to all contract tickers."""
+        await self.subscribe("tickers")
+
+    async def subscribe_orderbook_step(self, product_symbol: str, step: str) -> None:
+        """Subscribe to depth aggregated by the documented notional step."""
+        await self.subscribe("depth.step", product_symbol, step=step)
+
+    async def subscribe_klines(self, product_symbol: str, interval: str) -> None:
+        """Subscribe to contract candles using a native or canonical interval."""
+        await self.subscribe("kline", product_symbol, interval=interval)
+
+    async def subscribe_ticker(self, product_symbol: str) -> None:
+        """Subscribe to the contract ticker channel."""
+        await self.subscribe("ticker", product_symbol)
+
+    async def subscribe_trades(self, product_symbol: str) -> None:
+        """Subscribe to the contract deal channel."""
+        await self.subscribe("deal", product_symbol)
+
+    async def subscribe_orderbook(self, product_symbol: str) -> None:
+        """Subscribe to the contract depth channel."""
+        await self.subscribe("depth", product_symbol)
+
+    async def subscribe_funding_rate(self, product_symbol: str) -> None:
+        """Subscribe to the contract funding.rate channel."""
+        await self.subscribe("funding.rate", product_symbol)
+
+    async def subscribe_index_price(self, product_symbol: str) -> None:
+        """Subscribe to the contract index.price channel."""
+        await self.subscribe("index.price", product_symbol)
+
+    async def subscribe_fair_price(self, product_symbol: str) -> None:
+        """Subscribe to the contract fair.price channel."""
+        await self.subscribe("fair.price", product_symbol)
+
+
+class FuturesPrivateClient(FuturesPublicClient):
+    """Authenticated contract streams; all account events are pushed after login."""
+
+    def __init__(
+        self, api_key: str, api_secret: str, timeout: float = 10.0, base_url: str | None = None
+    ) -> None:
+        """Create a contract connection that authenticates during connect."""
+        self._native_client = _native.MexcFuturesWebSocketClient(
+            timeout=timeout, base_url=base_url, api_key=api_key, api_secret=api_secret
+        )
+
+    async def set_private_filters(self, filters: list[dict[str, Any]]) -> None:
+        """
+        Replace account push filters; [] restores all default account events.
+
+        Each entry has filter (e.g. order, order.deal, position, asset) and
+        optional rules containing contract symbols. Filters replace prior rules.
+        """
+        await self._native_client.set_private_filters(json.dumps(filters))

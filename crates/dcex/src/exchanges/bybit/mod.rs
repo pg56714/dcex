@@ -14,9 +14,11 @@ mod params;
 mod position;
 mod private;
 mod rfq;
+mod risk;
 mod rwa_earn;
 mod signing;
 mod spread;
+mod strategy;
 #[cfg(test)]
 mod tests;
 mod trade;

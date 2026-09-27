@@ -10,7 +10,9 @@ mod websocket;
 mod wrappers;
 
 pub use client::{MexcApi, MexcClient};
-pub use websocket::{MexcPrivateWebSocket, MexcPublicWebSocket};
+pub use websocket::{MexcFuturesWebSocket, MexcPrivateWebSocket, MexcPublicWebSocket};
 
 #[cfg(test)]
 mod tests;
+
+mod additional;

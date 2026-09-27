@@ -258,6 +258,57 @@ impl AsterClient {
         Ok(request)
     }
 
+    pub(super) async fn signed_at_nonce(
+        &self,
+        method: HttpMethod,
+        market: AsterMarket,
+        path: &str,
+        params: Vec<(String, String)>,
+        nonce: Option<u64>,
+    ) -> Result<ValidatedResponse> {
+        let request = self.build_request(method, market, path, params, true, nonce)?;
+        let response = self.transport.execute(request).await?;
+        let data = validate_response(&response)?;
+        Ok(ValidatedResponse {
+            status: response.status,
+            headers: response.headers,
+            data,
+        })
+    }
+
+    /// Transfers within one master/sub-account family using the approved agent.
+    /// This endpoint identifies the signing key with `signer` alone, unlike orders.
+    pub(super) async fn sub_account_transfer(
+        &self,
+        params: &super::params::AsterParams,
+    ) -> Result<ValidatedResponse> {
+        let signer = self.signer_address.as_deref().ok_or_else(|| {
+            DcexError::InvalidInput(
+                "Aster sub-account transfers require an approved signer.".into(),
+            )
+        })?;
+        let key = self.private_key.as_ref().ok_or_else(|| {
+            DcexError::InvalidInput(
+                "Aster sub-account transfers require the signer private key.".into(),
+            )
+        })?;
+        let mut pairs = params.only(&["toAccountAddress", "asset", "amount", "kindType"]);
+        pairs.push(("nonce".into(), self.next_nonce()?.to_string()));
+        pairs.push(("signer".into(), signer.into()));
+        pairs.extend(params.only(&["fromAccountAddress"]));
+        let signature = sign_message(&encode_params(&pairs), key)?;
+        pairs.push(("signature".into(), signature));
+        // Already signed in this endpoint's specified field order.
+        self.request(
+            HttpMethod::Post,
+            AsterMarket::Futures,
+            "/fapi/v3/subAccountTransfer",
+            pairs,
+            false,
+        )
+        .await
+    }
+
     fn next_nonce(&self) -> Result<u64> {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)

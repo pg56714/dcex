@@ -1,3 +1,8 @@
+mod api;
+mod api_methods;
+mod api_schema;
+mod api_validation;
+pub use api::{BinanceWebSocketApi, BinanceWebSocketApiMarket};
 mod equity;
 mod private;
 mod public;

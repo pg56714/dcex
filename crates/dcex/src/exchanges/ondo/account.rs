@@ -17,6 +17,10 @@ impl OndoClient {
         params: &OndoParams,
     ) -> Result<Option<ValidatedResponse>> {
         let response = match method_name {
+            "invalidate_jwt" => {
+                self.empty_private_get(params, "/v1/auth/invalidate_jwt")
+                    .await
+            }
             "get_account" => self.empty_private_get(params, ACCOUNT).await,
             "get_open_order_counts" => self.empty_private_get(params, ORDER_COUNTS).await,
             "get_deposits" => self.empty_private_get(params, DEPOSITS).await,

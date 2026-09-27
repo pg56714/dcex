@@ -3,6 +3,8 @@ use super::OndoClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     OndoClient;
     public [
+        get_login_challenge(wallet_address => "walletAddress", chain_id => "chainId"),
+        complete_login_challenge(id => "id", signature => "signature"),
         get_status(), hello(), ping(), get_markets(),
         get_trades(market => "market"), get_recent_trades(market => "market"),
         get_order_book_depth(market => "market"), get_depth(market => "market"),
@@ -12,6 +14,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_mark_prices(), get_open_interest(), get_volume(), get_contracts()
     ];
     private [
+        invalidate_jwt(),
         get_account(), get_open_order_counts(), get_deposits(),
         get_deposit(deposit_id => "depositID"), get_withdrawals(),
         get_withdrawal_limits(), get_withdrawal(withdrawal_id => "withdrawalID"),

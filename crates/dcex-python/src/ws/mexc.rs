@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use dcex::ws::mexc::{MexcPrivateWebSocket, MexcPublicWebSocket};
+use dcex::ws::mexc::{MexcFuturesWebSocket, MexcPrivateWebSocket, MexcPublicWebSocket};
 use tokio::sync::Mutex;
 
 use super::*;
@@ -383,7 +383,157 @@ impl PythonMexcPrivateWebSocketClient {
     }
 }
 
+#[pyclass(name = "MexcFuturesWebSocketClient")]
+struct PythonMexcFuturesWebSocketClient {
+    client: Arc<Mutex<MexcFuturesWebSocket>>,
+}
+
+#[pymethods]
+impl PythonMexcFuturesWebSocketClient {
+    #[new]
+    #[pyo3(signature=(timeout=10.0, base_url=None, api_key=None, api_secret=None))]
+    fn new(
+        timeout: f64,
+        base_url: Option<String>,
+        api_key: Option<String>,
+        api_secret: Option<String>,
+    ) -> PyResult<Self> {
+        let timeout = websocket_timeout(timeout)?;
+        let client = if let Some(url) = base_url {
+            MexcFuturesWebSocket::with_url(url, timeout)
+        } else {
+            MexcFuturesWebSocket::new(timeout)
+        }
+        .map_err(to_py_runtime_error)?;
+        let client = match (api_key, api_secret) {
+            (None, None) => client,
+            (Some(key), Some(secret)) => client
+                .with_credentials(key, secret)
+                .map_err(to_py_runtime_error)?,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(
+                    "provide both api_key and api_secret",
+                ));
+            }
+        };
+        Ok(Self {
+            client: Arc::new(Mutex::new(client)),
+        })
+    }
+    fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .connect()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .close()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn ping<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .ping()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    #[pyo3(signature=(channel, product_symbol=None, interval=None, step=None))]
+    fn subscribe<'py>(
+        &self,
+        py: Python<'py>,
+        channel: String,
+        product_symbol: Option<String>,
+        interval: Option<String>,
+        step: Option<String>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .subscribe(
+                    &channel,
+                    product_symbol.as_deref(),
+                    interval.as_deref(),
+                    step.as_deref(),
+                )
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    #[pyo3(signature=(channel, product_symbol=None, interval=None, step=None))]
+    fn unsubscribe<'py>(
+        &self,
+        py: Python<'py>,
+        channel: String,
+        product_symbol: Option<String>,
+        interval: Option<String>,
+        step: Option<String>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .unsubscribe(
+                    &channel,
+                    product_symbol.as_deref(),
+                    interval.as_deref(),
+                    step.as_deref(),
+                )
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn set_private_filters<'py>(
+        &self,
+        py: Python<'py>,
+        filters: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let filters: serde_json::Value = serde_json::from_str(&filters)
+            .map_err(|error| pyo3::exceptions::PyValueError::new_err(error.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .set_private_filters(filters)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+    fn recv<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let body = client
+                .lock()
+                .await
+                .recv()
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &body).unbind()))
+        })
+    }
+}
+
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<PythonMexcFuturesWebSocketClient>()?;
     m.add_class::<PythonMexcPublicWebSocketClient>()?;
     m.add_class::<PythonMexcPrivateWebSocketClient>()
 }

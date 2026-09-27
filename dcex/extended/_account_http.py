@@ -186,3 +186,266 @@ class AccountHTTP(HTTPManager):
                 asset=asset,
             ),
         )
+
+    def get_account_equity_history(self, *, account_id: int | Sequence[int], interval: str) -> Any:  # noqa: ANN401
+        """
+        Get account equity history.
+
+        Source: https://api.docs.extended.exchange/#get-account-equity-history
+        """
+        return self._native_private(
+            "get_account_equity_history",
+            self._native_params(accountId=account_id, interval=interval),
+        )
+
+    def get_account_pnl_history(
+        self,
+        *,
+        account_id: int | Sequence[int],
+        interval: str,
+        pnl_type: str,
+        instrument_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account pnl history.
+
+        Source: https://api.docs.extended.exchange/#get-account-pnl-history
+        """
+        return self._native_private(
+            "get_account_pnl_history",
+            self._native_params(
+                accountId=account_id,
+                interval=interval,
+                pnlType=pnl_type,
+                instrumentType=instrument_type,
+            ),
+        )
+
+    def get_account_pnl_percentage_history(
+        self,
+        *,
+        account_id: int | Sequence[int],
+        interval: str,
+        pnl_type: str,
+        price_market: str | Sequence[str] | None = None,
+        instrument_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account pnl percentage history.
+
+        Source: https://api.docs.extended.exchange/#get-account-pnl-percentage-history
+        """
+        return self._native_private(
+            "get_account_pnl_percentage_history",
+            self._native_params(
+                accountId=account_id,
+                interval=interval,
+                pnlType=pnl_type,
+                priceMarket=price_market,
+                instrumentType=instrument_type,
+            ),
+        )
+
+    def get_cumulative_account_pnl_history(
+        self,
+        *,
+        account_id: int | Sequence[int],
+        interval: str,
+        pnl_type: str,
+        instrument_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get cumulative account pnl history.
+
+        Source: https://api.docs.extended.exchange/#get-cumulative-account-pnl-history
+        """
+        return self._native_private(
+            "get_cumulative_account_pnl_history",
+            self._native_params(
+                accountId=account_id,
+                interval=interval,
+                pnlType=pnl_type,
+                instrumentType=instrument_type,
+            ),
+        )
+
+    def get_cumulative_account_pnl_percentage_history(
+        self,
+        *,
+        account_id: int | Sequence[int],
+        interval: str,
+        pnl_type: str,
+        price_market: str | Sequence[str] | None = None,
+        instrument_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get cumulative account pnl percentage history.
+
+        Source: https://api.docs.extended.exchange/#get-cumulative-account-pnl-percentage-history
+        """
+        return self._native_private(
+            "get_cumulative_account_pnl_percentage_history",
+            self._native_params(
+                accountId=account_id,
+                interval=interval,
+                pnlType=pnl_type,
+                priceMarket=price_market,
+                instrumentType=instrument_type,
+            ),
+        )
+
+    def get_account_vault_equity_history(
+        self, *, account_id: int | Sequence[int], interval: str
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account vault equity history.
+
+        Source: https://api.docs.extended.exchange/#get-account-vault-equity-history
+        """
+        return self._native_private(
+            "get_account_vault_equity_history",
+            self._native_params(accountId=account_id, interval=interval),
+        )
+
+    def get_account_max_drawdown_history(
+        self, *, account_id: int | Sequence[int], interval: str
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account max drawdown history.
+
+        Source: https://api.docs.extended.exchange/#get-account-max-drawdown-history
+        """
+        return self._native_private(
+            "get_account_max_drawdown_history",
+            self._native_params(accountId=account_id, interval=interval),
+        )
+
+    def get_account_funding_chart(
+        self,
+        *,
+        account_id: int | Sequence[int],
+        interval: str,
+        market: str | Sequence[str] | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account funding chart.
+
+        Source: https://api.docs.extended.exchange/#get-account-funding-chart
+        """
+        return self._native_private(
+            "get_account_funding_chart",
+            self._native_params(accountId=account_id, interval=interval, market=market),
+        )
+
+    def get_account_portfolio_summary(
+        self, *, account_id: int | Sequence[int], interval: str, instrument_type: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account portfolio summary.
+
+        Source: https://api.docs.extended.exchange/#get-account-portfolio-summary
+        """
+        return self._native_private(
+            "get_account_portfolio_summary",
+            self._native_params(
+                accountId=account_id, interval=interval, instrumentType=instrument_type
+            ),
+        )
+
+    def get_account_performance(
+        self, *, account_id: int | Sequence[int], interval: str, market_type: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account performance.
+
+        Source: https://api.docs.extended.exchange/#get-account-performance
+        """
+        return self._native_private(
+            "get_account_performance",
+            self._native_params(accountId=account_id, interval=interval, marketType=market_type),
+        )
+
+    def get_account_funding_stats(
+        self,
+        *,
+        account_id: int | Sequence[int],
+        interval: str,
+        market: str | Sequence[str] | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account funding stats.
+
+        Source: https://api.docs.extended.exchange/#get-account-funding-stats
+        """
+        return self._native_private(
+            "get_account_funding_stats",
+            self._native_params(accountId=account_id, interval=interval, market=market),
+        )
+
+    def get_account_funding_history(
+        self,
+        *,
+        account_id: int | Sequence[int],
+        interval: str,
+        market: str | Sequence[str] | None = None,
+        cursor: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get account funding history.
+
+        Source: https://api.docs.extended.exchange/#get-account-funding-history
+        """
+        return self._native_private(
+            "get_account_funding_history",
+            self._native_params(
+                accountId=account_id, interval=interval, market=market, cursor=cursor, limit=limit
+            ),
+        )
+
+    def get_interest_key_metrics(self, *, account_id: int | Sequence[int]) -> Any:  # noqa: ANN401
+        """
+        Get interest key metrics.
+
+        Source: https://api.docs.extended.exchange/#get-interest-key-metrics
+        """
+        return self._native_private(
+            "get_interest_key_metrics", self._native_params(accountId=account_id)
+        )
+
+    def get_interest_daily_metrics(self, *, account_id: int | Sequence[int], interval: str) -> Any:  # noqa: ANN401
+        """
+        Get interest daily metrics.
+
+        Source: https://api.docs.extended.exchange/#get-interest-daily-metrics
+        """
+        return self._native_private(
+            "get_interest_daily_metrics",
+            self._native_params(accountId=account_id, interval=interval),
+        )
+
+    def get_interest_payment_chart(
+        self, *, account_id: int | Sequence[int], interval: str, bucket: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Get interest payment chart.
+
+        Source: https://api.docs.extended.exchange/#get-interest-payment-chart
+        """
+        return self._native_private(
+            "get_interest_payment_chart",
+            self._native_params(accountId=account_id, interval=interval, bucket=bucket),
+        )
+
+    def get_interest_payments_history(
+        self, *, account_id: int | Sequence[int], interval: str
+    ) -> Any:  # noqa: ANN401
+        """
+        Get interest payments history.
+
+        Source: https://api.docs.extended.exchange/#get-interest-payments-history
+        """
+        return self._native_private(
+            "get_interest_payments_history",
+            self._native_params(accountId=account_id, interval=interval),
+        )

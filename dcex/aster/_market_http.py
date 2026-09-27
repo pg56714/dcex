@@ -414,3 +414,7 @@ class MarketHTTP(HTTPManager):
             "get_futures_index_references",
             self._params(product_symbol=self._symbol(product_symbol)),
         )
+
+    def get_asset_logos(self) -> dict[str, Any] | list[Any]:
+        """GET /fapi/v3/common/asset/all-asset-logo."""
+        return self._native_public("get_asset_logos", self._native_params())

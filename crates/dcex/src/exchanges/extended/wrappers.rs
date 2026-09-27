@@ -3,6 +3,8 @@ use super::client::ExtendedClient;
 crate::exchanges::impl_exchange_method_wrappers!(
     ExtendedClient;
     public [
+get_interest_rate_curves_history(interval => "interval"),
+get_latest_interest_rate_curve(),
         get_markets(),
         get_assets(),
         get_asset_index_price(asset => "asset"),
@@ -27,6 +29,22 @@ crate::exchanges::impl_exchange_method_wrappers!(
         )
     ];
     private [
+get_account_equity_history(account_id => "accountId",interval => "interval"),
+get_account_pnl_history(account_id => "accountId",interval => "interval",pnl_type => "pnlType"),
+get_account_pnl_percentage_history(account_id => "accountId",interval => "interval",pnl_type => "pnlType"),
+get_cumulative_account_pnl_history(account_id => "accountId",interval => "interval",pnl_type => "pnlType"),
+get_cumulative_account_pnl_percentage_history(account_id => "accountId",interval => "interval",pnl_type => "pnlType"),
+get_account_vault_equity_history(account_id => "accountId",interval => "interval"),
+get_account_max_drawdown_history(account_id => "accountId",interval => "interval"),
+get_account_funding_chart(account_id => "accountId",interval => "interval"),
+get_account_portfolio_summary(account_id => "accountId",interval => "interval"),
+get_account_performance(account_id => "accountId",interval => "interval"),
+get_account_funding_stats(account_id => "accountId",interval => "interval"),
+get_account_funding_history(account_id => "accountId",interval => "interval"),
+get_interest_key_metrics(account_id => "accountId"),
+get_interest_daily_metrics(account_id => "accountId",interval => "interval"),
+get_interest_payment_chart(account_id => "accountId",interval => "interval"),
+get_interest_payments_history(account_id => "accountId",interval => "interval"),
         get_account_details(),
         get_sub_accounts(),
         get_balance(),

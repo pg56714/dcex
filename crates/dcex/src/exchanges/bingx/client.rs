@@ -193,9 +193,12 @@ impl BingxClient {
         params.sort_by(|left, right| left.0.cmp(&right.0));
         let mut request = HttpRequest::new(method, &self.base_url, path);
         request.headers.extend(headers);
-        if signed || matches!(method, HttpMethod::Get | HttpMethod::Delete) {
-            request.query = params;
-        } else if let Some(json_body) = json_body {
+        if let Some(json_body) = json_body {
+            // Signed JSON requests merge their query fields in the signer.
+            // Unsigned JSON callers supply the same fields in the body already.
+            if signed {
+                request.query = params;
+            }
             request = request.json(json_body);
         } else {
             request.query = params;

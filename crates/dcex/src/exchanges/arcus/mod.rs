@@ -3,6 +3,7 @@
 mod client;
 mod endpoints;
 mod market;
+mod onboarding;
 mod params;
 mod signing;
 mod trade;
@@ -13,3 +14,5 @@ mod wrappers;
 mod tests;
 
 pub use client::{ArcusClient, ArcusSpotClient};
+
+mod query_validation;

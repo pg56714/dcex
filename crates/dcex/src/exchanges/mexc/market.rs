@@ -22,6 +22,9 @@ impl MexcClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = MexcParams::from_pairs(params);
+        if let Some(result) = self.additional_request(method_name, &params, true).await? {
+            return Ok(result);
+        }
         let (api, path, query) = match method_name {
             "ping" => {
                 params.ensure_allowed(&[])?;

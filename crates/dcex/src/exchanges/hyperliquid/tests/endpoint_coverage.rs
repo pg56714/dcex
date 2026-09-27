@@ -140,6 +140,81 @@ fn private_payload(method: &'static str, params: &[(&str, &str)]) -> Recorded {
 #[test]
 fn info_requests_match_official_request_types() {
     let cases: Vec<(&'static str, Vec<(&str, &str)>, Value)> = vec![
+        (
+            "get_perps_at_open_interest_cap",
+            vec![("dex", "xyz")],
+            json!({"type": "perpsAtOpenInterestCap", "dex": "xyz"}),
+        ),
+        (
+            "get_perp_dex_limits",
+            vec![("dex", "xyz")],
+            json!({"type": "perpDexLimits", "dex": "xyz"}),
+        ),
+        (
+            "get_perp_dex_status",
+            vec![("dex", "")],
+            json!({"type": "perpDexStatus", "dex": ""}),
+        ),
+        (
+            "get_all_perp_metas",
+            vec![],
+            json!({"type": "allPerpMetas"}),
+        ),
+        (
+            "get_perp_annotation",
+            vec![("product_symbol", "[\"ETH\",1]")],
+            json!({"type": "perpAnnotation", "coin": "ETH"}),
+        ),
+        (
+            "get_perp_categories",
+            vec![],
+            json!({"type": "perpCategories"}),
+        ),
+        (
+            "get_perp_concise_annotations",
+            vec![],
+            json!({"type": "perpConciseAnnotations"}),
+        ),
+        (
+            "get_token_details",
+            vec![("tokenId", "0x00000000000000000000000000000000")],
+            json!({"type": "tokenDetails", "tokenId": "0x00000000000000000000000000000000"}),
+        ),
+        (
+            "get_user_dex_abstraction",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "userDexAbstraction", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_user_abstraction",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "userAbstraction", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_borrow_lend_user_state",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "borrowLendUserState", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_borrow_lend_reserve_state",
+            vec![("token", "0")],
+            json!({"type": "borrowLendReserveState", "token": 0}),
+        ),
+        (
+            "get_all_borrow_lend_reserve_states",
+            vec![],
+            json!({"type": "allBorrowLendReserveStates"}),
+        ),
+        (
+            "get_predicted_fundings",
+            vec![],
+            json!({"type":"predictedFundings"}),
+        ),
+        (
+            "frontend_open_orders",
+            vec![("user", USER), ("dex", "xyz")],
+            json!({"type":"frontendOpenOrders","user":USER_LOWER,"dex":"xyz"}),
+        ),
         ("get_meta", vec![], json!({"type": "meta"})),
         (
             "get_meta",
@@ -859,6 +934,9 @@ fn additional_info_requests_reject_invalid_parameters_before_network() {
 
 #[test]
 fn schedule_cancel_and_batch_modify_match_official_wire_format() {
+    let recorded = private_payload("noop", &[("nonce", "1700000000123")]);
+    assert_eq!(recorded.body["action"], json!({"type":"noop"}));
+    assert_eq!(recorded.body["nonce"], 1700000000123_u64);
     let recorded = private_payload("schedule_cancel", &[]);
     assert_eq!(recorded.body["action"], json!({"type": "scheduleCancel"}));
 
@@ -1296,4 +1374,101 @@ fn spot_market_orders_price_from_spot_mids() {
     assert_eq!(order["a"], 10000);
     // 0.209265 * 0.95 = 0.19880175 -> 5 significant figures (spot allows 8 decimals), down.
     assert_eq!(order["p"], "0.1988");
+}
+
+#[test]
+fn abstraction_queries_preserve_scalar_results() {
+    for (method, response, expected) in [
+        ("get_user_dex_abstraction", "true", json!(true)),
+        (
+            "get_user_abstraction",
+            "\"portfolioMargin\"",
+            json!("portfolioMargin"),
+        ),
+    ] {
+        let (_, data) = public_payload_with_response(method, &[("user", USER)], response);
+        assert_eq!(data, expected);
+    }
+}
+
+#[test]
+fn account_actions_preserve_wallet_signature_and_exact_payloads() {
+    let reserve = private_payload("reserve_request_weight", &[("weight", "100")]);
+    assert_eq!(
+        reserve.body["action"],
+        json!({"type":"reserveRequestWeight","weight":100})
+    );
+    let agent = private_payload("set_agent_abstraction", &[("abstraction", "p")]);
+    assert_eq!(
+        agent.body["action"],
+        json!({"type":"agentSetAbstraction","abstraction":"p"})
+    );
+    let signature =
+        json!({"r":format!("0x{}","11".repeat(32)),"s":format!("0x{}","22".repeat(32)),"v":28});
+    let signature_text = signature.to_string();
+    let user = private_payload(
+        "set_user_abstraction",
+        &[
+            ("user", USER),
+            ("abstraction", "portfolioMargin"),
+            ("nonce", "1700000000000"),
+            ("signature", &signature_text),
+            ("signatureChainId", "0xa4b1"),
+        ],
+    );
+    assert_eq!(
+        user.body,
+        json!({"action":{"type":"userSetAbstraction","hyperliquidChain":"Mainnet","signatureChainId":"0xa4b1","user":USER_LOWER,"abstraction":"portfolioMargin","nonce":1700000000000_u64},"nonce":1700000000000_u64,"signature":signature})
+    );
+}
+
+#[test]
+fn account_risk_queries_and_actions_reject_invalid_parameters() {
+    for (public, name, params) in [
+        (true, "get_token_details", vec![("tokenId", "0x1234")]),
+        (true, "get_borrow_lend_reserve_state", vec![("token", "-1")]),
+        (true, "get_user_abstraction", vec![("user", "0x1234")]),
+        (false, "reserve_request_weight", vec![("weight", "0")]),
+        (
+            false,
+            "reserve_request_weight",
+            vec![("weight", "1"), ("destination", USER)],
+        ),
+        (
+            false,
+            "set_agent_abstraction",
+            vec![("abstraction", "portfolioMargin")],
+        ),
+        (
+            false,
+            "set_agent_abstraction",
+            vec![("abstraction", "p"), ("vaultAddress", USER)],
+        ),
+        (
+            false,
+            "set_user_abstraction",
+            vec![
+                ("user", USER),
+                ("abstraction", "portfolioMargin"),
+                ("nonce", "1"),
+                ("signature", "{}"),
+                ("signatureChainId", "0xa4b1"),
+            ],
+        ),
+    ] {
+        let client = signing_client("http://127.0.0.1:1".into());
+        let params = pairs(&params);
+        let error = crate::http::block_on(async move {
+            if public {
+                client.public_request(name, params).await
+            } else {
+                client.private_request(name, params).await
+            }
+        })
+        .unwrap_err();
+        assert!(
+            matches!(error, crate::DcexError::InvalidInput(_)),
+            "{name}: {error}"
+        );
+    }
 }

@@ -52,6 +52,21 @@ impl HyperliquidPrivateWebSocket {
         self.connection.close().await
     }
 
+    /// Sends an info request; match the response from `recv` by its numeric id.
+    pub async fn post_info(&mut self, id: u64, payload: Value) -> Result<()> {
+        self.connection
+            .send_json(&super::post::payload(id, "info", payload)?)
+            .await
+    }
+
+    /// Sends an already signed trading action without changing its nonce or signature.
+    /// A successful send is not an acknowledgement; consume the `post` response.
+    pub async fn post_action(&mut self, id: u64, signed_payload: Value) -> Result<()> {
+        self.connection
+            .send_json(&super::post::payload(id, "action", signed_payload)?)
+            .await
+    }
+
     pub async fn subscribe(&mut self, subscription: Value) -> Result<()> {
         let payload = subscription_payload("subscribe", subscription)?;
         self.connection.send_json(&payload).await

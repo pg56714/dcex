@@ -12,6 +12,12 @@ impl BybitClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         if let Some(result) = self
+            .risk_request(method_name, &BybitParams::from_pairs(params.clone()), true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
             .spread_public_request(method_name, &BybitParams::from_pairs(params.clone()))
             .await?
         {
@@ -71,6 +77,49 @@ impl BybitClient {
                 self.normalize_symbol_params(params, true)?,
             ),
             "get_kline" => (KLINE, self.normalize_kline_params(params)?),
+            "get_mark_price_kline" | "get_index_price_kline" | "get_premium_index_price_kline" => {
+                let normalized = self.normalize_kline_params(params)?;
+                let values = BybitParams::from_pairs(normalized.clone());
+                values.required("symbol")?;
+                values.required("interval")?;
+                let category = values.get("category").unwrap_or("linear");
+                let allowed: &[&str] = match method_name {
+                    "get_mark_price_kline" => &["linear", "inverse", "option"],
+                    "get_index_price_kline" => &["linear", "inverse"],
+                    _ => &["linear"],
+                };
+                if !allowed.contains(&category) {
+                    return Err(DcexError::InvalidInput(
+                        "category is not supported by this price kline endpoint".into(),
+                    ));
+                }
+                for key in ["start", "end", "limit"] {
+                    if let Some(value) = values.get(key) {
+                        value
+                            .parse::<u64>()
+                            .map_err(|_| DcexError::InvalidInput(format!("invalid {key}")))?;
+                    }
+                }
+                if let Some(limit) = values.get("limit") {
+                    let limit: u64 = limit.parse().unwrap();
+                    let max = if category == "option" { 500 } else { 1000 };
+                    if limit == 0 || limit > max {
+                        return Err(DcexError::InvalidInput(format!("limit must be 1..={max}")));
+                    }
+                }
+                if let (Some(start), Some(end)) = (values.get("start"), values.get("end")) {
+                    if start.parse::<u64>().unwrap() > end.parse::<u64>().unwrap() {
+                        return Err(DcexError::InvalidInput("start must not exceed end".into()));
+                    }
+                }
+                let path = match method_name {
+                    "get_mark_price_kline" => "/v5/market/mark-price-kline",
+                    "get_index_price_kline" => "/v5/market/index-price-kline",
+                    _ => "/v5/market/premium-index-price-kline",
+                };
+                (path, normalized)
+            }
+
             "get_orderbook" => (ORDERBOOK, self.normalize_symbol_params(params, true)?),
             "get_tickers" => (TICKERS, self.normalize_symbol_params(params, true)?),
             "get_funding_rate_history" => (

@@ -1,3 +1,5 @@
+mod futures;
+pub use futures::MexcFuturesWebSocket;
 mod private;
 mod public;
 

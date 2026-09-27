@@ -1,5 +1,6 @@
 """Kraken public market-data HTTP client backed by Rust."""
 
+from json import dumps
 from typing import Any
 
 from .._native_http import request_native_json
@@ -228,3 +229,104 @@ class MarketHTTP(HTTPManager):
                 count=count,
             ),
         )
+
+    def get_futures_funding_history(self, product_symbol: str) -> dict[str, Any]:
+        """Get historical derivatives funding rates."""
+        return self._native_public(
+            "get_futures_funding_history", self._native_params(product_symbol=product_symbol)
+        )
+
+    def get_futures_instrument_status(self, *, product_symbol: str) -> dict[str, Any]:
+        """
+        GET /derivatives/api/v3/instruments/{symbol}/status.
+
+        Source: https://docs.kraken.com/api-reference/instrument-details/get-instrument-status
+        """
+        return self._native_public(
+            "get_futures_instrument_status", self._native_params(product_symbol=product_symbol)
+        )
+
+    def get_futures_instrument_statuses(
+        self, *, contract_types: list[str] | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /derivatives/api/v3/instruments/status.
+
+        Source: https://docs.kraken.com/api-reference/instrument-details/get-instrument-status-list
+        """
+        return self._native_public(
+            "get_futures_instrument_statuses",
+            self._native_params(
+                contractType=dumps(contract_types) if contract_types is not None else None
+            ),
+        )
+
+    def get_spot_grouped_orderbook(
+        self, *, product_symbol: str, depth: int | None = None, grouping: int | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /0/public/GroupedBook.
+
+        Source: https://docs.kraken.com/api-reference/market-data/get-grouped-order-book
+        """
+        return self._native_public(
+            "get_spot_grouped_orderbook",
+            self._native_params(product_symbol=product_symbol, depth=depth, grouping=grouping),
+        )
+
+    def get_spot_maintenance_schedule(self) -> dict[str, Any]:
+        """
+        GET /0/public/MaintenanceSchedule.
+
+        Source: https://docs.kraken.com/api-reference/market-data/get-maintenance-schedule
+        """
+        return self._native_public("get_spot_maintenance_schedule", self._native_params())
+
+    def get_futures_market_analytics(
+        self, *, symbol: str, analytics_type: str, since: int, interval: int, to: int | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /api/charts/v1/analytics/{symbol}/{analytics_type}.
+
+        Source: https://docs.kraken.com/api-reference/analytics/market-analytics
+        """
+        return self._native_public(
+            "get_futures_market_analytics",
+            self._native_params(
+                symbol=symbol, analytics_type=analytics_type, since=since, interval=interval, to=to
+            ),
+        )
+
+    def get_futures_ticker(self, *, symbol: str) -> dict[str, Any]:
+        """
+        GET /derivatives/api/v3/tickers/{symbol}.
+
+        Source: https://docs.kraken.com/api-reference/market-data/get-ticker-by-symbol
+        """
+        return self._native_public("get_futures_ticker", self._native_params(symbol=symbol))
+
+    def get_spot_post_trade_data(
+        self,
+        *,
+        symbol: str | None = None,
+        from_ts: str | None = None,
+        to_ts: str | None = None,
+        count: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /0/public/PostTrade.
+
+        Source: https://docs.kraken.com/api-reference/transparency/post-trade-data
+        """
+        return self._native_public(
+            "get_spot_post_trade_data",
+            self._native_params(symbol=symbol, from_ts=from_ts, to_ts=to_ts, count=count),
+        )
+
+    def get_spot_pre_trade_data(self, *, symbol: str) -> dict[str, Any]:
+        """
+        GET /0/public/PreTrade.
+
+        Source: https://docs.kraken.com/api-reference/transparency/pre-trade-data
+        """
+        return self._native_public("get_spot_pre_trade_data", self._native_params(symbol=symbol))

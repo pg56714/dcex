@@ -45,6 +45,13 @@ impl HyperliquidPublicWebSocket {
         self.connection.close().await
     }
 
+    /// Sends an info request; match the response from `recv` by its numeric id.
+    pub async fn post_info(&mut self, id: u64, payload: Value) -> Result<()> {
+        self.connection
+            .send_json(&super::post::payload(id, "info", payload)?)
+            .await
+    }
+
     pub async fn subscribe(&mut self, subscription: Value) -> Result<()> {
         let payload = subscription_payload("subscribe", subscription)?;
         self.connection.send_json(&payload).await

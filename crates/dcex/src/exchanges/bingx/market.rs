@@ -39,6 +39,9 @@ impl BingxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BingxParams::from_pairs(params);
+        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
         match method_name {
             "get_swap_instrument_info" => {
                 params.ensure_allowed(&["product_symbol", "symbol"])?;

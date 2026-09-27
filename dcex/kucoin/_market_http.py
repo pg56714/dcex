@@ -189,3 +189,573 @@ class MarketHTTP(HTTPManager):
                 accountType=accountType,
             ),
         )
+
+    def get_futures_current_funding_rate(self, product_symbol: str) -> dict[str, Any]:
+        """GET /api/v1/funding-rate/{symbol}/current; public market data."""
+        return self._native_public(
+            "get_futures_current_funding_rate", self._native_params(product_symbol=product_symbol)
+        )
+
+    def get_futures_public_funding_history(
+        self, product_symbol: str, from_: int, to: int
+    ) -> dict[str, Any]:
+        """GET /api/v1/contract/funding-rates; public market data."""
+        return self._native_public(
+            "get_futures_public_funding_history",
+            self._native_params(product_symbol=product_symbol, **{"from": from_, "to": to}),
+        )
+
+    def get_futures_all_tickers(self) -> dict[str, Any]:
+        """Call ``GET /api/v1/allTickers``."""
+        return self._native_public("get_futures_all_tickers", self._native_params())
+
+    def get_futures_mark_price(self, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/v1/mark-price/{symbol}/current``."""
+        return self._native_public(
+            "get_futures_mark_price", self._native_params(product_symbol=product_symbol)
+        )
+
+    def get_futures_server_time(self) -> dict[str, Any]:
+        """Call ``GET /api/v1/timestamp``."""
+        return self._native_public("get_futures_server_time", self._native_params())
+
+    def get_futures_service_status(self) -> dict[str, Any]:
+        """Call ``GET /api/v1/status``."""
+        return self._native_public("get_futures_service_status", self._native_params())
+
+    def get_margin_mark_price(self, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/v1/mark-price/{symbol}/current``."""
+        return self._native_public(
+            "get_margin_mark_price", self._native_params(product_symbol=product_symbol)
+        )
+
+    def get_margin_mark_prices(self) -> dict[str, Any]:
+        """Call ``GET /api/v3/mark-price/all-symbols``."""
+        return self._native_public("get_margin_mark_prices", self._native_params())
+
+    def get_spot_server_time(self) -> dict[str, Any]:
+        """Call ``GET /api/v1/timestamp``."""
+        return self._native_public("get_spot_server_time", self._native_params())
+
+    def get_spot_service_status(self) -> dict[str, Any]:
+        """Call ``GET /api/v1/status``."""
+        return self._native_public("get_spot_service_status", self._native_params())
+
+    def get_uta_borrowable_currencies(self) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/borrowable-currency``."""
+        return self._native_public("get_uta_borrowable_currencies", self._native_params())
+
+    def get_uta_collateral_ratios(self) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/collateral-discount-ratio``."""
+        return self._native_public("get_uta_collateral_ratios", self._native_params())
+
+    def get_uta_current_funding_rates(
+        self, *, product_symbol: str | None = None, product_type: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/funding-rate``."""
+        return self._native_public(
+            "get_uta_current_funding_rates",
+            self._native_params(product_symbol=product_symbol, productType=product_type),
+        )
+
+    def get_uta_funding_rate_history(
+        self, product_symbol: str, start_at: str, end_at: str
+    ) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/funding-rate-history``."""
+        return self._native_public(
+            "get_uta_funding_rate_history",
+            self._native_params(product_symbol=product_symbol, startAt=start_at, endAt=end_at),
+        )
+
+    def get_uta_index_prices(
+        self,
+        product_symbol: str,
+        *,
+        start_at: str | None = None,
+        end_at: str | None = None,
+        page_size: str | None = None,
+        last_id: int | None = None,
+    ) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/index-price``."""
+        return self._native_public(
+            "get_uta_index_prices",
+            self._native_params(
+                product_symbol=product_symbol,
+                startAt=start_at,
+                endAt=end_at,
+                pageSize=page_size,
+                lastId=last_id,
+            ),
+        )
+
+    def get_uta_interest_rate_index(
+        self,
+        product_symbol: str,
+        *,
+        start_at: int | None = None,
+        end_at: int | None = None,
+        last_id: int | None = None,
+        page_size: int | None = None,
+    ) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/interest-rate-index``."""
+        return self._native_public(
+            "get_uta_interest_rate_index",
+            self._native_params(
+                product_symbol=product_symbol,
+                startAt=start_at,
+                endAt=end_at,
+                lastId=last_id,
+                pageSize=page_size,
+            ),
+        )
+
+    def get_uta_klines(
+        self,
+        product_symbol: str,
+        trade_type: str,
+        interval: str,
+        *,
+        kline_type: str | None = None,
+        start_at: int | None = None,
+        end_at: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        Call ``GET /api/ua/v2/market/kline``. Times are in seconds; futures do not support 6hour
+        or 3day intervals.
+        """
+        return self._native_public(
+            "get_uta_klines",
+            self._native_params(
+                product_symbol=product_symbol,
+                tradeType=trade_type,
+                klineType=kline_type,
+                interval=interval,
+                startAt=start_at,
+                endAt=end_at,
+            ),
+        )
+
+    def get_uta_service_status(self, trade_type: str) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/server/status``."""
+        return self._native_public(
+            "get_uta_service_status", self._native_params(tradeType=trade_type)
+        )
+
+    def get_uta_tickers(
+        self, trade_type: str, *, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/ticker``."""
+        return self._native_public(
+            "get_uta_tickers",
+            self._native_params(tradeType=trade_type, product_symbol=product_symbol),
+        )
+
+    def get_uta_trade_statistics(self) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/trade-statistics``."""
+        return self._native_public("get_uta_trade_statistics", self._native_params())
+
+    def get_uta_public_trades(self, trade_type: str, product_symbol: str) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/trade``."""
+        return self._native_public(
+            "get_uta_public_trades",
+            self._native_params(tradeType=trade_type, product_symbol=product_symbol),
+        )
+
+    def get_uta_instruments(
+        self, trade_type: str, *, product_symbol: str | None = None
+    ) -> dict[str, Any]:
+        """Call ``GET /api/ua/v2/market/instrument``."""
+        return self._native_public(
+            "get_uta_instruments",
+            self._native_params(product_symbol=product_symbol, tradeType=trade_type),
+        )
+
+    def get_convert_currencies(self) -> dict[str, Any]:
+        """
+
+        GET /api/v1/convert/currencies.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/convert/get-convert-currencies
+
+        """
+        return self._native_public("get_convert_currencies", self._native_params())
+
+    def get_convert_symbol(
+        self, *, from_currency: str, to_currency: str, order_type: str | None = None
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v1/convert/symbol.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/convert/get-convert-symbol
+
+        """
+        return self._native_public(
+            "get_convert_symbol",
+            self._native_params(
+                fromCurrency=from_currency, toCurrency=to_currency, orderType=order_type
+            ),
+        )
+
+    def get_futures_interest_rate_index(
+        self,
+        *,
+        symbol: str,
+        start_at: int | None = None,
+        end_at: int | None = None,
+        reverse: bool | None = None,
+        offset: int | None = None,
+        forward: bool | None = None,
+        max_count: int | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v1/interest/query.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-interest-rate-index
+
+        """
+        return self._native_public(
+            "get_futures_interest_rate_index",
+            self._native_params(
+                symbol=symbol,
+                startAt=start_at,
+                endAt=end_at,
+                reverse=reverse,
+                offset=offset,
+                forward=forward,
+                maxCount=max_count,
+            ),
+        )
+
+    def get_futures_premium_index(
+        self,
+        *,
+        symbol: str,
+        start_at: int | None = None,
+        end_at: int | None = None,
+        reverse: bool | None = None,
+        offset: int | None = None,
+        forward: bool | None = None,
+        max_count: int | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v1/premium/query.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-premium-index
+
+        """
+        return self._native_public(
+            "get_futures_premium_index",
+            self._native_params(
+                symbol=symbol,
+                startAt=start_at,
+                endAt=end_at,
+                reverse=reverse,
+                offset=offset,
+                forward=forward,
+                maxCount=max_count,
+            ),
+        )
+
+    def get_margin_config(self) -> dict[str, Any]:
+        """
+
+        GET /api/v1/margin/config.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/margin-trading/market-data/get-margin-config
+
+        """
+        return self._native_public("get_margin_config", self._native_params())
+
+    def get_announcements(
+        self,
+        *,
+        current_page: int | None = None,
+        page_size: int | None = None,
+        ann_type: str | None = None,
+        lang: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v3/announcements.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-announcements
+
+        """
+        return self._native_public(
+            "get_announcements",
+            self._native_params(
+                currentPage=current_page,
+                pageSize=page_size,
+                annType=ann_type,
+                lang=lang,
+                startTime=start_time,
+                endTime=end_time,
+            ),
+        )
+
+    def get_call_auction_info(self, *, symbol: str) -> dict[str, Any]:
+        """
+
+        GET /api/v1/market/callauctionData.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-call-auction-info
+
+        """
+        return self._native_public("get_call_auction_info", self._native_params(symbol=symbol))
+
+    def get_call_auction_part_order_book(self, *, size: int, symbol: str) -> dict[str, Any]:
+        """
+
+        GET /api/v1/market/orderbook/callauction/level2_{size}.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-call-auction-part-orderbook
+
+        """
+        return self._native_public(
+            "get_call_auction_part_order_book", self._native_params(size=size, symbol=symbol)
+        )
+
+    def get_spot_currency_v3(self, *, currency: str, chain: str | None = None) -> dict[str, Any]:
+        """
+
+        GET /api/v3/currencies/{currency}.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-currency
+
+        """
+        return self._native_public(
+            "get_spot_currency_v3", self._native_params(currency=currency, chain=chain)
+        )
+
+    def get_fiat_price(
+        self, *, base: str | None = None, currencies: str | None = None
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v1/prices.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-fiat-price
+
+        """
+        return self._native_public(
+            "get_fiat_price", self._native_params(base=base, currencies=currencies)
+        )
+
+    def get_market_list(self) -> dict[str, Any]:
+        """
+
+        GET /api/v1/markets.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-market-list
+
+        """
+        return self._native_public("get_market_list", self._native_params())
+
+    def get_spot_symbol_v2(self, *, symbol: str) -> dict[str, Any]:
+        """
+
+        GET /api/v2/symbols/{symbol}.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-symbol
+
+        """
+        return self._native_public("get_spot_symbol_v2", self._native_params(symbol=symbol))
+
+    def get_uta_currencies(
+        self, *, chain: str | None = None, currency_list: list[str] | None = None
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/ua/v2/asset/currencies.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/v2/rest/ua/currencies
+
+        """
+        return self._native_public(
+            "get_uta_currencies", self._native_params(chain=chain, currencyList=currency_list)
+        )
+
+    def get_uta_currency(self, *, currency: str, chain: str | None = None) -> dict[str, Any]:
+        """
+
+        GET /api/ua/v2/market/currency.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/v2/rest/ua/currency
+
+        """
+        return self._native_public(
+            "get_uta_currency", self._native_params(chain=chain, currency=currency)
+        )
+
+    def get_uta_fiat_price(
+        self, *, base: str, currencies: list[str] | None = None
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/ua/v2/market/fiat-price.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/v2/rest/ua/fiat-price
+
+        """
+        return self._native_public(
+            "get_uta_fiat_price", self._native_params(base=base, currencies=currencies)
+        )
+
+    def get_uta_announcements(
+        self,
+        *,
+        language: str | None = None,
+        type_: str | None = None,
+        page_number: int | None = None,
+        page_size: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/ua/v2/market/announcement.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/v2/rest/ua/get-announcements
+
+        """
+        return self._native_public(
+            "get_uta_announcements",
+            self._native_params(
+                language=language,
+                type=type_,
+                pageNumber=page_number,
+                pageSize=page_size,
+                startTime=start_time,
+                endTime=end_time,
+            ),
+        )
+
+    def get_uta_call_auction_info(self, *, symbol: str) -> dict[str, Any]:
+        """
+
+        GET /api/ua/v2/market/call-auction-info.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/v2/rest/ua/get-call-auction-info
+
+        """
+        return self._native_public("get_uta_call_auction_info", self._native_params(symbol=symbol))
+
+    def get_uta_client_ip_address(self) -> dict[str, Any]:
+        """
+
+        GET /api/ua/v2/user/my-ip.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/v2/rest/ua/get-client-ip-address
+
+        """
+        return self._native_public("get_uta_client_ip_address", self._native_params())
+
+    def get_uta_kyc_regions(self) -> dict[str, Any]:
+        """
+
+        GET /api/ua/v2/user/kyc-region.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/v2/rest/ua/get-kyc-region
+
+        """
+        return self._native_public("get_uta_kyc_regions", self._native_params())
+
+    def get_spot_24h_statistics(self, *, symbol: str) -> dict[str, Any]:
+        """
+
+        GET /api/v1/market/stats.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-24hr-stats
+
+        """
+        return self._native_public("get_spot_24h_statistics", self._native_params(symbol=symbol))
+
+    def get_client_ip_address(self) -> dict[str, Any]:
+        """
+
+        GET /api/v1/my-ip.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/spot-trading/market-data/get-client-ip-address
+
+        """
+        return self._native_public("get_client_ip_address", self._native_params())
+
+    def get_kyc_regions(self) -> dict[str, Any]:
+        """
+
+        GET /api/kyc/regions/v4.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-kyc-regions
+
+        """
+        return self._native_public("get_kyc_regions", self._native_params())
+
+    def get_spot_index_price(
+        self,
+        *,
+        symbol: str,
+        start_at: int | None = None,
+        end_at: int | None = None,
+        reverse: bool | None = None,
+        offset: int | None = None,
+        forward: bool | None = None,
+        max_count: int | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /api/v1/index/query.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-spot-index-price
+
+        """
+        return self._native_public(
+            "get_spot_index_price",
+            self._native_params(
+                symbol=symbol,
+                startAt=start_at,
+                endAt=end_at,
+                reverse=reverse,
+                offset=offset,
+                forward=forward,
+                maxCount=max_count,
+            ),
+        )
+
+    def get_futures_24h_statistics(self) -> dict[str, Any]:
+        """
+
+        GET /api/v1/trade-statistics.
+
+        Use native exchange symbols and decimal strings. Source:
+        https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-24hr-stats
+
+        """
+        return self._native_public("get_futures_24h_statistics", self._native_params())

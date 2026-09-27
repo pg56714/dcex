@@ -33,6 +33,296 @@ FUTURES = "FUTURES"
 
 # method name -> (kwargs, HTTP method, official path, API family)
 CASES: dict[str, tuple[dict[str, Any], str, str, str]] = {
+    "delete_spot_export_report": (
+        {"id": "report1", "report_action": "cancel"},
+        "POST",
+        "/0/private/RemoveExport",
+        SPOT,
+    ),
+    "get_spot_export_status": ({"report": "trades"}, "POST", "/0/private/ExportStatus", SPOT),
+    "request_spot_export_report": (
+        {
+            "report": "trades",
+            "format": "CSV",
+            "description": "history",
+            "starttm": 1700000000,
+            "endtm": 1700000060,
+        },
+        "POST",
+        "/0/private/AddExport",
+        SPOT,
+    ),
+    "simulate_futures_portfolio": (
+        {
+            "portfolio": {
+                "positions": [{"instrument": "PF_XBTUSD", "size": -1.25, "entryPrice": 60000.25}]
+            }
+        },
+        "POST",
+        "/derivatives/api/v3/portfolio-margining/simulate",
+        FUTURES,
+    ),
+    "get_futures_market_analytics": (
+        {
+            "symbol": "PF_XBTUSD",
+            "analytics_type": "open-interest",
+            "since": 1700000000,
+            "interval": 60,
+        },
+        "GET",
+        "/api/charts/v1/analytics/PF_XBTUSD/open-interest",
+        FUTURES,
+    ),
+    "check_futures_api_key": ({}, "GET", "/api/auth/v1/api-keys/v3/check", FUTURES),
+    "get_futures_ticker": (
+        {"symbol": "PF_XBTUSD"},
+        "GET",
+        "/derivatives/api/v3/tickers/PF_XBTUSD",
+        FUTURES,
+    ),
+    "get_futures_pnl_preferences": ({}, "GET", "/derivatives/api/v3/pnlpreferences", FUTURES),
+    "set_futures_pnl_preference": (
+        {"symbol": "PF_XBTUSD", "pnl_preference": "USD"},
+        "PUT",
+        "/derivatives/api/v3/pnlpreferences",
+        FUTURES,
+    ),
+    "create_spot_subaccount": (
+        {"username": "trader1", "email": "trader@example.com"},
+        "POST",
+        "/0/private/CreateSubaccount",
+        SPOT,
+    ),
+    "get_futures_subaccounts": ({}, "GET", "/derivatives/api/v3/subaccounts", FUTURES),
+    "get_spot_post_trade_data": ({"symbol": "BTC/USD"}, "GET", "/0/public/PostTrade", SPOT),
+    "get_spot_pre_trade_data": ({"symbol": "BTC/USD"}, "GET", "/0/public/PreTrade", SPOT),
+    "get_spot_api_key_info": ({}, "POST", "/0/private/GetApiKeyInfo", SPOT),
+    "get_spot_credit_lines": (
+        {"rebase_multiplier": "base"},
+        "POST",
+        "/0/private/CreditLines",
+        SPOT,
+    ),
+    "get_spot_order_amends": (
+        {"order_id": "OID-1", "rebase_multiplier": "base"},
+        "POST",
+        "/0/private/OrderAmends",
+        SPOT,
+    ),
+    "get_spot_wallet_accounts": ({}, "POST", "/0/private/ListWalletAccounts", SPOT),
+    "get_spot_ledger_entries": (
+        {"ledger_ids": "ledger1,ledger2", "trades": True, "rebase_multiplier": "base"},
+        "POST",
+        "/0/private/QueryLedgers",
+        SPOT,
+    ),
+    "get_futures_portfolio_margin_parameters": (
+        {},
+        "GET",
+        "/derivatives/api/v3/portfolio-margining/parameters",
+        FUTURES,
+    ),
+    "get_futures_unwind_queue": ({}, "GET", "/derivatives/api/v3/unwindqueue", FUTURES),
+    "get_futures_notifications": ({}, "GET", "/derivatives/api/v3/notifications", FUTURES),
+    "get_spot_grouped_orderbook": (
+        {"product_symbol": "BTC-USD-SPOT", "depth": 25, "grouping": 100},
+        "GET",
+        "/0/public/GroupedBook",
+        SPOT,
+    ),
+    "get_spot_maintenance_schedule": ({}, "GET", "/0/public/MaintenanceSchedule", SPOT),
+    "get_futures_self_trade_strategy": (
+        {},
+        "GET",
+        "/derivatives/api/v3/self-trade-strategy",
+        FUTURES,
+    ),
+    "set_futures_self_trade_strategy": (
+        {"strategy": "CANCEL_MAKER_SELF"},
+        "PUT",
+        "/derivatives/api/v3/self-trade-strategy",
+        FUTURES,
+    ),
+    "get_futures_trading_instruments": (
+        {"contract_types": ["futures_inverse", "flexible_futures"]},
+        "GET",
+        "/derivatives/api/v3/trading/instruments",
+        FUTURES,
+    ),
+    "get_futures_subaccount_trading_status": (
+        {"subaccount_uid": "abcd-1234"},
+        "GET",
+        "/derivatives/api/v3/subaccount/abcd-1234/trading-enabled",
+        FUTURES,
+    ),
+    "set_futures_subaccount_trading_status": (
+        {"subaccount_uid": "abcd-1234", "trading_enabled": False},
+        "PUT",
+        "/derivatives/api/v3/subaccount/abcd-1234/trading-enabled",
+        FUTURES,
+    ),
+    "get_spot_trades_info": (
+        {"txid": "trade-1,trade-2", "trades": True, "rebase_multiplier": "base"},
+        "POST",
+        "/0/private/QueryTrades",
+        SPOT,
+    ),
+    "get_futures_account_log_csv": (
+        {"conversion_details": True},
+        "GET",
+        "/api/history/v3/accountlogcsv",
+        FUTURES,
+    ),
+    "get_futures_account_log": (
+        {
+            "since": 1000,
+            "before": 2000,
+            "count": 10,
+            "conversion_details": True,
+            "info": ["futures trade", "funding rate change"],
+        },
+        "GET",
+        "/api/history/v3/account-log",
+        FUTURES,
+    ),
+    "get_futures_execution_events": (
+        {"since": 1000, "before": 2000, "count": 10},
+        "GET",
+        "/api/history/v3/executions",
+        FUTURES,
+    ),
+    "get_futures_order_events": (
+        {"since": 1000, "before": 2000, "count": 10},
+        "GET",
+        "/api/history/v3/orders",
+        FUTURES,
+    ),
+    "get_futures_position_events": (
+        {"since": 1000, "before": 2000, "count": 10},
+        "GET",
+        "/api/history/v3/positions",
+        FUTURES,
+    ),
+    "get_futures_trigger_events": (
+        {"since": 1000, "before": 2000, "count": 10},
+        "GET",
+        "/api/history/v3/triggers",
+        FUTURES,
+    ),
+    "get_spot_deposit_addresses": (
+        {"asset": "XBT", "method": "Bitcoin"},
+        "POST",
+        "/0/private/DepositAddresses",
+        SPOT,
+    ),
+    "get_spot_deposit_methods": ({"asset": "XBT"}, "POST", "/0/private/DepositMethods", SPOT),
+    "get_futures_instrument_status": (
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/derivatives/api/v3/instruments/PF_XBTUSD/status",
+        FUTURES,
+    ),
+    "get_futures_instrument_statuses": (
+        {"contract_types": ["futures_inverse", "flexible_futures"]},
+        "GET",
+        "/derivatives/api/v3/instruments/status",
+        FUTURES,
+    ),
+    "transfer_spot_sub_account": (
+        {"asset": "XBT", "amount": "1.25", "from_account": "master-id", "to_account": "sub-id"},
+        "POST",
+        "/0/private/AccountTransfer",
+        SPOT,
+    ),
+    "transfer_futures_sub_account": (
+        {
+            "from_user": "master-id",
+            "to_user": "sub-id",
+            "from_account": "cash",
+            "to_account": "flex",
+            "unit": "USD",
+            "amount": "1.25",
+        },
+        "POST",
+        "/derivatives/api/v3/transfer/subaccount",
+        FUTURES,
+    ),
+    "get_spot_deposit_status": (
+        {"cursor": True, "limit": 10},
+        "POST",
+        "/0/private/DepositStatus",
+        SPOT,
+    ),
+    "get_spot_level3_orderbook": (
+        {"product_symbol": "BTC-USD-SPOT", "depth": 0},
+        "POST",
+        "/0/private/Level3",
+        SPOT,
+    ),
+    "manage_futures_batch_orders": (
+        {
+            "orders": [
+                {
+                    "order": "send",
+                    "order_tag": "1",
+                    "orderType": "lmt",
+                    "product_symbol": "BTC-USD-SWAP",
+                    "side": "buy",
+                    "size": 1,
+                    "limitPrice": 100,
+                    "reduceOnly": False,
+                },
+                {"order": "edit", "cliOrdId": "c-1", "size": 2},
+                {"order": "cancel", "cliOrdId": "c-2"},
+            ]
+        },
+        "POST",
+        "/derivatives/api/v3/batchorder",
+        FUTURES,
+    ),
+    "get_futures_funding_history": (
+        {"product_symbol": "BTC-USD-SWAP"},
+        "GET",
+        "/derivatives/api/v3/historical-funding-rates",
+        FUTURES,
+    ),
+    "place_spot_batch_orders": (
+        {
+            "product_symbol": "BTC-USD-SPOT",
+            "orders": [
+                {"type": "buy", "ordertype": "limit", "price": "100", "volume": "1"},
+                {"type": "sell", "ordertype": "market", "volume": "1"},
+            ],
+            "validate": True,
+        },
+        "POST",
+        "/0/private/AddOrderBatch",
+        SPOT,
+    ),
+    "cancel_spot_batch_orders": (
+        {"orders": ["OABC", 42], "cl_ord_ids": ["client-a"]},
+        "POST",
+        "/0/private/CancelOrderBatch",
+        SPOT,
+    ),
+    "get_spot_extended_balance": (
+        {"rebase_multiplier": "base"},
+        "POST",
+        "/0/private/BalanceEx",
+        SPOT,
+    ),
+    "get_futures_leverage_preferences": (
+        {},
+        "GET",
+        "/derivatives/api/v3/leveragepreferences",
+        FUTURES,
+    ),
+    "set_futures_leverage_preference": (
+        {"product_symbol": "BTC-USD-SWAP", "max_leverage": "3"},
+        "PUT",
+        "/derivatives/api/v3/leveragepreferences",
+        FUTURES,
+    ),
     # Spot market data
     "get_server_time": ({}, "GET", "/0/public/Time", SPOT),
     "get_spot_system_status": ({}, "GET", "/0/public/SystemStatus", SPOT),
@@ -388,40 +678,122 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
 
 def _assert_route(request: dict[str, Any], method_name: str) -> None:
     _kwargs, http_method, path, family = CASES[method_name]
+    if method_name in RISK_FIELDS:
+        sent = parse_qsl(request["body"] or urlsplit(request["path"]).query)
+        assert sorted((k, v) for k, v in sent if k != "nonce") == sorted(RISK_FIELDS[method_name])
     assert request["method"] == http_method, method_name
     assert urlsplit(request["path"]).path == path, method_name
     if family == SPOT and path.startswith("/0/private/"):
         assert request["api_sign"], method_name
-        assert "nonce" in dict(parse_qsl(request["body"])), method_name
+        body = (
+            json.loads(request["body"])
+            if request["body"].startswith("{")
+            else dict(parse_qsl(request["body"]))
+        )
+        assert "nonce" in body, method_name
+        if request["body"].startswith("{"):
+            import hashlib
+            import hmac
+
+            digest = hashlib.sha256((str(body["nonce"]) + request["body"]).encode()).digest()
+            signature = base64.b64encode(
+                hmac.new(b"secret", path.encode() + digest, hashlib.sha512).digest()
+            ).decode()
+            assert request["api_sign"] == signature
+            if method_name == "place_spot_batch_orders":
+                assert body["orders"] == CASES[method_name][0]["orders"]
+                assert body["validate"] is True
+                assert body["pair"] == "XBTUSD"
+            else:
+                assert body["orders"] == ["OABC", 42]
+                assert body["cl_ord_ids"] == ["client-a"]
+    if method_name == "manage_futures_batch_orders":
+        value = json.loads(dict(parse_qsl(request["body"]))["json"])
+        expected = [dict(order) for order in CASES[method_name][0]["orders"]]
+        expected[0].pop("product_symbol")
+        expected[0]["symbol"] = "PF_XBTUSD"
+        assert value == {"batchOrder": expected}
     if family == FUTURES and method_name in _PRIVATE_FUTURES:
         assert request["authent"], method_name
 
 
-def _skip_if_stale_native(exc: Exception) -> None:
+def _fail_if_stale_native(exc: Exception) -> None:
     if "unsupported Kraken" in str(exc):
-        pytest.skip(f"installed dcex._native predates this Rust dispatch: {exc}")
+        pytest.fail(f"installed dcex._native predates this Rust dispatch: {exc}")
 
 
-def _call_or_skip_stale_native(method: Any, kwargs: dict[str, Any]) -> None:
+def _call_checked_native(method: Any, kwargs: dict[str, Any]) -> None:
     try:
         method(**kwargs)
     except ValueError as exc:
-        _skip_if_stale_native(exc)
+        _fail_if_stale_native(exc)
         raise
 
+
+RISK_FIELDS = {
+    "get_spot_trades_info": [
+        ("txid", "trade-1,trade-2"),
+        ("trades", "true"),
+        ("rebase_multiplier", "base"),
+    ],
+    "get_futures_account_log_csv": [("conversion_details", "true")],
+    "get_futures_account_log": [
+        ("since", "1000"),
+        ("before", "2000"),
+        ("count", "10"),
+        ("conversion_details", "true"),
+        ("info", "futures trade"),
+        ("info", "funding rate change"),
+    ],
+    "get_futures_execution_events": [("since", "1000"), ("before", "2000"), ("count", "10")],
+    "get_futures_order_events": [("since", "1000"), ("before", "2000"), ("count", "10")],
+    "get_futures_position_events": [("since", "1000"), ("before", "2000"), ("count", "10")],
+    "get_futures_trigger_events": [("since", "1000"), ("before", "2000"), ("count", "10")],
+    "get_spot_deposit_addresses": [("asset", "XBT"), ("method", "Bitcoin")],
+    "get_spot_deposit_methods": [("asset", "XBT")],
+    "get_futures_instrument_status": [],
+    "get_futures_instrument_statuses": [
+        ("contractType", "futures_inverse"),
+        ("contractType", "flexible_futures"),
+    ],
+    "transfer_spot_sub_account": [
+        ("asset", "XBT"),
+        ("amount", "1.25"),
+        ("from", "master-id"),
+        ("to", "sub-id"),
+    ],
+    "transfer_futures_sub_account": [
+        ("fromUser", "master-id"),
+        ("toUser", "sub-id"),
+        ("fromAccount", "cash"),
+        ("toAccount", "flex"),
+        ("unit", "USD"),
+        ("amount", "1.25"),
+    ],
+    "get_spot_deposit_status": [("cursor", "true"), ("limit", "10")],
+    "get_spot_level3_orderbook": [("pair", "XBTUSD"), ("depth", "0")],
+}
 
 _PRIVATE_FUTURES = {
     name
     for name, (_kwargs, _method, path, family) in CASES.items()
     if family == FUTURES
+    and name
+    not in {
+        "get_futures_instrument_status",
+        "get_futures_instrument_statuses",
+        "get_futures_ticker",
+    }
     and not path.startswith("/api/charts")
-    and not path.endswith(("/instruments", "/tickers", "/orderbook", "/history"))
+    and not path.endswith(
+        ("/instruments", "/tickers", "/orderbook", "/history", "/historical-funding-rates")
+    )
 }
 
 
 @pytest.mark.parametrize("mode", ["sync", "async"])
 def test_every_kraken_wrapper_has_a_route_case(mode: str) -> None:
-    assert _wrapper_names(mode) == set(CASES)
+    assert _wrapper_names(mode) == set(CASES) | {"retrieve_spot_export"}
 
 
 @pytest.mark.parametrize("method_name", sorted(CASES))
@@ -432,7 +804,7 @@ def test_sync_kraken_wrapper_hits_official_route(method_name: str) -> None:
     with _route_server() as (base_url, received):
         client = Client(**_client_kwargs(base_url))
         try:
-            _call_or_skip_stale_native(getattr(client, method_name), kwargs)
+            _call_checked_native(getattr(client, method_name), kwargs)
         finally:
             client.close()
         request = received.get(timeout=5)
@@ -452,7 +824,7 @@ async def test_async_kraken_wrapper_hits_official_route(method_name: str) -> Non
             try:
                 await getattr(client, method_name)(**kwargs)
             except ValueError as exc:
-                _skip_if_stale_native(exc)
+                _fail_if_stale_native(exc)
                 raise
         finally:
             await client.close()
@@ -533,9 +905,108 @@ def test_kraken_amend_wrappers_work_without_product_table(
     with _route_server() as (base_url, received):
         client = Client(**_client_kwargs(base_url))
         try:
-            _call_or_skip_stale_native(getattr(client, method_name), kwargs)
+            _call_checked_native(getattr(client, method_name), kwargs)
             request = received.get(timeout=5)
         finally:
             client.close()
     sent = parse_qsl(request["body"] or urlsplit(request["path"]).query)
     assert "self" not in dict(sent)
+
+
+@pytest.mark.parametrize(
+    ("method", "kwargs"),
+    [
+        ("get_spot_level3_orderbook", {"product_symbol": "BTC-USD-SPOT", "depth": 50}),
+        ("get_spot_trades_info", {"txid": ",".join(["id"] * 21)}),
+        ("get_spot_trades_info", {"txid": "id,,other"}),
+        ("get_spot_deposit_addresses", {"asset": "BTC", "method": "Bitcoin Lightning"}),
+        (
+            "transfer_spot_sub_account",
+            {"asset": "BTC", "amount": "NaN", "from_account": "master", "to_account": "sub"},
+        ),
+        ("get_futures_account_log", {"since": 2000, "before": 1000}),
+        ("get_futures_account_log", {"info": ["not-a-ledger-type"]}),
+        ("get_futures_execution_events", {"count": 0}),
+        ("get_futures_instrument_statuses", {"contract_types": []}),
+    ],
+)
+@pytest.mark.parametrize("mode", ["sync", "async"])
+@pytest.mark.asyncio
+async def test_risk_parameters_rejected_without_transport(
+    method: str, kwargs: dict[str, Any], mode: str
+) -> None:
+    if mode == "sync":
+        from dcex.kraken.client import Client
+
+        client = Client(**_client_kwargs("http://127.0.0.1:1"))
+        try:
+            with pytest.raises(ValueError):
+                getattr(client, method)(**kwargs)
+        finally:
+            client.close()
+    else:
+        from dcex.async_support.kraken.client import Client as AsyncClient
+
+        client = await AsyncClient(**_client_kwargs("http://127.0.0.1:1")).async_init()
+        try:
+            with pytest.raises(ValueError):
+                await getattr(client, method)(**kwargs)
+        finally:
+            await client.close()
+
+
+RISK_FIELDS.update(
+    {
+        "get_spot_api_key_info": [],
+        "get_spot_credit_lines": [("rebase_multiplier", "base")],
+        "get_spot_order_amends": [("order_id", "OID-1"), ("rebase_multiplier", "base")],
+        "get_spot_wallet_accounts": [],
+        "get_spot_ledger_entries": [
+            ("id", "ledger1,ledger2"),
+            ("trades", "true"),
+            ("rebase_multiplier", "base"),
+        ],
+        "get_futures_portfolio_margin_parameters": [],
+        "get_futures_unwind_queue": [],
+        "get_futures_notifications": [],
+        "get_spot_grouped_orderbook": [("pair", "XBTUSD"), ("depth", "25"), ("grouping", "100")],
+        "get_spot_maintenance_schedule": [],
+        "get_futures_self_trade_strategy": [],
+        "set_futures_self_trade_strategy": [("strategy", "CANCEL_MAKER_SELF")],
+        "get_futures_trading_instruments": [
+            ("contractType", "futures_inverse"),
+            ("contractType", "flexible_futures"),
+        ],
+        "get_futures_subaccount_trading_status": [],
+        "set_futures_subaccount_trading_status": [("tradingEnabled", "false")],
+    }
+)
+
+RISK_FIELDS.update(
+    {
+        "delete_spot_export_report": [("id", "report1"), ("type", "cancel")],
+        "get_spot_export_status": [("report", "trades")],
+        "request_spot_export_report": [
+            ("report", "trades"),
+            ("format", "CSV"),
+            ("description", "history"),
+            ("starttm", "1700000000"),
+            ("endtm", "1700000060"),
+        ],
+        "simulate_futures_portfolio": [
+            (
+                "json",
+                '{"positions":[{"instrument":"PF_XBTUSD","size":-1.25,"entryPrice":60000.25}]}',
+            )
+        ],
+        "get_futures_market_analytics": [("since", "1700000000"), ("interval", "60")],
+        "check_futures_api_key": [],
+        "get_futures_ticker": [],
+        "get_futures_pnl_preferences": [],
+        "set_futures_pnl_preference": [("symbol", "PF_XBTUSD"), ("pnlPreference", "USD")],
+        "create_spot_subaccount": [("username", "trader1"), ("email", "trader@example.com")],
+        "get_futures_subaccounts": [],
+        "get_spot_post_trade_data": [("symbol", "BTC/USD")],
+        "get_spot_pre_trade_data": [("symbol", "BTC/USD")],
+    }
+)

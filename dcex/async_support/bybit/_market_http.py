@@ -305,3 +305,172 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_spread_recent_trades", self._native_params(symbol=symbol, limit=limit)
         )
+
+    async def get_mark_price_kline(
+        self,
+        product_symbol: str,
+        interval: str,
+        *,
+        category: str | None = None,
+        start: int | None = None,
+        end: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Get mark price candles; interval uses values such as ``1m`` or ``1h``."""
+        return await self._native_public(
+            "get_mark_price_kline",
+            self._params(
+                product_symbol=product_symbol,
+                interval=interval,
+                category=category,
+                start=start,
+                end=end,
+                limit=limit,
+            ),
+        )
+
+    async def get_index_price_kline(
+        self,
+        product_symbol: str,
+        interval: str,
+        *,
+        category: str | None = None,
+        start: int | None = None,
+        end: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Get index price candles; interval uses values such as ``1m`` or ``1h``."""
+        return await self._native_public(
+            "get_index_price_kline",
+            self._params(
+                product_symbol=product_symbol,
+                interval=interval,
+                category=category,
+                start=start,
+                end=end,
+                limit=limit,
+            ),
+        )
+
+    async def get_premium_index_price_kline(
+        self,
+        product_symbol: str,
+        interval: str,
+        *,
+        category: str | None = None,
+        start: int | None = None,
+        end: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """Get premium index price candles; interval uses values such as ``1m`` or ``1h``."""
+        return await self._native_public(
+            "get_premium_index_price_kline",
+            self._params(
+                product_symbol=product_symbol,
+                interval=interval,
+                category=category,
+                start=start,
+                end=end,
+                limit=limit,
+            ),
+        )
+
+    async def get_full_orderbook(self, category: str, product_symbol: str) -> dict[str, Any]:
+        """Get full orderbook; see https://bybit-exchange.github.io/docs/v5/market/full-ob."""
+        return await self._native_public(
+            "get_full_orderbook", self._params(category=category, product_symbol=product_symbol)
+        )
+
+    async def get_rpi_orderbook(
+        self, product_symbol: str, limit: int, category: str | None = None
+    ) -> dict[str, Any]:
+        """Get rpi orderbook; see https://bybit-exchange.github.io/docs/v5/market/rpi-orderbook."""
+        return await self._native_public(
+            "get_rpi_orderbook",
+            self._params(product_symbol=product_symbol, limit=limit, category=category),
+        )
+
+    async def get_system_status(
+        self, id: str | None = None, state: str | None = None
+    ) -> dict[str, Any]:
+        """Get system status; see https://bybit-exchange.github.io/docs/v5/system-status."""
+        return await self._native_public("get_system_status", self._params(id=id, state=state))
+
+    async def get_announcements(
+        self,
+        *,
+        locale: str,
+        type_: str | None = None,
+        tag: str | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """
+
+        GET /v5/announcements/index.
+
+        Native symbols; timestamps are milliseconds. Source:
+        https://bybit-exchange.github.io/docs/v5/announcement
+
+        """
+        return await self._native_public(
+            "get_announcements",
+            self._native_params(locale=locale, type=type_, tag=tag, page=page, limit=limit),
+        )
+
+    async def get_fee_group_info(
+        self, *, product_type: str, group_id: str | None = None
+    ) -> dict[str, Any]:
+        """
+
+        GET /v5/market/fee-group-info.
+
+        Native symbols; timestamps are milliseconds. Source:
+        https://bybit-exchange.github.io/docs/v5/market/fee-group-info
+
+        """
+        return await self._native_public(
+            "get_fee_group_info", self._native_params(productType=product_type, groupId=group_id)
+        )
+
+    async def get_index_price_components(self, *, index_name: str) -> dict[str, Any]:
+        """
+
+        GET /v5/market/index-price-components.
+
+        Native symbols; timestamps are milliseconds. Source:
+        https://bybit-exchange.github.io/docs/v5/market/index-components
+
+        """
+        return await self._native_public(
+            "get_index_price_components", self._native_params(indexName=index_name)
+        )
+
+    async def get_option_delivery_prices(
+        self, *, category: str, base_coin: str, settle_coin: str | None = None
+    ) -> dict[str, Any]:
+        """
+
+        GET /v5/market/new-delivery-price.
+
+        Native symbols; timestamps are milliseconds. Source:
+        https://bybit-exchange.github.io/docs/v5/market/new-delivery-price
+
+        """
+        return await self._native_public(
+            "get_option_delivery_prices",
+            self._native_params(category=category, baseCoin=base_coin, settleCoin=settle_coin),
+        )
+
+    async def get_option_base_coins(self, *, underlying_type: str | None = None) -> dict[str, Any]:
+        """
+
+        GET /v5/market/option-base-coins.
+
+        Native symbols; timestamps are milliseconds. Source:
+        https://bybit-exchange.github.io/docs/v5/market/option-base-coins
+
+        """
+        return await self._native_public(
+            "get_option_base_coins", self._native_params(underlyingType=underlying_type)
+        )

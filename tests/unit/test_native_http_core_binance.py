@@ -37,6 +37,7 @@ def test_native_sync_http_client() -> None:
     assert headers["x-response"] == "native"
     assert json.loads(body) == {"ok": True}
     assert received.get_nowait() == {
+        "method": "GET",
         "path": "/test?symbol=BTCUSDT",
         "header": "sync",
         "api_key": None,
@@ -78,6 +79,7 @@ async def test_native_async_http_client() -> None:
     assert headers["x-response"] == "native"
     assert json.loads(body) == {"ok": True}
     assert received.get_nowait() == {
+        "method": "GET",
         "path": "/test?symbol=ETHUSDT",
         "header": "async",
         "api_key": None,

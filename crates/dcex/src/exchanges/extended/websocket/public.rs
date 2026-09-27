@@ -68,6 +68,24 @@ impl ExtendedPublicWebSocket {
             .await
     }
 
+    /// Subscribe to the resting RFQ order book (the normal stream is indicative).
+    pub async fn subscribe_rfq_orderbook(
+        &mut self,
+        market: Option<&str>,
+        depth: Option<u8>,
+    ) -> Result<()> {
+        let mut path = optional_market_path("orderbooks/rfq", market)?;
+        if let Some(depth) = depth {
+            if depth != 1 {
+                return Err(DcexError::InvalidInput(
+                    "Extended RFQ depth must be 1 when specified.".into(),
+                ));
+            }
+            path.push_str("?depth=1");
+        }
+        self.select_stream(path).await
+    }
+
     pub async fn subscribe_funding(&mut self, market: Option<&str>) -> Result<()> {
         self.select_stream(optional_market_path("funding", market)?)
             .await

@@ -78,6 +78,18 @@ impl BinanceClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = PublicParams(params);
+        if let Some(response) = self.risk_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(result) = self.batch_private_request(method_name, &params).await? {
+            return Ok(result);
+        }
+        if let Some(response) = self
+            .trading_controls_private_request(method_name, &params)
+            .await?
+        {
+            return Ok(response);
+        }
         if let Some(response) = self
             .portfolio_margin_private_request(method_name, &params)
             .await?

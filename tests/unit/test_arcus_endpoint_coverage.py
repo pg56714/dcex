@@ -83,7 +83,24 @@ def signed(
     return WireCase(method, kwargs, path, {"address": ADDRESS}, body, signed=True, lookups=lookups)
 
 
+WALLET_KEY_BODY = {
+    "address": ADDRESS,
+    "publicKey": "33" * 32,
+    "apiWalletName": "trade",
+    "accountIndex": 255,
+    "nonce": "nonce1",
+    "signature": {"r": "11" * 32, "s": "22" * 32, "v": "1b"},
+}
+
 CASES = [
+    read("get_api_keys", "/v1/apiKeys", {"address": ADDRESS}),
+    read("get_api_keys", "/v1/apiKeys", {"address": ADDRESS, "accountIndex": "2"}, account_index=2),
+    WireCase(
+        "create_api_key_signed", {"body": WALLET_KEY_BODY}, "/v1/createApiKey", {}, WALLET_KEY_BODY
+    ),
+    WireCase(
+        "revoke_api_key_signed", {"body": WALLET_KEY_BODY}, "/v1/revokeApiKey", {}, WALLET_KEY_BODY
+    ),
     read("get_markets", "/v1/markets"),
     read("get_spot_assets", "/v1/spotAssets"),
     read("get_fee_tiers", "/v1/feetiers"),
@@ -171,6 +188,156 @@ TRANSFER = {
 }
 
 
+CASES.extend(
+    [
+        read(
+            "get_trade",
+            "/v1/trade/123",
+            {"market": "BTC-USD"},
+            **{"trade_id": "123", "market": "BTC-USD"},
+        ),
+        read(
+            "get_account_stats",
+            "/v1/account/stats",
+            {"address": ADDRESS, "include": "feeTier,volumes", "windows": "24h,7d"},
+            **{"include": ["feeTier", "volumes"], "windows": ["24h", "7d"]},
+        ),
+        read("get_mid_prices", "/v1/mids", {"market": "BTC-USD"}, **{"market": "BTC-USD"}),
+        read("get_compliance", "/v1/compliance", {"address": ADDRESS}, **{}),
+        read("get_rate_limit", "/v1/rateLimit", {"address": ADDRESS, "accountIndex": "0"}, **{}),
+        read("get_time", "/v1/time", {}, **{}),
+        read(
+            "get_fill",
+            "/v1/fill/123",
+            {"address": ADDRESS, "accountIndex": "0"},
+            **{"trade_id": "123"},
+        ),
+        read(
+            "get_funding",
+            "/v1/funding",
+            {
+                "address": ADDRESS,
+                "accountIndex": "0",
+                "market": "BTC-USD",
+                "from": "1700000000000000",
+                "to": "1700000060000000",
+                "limit": "20",
+            },
+            **{
+                "market": "BTC-USD",
+                "start_time": 1700000000000000,
+                "end_time": 1700000060000000,
+                "limit": 20,
+            },
+        ),
+        read(
+            "get_interest",
+            "/v1/interest",
+            {
+                "address": ADDRESS,
+                "accountIndex": "0",
+                "from": "1700000000000000",
+                "to": "1700000060000000",
+                "limit": "20",
+            },
+            **{"start_time": 1700000000000000, "end_time": 1700000060000000, "limit": 20},
+        ),
+        read("get_live_prices", "/v1/prices", {"market": "BTC-USD"}, **{"market": "BTC-USD"}),
+        read(
+            "get_funding_rates",
+            "/v1/fundingRates",
+            {
+                "market": "BTC-USD",
+                "from": "1700000000000000",
+                "to": "1700000060000000",
+                "limit": "20",
+            },
+            **{
+                "market": "BTC-USD",
+                "start_time": 1700000000000000,
+                "end_time": 1700000060000000,
+                "limit": 20,
+            },
+        ),
+        read(
+            "get_candles",
+            "/v1/candles",
+            {"market": "BTC-USD", "timeframe": "1m", "to": "1700000060000000", "countback": "20"},
+            **{
+                "market": "BTC-USD",
+                "timeframe": "1m",
+                "end_time": 1700000060000000,
+                "countback": 20,
+            },
+        ),
+        read(
+            "get_order_history",
+            "/v1/orders",
+            {
+                "address": ADDRESS,
+                "accountIndex": "0",
+                "market": "BTC-USD",
+                "side": "BUY",
+                "status": "OPEN,UNTRIGGERED",
+                "limit": "20",
+                "from": "1700000000000000",
+                "to": "1700000060000000",
+            },
+            **{
+                "market": "BTC-USD",
+                "side": "BUY",
+                "status": ["OPEN", "UNTRIGGERED"],
+                "limit": 20,
+                "start_time": 1700000000000000,
+                "end_time": 1700000060000000,
+            },
+        ),
+        read(
+            "get_portfolio_history",
+            "/v1/portfolio",
+            {"address": ADDRESS, "accountIndex": "0"},
+            **{},
+        ),
+        read(
+            "get_trades",
+            "/v1/trades",
+            {
+                "market": "BTC-USD",
+                "limit": "20",
+                "from": "1700000000000000",
+                "to": "1700000060000000",
+            },
+            **{
+                "market": "BTC-USD",
+                "limit": 20,
+                "start_time": 1700000000000000,
+                "end_time": 1700000060000000,
+            },
+        ),
+        read(
+            "get_spot_fills",
+            "/v1/spotFills",
+            {
+                "address": ADDRESS,
+                "accountIndex": "0",
+                "limit": "20",
+                "from": "1700000000000000",
+                "to": "1700000060000000",
+            },
+            **{"limit": 20, "start_time": 1700000000000000, "end_time": 1700000060000000},
+        ),
+        read(
+            "get_spot_positions",
+            "/v1/spotPositions",
+            {"address": ADDRESS, "accountIndex": "0"},
+            **{},
+        ),
+        read("health", "/health", {}, **{}),
+        read("get_service_info", "/", {}, **{}),
+    ]
+)
+
+
 def _client_kwargs(base_url: str) -> dict[str, Any]:
     return {"api_secret": SECRET, "address": ADDRESS, "base_url": base_url}
 
@@ -205,6 +372,15 @@ def _assert_wire(wire: WireCase, requests: list[dict[str, Any]]) -> dict[str, An
     query = dict(parse_qsl(target.query))
     for key, value in wire.query.items():
         assert query.get(key) == value, (key, query)
+    if wire.method in {"get_api_keys", "create_api_key_signed", "revoke_api_key_signed"}:
+        assert not final.get("x-api-key")
+        assert not final.get("x-signature")
+        assert query == wire.query
+        if wire.body is not None:
+            assert json.loads(final["body"]) == wire.body
+            return wire.body
+        assert final["body"] == ""
+        return {}
     assert final.get("x-api-key")
     if wire.signed:
         assert len(final["x-signature"]) == 128
@@ -226,7 +402,7 @@ def test_every_perps_wrapper_has_a_wire_case() -> None:
         name for name, value in vars(Client).items() if not name.startswith("_") and callable(value)
     }
     extra = {"schedule_cancel", "modify_order", "batch_modify_orders", "submit_internal_transfer"}
-    generic = {"public_request", "private_request", "close"}
+    generic = {"sign_websocket_request", "public_request", "private_request", "close"}
     assert wrappers - generic - extra - {wire.method for wire in CASES} == set()
 
 
@@ -372,3 +548,52 @@ def test_unsafe_orders_are_rejected_before_state_changes(
         client.close()
     paths = {urlsplit(request["path"]).path for request in _drain(received)}
     assert paths <= {"/v1/markets"}
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+@pytest.mark.parametrize("grouping", ["partialTpsl", "positionTpsl", "entryTpsl"])
+async def test_tpsl_grouping_preserves_zero_size_and_triggers(
+    asynchronous: bool, grouping: str, server: tuple[str, queue.Queue[dict[str, Any]]]
+) -> None:
+    import inspect
+
+    base, received = server
+    _drain(received)
+    quantity = "0" if grouping == "positionTpsl" else "0.01"
+    orders = [
+        {
+            "product_symbol": "BTC-USD",
+            "side": "SELL",
+            "price": "100",
+            "quantity": quantity,
+            "reduce_only": True,
+            "tpsl_type": kind,
+            "stop_price": stop,
+        }
+        for kind, stop in [("TAKE_PROFIT", "110"), ("STOP_LOSS", "90")]
+    ]
+    if grouping == "entryTpsl":
+        orders.insert(
+            0, {"product_symbol": "BTC-USD", "side": "BUY", "price": "100", "quantity": "0.01"}
+        )
+    client = AsyncClient(**_client_kwargs(base)) if asynchronous else Client(**_client_kwargs(base))
+    try:
+        if asynchronous:
+            await client.async_init()
+        result = client.batch_place_orders(orders, grouping=grouping)
+        if inspect.isawaitable(result):
+            await result
+    finally:
+        result = client.close()
+        if inspect.isawaitable(result):
+            await result
+    requests = [request for request in _drain(received) if request["method"] == "POST"]
+    assert len(requests) == 1
+    payload = json.loads(requests[0]["body"])
+    assert payload["grouping"] == grouping
+    children = payload["orders"][1:] if grouping == "entryTpsl" else payload["orders"]
+    assert [leg["tpslType"] for leg in children] == ["TAKE_PROFIT", "STOP_LOSS"]
+    assert [leg["stopPrice"] for leg in children] == ["110", "90"]
+    assert all(leg["quantity"] == quantity and leg["reduceOnly"] for leg in children)
+    assert all(len(leg["signature"]) == 128 for leg in payload["orders"])

@@ -1,4 +1,5 @@
 mod account;
+mod classic_trading;
 mod client;
 mod earn;
 mod endpoints;
@@ -17,3 +18,5 @@ pub use websocket::{KucoinPrivateWebSocket, KucoinPublicWebSocket};
 
 #[cfg(test)]
 mod tests;
+
+mod risk;

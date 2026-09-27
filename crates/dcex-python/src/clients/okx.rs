@@ -7,6 +7,30 @@ struct PythonOkxHttpClient {
 
 #[pymethods]
 impl PythonOkxHttpClient {
+    fn get_sbe_orderbook(&self, py: Python<'_>, inst_id_code: u64) -> PyResult<Py<PyBytes>> {
+        let client = self.client.clone();
+        let bytes = py
+            .allow_threads(move || {
+                dcex::http::block_on(async move { client.get_sbe_orderbook(inst_id_code).await })
+            })
+            .map_err(to_py_runtime_error)?;
+        Ok(PyBytes::new(py, &bytes).unbind())
+    }
+    fn get_sbe_orderbook_async<'py>(
+        &self,
+        py: Python<'py>,
+        inst_id_code: u64,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let bytes = client
+                .get_sbe_orderbook(inst_id_code)
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+        })
+    }
+
     #[new]
     #[pyo3(signature = (
         api_key=None,

@@ -319,3 +319,22 @@ class MarketHTTP(HTTPManager):
                 page_size=page_size,
             ),
         )
+
+    def get_spot_offline_symbols(self) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/symbol/offline. Timestamps use milliseconds; asset/IP lists use commas."""
+        return self._native_public("get_spot_offline_symbols", self._native_params())
+
+    def get_announcements(
+        self, *, language: str | None = None, page: int | None = None, limit: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/announcements. Timestamps use milliseconds; asset/IP lists use commas."""
+        return self._native_public(
+            "get_announcements", self._native_params(language=language, page=page, limit=limit)
+        )
+
+    def get_contract_supported_currencies(self) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v1/contract/support_currencies. Timestamps use milliseconds; asset/IP lists use
+        commas.
+        """
+        return self._native_public("get_contract_supported_currencies", self._native_params())

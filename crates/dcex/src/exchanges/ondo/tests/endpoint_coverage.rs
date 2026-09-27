@@ -261,6 +261,31 @@ const MARKET: &str = "AAPL-USD.P";
 fn public_market_data_routes_match_official_paths() {
     assert_cases(&[
         public("get_status", &[], "GET", "/status"),
+        Case {
+            kind: Kind::Public,
+            name: "get_login_challenge",
+            params: &[
+                (
+                    "walletAddress",
+                    "0x1111111111111111111111111111111111111111",
+                ),
+                ("chainId", "1"),
+            ],
+            method: "POST",
+            target: "/v1/auth/erc-4361/login/get_challenge",
+            body: Some(
+                r#"{"walletAddress":"0x1111111111111111111111111111111111111111","chainId":"1"}"#,
+            ),
+        },
+        Case {
+            kind: Kind::Public,
+            name: "complete_login_challenge",
+            params: &[("id", "challenge1"), ("signature", "signed")],
+            method: "POST",
+            target: "/v1/auth/erc-4361/login/complete_challenge",
+            body: Some(r#"{"id":"challenge1","signature":"signed"}"#),
+        },
+        private("invalidate_jwt", &[], "GET", "/v1/auth/invalidate_jwt"),
         public("hello", &[], "GET", "/hello"),
         public("ping", &[], "GET", "/hello"),
         public("get_markets", &[], "GET", "/v1/markets"),

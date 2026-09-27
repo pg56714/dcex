@@ -7,6 +7,37 @@ struct PythonBingxHttpClient {
 
 #[pymethods]
 impl PythonBingxHttpClient {
+    #[pyo3(signature = (params=None))]
+    fn export_swap_income(
+        &self,
+        py: Python<'_>,
+        params: Option<PythonRequestParams>,
+    ) -> PyResult<Py<PyBytes>> {
+        let client = self.client.clone();
+        let bytes = py
+            .allow_threads(move || {
+                dcex::http::block_on(async move {
+                    client.export_swap_income(params.unwrap_or_default()).await
+                })
+            })
+            .map_err(to_py_runtime_error)?;
+        Ok(PyBytes::new(py, &bytes).unbind())
+    }
+    #[pyo3(signature = (params=None))]
+    fn export_swap_income_async<'py>(
+        &self,
+        py: Python<'py>,
+        params: Option<PythonRequestParams>,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            let bytes = client
+                .export_swap_income(params.unwrap_or_default())
+                .await
+                .map_err(to_py_runtime_error)?;
+            Python::with_gil(|py| Ok(PyBytes::new(py, &bytes).unbind()))
+        })
+    }
     #[new]
     #[pyo3(signature = (api_key=None, api_secret=None, timeout=10.0, base_url=None))]
     fn new(

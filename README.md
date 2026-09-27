@@ -59,7 +59,10 @@ External withdrawal creation endpoints are not wrapped. PTM includes listed opti
 | Ondo | Yes | Yes | Yes | Yes |
 | Arcus | Yes | Yes | Yes | Yes |
 
-Private WebSocket support includes authenticated or address-scoped user-data streams. Bybit also provides an authenticated trade WebSocket for order operations. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo support covers perpetual futures only.
+Private WebSocket support includes authenticated or address-scoped user-data streams. Trading WebSocket APIs are available for Binance, Bybit, Bitget and Kraken Spot; Hyperliquid and Lighter accept signed actions, and Arcus provides signed request construction. Lighter Mainnet and Robinhood use separate credential profiles; select the network per client (Mainnet is the default); see [.env.example](.env.example) and the [Lighter examples](examples/async/lighter_private_readonly.py). Ondo support covers perpetual futures only.
+
+
+[Endpoint coverage, limitations and verification](docs/endpoint-audit.md).
 
 ## Python quick start
 

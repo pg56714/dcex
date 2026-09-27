@@ -53,6 +53,25 @@ impl PythonHyperliquidPublicWebSocketClient {
         })
     }
 
+    fn post_info<'py>(
+        &self,
+        py: Python<'py>,
+        id: u64,
+        payload: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let payload: serde_json::Value = serde_json::from_str(&payload)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .post_info(id, payload)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
     fn close<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let client = self.client.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
@@ -284,6 +303,44 @@ impl PythonHyperliquidPrivateWebSocketClient {
                 .lock()
                 .await
                 .connect()
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn post_info<'py>(
+        &self,
+        py: Python<'py>,
+        id: u64,
+        payload: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let payload: serde_json::Value = serde_json::from_str(&payload)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .post_info(id, payload)
+                .await
+                .map_err(to_py_runtime_error)
+        })
+    }
+
+    fn post_action<'py>(
+        &self,
+        py: Python<'py>,
+        id: u64,
+        payload: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let payload: serde_json::Value = serde_json::from_str(&payload)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+        let client = self.client.clone();
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+            client
+                .lock()
+                .await
+                .post_action(id, payload)
                 .await
                 .map_err(to_py_runtime_error)
         })

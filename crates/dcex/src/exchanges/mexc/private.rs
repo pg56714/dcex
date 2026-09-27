@@ -11,6 +11,9 @@ impl MexcClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = MexcParams::from_pairs(params);
+        if let Some(result) = self.additional_request(method_name, &params, false).await? {
+            return Ok(result);
+        }
         validate_u64_range(&params, "recvWindow", 1, 60_000)?;
         if let Some(result) = self.account_private_request(method_name, &params).await? {
             return Ok(result);
