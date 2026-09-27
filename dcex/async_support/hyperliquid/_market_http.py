@@ -98,50 +98,118 @@ class MarketHTTP(HTTPManager):
         """Get predicted funding rates across venues for the first perpetual DEX."""
         return await self._native_public("get_predicted_fundings", [])
 
-    async def get_perps_at_open_interest_cap(self, *, dex: str | None = None) -> Any:
+    async def get_perps_at_open_interest_cap(self, *, dex: str | None = None) -> Any:  # noqa: ANN401
         """Query perpsAtOpenInterestCap using POST /info."""
         return await self._native_public(
             "get_perps_at_open_interest_cap", self._native_params(dex=dex)
         )
 
-    async def get_perp_dex_limits(self, *, dex: str) -> Any:
+    async def get_perp_dex_limits(self, *, dex: str) -> Any:  # noqa: ANN401
         """Query perpDexLimits using POST /info."""
         return await self._native_public("get_perp_dex_limits", self._native_params(dex=dex))
 
-    async def get_perp_dex_status(self, *, dex: str) -> Any:
+    async def get_perp_dex_status(self, *, dex: str) -> Any:  # noqa: ANN401
         """Query perpDexStatus using POST /info. An empty dex selects the first perpetual DEX."""
         return await self._native_public("get_perp_dex_status", self._native_params(dex=dex))
 
-    async def get_all_perp_metas(self) -> Any:
+    async def get_all_perp_metas(self) -> Any:  # noqa: ANN401
         """Query allPerpMetas using POST /info."""
         return await self._native_public("get_all_perp_metas", self._native_params())
 
-    async def get_perp_annotation(self, *, product_symbol: str) -> Any:
+    async def get_perp_annotation(self, *, product_symbol: str) -> Any:  # noqa: ANN401
         """Query perpAnnotation using POST /info."""
         return await self._native_public(
             "get_perp_annotation", self._native_params(product_symbol=product_symbol)
         )
 
-    async def get_perp_categories(self) -> Any:
+    async def get_perp_categories(self) -> Any:  # noqa: ANN401
         """Query perpCategories using POST /info."""
         return await self._native_public("get_perp_categories", self._native_params())
 
-    async def get_perp_concise_annotations(self) -> Any:
+    async def get_perp_concise_annotations(self) -> Any:  # noqa: ANN401
         """Query perpConciseAnnotations using POST /info."""
         return await self._native_public("get_perp_concise_annotations", self._native_params())
 
-    async def get_token_details(self, *, token_id: str) -> Any:
+    async def get_token_details(self, *, token_id: str) -> Any:  # noqa: ANN401
         """Query tokenDetails using POST /info."""
         return await self._native_public("get_token_details", self._native_params(tokenId=token_id))
 
-    async def get_borrow_lend_reserve_state(self, *, token: int) -> Any:
+    async def get_borrow_lend_reserve_state(self, *, token: int) -> Any:  # noqa: ANN401
         """Query borrowLendReserveState using POST /info."""
         return await self._native_public(
             "get_borrow_lend_reserve_state", self._native_params(token=token)
         )
 
-    async def get_all_borrow_lend_reserve_states(self) -> Any:
+    async def get_all_borrow_lend_reserve_states(self) -> Any:  # noqa: ANN401
         """Query allBorrowLendReserveStates using POST /info."""
         return await self._native_public(
             "get_all_borrow_lend_reserve_states", self._native_params()
+        )
+
+    async def get_vault_details(self, *, vault_address: str, user: str | None = None) -> Any:  # noqa: ANN401
+        """Query vaultDetails using POST /info."""
+        return await self._native_public(
+            "get_vault_details", self._native_params(vaultAddress=vault_address, user=user)
+        )
+
+    async def get_delegations(self, *, user: str) -> Any:  # noqa: ANN401
+        """Query delegations using POST /info."""
+        return await self._native_public("get_delegations", self._native_params(user=user))
+
+    async def get_delegator_summary(self, *, user: str) -> Any:  # noqa: ANN401
+        """Query delegatorSummary using POST /info."""
+        return await self._native_public("get_delegator_summary", self._native_params(user=user))
+
+    async def get_delegator_history(self, *, user: str) -> Any:  # noqa: ANN401
+        """Query delegatorHistory using POST /info."""
+        return await self._native_public("get_delegator_history", self._native_params(user=user))
+
+    async def get_delegator_rewards(self, *, user: str) -> Any:  # noqa: ANN401
+        """Query delegatorRewards using POST /info."""
+        return await self._native_public("get_delegator_rewards", self._native_params(user=user))
+
+    async def get_spot_deploy_state(self, *, user: str) -> Any:  # noqa: ANN401
+        """Query spotDeployState using POST /info."""
+        return await self._native_public("get_spot_deploy_state", self._native_params(user=user))
+
+    async def get_outcome_meta(self) -> Any:  # noqa: ANN401
+        """Query outcomeMeta using POST /info."""
+        return await self._native_public("get_outcome_meta", self._native_params())
+
+    async def get_settled_outcome(self, *, outcome: int) -> Any:  # noqa: ANN401
+        """Query settledOutcome using POST /info."""
+        return await self._native_public(
+            "get_settled_outcome", self._native_params(outcome=outcome)
+        )
+
+    async def get_outcome_deployer_limits(self, *, venue: str) -> Any:  # noqa: ANN401
+        """Query outcomeDeployerLimits using POST /info."""
+        return await self._native_public(
+            "get_outcome_deployer_limits", self._native_params(venue=venue)
+        )
+
+    async def get_perp_deploy_auction_status(self) -> Any:  # noqa: ANN401
+        """Query perpDeployAuctionStatus using POST /info."""
+        return await self._native_public("get_perp_deploy_auction_status", self._native_params())
+
+    async def get_spot_pair_deploy_auction_status(self) -> Any:  # noqa: ANN401
+        """Query spotPairDeployAuctionStatus using POST /info."""
+        return await self._native_public(
+            "get_spot_pair_deploy_auction_status", self._native_params()
+        )
+
+    async def get_all_mids(self, *, dex: str = "") -> Any:
+        """Query the documented Hyperliquid REST info type."""
+        return await self._native_public("get_all_mids", self._native_params(dex=dex))
+
+    async def get_active_asset_data(self, *, user: str, product_symbol: str) -> Any:
+        """Query the documented Hyperliquid REST info type."""
+        return await self._native_public(
+            "get_active_asset_data", self._native_params(user=user, product_symbol=product_symbol)
+        )
+
+    async def get_user_twap_slice_fills(self, *, user: str) -> Any:
+        """Query the documented Hyperliquid REST info type."""
+        return await self._native_public(
+            "get_user_twap_slice_fills", self._native_params(user=user)
         )

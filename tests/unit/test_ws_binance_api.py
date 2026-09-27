@@ -263,3 +263,41 @@ async def test_coin_futures_methods_and_authentication() -> None:
     finally:
         await client.close()
         await runner.cleanup()
+
+
+@pytest.mark.asyncio
+async def test_margin_listen_token_without_session_credentials() -> None:
+    received: list[dict[str, Any]] = []
+
+    async def handler(request: web.Request) -> web.WebSocketResponse:
+        peer = web.WebSocketResponse()
+        await peer.prepare(request)
+        async for message in peer:
+            data = message.json()
+            received.append(data)
+            await peer.send_json({"id": data["id"], "status": 200, "result": {"subscriptionId": 9}})
+        return peer
+
+    app = web.Application()
+    app.router.add_get("/", handler)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "127.0.0.1", 0)
+    await site.start()
+    client = SpotApiClient(base_url=f"ws://127.0.0.1:{runner.addresses[0][1]}/")
+    try:
+        await client.connect()
+        request_id = await client.subscribe_user_data_listen_token("token+value/=")
+        assert (await client.recv())["id"] == request_id
+        assert received == [
+            {
+                "id": request_id,
+                "method": "userDataStream.subscribe.listenToken",
+                "params": {"listenToken": "token+value/="},
+            }
+        ]
+        with pytest.raises(ValueError, match="listenToken"):
+            await client.request("userDataStream.subscribe.listenToken", {})
+    finally:
+        await client.close()
+        await runner.cleanup()

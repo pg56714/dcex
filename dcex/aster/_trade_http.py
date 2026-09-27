@@ -720,3 +720,243 @@ class TradeHTTP(HTTPManager):
                 signature=signature,
             ),
         )
+
+    def get_prediction_commission_rate(self, *, symbol: str) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/commissionRate on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "get_prediction_commission_rate", self._native_params(symbol=symbol)
+        )
+
+    def create_prediction_order(
+        self,
+        *,
+        symbol: str,
+        side: str,
+        type_: str,
+        time_in_force: str | None = None,
+        quantity: str | None = None,
+        quote_order_qty: str | None = None,
+        price: str | None = None,
+        new_client_order_id: str | None = None,
+        stop_price: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/order on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "create_prediction_order",
+            self._native_params(
+                symbol=symbol,
+                side=side,
+                type=type_,
+                timeInForce=time_in_force,
+                quantity=quantity,
+                quoteOrderQty=quote_order_qty,
+                price=price,
+                newClientOrderId=new_client_order_id,
+                stopPrice=stop_price,
+            ),
+        )
+
+    def cancel_prediction_order(
+        self, *, symbol: str, order_id: int | None = None, orig_client_order_id: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """DELETE /api/v3/order on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "cancel_prediction_order",
+            self._native_params(
+                symbol=symbol, orderId=order_id, origClientOrderId=orig_client_order_id
+            ),
+        )
+
+    def get_prediction_order(
+        self, *, symbol: str, order_id: int | None = None, orig_client_order_id: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/order on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "get_prediction_order",
+            self._native_params(
+                symbol=symbol, orderId=order_id, origClientOrderId=orig_client_order_id
+            ),
+        )
+
+    def get_prediction_open_order(
+        self, *, symbol: str, order_id: int | None = None, orig_client_order_id: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/openOrder on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "get_prediction_open_order",
+            self._native_params(
+                symbol=symbol, orderId=order_id, origClientOrderId=orig_client_order_id
+            ),
+        )
+
+    def get_prediction_open_orders(
+        self, *, symbol: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/openOrders on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "get_prediction_open_orders", self._native_params(symbol=symbol)
+        )
+
+    def get_prediction_all_orders(
+        self,
+        *,
+        symbol: str,
+        order_id: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/allOrders on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "get_prediction_all_orders",
+            self._native_params(
+                symbol=symbol, orderId=order_id, startTime=start_time, endTime=end_time, limit=limit
+            ),
+        )
+
+    def create_prediction_asset_wallet_transfer(
+        self, *, amount: str, asset: str, client_tran_id: str, kind_type: str
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v3/asset/wallet/transfer on the prediction host. Use native prediction
+        symbols.
+        """
+        return self._native_private(
+            "create_prediction_asset_wallet_transfer",
+            self._native_params(
+                amount=amount, asset=asset, clientTranId=client_tran_id, kindType=kind_type
+            ),
+        )
+
+    def create_prediction_mint(
+        self, *, symbol: str, quantity: str, new_client_order_id: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/prediction/mint on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "create_prediction_mint",
+            self._native_params(
+                symbol=symbol, quantity=quantity, newClientOrderId=new_client_order_id
+            ),
+        )
+
+    def create_prediction_burn(
+        self, *, symbol: str, quantity: str, new_client_order_id: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/prediction/burn on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "create_prediction_burn",
+            self._native_params(
+                symbol=symbol, quantity=quantity, newClientOrderId=new_client_order_id
+            ),
+        )
+
+    def create_prediction_split(
+        self, *, event: str, symbol: str, quantity: str, new_client_order_id: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/prediction/split on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "create_prediction_split",
+            self._native_params(
+                event=event, symbol=symbol, quantity=quantity, newClientOrderId=new_client_order_id
+            ),
+        )
+
+    def create_prediction_merge(
+        self, *, event: str, quantity: str, new_client_order_id: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/prediction/merge on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "create_prediction_merge",
+            self._native_params(
+                event=event, quantity=quantity, newClientOrderId=new_client_order_id
+            ),
+        )
+
+    def get_prediction_positions(self, *, symbol: str | None = None) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/prediction/positions on the prediction host. Use native prediction symbols.
+        """
+        return self._native_private("get_prediction_positions", self._native_params(symbol=symbol))
+
+    def get_prediction_position_histories(
+        self,
+        *,
+        symbol: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/prediction/positionHistories on the prediction host. Use native prediction
+        symbols.
+        """
+        return self._native_private(
+            "get_prediction_position_histories",
+            self._native_params(symbol=symbol, startTime=start_time, endTime=end_time, limit=limit),
+        )
+
+    def get_prediction_settlement_histories(
+        self,
+        *,
+        symbol: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/prediction/settlementHistories on the prediction host. Use native prediction
+        symbols.
+        """
+        return self._native_private(
+            "get_prediction_settlement_histories",
+            self._native_params(symbol=symbol, startTime=start_time, endTime=end_time, limit=limit),
+        )
+
+    def get_prediction_account(self) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/account on the prediction host. Use native prediction symbols."""
+        return self._native_private("get_prediction_account", self._native_params())
+
+    def get_prediction_user_trades(
+        self,
+        *,
+        symbol: str | None = None,
+        order_id: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        from_id: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/userTrades on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "get_prediction_user_trades",
+            self._native_params(
+                symbol=symbol,
+                orderId=order_id,
+                startTime=start_time,
+                endTime=end_time,
+                fromId=from_id,
+                limit=limit,
+            ),
+        )
+
+    def create_prediction_listen_key(self) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/listenKey on the prediction host. Use native prediction symbols."""
+        return self._native_private("create_prediction_listen_key", self._native_params())
+
+    def update_prediction_listen_key(self, *, listen_key: str) -> dict[str, Any] | list[Any]:
+        """PUT /api/v3/listenKey on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "update_prediction_listen_key", self._native_params(listenKey=listen_key)
+        )
+
+    def cancel_prediction_listen_key(self, *, listen_key: str) -> dict[str, Any] | list[Any]:
+        """DELETE /api/v3/listenKey on the prediction host. Use native prediction symbols."""
+        return self._native_private(
+            "cancel_prediction_listen_key", self._native_params(listenKey=listen_key)
+        )
+
+    def get_asset_migration_history(self, *, batch_id: str) -> dict[str, Any] | list[Any]:
+        """Query a migration batch with the authenticated destination account."""
+        return self._native_private(
+            "get_asset_migration_history", self._native_params(batchId=batch_id)
+        )

@@ -3,6 +3,12 @@ use super::api::{BinanceWebSocketApi, BinanceWebSocketApiMarket};
 use crate::Result;
 use serde_json::Value;
 impl BinanceWebSocketApi {
+    /// Subscribe with a caller-provided Margin listen token; renew before its expiration.
+    pub async fn subscribe_user_data_listen_token(&self, params: Value) -> Result<u64> {
+        self.request("userDataStream.subscribe.listenToken", params)
+            .await
+    }
+
     /// Send the corresponding WebSocket API method; receive its outcome with `recv`.
     pub async fn ping(&self, params: Value) -> Result<u64> {
         self.request("ping", params).await

@@ -1151,3 +1151,780 @@ class AccountHTTP(HTTPManager):
                 depositId=deposit_id, subAccountId=sub_account_id, questionnaire=questionnaire
             ),
         )
+
+    def get_asset_withdraw_vasp_list(self) -> dict[str, Any]:
+        """
+        GET /v5/asset/withdraw/vasp/list.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/asset/withdraw/vasp-list.mdx
+        """
+        return self._native_private("get_asset_withdraw_vasp_list", self._native_params())
+
+    def get_asset_withdraw_query_address(
+        self,
+        *,
+        coin: str | None = None,
+        chain: str | None = None,
+        address_type: int | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/asset/withdraw/query-address.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/asset/withdraw/withdraw-address.mdx
+        """
+        return self._native_private(
+            "get_asset_withdraw_query_address",
+            self._native_params(
+                coin=coin, chain=chain, addressType=address_type, limit=limit, cursor=cursor
+            ),
+        )
+
+    def get_asset_withdraw_query_record(
+        self,
+        *,
+        withdraw_id: str | None = None,
+        tx_id: str | None = None,
+        coin: str | None = None,
+        withdraw_type: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/asset/withdraw/query-record.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/asset/withdraw/withdraw-record.mdx
+        """
+        return self._native_private(
+            "get_asset_withdraw_query_record",
+            self._native_params(
+                withdrawID=withdraw_id,
+                txID=tx_id,
+                coin=coin,
+                withdrawType=withdraw_type,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_crypto_loan_borrowable_collateralisable_number(
+        self, *, loan_currency: str, collateral_currency: str
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/borrowable-collateralisable-number.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/acct-borrow-collateral.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_borrowable_collateralisable_number",
+            self._native_params(loanCurrency=loan_currency, collateralCurrency=collateral_currency),
+        )
+
+    def crypto_loan_adjust_ltv(
+        self, *, order_id: str, amount: str, direction: str
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan/adjust-ltv.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/adjust-collateral.mdx
+        """
+        return self._native_private(
+            "crypto_loan_adjust_ltv",
+            self._native_params(orderId=order_id, amount=amount, direction=direction),
+        )
+
+    def get_crypto_loan_borrow_history(
+        self,
+        *,
+        order_id: str | None = None,
+        loan_currency: str | None = None,
+        collateral_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/borrow-history.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/completed-loan-order.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_borrow_history",
+            self._native_params(
+                orderId=order_id,
+                loanCurrency=loan_currency,
+                collateralCurrency=collateral_currency,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_crypto_loan_adjustment_history(
+        self,
+        *,
+        order_id: str | None = None,
+        adjust_id: str | None = None,
+        collateral_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/adjustment-history.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/ltv-adjust-history.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_adjustment_history",
+            self._native_params(
+                orderId=order_id,
+                adjustId=adjust_id,
+                collateralCurrency=collateral_currency,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_crypto_loan_max_collateral_amount(self, *, order_id: str) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/max-collateral-amount.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/reduce-max-collateral-amt.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_max_collateral_amount", self._native_params(orderId=order_id)
+        )
+
+    def get_crypto_loan_repayment_history(
+        self,
+        *,
+        order_id: str | None = None,
+        repay_id: str | None = None,
+        loan_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/repayment-history.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/repay-transaction.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_repayment_history",
+            self._native_params(
+                orderId=order_id,
+                repayId=repay_id,
+                loanCurrency=loan_currency,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def crypto_loan_repay(self, *, order_id: str, amount: str) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan/repay.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/repay.mdx
+        """
+        return self._native_private(
+            "crypto_loan_repay", self._native_params(orderId=order_id, amount=amount)
+        )
+
+    def get_crypto_loan_ongoing_orders(
+        self,
+        *,
+        order_id: str | None = None,
+        loan_currency: str | None = None,
+        collateral_currency: str | None = None,
+        loan_term_type: str | None = None,
+        loan_term: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/ongoing-orders.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/unpaid-loan-order.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_ongoing_orders",
+            self._native_params(
+                orderId=order_id,
+                loanCurrency=loan_currency,
+                collateralCurrency=collateral_currency,
+                loanTermType=loan_term_type,
+                loanTerm=loan_term,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_spot_x_puzzle_project_list(
+        self,
+        *,
+        status: int,
+        project_id: str | None = None,
+        activity_coin: str | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/spot-x/puzzle/project/list.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/finance/spot-x/puzzle/puzzle-project-list.mdx
+        """
+        return self._native_private(
+            "get_spot_x_puzzle_project_list",
+            self._native_params(
+                status=status,
+                projectId=project_id,
+                activityCoin=activity_coin,
+                cursor=cursor,
+                limit=limit,
+            ),
+        )
+
+    def get_spot_x_token_splash_project_list(
+        self,
+        *,
+        status: int,
+        project_id: str | None = None,
+        activity_coin: str | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/spot-x/token-splash/project/list.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/finance/spot-x/token-splash/token-splash-project-list.mdx
+        """
+        return self._native_private(
+            "get_spot_x_token_splash_project_list",
+            self._native_params(
+                status=status,
+                projectId=project_id,
+                activityCoin=activity_coin,
+                cursor=cursor,
+                limit=limit,
+            ),
+        )
+
+    def get_spot_x_token_splash_user_activity_params(
+        self, *, project_id: str | None = None, activity_coin: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /v5/spot-x/token-splash/user/activity-params.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/finance/spot-x/token-splash/token-splash-user-activity-params.mdx
+        """
+        return self._native_private(
+            "get_spot_x_token_splash_user_activity_params",
+            self._native_params(projectId=project_id, activityCoin=activity_coin),
+        )
+
+    def crypto_loan_common_adjust_ltv(
+        self, *, currency: str, amount: str, direction: str
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-common/adjust-ltv.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/adjust-collateral.mdx
+        """
+        return self._native_private(
+            "crypto_loan_common_adjust_ltv",
+            self._native_params(currency=currency, amount=amount, direction=direction),
+        )
+
+    def get_crypto_loan_common_position(self) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-common/position.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/crypto-loan-position.mdx
+        """
+        return self._native_private("get_crypto_loan_common_position", self._native_params())
+
+    def get_crypto_loan_fixed_available_inventory(
+        self, *, currency: str, term: str, annual_rate: str
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/available-inventory.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/available-inventory.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_fixed_available_inventory",
+            self._native_params(currency=currency, term=term, annualRate=annual_rate),
+        )
+
+    def get_crypto_loan_fixed_borrow_contract_info(
+        self,
+        *,
+        order_id: str | None = None,
+        loan_id: str | None = None,
+        order_currency: str | None = None,
+        term: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/borrow-contract-info.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/borrow-contract.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_fixed_borrow_contract_info",
+            self._native_params(
+                orderId=order_id,
+                loanId=loan_id,
+                orderCurrency=order_currency,
+                term=term,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def get_crypto_loan_fixed_borrow_order_info(
+        self,
+        *,
+        order_id: str | None = None,
+        order_currency: str | None = None,
+        state: str | None = None,
+        term: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/borrow-order-info.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/borrow-order.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_fixed_borrow_order_info",
+            self._native_params(
+                orderId=order_id,
+                orderCurrency=order_currency,
+                state=state,
+                term=term,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def crypto_loan_fixed_borrow(
+        self,
+        *,
+        order_currency: str,
+        order_amount: str,
+        annual_rate: str,
+        term: str,
+        repay_type: str | None = None,
+        strategy_type: str | None = None,
+        collateral_list: list[dict[str, str]] | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-fixed/borrow.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/borrow.mdx
+        """
+        return self._native_private(
+            "crypto_loan_fixed_borrow",
+            self._native_params(
+                orderCurrency=order_currency,
+                orderAmount=order_amount,
+                annualRate=annual_rate,
+                term=term,
+                repayType=repay_type,
+                strategyType=strategy_type,
+                collateralList=collateral_list,
+            ),
+        )
+
+    def crypto_loan_fixed_borrow_order_cancel(self, *, order_id: str) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-fixed/borrow-order-cancel.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/cancel-borrow.mdx
+        """
+        return self._native_private(
+            "crypto_loan_fixed_borrow_order_cancel", self._native_params(orderId=order_id)
+        )
+
+    def crypto_loan_fixed_supply_order_cancel(
+        self, *, order_id: str, refunded_account: str | None = None
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-fixed/supply-order-cancel.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/cancel-supply.mdx
+        """
+        return self._native_private(
+            "crypto_loan_fixed_supply_order_cancel",
+            self._native_params(orderId=order_id, refundedAccount=refunded_account),
+        )
+
+    def get_crypto_loan_fixed_renew_info(
+        self,
+        *,
+        order_id: str | None = None,
+        order_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/renew-info.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/renew-order.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_fixed_renew_info",
+            self._native_params(
+                orderId=order_id, orderCurrency=order_currency, limit=limit, cursor=cursor
+            ),
+        )
+
+    def crypto_loan_fixed_renew(
+        self, *, loan_id: str, collateral_list: list[dict[str, str]] | None = None
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-fixed/renew.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/renew.mdx
+        """
+        return self._native_private(
+            "crypto_loan_fixed_renew",
+            self._native_params(loanId=loan_id, collateralList=collateral_list),
+        )
+
+    def crypto_loan_fixed_repay_collateral(
+        self, *, loan_currency: str, collateral_coin: str, amount: str, loan_id: str | None = None
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-fixed/repay-collateral.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/repay-collateral.mdx
+        """
+        return self._native_private(
+            "crypto_loan_fixed_repay_collateral",
+            self._native_params(
+                loanId=loan_id,
+                loanCurrency=loan_currency,
+                collateralCoin=collateral_coin,
+                amount=amount,
+            ),
+        )
+
+    def get_crypto_loan_fixed_repayment_history(
+        self,
+        *,
+        repay_id: str | None = None,
+        loan_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/repayment-history.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/repay-history.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_fixed_repayment_history",
+            self._native_params(
+                repayId=repay_id, loanCurrency=loan_currency, limit=limit, cursor=cursor
+            ),
+        )
+
+    def crypto_loan_fixed_fully_repay(
+        self, *, loan_id: str | None = None, loan_currency: str | None = None
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-fixed/fully-repay.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/repay.mdx
+        """
+        return self._native_private(
+            "crypto_loan_fixed_fully_repay",
+            self._native_params(loanId=loan_id, loanCurrency=loan_currency),
+        )
+
+    def get_crypto_loan_fixed_supply_order_info(
+        self,
+        *,
+        order_id: str | None = None,
+        order_currency: str | None = None,
+        state: str | None = None,
+        term: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/supply-order-info.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/supply-order.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_fixed_supply_order_info",
+            self._native_params(
+                orderId=order_id,
+                orderCurrency=order_currency,
+                state=state,
+                term=term,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def crypto_loan_fixed_supply(
+        self,
+        *,
+        order_currency: str,
+        order_amount: str,
+        annual_rate: str,
+        term: str,
+        available_source: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-fixed/supply.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/supply.mdx
+        """
+        return self._native_private(
+            "crypto_loan_fixed_supply",
+            self._native_params(
+                orderCurrency=order_currency,
+                orderAmount=order_amount,
+                annualRate=annual_rate,
+                term=term,
+                availableSource=available_source,
+            ),
+        )
+
+    def get_crypto_loan_flexible_available_inventory(self, *, currency: str) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-flexible/available-inventory.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/flexible/available-inventory.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_flexible_available_inventory", self._native_params(currency=currency)
+        )
+
+    def crypto_loan_flexible_borrow(
+        self,
+        *,
+        loan_currency: str,
+        loan_amount: str,
+        collateral_list: list[dict[str, str]] | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-flexible/borrow.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/flexible/borrow.mdx
+        """
+        return self._native_private(
+            "crypto_loan_flexible_borrow",
+            self._native_params(
+                loanCurrency=loan_currency, loanAmount=loan_amount, collateralList=collateral_list
+            ),
+        )
+
+    def get_crypto_loan_flexible_borrow_history(
+        self,
+        *,
+        order_id: str | None = None,
+        loan_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-flexible/borrow-history.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/flexible/loan-orders.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_flexible_borrow_history",
+            self._native_params(
+                orderId=order_id, loanCurrency=loan_currency, limit=limit, cursor=cursor
+            ),
+        )
+
+    def crypto_loan_flexible_repay_collateral(
+        self, *, loan_currency: str, collateral_coin: str, amount: str
+    ) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-flexible/repay-collateral.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/flexible/repay-collateral.mdx
+        """
+        return self._native_private(
+            "crypto_loan_flexible_repay_collateral",
+            self._native_params(
+                loanCurrency=loan_currency, collateralCoin=collateral_coin, amount=amount
+            ),
+        )
+
+    def get_crypto_loan_flexible_repayment_history(
+        self,
+        *,
+        repay_id: str | None = None,
+        loan_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-flexible/repayment-history.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/flexible/repay-orders.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_flexible_repayment_history",
+            self._native_params(
+                repayId=repay_id, loanCurrency=loan_currency, limit=limit, cursor=cursor
+            ),
+        )
+
+    def crypto_loan_flexible_repay(self, *, loan_currency: str, amount: str) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-flexible/repay.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/flexible/repay.mdx
+        """
+        return self._native_private(
+            "crypto_loan_flexible_repay",
+            self._native_params(loanCurrency=loan_currency, amount=amount),
+        )
+
+    def get_crypto_loan_flexible_ongoing_coin(
+        self, *, loan_currency: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-flexible/ongoing-coin.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/flexible/unpaid-loan-order.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_flexible_ongoing_coin", self._native_params(loanCurrency=loan_currency)
+        )
+
+    def get_crypto_loan_common_adjustment_history(
+        self,
+        *,
+        adjust_id: str | None = None,
+        collateral_currency: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-common/adjustment-history.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/ltv-adjust-history.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_common_adjustment_history",
+            self._native_params(
+                adjustId=adjust_id,
+                collateralCurrency=collateral_currency,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    def crypto_loan_common_max_loan(self, *, currency: str) -> dict[str, Any]:
+        """
+        POST /v5/crypto-loan-common/max-loan.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/max-loan-amt.mdx
+        """
+        return self._native_private(
+            "crypto_loan_common_max_loan", self._native_params(currency=currency)
+        )
+
+    def get_crypto_loan_common_max_collateral_amount(self, *, currency: str) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-common/max-collateral-amount.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/reduce-max-collateral-amt.mdx
+        """
+        return self._native_private(
+            "get_crypto_loan_common_max_collateral_amount", self._native_params(currency=currency)
+        )
+
+    def get_spot_lever_token_order_record(
+        self,
+        *,
+        lt_coin: str | None = None,
+        order_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+        lt_order_type: int | None = None,
+        serial_no: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/spot-lever-token/order-record.
+
+        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/order-record.mdx
+        """
+        return self._native_private(
+            "get_spot_lever_token_order_record",
+            self._native_params(
+                ltCoin=lt_coin,
+                orderId=order_id,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+                ltOrderType=lt_order_type,
+                serialNo=serial_no,
+            ),
+        )
+
+    def spot_lever_token_purchase(
+        self, *, lt_coin: str, lt_amount: str, serial_no: str | None = None
+    ) -> dict[str, Any]:
+        """
+        POST /v5/spot-lever-token/purchase.
+
+        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/purchase.mdx
+        """
+        return self._native_private(
+            "spot_lever_token_purchase",
+            self._native_params(ltCoin=lt_coin, ltAmount=lt_amount, serialNo=serial_no),
+        )
+
+    def spot_lever_token_redeem(
+        self, *, lt_coin: str, quantity: str, serial_no: str | None = None
+    ) -> dict[str, Any]:
+        """
+        POST /v5/spot-lever-token/redeem.
+
+        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/redeem.mdx
+        """
+        return self._native_private(
+            "spot_lever_token_redeem",
+            self._native_params(ltCoin=lt_coin, quantity=quantity, serialNo=serial_no),
+        )
+
+    def get_fixed_loan_supply_contract_info(
+        self,
+        *,
+        order_id: str | None = None,
+        supply_id: str | None = None,
+        supply_currency: str | None = None,
+        term: str | None = None,
+        limit: int | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """Query fixed crypto-loan supply contracts."""
+        return self._native_private(
+            "get_fixed_loan_supply_contract_info",
+            self._native_params(
+                orderId=order_id,
+                supplyId=supply_id,
+                supplyCurrency=supply_currency,
+                term=term,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )

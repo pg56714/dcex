@@ -1339,3 +1339,120 @@ class TradeHTTP(HTTPManager):
         if self._native_client is None:
             raise RuntimeError("Kraken native client is required.")
         return self._native_client.retrieve_spot_export(id)
+
+    def get_withdrawal_addresses(
+        self,
+        *,
+        asset: str | None = None,
+        aclass: str | None = None,
+        method: str | None = None,
+        key: str | None = None,
+        verified: bool | None = None,
+    ) -> dict[str, Any]:
+        """
+        Read-only POST /0/private/WithdrawAddresses.
+
+        Source: https://docs.kraken.com/api-reference/funding/get-withdrawal-addresses.md
+        """
+        return self._native_private(
+            "get_withdrawal_addresses",
+            self._native_params(
+                asset=asset, aclass=aclass, method=method, key=key, verified=verified
+            ),
+        )
+
+    def get_withdrawal_information(self, *, asset: str, key: str, amount: str) -> dict[str, Any]:
+        """
+        Read-only POST /0/private/WithdrawInfo.
+
+        Source: https://docs.kraken.com/api-reference/funding/get-withdrawal-information.md
+        """
+        return self._native_private(
+            "get_withdrawal_information", self._native_params(asset=asset, key=key, amount=amount)
+        )
+
+    def get_withdrawal_methods(
+        self,
+        *,
+        asset: str | None = None,
+        aclass: str | None = None,
+        network: str | None = None,
+        rebase_multiplier: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Read-only POST /0/private/WithdrawMethods.
+
+        Source: https://docs.kraken.com/api-reference/funding/get-withdrawal-methods.md
+        """
+        return self._native_private(
+            "get_withdrawal_methods",
+            self._native_params(
+                asset=asset, aclass=aclass, network=network, rebase_multiplier=rebase_multiplier
+            ),
+        )
+
+    def get_withdrawal_status(
+        self,
+        *,
+        asset: str | None = None,
+        aclass: str | None = None,
+        method: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
+        cursor: str | bool | None = None,
+        limit: int | None = None,
+        rebase_multiplier: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Read-only POST /0/private/WithdrawStatus.
+
+        Source: https://docs.kraken.com/api-reference/funding/get-status-of-recent-withdrawals.md
+        """
+        return self._native_private(
+            "get_withdrawal_status",
+            self._native_params(
+                asset=asset,
+                aclass=aclass,
+                method=method,
+                start=start,
+                end=end,
+                cursor=cursor,
+                limit=limit,
+                rebase_multiplier=rebase_multiplier,
+            ),
+        )
+
+    def edit_spot_order(
+        self,
+        *,
+        pair: str,
+        txid: str,
+        userref: int | None = None,
+        volume: str | None = None,
+        displayvol: str | None = None,
+        asset_class: str | None = None,
+        price: str | None = None,
+        price2: str | None = None,
+        oflags: str | None = None,
+        deadline: str | None = None,
+        cancel_response: bool | None = None,
+        validate: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Cancel and replace an order, returning a new txid; queue priority is lost."""
+        return self._native_private(
+            "edit_spot_order",
+            self._native_params(
+                pair=pair,
+                txid=txid,
+                userref=userref,
+                volume=volume,
+                displayvol=displayvol,
+                asset_class=asset_class,
+                price=price,
+                price2=price2,
+                oflags=oflags,
+                deadline=deadline,
+                cancel_response=cancel_response,
+                validate=validate,
+            ),
+        )

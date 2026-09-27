@@ -297,3 +297,64 @@ get_api_rate_limits(uids => "uids"),
 set_api_rate_limits(list => "list"),
 submit_deposit_information(deposit_id => "depositId",questionnaire => "questionnaire"),
 ]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BybitClient; public [
+get_crypto_loan_collateral_data(),
+get_crypto_loan_loanable_data(),
+get_crypto_loan_common_collateral_data(),
+get_crypto_loan_fixed_borrow_order_quote(order_currency => "orderCurrency",order_by => "orderBy"),
+get_crypto_loan_fixed_supply_order_quote(order_currency => "orderCurrency",order_by => "orderBy"),
+get_crypto_loan_common_loanable_data(),
+]; private [
+get_asset_withdraw_vasp_list(),
+get_asset_withdraw_query_address(),
+get_asset_withdraw_query_record(),
+get_crypto_loan_borrowable_collateralisable_number(loan_currency => "loanCurrency",collateral_currency => "collateralCurrency"),
+crypto_loan_adjust_ltv(order_id => "orderId",amount => "amount",direction => "direction"),
+get_crypto_loan_borrow_history(),
+get_crypto_loan_adjustment_history(),
+get_crypto_loan_max_collateral_amount(order_id => "orderId"),
+get_crypto_loan_repayment_history(),
+crypto_loan_repay(order_id => "orderId",amount => "amount"),
+get_crypto_loan_ongoing_orders(),
+get_spot_x_puzzle_project_list(status => "status"),
+get_spot_x_token_splash_project_list(status => "status"),
+get_spot_x_token_splash_user_activity_params(),
+crypto_loan_common_adjust_ltv(currency => "currency",amount => "amount",direction => "direction"),
+get_crypto_loan_common_position(),
+get_crypto_loan_fixed_available_inventory(currency => "currency",term => "term",annual_rate => "annualRate"),
+get_crypto_loan_fixed_borrow_contract_info(),
+get_crypto_loan_fixed_borrow_order_info(),
+crypto_loan_fixed_borrow(order_currency => "orderCurrency",order_amount => "orderAmount",annual_rate => "annualRate",term => "term"),
+crypto_loan_fixed_borrow_order_cancel(order_id => "orderId"),
+crypto_loan_fixed_supply_order_cancel(order_id => "orderId"),
+get_crypto_loan_fixed_renew_info(),
+crypto_loan_fixed_renew(loan_id => "loanId"),
+crypto_loan_fixed_repay_collateral(loan_currency => "loanCurrency",collateral_coin => "collateralCoin",amount => "amount"),
+get_crypto_loan_fixed_repayment_history(),
+crypto_loan_fixed_fully_repay(),
+get_crypto_loan_fixed_supply_order_info(),
+crypto_loan_fixed_supply(order_currency => "orderCurrency",order_amount => "orderAmount",annual_rate => "annualRate",term => "term"),
+get_crypto_loan_flexible_available_inventory(currency => "currency"),
+crypto_loan_flexible_borrow(loan_currency => "loanCurrency",loan_amount => "loanAmount"),
+get_crypto_loan_flexible_borrow_history(),
+crypto_loan_flexible_repay_collateral(loan_currency => "loanCurrency",collateral_coin => "collateralCoin",amount => "amount"),
+get_crypto_loan_flexible_repayment_history(),
+crypto_loan_flexible_repay(loan_currency => "loanCurrency",amount => "amount"),
+get_crypto_loan_flexible_ongoing_coin(),
+get_crypto_loan_common_adjustment_history(),
+crypto_loan_common_max_loan(currency => "currency"),
+get_crypto_loan_common_max_collateral_amount(currency => "currency"),
+]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BybitClient; public [
+get_spot_lever_token_reference(lt_coin => "ltCoin"),
+]; private [
+get_spot_lever_token_order_record(),
+spot_lever_token_purchase(lt_coin => "ltCoin",lt_amount => "ltAmount"),
+spot_lever_token_redeem(lt_coin => "ltCoin",quantity => "quantity"),
+]; }
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;BybitClient;public [];private [get_fixed_loan_supply_contract_info()];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;BybitClient;public [get_server_time()];private [];}

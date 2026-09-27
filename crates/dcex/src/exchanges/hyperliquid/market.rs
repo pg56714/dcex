@@ -14,6 +14,85 @@ impl HyperliquidClient {
     ) -> Result<ValidatedResponse> {
         let params = HyperliquidParams::from_pairs(params);
         let payload = match method_name {
+            "get_all_mids" => {
+                params.ensure_allowed(&["dex"])?;
+                json!({"type":"allMids","dex":params.get("dex").unwrap_or("")})
+            }
+            "get_active_asset_data" => {
+                params.ensure_allowed(&["user", "product_symbol"])?;
+                json!({"type":"activeAssetData","user":params.address("user")?,"coin":self.coin(params.required("product_symbol")?)?})
+            }
+            "get_user_twap_slice_fills" => {
+                params.ensure_allowed(&["user"])?;
+                json!({"type":"userTwapSliceFills","user":params.address("user")?})
+            }
+
+            "get_vault_details" => {
+                params.ensure_allowed(&["vaultAddress", "user"])?;
+                let mut payload = json!({"type":"vaultDetails"});
+                payload["vaultAddress"] = params.address("vaultAddress")?.into();
+                if params.get("user").is_some() {
+                    payload["user"] = params.address("user")?.into();
+                }
+                payload
+            }
+            "get_delegations" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"delegations"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_delegator_summary" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"delegatorSummary"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_delegator_history" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"delegatorHistory"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_delegator_rewards" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"delegatorRewards"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_spot_deploy_state" => {
+                params.ensure_allowed(&["user"])?;
+                let mut payload = json!({"type":"spotDeployState"});
+                payload["user"] = params.address("user")?.into();
+                payload
+            }
+            "get_outcome_meta" => {
+                params.ensure_allowed(&[])?;
+                let payload = json!({"type":"outcomeMeta"});
+                payload
+            }
+            "get_settled_outcome" => {
+                params.ensure_allowed(&["outcome"])?;
+                let mut payload = json!({"type":"settledOutcome"});
+                payload["outcome"] = params.required_u64("outcome")?.into();
+                payload
+            }
+            "get_outcome_deployer_limits" => {
+                params.ensure_allowed(&["venue"])?;
+                let mut payload = json!({"type":"outcomeDeployerLimits"});
+                payload["venue"] = params.required("venue")?.into();
+                payload
+            }
+            "get_perp_deploy_auction_status" => {
+                params.ensure_allowed(&[])?;
+                let payload = json!({"type":"perpDeployAuctionStatus"});
+                payload
+            }
+            "get_spot_pair_deploy_auction_status" => {
+                params.ensure_allowed(&[])?;
+                let payload = json!({"type":"spotPairDeployAuctionStatus"});
+                payload
+            }
             "get_perps_at_open_interest_cap" => {
                 params.ensure_allowed(&["dex"])?;
                 let mut payload = json!({"type":"perpsAtOpenInterestCap"});

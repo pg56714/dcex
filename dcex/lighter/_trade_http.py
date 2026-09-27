@@ -1,5 +1,6 @@
 """Lighter signed trading HTTP client backed by Rust."""
 
+import json
 from json import dumps
 from typing import Any
 
@@ -494,3 +495,231 @@ class TradeHTTP(HTTPManager):
         Recreate the client with the new key after confirmation.
         """
         return self._native_sign("sign_change_api_key_signed", self._native_params(**locals()))
+
+    def create_public_pool(
+        self,
+        *,
+        operator_fee: int,
+        initial_total_shares: int,
+        min_operator_share_rate: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Submit Lighter transaction 10. Amounts use integer shares, not decimal token amounts."""
+        return self._native_private("create_public_pool", self._native_params(**locals()))
+
+    def sign_create_public_pool(
+        self,
+        *,
+        operator_fee: int,
+        initial_total_shares: int,
+        min_operator_share_rate: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign Lighter transaction 10. Amounts use integer shares, not decimal token amounts."""
+        return self._native_sign("sign_create_public_pool", self._native_params(**locals()))
+
+    def update_public_pool(
+        self,
+        *,
+        public_pool_index: int,
+        status: int,
+        operator_fee: int,
+        min_operator_share_rate: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Submit Lighter transaction 11. Amounts use integer shares, not decimal token amounts."""
+        return self._native_private("update_public_pool", self._native_params(**locals()))
+
+    def sign_update_public_pool(
+        self,
+        *,
+        public_pool_index: int,
+        status: int,
+        operator_fee: int,
+        min_operator_share_rate: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign Lighter transaction 11. Amounts use integer shares, not decimal token amounts."""
+        return self._native_sign("sign_update_public_pool", self._native_params(**locals()))
+
+    def mint_shares(
+        self,
+        *,
+        public_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Submit Lighter transaction 18. Amounts use integer shares, not decimal token amounts."""
+        return self._native_private("mint_shares", self._native_params(**locals()))
+
+    def sign_mint_shares(
+        self,
+        *,
+        public_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign Lighter transaction 18. Amounts use integer shares, not decimal token amounts."""
+        return self._native_sign("sign_mint_shares", self._native_params(**locals()))
+
+    def burn_shares(
+        self,
+        *,
+        public_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Submit Lighter transaction 19. Amounts use integer shares, not decimal token amounts."""
+        return self._native_private("burn_shares", self._native_params(**locals()))
+
+    def sign_burn_shares(
+        self,
+        *,
+        public_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign Lighter transaction 19. Amounts use integer shares, not decimal token amounts."""
+        return self._native_sign("sign_burn_shares", self._native_params(**locals()))
+
+    def stake_assets(
+        self,
+        *,
+        staking_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Submit Lighter transaction 35. Amounts use integer shares, not decimal token amounts."""
+        return self._native_private("stake_assets", self._native_params(**locals()))
+
+    def sign_stake_assets(
+        self,
+        *,
+        staking_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign Lighter transaction 35. Amounts use integer shares, not decimal token amounts."""
+        return self._native_sign("sign_stake_assets", self._native_params(**locals()))
+
+    def unstake_assets(
+        self,
+        *,
+        staking_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Submit Lighter transaction 36. Amounts use integer shares, not decimal token amounts."""
+        return self._native_private("unstake_assets", self._native_params(**locals()))
+
+    def sign_unstake_assets(
+        self,
+        *,
+        staking_pool_index: int,
+        share_amount: int,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Sign Lighter transaction 36. Amounts use integer shares, not decimal token amounts."""
+        return self._native_sign("sign_unstake_assets", self._native_params(**locals()))
+
+    def submit_lit_lease(
+        self,
+        *,
+        tx_info: str,
+        lease_amount: str,
+        duration_days: int,
+        authorization: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Submit caller-signed JSON. Lease amounts use raw LIT units (1 LIT = 100000000)."""
+        return self._native_private("submit_lit_lease", self._native_params(**locals()))
+
+    def export_historical_trades(
+        self, *, l1_address: str, date: str, authorization: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """Request a historical export URL; server access requirements apply."""
+        return self._native_private(
+            "export_historical_trades",
+            self._native_params(
+                **{"authorization": authorization, "l1_address": l1_address, "date": date}
+            ),
+        )
+
+    def transfer_same_master_account(
+        self,
+        *,
+        to_account_index: int,
+        asset_index: int,
+        from_route_type: int,
+        to_route_type: int,
+        amount: int,
+        usdc_fee: int = 0,
+        memo_hex: str | None = None,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+        price_protection: bool | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Transfer within one master account; amounts and fees use raw integer units."""
+        return self._native_private("transfer_same_master_account", self._native_params(**locals()))
+
+    def sign_transfer_same_master_account(
+        self,
+        *,
+        to_account_index: int,
+        asset_index: int,
+        from_route_type: int,
+        to_route_type: int,
+        amount: int,
+        usdc_fee: int = 0,
+        memo_hex: str | None = None,
+        skip_nonce: int = 0,
+        nonce: int | None = None,
+        api_key_index: int | None = None,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Transfer within one master account; amounts and fees use raw integer units."""
+        return self._native_sign(
+            "sign_transfer_same_master_account", self._native_params(**locals())
+        )
+
+    def set_maker_only_api_keys(
+        self, *, account_index: int, api_key_indexes: list[int], authorization: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """Replace the complete maker-only key list; an empty list clears restrictions."""
+        return self._native_private(
+            "set_maker_only_api_keys",
+            self._native_params(
+                account_index=account_index,
+                api_key_indexes=json.dumps(api_key_indexes, separators=(",", ":")),
+                authorization=authorization,
+            ),
+        )

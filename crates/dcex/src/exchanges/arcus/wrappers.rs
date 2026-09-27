@@ -25,6 +25,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_positions(),
         health(),
         get_service_info(),
+        get_leaderboard(),
 
         get_markets(), get_spot_assets(), get_fee_tiers(),
         get_account(), get_bbo(market => "market"),
@@ -77,3 +78,8 @@ impl ArcusSpotClient {
         )
     }
 }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; ArcusClient; public [
+get_market_metadata(), get_market_overview(), get_spot_market_overview(),
+get_metadata_candles(market => "market", timeframe => "timeframe", to => "to"), get_user_preferences()
+]; private [upsert_user_preferences(preferences => "preferences"), delete_user_preference_signed(key => "key", timestamp => "timestamp", signature => "signature")]; }

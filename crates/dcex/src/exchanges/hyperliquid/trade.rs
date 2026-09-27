@@ -18,6 +18,96 @@ impl HyperliquidClient {
         let params = HyperliquidParams::from_pairs(params);
         validate_private_params(method_name, &params)?;
         match method_name {
+            "approve_agent_signed" => self.additional_user_action("approveAgent", &params).await,
+            "create_sub_account" => {
+                self.submit_action(
+                    object(vec![
+                        ("type", string("createSubAccount")),
+                        ("name", string(params.required("name")?)),
+                    ]),
+                    &params,
+                )
+                .await
+            }
+            "transfer_sub_account_usd" => {
+                if params.required_u64("usd")? == 0 {
+                    return Err(DcexError::InvalidInput("usd must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("subAccountTransfer")),
+                        ("subAccountUser", string(&params.address("subAccountUser")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                        ("usd", uint(params.required_u64("usd")?)),
+                    ]),
+                    &params,
+                )
+                .await
+            }
+            "transfer_sub_account_spot" => {
+                if !params
+                    .required("amount")?
+                    .parse::<f64>()
+                    .is_ok_and(|v| v.is_finite() && v > 0.0)
+                {
+                    return Err(DcexError::InvalidInput("amount must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("subAccountSpotTransfer")),
+                        ("subAccountUser", string(&params.address("subAccountUser")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                        ("token", string(params.required("token")?)),
+                        ("amount", string(params.required("amount")?)),
+                    ]),
+                    &params,
+                )
+                .await
+            }
+            "transfer_vault_usd" => {
+                if params.required_u64("usd")? == 0 {
+                    return Err(DcexError::InvalidInput("amount must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("vaultTransfer")),
+                        ("vaultAddress", string(&params.address("targetVault")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                        ("usd", uint(params.required_u64("usd")?)),
+                    ]),
+                    &params,
+                )
+                .await
+            }
+            "enable_agent_dex_abstraction" => {
+                self.submit_action(
+                    object(vec![("type", string("agentEnableDexAbstraction"))]),
+                    &params,
+                )
+                .await
+            }
+            "transfer_hip3_liquidator" => {
+                if params.required_u64("ntl")? == 0 {
+                    return Err(DcexError::InvalidInput("amount must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("hip3LiquidatorTransfer")),
+                        ("dex", string(params.required("dex")?)),
+                        ("ntl", uint(params.required_u64("ntl")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                    ]),
+                    &params,
+                )
+                .await
+            }
+            "deposit_staking_signed" => self.additional_user_action("cDeposit", &params).await,
+            "withdraw_staking_signed" => self.additional_user_action("cWithdraw", &params).await,
+            "delegate_tokens_signed" => self.additional_user_action("tokenDelegate", &params).await,
+            "set_user_dex_abstraction_signed" => {
+                self.additional_user_action("userDexAbstraction", &params)
+                    .await
+            }
             "reserve_request_weight" => {
                 let weight = params.required_u64("weight")?;
                 if weight == 0 {
@@ -95,6 +185,66 @@ impl HyperliquidClient {
         }
     }
 
+    async fn additional_user_action(
+        &self,
+        kind: &str,
+        params: &HyperliquidParams,
+    ) -> Result<ValidatedResponse> {
+        let nonce = params.required_u64("nonce")?;
+        let chain_id = params.required("signatureChainId")?;
+        if !chain_id.starts_with("0x")
+            || chain_id.len() <= 2
+            || !chain_id[2..].bytes().all(|b| b.is_ascii_hexdigit())
+        {
+            return Err(DcexError::InvalidInput(
+                "signatureChainId must be a hexadecimal chain ID".into(),
+            ));
+        }
+        let signature: Value = serde_json::from_str(params.required("signature")?)
+            .map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+        if !signature.as_object().is_some_and(|s| {
+            s.len() == 3
+                && ["r", "s"].iter().all(|k| {
+                    s.get(*k).and_then(Value::as_str).is_some_and(|v| {
+                        v.len() == 66
+                            && v.starts_with("0x")
+                            && v[2..].bytes().all(|b| b.is_ascii_hexdigit())
+                    })
+                })
+                && matches!(s.get("v").and_then(Value::as_u64), Some(27 | 28))
+        }) {
+            return Err(DcexError::InvalidInput(
+                "signature requires 32-byte r/s and v 27 or 28".into(),
+            ));
+        }
+
+        let mut action = serde_json::json!({"type":kind,"hyperliquidChain":if self.is_testnet(){"Testnet"}else{"Mainnet"},"signatureChainId":chain_id,"nonce":nonce});
+        if kind == "approveAgent" {
+            action["agentAddress"] = params.address("agentAddress")?.into();
+            if let Some(name) = params.get("agentName") {
+                action["agentName"] = name.into();
+            }
+        } else if kind == "userDexAbstraction" {
+            action["user"] = params.address("user")?.into();
+            action["enabled"] = params.required_bool("enabled")?.into();
+        } else {
+            let wei = params.required_u64("wei")?;
+            if wei == 0 {
+                return Err(DcexError::InvalidInput("wei must be positive".into()));
+            }
+            action["wei"] = wei.into();
+            if kind == "tokenDelegate" {
+                action["validator"] = params.address("validator")?.into();
+                action["isUndelegate"] = params.required_bool("isUndelegate")?.into();
+            }
+        }
+        let body = serde_json::to_vec(
+            &serde_json::json!({"action":action,"nonce":nonce,"signature":signature}),
+        )
+        .map_err(|e| DcexError::Decode(e.to_string()))?;
+        self.request(HttpMethod::Post, EXCHANGE, body, None, false)
+            .await
+    }
     async fn place_order_from_params(
         &self,
         params: &HyperliquidParams,
@@ -928,6 +1078,45 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
     ];
 
     let allowed: &[&str] = match method_name {
+        "approve_agent_signed" => &[
+            "agentAddress",
+            "agentName",
+            "nonce",
+            "signature",
+            "signatureChainId",
+        ],
+        "create_sub_account" => &["name", "nonce", "expiresAfter"],
+        "transfer_sub_account_usd" => &[
+            "subAccountUser",
+            "isDeposit",
+            "usd",
+            "nonce",
+            "expiresAfter",
+        ],
+        "transfer_sub_account_spot" => &[
+            "subAccountUser",
+            "isDeposit",
+            "token",
+            "amount",
+            "nonce",
+            "expiresAfter",
+        ],
+        "transfer_vault_usd" => &["targetVault", "isDeposit", "usd", "nonce", "expiresAfter"],
+        "enable_agent_dex_abstraction" => &["nonce", "expiresAfter"],
+        "transfer_hip3_liquidator" => &["dex", "ntl", "isDeposit", "nonce", "expiresAfter"],
+        "deposit_staking_signed" => &["wei", "nonce", "signature", "signatureChainId"],
+        "withdraw_staking_signed" => &["wei", "nonce", "signature", "signatureChainId"],
+        "delegate_tokens_signed" => &[
+            "validator",
+            "wei",
+            "isUndelegate",
+            "nonce",
+            "signature",
+            "signatureChainId",
+        ],
+        "set_user_dex_abstraction_signed" => {
+            &["user", "enabled", "nonce", "signature", "signatureChainId"]
+        }
         "place_order" => ORDER_FIELDS,
         "place_future_market_order" => MARKET_FIELDS,
         "place_future_market_buy_order" | "place_future_market_sell_order" => &[

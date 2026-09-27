@@ -120,3 +120,11 @@ class MarketHTTP(HTTPManager):
         Source: https://api.docs.extended.exchange/#get-latest-interest-rate-curve
         """
         return self._native_public("get_latest_interest_rate_curve", self._native_params())
+
+    def get_vault_performance(self, *, interval: str) -> Any:  # noqa: ANN401
+        """GET /api/v1/vault/public/performance."""
+        return self._native_public("get_vault_performance", self._native_params(interval=interval))
+
+    def get_vault_summary(self) -> Any:  # noqa: ANN401
+        """GET /api/v1/vault/public/summary."""
+        return self._native_public("get_vault_summary", self._native_params())

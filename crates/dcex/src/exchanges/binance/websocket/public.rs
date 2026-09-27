@@ -19,6 +19,7 @@ pub struct BinancePublicWebSocket {
     next_request_id: u64,
     product_table: Option<Arc<ProductTable>>,
     subscriptions: HashSet<String>,
+    profile: String,
 }
 
 impl BinancePublicWebSocket {
@@ -27,12 +28,39 @@ impl BinancePublicWebSocket {
     }
 
     pub fn with_url(url: impl Into<String>, timeout: Duration) -> Result<Self> {
+        Self::with_profile_url("spot", Some(url.into()), timeout)
+    }
+
+    /// Profiles: spot, futures_public, futures_market, coin_futures,
+    /// options_public, options_market. Split futures/options connections by feed.
+    pub fn with_profile(profile: &str, timeout: Duration) -> Result<Self> {
+        Self::with_profile_url(profile, None, timeout)
+    }
+
+    pub fn with_profile_url(profile: &str, url: Option<String>, timeout: Duration) -> Result<Self> {
+        let default_url = match profile {
+            "spot" => SPOT_PUBLIC_WS_URL,
+            "futures_public" | "options_public" => "wss://fstream.binance.com/public/ws",
+            "futures_market" | "options_market" => "wss://fstream.binance.com/market/ws",
+            "coin_futures" => "wss://dstream.binance.com/ws",
+            _ => {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported Binance public stream profile: {profile}"
+                )));
+            }
+        };
+        let url = url.unwrap_or_else(|| default_url.to_string());
         Ok(Self {
+            profile: profile.to_string(),
             connection: WebSocketConnection::new(WebSocketConfig::new(url, timeout)?),
             next_request_id: 1,
             product_table: None,
             subscriptions: HashSet::new(),
         })
+    }
+
+    pub fn url(&self) -> &str {
+        &self.connection.config().url
     }
 
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
@@ -101,7 +129,10 @@ impl BinancePublicWebSocket {
     }
 
     fn stream_symbol(&self, product_symbol: &str) -> Result<String> {
-        if is_canonical_product_symbol(product_symbol) && !is_spot_product_symbol(product_symbol) {
+        if self.profile == "spot"
+            && is_canonical_product_symbol(product_symbol)
+            && !is_spot_product_symbol(product_symbol)
+        {
             return Err(DcexError::InvalidInput(format!(
                 "Binance Spot WebSocket does not support non-Spot product: {product_symbol}"
             )));
@@ -116,6 +147,24 @@ impl BinancePublicWebSocket {
         } else {
             exchange_symbol_fallback(product_symbol)
         };
+        if self.profile.starts_with("options_") {
+            let symbol = product_symbol.trim();
+            if symbol.is_empty()
+                || !symbol
+                    .chars()
+                    .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+            {
+                return Err(DcexError::InvalidInput(
+                    "invalid Binance option stream symbol".into(),
+                ));
+            }
+            return Ok(symbol.to_ascii_lowercase());
+        }
+        if self.profile != "spot" && is_spot_product_symbol(product_symbol) {
+            return Err(DcexError::InvalidInput(
+                "Spot product requires the spot WebSocket profile".into(),
+            ));
+        }
         normalize_stream_symbol(&symbol)
     }
 
@@ -126,13 +175,32 @@ impl BinancePublicWebSocket {
             ));
         }
         let streams = normalize_streams(streams)?;
+        if self.profile.starts_with("futures_") {
+            for stream in &streams {
+                let public = stream.contains("@depth")
+                    || stream.contains("@rpiDepth")
+                    || stream.contains("bookTicker");
+                if public != (self.profile == "futures_public") {
+                    return Err(DcexError::InvalidInput(format!(
+                        "stream {stream} requires the futures_{} profile",
+                        if public { "public" } else { "market" }
+                    )));
+                }
+            }
+        }
         if method == "SUBSCRIBE" {
             let mut subscriptions = self.subscriptions.clone();
             subscriptions.extend(streams.iter().cloned());
-            if subscriptions.len() > 1_024 {
-                return Err(DcexError::InvalidInput(
-                    "Binance Spot WebSocket connections support at most 1024 streams.".to_string(),
-                ));
+            let limit = if self.profile.starts_with("options_") {
+                200
+            } else {
+                1_024
+            };
+            if subscriptions.len() > limit {
+                return Err(DcexError::InvalidInput(format!(
+                    "Binance {} WebSocket supports at most {limit} streams.",
+                    self.profile
+                )));
             }
         }
         let id = self.next_id();

@@ -123,3 +123,24 @@ get_spot_level3_orderbook(product_symbol => "product_symbol"),
         withdraw_futures_to_spot_wallet(amount => "amount", currency => "currency"),
     ];
 }
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [];private [get_withdrawal_addresses(),
+get_withdrawal_information(asset => "asset",key => "key",amount => "amount"),
+get_withdrawal_methods(),
+get_withdrawal_status(),];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [];private [edit_spot_order(pair => "pair",txid => "txid")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_chart_types()];private [];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_chart_markets(tick_type => "tick_type")];private [];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_chart_resolutions(tick_type => "tick_type",symbol => "symbol")];private [];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_market_executions(tradeable => "tradeable")];private [];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_market_orders(tradeable => "tradeable")];private [];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_market_price(tradeable => "tradeable")];private [];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_liquidity_pool_statistics(since => "since",interval => "interval")];private [];}

@@ -15,6 +15,9 @@ impl BinanceClient {
             "equity" | "stock" => (BinanceMarket::Equity, SPOT_SERVER_TIME),
             "option" | "options" => (BinanceMarket::Options, OPTIONS_SERVER_TIME),
             "spot" => (BinanceMarket::Spot, SPOT_SERVER_TIME),
+            "coin_futures" | "coin-m" | "coinm" | "delivery" => {
+                (BinanceMarket::CoinFutures, COIN_FUTURES_SERVER_TIME)
+            }
             _ => (BinanceMarket::Futures, FUTURES_SERVER_TIME),
         };
         self.request(HttpMethod::Get, market, path, Vec::new(), false)

@@ -64,7 +64,8 @@ impl PythonLighterHttpClient {
         api_key_index=None,
         api_private_key=None,
         network="mainnet",
-        chain_id=None
+        chain_id=None,
+        explorer_base_url=None
     ))]
     fn new(
         timeout: f64,
@@ -74,6 +75,7 @@ impl PythonLighterHttpClient {
         api_private_key: Option<String>,
         network: &str,
         chain_id: Option<u64>,
+        explorer_base_url: Option<String>,
     ) -> PyResult<Self> {
         let timeout = http_timeout(timeout)?;
         let network = lighter_network(network)?;
@@ -110,9 +112,13 @@ impl PythonLighterHttpClient {
                 api_private_key,
             )
         };
-        Ok(Self {
-            client: client.map_err(to_py_runtime_error)?,
-        })
+        let mut client = client.map_err(to_py_runtime_error)?;
+        if let Some(url) = explorer_base_url {
+            client = client
+                .with_explorer_base_url(url)
+                .map_err(to_py_value_error)?;
+        }
+        Ok(Self { client })
     }
 
     #[staticmethod]

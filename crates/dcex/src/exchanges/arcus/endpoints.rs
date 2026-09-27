@@ -6,6 +6,7 @@ pub(super) const TESTNET_URL: &str = "https://api.testnet.arcus.xyz";
 pub(super) fn public_path(method_name: &str) -> Result<&'static str> {
     Ok(match method_name {
         "get_service_info" => "/",
+        "get_leaderboard" => "/v1/leaderboard",
         "health" => "/health",
         "get_time" => "/v1/time",
         "get_markets" => "/v1/markets",

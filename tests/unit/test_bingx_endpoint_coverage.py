@@ -944,6 +944,45 @@ ROUTES.update(
 PUBLIC_METHODS.update(["get_spot_historical_trades", "get_swap_historical_trades"])
 
 
+ADDITIONAL_CASES.extend(
+    [
+        ("get_withdrawal_history", {}, "GET", "/openApi/api/v3/capital/withdraw/history"),
+        (
+            "get_internal_transfer_records",
+            {"coin": "USDT"},
+            "GET",
+            "/openApi/wallets/v1/capital/innerTransfer/records",
+        ),
+        (
+            "get_sub_account_internal_transfer_records",
+            {"coin": "USDT"},
+            "GET",
+            "/openApi/wallets/v1/capital/subAccount/innerTransfer/records",
+        ),
+    ]
+)
+ADDITIONAL_FIELDS.update(
+    {
+        "get_withdrawal_history": {},
+        "get_internal_transfer_records": {"coin": "USDT"},
+        "get_sub_account_internal_transfer_records": {"coin": "USDT"},
+    }
+)
+ROUTES.update(
+    {
+        "get_withdrawal_history": ("GET", "/openApi/api/v3/capital/withdraw/history"),
+        "get_internal_transfer_records": (
+            "GET",
+            "/openApi/wallets/v1/capital/innerTransfer/records",
+        ),
+        "get_sub_account_internal_transfer_records": (
+            "GET",
+            "/openApi/wallets/v1/capital/subAccount/innerTransfer/records",
+        ),
+    }
+)
+
+
 def _kwargs(method: Any, name: str) -> dict[str, Any]:  # noqa: ANN401
     if name == "replace_swap_batch_orders":
         return {"orders": BATCH_REPLACEMENT}
@@ -988,7 +1027,7 @@ def _assert_route(name: str, request: dict[str, Any]) -> None:
         signature = body.pop("signature")
         assert isinstance(body["timestamp"], int)
 
-        def signing_text(value: Any) -> str:
+        def signing_text(value: Any) -> str:  # noqa: ANN401
             if isinstance(value, list):
                 return ",".join(signing_text(item) for item in value)
             if isinstance(value, bool):

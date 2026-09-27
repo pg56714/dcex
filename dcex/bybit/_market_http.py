@@ -468,3 +468,110 @@ class MarketHTTP(HTTPManager):
         return self._native_public(
             "get_option_base_coins", self._native_params(underlyingType=underlying_type)
         )
+
+    def get_crypto_loan_collateral_data(
+        self, *, vip_level: str | None = None, currency: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/collateral-data.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/collateral-coin.mdx
+        """
+        return self._native_public(
+            "get_crypto_loan_collateral_data",
+            self._native_params(vipLevel=vip_level, currency=currency),
+        )
+
+    def get_crypto_loan_loanable_data(
+        self, *, vip_level: str | None = None, currency: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan/loanable-data.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/crypto-loan/loan-coin.mdx
+        """
+        return self._native_public(
+            "get_crypto_loan_loanable_data",
+            self._native_params(vipLevel=vip_level, currency=currency),
+        )
+
+    def get_crypto_loan_common_collateral_data(
+        self, *, currency: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-common/collateral-data.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/collateral-coin.mdx
+        """
+        return self._native_public(
+            "get_crypto_loan_common_collateral_data", self._native_params(currency=currency)
+        )
+
+    def get_crypto_loan_fixed_borrow_order_quote(
+        self,
+        *,
+        order_currency: str,
+        order_by: str,
+        term: str | None = None,
+        sort: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/borrow-order-quote.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/borrow-market.mdx
+        """
+        return self._native_public(
+            "get_crypto_loan_fixed_borrow_order_quote",
+            self._native_params(
+                orderCurrency=order_currency, orderBy=order_by, term=term, sort=sort, limit=limit
+            ),
+        )
+
+    def get_crypto_loan_fixed_supply_order_quote(
+        self,
+        *,
+        order_currency: str,
+        order_by: str,
+        term: str | None = None,
+        sort: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-fixed/supply-order-quote.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/fixed/supply-market.mdx
+        """
+        return self._native_public(
+            "get_crypto_loan_fixed_supply_order_quote",
+            self._native_params(
+                orderCurrency=order_currency, term=term, orderBy=order_by, sort=sort, limit=limit
+            ),
+        )
+
+    def get_crypto_loan_common_loanable_data(
+        self, *, vip_level: str | None = None, currency: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /v5/crypto-loan-common/loanable-data.
+
+        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/new-crypto-loan/loan-coin.mdx
+        """
+        return self._native_public(
+            "get_crypto_loan_common_loanable_data",
+            self._native_params(vipLevel=vip_level, currency=currency),
+        )
+
+    def get_spot_lever_token_reference(self, *, lt_coin: str) -> dict[str, Any]:
+        """
+        GET /v5/spot-lever-token/reference.
+
+        Decimal amounts are strings. Source: https://github.com/bybit-exchange/docs/blob/master/docs/v5/lt/leverage-token-reference.mdx
+        """
+        return self._native_public(
+            "get_spot_lever_token_reference", self._native_params(ltCoin=lt_coin)
+        )
+
+    def get_server_time(self) -> dict[str, Any]:
+        """Retrieve the exchange server time."""
+        return self._native_public("get_server_time", [])

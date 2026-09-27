@@ -418,3 +418,103 @@ class MarketHTTP(HTTPManager):
     def get_asset_logos(self) -> dict[str, Any] | list[Any]:
         """GET /fapi/v3/common/asset/all-asset-logo."""
         return self._native_public("get_asset_logos", self._native_params())
+
+    def get_prediction_ping(self) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/ping on the prediction host. Use native prediction symbols."""
+        return self._native_public("get_prediction_ping", self._native_params())
+
+    def get_prediction_time(self) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/time on the prediction host. Use native prediction symbols."""
+        return self._native_public("get_prediction_time", self._native_params())
+
+    def get_prediction_exchange_info(self) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/prediction/exchangeInfo on the prediction host. Use native prediction
+        symbols.
+        """
+        return self._native_public("get_prediction_exchange_info", self._native_params())
+
+    def get_prediction_depth(
+        self, *, symbol: str, limit: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/depth on the prediction host. Use native prediction symbols."""
+        return self._native_public(
+            "get_prediction_depth", self._native_params(symbol=symbol, limit=limit)
+        )
+
+    def get_prediction_trades(
+        self, *, symbol: str, limit: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/trades on the prediction host. Use native prediction symbols."""
+        return self._native_public(
+            "get_prediction_trades", self._native_params(symbol=symbol, limit=limit)
+        )
+
+    def get_prediction_historical_trades(
+        self, *, symbol: str, limit: int | None = None, from_id: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/historicalTrades on the prediction host. Use native prediction symbols."""
+        return self._native_public(
+            "get_prediction_historical_trades",
+            self._native_params(symbol=symbol, limit=limit, fromId=from_id),
+        )
+
+    def get_prediction_agg_trades(
+        self,
+        *,
+        symbol: str,
+        from_id: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/aggTrades on the prediction host. Use native prediction symbols."""
+        return self._native_public(
+            "get_prediction_agg_trades",
+            self._native_params(
+                symbol=symbol, fromId=from_id, startTime=start_time, endTime=end_time, limit=limit
+            ),
+        )
+
+    def get_prediction_klines(
+        self,
+        *,
+        symbol: str,
+        interval: str,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/klines on the prediction host. Use native prediction symbols."""
+        return self._native_public(
+            "get_prediction_klines",
+            self._native_params(
+                symbol=symbol,
+                interval=interval,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+            ),
+        )
+
+    def get_prediction_ticker_24hr(
+        self, *, symbol: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/ticker/24hr on the prediction host. Use native prediction symbols."""
+        return self._native_public("get_prediction_ticker_24hr", self._native_params(symbol=symbol))
+
+    def get_prediction_ticker_price(
+        self, *, symbol: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/ticker/price on the prediction host. Use native prediction symbols."""
+        return self._native_public(
+            "get_prediction_ticker_price", self._native_params(symbol=symbol)
+        )
+
+    def get_prediction_ticker_book_ticker(
+        self, *, symbol: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/ticker/bookTicker on the prediction host. Use native prediction symbols."""
+        return self._native_public(
+            "get_prediction_ticker_book_ticker", self._native_params(symbol=symbol)
+        )

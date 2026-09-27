@@ -68,3 +68,18 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_position_history()
     ];
 }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BackpackClient; public [
+get_prediction_events(),
+get_prediction_tags(),
+get_vaults(),
+get_vault_history(interval => "interval"),
+]; private [
+vault_mint(vault_id => "vaultId",symbol => "symbol",quantity => "quantity"),
+vault_redeem(vault_id => "vaultId"),
+vault_redeem_cancel(vault_id => "vaultId"),
+get_vault_pending_redeems(vault_id => "vaultId"),
+get_vault_nav(),
+]; }
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;BackpackClient;public [];private [execute_borrow_lend(quantity => "quantity",side => "side",symbol => "symbol")];}

@@ -1042,3 +1042,33 @@ fn portfolio_and_interest_routes_preserve_account_filters() {
         ),
     ]);
 }
+
+#[test]
+fn remaining_vault_and_rewards_routes() {
+    assert_cases(&[
+        public(
+            "get_vault_performance",
+            &[("interval", "WEEK")],
+            "GET",
+            "/api/v1/vault/public/performance?interval=WEEK",
+        ),
+        public(
+            "get_vault_summary",
+            &[],
+            "GET",
+            "/api/v1/vault/public/summary",
+        ),
+        private(
+            "get_earned_points",
+            &[],
+            "GET",
+            "/api/v1/user/rewards/earned",
+        ),
+        private(
+            "get_points_leaderboard_stats",
+            &[],
+            "GET",
+            "/api/v1/user/rewards/leaderboard/stats",
+        ),
+    ]);
+}

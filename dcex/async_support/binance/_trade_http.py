@@ -2506,7 +2506,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/income.
@@ -2531,7 +2531,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_commission_rate(
         self, *, symbol: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/commissionRate.
@@ -2553,7 +2553,7 @@ class TradeHTTP(HTTPManager):
         kind_type: int,
         position_side: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         POST /dapi/v1/positionMargin.
@@ -2576,7 +2576,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_adl_quantiles(
         self, *, symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/adlQuantile.
@@ -2599,7 +2599,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/forceOrders.
@@ -2631,7 +2631,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/cm/income.
@@ -2664,7 +2664,7 @@ class TradeHTTP(HTTPManager):
         size: int | None = None,
         archived: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/margin/marginInterestHistory.
@@ -2697,7 +2697,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/um/income.
@@ -2722,7 +2722,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_coin_commission_rate(
         self, *, symbol: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/cm/commissionRate.
@@ -2738,7 +2738,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_futures_commission_rate(
         self, *, product_symbol: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/um/commissionRate.
@@ -2764,7 +2764,7 @@ class TradeHTTP(HTTPManager):
         size: int | None = None,
         archived: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/margin/marginLoan.
@@ -2790,7 +2790,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_margin_transferable_amount(
         self, *, asset: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/margin/maxWithdraw.
@@ -2815,7 +2815,7 @@ class TradeHTTP(HTTPManager):
         size: int | None = None,
         archived: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/margin/repayLoan.
@@ -2839,7 +2839,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def get_pm_order_rate_limits(self, *, recv_window: int | None = None) -> Any:
+    async def get_pm_order_rate_limits(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /papi/v1/rateLimit/order.
@@ -2853,7 +2853,7 @@ class TradeHTTP(HTTPManager):
             "get_pm_order_rate_limits", self._params(recvWindow=recv_window)
         )
 
-    async def get_futures_account_config(self, *, recv_window: int | None = None) -> Any:
+    async def get_futures_account_config(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/accountConfig.
@@ -2869,7 +2869,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_trading_status(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/apiTradingStatus.
@@ -2884,7 +2884,7 @@ class TradeHTTP(HTTPManager):
             self._params(product_symbol=product_symbol, recvWindow=recv_window),
         )
 
-    async def get_futures_multi_assets_mode(self, *, recv_window: int | None = None) -> Any:
+    async def get_futures_multi_assets_mode(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/multiAssetsMargin.
@@ -2898,7 +2898,7 @@ class TradeHTTP(HTTPManager):
             "get_futures_multi_assets_mode", self._params(recvWindow=recv_window)
         )
 
-    async def get_futures_order_rate_limits(self, *, recv_window: int | None = None) -> Any:
+    async def get_futures_order_rate_limits(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/rateLimit/order.
@@ -2914,7 +2914,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_symbol_config(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/symbolConfig.
@@ -2931,7 +2931,7 @@ class TradeHTTP(HTTPManager):
 
     async def set_futures_multi_assets_mode(
         self, *, multi_assets_margin: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         POST /fapi/v1/multiAssetsMargin.
@@ -2954,7 +2954,7 @@ class TradeHTTP(HTTPManager):
         kind_type: int,
         position_side: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         POST /fapi/v1/positionMargin.
@@ -2977,7 +2977,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_adl_quantiles(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/adlQuantile.
@@ -3001,7 +3001,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/forceOrders.
@@ -3023,7 +3023,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def get_margin_risk_coefficients(self, *, recv_window: int | None = None) -> Any:
+    async def get_margin_risk_coefficients(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/tradeCoeff.
@@ -3048,7 +3048,7 @@ class TradeHTTP(HTTPManager):
         from_id: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/capital-flow.
@@ -3081,7 +3081,7 @@ class TradeHTTP(HTTPManager):
         current: int | None = None,
         size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/forceLiquidationRec.
@@ -3112,7 +3112,7 @@ class TradeHTTP(HTTPManager):
         list_client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         DELETE /sapi/v1/margin/orderList.
@@ -3140,7 +3140,7 @@ class TradeHTTP(HTTPManager):
         is_isolated: str | None = None,
         product_symbol: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/rateLimit/order.
@@ -3167,7 +3167,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/allOrderList.
@@ -3198,7 +3198,7 @@ class TradeHTTP(HTTPManager):
         order_list_id: int | None = None,
         orig_client_order_id: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/orderList.
@@ -3225,7 +3225,7 @@ class TradeHTTP(HTTPManager):
         is_isolated: str | None = None,
         product_symbol: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/openOrderList.
@@ -3242,7 +3242,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def close_margin_listen_key(self) -> Any:
+    async def close_margin_listen_key(self) -> Any:  # noqa: ANN401
         """
 
         DELETE /sapi/v1/margin/listen-key.
@@ -3254,7 +3254,7 @@ class TradeHTTP(HTTPManager):
         """
         return await self._native_private("close_margin_listen_key", self._params())
 
-    async def keep_alive_margin_listen_key(self, *, listen_key: str) -> Any:
+    async def keep_alive_margin_listen_key(self, *, listen_key: str) -> Any:  # noqa: ANN401
         """
 
         PUT /sapi/v1/margin/listen-key.
@@ -3268,7 +3268,7 @@ class TradeHTTP(HTTPManager):
             "keep_alive_margin_listen_key", self._params(listenKey=listen_key)
         )
 
-    async def create_margin_listen_key(self) -> Any:
+    async def create_margin_listen_key(self) -> Any:  # noqa: ANN401
         """
 
         POST /sapi/v1/margin/listen-key.
@@ -3280,7 +3280,7 @@ class TradeHTTP(HTTPManager):
         """
         return await self._native_private("create_margin_listen_key", self._params())
 
-    async def get_account_trading_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_account_trading_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/account/apiTradingStatus.
@@ -3294,7 +3294,7 @@ class TradeHTTP(HTTPManager):
             "get_account_trading_status", self._params(recvWindow=recv_window)
         )
 
-    async def get_account_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_account_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/account/status.
@@ -3308,7 +3308,7 @@ class TradeHTTP(HTTPManager):
             "get_account_status", self._params(recvWindow=recv_window)
         )
 
-    async def get_api_key_permissions(self, *, recv_window: int | None = None) -> Any:
+    async def get_api_key_permissions(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/account/apiRestrictions.
@@ -3324,7 +3324,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_spot_trade_fees(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/asset/tradeFee.
@@ -3345,7 +3345,7 @@ class TradeHTTP(HTTPManager):
         asset: str | None = None,
         need_btc_valuation: bool | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         POST /sapi/v3/asset/getUserAsset.
@@ -3360,7 +3360,7 @@ class TradeHTTP(HTTPManager):
             self._params(asset=asset, needBtcValuation=need_btc_valuation, recvWindow=recv_window),
         )
 
-    async def get_coin_network_config(self, *, recv_window: int | None = None) -> Any:
+    async def get_coin_network_config(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/capital/config/getall.
@@ -3381,7 +3381,7 @@ class TradeHTTP(HTTPManager):
         network: str | None = None,
         amount: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/capital/deposit/address.
@@ -3408,7 +3408,7 @@ class TradeHTTP(HTTPManager):
         limit: int | None = None,
         recv_window: int | None = None,
         tx_id: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/capital/deposit/hisrec.
@@ -3454,7 +3454,7 @@ class TradeHTTP(HTTPManager):
         self_trade_prevention_mode: str | None = None,
         auto_repay_at_cancel: bool | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Both legs share quantity; cancelling either leg cancels the entire list.
@@ -3514,7 +3514,7 @@ class TradeHTTP(HTTPManager):
         pending_trailing_delta: int | None = None,
         pending_iceberg_qty: str | None = None,
         pending_time_in_force: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Pending orders activate only after the working order fully fills.
@@ -3586,7 +3586,7 @@ class TradeHTTP(HTTPManager):
         pending_below_trailing_delta: int | None = None,
         pending_below_iceberg_qty: str | None = None,
         pending_below_time_in_force: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Pending orders activate only after the working order fully fills.
@@ -3665,7 +3665,7 @@ class TradeHTTP(HTTPManager):
         pending_peg_offset_type: str | None = None,
         pending_peg_offset_value: int | None = None,
         recv_window: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Working BUY must fully fill before pending SELL orders use its received funds; no
@@ -3757,7 +3757,7 @@ class TradeHTTP(HTTPManager):
         pending_below_peg_offset_type: str | None = None,
         pending_below_peg_offset_value: int | None = None,
         recv_window: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Working BUY must fully fill before pending SELL orders use its received funds; no
@@ -3818,7 +3818,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_download_id_for_futures_order_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For Futures Order History (USER_DATA).
@@ -3835,7 +3835,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_download_id_for_futures_trade_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For Futures Trade History (USER_DATA).
@@ -3852,7 +3852,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_download_id_for_futures_transaction_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For Futures Transaction History (USER_DATA).
@@ -3869,7 +3869,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_futures_order_history_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Futures Order History Download Link by Id (USER_DATA).
@@ -3886,7 +3886,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_futures_trade_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Futures Trade Download Link by Id (USER_DATA).
@@ -3903,7 +3903,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_coin_futures_futures_transaction_history_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Futures Transaction History Download Link by Id (USER_DATA).
@@ -3928,7 +3928,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Order Modify History (USER_DATA).
@@ -3960,7 +3960,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Position Margin Change History (TRADE).
@@ -3990,7 +3990,7 @@ class TradeHTTP(HTTPManager):
         order_id: int | None = None,
         orig_client_order_id: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Current Open Order (USER_DATA).
@@ -4012,7 +4012,7 @@ class TradeHTTP(HTTPManager):
 
     async def pm_bnb_transfer(
         self, *, amount: str, transfer_side: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         BNB transfer (TRADE).
@@ -4029,7 +4029,7 @@ class TradeHTTP(HTTPManager):
 
     async def change_pm_auto_repay_futures_status(
         self, *, auto_repay: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Change Auto-repay-futures Status (TRADE).
@@ -4045,7 +4045,7 @@ class TradeHTTP(HTTPManager):
             self._params(autoRepay=auto_repay, recvWindow=recv_window),
         )
 
-    async def pm_fund_auto_collection(self, *, recv_window: int | None = None) -> Any:
+    async def pm_fund_auto_collection(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Fund Auto-collection (TRADE).
@@ -4061,7 +4061,7 @@ class TradeHTTP(HTTPManager):
 
     async def pm_fund_collection_by_asset(
         self, *, asset: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Fund Collection by Asset (TRADE).
@@ -4075,7 +4075,7 @@ class TradeHTTP(HTTPManager):
             "pm_fund_collection_by_asset", self._params(asset=asset, recvWindow=recv_window)
         )
 
-    async def get_pm_auto_repay_futures_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_pm_auto_repay_futures_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get Auto-repay-futures Status (USER_DATA).
@@ -4091,7 +4091,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_download_id_for_um_futures_order_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For UM Futures Order History (USER_DATA).
@@ -4108,7 +4108,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_download_id_for_um_futures_trade_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For UM Futures Trade History (USER_DATA).
@@ -4125,7 +4125,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_download_id_for_um_futures_transaction_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For UM Futures Transaction History (USER_DATA).
@@ -4140,7 +4140,7 @@ class TradeHTTP(HTTPManager):
             self._params(startTime=start_time, endTime=end_time, recvWindow=recv_window),
         )
 
-    async def get_pm_um_account_detail_v2(self, *, recv_window: int | None = None) -> Any:
+    async def get_pm_um_account_detail_v2(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get UM Account Detail V2 (USER_DATA).
@@ -4156,7 +4156,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_um_futures_order_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get UM Futures Order Download Link by Id (USER_DATA).
@@ -4173,7 +4173,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_um_futures_trade_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get UM Futures Trade Download Link by Id (USER_DATA).
@@ -4190,7 +4190,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_um_futures_transaction_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get UM Futures Transaction Download Link by Id (USER_DATA).
@@ -4213,7 +4213,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Portfolio Margin Negative Balance Interest History (USER_DATA).
@@ -4237,7 +4237,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_pm_user_negative_balance_auto_exchange_record(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query User Negative Balance Auto Exchange Record (USER_DATA).
@@ -4253,7 +4253,7 @@ class TradeHTTP(HTTPManager):
             self._params(startTime=start_time, endTime=end_time, recvWindow=recv_window),
         )
 
-    async def repay_pm_futures_negative_balance(self, *, recv_window: int | None = None) -> Any:
+    async def repay_pm_futures_negative_balance(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Repay futures Negative Balance (USER_DATA).
@@ -4268,7 +4268,7 @@ class TradeHTTP(HTTPManager):
             "repay_pm_futures_negative_balance", self._params(recvWindow=recv_window)
         )
 
-    async def pm_futures_tradfi_perps_contract(self, *, recv_window: int | None = None) -> Any:
+    async def pm_futures_tradfi_perps_contract(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Futures TradFi Perps Contract (USER_DATA).
@@ -4282,7 +4282,7 @@ class TradeHTTP(HTTPManager):
             "pm_futures_tradfi_perps_contract", self._params(recvWindow=recv_window)
         )
 
-    async def get_pm_um_futures_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_pm_um_futures_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get UM Futures BNB Burn Status (USER_DATA).
@@ -4303,7 +4303,7 @@ class TradeHTTP(HTTPManager):
         order_id: int | None = None,
         orig_client_order_id: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Current CM Open Order (USER_DATA).
@@ -4330,7 +4330,7 @@ class TradeHTTP(HTTPManager):
         order_id: int | None = None,
         orig_client_order_id: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Current UM Open Order (USER_DATA).
@@ -4352,7 +4352,7 @@ class TradeHTTP(HTTPManager):
 
     async def toggle_pm_bnb_burn_on_um_futures_trade(
         self, *, fee_burn: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Toggle BNB Burn On UM Futures Trade (TRADE).
@@ -4367,7 +4367,7 @@ class TradeHTTP(HTTPManager):
             self._params(feeBurn=fee_burn, recvWindow=recv_window),
         )
 
-    async def get_futures_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_futures_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get BNB Burn Status (USER_DATA).
@@ -4383,7 +4383,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_download_id_for_futures_order_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For Futures Order History (USER_DATA).
@@ -4400,7 +4400,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_download_id_for_futures_trade_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For Futures Trade History (USER_DATA).
@@ -4417,7 +4417,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_download_id_for_futures_transaction_history(
         self, *, start_time: int, end_time: int, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Download Id For Futures Transaction History (USER_DATA).
@@ -4434,7 +4434,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_futures_order_history_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Futures Order History Download Link by Id (USER_DATA).
@@ -4451,7 +4451,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_futures_trade_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Futures Trade Download Link by Id (USER_DATA).
@@ -4468,7 +4468,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_futures_futures_transaction_history_download_link_by_id(
         self, *, download_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Futures Transaction History Download Link by Id (USER_DATA).
@@ -4485,7 +4485,7 @@ class TradeHTTP(HTTPManager):
 
     async def toggle_futures_bnb_burn_on_futures_trade(
         self, *, fee_burn: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Toggle BNB Burn On Futures Trade (TRADE).
@@ -4502,7 +4502,7 @@ class TradeHTTP(HTTPManager):
 
     async def futures_accept_the_offered_quote(
         self, *, quote_id: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Accept the offered quote (USER_DATA).
@@ -4519,7 +4519,7 @@ class TradeHTTP(HTTPManager):
 
     async def futures_order_status(
         self, *, order_id: str | None = None, quote_id: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Order status (USER_DATA).
@@ -4542,7 +4542,7 @@ class TradeHTTP(HTTPManager):
         to_amount: str | None = None,
         valid_time: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Send Quote Request (USER_DATA).
@@ -4566,7 +4566,7 @@ class TradeHTTP(HTTPManager):
 
     async def futures_classic_portfolio_margin_account_information(
         self, *, asset: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Classic Portfolio Margin Account Information (USER_DATA).
@@ -4581,7 +4581,7 @@ class TradeHTTP(HTTPManager):
             self._params(asset=asset, recvWindow=recv_window),
         )
 
-    async def futures_futures_tradfi_perps_contract(self, *, recv_window: int | None = None) -> Any:
+    async def futures_futures_tradfi_perps_contract(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Futures TradFi Perps Contract (USER_DATA).
@@ -4605,7 +4605,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Order Modify History (USER_DATA).
@@ -4637,7 +4637,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Position Margin Change History (TRADE).
@@ -4660,7 +4660,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def adjust_margin_cross_margin_max_leverage(self, *, max_leverage: int) -> Any:
+    async def adjust_margin_cross_margin_max_leverage(self, *, max_leverage: int) -> Any:  # noqa: ANN401
         """
 
         Adjust cross margin max leverage (USER_DATA).
@@ -4674,7 +4674,7 @@ class TradeHTTP(HTTPManager):
             "adjust_margin_cross_margin_max_leverage", self._params(maxLeverage=max_leverage)
         )
 
-    async def get_margin_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_margin_bnb_burn_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get BNB Burn Status (USER_DATA).
@@ -4694,7 +4694,7 @@ class TradeHTTP(HTTPManager):
         vip_level: int | None = None,
         coin: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Cross Margin Fee Data (USER_DATA).
@@ -4712,7 +4712,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_margin_enabled_isolated_margin_account_limit(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Enabled Isolated Margin Account Limit (USER_DATA).
@@ -4734,7 +4734,7 @@ class TradeHTTP(HTTPManager):
         vip_level: int | None = None,
         symbol: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Isolated Margin Fee Data (USER_DATA).
@@ -4750,7 +4750,7 @@ class TradeHTTP(HTTPManager):
             self._params(vipLevel=vip_level, symbol=symbol, recvWindow=recv_window),
         )
 
-    async def get_margin_future_hourly_interest_rate(self, *, assets: str, is_isolated: str) -> Any:
+    async def get_margin_future_hourly_interest_rate(self, *, assets: str, is_isolated: str) -> Any:  # noqa: ANN401
         """
 
         Get future hourly interest rate (USER_DATA).
@@ -4774,7 +4774,7 @@ class TradeHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Margin Interest Rate History (USER_DATA).
@@ -4798,7 +4798,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_margin_isolated_margin_tier_data(
         self, *, symbol: str, tier: int | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Isolated Margin Tier Data (USER_DATA).
@@ -4814,7 +4814,7 @@ class TradeHTTP(HTTPManager):
             self._params(symbol=symbol, tier=tier, recvWindow=recv_window),
         )
 
-    async def query_margin_margin_available_inventory(self, *, kind_type: str) -> Any:
+    async def query_margin_margin_available_inventory(self, *, kind_type: str) -> Any:  # noqa: ANN401
         """
 
         Query Margin Available Inventory (USER_DATA).
@@ -4838,7 +4838,7 @@ class TradeHTTP(HTTPManager):
         public_key: str | None = None,
         permission_mode: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Create Special Key(Low-Latency Trading) (TRADE).
@@ -4866,7 +4866,7 @@ class TradeHTTP(HTTPManager):
         api_name: str | None = None,
         symbol: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Delete Special Key(Low-Latency Trading) (TRADE).
@@ -4883,7 +4883,7 @@ class TradeHTTP(HTTPManager):
 
     async def edit_margin_ip_for_special_key(
         self, *, ip: str, symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Edit ip for Special Key(Low-Latency Trading) (TRADE).
@@ -4898,7 +4898,7 @@ class TradeHTTP(HTTPManager):
             self._params(ip=ip, symbol=symbol, recvWindow=recv_window),
         )
 
-    async def margin_exit_special_key_mode(self, *, recv_window: int | None = None) -> Any:
+    async def margin_exit_special_key_mode(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Exit Special Key Mode (TRADE).
@@ -4915,7 +4915,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_margin_small_liability_exchange_coin_list(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Small Liability Exchange Coin List (USER_DATA).
@@ -4938,7 +4938,7 @@ class TradeHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Small Liability Exchange History (USER_DATA).
@@ -4962,7 +4962,7 @@ class TradeHTTP(HTTPManager):
 
     async def margin_liquidation_loan_repay(
         self, *, asset: str, amount: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Liquidation Loan Repay (MARGIN).
@@ -4980,7 +4980,7 @@ class TradeHTTP(HTTPManager):
 
     async def margin_margin_manual_liquidation(
         self, *, kind_type: str, symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Margin Manual Liquidation (TRADE).
@@ -4996,7 +4996,7 @@ class TradeHTTP(HTTPManager):
             self._params(type=kind_type, symbol=symbol, recvWindow=recv_window),
         )
 
-    async def query_margin_liquidation_loan(self, *, recv_window: int | None = None) -> Any:
+    async def query_margin_liquidation_loan(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Query Liquidation Loan (USER_DATA).
@@ -5019,7 +5019,7 @@ class TradeHTTP(HTTPManager):
         current: int | None = None,
         size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Liquidation Loan Repay History (USER_DATA).
@@ -5050,7 +5050,7 @@ class TradeHTTP(HTTPManager):
         from_prevented_match_id: int | None = None,
         is_isolated: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Prevented Matches (USER_DATA).
@@ -5075,7 +5075,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_margin_special_key(
         self, *, symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Special key(Low Latency Trading) (TRADE).
@@ -5091,7 +5091,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_margin_special_key_list(
         self, *, symbol: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Special key List(Low Latency Trading) (TRADE).
@@ -5107,7 +5107,7 @@ class TradeHTTP(HTTPManager):
 
     async def margin_small_liability_exchange(
         self, *, asset_names: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Small Liability Exchange (MARGIN).
@@ -5134,7 +5134,7 @@ class TradeHTTP(HTTPManager):
         size: int | None = None,
         isolated_symbol: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Cross Margin Transfer History (USER_DATA).
@@ -5158,7 +5158,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def spot_my_filters(self, *, symbol: str, recv_window: str | None = None) -> Any:
+    async def spot_my_filters(self, *, symbol: str, recv_window: str | None = None) -> Any:  # noqa: ANN401
         """
 
         Query relevant filters (USER_DATA).
@@ -5180,7 +5180,7 @@ class TradeHTTP(HTTPManager):
         from_execution_id: int | None = None,
         limit: int | None = None,
         recv_window: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Order Amendments (USER_DATA).
@@ -5217,7 +5217,7 @@ class TradeHTTP(HTTPManager):
         new_order_resp_type: str | None = None,
         self_trade_prevention_mode: str | None = None,
         recv_window: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         New order using SOR (TRADE).
@@ -5263,7 +5263,7 @@ class TradeHTTP(HTTPManager):
         new_order_resp_type: str | None = None,
         self_trade_prevention_mode: str | None = None,
         recv_window: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Test new order using SOR (TRADE).
@@ -5293,7 +5293,7 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def wallet_account_info(self, *, recv_window: int | None = None) -> Any:
+    async def wallet_account_info(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Account info (USER_DATA).
@@ -5315,7 +5315,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Daily Account Snapshot (USER_DATA).
@@ -5338,7 +5338,7 @@ class TradeHTTP(HTTPManager):
 
     async def wallet_asset_detail(
         self, *, asset: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Asset Detail (USER_DATA).
@@ -5360,7 +5360,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         limit: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Asset Dividend Record (USER_DATA).
@@ -5390,7 +5390,7 @@ class TradeHTTP(HTTPManager):
         target_asset: str | None = None,
         third_party_client_id: str | None = None,
         dust_quota_asset_to_target_asset_price: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Dust Convert (USER_DATA).
@@ -5419,7 +5419,7 @@ class TradeHTTP(HTTPManager):
         target_asset: str,
         account_type: str | None = None,
         dust_quota_asset_to_target_asset_price: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Dust Convertible Assets (USER_DATA).
@@ -5441,7 +5441,7 @@ class TradeHTTP(HTTPManager):
 
     async def wallet_dust_transfer(
         self, *, asset: str, account_type: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Dust Transfer (USER_DATA).
@@ -5463,7 +5463,7 @@ class TradeHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         DustLog (USER_DATA).
@@ -5485,7 +5485,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_wallet_assets_that_can_be_converted_into_bnb(
         self, *, account_type: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Assets That Can Be Converted Into BNB (USER_DATA).
@@ -5506,7 +5506,7 @@ class TradeHTTP(HTTPManager):
         spot_bnb_burn: str | None = None,
         interest_bnb_burn: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Toggle BNB Burn On Spot Trade And Margin Interest (USER_DATA).
@@ -5525,7 +5525,7 @@ class TradeHTTP(HTTPManager):
 
     async def wallet_fetch_deposit_address_list_with_network(
         self, *, coin: str, network: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Fetch deposit address list with network (USER_DATA).
@@ -5548,7 +5548,7 @@ class TradeHTTP(HTTPManager):
         tx_id: str | None = None,
         sub_account_id: str | None = None,
         sub_user_id: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         One click arrival deposit apply (for expired address deposit) (USER_DATA).
@@ -5572,7 +5572,7 @@ class TradeHTTP(HTTPManager):
         algo_id: int | None = None,
         client_algo_id: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Cancel Futures Algo Order (TRADE).
@@ -5590,7 +5590,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_algo_current_algo_open_orders_future_algo(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Current Futures Algo Open Orders (USER_DATA).
@@ -5615,7 +5615,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         page_size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Historical Futures Algo Orders (USER_DATA).
@@ -5646,7 +5646,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         page_size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Futures Sub Orders (USER_DATA).
@@ -5674,7 +5674,7 @@ class TradeHTTP(HTTPManager):
         reduce_only: bool | None = None,
         limit_price: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Time-Weighted Futures Average Price (Twap) New Order (TRADE).
@@ -5712,7 +5712,7 @@ class TradeHTTP(HTTPManager):
         reduce_only: bool | None = None,
         limit_price: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Volume Participation (VP) New Order (TRADE).
@@ -5744,7 +5744,7 @@ class TradeHTTP(HTTPManager):
         algo_id: int | None = None,
         client_algo_id: str | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Cancel Spot Algo Order (TRADE).
@@ -5761,7 +5761,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_algo_current_algo_open_orders_spot_algo(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Current Spot Algo Open Orders (USER_DATA).
@@ -5785,7 +5785,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         page_size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Historical Spot Algo Orders (USER_DATA).
@@ -5816,7 +5816,7 @@ class TradeHTTP(HTTPManager):
         page: int | None = None,
         page_size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Spot Sub Orders (USER_DATA).
@@ -5840,7 +5840,7 @@ class TradeHTTP(HTTPManager):
         duration: int,
         client_algo_id: str | None = None,
         limit_price: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Time-Weighted Spot Average Price(Twap) New Order (TRADE).
@@ -5865,7 +5865,7 @@ class TradeHTTP(HTTPManager):
 
     async def pm_pro_bnb_transfer(
         self, *, amount: str, transfer_side: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         BNB transfer (USER_DATA).
@@ -5883,7 +5883,7 @@ class TradeHTTP(HTTPManager):
 
     async def change_pm_pro_auto_repay_futures_status(
         self, *, auto_repay: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Change Auto-repay-futures Status (TRADE).
@@ -5899,7 +5899,7 @@ class TradeHTTP(HTTPManager):
             self._params(autoRepay=auto_repay, recvWindow=recv_window),
         )
 
-    async def delete_pm_pro_margin_call_level(self, *, recv_window: int | None = None) -> Any:
+    async def delete_pm_pro_margin_call_level(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Delete Margin Call Level (USER_DATA).
@@ -5914,7 +5914,7 @@ class TradeHTTP(HTTPManager):
             "delete_pm_pro_margin_call_level", self._params(recvWindow=recv_window)
         )
 
-    async def pm_pro_fund_auto_collection(self, *, recv_window: int | None = None) -> Any:
+    async def pm_pro_fund_auto_collection(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Fund Auto-collection (USER_DATA).
@@ -5931,7 +5931,7 @@ class TradeHTTP(HTTPManager):
 
     async def pm_pro_fund_collection_by_asset(
         self, *, asset: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Fund Collection by Asset (USER_DATA).
@@ -5946,7 +5946,7 @@ class TradeHTTP(HTTPManager):
             "pm_pro_fund_collection_by_asset", self._params(asset=asset, recvWindow=recv_window)
         )
 
-    async def get_pm_pro_auto_repay_futures_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_pm_pro_auto_repay_futures_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get Auto-repay-futures Status (USER_DATA).
@@ -5961,7 +5961,7 @@ class TradeHTTP(HTTPManager):
             "get_pm_pro_auto_repay_futures_status", self._params(recvWindow=recv_window)
         )
 
-    async def get_pm_pro_delta_mode_status(self, *, recv_window: int | None = None) -> Any:
+    async def get_pm_pro_delta_mode_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get Delta Mode Status (USER_DATA).
@@ -5975,7 +5975,7 @@ class TradeHTTP(HTTPManager):
             "get_pm_pro_delta_mode_status", self._params(recvWindow=recv_window)
         )
 
-    async def get_pm_pro_margin_call_level(self, *, recv_window: int | None = None) -> Any:
+    async def get_pm_pro_margin_call_level(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get Margin Call Level (USER_DATA).
@@ -5992,7 +5992,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_pro_portfolio_margin_pro_account_balance(
         self, *, asset: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Portfolio Margin Pro Account Balance (USER_DATA).
@@ -6009,7 +6009,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_pro_portfolio_margin_pro_account_info(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Portfolio Margin Pro Account Info (USER_DATA).
@@ -6025,7 +6025,7 @@ class TradeHTTP(HTTPManager):
 
     async def get_pm_pro_portfolio_margin_pro_span_account_info(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Get Portfolio Margin Pro SPAN Account Info (USER_DATA).
@@ -6042,7 +6042,7 @@ class TradeHTTP(HTTPManager):
 
     async def pm_pro_portfolio_margin_pro_bankruptcy_loan_repay(
         self, *, var_from: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Portfolio Margin Pro Bankruptcy Loan Repay (TRADE).
@@ -6059,7 +6059,7 @@ class TradeHTTP(HTTPManager):
 
     async def query_pm_pro_portfolio_margin_pro_bankruptcy_loan_amount(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Portfolio Margin Pro Bankruptcy Loan Amount (USER_DATA).
@@ -6082,7 +6082,7 @@ class TradeHTTP(HTTPManager):
         size: int | None = None,
         current: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Portfolio Margin Pro Bankruptcy Loan Repay History (USER_DATA).
@@ -6112,7 +6112,7 @@ class TradeHTTP(HTTPManager):
         end_time: int | None = None,
         size: int | None = None,
         recv_window: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Portfolio Margin Pro Negative Balance Interest History (USER_DATA).
@@ -6136,7 +6136,7 @@ class TradeHTTP(HTTPManager):
 
     async def repay_pm_pro_futures_negative_balance(
         self, *, var_from: str | None = None, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Repay futures Negative Balance (USER_DATA).
@@ -6154,7 +6154,7 @@ class TradeHTTP(HTTPManager):
 
     async def set_pm_pro_margin_call_level(
         self, *, margin_call_level: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Set Margin Call Level (USER_DATA).
@@ -6172,7 +6172,7 @@ class TradeHTTP(HTTPManager):
 
     async def pm_pro_switch_delta_mode(
         self, *, delta_enabled: str, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Switch Delta Mode (TRADE).
@@ -6188,7 +6188,7 @@ class TradeHTTP(HTTPManager):
             self._params(deltaEnabled=delta_enabled, recvWindow=recv_window),
         )
 
-    async def get_pm_pro_portfolio_margin_asset_leverage(self) -> Any:
+    async def get_pm_pro_portfolio_margin_asset_leverage(self) -> Any:  # noqa: ANN401
         """
 
         Get Portfolio Margin Asset Leverage (USER_DATA).
@@ -6205,7 +6205,7 @@ class TradeHTTP(HTTPManager):
 
     async def pm_pro_portfolio_margin_pro_tiered_collateral_rate(
         self, *, recv_window: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Portfolio Margin Pro Tiered Collateral Rate (USER_DATA).
@@ -6219,4 +6219,1528 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "pm_pro_portfolio_margin_pro_tiered_collateral_rate",
             self._params(recvWindow=recv_window),
+        )
+
+    async def tradfi_options_contract(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        POST /eapi/v1/stock/contract.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/trade#tradfi-options-contract
+        """
+        return await self._native_private(
+            "tradfi_options_contract", self._params(recvWindow=recv_window)
+        )
+
+    async def get_cloud_mining_payment_and_refund_history(
+        self,
+        *,
+        start_time: int,
+        end_time: int,
+        tran_id: int | None = None,
+        client_tran_id: str | None = None,
+        asset: str | None = None,
+        current: int | None = None,
+        size: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/asset/ledger-transfer/cloud-mining/queryByPage.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/asset#get-cloud-mining-payment-and-refund-history
+        """
+        return await self._native_private(
+            "get_cloud_mining_payment_and_refund_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                tranId=tran_id,
+                clientTranId=client_tran_id,
+                asset=asset,
+                current=current,
+                size=size,
+            ),
+        )
+
+    async def query_user_delegation_history(
+        self,
+        *,
+        email: str,
+        start_time: int,
+        end_time: int,
+        type_: str | None = None,
+        asset: str | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/asset/custody/transfer-history.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/asset#query-user-delegation-history
+        """
+        return await self._native_private(
+            "query_user_delegation_history",
+            self._params(
+                email=email,
+                startTime=start_time,
+                endTime=end_time,
+                type=type_,
+                asset=asset,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def fetch_withdraw_address_list(self) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/capital/withdraw/address/list.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#fetch-withdraw-address-list
+        """
+        return await self._native_private("fetch_withdraw_address_list", self._params())
+
+    async def fetch_withdraw_quota(self) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/capital/withdraw/quota.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#fetch-withdraw-quota
+        """
+        return await self._native_private("fetch_withdraw_quota", self._params())
+
+    async def get_withdrawal_history(
+        self,
+        *,
+        coin: str | None = None,
+        withdraw_order_id: str | None = None,
+        status: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        id_list: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/capital/withdraw/history.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#withdraw-history
+        """
+        return await self._native_private(
+            "get_withdrawal_history",
+            self._params(
+                coin=coin,
+                withdrawOrderId=withdraw_order_id,
+                status=status,
+                offset=offset,
+                limit=limit,
+                idList=id_list,
+                startTime=start_time,
+                endTime=end_time,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def check_questionnaire_requirements(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/localentity/questionnaire-requirements.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#check-questionnaire-requirements
+        """
+        return await self._native_private(
+            "check_questionnaire_requirements", self._params(recvWindow=recv_window)
+        )
+
+    async def get_travel_rule_deposit_history(
+        self,
+        *,
+        tr_id: str | None = None,
+        tx_id: str | None = None,
+        tran_id: str | None = None,
+        network: str | None = None,
+        coin: str | None = None,
+        travel_rule_status: int | None = None,
+        pending_questionnaire: bool | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/localentity/deposit/history.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#deposit-history-travel-rule
+        """
+        return await self._native_private(
+            "get_travel_rule_deposit_history",
+            self._params(
+                trId=tr_id,
+                txId=tx_id,
+                tranId=tran_id,
+                network=network,
+                coin=coin,
+                travelRuleStatus=travel_rule_status,
+                pendingQuestionnaire=pending_questionnaire,
+                startTime=start_time,
+                endTime=end_time,
+                offset=offset,
+                limit=limit,
+            ),
+        )
+
+    async def get_travel_rule_deposit_history_v2(
+        self,
+        *,
+        deposit_id: int | None = None,
+        tx_id: str | None = None,
+        network: str | None = None,
+        coin: str | None = None,
+        retrieve_questionnaire: bool | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v2/localentity/deposit/history.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#deposit-history-v2
+        """
+        return await self._native_private(
+            "get_travel_rule_deposit_history_v2",
+            self._params(
+                depositId=deposit_id,
+                txId=tx_id,
+                network=network,
+                coin=coin,
+                retrieveQuestionnaire=retrieve_questionnaire,
+                startTime=start_time,
+                endTime=end_time,
+                offset=offset,
+                limit=limit,
+            ),
+        )
+
+    async def fetch_address_verification_list(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/addressVerify/list.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#fetch-address-verification-list
+        """
+        return await self._native_private(
+            "fetch_address_verification_list", self._params(recvWindow=recv_window)
+        )
+
+    async def get_country_list(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/localentity/country/list.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#get-country-list
+        """
+        return await self._native_private("get_country_list", self._params(recvWindow=recv_window))
+
+    async def get_region_list(self, *, country_code: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/localentity/region/list.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#get-region-list
+        """
+        return await self._native_private(
+            "get_region_list", self._params(countryCode=country_code, recvWindow=recv_window)
+        )
+
+    async def submit_deposit_questionnaire_travel_rule(
+        self, *, tran_id: int, questionnaire: str
+    ) -> Any:  # noqa: ANN401
+        """
+        PUT /sapi/v1/localentity/deposit/provide-info.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#submit-deposit-questionnaire-travel-rule
+        """
+        return await self._native_private(
+            "submit_deposit_questionnaire_travel_rule",
+            self._params(tranId=tran_id, questionnaire=questionnaire),
+        )
+
+    async def submit_deposit_questionnaire_v2(self, *, deposit_id: int, questionnaire: str) -> Any:  # noqa: ANN401
+        """
+        PUT /sapi/v2/localentity/deposit/provide-info.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#submit-deposit-questionnaire-v2
+        """
+        return await self._native_private(
+            "submit_deposit_questionnaire_v2",
+            self._params(depositId=deposit_id, questionnaire=questionnaire),
+        )
+
+    async def vasp_list(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/localentity/vasp.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#vasp-list
+        """
+        return await self._native_private("vasp_list", self._params(recvWindow=recv_window))
+
+    async def get_travel_rule_withdrawal_history(
+        self,
+        *,
+        tr_id: str | None = None,
+        tx_id: str | None = None,
+        withdraw_order_id: str | None = None,
+        network: str | None = None,
+        coin: str | None = None,
+        travel_rule_status: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/localentity/withdraw/history.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-history-v1
+        """
+        return await self._native_private(
+            "get_travel_rule_withdrawal_history",
+            self._params(
+                trId=tr_id,
+                txId=tx_id,
+                withdrawOrderId=withdraw_order_id,
+                network=network,
+                coin=coin,
+                travelRuleStatus=travel_rule_status,
+                offset=offset,
+                limit=limit,
+                startTime=start_time,
+                endTime=end_time,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_travel_rule_withdrawal_history_v2(
+        self,
+        *,
+        tr_id: str | None = None,
+        tx_id: str | None = None,
+        withdraw_order_id: str | None = None,
+        network: str | None = None,
+        coin: str | None = None,
+        travel_rule_status: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v2/localentity/withdraw/history.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-history-v2
+        """
+        return await self._native_private(
+            "get_travel_rule_withdrawal_history_v2",
+            self._params(
+                trId=tr_id,
+                txId=tx_id,
+                withdrawOrderId=withdraw_order_id,
+                network=network,
+                coin=coin,
+                travelRuleStatus=travel_rule_status,
+                offset=offset,
+                limit=limit,
+                startTime=start_time,
+                endTime=end_time,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_futures_lead_trader_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/copyTrading/futures/userStatus.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/advanced-trading-copy-trading/api/rest-api/future-copy-trading#get-futures-lead-trader-status
+        """
+        return await self._native_private(
+            "get_futures_lead_trader_status", self._params(recvWindow=recv_window)
+        )
+
+    async def get_futures_lead_trading_symbol_whitelist(
+        self, *, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/copyTrading/futures/leadSymbol.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/advanced-trading-copy-trading/api/rest-api/future-copy-trading#get-futures-lead-trading-symbol-whitelist
+        """
+        return await self._native_private(
+            "get_futures_lead_trading_symbol_whitelist", self._params(recvWindow=recv_window)
+        )
+
+    async def change_auto_compound_status(
+        self, *, position_id: str, auto_compound_plan: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/dci/product/auto_compound/edit-status.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-dual-investment/api/rest-api/trade#change-auto-compound-status
+        """
+        return await self._native_private(
+            "change_auto_compound_status",
+            self._params(
+                positionId=position_id, autoCompoundPlan=auto_compound_plan, recvWindow=recv_window
+            ),
+        )
+
+    async def check_dual_investment_accounts(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/dci/product/accounts.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-dual-investment/api/rest-api/trade#check-dual-investment-accounts
+        """
+        return await self._native_private(
+            "check_dual_investment_accounts", self._params(recvWindow=recv_window)
+        )
+
+    async def get_dual_investment_positions(
+        self,
+        *,
+        status: str | None = None,
+        page_size: int | None = None,
+        page_index: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/dci/product/positions.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-dual-investment/api/rest-api/trade#get-dual-investment-positions
+        """
+        return await self._native_private(
+            "get_dual_investment_positions",
+            self._params(
+                status=status, pageSize=page_size, pageIndex=page_index, recvWindow=recv_window
+            ),
+        )
+
+    async def subscribe_dual_investment_products(
+        self,
+        *,
+        id: str,
+        order_id: str,
+        deposit_amount: str,
+        auto_compound_plan: str,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/dci/product/subscribe.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-dual-investment/api/rest-api/trade#subscribe-dual-investment-products
+        """
+        return await self._native_private(
+            "subscribe_dual_investment_products",
+            self._params(
+                id=id,
+                orderId=order_id,
+                depositAmount=deposit_amount,
+                autoCompoundPlan=auto_compound_plan,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_bfusd_account(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/bfusd/account.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#get-bfusd-account
+        """
+        return await self._native_private("get_bfusd_account", self._params(recvWindow=recv_window))
+
+    async def get_bfusd_quota_details(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/bfusd/quota.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#get-bfusd-quota-details
+        """
+        return await self._native_private(
+            "get_bfusd_quota_details", self._params(recvWindow=recv_window)
+        )
+
+    async def get_bfusd_rate_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/bfusd/history/rateHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#get-bfusd-rate-history
+        """
+        return await self._native_private(
+            "get_bfusd_rate_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_bfusd_redemption_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/bfusd/history/redemptionHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#get-bfusd-redemption-history
+        """
+        return await self._native_private(
+            "get_bfusd_redemption_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_bfusd_rewards_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/bfusd/history/rewardsHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#get-bfusd-rewards-history
+        """
+        return await self._native_private(
+            "get_bfusd_rewards_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_bfusd_subscription_history(
+        self,
+        *,
+        asset: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/bfusd/history/subscriptionHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#get-bfusd-subscription-history
+        """
+        return await self._native_private(
+            "get_bfusd_subscription_history",
+            self._params(
+                asset=asset,
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def redeem_bfusd(self, *, amount: str, type_: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/bfusd/redeem.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#redeem-bfusd
+        """
+        return await self._native_private(
+            "redeem_bfusd", self._params(amount=amount, type=type_, recvWindow=recv_window)
+        )
+
+    async def subscribe_bfusd(
+        self, *, asset: str, amount: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/bfusd/subscribe.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/bfusd#subscribe-bfusd
+        """
+        return await self._native_private(
+            "subscribe_bfusd", self._params(asset=asset, amount=amount, recvWindow=recv_window)
+        )
+
+    async def get_collateral_record(
+        self,
+        *,
+        product_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/simple-earn/flexible/history/collateralRecord.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#get-collateral-record
+        """
+        return await self._native_private(
+            "get_collateral_record",
+            self._params(
+                productId=product_id,
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_flexible_personal_left_quota(
+        self, *, product_id: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/simple-earn/flexible/personalLeftQuota.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#get-flexible-personal-left-quota
+        """
+        return await self._native_private(
+            "get_flexible_personal_left_quota",
+            self._params(productId=product_id, recvWindow=recv_window),
+        )
+
+    async def get_flexible_subscription_preview(
+        self, *, product_id: str, amount: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/simple-earn/flexible/subscriptionPreview.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#get-flexible-subscription-preview
+        """
+        return await self._native_private(
+            "get_flexible_subscription_preview",
+            self._params(productId=product_id, amount=amount, recvWindow=recv_window),
+        )
+
+    async def get_locked_personal_left_quota(
+        self, *, project_id: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/simple-earn/locked/personalLeftQuota.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#get-locked-personal-left-quota
+        """
+        return await self._native_private(
+            "get_locked_personal_left_quota",
+            self._params(projectId=project_id, recvWindow=recv_window),
+        )
+
+    async def get_locked_subscription_preview(
+        self,
+        *,
+        project_id: str,
+        amount: str,
+        auto_subscribe: bool | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/simple-earn/locked/subscriptionPreview.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#get-locked-subscription-preview
+        """
+        return await self._native_private(
+            "get_locked_subscription_preview",
+            self._params(
+                projectId=project_id,
+                amount=amount,
+                autoSubscribe=auto_subscribe,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_flexible_rate_history(
+        self,
+        *,
+        product_id: str,
+        apr_period: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/simple-earn/flexible/history/rateHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#get-rate-history
+        """
+        return await self._native_private(
+            "get_flexible_rate_history",
+            self._params(
+                productId=product_id,
+                aprPeriod=apr_period,
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def set_flexible_auto_subscribe(
+        self, *, product_id: str, auto_subscribe: bool, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/simple-earn/flexible/setAutoSubscribe.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#set-flexible-auto-subscribe
+        """
+        return await self._native_private(
+            "set_flexible_auto_subscribe",
+            self._params(
+                productId=product_id, autoSubscribe=auto_subscribe, recvWindow=recv_window
+            ),
+        )
+
+    async def set_locked_auto_subscribe(
+        self, *, position_id: str, auto_subscribe: bool, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/simple-earn/locked/setAutoSubscribe.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#set-locked-auto-subscribe
+        """
+        return await self._native_private(
+            "set_locked_auto_subscribe",
+            self._params(
+                positionId=position_id, autoSubscribe=auto_subscribe, recvWindow=recv_window
+            ),
+        )
+
+    async def set_locked_product_redeem_option(
+        self, *, position_id: str, redeem_to: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/simple-earn/locked/setRedeemOption.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/flexible-locked#set-locked-product-redeem-option
+        """
+        return await self._native_private(
+            "set_locked_product_redeem_option",
+            self._params(positionId=position_id, redeemTo=redeem_to, recvWindow=recv_window),
+        )
+
+    async def get_rwusd_account(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/rwusd/account.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#get-rwusd-account
+        """
+        return await self._native_private("get_rwusd_account", self._params(recvWindow=recv_window))
+
+    async def get_rwusd_quota_details(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/rwusd/quota.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#get-rwusd-quota-details
+        """
+        return await self._native_private(
+            "get_rwusd_quota_details", self._params(recvWindow=recv_window)
+        )
+
+    async def get_rwusd_rate_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/rwusd/history/rateHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#get-rwusd-rate-history
+        """
+        return await self._native_private(
+            "get_rwusd_rate_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_rwusd_redemption_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/rwusd/history/redemptionHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#get-rwusd-redemption-history
+        """
+        return await self._native_private(
+            "get_rwusd_redemption_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_rwusd_rewards_history(
+        self,
+        *,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/rwusd/history/rewardsHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#get-rwusd-rewards-history
+        """
+        return await self._native_private(
+            "get_rwusd_rewards_history",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_rwusd_subscription_history(
+        self,
+        *,
+        asset: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        current: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/rwusd/history/subscriptionHistory.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#get-rwusd-subscription-history
+        """
+        return await self._native_private(
+            "get_rwusd_subscription_history",
+            self._params(
+                asset=asset,
+                startTime=start_time,
+                endTime=end_time,
+                current=current,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def redeem_rwusd(self, *, amount: str, type_: str, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/rwusd/redeem.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#redeem-rwusd
+        """
+        return await self._native_private(
+            "redeem_rwusd", self._params(amount=amount, type=type_, recvWindow=recv_window)
+        )
+
+    async def subscribe_rwusd(
+        self, *, asset: str, amount: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/rwusd/subscribe.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/rwusd#subscribe-rwusd
+        """
+        return await self._native_private(
+            "subscribe_rwusd", self._params(asset=asset, amount=amount, recvWindow=recv_window)
+        )
+
+    async def get_yield_arena_activities(
+        self, *, lang: str | None = None, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/earn/arena/activities.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-simple-earn/api/rest-api/yield-arena#get-yield-arena-activities
+        """
+        return await self._native_private(
+            "get_yield_arena_activities", self._params(lang=lang, recvWindow=recv_window)
+        )
+
+    async def create_a_virtual_sub_account(
+        self, *, sub_account_string: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/sub-account/virtualSubAccount.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/account-management#create-avirtual-sub-account
+        """
+        return await self._native_private(
+            "create_a_virtual_sub_account",
+            self._params(subAccountString=sub_account_string, recvWindow=recv_window),
+        )
+
+    async def enable_futures_for_sub_account(
+        self, *, email: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/sub-account/futures/enable.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/account-management#enable-futures-for-sub-account
+        """
+        return await self._native_private(
+            "enable_futures_for_sub_account", self._params(email=email, recvWindow=recv_window)
+        )
+
+    async def enable_options_for_sub_account(
+        self, *, email: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/sub-account/eoptions/enable.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/account-management#enable-options-for-sub-account
+        """
+        return await self._native_private(
+            "enable_options_for_sub_account", self._params(email=email, recvWindow=recv_window)
+        )
+
+    async def add_ip_restriction_for_sub_account_api_key(
+        self,
+        *,
+        email: str,
+        sub_account_api_key: str,
+        status: int,
+        ip_address: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v2/sub-account/subAccountApi/ipRestriction.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/api-management#add-ip-restriction-for-sub-account-api-key
+        """
+        return await self._native_private(
+            "add_ip_restriction_for_sub_account_api_key",
+            self._params(
+                email=email,
+                subAccountApiKey=sub_account_api_key,
+                status=status,
+                ipAddress=ip_address,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def create_sub_account_api_key(
+        self,
+        *,
+        email: str,
+        api_name: str,
+        status: int,
+        can_trade: bool | None = None,
+        can_margin_loan_repay: bool | None = None,
+        can_futures_trade: bool | None = None,
+        can_universal_transfer: bool | None = None,
+        can_vanilla_options: bool | None = None,
+        ip_address: str | None = None,
+        third_party_name: str | None = None,
+        public_key: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/sub-account/subAccountApi.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/api-management#create-sub-account-api-key
+        """
+        return await self._native_private(
+            "create_sub_account_api_key",
+            self._params(
+                email=email,
+                apiName=api_name,
+                status=status,
+                canTrade=can_trade,
+                canMarginLoanRepay=can_margin_loan_repay,
+                canFuturesTrade=can_futures_trade,
+                canUniversalTransfer=can_universal_transfer,
+                canVanillaOptions=can_vanilla_options,
+                ipAddress=ip_address,
+                thirdPartyName=third_party_name,
+                publicKey=public_key,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def delete_ip_list_for_a_sub_account_api_key(
+        self,
+        *,
+        email: str,
+        sub_account_api_key: str,
+        ip_address: str,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        DELETE /sapi/v1/sub-account/subAccountApi/ipRestriction/ipList.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/api-management#delete-ip-list-for-asub-account-api-key
+        """
+        return await self._native_private(
+            "delete_ip_list_for_a_sub_account_api_key",
+            self._params(
+                email=email,
+                subAccountApiKey=sub_account_api_key,
+                ipAddress=ip_address,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def delete_sub_account_api_key(
+        self, *, email: str, sub_account_api_key: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        DELETE /sapi/v1/sub-account/subAccountApi.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/api-management#delete-sub-account-api-key
+        """
+        return await self._native_private(
+            "delete_sub_account_api_key",
+            self._params(email=email, subAccountApiKey=sub_account_api_key, recvWindow=recv_window),
+        )
+
+    async def get_ip_restriction_for_a_sub_account_api_key(
+        self, *, email: str, sub_account_api_key: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/sub-account/subAccountApi/ipRestriction.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/api-management#get-ip-restriction-for-asub-account-api-key
+        """
+        return await self._native_private(
+            "get_ip_restriction_for_a_sub_account_api_key",
+            self._params(email=email, subAccountApiKey=sub_account_api_key, recvWindow=recv_window),
+        )
+
+    async def modify_sub_account_api_key_permission(
+        self,
+        *,
+        email: str,
+        sub_account_api_key: str,
+        can_trade: bool | None = None,
+        can_margin_loan_repay: bool | None = None,
+        can_futures_trade: bool | None = None,
+        can_universal_transfer: bool | None = None,
+        can_vanilla_options: bool | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/sub-account/subAccountApiPermission.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/api-management#modify-sub-account-api-key-permission
+        """
+        return await self._native_private(
+            "modify_sub_account_api_key_permission",
+            self._params(
+                email=email,
+                subAccountApiKey=sub_account_api_key,
+                canTrade=can_trade,
+                canMarginLoanRepay=can_margin_loan_repay,
+                canFuturesTrade=can_futures_trade,
+                canUniversalTransfer=can_universal_transfer,
+                canVanillaOptions=can_vanilla_options,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def query_sub_account_api_key(
+        self,
+        *,
+        email: str,
+        sub_account_api_key: str | None = None,
+        page: int | None = None,
+        size: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/sub-account/subAccountApi.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/api-management#query-sub-account-api-key
+        """
+        return await self._native_private(
+            "query_sub_account_api_key",
+            self._params(
+                email=email,
+                subAccountApiKey=sub_account_api_key,
+                page=page,
+                size=size,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_move_position_history_for_sub_account(
+        self,
+        *,
+        symbol: str,
+        page: int,
+        rows: int,
+        product_type: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/sub-account/futures/move-position.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/asset-management#get-move-position-history-for-sub-account
+        """
+        return await self._native_private(
+            "get_move_position_history_for_sub_account",
+            self._params(
+                symbol=symbol,
+                page=page,
+                rows=rows,
+                productType=product_type,
+                startTime=start_time,
+                endTime=end_time,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_sub_account_deposit_address(
+        self,
+        *,
+        email: str,
+        coin: str,
+        network: str | None = None,
+        amount: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/capital/deposit/subAddress.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/asset-management#get-sub-account-deposit-address
+        """
+        return await self._native_private(
+            "get_sub_account_deposit_address",
+            self._params(
+                email=email, coin=coin, network=network, amount=amount, recvWindow=recv_window
+            ),
+        )
+
+    async def get_sub_account_deposit_history(
+        self,
+        *,
+        email: str,
+        include_source: bool | None = None,
+        coin: str | None = None,
+        status: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        recv_window: int | None = None,
+        tx_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/capital/deposit/subHisrec.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/asset-management#get-sub-account-deposit-history
+        """
+        return await self._native_private(
+            "get_sub_account_deposit_history",
+            self._params(
+                email=email,
+                includeSource=include_source,
+                coin=coin,
+                status=status,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+                offset=offset,
+                recvWindow=recv_window,
+                txId=tx_id,
+            ),
+        )
+
+    async def move_position_for_sub_account(
+        self,
+        *,
+        from_user_email: str,
+        to_user_email: str,
+        product_type: str,
+        order_args: list[dict[str, Any]],
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/sub-account/futures/move-position.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/asset-management#move-position-for-sub-account
+        """
+        return await self._native_private(
+            "move_position_for_sub_account",
+            self._params(
+                fromUserEmail=from_user_email,
+                toUserEmail=to_user_email,
+                productType=product_type,
+                orderArgs=dumps(order_args, separators=(",", ":"), allow_nan=False)
+                if order_args is not None
+                else None,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def deposit_assets_into_the_managed_sub_account(
+        self, *, to_email: str, asset: str, amount: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/managed-subaccount/deposit.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#deposit-assets-into-the-managed-sub-account
+        """
+        return await self._native_private(
+            "deposit_assets_into_the_managed_sub_account",
+            self._params(toEmail=to_email, asset=asset, amount=amount, recvWindow=recv_window),
+        )
+
+    async def get_managed_sub_account_deposit_address(
+        self,
+        *,
+        email: str,
+        coin: str,
+        network: str | None = None,
+        amount: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/deposit/address.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#get-managed-sub-account-deposit-address
+        """
+        return await self._native_private(
+            "get_managed_sub_account_deposit_address",
+            self._params(
+                email=email, coin=coin, network=network, amount=amount, recvWindow=recv_window
+            ),
+        )
+
+    async def query_managed_sub_account_asset_details(
+        self, *, email: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/asset.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-asset-details
+        """
+        return await self._native_private(
+            "query_managed_sub_account_asset_details",
+            self._params(email=email, recvWindow=recv_window),
+        )
+
+    async def query_managed_sub_account_futures_asset_details(
+        self, *, email: str, account_type: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/fetch-future-asset.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-futures-asset-details
+        """
+        return await self._native_private(
+            "query_managed_sub_account_futures_asset_details",
+            self._params(email=email, accountType=account_type),
+        )
+
+    async def query_managed_sub_account_list(
+        self,
+        *,
+        email: str | None = None,
+        page: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/info.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-list
+        """
+        return await self._native_private(
+            "query_managed_sub_account_list",
+            self._params(email=email, page=page, limit=limit, recvWindow=recv_window),
+        )
+
+    async def query_managed_sub_account_margin_asset_details(
+        self, *, email: str, account_type: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/marginAsset.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-margin-asset-details
+        """
+        return await self._native_private(
+            "query_managed_sub_account_margin_asset_details",
+            self._params(email=email, accountType=account_type),
+        )
+
+    async def query_managed_sub_account_snapshot(
+        self,
+        *,
+        email: str,
+        type_: str,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/accountSnapshot.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-snapshot
+        """
+        return await self._native_private(
+            "query_managed_sub_account_snapshot",
+            self._params(
+                email=email,
+                type=type_,
+                startTime=start_time,
+                endTime=end_time,
+                limit=limit,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def query_managed_sub_account_transfer_log_master_account_investor(
+        self,
+        *,
+        email: str,
+        start_time: int,
+        end_time: int,
+        page: int,
+        limit: int,
+        transfers: str | None = None,
+        transfer_function_account_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/queryTransLogForInvestor.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-transfer-log-master-account-investor
+        """
+        return await self._native_private(
+            "query_managed_sub_account_transfer_log_master_account_investor",
+            self._params(
+                email=email,
+                startTime=start_time,
+                endTime=end_time,
+                page=page,
+                limit=limit,
+                transfers=transfers,
+                transferFunctionAccountType=transfer_function_account_type,
+            ),
+        )
+
+    async def query_managed_sub_account_transfer_log_master_account_trading(
+        self,
+        *,
+        email: str,
+        start_time: int,
+        end_time: int,
+        page: int,
+        limit: int,
+        transfers: str | None = None,
+        transfer_function_account_type: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/queryTransLogForTradeParent.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-transfer-log-master-account-trading
+        """
+        return await self._native_private(
+            "query_managed_sub_account_transfer_log_master_account_trading",
+            self._params(
+                email=email,
+                startTime=start_time,
+                endTime=end_time,
+                page=page,
+                limit=limit,
+                transfers=transfers,
+                transferFunctionAccountType=transfer_function_account_type,
+            ),
+        )
+
+    async def query_managed_sub_account_transfer_log_sub_account_trading(
+        self,
+        *,
+        start_time: int,
+        end_time: int,
+        page: int,
+        limit: int,
+        transfers: str | None = None,
+        transfer_function_account_type: str | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/managed-subaccount/query-trans-log.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-transfer-log-sub-account-trading
+        """
+        return await self._native_private(
+            "query_managed_sub_account_transfer_log_sub_account_trading",
+            self._params(
+                startTime=start_time,
+                endTime=end_time,
+                page=page,
+                limit=limit,
+                transfers=transfers,
+                transferFunctionAccountType=transfer_function_account_type,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_transferable_earn_asset_balance_for_portfolio_margin(
+        self, *, asset: str, transfer_type: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/portfolio/earn-asset-balance.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/advanced-trading-derivatives-trading-portfolio-margin-pro/api/rest-api/account#get-transferable-earn-asset-balance-for-portfolio-margin
+        """
+        return await self._native_private(
+            "get_transferable_earn_asset_balance_for_portfolio_margin",
+            self._params(asset=asset, transferType=transfer_type, recvWindow=recv_window),
+        )
+
+    async def transfer_ldusdt_rwusd_for_portfolio_margin(
+        self, *, asset: str, transfer_type: str, amount: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        POST /sapi/v1/portfolio/earn-asset-transfer.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/advanced-trading-derivatives-trading-portfolio-margin-pro/api/rest-api/account#transfer-ldusdt-rwusd-for-portfolio-margin
+        """
+        return await self._native_private(
+            "transfer_ldusdt_rwusd_for_portfolio_margin",
+            self._params(
+                asset=asset, transferType=transfer_type, amount=amount, recvWindow=recv_window
+            ),
+        )
+
+    async def enable_isolated_margin_account(
+        self, *, symbol: str, recv_window: int | None = None
+    ) -> dict[str, Any]:
+        """Change availability of an existing isolated margin account for a symbol."""
+        return await self._native_private(
+            "enable_isolated_margin_account", self._params(symbol=symbol, recvWindow=recv_window)
+        )
+
+    async def disable_isolated_margin_account(
+        self, *, symbol: str, recv_window: int | None = None
+    ) -> dict[str, Any]:
+        """Change availability of an existing isolated margin account for a symbol."""
+        return await self._native_private(
+            "disable_isolated_margin_account", self._params(symbol=symbol, recvWindow=recv_window)
         )

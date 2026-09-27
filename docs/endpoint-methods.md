@@ -2,10 +2,11 @@
 
 **English** | [繁體中文](endpoint-methods.zh_tw.md)
 
-See [coverage status and limitations](endpoint-audit.md). These Python methods were added relative to the baseline commit `d0bbf8b0` baseline; sync/async clients share the Rust implementation.
+Public Python sync/async methods added relative to `d0bbf8b0`. Counts include aliases and signing helpers; they are not official endpoint counts. See [coverage and limitations](endpoint-audit.md).
 
 ## Binance
 
+- [`add_ip_restriction_for_sub_account_api_key`](../dcex/binance/_trade_http.py) — POST /sapi/v2/sub-account/subAccountApi/ipRestriction.
 - [`adjust_coin_futures_position_margin`](../dcex/binance/_trade_http.py) — POST /dapi/v1/positionMargin.
 - [`adjust_futures_position_margin`](../dcex/binance/_trade_http.py) — POST /fapi/v1/positionMargin.
 - [`adjust_margin_cross_margin_max_leverage`](../dcex/binance/_trade_http.py) — Adjust cross margin max leverage (USER_DATA).
@@ -14,31 +15,46 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`algo_time_weighted_average_price_future_algo`](../dcex/binance/_trade_http.py) — Time-Weighted Futures Average Price (Twap) New Order (TRADE).
 - [`algo_time_weighted_average_price_spot_algo`](../dcex/binance/_trade_http.py) — Time-Weighted Spot Average Price(Twap) New Order (TRADE).
 - [`algo_volume_participation_future_algo`](../dcex/binance/_trade_http.py) — Volume Participation (VP) New Order (TRADE).
-- [`amend_coin_futures_batch_orders`](../dcex/binance/_trade_http.py) — Amend a coin_futures batch; each response item may independently fail.
-- [`amend_coin_futures_order`](../dcex/binance/_trade_http.py) — Call ``PUT /dapi/v1/order`` with signed authentication.
-- [`amend_futures_batch_orders`](../dcex/binance/_trade_http.py) — Amend a futures batch; each response item may independently fail.
-- [`amend_futures_order`](../dcex/binance/_trade_http.py) — Call ``PUT /fapi/v1/order`` with signed authentication.
-- [`amend_spot_order_keep_priority`](../dcex/binance/_trade_http.py) — Call ``PUT /api/v3/order/amend/keepPriority`` with signed authentication.
-- [`cancel_coin_futures_batch_orders`](../dcex/binance/_trade_http.py) — Cancel a coin_futures batch; each response item may independently fail.
-- [`cancel_futures_batch_orders`](../dcex/binance/_trade_http.py) — Cancel a futures batch; each response item may independently fail.
+- [`amend_coin_futures_batch_orders`](../dcex/binance/_trade_http.py) — Amend a coin_futures batch; each response item may independently fail..
+- [`amend_coin_futures_order`](../dcex/binance/_trade_http.py) — Call ``PUT /dapi/v1/order`` with signed authentication..
+- [`amend_futures_batch_orders`](../dcex/binance/_trade_http.py) — Amend a futures batch; each response item may independently fail..
+- [`amend_futures_order`](../dcex/binance/_trade_http.py) — Call ``PUT /fapi/v1/order`` with signed authentication..
+- [`amend_spot_order_keep_priority`](../dcex/binance/_trade_http.py) — Call ``PUT /api/v3/order/amend/keepPriority`` with signed authentication..
+- [`cancel_coin_futures_batch_orders`](../dcex/binance/_trade_http.py) — Cancel a coin_futures batch; each response item may independently fail..
+- [`cancel_futures_batch_orders`](../dcex/binance/_trade_http.py) — Cancel a futures batch; each response item may independently fail..
 - [`cancel_margin_order_list`](../dcex/binance/_trade_http.py) — DELETE /sapi/v1/margin/orderList.
-- [`cancel_replace_spot_order`](../dcex/binance/_trade_http.py) — Cancel and replace an order; partial failures include both outcomes in the error.
-- [`cancel_spot_order_list`](../dcex/binance/_trade_http.py) — Call ``DELETE /api/v3/orderList`` with signed authentication.
+- [`cancel_replace_spot_order`](../dcex/binance/_trade_http.py) — Cancel and replace an order; partial failures include both outcomes in the error..
+- [`cancel_spot_order_list`](../dcex/binance/_trade_http.py) — Call ``DELETE /api/v3/orderList`` with signed authentication..
+- [`change_auto_compound_status`](../dcex/binance/_trade_http.py) — POST /sapi/v1/dci/product/auto_compound/edit-status.
 - [`change_pm_auto_repay_futures_status`](../dcex/binance/_trade_http.py) — Change Auto-repay-futures Status (TRADE).
 - [`change_pm_pro_auto_repay_futures_status`](../dcex/binance/_trade_http.py) — Change Auto-repay-futures Status (TRADE).
-- [`close_coin_futures_listen_key`](../dcex/binance/_trade_http.py) — DELETE /dapi/v1/listenKey; uses the account API key without a signature.
+- [`check_dual_investment_accounts`](../dcex/binance/_trade_http.py) — GET /sapi/v1/dci/product/accounts.
+- [`check_questionnaire_requirements`](../dcex/binance/_trade_http.py) — GET /sapi/v1/localentity/questionnaire-requirements.
+- [`close_coin_futures_listen_key`](../dcex/binance/_trade_http.py) — DELETE /dapi/v1/listenKey; uses the account API key without a signature..
 - [`close_margin_listen_key`](../dcex/binance/_trade_http.py) — DELETE /sapi/v1/margin/listen-key.
-- [`close_pm_listen_key`](../dcex/binance/_trade_http.py) — DELETE /papi/v1/listenKey; uses the account API key without a signature.
+- [`close_pm_listen_key`](../dcex/binance/_trade_http.py) — DELETE /papi/v1/listenKey; uses the account API key without a signature..
 - [`coin_futures_old_trades_lookup`](../dcex/binance/_market_http.py) — Old Trades Lookup (MARKET_DATA).
 - [`coin_futures_taker_buy_sell_volume`](../dcex/binance/_market_http.py) — Taker Buy/Sell Volume.
 - [`coin_futures_test_connectivity`](../dcex/binance/_market_http.py) — Test Connectivity.
-- [`create_coin_futures_listen_key`](../dcex/binance/_trade_http.py) — POST /dapi/v1/listenKey; uses the account API key without a signature.
+- [`create_a_virtual_sub_account`](../dcex/binance/_trade_http.py) — POST /sapi/v1/sub-account/virtualSubAccount.
+- [`create_coin_futures_listen_key`](../dcex/binance/_trade_http.py) — POST /dapi/v1/listenKey; uses the account API key without a signature..
 - [`create_margin_listen_key`](../dcex/binance/_trade_http.py) — POST /sapi/v1/margin/listen-key.
 - [`create_margin_special_key`](../dcex/binance/_trade_http.py) — Create Special Key(Low-Latency Trading) (TRADE).
-- [`create_pm_listen_key`](../dcex/binance/_trade_http.py) — POST /papi/v1/listenKey; uses the account API key without a signature.
+- [`create_pm_listen_key`](../dcex/binance/_trade_http.py) — POST /papi/v1/listenKey; uses the account API key without a signature..
+- [`create_sub_account_api_key`](../dcex/binance/_trade_http.py) — POST /sapi/v1/sub-account/subAccountApi.
+- [`delete_ip_list_for_a_sub_account_api_key`](../dcex/binance/_trade_http.py) — DELETE /sapi/v1/sub-account/subAccountApi/ipRestriction/ipList.
 - [`delete_margin_special_key`](../dcex/binance/_trade_http.py) — Delete Special Key(Low-Latency Trading) (TRADE).
 - [`delete_pm_pro_margin_call_level`](../dcex/binance/_trade_http.py) — Delete Margin Call Level (USER_DATA).
+- [`delete_sub_account_api_key`](../dcex/binance/_trade_http.py) — DELETE /sapi/v1/sub-account/subAccountApi.
+- [`deposit_assets_into_the_managed_sub_account`](../dcex/binance/_trade_http.py) — POST /sapi/v1/managed-subaccount/deposit.
+- [`disable_isolated_margin_account`](../dcex/binance/_trade_http.py) — Change availability of an existing isolated margin account for a symbol..
 - [`edit_margin_ip_for_special_key`](../dcex/binance/_trade_http.py) — Edit ip for Special Key(Low-Latency Trading) (TRADE).
+- [`enable_futures_for_sub_account`](../dcex/binance/_trade_http.py) — POST /sapi/v1/sub-account/futures/enable.
+- [`enable_isolated_margin_account`](../dcex/binance/_trade_http.py) — Change availability of an existing isolated margin account for a symbol..
+- [`enable_options_for_sub_account`](../dcex/binance/_trade_http.py) — POST /sapi/v1/sub-account/eoptions/enable.
+- [`fetch_address_verification_list`](../dcex/binance/_trade_http.py) — GET /sapi/v1/addressVerify/list.
+- [`fetch_withdraw_address_list`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/withdraw/address/list.
+- [`fetch_withdraw_quota`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/withdraw/quota.
 - [`futures_accept_the_offered_quote`](../dcex/binance/_trade_http.py) — Accept the offered quote (USER_DATA).
 - [`futures_adl_risk`](../dcex/binance/_market_http.py) — ADL Risk.
 - [`futures_asset_index`](../dcex/binance/_market_http.py) — Multi-Assets Mode Asset Index.
@@ -56,11 +72,18 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_account_status`](../dcex/binance/_trade_http.py) — GET /sapi/v1/account/status.
 - [`get_account_trading_status`](../dcex/binance/_trade_http.py) — GET /sapi/v1/account/apiTradingStatus.
 - [`get_api_key_permissions`](../dcex/binance/_trade_http.py) — GET /sapi/v1/account/apiRestrictions.
+- [`get_bfusd_account`](../dcex/binance/_trade_http.py) — GET /sapi/v1/bfusd/account.
+- [`get_bfusd_quota_details`](../dcex/binance/_trade_http.py) — GET /sapi/v1/bfusd/quota.
+- [`get_bfusd_rate_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/bfusd/history/rateHistory.
+- [`get_bfusd_redemption_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/bfusd/history/redemptionHistory.
+- [`get_bfusd_rewards_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/bfusd/history/rewardsHistory.
+- [`get_bfusd_subscription_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/bfusd/history/subscriptionHistory.
+- [`get_cloud_mining_payment_and_refund_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/asset/ledger-transfer/cloud-mining/queryByPage.
 - [`get_coin_futures_24h_ticker`](../dcex/binance/_market_http.py) — GET /dapi/v1/ticker/24hr.
-- [`get_coin_futures_account_trades`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/userTrades`` with signed authentication.
+- [`get_coin_futures_account_trades`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/userTrades`` with signed authentication..
 - [`get_coin_futures_adl_quantiles`](../dcex/binance/_trade_http.py) — GET /dapi/v1/adlQuantile.
 - [`get_coin_futures_aggregate_trades`](../dcex/binance/_market_http.py) — GET /dapi/v1/aggTrades.
-- [`get_coin_futures_all_orders`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/allOrders`` with signed authentication.
+- [`get_coin_futures_all_orders`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/allOrders`` with signed authentication..
 - [`get_coin_futures_book_ticker`](../dcex/binance/_market_http.py) — GET /dapi/v1/ticker/bookTicker.
 - [`get_coin_futures_commission_rate`](../dcex/binance/_trade_http.py) — GET /dapi/v1/commissionRate.
 - [`get_coin_futures_continuous_klines`](../dcex/binance/_market_http.py) — GET /dapi/v1/continuousKlines.
@@ -74,17 +97,24 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_coin_futures_futures_transaction_history_download_link_by_id`](../dcex/binance/_trade_http.py) — Get Futures Transaction History Download Link by Id (USER_DATA).
 - [`get_coin_futures_income_history`](../dcex/binance/_trade_http.py) — GET /dapi/v1/income.
 - [`get_coin_futures_index_price_klines`](../dcex/binance/_market_http.py) — GET /dapi/v1/indexPriceKlines.
-- [`get_coin_futures_leverage_brackets`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v2/leverageBracket`` with signed authentication.
+- [`get_coin_futures_leverage_brackets`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v2/leverageBracket`` with signed authentication..
 - [`get_coin_futures_mark_price_klines`](../dcex/binance/_market_http.py) — GET /dapi/v1/markPriceKlines.
 - [`get_coin_futures_open_interest`](../dcex/binance/_market_http.py) — GET /dapi/v1/openInterest.
 - [`get_coin_futures_order_modify_history`](../dcex/binance/_trade_http.py) — Get Order Modify History (USER_DATA).
-- [`get_coin_futures_pair_leverage_brackets`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/leverageBracket`` with signed authentication.
+- [`get_coin_futures_pair_leverage_brackets`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/leverageBracket`` with signed authentication..
 - [`get_coin_futures_position_margin_change_history`](../dcex/binance/_trade_http.py) — Get Position Margin Change History (TRADE).
-- [`get_coin_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/positionSide/dual`` with signed authentication.
+- [`get_coin_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/positionSide/dual`` with signed authentication..
 - [`get_coin_futures_premium_index_klines`](../dcex/binance/_market_http.py) — GET /dapi/v1/premiumIndexKlines.
 - [`get_coin_network_config`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/config/getall.
+- [`get_collateral_record`](../dcex/binance/_trade_http.py) — GET /sapi/v1/simple-earn/flexible/history/collateralRecord.
+- [`get_country_list`](../dcex/binance/_trade_http.py) — GET /sapi/v1/localentity/country/list.
 - [`get_deposit_address`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/deposit/address.
 - [`get_deposit_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/deposit/hisrec.
+- [`get_dual_investment_positions`](../dcex/binance/_trade_http.py) — GET /sapi/v1/dci/product/positions.
+- [`get_dual_investment_product_list`](../dcex/binance/_market_http.py) — GET /sapi/v1/dci/product/list.
+- [`get_flexible_personal_left_quota`](../dcex/binance/_trade_http.py) — GET /sapi/v1/simple-earn/flexible/personalLeftQuota.
+- [`get_flexible_rate_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/simple-earn/flexible/history/rateHistory.
+- [`get_flexible_subscription_preview`](../dcex/binance/_trade_http.py) — GET /sapi/v1/simple-earn/flexible/subscriptionPreview.
 - [`get_futures_24h_ticker`](../dcex/binance/_market_http.py) — GET /fapi/v1/ticker/24hr.
 - [`get_futures_account_config`](../dcex/binance/_trade_http.py) — GET /fapi/v1/accountConfig.
 - [`get_futures_adl_quantiles`](../dcex/binance/_trade_http.py) — GET /fapi/v1/adlQuantile.
@@ -100,19 +130,25 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_futures_futures_trade_download_link_by_id`](../dcex/binance/_trade_http.py) — Get Futures Trade Download Link by Id (USER_DATA).
 - [`get_futures_futures_transaction_history_download_link_by_id`](../dcex/binance/_trade_http.py) — Get Futures Transaction History Download Link by Id (USER_DATA).
 - [`get_futures_index_price_klines`](../dcex/binance/_market_http.py) — GET /fapi/v1/indexPriceKlines.
-- [`get_futures_leverage_brackets`](../dcex/binance/_trade_http.py) — Call ``GET /fapi/v1/leverageBracket`` with signed authentication.
+- [`get_futures_lead_trader_status`](../dcex/binance/_trade_http.py) — GET /sapi/v1/copyTrading/futures/userStatus.
+- [`get_futures_lead_trading_symbol_whitelist`](../dcex/binance/_trade_http.py) — GET /sapi/v1/copyTrading/futures/leadSymbol.
+- [`get_futures_leverage_brackets`](../dcex/binance/_trade_http.py) — Call ``GET /fapi/v1/leverageBracket`` with signed authentication..
 - [`get_futures_mark_price_klines`](../dcex/binance/_market_http.py) — GET /fapi/v1/markPriceKlines.
 - [`get_futures_multi_assets_mode`](../dcex/binance/_trade_http.py) — GET /fapi/v1/multiAssetsMargin.
 - [`get_futures_order_modify_history`](../dcex/binance/_trade_http.py) — Get Order Modify History (USER_DATA).
 - [`get_futures_order_rate_limits`](../dcex/binance/_trade_http.py) — GET /fapi/v1/rateLimit/order.
 - [`get_futures_position_margin_change_history`](../dcex/binance/_trade_http.py) — Get Position Margin Change History (TRADE).
-- [`get_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``GET /fapi/v1/positionSide/dual`` with signed authentication.
+- [`get_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``GET /fapi/v1/positionSide/dual`` with signed authentication..
 - [`get_futures_premium_index_klines`](../dcex/binance/_market_http.py) — GET /fapi/v1/premiumIndexKlines.
 - [`get_futures_price_ticker`](../dcex/binance/_market_http.py) — GET /fapi/v2/ticker/price.
 - [`get_futures_price_ticker_v1`](../dcex/binance/_market_http.py) — GET /fapi/v1/ticker/price.
 - [`get_futures_recent_trades`](../dcex/binance/_market_http.py) — GET /fapi/v1/trades.
 - [`get_futures_symbol_config`](../dcex/binance/_trade_http.py) — GET /fapi/v1/symbolConfig.
 - [`get_futures_trading_status`](../dcex/binance/_trade_http.py) — GET /fapi/v1/apiTradingStatus.
+- [`get_ip_restriction_for_a_sub_account_api_key`](../dcex/binance/_trade_http.py) — GET /sapi/v1/sub-account/subAccountApi/ipRestriction.
+- [`get_locked_personal_left_quota`](../dcex/binance/_trade_http.py) — GET /sapi/v1/simple-earn/locked/personalLeftQuota.
+- [`get_locked_subscription_preview`](../dcex/binance/_trade_http.py) — GET /sapi/v1/simple-earn/locked/subscriptionPreview.
+- [`get_managed_sub_account_deposit_address`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/deposit/address.
 - [`get_margin_all_order_lists`](../dcex/binance/_trade_http.py) — GET /sapi/v1/margin/allOrderList.
 - [`get_margin_bnb_burn_status`](../dcex/binance/_trade_http.py) — Get BNB Burn Status (USER_DATA).
 - [`get_margin_capital_flow`](../dcex/binance/_trade_http.py) — GET /sapi/v1/margin/capital-flow.
@@ -130,6 +166,7 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_margin_risk_coefficients`](../dcex/binance/_trade_http.py) — GET /sapi/v1/margin/tradeCoeff.
 - [`get_margin_small_liability_exchange_coin_list`](../dcex/binance/_trade_http.py) — Get Small Liability Exchange Coin List (USER_DATA).
 - [`get_margin_small_liability_exchange_history`](../dcex/binance/_trade_http.py) — Get Small Liability Exchange History (USER_DATA).
+- [`get_move_position_history_for_sub_account`](../dcex/binance/_trade_http.py) — GET /sapi/v1/sub-account/futures/move-position.
 - [`get_pm_auto_repay_futures_status`](../dcex/binance/_trade_http.py) — Get Auto-repay-futures Status (USER_DATA).
 - [`get_pm_coin_commission_rate`](../dcex/binance/_trade_http.py) — GET /papi/v1/cm/commissionRate.
 - [`get_pm_coin_income_history`](../dcex/binance/_trade_http.py) — GET /papi/v1/cm/income.
@@ -155,30 +192,48 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_pm_um_futures_order_download_link_by_id`](../dcex/binance/_trade_http.py) — Get UM Futures Order Download Link by Id (USER_DATA).
 - [`get_pm_um_futures_trade_download_link_by_id`](../dcex/binance/_trade_http.py) — Get UM Futures Trade Download Link by Id (USER_DATA).
 - [`get_pm_um_futures_transaction_download_link_by_id`](../dcex/binance/_trade_http.py) — Get UM Futures Transaction Download Link by Id (USER_DATA).
+- [`get_region_list`](../dcex/binance/_trade_http.py) — GET /sapi/v1/localentity/region/list.
+- [`get_rwusd_account`](../dcex/binance/_trade_http.py) — GET /sapi/v1/rwusd/account.
+- [`get_rwusd_quota_details`](../dcex/binance/_trade_http.py) — GET /sapi/v1/rwusd/quota.
+- [`get_rwusd_rate_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/rwusd/history/rateHistory.
+- [`get_rwusd_redemption_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/rwusd/history/redemptionHistory.
+- [`get_rwusd_rewards_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/rwusd/history/rewardsHistory.
+- [`get_rwusd_subscription_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/rwusd/history/subscriptionHistory.
 - [`get_spot_24h_ticker`](../dcex/binance/_market_http.py) — GET /api/v3/ticker/24hr.
 - [`get_spot_aggregate_trades`](../dcex/binance/_market_http.py) — GET /api/v3/aggTrades.
-- [`get_spot_all_order_lists`](../dcex/binance/_trade_http.py) — Call ``GET /api/v3/allOrderList`` with signed authentication.
+- [`get_spot_all_order_lists`](../dcex/binance/_trade_http.py) — Call ``GET /api/v3/allOrderList`` with signed authentication..
 - [`get_spot_average_price`](../dcex/binance/_market_http.py) — GET /api/v3/avgPrice.
 - [`get_spot_book_ticker`](../dcex/binance/_market_http.py) — GET /api/v3/ticker/bookTicker.
 - [`get_spot_delist_schedule`](../dcex/binance/_market_http.py) — GET /sapi/v1/spot/delist-schedule.
-- [`get_spot_open_order_lists`](../dcex/binance/_trade_http.py) — Call ``GET /api/v3/openOrderList`` with signed authentication.
-- [`get_spot_order_list`](../dcex/binance/_trade_http.py) — Call ``GET /api/v3/orderList`` with signed authentication.
+- [`get_spot_open_order_lists`](../dcex/binance/_trade_http.py) — Call ``GET /api/v3/openOrderList`` with signed authentication..
+- [`get_spot_order_list`](../dcex/binance/_trade_http.py) — Call ``GET /api/v3/orderList`` with signed authentication..
 - [`get_spot_trade_fees`](../dcex/binance/_trade_http.py) — GET /sapi/v1/asset/tradeFee.
+- [`get_sub_account_deposit_address`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/deposit/subAddress.
+- [`get_sub_account_deposit_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/deposit/subHisrec.
 - [`get_system_status`](../dcex/binance/_market_http.py) — GET /sapi/v1/system/status.
+- [`get_transferable_earn_asset_balance_for_portfolio_margin`](../dcex/binance/_trade_http.py) — GET /sapi/v1/portfolio/earn-asset-balance.
+- [`get_travel_rule_deposit_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/localentity/deposit/history.
+- [`get_travel_rule_deposit_history_v2`](../dcex/binance/_trade_http.py) — GET /sapi/v2/localentity/deposit/history.
+- [`get_travel_rule_withdrawal_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/localentity/withdraw/history.
+- [`get_travel_rule_withdrawal_history_v2`](../dcex/binance/_trade_http.py) — GET /sapi/v2/localentity/withdraw/history.
 - [`get_user_assets`](../dcex/binance/_trade_http.py) — POST /sapi/v3/asset/getUserAsset.
 - [`get_wallet_assets_that_can_be_converted_into_bnb`](../dcex/binance/_trade_http.py) — Get Assets That Can Be Converted Into BNB (USER_DATA).
 - [`get_wallet_open_symbol_list`](../dcex/binance/_market_http.py) — Get Open Symbol List (MARKET_DATA).
 - [`get_wallet_spot_asset_tags`](../dcex/binance/_market_http.py) — Get Spot Asset Tags (MARKET_DATA).
-- [`keep_alive_coin_futures_listen_key`](../dcex/binance/_trade_http.py) — PUT /dapi/v1/listenKey; uses the account API key without a signature.
+- [`get_withdrawal_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/capital/withdraw/history.
+- [`get_yield_arena_activities`](../dcex/binance/_trade_http.py) — GET /sapi/v1/earn/arena/activities.
+- [`keep_alive_coin_futures_listen_key`](../dcex/binance/_trade_http.py) — PUT /dapi/v1/listenKey; uses the account API key without a signature..
 - [`keep_alive_margin_listen_key`](../dcex/binance/_trade_http.py) — PUT /sapi/v1/margin/listen-key.
-- [`keep_alive_pm_listen_key`](../dcex/binance/_trade_http.py) — PUT /papi/v1/listenKey; uses the account API key without a signature.
+- [`keep_alive_pm_listen_key`](../dcex/binance/_trade_http.py) — PUT /papi/v1/listenKey; uses the account API key without a signature..
 - [`margin_cross_margin_collateral_ratio`](../dcex/binance/_market_http.py) — Cross margin collateral ratio (MARKET_DATA).
 - [`margin_exit_special_key_mode`](../dcex/binance/_trade_http.py) — Exit Special Key Mode (TRADE).
 - [`margin_liquidation_loan_repay`](../dcex/binance/_trade_http.py) — Liquidation Loan Repay (MARGIN).
 - [`margin_margin_manual_liquidation`](../dcex/binance/_trade_http.py) — Margin Manual Liquidation (TRADE).
 - [`margin_small_liability_exchange`](../dcex/binance/_trade_http.py) — Small Liability Exchange (MARGIN).
-- [`place_coin_futures_batch_orders`](../dcex/binance/_trade_http.py) — Place a coin_futures batch; each response item may independently fail.
-- [`place_futures_batch_orders`](../dcex/binance/_trade_http.py) — Place a futures batch; each response item may independently fail.
+- [`modify_sub_account_api_key_permission`](../dcex/binance/_trade_http.py) — POST /sapi/v1/sub-account/subAccountApiPermission.
+- [`move_position_for_sub_account`](../dcex/binance/_trade_http.py) — POST /sapi/v1/sub-account/futures/move-position.
+- [`place_coin_futures_batch_orders`](../dcex/binance/_trade_http.py) — Place a coin_futures batch; each response item may independently fail..
+- [`place_futures_batch_orders`](../dcex/binance/_trade_http.py) — Place a futures batch; each response item may independently fail..
 - [`place_margin_oco`](../dcex/binance/_trade_http.py) — Both legs share quantity; cancelling either leg cancels the entire list.
 - [`place_margin_oto`](../dcex/binance/_trade_http.py) — Pending orders activate only after the working order fully fills.
 - [`place_margin_otoco`](../dcex/binance/_trade_http.py) — Pending orders activate only after the working order fully fills.
@@ -206,6 +261,14 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`query_coin_futures_index_price_constituents`](../dcex/binance/_market_http.py) — Query Index Price Constituents.
 - [`query_futures_index_price_constituents`](../dcex/binance/_market_http.py) — Query Index Price Constituents.
 - [`query_futures_insurance_fund_balance_snapshot`](../dcex/binance/_market_http.py) — Query Insurance Fund Balance Snapshot.
+- [`query_managed_sub_account_asset_details`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/asset.
+- [`query_managed_sub_account_futures_asset_details`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/fetch-future-asset.
+- [`query_managed_sub_account_list`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/info.
+- [`query_managed_sub_account_margin_asset_details`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/marginAsset.
+- [`query_managed_sub_account_snapshot`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/accountSnapshot.
+- [`query_managed_sub_account_transfer_log_master_account_investor`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/queryTransLogForInvestor.
+- [`query_managed_sub_account_transfer_log_master_account_trading`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/queryTransLogForTradeParent.
+- [`query_managed_sub_account_transfer_log_sub_account_trading`](../dcex/binance/_trade_http.py) — GET /sapi/v1/managed-subaccount/query-trans-log.
 - [`query_margin_cross_margin_fee_data`](../dcex/binance/_trade_http.py) — Query Cross Margin Fee Data (USER_DATA).
 - [`query_margin_enabled_isolated_margin_account_limit`](../dcex/binance/_trade_http.py) — Query Enabled Isolated Margin Account Limit (USER_DATA).
 - [`query_margin_isolated_margin_fee_data`](../dcex/binance/_trade_http.py) — Query Isolated Margin Fee Data (USER_DATA).
@@ -226,16 +289,23 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`query_pm_pro_portfolio_margin_pro_bankruptcy_loan_repay_history`](../dcex/binance/_trade_http.py) — Query Portfolio Margin Pro Bankruptcy Loan Repay History (USER_DATA).
 - [`query_pm_pro_portfolio_margin_pro_negative_balance_interest_history`](../dcex/binance/_trade_http.py) — Query Portfolio Margin Pro Negative Balance Interest History (USER_DATA).
 - [`query_pm_user_negative_balance_auto_exchange_record`](../dcex/binance/_trade_http.py) — Query User Negative Balance Auto Exchange Record (USER_DATA).
+- [`query_sub_account_api_key`](../dcex/binance/_trade_http.py) — GET /sapi/v1/sub-account/subAccountApi.
+- [`query_user_delegation_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/asset/custody/transfer-history.
+- [`redeem_bfusd`](../dcex/binance/_trade_http.py) — POST /sapi/v1/bfusd/redeem.
+- [`redeem_rwusd`](../dcex/binance/_trade_http.py) — POST /sapi/v1/rwusd/redeem.
 - [`repay_pm_futures_negative_balance`](../dcex/binance/_trade_http.py) — Repay futures Negative Balance (USER_DATA).
 - [`repay_pm_pro_futures_negative_balance`](../dcex/binance/_trade_http.py) — Repay futures Negative Balance (USER_DATA).
-- [`set_coin_futures_cancel_countdown`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/countdownCancelAll`` with signed authentication.
-- [`set_coin_futures_leverage`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/leverage`` with signed authentication.
-- [`set_coin_futures_margin_type`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/marginType`` with signed authentication.
-- [`set_coin_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/positionSide/dual`` with signed authentication.
-- [`set_futures_cancel_countdown`](../dcex/binance/_trade_http.py) — Call ``POST /fapi/v1/countdownCancelAll`` with signed authentication.
-- [`set_futures_margin_type`](../dcex/binance/_trade_http.py) — Call ``POST /fapi/v1/marginType`` with signed authentication.
+- [`set_coin_futures_cancel_countdown`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/countdownCancelAll`` with signed authentication..
+- [`set_coin_futures_leverage`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/leverage`` with signed authentication..
+- [`set_coin_futures_margin_type`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/marginType`` with signed authentication..
+- [`set_coin_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``POST /dapi/v1/positionSide/dual`` with signed authentication..
+- [`set_flexible_auto_subscribe`](../dcex/binance/_trade_http.py) — POST /sapi/v1/simple-earn/flexible/setAutoSubscribe.
+- [`set_futures_cancel_countdown`](../dcex/binance/_trade_http.py) — Call ``POST /fapi/v1/countdownCancelAll`` with signed authentication..
+- [`set_futures_margin_type`](../dcex/binance/_trade_http.py) — Call ``POST /fapi/v1/marginType`` with signed authentication..
 - [`set_futures_multi_assets_mode`](../dcex/binance/_trade_http.py) — POST /fapi/v1/multiAssetsMargin.
-- [`set_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``POST /fapi/v1/positionSide/dual`` with signed authentication.
+- [`set_futures_position_mode`](../dcex/binance/_trade_http.py) — Call ``POST /fapi/v1/positionSide/dual`` with signed authentication..
+- [`set_locked_auto_subscribe`](../dcex/binance/_trade_http.py) — POST /sapi/v1/simple-earn/locked/setAutoSubscribe.
+- [`set_locked_product_redeem_option`](../dcex/binance/_trade_http.py) — POST /sapi/v1/simple-earn/locked/setRedeemOption.
 - [`set_pm_pro_margin_call_level`](../dcex/binance/_trade_http.py) — Set Margin Call Level (USER_DATA).
 - [`spot_execution_rules`](../dcex/binance/_market_http.py) — Query Execution Rules.
 - [`spot_historical_block_trades`](../dcex/binance/_market_http.py) — Historical Block Trades (MARKET_DATA).
@@ -250,9 +320,17 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`spot_ticker`](../dcex/binance/_market_http.py) — Rolling window price change statistics.
 - [`spot_ticker_trading_day`](../dcex/binance/_market_http.py) — Trading Day Ticker.
 - [`spot_ui_klines`](../dcex/binance/_market_http.py) — UIKlines.
+- [`submit_deposit_questionnaire_travel_rule`](../dcex/binance/_trade_http.py) — PUT /sapi/v1/localentity/deposit/provide-info.
+- [`submit_deposit_questionnaire_v2`](../dcex/binance/_trade_http.py) — PUT /sapi/v2/localentity/deposit/provide-info.
+- [`subscribe_bfusd`](../dcex/binance/_trade_http.py) — POST /sapi/v1/bfusd/subscribe.
+- [`subscribe_dual_investment_products`](../dcex/binance/_trade_http.py) — POST /sapi/v1/dci/product/subscribe.
+- [`subscribe_rwusd`](../dcex/binance/_trade_http.py) — POST /sapi/v1/rwusd/subscribe.
 - [`toggle_futures_bnb_burn_on_futures_trade`](../dcex/binance/_trade_http.py) — Toggle BNB Burn On Futures Trade (TRADE).
 - [`toggle_pm_bnb_burn_on_um_futures_trade`](../dcex/binance/_trade_http.py) — Toggle BNB Burn On UM Futures Trade (TRADE).
 - [`toggle_wallet_bnb_burn_on_spot_trade_and_margin_interest`](../dcex/binance/_trade_http.py) — Toggle BNB Burn On Spot Trade And Margin Interest (USER_DATA).
+- [`tradfi_options_contract`](../dcex/binance/_trade_http.py) — POST /eapi/v1/stock/contract.
+- [`transfer_ldusdt_rwusd_for_portfolio_margin`](../dcex/binance/_trade_http.py) — POST /sapi/v1/portfolio/earn-asset-transfer.
+- [`vasp_list`](../dcex/binance/_trade_http.py) — GET /sapi/v1/localentity/vasp.
 - [`wallet_account_info`](../dcex/binance/_trade_http.py) — Account info (USER_DATA).
 - [`wallet_asset_detail`](../dcex/binance/_trade_http.py) — Asset Detail (USER_DATA).
 - [`wallet_asset_dividend_record`](../dcex/binance/_trade_http.py) — Asset Dividend Record (USER_DATA).
@@ -266,493 +344,624 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 
 ## Bybit
 
-- [`batch_set_collateral_coins`](../dcex/bybit/_account_http.py) — Batch set collateral coins; see https://bybit-exchange.github.io/docs/v5/account/batch-set-collateral.
-- [`confirm_pending_mmr`](../dcex/bybit/_account_http.py) — Confirm pending mmr; see https://bybit-exchange.github.io/docs/v5/position/confirm-mmr.
-- [`create_strategy`](../dcex/bybit/_trade_http.py) — Create a TWAP, chase, iceberg or POV strategy; category uses UTA_* values.
+- [`batch_set_collateral_coins`](../dcex/bybit/_account_http.py) — Batch set collateral coins; see https://bybit-exchange.github.io/docs/v5/account/batch-set-collateral..
+- [`confirm_pending_mmr`](../dcex/bybit/_account_http.py) — Confirm pending mmr; see https://bybit-exchange.github.io/docs/v5/position/confirm-mmr..
+- [`create_strategy`](../dcex/bybit/_trade_http.py) — Create a TWAP, chase, iceberg or POV strategy; category uses UTA_* values..
 - [`create_sub_account`](../dcex/bybit/_account_http.py) — POST /v5/user/create-sub-member.
 - [`create_sub_account_api_key`](../dcex/bybit/_account_http.py) — POST /v5/user/create-sub-api.
+- [`crypto_loan_adjust_ltv`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan/adjust-ltv.
+- [`crypto_loan_common_adjust_ltv`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-common/adjust-ltv.
+- [`crypto_loan_common_max_loan`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-common/max-loan.
+- [`crypto_loan_fixed_borrow`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-fixed/borrow.
+- [`crypto_loan_fixed_borrow_order_cancel`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-fixed/borrow-order-cancel.
+- [`crypto_loan_fixed_fully_repay`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-fixed/fully-repay.
+- [`crypto_loan_fixed_renew`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-fixed/renew.
+- [`crypto_loan_fixed_repay_collateral`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-fixed/repay-collateral.
+- [`crypto_loan_fixed_supply`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-fixed/supply.
+- [`crypto_loan_fixed_supply_order_cancel`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-fixed/supply-order-cancel.
+- [`crypto_loan_flexible_borrow`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-flexible/borrow.
+- [`crypto_loan_flexible_repay`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-flexible/repay.
+- [`crypto_loan_flexible_repay_collateral`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan-flexible/repay-collateral.
+- [`crypto_loan_repay`](../dcex/bybit/_account_http.py) — POST /v5/crypto-loan/repay.
 - [`delete_api_key`](../dcex/bybit/_account_http.py) — POST /v5/user/delete-api.
 - [`delete_sub_account`](../dcex/bybit/_account_http.py) — POST /v5/user/del-submember.
 - [`delete_sub_account_api_key`](../dcex/bybit/_account_http.py) — POST /v5/user/delete-sub-api.
-- [`execute_convert_quote`](../dcex/bybit/_account_http.py) — Execute convert quote; see https://bybit-exchange.github.io/docs/v5/asset/convert/confirm-quote.
+- [`execute_convert_quote`](../dcex/bybit/_account_http.py) — Execute convert quote; see https://bybit-exchange.github.io/docs/v5/asset/convert/confirm-quote..
 - [`execute_small_balance_quote`](../dcex/bybit/_account_http.py) — POST /v5/asset/covert/small-balance-execute.
-- [`get_account_instruments`](../dcex/bybit/_account_http.py) — Get account instruments; see https://bybit-exchange.github.io/docs/v5/account/instrument.
+- [`get_account_instruments`](../dcex/bybit/_account_http.py) — Get account instruments; see https://bybit-exchange.github.io/docs/v5/account/instrument..
 - [`get_all_api_rate_limits`](../dcex/bybit/_account_http.py) — GET /v5/apilimit/query-all.
 - [`get_announcements`](../dcex/bybit/_market_http.py) — GET /v5/announcements/index.
-- [`get_api_key_info`](../dcex/bybit/_account_http.py) — Get api key info; see https://bybit-exchange.github.io/docs/v5/user/apikey-info.
+- [`get_api_key_info`](../dcex/bybit/_account_http.py) — Get api key info; see https://bybit-exchange.github.io/docs/v5/user/apikey-info..
 - [`get_api_rate_limit_cap`](../dcex/bybit/_account_http.py) — GET /v5/apilimit/query-cap.
 - [`get_api_rate_limits`](../dcex/bybit/_account_http.py) — GET /v5/apilimit/query.
-- [`get_asset_overview`](../dcex/bybit/_account_http.py) — Get asset overview; see https://bybit-exchange.github.io/docs/v5/asset/balance/asset-overview.
-- [`get_closed_option_positions`](../dcex/bybit/_account_http.py) — GET /v5/position/get-closed-positions; account-family restrictions are enforced by Bybit.
-- [`get_coin_greeks`](../dcex/bybit/_account_http.py) — Get coin greeks; see https://bybit-exchange.github.io/docs/v5/account/coin-greeks.
+- [`get_asset_overview`](../dcex/bybit/_account_http.py) — Get asset overview; see https://bybit-exchange.github.io/docs/v5/asset/balance/asset-overview..
+- [`get_asset_withdraw_query_address`](../dcex/bybit/_account_http.py) — GET /v5/asset/withdraw/query-address.
+- [`get_asset_withdraw_query_record`](../dcex/bybit/_account_http.py) — GET /v5/asset/withdraw/query-record.
+- [`get_asset_withdraw_vasp_list`](../dcex/bybit/_account_http.py) — GET /v5/asset/withdraw/vasp/list.
+- [`get_closed_option_positions`](../dcex/bybit/_account_http.py) — GET /v5/position/get-closed-positions; account-family restrictions are enforced by Bybit..
+- [`get_coin_greeks`](../dcex/bybit/_account_http.py) — Get coin greeks; see https://bybit-exchange.github.io/docs/v5/account/coin-greeks..
 - [`get_convert_coins`](../dcex/bybit/_account_http.py) — GET /v5/asset/exchange/query-coin-list.
 - [`get_convert_history`](../dcex/bybit/_account_http.py) — GET /v5/asset/exchange/query-convert-history.
-- [`get_convert_result`](../dcex/bybit/_account_http.py) — Get convert result; see https://bybit-exchange.github.io/docs/v5/asset/convert/get-convert-result.
-- [`get_dcp_info`](../dcex/bybit/_account_http.py) — Get dcp info; see https://bybit-exchange.github.io/docs/v5/account/dcp-info.
-- [`get_delivery_records`](../dcex/bybit/_account_http.py) — Get delivery records; see https://bybit-exchange.github.io/docs/v5/asset/delivery.
+- [`get_convert_result`](../dcex/bybit/_account_http.py) — Get convert result; see https://bybit-exchange.github.io/docs/v5/asset/convert/get-convert-result..
+- [`get_crypto_loan_adjustment_history`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan/adjustment-history.
+- [`get_crypto_loan_borrow_history`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan/borrow-history.
+- [`get_crypto_loan_borrowable_collateralisable_number`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan/borrowable-collateralisable-number.
+- [`get_crypto_loan_collateral_data`](../dcex/bybit/_market_http.py) — GET /v5/crypto-loan/collateral-data.
+- [`get_crypto_loan_common_adjustment_history`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-common/adjustment-history.
+- [`get_crypto_loan_common_collateral_data`](../dcex/bybit/_market_http.py) — GET /v5/crypto-loan-common/collateral-data.
+- [`get_crypto_loan_common_loanable_data`](../dcex/bybit/_market_http.py) — GET /v5/crypto-loan-common/loanable-data.
+- [`get_crypto_loan_common_max_collateral_amount`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-common/max-collateral-amount.
+- [`get_crypto_loan_common_position`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-common/position.
+- [`get_crypto_loan_fixed_available_inventory`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-fixed/available-inventory.
+- [`get_crypto_loan_fixed_borrow_contract_info`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-fixed/borrow-contract-info.
+- [`get_crypto_loan_fixed_borrow_order_info`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-fixed/borrow-order-info.
+- [`get_crypto_loan_fixed_borrow_order_quote`](../dcex/bybit/_market_http.py) — GET /v5/crypto-loan-fixed/borrow-order-quote.
+- [`get_crypto_loan_fixed_renew_info`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-fixed/renew-info.
+- [`get_crypto_loan_fixed_repayment_history`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-fixed/repayment-history.
+- [`get_crypto_loan_fixed_supply_order_info`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-fixed/supply-order-info.
+- [`get_crypto_loan_fixed_supply_order_quote`](../dcex/bybit/_market_http.py) — GET /v5/crypto-loan-fixed/supply-order-quote.
+- [`get_crypto_loan_flexible_available_inventory`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-flexible/available-inventory.
+- [`get_crypto_loan_flexible_borrow_history`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-flexible/borrow-history.
+- [`get_crypto_loan_flexible_ongoing_coin`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-flexible/ongoing-coin.
+- [`get_crypto_loan_flexible_repayment_history`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan-flexible/repayment-history.
+- [`get_crypto_loan_loanable_data`](../dcex/bybit/_market_http.py) — GET /v5/crypto-loan/loanable-data.
+- [`get_crypto_loan_max_collateral_amount`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan/max-collateral-amount.
+- [`get_crypto_loan_ongoing_orders`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan/ongoing-orders.
+- [`get_crypto_loan_repayment_history`](../dcex/bybit/_account_http.py) — GET /v5/crypto-loan/repayment-history.
+- [`get_dcp_info`](../dcex/bybit/_account_http.py) — Get dcp info; see https://bybit-exchange.github.io/docs/v5/account/dcp-info..
+- [`get_delivery_records`](../dcex/bybit/_account_http.py) — Get delivery records; see https://bybit-exchange.github.io/docs/v5/asset/delivery..
 - [`get_exchange_order_records`](../dcex/bybit/_account_http.py) — GET /v5/asset/exchange/order-record.
 - [`get_fee_group_info`](../dcex/bybit/_market_http.py) — GET /v5/market/fee-group-info.
-- [`get_full_orderbook`](../dcex/bybit/_market_http.py) — Get full orderbook; see https://bybit-exchange.github.io/docs/v5/market/full-ob.
-- [`get_funding_account_history`](../dcex/bybit/_account_http.py) — Get funding account history; see https://bybit-exchange.github.io/docs/v5/asset/fund-history.
+- [`get_fixed_loan_supply_contract_info`](../dcex/bybit/_account_http.py) — Query fixed crypto-loan supply contracts..
+- [`get_full_orderbook`](../dcex/bybit/_market_http.py) — Get full orderbook; see https://bybit-exchange.github.io/docs/v5/market/full-ob..
+- [`get_funding_account_history`](../dcex/bybit/_account_http.py) — Get funding account history; see https://bybit-exchange.github.io/docs/v5/asset/fund-history..
 - [`get_index_price_components`](../dcex/bybit/_market_http.py) — GET /v5/market/index-price-components.
-- [`get_index_price_kline`](../dcex/bybit/_market_http.py) — Get index price candles; interval uses values such as ``1m`` or ``1h``.
+- [`get_index_price_kline`](../dcex/bybit/_market_http.py) — Get index price candles; interval uses values such as ``1m`` or ``1h``..
 - [`get_margin_currency_data`](../dcex/bybit/_account_http.py) — GET /v5/spot-margin-trade/currency-data.
-- [`get_mark_price_kline`](../dcex/bybit/_market_http.py) — Get mark price candles; interval uses values such as ``1m`` or ``1h``.
+- [`get_mark_price_kline`](../dcex/bybit/_market_http.py) — Get mark price candles; interval uses values such as ``1m`` or ``1h``..
 - [`get_member_wallet_types`](../dcex/bybit/_account_http.py) — GET /v5/user/get-member-type.
-- [`get_move_position_history`](../dcex/bybit/_account_http.py) — GET /v5/position/move-history; account-family restrictions are enforced by Bybit.
-- [`get_option_asset_info`](../dcex/bybit/_account_http.py) — Get option asset info; see https://bybit-exchange.github.io/docs/v5/account/option-asset-info.
+- [`get_move_position_history`](../dcex/bybit/_account_http.py) — GET /v5/position/move-history; account-family restrictions are enforced by Bybit..
+- [`get_option_asset_info`](../dcex/bybit/_account_http.py) — Get option asset info; see https://bybit-exchange.github.io/docs/v5/account/option-asset-info..
 - [`get_option_base_coins`](../dcex/bybit/_market_http.py) — GET /v5/market/option-base-coins.
 - [`get_option_delivery_prices`](../dcex/bybit/_market_http.py) — GET /v5/market/new-delivery-price.
-- [`get_portfolio_margin_info`](../dcex/bybit/_account_http.py) — Get portfolio margin info; see https://bybit-exchange.github.io/docs/v5/asset/portfolio-margin.
-- [`get_position_symbol_info`](../dcex/bybit/_account_http.py) — Get position symbol info; see https://bybit-exchange.github.io/docs/v5/position/batch-lvg.
+- [`get_portfolio_margin_info`](../dcex/bybit/_account_http.py) — Get portfolio margin info; see https://bybit-exchange.github.io/docs/v5/asset/portfolio-margin..
+- [`get_position_symbol_info`](../dcex/bybit/_account_http.py) — Get position symbol info; see https://bybit-exchange.github.io/docs/v5/position/batch-lvg..
 - [`get_pre_upgrade_closed_pnl`](../dcex/bybit/_account_http.py) — GET /v5/pre-upgrade/position/closed-pnl.
 - [`get_pre_upgrade_delivery_records`](../dcex/bybit/_account_http.py) — GET /v5/pre-upgrade/asset/delivery-record.
 - [`get_pre_upgrade_executions`](../dcex/bybit/_account_http.py) — GET /v5/pre-upgrade/execution/list.
 - [`get_pre_upgrade_order_history`](../dcex/bybit/_account_http.py) — GET /v5/pre-upgrade/order/history.
 - [`get_pre_upgrade_settlement_records`](../dcex/bybit/_account_http.py) — GET /v5/pre-upgrade/asset/settlement-record.
 - [`get_pre_upgrade_transaction_log`](../dcex/bybit/_account_http.py) — GET /v5/pre-upgrade/account/transaction-log.
-- [`get_premium_index_price_kline`](../dcex/bybit/_market_http.py) — Get premium index price candles; interval uses values such as ``1m`` or ``1h``.
-- [`get_repayment_info`](../dcex/bybit/_account_http.py) — Get repayment info; see https://bybit-exchange.github.io/docs/v5/account/pay-info.
-- [`get_rpi_orderbook`](../dcex/bybit/_market_http.py) — Get rpi orderbook; see https://bybit-exchange.github.io/docs/v5/market/rpi-orderbook.
-- [`get_settlement_records`](../dcex/bybit/_account_http.py) — Get settlement records; see https://bybit-exchange.github.io/docs/v5/asset/settlement.
+- [`get_premium_index_price_kline`](../dcex/bybit/_market_http.py) — Get premium index price candles; interval uses values such as ``1m`` or ``1h``..
+- [`get_repayment_info`](../dcex/bybit/_account_http.py) — Get repayment info; see https://bybit-exchange.github.io/docs/v5/account/pay-info..
+- [`get_rpi_orderbook`](../dcex/bybit/_market_http.py) — Get rpi orderbook; see https://bybit-exchange.github.io/docs/v5/market/rpi-orderbook..
+- [`get_server_time`](../dcex/bybit/_market_http.py) — Retrieve the exchange server time..
+- [`get_settlement_records`](../dcex/bybit/_account_http.py) — Get settlement records; see https://bybit-exchange.github.io/docs/v5/asset/settlement..
 - [`get_small_balance_coins`](../dcex/bybit/_account_http.py) — GET /v5/asset/covert/small-balance-list.
 - [`get_small_balance_history`](../dcex/bybit/_account_http.py) — GET /v5/asset/covert/small-balance-history.
-- [`get_smp_group`](../dcex/bybit/_account_http.py) — GET /v5/account/smp-group; account-family restrictions are enforced by Bybit.
-- [`get_strategy_list`](../dcex/bybit/_trade_http.py) — Query strategies; begin_time and end_time are Unix seconds.
-- [`get_strategy_orders`](../dcex/bybit/_trade_http.py) — Query strategy child orders; times are Unix seconds.
+- [`get_smp_group`](../dcex/bybit/_account_http.py) — GET /v5/account/smp-group; account-family restrictions are enforced by Bybit..
+- [`get_spot_lever_token_order_record`](../dcex/bybit/_account_http.py) — GET /v5/spot-lever-token/order-record.
+- [`get_spot_lever_token_reference`](../dcex/bybit/_market_http.py) — GET /v5/spot-lever-token/reference.
+- [`get_spot_x_puzzle_project_list`](../dcex/bybit/_account_http.py) — GET /v5/spot-x/puzzle/project/list.
+- [`get_spot_x_token_splash_project_list`](../dcex/bybit/_account_http.py) — GET /v5/spot-x/token-splash/project/list.
+- [`get_spot_x_token_splash_user_activity_params`](../dcex/bybit/_account_http.py) — GET /v5/spot-x/token-splash/user/activity-params.
+- [`get_strategy_list`](../dcex/bybit/_trade_http.py) — Query strategies; begin_time and end_time are Unix seconds..
+- [`get_strategy_orders`](../dcex/bybit/_trade_http.py) — Query strategy child orders; times are Unix seconds..
 - [`get_sub_account_api_keys`](../dcex/bybit/_account_http.py) — GET /v5/user/sub-apikeys.
 - [`get_sub_account_deposit_address`](../dcex/bybit/_account_http.py) — GET /v5/asset/deposit/query-sub-member-address.
 - [`get_sub_accounts`](../dcex/bybit/_account_http.py) — GET /v5/user/query-sub-members.
 - [`get_sub_accounts_paginated`](../dcex/bybit/_account_http.py) — GET /v5/user/submembers.
-- [`get_system_status`](../dcex/bybit/_market_http.py) — Get system status; see https://bybit-exchange.github.io/docs/v5/system-status.
-- [`get_total_members_assets`](../dcex/bybit/_account_http.py) — Get total members assets; see https://bybit-exchange.github.io/docs/v5/asset/total-members-assets.
-- [`get_trade_analysis`](../dcex/bybit/_account_http.py) — Get trade analysis; see https://bybit-exchange.github.io/docs/v5/account/trade-info-for-analysis.
-- [`get_trade_behavior_config`](../dcex/bybit/_account_http.py) — GET /v5/account/user-setting-config; account-family restrictions are enforced by Bybit.
+- [`get_system_status`](../dcex/bybit/_market_http.py) — Get system status; see https://bybit-exchange.github.io/docs/v5/system-status..
+- [`get_total_members_assets`](../dcex/bybit/_account_http.py) — Get total members assets; see https://bybit-exchange.github.io/docs/v5/asset/total-members-assets..
+- [`get_trade_analysis`](../dcex/bybit/_account_http.py) — Get trade analysis; see https://bybit-exchange.github.io/docs/v5/account/trade-info-for-analysis..
+- [`get_trade_behavior_config`](../dcex/bybit/_account_http.py) — GET /v5/account/user-setting-config; account-family restrictions are enforced by Bybit..
 - [`modify_api_key`](../dcex/bybit/_account_http.py) — POST /v5/user/update-api.
 - [`modify_sub_account_api_key`](../dcex/bybit/_account_http.py) — POST /v5/user/update-sub-api.
-- [`move_positions`](../dcex/bybit/_account_http.py) — POST /v5/position/move-positions; account-family restrictions are enforced by Bybit.
-- [`repay_liability`](../dcex/bybit/_account_http.py) — Repay liability; see https://bybit-exchange.github.io/docs/v5/account/repay-liability.
-- [`request_convert_quote`](../dcex/bybit/_account_http.py) — Request convert quote; see https://bybit-exchange.github.io/docs/v5/asset/convert/apply-quote.
+- [`move_positions`](../dcex/bybit/_account_http.py) — POST /v5/position/move-positions; account-family restrictions are enforced by Bybit..
+- [`repay_liability`](../dcex/bybit/_account_http.py) — Repay liability; see https://bybit-exchange.github.io/docs/v5/account/repay-liability..
+- [`request_convert_quote`](../dcex/bybit/_account_http.py) — Request convert quote; see https://bybit-exchange.github.io/docs/v5/asset/convert/apply-quote..
 - [`request_small_balance_quote`](../dcex/bybit/_account_http.py) — POST /v5/asset/covert/get-quote.
 - [`set_api_rate_limits`](../dcex/bybit/_account_http.py) — POST /v5/apilimit/set.
-- [`set_collateral_coin`](../dcex/bybit/_account_http.py) — Set collateral coin; see https://bybit-exchange.github.io/docs/v5/account/set-collateral.
-- [`set_delta_mode`](../dcex/bybit/_account_http.py) — POST /v5/account/set-delta-mode; account-family restrictions are enforced by Bybit.
-- [`set_price_limit_behavior`](../dcex/bybit/_account_http.py) — POST /v5/account/set-limit-px-action; account-family restrictions are enforced by Bybit.
-- [`set_spot_hedging`](../dcex/bybit/_account_http.py) — POST /v5/account/set-hedging-mode; account-family restrictions are enforced by Bybit.
-- [`set_spot_margin_leverage`](../dcex/bybit/_account_http.py) — Set UTA spot cross-margin leverage, optionally for one currency.
-- [`set_spot_margin_mode`](../dcex/bybit/_account_http.py) — Enable (``1``) or disable (``0``) UTA spot margin trading.
+- [`set_collateral_coin`](../dcex/bybit/_account_http.py) — Set collateral coin; see https://bybit-exchange.github.io/docs/v5/account/set-collateral..
+- [`set_delta_mode`](../dcex/bybit/_account_http.py) — POST /v5/account/set-delta-mode; account-family restrictions are enforced by Bybit..
+- [`set_price_limit_behavior`](../dcex/bybit/_account_http.py) — POST /v5/account/set-limit-px-action; account-family restrictions are enforced by Bybit..
+- [`set_spot_hedging`](../dcex/bybit/_account_http.py) — POST /v5/account/set-hedging-mode; account-family restrictions are enforced by Bybit..
+- [`set_spot_margin_leverage`](../dcex/bybit/_account_http.py) — Set UTA spot cross-margin leverage, optionally for one currency..
+- [`set_spot_margin_mode`](../dcex/bybit/_account_http.py) — Enable (``1``) or disable (``0``) UTA spot margin trading..
 - [`set_sub_account_frozen`](../dcex/bybit/_account_http.py) — POST /v5/user/frozen-sub-member.
 - [`sign_trading_agreement`](../dcex/bybit/_account_http.py) — POST /v5/user/agreement.
-- [`stop_strategy`](../dcex/bybit/_trade_http.py) — Stop a strategy and cancel its unfilled child orders.
+- [`spot_lever_token_purchase`](../dcex/bybit/_account_http.py) — POST /v5/spot-lever-token/purchase.
+- [`spot_lever_token_redeem`](../dcex/bybit/_account_http.py) — POST /v5/spot-lever-token/redeem.
+- [`stop_strategy`](../dcex/bybit/_trade_http.py) — Stop a strategy and cancel its unfilled child orders..
 - [`submit_deposit_information`](../dcex/bybit/_account_http.py) — POST /v5/asset/travel-rule/deposit/submit.
 
-## OKX
+## Okx
 
 - [`activate_options`](../dcex/okx/_trade_http.py) — POST /api/v5/account/activate-option.
-- [`adjust_demo_balance`](../dcex/okx/_trade_http.py) — POST /api/v5/account/demo-adjust-balance. Use native instrument IDs.
-- [`adjust_position_margin`](../dcex/okx/_trade_http.py) — Add or reduce isolated position margin.
-- [`amend_algo_order`](../dcex/okx/_trade_http.py) — Amend an untriggered stop or trigger order; zero TP/SL values remove that leg.
-- [`amend_spread_order`](../dcex/okx/_trade_http.py) — Amend spread order through ``POST /api/v5/sprd/amend-order``.
-- [`cancel_algo_orders`](../dcex/okx/_trade_http.py) — Cancel up to ten algo orders identified by instId and algoId or algoClOrdId.
-- [`convert_contract_coin`](../dcex/okx/_market_http.py) — Convert contract coin through ``GET /api/v5/public/convert-contract-coin``.
-- [`create_sub_account`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/create-subaccount. Use native instrument IDs.
-- [`create_sub_account_api_key`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/apikey. Use native instrument IDs.
-- [`delete_sub_account_api_key`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/delete-apikey. Use native instrument IDs.
-- [`estimate_convert_quote`](../dcex/okx/_trade_http.py) — Estimate convert quote through ``POST /api/v5/asset/convert/estimate-quote``.
-- [`execute_convert_trade`](../dcex/okx/_trade_http.py) — Execute convert trade through ``POST /api/v5/asset/convert/trade``.
-- [`get_account_risk_state`](../dcex/okx/_trade_http.py) — Get account risk state through ``GET /api/v5/account/risk-state``.
-- [`get_algo_order`](../dcex/okx/_trade_http.py) — Query an algo order by its exchange or client identifier.
-- [`get_algo_order_history`](../dcex/okx/_trade_http.py) — Query historical algo orders; state or algo_id is required.
-- [`get_announcement_types`](../dcex/okx/_market_http.py) — GET /api/v5/support/announcement-types. Use native instrument IDs.
-- [`get_announcements`](../dcex/okx/_market_http.py) — GET /api/v5/support/announcements. Use native instrument IDs.
-- [`get_asset_bill_history`](../dcex/okx/_trade_http.py) — Get asset bill history through ``GET /api/v5/asset/bills-history``.
-- [`get_bill_types`](../dcex/okx/_trade_http.py) — GET /api/v5/account/subtypes. Use native instrument IDs.
-- [`get_block_ticker`](../dcex/okx/_market_http.py) — GET /api/v5/market/block-ticker. Use native instrument IDs.
-- [`get_block_tickers`](../dcex/okx/_market_http.py) — GET /api/v5/market/block-tickers. Use native instrument IDs.
-- [`get_block_trades`](../dcex/okx/_market_http.py) — GET /api/v5/public/block-trades. Use native instrument IDs.
-- [`get_books_rpi`](../dcex/okx/_market_http.py) — GET /api/v5/market/books-rpi. Use native instrument IDs.
-- [`get_call_auction_details`](../dcex/okx/_market_http.py) — GET /api/v5/market/call-auction-details. Use native instrument IDs.
-- [`get_candles_history`](../dcex/okx/_market_http.py) — Get candles history through ``GET /api/v5/market/history-candles``.
-- [`get_collateral_assets`](../dcex/okx/_trade_http.py) — Get collateral assets through ``GET /api/v5/account/collateral-assets``.
-- [`get_convert_currency_pair`](../dcex/okx/_trade_http.py) — Get convert currency pair through ``GET /api/v5/asset/convert/currency-pair``.
-- [`get_delta_hedge_currencies`](../dcex/okx/_market_http.py) — GET /api/v5/public/delta-hedge-currencies. Use native instrument IDs.
-- [`get_discount_rates`](../dcex/okx/_market_http.py) — Get discount rates through ``GET /api/v5/public/discount-rate-interest-free-quota``.
-- [`get_economic_calendar`](../dcex/okx/_market_http.py) — GET /api/v5/public/economic-calendar. Use native instrument IDs.
-- [`get_estimated_delivery_price`](../dcex/okx/_market_http.py) — Get estimated delivery price through ``GET /api/v5/public/estimated-price``.
-- [`get_estimated_settlement_info`](../dcex/okx/_market_http.py) — GET /api/v5/public/estimated-settlement-info. Use native instrument IDs.
-- [`get_exchange_rate`](../dcex/okx/_market_http.py) — GET /api/v5/market/exchange-rate. Use native instrument IDs.
-- [`get_full_orderbook`](../dcex/okx/_market_http.py) — Get full orderbook through ``GET /api/v5/market/books-full``.
-- [`get_greeks`](../dcex/okx/_trade_http.py) — Get greeks through ``GET /api/v5/account/greeks``.
-- [`get_history_index_candles`](../dcex/okx/_market_http.py) — GET /api/v5/market/history-index-candles. Use native instrument IDs.
-- [`get_history_mark_price_candles`](../dcex/okx/_market_http.py) — GET /api/v5/market/history-mark-price-candles. Use native instrument IDs.
-- [`get_index_candles`](../dcex/okx/_market_http.py) — GET /api/v5/market/index-candles. Use native instrument IDs.
-- [`get_index_components`](../dcex/okx/_market_http.py) — GET /api/v5/market/index-components. Use native instrument IDs.
-- [`get_index_tickers`](../dcex/okx/_market_http.py) — Get index tickers through ``GET /api/v5/market/index-tickers``.
-- [`get_insurance_fund`](../dcex/okx/_market_http.py) — GET /api/v5/public/insurance-fund. Use native instrument IDs.
-- [`get_loan_ratio`](../dcex/okx/_market_http.py) — GET /api/v5/rubik/stat/margin/loan-ratio. Use native instrument IDs.
-- [`get_mark_price`](../dcex/okx/_market_http.py) — Get mark prices for MARGIN, SWAP, FUTURES, OPTION or EVENTS instruments.
-- [`get_mark_price_candles`](../dcex/okx/_market_http.py) — Get mark price candles through ``GET /api/v5/market/mark-price-candles``.
-- [`get_market_data_history`](../dcex/okx/_market_http.py) — GET /api/v5/public/market-data-history. Use native instrument IDs.
-- [`get_move_positions_history`](../dcex/okx/_trade_http.py) — GET /api/v5/account/move-positions-history. Use native instrument IDs.
-- [`get_non_tradable_assets`](../dcex/okx/_trade_http.py) — GET /api/v5/asset/non-tradable-assets. Use native instrument IDs.
-- [`get_pending_algo_orders`](../dcex/okx/_trade_http.py) — List untriggered algo orders, including standalone TP/SL orders.
-- [`get_platform_24_volume`](../dcex/okx/_market_http.py) — GET /api/v5/market/platform-24-volume. Use native instrument IDs.
-- [`get_pm_position_tiers`](../dcex/okx/_trade_http.py) — Get pm position tiers through ``GET /api/v5/account/position-tiers``.
-- [`get_position_margin_graph`](../dcex/okx/_trade_http.py) — POST /api/v5/account/position-builder-graph. Use native instrument IDs.
-- [`get_premium_history`](../dcex/okx/_market_http.py) — GET /api/v5/public/premium-history. Use native instrument IDs.
-- [`get_price_limit`](../dcex/okx/_market_http.py) — Get the current highest buy and lowest sell limit prices.
+- [`adjust_demo_balance`](../dcex/okx/_trade_http.py) — POST /api/v5/account/demo-adjust-balance.
+- [`adjust_position_margin`](../dcex/okx/_trade_http.py) — Add or reduce isolated position margin..
+- [`amend_algo_order`](../dcex/okx/_trade_http.py) — Amend an untriggered stop or trigger order; zero TP/SL values remove that leg..
+- [`amend_spread_order`](../dcex/okx/_trade_http.py) — Amend spread order through ``POST /api/v5/sprd/amend-order``..
+- [`cancel_algo_orders`](../dcex/okx/_trade_http.py) — Cancel up to ten algo orders identified by instId and algoId or algoClOrdId..
+- [`convert_contract_coin`](../dcex/okx/_market_http.py) — Convert contract coin through ``GET /api/v5/public/convert-contract-coin``..
+- [`copytrading_algo_order`](../dcex/okx/_trade_http.py) — POST /api/v5/copytrading/algo-order.
+- [`copytrading_amend_copy_settings`](../dcex/okx/_trade_http.py) — POST /api/v5/copytrading/amend-copy-settings.
+- [`copytrading_amend_profit_sharing_ratio`](../dcex/okx/_trade_http.py) — POST /api/v5/copytrading/amend-profit-sharing-ratio.
+- [`copytrading_close_subposition`](../dcex/okx/_trade_http.py) — POST /api/v5/copytrading/close-subposition.
+- [`copytrading_first_copy_settings`](../dcex/okx/_trade_http.py) — POST /api/v5/copytrading/first-copy-settings.
+- [`copytrading_set_instruments`](../dcex/okx/_trade_http.py) — POST /api/v5/copytrading/set-instruments.
+- [`copytrading_stop_copy_trading`](../dcex/okx/_trade_http.py) — POST /api/v5/copytrading/stop-copy-trading.
+- [`create_sub_account`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/create-subaccount.
+- [`create_sub_account_api_key`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/apikey.
+- [`delete_sub_account_api_key`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/delete-apikey.
+- [`estimate_convert_quote`](../dcex/okx/_trade_http.py) — Estimate convert quote through ``POST /api/v5/asset/convert/estimate-quote``..
+- [`execute_convert_trade`](../dcex/okx/_trade_http.py) — Execute convert trade through ``POST /api/v5/asset/convert/trade``..
+- [`fiat_buy_sell_quote`](../dcex/okx/_trade_http.py) — POST /api/v5/fiat/buy-sell/quote.
+- [`fiat_buy_sell_trade`](../dcex/okx/_trade_http.py) — POST /api/v5/fiat/buy-sell/trade.
+- [`get_account_risk_state`](../dcex/okx/_trade_http.py) — Get account risk state through ``GET /api/v5/account/risk-state``..
+- [`get_account_subaccount_max_withdrawal`](../dcex/okx/_trade_http.py) — GET /api/v5/account/subaccount/max-withdrawal.
+- [`get_algo_order`](../dcex/okx/_trade_http.py) — Query an algo order by its exchange or client identifier..
+- [`get_algo_order_history`](../dcex/okx/_trade_http.py) — Query historical algo orders; state or algo_id is required..
+- [`get_announcement_types`](../dcex/okx/_market_http.py) — GET /api/v5/support/announcement-types.
+- [`get_announcements`](../dcex/okx/_market_http.py) — GET /api/v5/support/announcements.
+- [`get_asset_bill_history`](../dcex/okx/_trade_http.py) — Get asset bill history through ``GET /api/v5/asset/bills-history``..
+- [`get_asset_subaccount_managed_subaccount_bills`](../dcex/okx/_trade_http.py) — GET /api/v5/asset/subaccount/managed-subaccount-bills.
+- [`get_asset_withdrawal_history`](../dcex/okx/_trade_http.py) — GET /api/v5/asset/withdrawal-history.
+- [`get_bill_types`](../dcex/okx/_trade_http.py) — GET /api/v5/account/subtypes.
+- [`get_block_ticker`](../dcex/okx/_market_http.py) — GET /api/v5/market/block-ticker.
+- [`get_block_tickers`](../dcex/okx/_market_http.py) — GET /api/v5/market/block-tickers.
+- [`get_block_trades`](../dcex/okx/_market_http.py) — GET /api/v5/public/block-trades.
+- [`get_books_rpi`](../dcex/okx/_market_http.py) — GET /api/v5/market/books-rpi.
+- [`get_call_auction_details`](../dcex/okx/_market_http.py) — GET /api/v5/market/call-auction-details.
+- [`get_candles_history`](../dcex/okx/_market_http.py) — Get candles history through ``GET /api/v5/market/history-candles``..
+- [`get_collateral_assets`](../dcex/okx/_trade_http.py) — Get collateral assets through ``GET /api/v5/account/collateral-assets``..
+- [`get_convert_currency_pair`](../dcex/okx/_trade_http.py) — Get convert currency pair through ``GET /api/v5/asset/convert/currency-pair``..
+- [`get_copytrading_config`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/config.
+- [`get_copytrading_copy_settings`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/copy-settings.
+- [`get_copytrading_current_lead_traders`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/current-lead-traders.
+- [`get_copytrading_current_subpositions`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/current-subpositions.
+- [`get_copytrading_instruments`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/instruments.
+- [`get_copytrading_profit_sharing_details`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/profit-sharing-details.
+- [`get_copytrading_public_config`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-config.
+- [`get_copytrading_public_copy_traders`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-copy-traders.
+- [`get_copytrading_public_current_subpositions`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-current-subpositions.
+- [`get_copytrading_public_lead_traders`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-lead-traders.
+- [`get_copytrading_public_pnl`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-pnl.
+- [`get_copytrading_public_preference_currency`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-preference-currency.
+- [`get_copytrading_public_stats`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-stats.
+- [`get_copytrading_public_subpositions_history`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-subpositions-history.
+- [`get_copytrading_public_weekly_pnl`](../dcex/okx/_market_http.py) — GET /api/v5/copytrading/public-weekly-pnl.
+- [`get_copytrading_subpositions_history`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/subpositions-history.
+- [`get_copytrading_total_profit_sharing`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/total-profit-sharing.
+- [`get_copytrading_total_unrealized_profit_sharing`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/total-unrealized-profit-sharing.
+- [`get_copytrading_unrealized_profit_sharing_details`](../dcex/okx/_trade_http.py) — GET /api/v5/copytrading/unrealized-profit-sharing-details.
+- [`get_delta_hedge_currencies`](../dcex/okx/_market_http.py) — GET /api/v5/public/delta-hedge-currencies.
+- [`get_discount_rates`](../dcex/okx/_market_http.py) — Get discount rates through ``GET /api/v5/public/discount-rate-interest-free-quota``..
+- [`get_economic_calendar`](../dcex/okx/_market_http.py) — GET /api/v5/public/economic-calendar.
+- [`get_estimated_delivery_price`](../dcex/okx/_market_http.py) — Get estimated delivery price through ``GET /api/v5/public/estimated-price``..
+- [`get_estimated_settlement_info`](../dcex/okx/_market_http.py) — GET /api/v5/public/estimated-settlement-info.
+- [`get_exchange_rate`](../dcex/okx/_market_http.py) — GET /api/v5/market/exchange-rate.
+- [`get_fiat_buy_sell_currencies`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/buy-sell/currencies.
+- [`get_fiat_buy_sell_currency_pair`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/buy-sell/currency-pair.
+- [`get_fiat_buy_sell_history`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/buy-sell/history.
+- [`get_fiat_deposit`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/deposit.
+- [`get_fiat_deposit_order_history`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/deposit-order-history.
+- [`get_fiat_deposit_payment_methods`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/deposit-payment-methods.
+- [`get_fiat_withdrawal`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/withdrawal.
+- [`get_fiat_withdrawal_order_history`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/withdrawal-order-history.
+- [`get_fiat_withdrawal_payment_methods`](../dcex/okx/_trade_http.py) — GET /api/v5/fiat/withdrawal-payment-methods.
+- [`get_finance_stable_rewards_apy_history`](../dcex/okx/_trade_http.py) — GET /api/v5/finance/stable-rewards/apy-history.
+- [`get_finance_stable_rewards_balance`](../dcex/okx/_trade_http.py) — GET /api/v5/finance/stable-rewards/balance.
+- [`get_finance_stable_rewards_product_info`](../dcex/okx/_trade_http.py) — GET /api/v5/finance/stable-rewards/product-info.
+- [`get_full_orderbook`](../dcex/okx/_market_http.py) — Get full orderbook through ``GET /api/v5/market/books-full``..
+- [`get_greeks`](../dcex/okx/_trade_http.py) — Get greeks through ``GET /api/v5/account/greeks``..
+- [`get_history_index_candles`](../dcex/okx/_market_http.py) — GET /api/v5/market/history-index-candles.
+- [`get_history_mark_price_candles`](../dcex/okx/_market_http.py) — GET /api/v5/market/history-mark-price-candles.
+- [`get_index_candles`](../dcex/okx/_market_http.py) — GET /api/v5/market/index-candles.
+- [`get_index_components`](../dcex/okx/_market_http.py) — GET /api/v5/market/index-components.
+- [`get_index_tickers`](../dcex/okx/_market_http.py) — Get index tickers through ``GET /api/v5/market/index-tickers``..
+- [`get_insurance_fund`](../dcex/okx/_market_http.py) — GET /api/v5/public/insurance-fund.
+- [`get_loan_ratio`](../dcex/okx/_market_http.py) — GET /api/v5/rubik/stat/margin/loan-ratio.
+- [`get_mark_price`](../dcex/okx/_market_http.py) — Get mark prices for MARGIN, SWAP, FUTURES, OPTION or EVENTS instruments..
+- [`get_mark_price_candles`](../dcex/okx/_market_http.py) — Get mark price candles through ``GET /api/v5/market/mark-price-candles``..
+- [`get_market_data_history`](../dcex/okx/_market_http.py) — GET /api/v5/public/market-data-history.
+- [`get_move_positions_history`](../dcex/okx/_trade_http.py) — GET /api/v5/account/move-positions-history.
+- [`get_non_tradable_assets`](../dcex/okx/_trade_http.py) — GET /api/v5/asset/non-tradable-assets.
+- [`get_pending_algo_orders`](../dcex/okx/_trade_http.py) — List untriggered algo orders, including standalone TP/SL orders..
+- [`get_platform_24_volume`](../dcex/okx/_market_http.py) — GET /api/v5/market/platform-24-volume.
+- [`get_pm_position_tiers`](../dcex/okx/_trade_http.py) — Get pm position tiers through ``GET /api/v5/account/position-tiers``..
+- [`get_position_margin_graph`](../dcex/okx/_trade_http.py) — POST /api/v5/account/position-builder-graph.
+- [`get_premium_history`](../dcex/okx/_market_http.py) — GET /api/v5/public/premium-history.
+- [`get_price_limit`](../dcex/okx/_market_http.py) — Get the current highest buy and lowest sell limit prices..
+- [`get_public_event_contract_events`](../dcex/okx/_market_http.py) — GET /api/v5/public/event-contract/events.
+- [`get_public_event_contract_markets`](../dcex/okx/_market_http.py) — GET /api/v5/public/event-contract/markets.
+- [`get_public_event_contract_series`](../dcex/okx/_market_http.py) — GET /api/v5/public/event-contract/series.
+- [`get_public_interest_rate_loan_quota`](../dcex/okx/_market_http.py) — GET /api/v5/public/interest-rate-loan-quota.
 - [`get_repayment_currencies`](../dcex/okx/_trade_http.py) — GET /api/v5/trade/one-click-repay-currency-list-v2.
 - [`get_repayment_history`](../dcex/okx/_trade_http.py) — GET /api/v5/trade/one-click-repay-history-v2.
-- [`get_rfq_counterparties`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/counterparties. Use native instrument IDs.
-- [`get_rfq_public_trades`](../dcex/okx/_market_http.py) — GET /api/v5/rfq/public-trades. Use native instrument IDs.
-- [`get_rfq_quotes`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/quotes. Use native instrument IDs.
-- [`get_rfq_rfqs`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/rfqs. Use native instrument IDs.
-- [`get_rfq_trades`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/trades. Use native instrument IDs.
-- [`get_sbe_orderbook`](../dcex/okx/_market_http.py) — Fetch raw SBE snapshot bytes; decode with OKX's versioned SBE XML schema.
-- [`get_server_time`](../dcex/okx/_market_http.py) — Get server time through ``GET /api/v5/public/time``.
-- [`get_settlement_history`](../dcex/okx/_market_http.py) — GET /api/v5/public/settlement-history. Use native instrument IDs.
+- [`get_rfq_counterparties`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/counterparties.
+- [`get_rfq_public_trades`](../dcex/okx/_market_http.py) — GET /api/v5/rfq/public-trades.
+- [`get_rfq_quotes`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/quotes.
+- [`get_rfq_rfqs`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/rfqs.
+- [`get_rfq_trades`](../dcex/okx/_trade_http.py) — GET /api/v5/rfq/trades.
+- [`get_sbe_orderbook`](../dcex/okx/_market_http.py) — Fetch raw SBE snapshot bytes; decode with OKX's versioned SBE XML schema..
+- [`get_server_time`](../dcex/okx/_market_http.py) — Get server time through ``GET /api/v5/public/time``..
+- [`get_settlement_history`](../dcex/okx/_market_http.py) — GET /api/v5/public/settlement-history.
 - [`get_spread_order_history_archive`](../dcex/okx/_trade_http.py) — GET /api/v5/sprd/orders-history-archive.
-- [`get_sub_account_api_keys`](../dcex/okx/_trade_http.py) — GET /api/v5/users/subaccount/apikey. Use native instrument IDs.
-- [`get_system_status`](../dcex/okx/_market_http.py) — Get system status through ``GET /api/v5/system/status``.
-- [`get_ticker`](../dcex/okx/_market_http.py) — Get ticker through ``GET /api/v5/market/ticker``.
-- [`get_trades_history`](../dcex/okx/_market_http.py) — Get trades history through ``GET /api/v5/market/history-trades``.
-- [`modify_sub_account_api_key`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/modify-apikey. Use native instrument IDs.
-- [`move_positions`](../dcex/okx/_trade_http.py) — POST /api/v5/account/move-positions. Use native instrument IDs.
-- [`place_algo_order`](../dcex/okx/_trade_http.py) — Place a standalone TP/SL, trigger, trailing, chase, TWAP or iceberg order.
+- [`get_sub_account_api_keys`](../dcex/okx/_trade_http.py) — GET /api/v5/users/subaccount/apikey.
+- [`get_system_status`](../dcex/okx/_market_http.py) — Get system status through ``GET /api/v5/system/status``..
+- [`get_ticker`](../dcex/okx/_market_http.py) — Get ticker through ``GET /api/v5/market/ticker``..
+- [`get_trades_history`](../dcex/okx/_market_http.py) — Get trades history through ``GET /api/v5/market/history-trades``..
+- [`get_trading_bot_dca_cycle_list`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/dca/cycle-list.
+- [`get_trading_bot_dca_history_list`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/dca/history-list.
+- [`get_trading_bot_dca_ongoing_list`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/dca/ongoing-list.
+- [`get_trading_bot_dca_orders`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/dca/orders.
+- [`get_trading_bot_dca_position_details`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/dca/position-details.
+- [`get_trading_bot_grid_ai_param`](../dcex/okx/_market_http.py) — GET /api/v5/tradingBot/grid/ai-param.
+- [`get_trading_bot_grid_grid_quantity`](../dcex/okx/_market_http.py) — GET /api/v5/tradingBot/grid/grid-quantity.
+- [`get_trading_bot_grid_orders_algo_details`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/grid/orders-algo-details.
+- [`get_trading_bot_grid_orders_algo_history`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/grid/orders-algo-history.
+- [`get_trading_bot_grid_orders_algo_pending`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/grid/orders-algo-pending.
+- [`get_trading_bot_grid_positions`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/grid/positions.
+- [`get_trading_bot_grid_sub_orders`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/grid/sub-orders.
+- [`get_trading_bot_public_rsi_back_testing`](../dcex/okx/_market_http.py) — GET /api/v5/tradingBot/public/rsi-back-testing.
+- [`get_trading_bot_recurring_orders_algo_details`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/recurring/orders-algo-details.
+- [`get_trading_bot_recurring_orders_algo_history`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/recurring/orders-algo-history.
+- [`get_trading_bot_recurring_orders_algo_pending`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/recurring/orders-algo-pending.
+- [`get_trading_bot_recurring_sub_orders`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/recurring/sub-orders.
+- [`get_trading_bot_signal_event_history`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/event-history.
+- [`get_trading_bot_signal_orders_algo_details`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/orders-algo-details.
+- [`get_trading_bot_signal_orders_algo_history`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/orders-algo-history.
+- [`get_trading_bot_signal_orders_algo_pending`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/orders-algo-pending.
+- [`get_trading_bot_signal_positions`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/positions.
+- [`get_trading_bot_signal_positions_history`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/positions-history.
+- [`get_trading_bot_signal_signals`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/signals.
+- [`get_trading_bot_signal_sub_orders`](../dcex/okx/_trade_http.py) — GET /api/v5/tradingBot/signal/sub-orders.
+- [`modify_sub_account_api_key`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/modify-apikey.
+- [`move_positions`](../dcex/okx/_trade_http.py) — POST /api/v5/account/move-positions.
+- [`place_algo_order`](../dcex/okx/_trade_http.py) — Place a standalone TP/SL, trigger, trailing, chase, TWAP or iceberg order..
 - [`precheck_account_level_switch`](../dcex/okx/_trade_http.py) — GET /api/v5/account/set-account-switch-precheck.
 - [`precheck_delta_neutral`](../dcex/okx/_trade_http.py) — GET /api/v5/account/precheck-set-delta-neutral.
 - [`preset_account_level_switch`](../dcex/okx/_trade_http.py) — POST /api/v5/account/account-level-switch-preset.
 - [`repay_debt`](../dcex/okx/_trade_http.py) — POST /api/v5/trade/one-click-repay-v2.
-- [`rfq_cancel_all_rfqs`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/cancel-all-rfqs. Use native instrument IDs.
-- [`rfq_cancel_batch_rfqs`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/cancel-batch-rfqs. Use native instrument IDs.
-- [`rfq_cancel_rfq`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/cancel-rfq. Use native instrument IDs.
-- [`rfq_create_rfq`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/create-rfq. Use native instrument IDs.
-- [`rfq_execute_quote`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/execute-quote. Use native instrument IDs.
-- [`set_account_level`](../dcex/okx/_trade_http.py) — Set account level through ``POST /api/v5/account/set-account-level``.
+- [`rfq_cancel_all_rfqs`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/cancel-all-rfqs.
+- [`rfq_cancel_batch_rfqs`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/cancel-batch-rfqs.
+- [`rfq_cancel_rfq`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/cancel-rfq.
+- [`rfq_create_rfq`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/create-rfq.
+- [`rfq_execute_quote`](../dcex/okx/_trade_http.py) — POST /api/v5/rfq/execute-quote.
+- [`set_account_level`](../dcex/okx/_trade_http.py) — Set account level through ``POST /api/v5/account/set-account-level``..
 - [`set_auto_loan`](../dcex/okx/_trade_http.py) — POST /api/v5/account/set-auto-loan.
 - [`set_collateral_assets`](../dcex/okx/_trade_http.py) — POST /api/v5/account/set-collateral-assets.
 - [`set_fee_type`](../dcex/okx/_trade_http.py) — POST /api/v5/account/set-fee-type.
-- [`set_isolated_mode`](../dcex/okx/_trade_http.py) — Set isolated mode through ``POST /api/v5/account/set-isolated-mode``.
+- [`set_isolated_mode`](../dcex/okx/_trade_http.py) — Set isolated mode through ``POST /api/v5/account/set-isolated-mode``..
 - [`set_risk_offset_amount`](../dcex/okx/_trade_http.py) — POST /api/v5/account/set-riskOffset-amt.
 - [`set_settlement_currency`](../dcex/okx/_trade_http.py) — POST /api/v5/account/set-settle-currency.
-- [`set_sub_account_transfer_out`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/set-transfer-out. Use native instrument IDs.
+- [`set_sub_account_transfer_out`](../dcex/okx/_trade_http.py) — POST /api/v5/users/subaccount/set-transfer-out.
 - [`set_trading_config`](../dcex/okx/_trade_http.py) — POST /api/v5/account/set-trading-config.
-- [`simulate_positions`](../dcex/okx/_trade_http.py) — POST /api/v5/account/position-builder. Use native instrument IDs.
+- [`simulate_positions`](../dcex/okx/_trade_http.py) — POST /api/v5/account/position-builder.
+- [`trading_bot_dca_amend_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/amend-order-algo.
+- [`trading_bot_dca_create`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/create.
+- [`trading_bot_dca_margin_add`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/margin/add.
+- [`trading_bot_dca_margin_reduce`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/margin/reduce.
+- [`trading_bot_dca_orders_manual_buy`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/orders/manual-buy.
+- [`trading_bot_dca_settings_reinvestment`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/settings/reinvestment.
+- [`trading_bot_dca_settings_take_profit`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/settings/take-profit.
+- [`trading_bot_dca_stop`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/dca/stop.
+- [`trading_bot_grid_adjust_investment`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/adjust-investment.
+- [`trading_bot_grid_amend_algo_basic_param`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/amend-algo-basic-param.
+- [`trading_bot_grid_amend_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/amend-order-algo.
+- [`trading_bot_grid_cancel_close_order`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/cancel-close-order.
+- [`trading_bot_grid_close_position`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/close-position.
+- [`trading_bot_grid_compute_margin_balance`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/compute-margin-balance.
+- [`trading_bot_grid_copy_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/copy-order-algo.
+- [`trading_bot_grid_margin_balance`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/margin-balance.
+- [`trading_bot_grid_min_investment`](../dcex/okx/_market_http.py) — POST /api/v5/tradingBot/grid/min-investment.
+- [`trading_bot_grid_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/order-algo.
+- [`trading_bot_grid_order_instant_trigger`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/order-instant-trigger.
+- [`trading_bot_grid_stop_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/stop-order-algo.
+- [`trading_bot_grid_withdraw_income`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/grid/withdraw-income.
+- [`trading_bot_recurring_add_investment`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/add-investment.
+- [`trading_bot_recurring_amend_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/amend-order-algo.
+- [`trading_bot_recurring_amend_price_range`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/amend-price-range.
+- [`trading_bot_recurring_amend_recurring_amount`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/amend-recurring-amount.
+- [`trading_bot_recurring_amend_recurring_time`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/amend-recurring-time.
+- [`trading_bot_recurring_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/order-algo.
+- [`trading_bot_recurring_pause`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/pause.
+- [`trading_bot_recurring_restart`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/restart.
+- [`trading_bot_recurring_stop_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/recurring/stop-order-algo.
+- [`trading_bot_signal_amend_tpsl`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/amendTPSL.
+- [`trading_bot_signal_cancel_sub_order`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/cancel-sub-order.
+- [`trading_bot_signal_close_position`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/close-position.
+- [`trading_bot_signal_create_signal`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/create-signal.
+- [`trading_bot_signal_margin_balance`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/margin-balance.
+- [`trading_bot_signal_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/order-algo.
+- [`trading_bot_signal_set_instruments`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/set-instruments.
+- [`trading_bot_signal_stop_order_algo`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/stop-order-algo.
+- [`trading_bot_signal_sub_order`](../dcex/okx/_trade_http.py) — POST /api/v5/tradingBot/signal/sub-order.
 
 ## Bitget
 
-- [`adjust_futures_position_margin`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-margin``. Positive amount adds margin; negative amount reduces it.
-- [`adjust_uta_position_margin`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/set-margin``.
-- [`batch_cancel_replace_spot_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/batch-cancel-replace-order``.
-- [`batch_create_classic_sub_accounts`](../dcex/bitget/_trade_http.py) — Create 1..5 virtual sub-accounts and API keys using an array body.
-- [`borrow_cross_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/borrow``.
-- [`borrow_isolated_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/borrow``.
-- [`borrow_uta_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/borrow``.
-- [`cancel_all_futures_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/cancel-all-orders``.
-- [`cancel_cross_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/batch-cancel-order``.
-- [`cancel_cross_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/cancel-order``.
-- [`cancel_futures_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/cancel-plan-order``.
-- [`cancel_isolated_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/batch-cancel-order``.
-- [`cancel_isolated_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/cancel-order``.
-- [`cancel_replace_spot_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/cancel-replace-order``.
-- [`cancel_spot_orders_by_symbol`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/cancel-symbol-order``.
-- [`cancel_spot_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/cancel-plan-order``.
-- [`cancel_spot_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/batch-cancel-plan-order``.
-- [`cancel_uta_orders_by_symbol`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/cancel-symbol-order``.
-- [`classic_create_virtual_subaccount`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/create-virtual-subaccount``.
-- [`classic_create_virtual_subaccount_apikey`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/create-virtual-subaccount-apikey``.
-- [`classic_modify_virtual_subaccount`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/modify-virtual-subaccount``.
-- [`classic_modify_virtual_subaccount_apikey`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/modify-virtual-subaccount-apikey``.
-- [`classic_trade`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/convert/trade``.
-- [`close_futures_positions`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/close-positions``.
-- [`close_uta_positions`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/close-positions``.
-- [`convert_futures_union_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/union-convert``.
-- [`create_uta_sub_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/create-sub``.
-- [`flash_repay_cross_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/flash-repay``.
-- [`flash_repay_isolated_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/flash-repay``.
-- [`get_all_trade_rates`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/common/all-trade-rate``.
-- [`get_classic_account_upgrade_status`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/upgrade-status``.
-- [`get_classic_auction`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/spot/market/auction``.
-- [`get_classic_convert_currencies`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/convert/currencies``.
-- [`get_classic_convert_record`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/convert/convert-record``.
-- [`get_classic_interest_rate_record`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/margin/interest-rate-record``.
-- [`get_classic_margin_currencies`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/margin/currencies``.
-- [`get_classic_merge_depth`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/spot/market/merge-depth``.
-- [`get_classic_quoted_price`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/convert/quoted-price``.
-- [`get_classic_vip_fee_rate`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/spot/market/vip-fee-rate``.
-- [`get_classic_virtual_subaccount_apikey_list`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/user/virtual-subaccount-apikey-list``.
-- [`get_classic_virtual_subaccount_list`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/user/virtual-subaccount-list``.
-- [`get_cross_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/assets``.
-- [`get_cross_margin_borrow_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/borrow-history``.
-- [`get_cross_margin_fills`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/fills``.
-- [`get_cross_margin_financial_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/financial-records``.
-- [`get_cross_margin_flash_repay_result`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/query-flash-repay-status``.
-- [`get_cross_margin_interest_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/interest-history``.
-- [`get_cross_margin_interest_rate_limits`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/interest-rate-and-limit``.
-- [`get_cross_margin_liquidation_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/liquidation-history``.
-- [`get_cross_margin_liquidation_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/liquidation-order``.
-- [`get_cross_margin_max_borrowable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/max-borrowable-amount``.
-- [`get_cross_margin_max_transferable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/max-transfer-out-amount``.
-- [`get_cross_margin_open_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/open-orders``.
-- [`get_cross_margin_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/history-orders``.
-- [`get_cross_margin_repay_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/repay-history``.
-- [`get_cross_margin_risk_rate`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/risk-rate``.
-- [`get_cross_margin_tiers`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/tier-data``.
-- [`get_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/wallet/deposit-address``.
-- [`get_futures_adl_rank`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/position/adlRank``.
-- [`get_futures_discount_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/discount-rate``.
-- [`get_futures_estimated_open_count`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/open-count``.
-- [`get_futures_fill_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/fill-history``.
-- [`get_futures_index_candle_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/history-index-candles``.
-- [`get_futures_interest_exchange_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/exchange-rate``.
-- [`get_futures_interest_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/interest-history``.
-- [`get_futures_interest_rate_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/union-interest-rate-history``.
-- [`get_futures_isolated_symbols`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/isolated-symbols``.
-- [`get_futures_liquidation_price`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/liq-price``.
-- [`get_futures_margin_mode_switch_quota`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/switch-union-usdt``.
-- [`get_futures_mark_candle_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/history-mark-candles``.
-- [`get_futures_max_open_quantity`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/max-open``.
-- [`get_futures_next_funding_time`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/funding-time``.
-- [`get_futures_open_interest_limit`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/oi-limit``.
-- [`get_futures_plan_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/orders-plan-history``.
-- [`get_futures_plan_sub_order`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/plan-sub-order``.
-- [`get_futures_position_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/position/history-position``.
-- [`get_futures_position_tiers`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/query-position-lever``.
-- [`get_futures_sub_account_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/sub-account-assets``.
-- [`get_futures_symbol_price`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/symbol-price``.
-- [`get_futures_trade_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/fills-history``.
-- [`get_futures_union_config`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/union-config``.
-- [`get_futures_union_transfer_limits`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/transfer-limits``.
-- [`get_futures_vip_fee_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/vip-fee-rate``.
-- [`get_isolated_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/assets``.
-- [`get_isolated_margin_borrow_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/borrow-history``.
-- [`get_isolated_margin_fills`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/fills``.
-- [`get_isolated_margin_financial_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/financial-records``.
-- [`get_isolated_margin_flash_repay_result`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/query-flash-repay-status``.
-- [`get_isolated_margin_interest_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/interest-history``.
-- [`get_isolated_margin_interest_rate_limits`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/interest-rate-and-limit``.
-- [`get_isolated_margin_liquidation_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/liquidation-history``.
-- [`get_isolated_margin_liquidation_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/liquidation-order``.
-- [`get_isolated_margin_max_borrowable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/max-borrowable-amount``.
-- [`get_isolated_margin_max_transferable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/max-transfer-out-amount``.
-- [`get_isolated_margin_open_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/open-orders``.
-- [`get_isolated_margin_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/history-orders``.
-- [`get_isolated_margin_repay_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/repay-history``.
-- [`get_isolated_margin_risk_rate`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/risk-rate``.
-- [`get_isolated_margin_tiers`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/tier-data``.
-- [`get_pending_futures_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/orders-plan-pending``.
-- [`get_pending_spot_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/trade/current-plan-order``.
-- [`get_server_time`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/public/time``.
-- [`get_spot_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/deduct-info``.
-- [`get_spot_plan_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/trade/history-plan-order``.
-- [`get_spot_plan_sub_order`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/trade/plan-sub-order``.
-- [`get_spot_sub_account_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/subaccount-assets``.
-- [`get_spot_sub_account_transfer_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/sub-main-trans-record``.
-- [`get_sub_account_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/wallet/subaccount-deposit-address``.
-- [`get_sub_account_deposit_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/wallet/subaccount-deposit-records``.
-- [`get_uta_account_open_interest_limit`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/open-interest-limit``.
-- [`get_uta_adl_rank`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/position/adlRank``.
-- [`get_uta_all_risk_reserves`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/risk-reserve-all``.
-- [`get_uta_cash_dividend_records`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/cash-dividend-records``.
-- [`get_uta_convert_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/convert-records``.
-- [`get_uta_current_funding_rate`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/current-fund-rate``.
-- [`get_uta_delta_info`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/delta-info``.
-- [`get_uta_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/deposit-address``.
-- [`get_uta_deposit_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/deposit-records``.
-- [`get_uta_discount_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/discount-rate``.
-- [`get_uta_eligible_discount_rates`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-discount-rate``.
-- [`get_uta_eligible_loan_info`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-loan-info``.
-- [`get_uta_eligible_margin_tiers`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-margin-tier``.
-- [`get_uta_eligible_symbols`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-symbols``.
-- [`get_uta_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/deduct-info``.
-- [`get_uta_fee_group`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/fee-group``.
-- [`get_uta_fee_rate`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/fee-rate``.
-- [`get_uta_financial_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/financial-records``.
-- [`get_uta_funding_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/funding-assets``.
-- [`get_uta_funding_rate_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/history-fund-rate``.
-- [`get_uta_funding_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/funding-financial-records``.
-- [`get_uta_futures_active_buy_sell`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-active-buy-sell``.
-- [`get_uta_futures_long_short`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-long-short``.
-- [`get_uta_futures_long_short_ratio`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-account-long-short``.
-- [`get_uta_futures_position_long_short`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-position-long-short``.
-- [`get_uta_hourly_risk_reserve`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/risk-reserve-hour``.
-- [`get_uta_index_components`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/index-components``.
-- [`get_uta_margin_isolated_borrow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-isolated-borrow``.
-- [`get_uta_margin_loan_growth`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-loan-growth``.
-- [`get_uta_margin_loan_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-loans``.
-- [`get_uta_margin_long_short`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-long-short``.
-- [`get_uta_max_borrowable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/max-borrowable``.
-- [`get_uta_max_open_available`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/max-open-available``.
-- [`get_uta_max_transferable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/max-transferable``.
-- [`get_uta_open_interest`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/open-interest``.
-- [`get_uta_open_interest_limit`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/oi-limit``.
-- [`get_uta_payment_coins`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/payment-coins``.
-- [`get_uta_position_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/position/history-position``.
-- [`get_uta_position_tiers`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/position-tier``.
-- [`get_uta_position_transfer_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/move-position-history``.
-- [`get_uta_proof_of_reserves`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/proof-of-reserves``.
-- [`get_uta_rate_limit_quota`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/user/rate-limit-quota``.
-- [`get_uta_repayable_coins`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/repayable-coins``.
-- [`get_uta_risk_reserve`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/risk-reserve``.
-- [`get_uta_rpi_orderbook`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/rpi-orderbook``.
-- [`get_uta_rpi_symbols`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/rpi-symbols``.
-- [`get_uta_score_weights`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/score-weights``.
-- [`get_uta_settings`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/settings``.
-- [`get_uta_small_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/convert/small-assets``.
-- [`get_uta_small_assets_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/convert/small-assets-history``.
-- [`get_uta_split_records`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/split-records``.
-- [`get_uta_spot_fund_flow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/spot-fund-flow``.
-- [`get_uta_spot_net_flow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/spot-net-flow``.
-- [`get_uta_spot_whale_flow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/spot-whale-flow``.
-- [`get_uta_strategy_sub_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/trade/strategy-sub-orders``.
-- [`get_uta_sub_account_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-unified-assets``.
-- [`get_uta_sub_account_transfer_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-transfer-record``.
-- [`get_uta_sub_accounts`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/user/sub-list``.
-- [`get_uta_sub_api_list`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/user/sub-api-list``.
-- [`get_uta_sub_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-deposit-address``.
-- [`get_uta_sub_deposit_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-deposit-records``.
-- [`get_uta_transferable_coins`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/transferable-coins``.
-- [`get_uta_upgrade_status`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/switch-status``.
-- [`modify_futures_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/modify-order``.
-- [`modify_futures_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/modify-plan-order``.
-- [`modify_futures_tpsl_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/modify-tpsl-order``. Pass an empty size for position-wide TP/SL orders.
-- [`modify_spot_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/modify-plan-order``.
-- [`modify_uta_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/batch-modify-order``. At most 20 orders in one category; ACK does not confirm matching-engine completion.
-- [`modify_uta_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/modify-order``. Symbol and category satisfy the September 30, 2026 requirements.
+- [`adjust_futures_position_margin`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-margin``.
+- [`adjust_uta_position_margin`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/set-margin``..
+- [`batch_cancel_replace_spot_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/batch-cancel-replace-order``..
+- [`batch_create_classic_sub_accounts`](../dcex/bitget/_trade_http.py) — Create 1..5 virtual sub-accounts and API keys using an array body..
+- [`borrow_cross_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/borrow``..
+- [`borrow_isolated_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/borrow``..
+- [`borrow_uta_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/borrow``..
+- [`cancel_all_futures_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/cancel-all-orders``..
+- [`cancel_cross_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/batch-cancel-order``..
+- [`cancel_cross_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/cancel-order``..
+- [`cancel_futures_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/cancel-plan-order``..
+- [`cancel_isolated_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/batch-cancel-order``..
+- [`cancel_isolated_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/cancel-order``..
+- [`cancel_replace_spot_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/cancel-replace-order``..
+- [`cancel_spot_orders_by_symbol`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/cancel-symbol-order``..
+- [`cancel_spot_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/cancel-plan-order``..
+- [`cancel_spot_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/batch-cancel-plan-order``..
+- [`cancel_uta_orders_by_symbol`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/cancel-symbol-order``..
+- [`classic_create_virtual_subaccount`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/create-virtual-subaccount``..
+- [`classic_create_virtual_subaccount_apikey`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/create-virtual-subaccount-apikey``..
+- [`classic_earn_elite_redeem`](../dcex/bitget/_trade_http.py) — POST /api/v2/earn/elite/redeem.
+- [`classic_earn_elite_subscribe`](../dcex/bitget/_trade_http.py) — POST /api/v2/earn/elite/subscribe.
+- [`classic_earn_loan_borrow`](../dcex/bitget/_trade_http.py) — POST /api/v2/earn/loan/borrow.
+- [`classic_earn_loan_repay`](../dcex/bitget/_trade_http.py) — POST /api/v2/earn/loan/repay.
+- [`classic_earn_loan_revise_pledge`](../dcex/bitget/_trade_http.py) — POST /api/v2/earn/loan/revise-pledge.
+- [`classic_modify_virtual_subaccount`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/modify-virtual-subaccount``..
+- [`classic_modify_virtual_subaccount_apikey`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/user/modify-virtual-subaccount-apikey``..
+- [`classic_trade`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/convert/trade``..
+- [`close_futures_positions`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/close-positions``..
+- [`close_uta_positions`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/close-positions``..
+- [`convert_futures_union_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/union-convert``..
+- [`create_uta_sub_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/create-sub``..
+- [`flash_repay_cross_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/flash-repay``..
+- [`flash_repay_isolated_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/flash-repay``..
+- [`get_all_trade_rates`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/common/all-trade-rate``..
+- [`get_classic_account_bot_assets`](../dcex/bitget/_trade_http.py) — GET /api/v2/account/bot-assets.
+- [`get_classic_account_upgrade_status`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/upgrade-status``..
+- [`get_classic_auction`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/spot/market/auction``..
+- [`get_classic_convert_currencies`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/convert/currencies``..
+- [`get_classic_convert_record`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/convert/convert-record``..
+- [`get_classic_earn_elite_assets`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/elite/assets.
+- [`get_classic_earn_elite_product`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/elite/product.
+- [`get_classic_earn_elite_records`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/elite/records.
+- [`get_classic_earn_elite_redeem_info`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/elite/redeem-info.
+- [`get_classic_earn_elite_subscribe_info`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/elite/subscribe-info.
+- [`get_classic_earn_elite_subscribe_result`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/elite/subscribe-result.
+- [`get_classic_earn_loan_borrow_history`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/loan/borrow-history.
+- [`get_classic_earn_loan_debts`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/loan/debts.
+- [`get_classic_earn_loan_ongoing_orders`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/loan/ongoing-orders.
+- [`get_classic_earn_loan_public_coin_infos`](../dcex/bitget/_market_http.py) — GET /api/v2/earn/loan/public/coinInfos.
+- [`get_classic_earn_loan_public_hour_interest`](../dcex/bitget/_market_http.py) — GET /api/v2/earn/loan/public/hour-interest.
+- [`get_classic_earn_loan_reduces`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/loan/reduces.
+- [`get_classic_earn_loan_repay_history`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/loan/repay-history.
+- [`get_classic_earn_loan_revise_history`](../dcex/bitget/_trade_http.py) — GET /api/v2/earn/loan/revise-history.
+- [`get_classic_interest_rate_record`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/margin/interest-rate-record``..
+- [`get_classic_margin_currencies`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/margin/currencies``..
+- [`get_classic_merge_depth`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/spot/market/merge-depth``..
+- [`get_classic_quoted_price`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/convert/quoted-price``..
+- [`get_classic_spot_wallet_withdrawal_records`](../dcex/bitget/_trade_http.py) — GET /api/v2/spot/wallet/withdrawal-records.
+- [`get_classic_vip_fee_rate`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/spot/market/vip-fee-rate``..
+- [`get_classic_virtual_subaccount_apikey_list`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/user/virtual-subaccount-apikey-list``..
+- [`get_classic_virtual_subaccount_list`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/user/virtual-subaccount-list``..
+- [`get_cross_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/assets``..
+- [`get_cross_margin_borrow_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/borrow-history``..
+- [`get_cross_margin_fills`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/fills``..
+- [`get_cross_margin_financial_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/financial-records``..
+- [`get_cross_margin_flash_repay_result`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/query-flash-repay-status``..
+- [`get_cross_margin_interest_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/interest-history``..
+- [`get_cross_margin_interest_rate_limits`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/interest-rate-and-limit``..
+- [`get_cross_margin_liquidation_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/liquidation-history``..
+- [`get_cross_margin_liquidation_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/liquidation-order``..
+- [`get_cross_margin_max_borrowable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/max-borrowable-amount``..
+- [`get_cross_margin_max_transferable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/max-transfer-out-amount``..
+- [`get_cross_margin_open_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/open-orders``..
+- [`get_cross_margin_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/history-orders``..
+- [`get_cross_margin_repay_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/repay-history``..
+- [`get_cross_margin_risk_rate`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/account/risk-rate``..
+- [`get_cross_margin_tiers`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/crossed/tier-data``..
+- [`get_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/wallet/deposit-address``..
+- [`get_futures_adl_rank`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/position/adlRank``..
+- [`get_futures_discount_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/discount-rate``..
+- [`get_futures_estimated_open_count`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/open-count``..
+- [`get_futures_fill_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/fill-history``..
+- [`get_futures_index_candle_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/history-index-candles``..
+- [`get_futures_interest_exchange_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/exchange-rate``..
+- [`get_futures_interest_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/interest-history``..
+- [`get_futures_interest_rate_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/union-interest-rate-history``..
+- [`get_futures_isolated_symbols`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/isolated-symbols``..
+- [`get_futures_liquidation_price`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/liq-price``..
+- [`get_futures_margin_mode_switch_quota`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/switch-union-usdt``..
+- [`get_futures_mark_candle_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/history-mark-candles``..
+- [`get_futures_max_open_quantity`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/max-open``..
+- [`get_futures_next_funding_time`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/funding-time``..
+- [`get_futures_open_interest_limit`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/oi-limit``..
+- [`get_futures_plan_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/orders-plan-history``..
+- [`get_futures_plan_sub_order`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/plan-sub-order``..
+- [`get_futures_position_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/position/history-position``..
+- [`get_futures_position_tiers`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/query-position-lever``..
+- [`get_futures_sub_account_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/sub-account-assets``..
+- [`get_futures_symbol_price`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/symbol-price``..
+- [`get_futures_trade_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/fills-history``..
+- [`get_futures_union_config`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/union-config``..
+- [`get_futures_union_transfer_limits`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/account/transfer-limits``..
+- [`get_futures_vip_fee_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/mix/market/vip-fee-rate``..
+- [`get_isolated_margin_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/assets``..
+- [`get_isolated_margin_borrow_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/borrow-history``..
+- [`get_isolated_margin_fills`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/fills``..
+- [`get_isolated_margin_financial_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/financial-records``..
+- [`get_isolated_margin_flash_repay_result`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/query-flash-repay-status``..
+- [`get_isolated_margin_interest_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/interest-history``..
+- [`get_isolated_margin_interest_rate_limits`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/interest-rate-and-limit``..
+- [`get_isolated_margin_liquidation_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/liquidation-history``..
+- [`get_isolated_margin_liquidation_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/liquidation-order``..
+- [`get_isolated_margin_max_borrowable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/max-borrowable-amount``..
+- [`get_isolated_margin_max_transferable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/max-transfer-out-amount``..
+- [`get_isolated_margin_open_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/open-orders``..
+- [`get_isolated_margin_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/history-orders``..
+- [`get_isolated_margin_repay_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/repay-history``..
+- [`get_isolated_margin_risk_rate`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/account/risk-rate``..
+- [`get_isolated_margin_tiers`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/margin/isolated/tier-data``..
+- [`get_pending_futures_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/mix/order/orders-plan-pending``..
+- [`get_pending_spot_plan_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/trade/current-plan-order``..
+- [`get_reality_company_overview`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/company-overview.
+- [`get_reality_dividends`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/dividends.
+- [`get_reality_earnings_forecast`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/earnings-forecast.
+- [`get_reality_executive_shareholdings`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/executive-shareholdings.
+- [`get_reality_inner_trades`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/inner-trades.
+- [`get_reality_share_capital_change`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/share-capital-change.
+- [`get_reality_sharehold_detail`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/sharehold-detail.
+- [`get_reality_suspension_resumption_info`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/suspension-resumption-info.
+- [`get_reality_valuation_indicators`](../dcex/bitget/_market_http.py) — GET /api/v3/reality/market/valuation-indicators.
+- [`get_server_time`](../dcex/bitget/_market_http.py) — Call ``GET /api/v2/public/time``..
+- [`get_spot_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/deduct-info``..
+- [`get_spot_plan_order_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/trade/history-plan-order``..
+- [`get_spot_plan_sub_order`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/trade/plan-sub-order``..
+- [`get_spot_sub_account_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/subaccount-assets``..
+- [`get_spot_sub_account_transfer_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/account/sub-main-trans-record``..
+- [`get_sub_account_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/wallet/subaccount-deposit-address``..
+- [`get_sub_account_deposit_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v2/spot/wallet/subaccount-deposit-records``..
+- [`get_uta_account_max_withdrawal`](../dcex/bitget/_trade_http.py) — GET /api/v3/account/max-withdrawal.
+- [`get_uta_account_open_interest_limit`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/open-interest-limit``..
+- [`get_uta_account_withdraw_address`](../dcex/bitget/_trade_http.py) — GET /api/v3/account/withdraw-address.
+- [`get_uta_account_withdrawal_records`](../dcex/bitget/_trade_http.py) — GET /api/v3/account/withdrawal-records.
+- [`get_uta_adl_rank`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/position/adlRank``..
+- [`get_uta_all_risk_reserves`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/risk-reserve-all``..
+- [`get_uta_cash_dividend_records`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/cash-dividend-records``..
+- [`get_uta_convert_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/convert-records``..
+- [`get_uta_current_funding_rate`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/current-fund-rate``..
+- [`get_uta_delta_info`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/delta-info``..
+- [`get_uta_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/deposit-address``..
+- [`get_uta_deposit_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/deposit-records``..
+- [`get_uta_discount_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/discount-rate``..
+- [`get_uta_eligible_discount_rates`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-discount-rate``..
+- [`get_uta_eligible_loan_info`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-loan-info``..
+- [`get_uta_eligible_margin_tiers`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-margin-tier``..
+- [`get_uta_eligible_symbols`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/eligible-symbols``..
+- [`get_uta_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/deduct-info``..
+- [`get_uta_fee_group`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/fee-group``..
+- [`get_uta_fee_rate`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/fee-rate``..
+- [`get_uta_financial_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/financial-records``..
+- [`get_uta_funding_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/funding-assets``..
+- [`get_uta_funding_rate_history`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/history-fund-rate``..
+- [`get_uta_funding_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/funding-financial-records``..
+- [`get_uta_futures_active_buy_sell`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-active-buy-sell``..
+- [`get_uta_futures_long_short`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-long-short``..
+- [`get_uta_futures_long_short_ratio`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-account-long-short``..
+- [`get_uta_futures_position_long_short`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/futures-position-long-short``..
+- [`get_uta_hourly_risk_reserve`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/risk-reserve-hour``..
+- [`get_uta_index_components`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/index-components``..
+- [`get_uta_margin_isolated_borrow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-isolated-borrow``..
+- [`get_uta_margin_loan_growth`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-loan-growth``..
+- [`get_uta_margin_loan_rates`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-loans``..
+- [`get_uta_margin_long_short`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/margin-long-short``..
+- [`get_uta_max_borrowable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/max-borrowable``..
+- [`get_uta_max_open_available`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/max-open-available``..
+- [`get_uta_max_transferable`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/max-transferable``..
+- [`get_uta_open_interest`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/open-interest``..
+- [`get_uta_open_interest_limit`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/oi-limit``..
+- [`get_uta_payment_coins`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/payment-coins``..
+- [`get_uta_position_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/position/history-position``..
+- [`get_uta_position_tiers`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/position-tier``..
+- [`get_uta_position_transfer_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/move-position-history``..
+- [`get_uta_proof_of_reserves`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/proof-of-reserves``..
+- [`get_uta_rate_limit_quota`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/user/rate-limit-quota``..
+- [`get_uta_repayable_coins`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/repayable-coins``..
+- [`get_uta_risk_reserve`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/risk-reserve``..
+- [`get_uta_rpi_orderbook`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/rpi-orderbook``..
+- [`get_uta_rpi_symbols`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/rpi-symbols``..
+- [`get_uta_score_weights`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/score-weights``..
+- [`get_uta_settings`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/settings``..
+- [`get_uta_small_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/convert/small-assets``..
+- [`get_uta_small_assets_history`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/convert/small-assets-history``..
+- [`get_uta_split_records`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/split-records``..
+- [`get_uta_spot_fund_flow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/spot-fund-flow``..
+- [`get_uta_spot_net_flow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/spot-net-flow``..
+- [`get_uta_spot_whale_flow`](../dcex/bitget/_market_http.py) — Call ``GET /api/v3/market/spot-whale-flow``..
+- [`get_uta_strategy_sub_orders`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/trade/strategy-sub-orders``..
+- [`get_uta_sub_account_assets`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-unified-assets``..
+- [`get_uta_sub_account_transfer_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-transfer-record``..
+- [`get_uta_sub_accounts`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/user/sub-list``..
+- [`get_uta_sub_api_list`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/user/sub-api-list``..
+- [`get_uta_sub_deposit_address`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-deposit-address``..
+- [`get_uta_sub_deposit_records`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/sub-deposit-records``..
+- [`get_uta_trade_grid_bot_detail`](../dcex/bitget/_trade_http.py) — GET /api/v3/trade/grid/bot-detail.
+- [`get_uta_trade_grid_list_details`](../dcex/bitget/_trade_http.py) — GET /api/v3/trade/grid/list-details.
+- [`get_uta_trade_grid_neutral_bot_detail`](../dcex/bitget/_trade_http.py) — GET /api/v3/trade/grid/neutral-bot-detail.
+- [`get_uta_trade_grid_neutral_list_details`](../dcex/bitget/_trade_http.py) — GET /api/v3/trade/grid/neutral-list-details.
+- [`get_uta_transferable_coins`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/transferable-coins``..
+- [`get_uta_upgrade_status`](../dcex/bitget/_trade_http.py) — Call ``GET /api/v3/account/switch-status``..
+- [`modify_futures_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/modify-order``..
+- [`modify_futures_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/modify-plan-order``..
+- [`modify_futures_tpsl_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/modify-tpsl-order``.
+- [`modify_spot_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/modify-plan-order``..
+- [`modify_uta_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/batch-modify-order``.
+- [`modify_uta_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/modify-order``.
 - [`move_uta_positions`](../dcex/bitget/_trade_http.py) — Move up to 10 cross-margin positions within the same account family.
-- [`place_cross_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/batch-place-order``.
-- [`place_cross_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/place-order``.
-- [`place_futures_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/place-plan-order``.
-- [`place_futures_position_tpsl`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/place-pos-tpsl``.
-- [`place_futures_tpsl_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/place-tpsl-order``.
-- [`place_isolated_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/batch-place-order``.
-- [`place_isolated_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/place-order``.
-- [`place_spot_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/place-plan-order``.
-- [`repay_cross_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/repay``.
-- [`repay_isolated_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/repay``.
-- [`reverse_futures_position`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/click-backhand``.
-- [`set_futures_all_leverage`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-all-leverage``.
-- [`set_futures_asset_mode`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-asset-mode``.
-- [`set_futures_auto_margin`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-auto-margin``.
-- [`set_spot_deposit_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/wallet/modify-deposit-account``.
-- [`set_spot_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/account/switch-deduct``.
-- [`set_uta_account_mode`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/adjust-account-mode``. Uses advanced mode with delta_switch; the deprecated delta mode is not accepted.
-- [`set_uta_cancel_countdown`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/countdown-cancel-all``. Exchange approval is required; countdown is 0 or 5..60 seconds.
-- [`set_uta_collateral_type`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/set-collateral-type``.
-- [`set_uta_deposit_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/deposit-account``.
-- [`set_uta_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/switch-deduct``.
-- [`set_uta_repay_mode`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/set-repay-mode``.
-- [`transfer_spot_sub_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/wallet/subaccount-transfer``.
-- [`transfer_uta_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/transfer``.
-- [`transfer_uta_sub_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/sub-transfer``.
-- [`transfer_uta_sub_to_master`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/sub-master-transfer``.
-- [`upgrade_classic_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/account/upgrade``.
-- [`upgrade_to_uta`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/switch``.
-- [`uta_create_sub_api`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/create-sub-api``.
-- [`uta_delete_sub`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/delete-sub``.
-- [`uta_delete_sub_api`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/delete-sub-api``.
-- [`uta_freeze_sub`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/freeze-sub``.
-- [`uta_set_rate_limit_quota`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/set-rate-limit-quota``.
-- [`uta_small_assets_trade`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/convert/small-assets-trade``.
-- [`uta_update_sub_api`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/update-sub-api``.
+- [`place_cross_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/batch-place-order``..
+- [`place_cross_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/place-order``..
+- [`place_futures_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/place-plan-order``..
+- [`place_futures_position_tpsl`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/place-pos-tpsl``..
+- [`place_futures_tpsl_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/place-tpsl-order``..
+- [`place_isolated_margin_batch_orders`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/batch-place-order``..
+- [`place_isolated_margin_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/place-order``..
+- [`place_spot_plan_order`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/trade/place-plan-order``..
+- [`repay_cross_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/crossed/account/repay``..
+- [`repay_isolated_margin_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/margin/isolated/account/repay``..
+- [`reverse_futures_position`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/click-backhand``..
+- [`set_futures_all_leverage`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-all-leverage``..
+- [`set_futures_asset_mode`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-asset-mode``..
+- [`set_futures_auto_margin`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/account/set-auto-margin``..
+- [`set_spot_deposit_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/wallet/modify-deposit-account``..
+- [`set_spot_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/account/switch-deduct``..
+- [`set_uta_account_mode`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/adjust-account-mode``.
+- [`set_uta_cancel_countdown`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/countdown-cancel-all``.
+- [`set_uta_collateral_type`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/set-collateral-type``..
+- [`set_uta_deposit_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/deposit-account``..
+- [`set_uta_fee_deduction`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/switch-deduct``..
+- [`set_uta_repay_mode`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/set-repay-mode``..
+- [`transfer_spot_sub_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/wallet/subaccount-transfer``..
+- [`transfer_uta_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/transfer``..
+- [`transfer_uta_sub_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/sub-transfer``..
+- [`transfer_uta_sub_to_master`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/sub-master-transfer``..
+- [`upgrade_classic_account`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/spot/account/upgrade``..
+- [`upgrade_to_uta`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/account/switch``..
+- [`uta_create_sub_api`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/create-sub-api``..
+- [`uta_delete_sub`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/delete-sub``..
+- [`uta_delete_sub_api`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/delete-sub-api``..
+- [`uta_freeze_sub`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/freeze-sub``..
+- [`uta_set_rate_limit_quota`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/set-rate-limit-quota``..
+- [`uta_small_assets_trade`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/convert/small-assets-trade``..
+- [`uta_trade_grid_add_investment`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/add-investment.
+- [`uta_trade_grid_close_bot`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/close-bot.
+- [`uta_trade_grid_create_bot`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/create-bot.
+- [`uta_trade_grid_create_neutral_bot`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/create-neutral-bot.
+- [`uta_trade_grid_modify_bot`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/modify-bot.
+- [`uta_trade_grid_modify_grid_interval`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/modify-grid-interval.
+- [`uta_trade_grid_modify_neutral_bot`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/modify-neutral-bot.
+- [`uta_trade_grid_modify_neutral_grid_interval`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/modify-neutral-grid-interval.
+- [`uta_trade_grid_validate`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/validate.
+- [`uta_trade_grid_validate_neutral`](../dcex/bitget/_trade_http.py) — POST /api/v3/trade/grid/validate-neutral.
+- [`uta_update_sub_api`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/user/update-sub-api``..
 
-## Kraken
-
-- [`cancel_spot_batch_orders`](../dcex/kraken/_trade_http.py) — Cancel up to 50 txids/userrefs or client order identifiers.
-- [`check_futures_api_key`](../dcex/kraken/_trade_http.py) — GET /api/auth/v1/api-keys/v3/check.
-- [`create_spot_subaccount`](../dcex/kraken/_trade_http.py) — POST /0/private/CreateSubaccount. Requires an eligible institutional master account and Funds Withdraw permission.
-- [`delete_spot_export_report`](../dcex/kraken/_trade_http.py) — POST /0/private/RemoveExport.
-- [`get_futures_account_log`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/account-log. Use response headers for the continuation token; timestamps are milliseconds.
-- [`get_futures_account_log_csv`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/accountlogcsv. Use response headers for the continuation token; timestamps are milliseconds.
-- [`get_futures_execution_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/executions. Use response headers for the continuation token; timestamps are milliseconds.
-- [`get_futures_funding_history`](../dcex/kraken/_market_http.py) — Get historical derivatives funding rates.
-- [`get_futures_instrument_status`](../dcex/kraken/_market_http.py) — GET /derivatives/api/v3/instruments/{symbol}/status.
-- [`get_futures_instrument_statuses`](../dcex/kraken/_market_http.py) — GET /derivatives/api/v3/instruments/status.
-- [`get_futures_leverage_preferences`](../dcex/kraken/_trade_http.py) — Get configured futures margin and leverage preferences.
-- [`get_futures_market_analytics`](../dcex/kraken/_market_http.py) — GET /api/charts/v1/analytics/{symbol}/{analytics_type}.
-- [`get_futures_notifications`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/notifications.
-- [`get_futures_order_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/orders. Use response headers for the continuation token; timestamps are milliseconds.
-- [`get_futures_pnl_preferences`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/pnlpreferences.
-- [`get_futures_portfolio_margin_parameters`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/portfolio-margining/parameters.
-- [`get_futures_position_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/positions. Use response headers for the continuation token; timestamps are milliseconds.
-- [`get_futures_self_trade_strategy`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/self-trade-strategy.
-- [`get_futures_subaccount_trading_status`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled.
-- [`get_futures_subaccounts`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/subaccounts.
-- [`get_futures_ticker`](../dcex/kraken/_market_http.py) — GET /derivatives/api/v3/tickers/{symbol}.
-- [`get_futures_trading_instruments`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/trading/instruments.
-- [`get_futures_trigger_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/triggers. Use response headers for the continuation token; timestamps are milliseconds.
-- [`get_futures_unwind_queue`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/unwindqueue.
-- [`get_spot_api_key_info`](../dcex/kraken/_trade_http.py) — POST /0/private/GetApiKeyInfo.
-- [`get_spot_credit_lines`](../dcex/kraken/_trade_http.py) — POST /0/private/CreditLines.
-- [`get_spot_deposit_addresses`](../dcex/kraken/_trade_http.py) — POST /0/private/DepositAddresses. Legacy funding API: active but no longer updated.
-- [`get_spot_deposit_methods`](../dcex/kraken/_trade_http.py) — POST /0/private/DepositMethods. Legacy funding API: active but no longer updated.
-- [`get_spot_deposit_status`](../dcex/kraken/_trade_http.py) — POST /0/private/DepositStatus. Legacy funding API: active but no longer updated.
-- [`get_spot_export_status`](../dcex/kraken/_trade_http.py) — POST /0/private/ExportStatus.
-- [`get_spot_extended_balance`](../dcex/kraken/_trade_http.py) — Get balances including credits, used credit and funds held for trading.
-- [`get_spot_grouped_orderbook`](../dcex/kraken/_market_http.py) — GET /0/public/GroupedBook.
-- [`get_spot_ledger_entries`](../dcex/kraken/_trade_http.py) — POST /0/private/QueryLedgers.
-- [`get_spot_level3_orderbook`](../dcex/kraken/_trade_http.py) — POST /0/private/Level3.
-- [`get_spot_maintenance_schedule`](../dcex/kraken/_market_http.py) — GET /0/public/MaintenanceSchedule.
-- [`get_spot_order_amends`](../dcex/kraken/_trade_http.py) — POST /0/private/OrderAmends.
-- [`get_spot_post_trade_data`](../dcex/kraken/_market_http.py) — GET /0/public/PostTrade.
-- [`get_spot_pre_trade_data`](../dcex/kraken/_market_http.py) — GET /0/public/PreTrade.
-- [`get_spot_trades_info`](../dcex/kraken/_trade_http.py) — POST /0/private/QueryTrades.
-- [`get_spot_wallet_accounts`](../dcex/kraken/_trade_http.py) — POST /0/private/ListWalletAccounts.
-- [`manage_futures_batch_orders`](../dcex/kraken/_trade_http.py) — Send, edit or cancel 1 to 500 instructions; price and size fields are JSON numbers.
-- [`place_spot_batch_orders`](../dcex/kraken/_trade_http.py) — Submit 2..15 orders for one pair as a signed JSON batch.
-- [`request_spot_export_report`](../dcex/kraken/_trade_http.py) — POST /0/private/AddExport.
-- [`retrieve_spot_export`](../dcex/kraken/_trade_http.py) — Download a completed Spot export as ZIP bytes, preserving binary content.
-- [`set_futures_leverage_preference`](../dcex/kraken/_trade_http.py) — Set isolated margin with max_leverage; omit it to select cross margin.
-- [`set_futures_pnl_preference`](../dcex/kraken/_trade_http.py) — PUT /derivatives/api/v3/pnlpreferences.
-- [`set_futures_self_trade_strategy`](../dcex/kraken/_trade_http.py) — PUT /derivatives/api/v3/self-trade-strategy.
-- [`set_futures_subaccount_trading_status`](../dcex/kraken/_trade_http.py) — PUT /derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled.
-- [`simulate_futures_portfolio`](../dcex/kraken/_trade_http.py) — POST /derivatives/api/v3/portfolio-margining/simulate. Available only in Kraken pre-production environments; configure futures_base_url.
-- [`transfer_futures_sub_account`](../dcex/kraken/_trade_http.py) — POST /derivatives/api/v3/transfer/subaccount.
-- [`transfer_spot_sub_account`](../dcex/kraken/_trade_http.py) — POST /0/private/AccountTransfer. Master account API key and Kraken subaccount eligibility are required.
-
-## MEXC
-
-- [`cancel_contract_batch_orders_by_external_id`](../dcex/mexc/_trade_http.py) — POST /api/v1/private/order/batch_cancel_with_external. Preserve item-level results for batch operations.
-- [`cancel_spot_all_orders`](../dcex/mexc/_trade_http.py) — Cancel all open Spot orders across the account.
-- [`convert_dust`](../dcex/mexc/_trade_http.py) — POST /api/v3/capital/convert. Timestamps use milliseconds; asset/IP lists use commas.
-- [`create_sub_account`](../dcex/mexc/_trade_http.py) — POST /api/v3/sub-account/virtualSubAccount. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_announcements`](../dcex/mexc/_market_http.py) — GET /api/v3/announcements. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_api_key_info`](../dcex/mexc/_trade_http.py) — GET /api/v3/apiKeyInfo. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_contract_30_day_fee_statistics`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/asset_book/order_deal_fee/total. Preserve item-level results for batch operations.
-- [`get_contract_batch_orders_by_external_id`](../dcex/mexc/_trade_http.py) — POST /api/v1/private/order/batch_query_with_external. Preserve item-level results for batch operations.
-- [`get_contract_closed_orders`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/order/list/close_orders. Preserve item-level results for batch operations.
-- [`get_contract_discount_usage`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/discountType. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_contract_fee_deduction_config`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/feeDeductConfigs. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_contract_fee_details`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/order/fee_details. Preserve item-level results for batch operations.
-- [`get_contract_fee_discount_config`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/config/contractFeeDiscountConfig. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_contract_open_stop_orders`](../dcex/mexc/_trade_http.py) — Get current contract take-profit/stop-loss orders.
-- [`get_contract_profit_rate`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/profit_rate/{type}. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_contract_supported_currencies`](../dcex/mexc/_market_http.py) — GET /api/v1/contract/support_currencies. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_convertible_assets`](../dcex/mexc/_trade_http.py) — GET /api/v3/capital/convert/list. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_dust_conversion_history`](../dcex/mexc/_trade_http.py) — GET /api/v3/capital/convert. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_spot_offline_symbols`](../dcex/mexc/_market_http.py) — GET /api/v3/symbol/offline. Timestamps use milliseconds; asset/IP lists use commas.
-- [`get_uid`](../dcex/mexc/_trade_http.py) — GET /api/v3/uid. Timestamps use milliseconds; asset/IP lists use commas.
-- [`set_api_key_ip_whitelist`](../dcex/mexc/_trade_http.py) — POST /api/v3/apiKeyInfo. Timestamps use milliseconds; asset/IP lists use commas.
-
-## BingX
+## Bingx
 
 - [`adjust_coin_swap_position_margin`](../dcex/bingx/_trade_http.py) — POST /openApi/cswap/v1/trade/positionMargin.
-- [`adjust_simulated_trading_balance`](../dcex/bingx/_trade_http.py) — POST /openApi/swap/v2/trade/getVst. Timestamps use milliseconds.
-- [`adjust_swap_position_margin`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v2/trade/positionMargin``.
-- [`amend_swap_order`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/trade/amend``.
+- [`adjust_simulated_trading_balance`](../dcex/bingx/_trade_http.py) — POST /openApi/swap/v2/trade/getVst.
+- [`adjust_swap_position_margin`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v2/trade/positionMargin``..
+- [`amend_swap_order`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/trade/amend``..
 - [`cancel_coin_swap_all_orders`](../dcex/bingx/_trade_http.py) — POST /openApi/cswap/v1/trade/allOpenOrders.
 - [`cancel_coin_swap_order`](../dcex/bingx/_trade_http.py) — DELETE /openApi/cswap/v1/trade/cancelOrder.
 - [`cancel_spot_oco`](../dcex/bingx/_trade_http.py) — POST /openApi/spot/v1/oco/cancel.
-- [`cancel_swap_twap_order`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/twap/cancelOrder``.
+- [`cancel_swap_twap_order`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/twap/cancelOrder``..
 - [`close_coin_swap_all_positions`](../dcex/bingx/_trade_http.py) — POST /openApi/cswap/v1/trade/closeAllPositions.
-- [`create_sub_account`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/create. Timestamps use milliseconds.
-- [`create_sub_account_api_key`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/apiKey/create. Timestamps use milliseconds.
-- [`create_sub_account_deposit_address`](../dcex/bingx/_trade_http.py) — POST /openApi/wallets/v1/capital/deposit/createSubAddress. Timestamps use milliseconds.
-- [`delete_sub_account_api_key`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/apiKey/del. Timestamps use milliseconds.
-- [`export_swap_income`](../dcex/bingx/_trade_http.py) — Download the income report as Excel bytes; timestamps use milliseconds.
-- [`get_api_permissions`](../dcex/bingx/_trade_http.py) — GET /openApi/v1/account/apiPermissions. Timestamps use milliseconds.
-- [`get_api_restrictions`](../dcex/bingx/_trade_http.py) — GET /openApi/v1/account/apiRestrictions. Timestamps use milliseconds.
-- [`get_coin_network_config`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/config/getall. Timestamps use milliseconds.
+- [`create_sub_account`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/create.
+- [`create_sub_account_api_key`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/apiKey/create.
+- [`create_sub_account_deposit_address`](../dcex/bingx/_trade_http.py) — POST /openApi/wallets/v1/capital/deposit/createSubAddress.
+- [`delete_sub_account_api_key`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/apiKey/del.
+- [`export_swap_income`](../dcex/bingx/_trade_http.py) — Download the income report as Excel bytes; timestamps use milliseconds..
+- [`get_api_permissions`](../dcex/bingx/_trade_http.py) — GET /openApi/v1/account/apiPermissions.
+- [`get_api_restrictions`](../dcex/bingx/_trade_http.py) — GET /openApi/v1/account/apiRestrictions.
+- [`get_coin_network_config`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/config/getall.
 - [`get_coin_swap_balance`](../dcex/bingx/_trade_http.py) — GET /openApi/cswap/v1/user/balance.
 - [`get_coin_swap_commission_rate`](../dcex/bingx/_trade_http.py) — GET /openApi/cswap/v1/user/commissionRate.
 - [`get_coin_swap_contracts`](../dcex/bingx/_market_http.py) — GET /openApi/cswap/v1/market/contracts.
@@ -769,94 +978,202 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_coin_swap_positions`](../dcex/bingx/_trade_http.py) — GET /openApi/cswap/v1/user/positions.
 - [`get_coin_swap_premium_index`](../dcex/bingx/_market_http.py) — GET /openApi/cswap/v1/market/premiumIndex.
 - [`get_coin_swap_ticker`](../dcex/bingx/_market_http.py) — GET /openApi/cswap/v1/market/ticker.
-- [`get_deposit_addresses`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/deposit/address. Timestamps use milliseconds.
+- [`get_deposit_addresses`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/deposit/address.
 - [`get_deposit_history`](../dcex/bingx/_trade_http.py) — GET /openApi/api/v3/capital/deposit/hisrec.
-- [`get_deposit_risk_records`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/deposit/riskRecords. Timestamps use milliseconds.
+- [`get_deposit_risk_records`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/deposit/riskRecords.
+- [`get_internal_transfer_records`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/innerTransfer/records.
 - [`get_spot_historical_kline`](../dcex/bingx/_market_http.py) — GET /openApi/market/his/v1/kline.
-- [`get_spot_historical_trades`](../dcex/bingx/_market_http.py) — GET /openApi/market/his/v1/trade. Timestamps use milliseconds.
+- [`get_spot_historical_trades`](../dcex/bingx/_market_http.py) — GET /openApi/market/his/v1/trade.
 - [`get_spot_oco`](../dcex/bingx/_trade_http.py) — GET /openApi/spot/v1/oco/orderList.
 - [`get_spot_oco_history`](../dcex/bingx/_trade_http.py) — GET /openApi/spot/v1/oco/historyOrderList.
 - [`get_spot_open_oco`](../dcex/bingx/_trade_http.py) — GET /openApi/spot/v1/oco/openOrderList.
-- [`get_standard_futures_balance`](../dcex/bingx/_trade_http.py) — GET /openApi/contract/v1/balance. Timestamps use milliseconds.
-- [`get_standard_futures_orders`](../dcex/bingx/_trade_http.py) — GET /openApi/contract/v1/allOrders. Timestamps use milliseconds.
-- [`get_standard_futures_positions`](../dcex/bingx/_trade_http.py) — GET /openApi/contract/v1/allPosition. Timestamps use milliseconds.
-- [`get_sub_account_deposit_addresses`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/subAccount/deposit/address. Timestamps use milliseconds.
-- [`get_sub_account_deposit_history`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/deposit/subHisrec. Timestamps use milliseconds.
-- [`get_swap_asset_mode`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/assetMode``.
-- [`get_swap_fill_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/fillHistory``.
-- [`get_swap_force_orders`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/forceOrders``.
-- [`get_swap_full_orders`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/fullOrder``.
-- [`get_swap_historical_trades`](../dcex/bingx/_market_http.py) — GET /openApi/swap/v1/market/historicalTrades. Timestamps use milliseconds.
-- [`get_swap_maintenance_margin_ratios`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/maintMarginRatio``.
-- [`get_swap_margin_assets`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/user/marginAssets``.
-- [`get_swap_margin_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/positionMargin/history``.
-- [`get_swap_multi_asset_rules`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/multiAssetsRules``.
-- [`get_swap_open_order`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/openOrder``.
-- [`get_swap_open_twap_orders`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/twap/openOrders``.
-- [`get_swap_position_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/positionHistory``.
-- [`get_swap_price_ticker`](../dcex/bingx/_market_http.py) — Get the USD-M last price for one or all symbols.
-- [`get_swap_server_time`](../dcex/bingx/_market_http.py) — Get USD-M server time without authentication or a client timestamp.
-- [`get_swap_trade_fills`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/allFillOrders``.
-- [`get_swap_twap_order`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/twap/orderDetail``.
-- [`get_swap_twap_order_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/twap/historyOrders``.
-- [`modify_sub_account_api_key`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/apiKey/edit. Timestamps use milliseconds.
+- [`get_standard_futures_balance`](../dcex/bingx/_trade_http.py) — GET /openApi/contract/v1/balance.
+- [`get_standard_futures_orders`](../dcex/bingx/_trade_http.py) — GET /openApi/contract/v1/allOrders.
+- [`get_standard_futures_positions`](../dcex/bingx/_trade_http.py) — GET /openApi/contract/v1/allPosition.
+- [`get_sub_account_deposit_addresses`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/subAccount/deposit/address.
+- [`get_sub_account_deposit_history`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/deposit/subHisrec.
+- [`get_sub_account_internal_transfer_records`](../dcex/bingx/_trade_http.py) — GET /openApi/wallets/v1/capital/subAccount/innerTransfer/records.
+- [`get_swap_asset_mode`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/assetMode``..
+- [`get_swap_fill_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/fillHistory``..
+- [`get_swap_force_orders`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/forceOrders``..
+- [`get_swap_full_orders`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/fullOrder``..
+- [`get_swap_historical_trades`](../dcex/bingx/_market_http.py) — GET /openApi/swap/v1/market/historicalTrades.
+- [`get_swap_maintenance_margin_ratios`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/maintMarginRatio``..
+- [`get_swap_margin_assets`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/user/marginAssets``..
+- [`get_swap_margin_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/positionMargin/history``..
+- [`get_swap_multi_asset_rules`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/multiAssetsRules``..
+- [`get_swap_open_order`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/openOrder``..
+- [`get_swap_open_twap_orders`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/twap/openOrders``..
+- [`get_swap_position_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/trade/positionHistory``..
+- [`get_swap_price_ticker`](../dcex/bingx/_market_http.py) — Get the USD-M last price for one or all symbols..
+- [`get_swap_server_time`](../dcex/bingx/_market_http.py) — Get USD-M server time without authentication or a client timestamp..
+- [`get_swap_trade_fills`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v2/trade/allFillOrders``..
+- [`get_swap_twap_order`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/twap/orderDetail``..
+- [`get_swap_twap_order_history`](../dcex/bingx/_trade_http.py) — Call ``GET /openApi/swap/v1/twap/historyOrders``..
+- [`get_withdrawal_history`](../dcex/bingx/_trade_http.py) — GET /openApi/api/v3/capital/withdraw/history.
+- [`modify_sub_account_api_key`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/apiKey/edit.
 - [`place_coin_swap_order`](../dcex/bingx/_trade_http.py) — POST /openApi/cswap/v1/trade/order.
 - [`place_spot_oco`](../dcex/bingx/_trade_http.py) — POST /openApi/spot/v1/oco/order.
-- [`place_swap_twap_order`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/twap/order``.
+- [`place_swap_twap_order`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/twap/order``..
 - [`replace_swap_batch_orders`](../dcex/bingx/_trade_http.py) — Cancel and replace multiple swap orders; preserve per-order failure results.
-- [`reverse_swap_position`](../dcex/bingx/_trade_http.py) — POST /openApi/swap/v1/trade/reverse. Timestamps use milliseconds.
+- [`reverse_swap_position`](../dcex/bingx/_trade_http.py) — POST /openApi/swap/v1/trade/reverse.
 - [`set_coin_swap_leverage`](../dcex/bingx/_trade_http.py) — POST /openApi/cswap/v1/trade/leverage.
 - [`set_coin_swap_margin_type`](../dcex/bingx/_trade_http.py) — POST /openApi/cswap/v1/trade/marginType.
-- [`set_sub_account_frozen`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/updateStatus. Timestamps use milliseconds.
-- [`set_sub_account_transfer_authorization`](../dcex/bingx/_trade_http.py) — POST /openApi/account/v1/innerTransfer/authorizeSubAccount. Timestamps use milliseconds.
-- [`set_swap_asset_mode`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/trade/assetMode``.
-- [`set_swap_auto_add_margin`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/trade/autoAddMargin``.
-- [`set_swap_cancel_all_after`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v2/trade/cancelAllAfter``.
+- [`set_sub_account_frozen`](../dcex/bingx/_trade_http.py) — POST /openApi/subAccount/v1/updateStatus.
+- [`set_sub_account_transfer_authorization`](../dcex/bingx/_trade_http.py) — POST /openApi/account/v1/innerTransfer/authorizeSubAccount.
+- [`set_swap_asset_mode`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/trade/assetMode``..
+- [`set_swap_auto_add_margin`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v1/trade/autoAddMargin``..
+- [`set_swap_cancel_all_after`](../dcex/bingx/_trade_http.py) — Call ``POST /openApi/swap/v2/trade/cancelAllAfter``..
 
-## KuCoin
+## Kraken
+
+- [`cancel_spot_batch_orders`](../dcex/kraken/_trade_http.py) — Cancel up to 50 txids/userrefs or client order identifiers..
+- [`check_futures_api_key`](../dcex/kraken/_trade_http.py) — GET /api/auth/v1/api-keys/v3/check.
+- [`create_spot_subaccount`](../dcex/kraken/_trade_http.py) — POST /0/private/CreateSubaccount.
+- [`delete_spot_export_report`](../dcex/kraken/_trade_http.py) — POST /0/private/RemoveExport.
+- [`edit_spot_order`](../dcex/kraken/_trade_http.py) — Cancel and replace an order, returning a new txid; queue priority is lost..
+- [`get_futures_account_log`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/account-log.
+- [`get_futures_account_log_csv`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/accountlogcsv.
+- [`get_futures_chart_markets`](../dcex/kraken/_market_http.py) — GET /api/charts/v1/{tick_type}; public discovery/history; preserve response headers for pagination..
+- [`get_futures_chart_resolutions`](../dcex/kraken/_market_http.py) — GET /api/charts/v1/{tick_type}/{symbol}; public discovery/history; preserve response headers for pagination..
+- [`get_futures_chart_types`](../dcex/kraken/_market_http.py) — GET /api/charts/v1/; public discovery/history; preserve response headers for pagination..
+- [`get_futures_execution_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/executions.
+- [`get_futures_funding_history`](../dcex/kraken/_market_http.py) — Get historical derivatives funding rates..
+- [`get_futures_instrument_status`](../dcex/kraken/_market_http.py) — GET /derivatives/api/v3/instruments/{symbol}/status.
+- [`get_futures_instrument_statuses`](../dcex/kraken/_market_http.py) — GET /derivatives/api/v3/instruments/status.
+- [`get_futures_leverage_preferences`](../dcex/kraken/_trade_http.py) — Get configured futures margin and leverage preferences..
+- [`get_futures_liquidity_pool_statistics`](../dcex/kraken/_market_http.py) — Retrieve public liquidity-pool statistics; time filters are epoch seconds..
+- [`get_futures_market_analytics`](../dcex/kraken/_market_http.py) — GET /api/charts/v1/analytics/{symbol}/{analytics_type}.
+- [`get_futures_market_executions`](../dcex/kraken/_market_http.py) — GET /api/history/v3/market/{tradeable}/executions; public discovery/history; preserve response headers for pagination..
+- [`get_futures_market_orders`](../dcex/kraken/_market_http.py) — GET /api/history/v3/market/{tradeable}/orders; public discovery/history; preserve response headers for pagination..
+- [`get_futures_market_price`](../dcex/kraken/_market_http.py) — GET /api/history/v3/market/{tradeable}/price; public discovery/history; preserve response headers for pagination..
+- [`get_futures_notifications`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/notifications.
+- [`get_futures_order_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/orders.
+- [`get_futures_pnl_preferences`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/pnlpreferences.
+- [`get_futures_portfolio_margin_parameters`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/portfolio-margining/parameters.
+- [`get_futures_position_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/positions.
+- [`get_futures_self_trade_strategy`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/self-trade-strategy.
+- [`get_futures_subaccount_trading_status`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled.
+- [`get_futures_subaccounts`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/subaccounts.
+- [`get_futures_ticker`](../dcex/kraken/_market_http.py) — GET /derivatives/api/v3/tickers/{symbol}.
+- [`get_futures_trading_instruments`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/trading/instruments.
+- [`get_futures_trigger_events`](../dcex/kraken/_trade_http.py) — GET /api/history/v3/triggers.
+- [`get_futures_unwind_queue`](../dcex/kraken/_trade_http.py) — GET /derivatives/api/v3/unwindqueue.
+- [`get_spot_api_key_info`](../dcex/kraken/_trade_http.py) — POST /0/private/GetApiKeyInfo.
+- [`get_spot_credit_lines`](../dcex/kraken/_trade_http.py) — POST /0/private/CreditLines.
+- [`get_spot_deposit_addresses`](../dcex/kraken/_trade_http.py) — POST /0/private/DepositAddresses.
+- [`get_spot_deposit_methods`](../dcex/kraken/_trade_http.py) — POST /0/private/DepositMethods.
+- [`get_spot_deposit_status`](../dcex/kraken/_trade_http.py) — POST /0/private/DepositStatus.
+- [`get_spot_export_status`](../dcex/kraken/_trade_http.py) — POST /0/private/ExportStatus.
+- [`get_spot_extended_balance`](../dcex/kraken/_trade_http.py) — Get balances including credits, used credit and funds held for trading..
+- [`get_spot_grouped_orderbook`](../dcex/kraken/_market_http.py) — GET /0/public/GroupedBook.
+- [`get_spot_ledger_entries`](../dcex/kraken/_trade_http.py) — POST /0/private/QueryLedgers.
+- [`get_spot_level3_orderbook`](../dcex/kraken/_trade_http.py) — POST /0/private/Level3.
+- [`get_spot_maintenance_schedule`](../dcex/kraken/_market_http.py) — GET /0/public/MaintenanceSchedule.
+- [`get_spot_order_amends`](../dcex/kraken/_trade_http.py) — POST /0/private/OrderAmends.
+- [`get_spot_post_trade_data`](../dcex/kraken/_market_http.py) — GET /0/public/PostTrade.
+- [`get_spot_pre_trade_data`](../dcex/kraken/_market_http.py) — GET /0/public/PreTrade.
+- [`get_spot_trades_info`](../dcex/kraken/_trade_http.py) — POST /0/private/QueryTrades.
+- [`get_spot_wallet_accounts`](../dcex/kraken/_trade_http.py) — POST /0/private/ListWalletAccounts.
+- [`get_withdrawal_addresses`](../dcex/kraken/_trade_http.py) — Read-only POST /0/private/WithdrawAddresses.
+- [`get_withdrawal_information`](../dcex/kraken/_trade_http.py) — Read-only POST /0/private/WithdrawInfo.
+- [`get_withdrawal_methods`](../dcex/kraken/_trade_http.py) — Read-only POST /0/private/WithdrawMethods.
+- [`get_withdrawal_status`](../dcex/kraken/_trade_http.py) — Read-only POST /0/private/WithdrawStatus.
+- [`manage_futures_batch_orders`](../dcex/kraken/_trade_http.py) — Send, edit or cancel 1 to 500 instructions; price and size fields are JSON numbers..
+- [`place_spot_batch_orders`](../dcex/kraken/_trade_http.py) — Submit 2..15 orders for one pair as a signed JSON batch..
+- [`request_spot_export_report`](../dcex/kraken/_trade_http.py) — POST /0/private/AddExport.
+- [`retrieve_spot_export`](../dcex/kraken/_trade_http.py) — Download a completed Spot export as ZIP bytes, preserving binary content..
+- [`set_futures_leverage_preference`](../dcex/kraken/_trade_http.py) — Set isolated margin with max_leverage; omit it to select cross margin..
+- [`set_futures_pnl_preference`](../dcex/kraken/_trade_http.py) — PUT /derivatives/api/v3/pnlpreferences.
+- [`set_futures_self_trade_strategy`](../dcex/kraken/_trade_http.py) — PUT /derivatives/api/v3/self-trade-strategy.
+- [`set_futures_subaccount_trading_status`](../dcex/kraken/_trade_http.py) — PUT /derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled.
+- [`simulate_futures_portfolio`](../dcex/kraken/_trade_http.py) — POST /derivatives/api/v3/portfolio-margining/simulate.
+- [`transfer_futures_sub_account`](../dcex/kraken/_trade_http.py) — POST /derivatives/api/v3/transfer/subaccount.
+- [`transfer_spot_sub_account`](../dcex/kraken/_trade_http.py) — POST /0/private/AccountTransfer.
+
+## Mexc
+
+- [`add_stp_strategy_group_members`](../dcex/mexc/_trade_http.py) — POST /api/v3/strategy/group/uid.
+- [`cancel_contract_batch_orders_by_external_id`](../dcex/mexc/_trade_http.py) — POST /api/v1/private/order/batch_cancel_with_external.
+- [`cancel_spot_all_orders`](../dcex/mexc/_trade_http.py) — Cancel all open Spot orders across the account..
+- [`close_spot_listen_key`](../dcex/mexc/_trade_http.py) — Manage the Spot user-data listen key through signed REST..
+- [`convert_dust`](../dcex/mexc/_trade_http.py) — POST /api/v3/capital/convert.
+- [`create_deposit_address`](../dcex/mexc/_trade_http.py) — Generate a deposit address.
+- [`create_spot_listen_key`](../dcex/mexc/_trade_http.py) — Manage the Spot user-data listen key through signed REST..
+- [`create_stp_strategy_group`](../dcex/mexc/_trade_http.py) — POST /api/v3/strategy/group.
+- [`create_sub_account`](../dcex/mexc/_trade_http.py) — POST /api/v3/sub-account/virtualSubAccount.
+- [`create_sub_account_api_key`](../dcex/mexc/_trade_http.py) — POST /api/v3/sub-account/apiKey.
+- [`delete_stp_strategy_group`](../dcex/mexc/_trade_http.py) — DELETE /api/v3/strategy/group.
+- [`delete_sub_account_api_key`](../dcex/mexc/_trade_http.py) — DELETE /api/v3/sub-account/apiKey.
+- [`get_announcements`](../dcex/mexc/_market_http.py) — GET /api/v3/announcements.
+- [`get_api_key_info`](../dcex/mexc/_trade_http.py) — GET /api/v3/apiKeyInfo.
+- [`get_contract_30_day_fee_statistics`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/asset_book/order_deal_fee/total.
+- [`get_contract_batch_orders_by_external_id`](../dcex/mexc/_trade_http.py) — POST /api/v1/private/order/batch_query_with_external.
+- [`get_contract_closed_orders`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/order/list/close_orders.
+- [`get_contract_discount_usage`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/discountType.
+- [`get_contract_fee_deduction_config`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/feeDeductConfigs.
+- [`get_contract_fee_details`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/order/fee_details.
+- [`get_contract_fee_discount_config`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/config/contractFeeDiscountConfig.
+- [`get_contract_open_stop_orders`](../dcex/mexc/_trade_http.py) — Get current contract take-profit/stop-loss orders..
+- [`get_contract_profit_rate`](../dcex/mexc/_trade_http.py) — GET /api/v1/private/account/profit_rate/{type}.
+- [`get_contract_supported_currencies`](../dcex/mexc/_market_http.py) — GET /api/v1/contract/support_currencies.
+- [`get_convertible_assets`](../dcex/mexc/_trade_http.py) — GET /api/v3/capital/convert/list.
+- [`get_dust_conversion_history`](../dcex/mexc/_trade_http.py) — GET /api/v3/capital/convert.
+- [`get_spot_listen_keys`](../dcex/mexc/_trade_http.py) — Manage the Spot user-data listen key through signed REST..
+- [`get_spot_offline_symbols`](../dcex/mexc/_market_http.py) — GET /api/v3/symbol/offline.
+- [`get_stp_strategy_group`](../dcex/mexc/_trade_http.py) — GET /api/v3/strategy/group.
+- [`get_sub_account_api_keys`](../dcex/mexc/_trade_http.py) — GET /api/v3/sub-account/apiKey.
+- [`get_uid`](../dcex/mexc/_trade_http.py) — GET /api/v3/uid.
+- [`get_withdrawal_addresses`](../dcex/mexc/_trade_http.py) — GET /api/v3/capital/withdraw/address.
+- [`keep_alive_spot_listen_key`](../dcex/mexc/_trade_http.py) — Manage the Spot user-data listen key through signed REST..
+- [`remove_stp_strategy_group_members`](../dcex/mexc/_trade_http.py) — DELETE /api/v3/strategy/group/uid.
+- [`set_api_key_ip_whitelist`](../dcex/mexc/_trade_http.py) — POST /api/v3/apiKeyInfo.
+
+## Kucoin
 
 - [`add_convert_limit_order`](../dcex/kucoin/_trade_http.py) — POST /api/v1/convert/limit/order.
 - [`add_convert_order`](../dcex/kucoin/_trade_http.py) — POST /api/v1/convert/order.
-- [`add_futures_isolated_margin`](../dcex/kucoin/_trade_http.py) — POST /api/v1/position/margin/deposit-margin; classic trading account.
+- [`add_futures_isolated_margin`](../dcex/kucoin/_trade_http.py) — POST /api/v1/position/margin/deposit-margin; classic trading account..
 - [`add_sub_account`](../dcex/kucoin/_trade_http.py) — POST /api/v2/sub/user/created.
 - [`add_sub_account_api`](../dcex/kucoin/_trade_http.py) — POST /api/v1/sub/api-key.
 - [`add_sub_account_futures_permission`](../dcex/kucoin/_trade_http.py) — POST /api/v3/sub/user/futures/enable.
 - [`add_sub_account_margin_permission`](../dcex/kucoin/_trade_http.py) — POST /api/v3/sub/user/margin/enable.
 - [`add_uta_sub_account`](../dcex/kucoin/_trade_http.py) — POST /api/ua/v2/user/sub/create-sub-account.
 - [`add_uta_sub_account_api`](../dcex/kucoin/_trade_http.py) — POST /api/ua/v2/user/create-sub-api-key.
-- [`batch_cancel_uta_orders`](../dcex/kucoin/_trade_http.py) — Cancel 1 to 20 UTA orders; each item needs symbol and orderId or clientOid.
+- [`batch_cancel_uta_orders`](../dcex/kucoin/_trade_http.py) — Cancel 1 to 20 UTA orders; each item needs symbol and orderId or clientOid..
 - [`cancel_convert_limit_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/convert/limit/order/cancel.
-- [`cancel_futures_batch_orders`](../dcex/kucoin/_trade_http.py) — Cancel up to 10 orders; order_ids takes precedence when both lists are given.
-- [`cancel_futures_stop_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stopOrders; classic trading account.
-- [`cancel_margin_oco_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/oco-order/cancel-by-id; classic trading account.
-- [`cancel_margin_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/oco-order/cancel-by-clientOid; classic trading account.
-- [`cancel_margin_oco_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/oco-order/cancel; classic trading account.
-- [`cancel_margin_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/orders/{orderId}; classic trading account.
-- [`cancel_margin_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/orders/client-order/{clientOid}; classic trading account.
-- [`cancel_margin_orders_by_symbol`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/orders; classic trading account.
-- [`cancel_margin_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/stop-order/cancel-by-clientOid; classic trading account.
-- [`cancel_margin_stop_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/stop-order/cancel; classic trading account.
-- [`cancel_spot_oco_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/oco/order/{orderId}; classic trading account.
-- [`cancel_spot_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/oco/client-order/{clientOid}; classic trading account.
-- [`cancel_spot_oco_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/oco/orders; classic trading account.
-- [`cancel_spot_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/hf/orders/client-order/{clientOid}; classic trading account.
-- [`cancel_spot_order_by_client_oid_sync`](../dcex/kucoin/_trade_http.py) — Cancel using the endpoint that returns the completed cancellation result.
-- [`cancel_spot_order_sync`](../dcex/kucoin/_trade_http.py) — Cancel using the endpoint that returns the completed cancellation result.
-- [`cancel_spot_partial_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/hf/orders/cancel/{orderId}; classic trading account.
-- [`cancel_spot_stop_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stop-order/{orderId}; classic trading account.
-- [`cancel_spot_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stop-order/cancelOrderByClientOid; classic trading account.
-- [`cancel_spot_stop_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stop-order/cancel; classic trading account.
-- [`cancel_uta_orders_by_symbol`](../dcex/kucoin/_trade_http.py) — Cancel UTA orders for a symbol and NORMAL or ADVANCED order filter.
+- [`cancel_futures_batch_orders`](../dcex/kucoin/_trade_http.py) — Cancel up to 10 orders; order_ids takes precedence when both lists are given..
+- [`cancel_futures_stop_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stopOrders; classic trading account..
+- [`cancel_margin_oco_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/oco-order/cancel-by-id; classic trading account..
+- [`cancel_margin_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/oco-order/cancel-by-clientOid; classic trading account..
+- [`cancel_margin_oco_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/oco-order/cancel; classic trading account..
+- [`cancel_margin_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/orders/{orderId}; classic trading account..
+- [`cancel_margin_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/orders/client-order/{clientOid}; classic trading account..
+- [`cancel_margin_orders_by_symbol`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/orders; classic trading account..
+- [`cancel_margin_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/stop-order/cancel-by-clientOid; classic trading account..
+- [`cancel_margin_stop_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/hf/margin/stop-order/cancel; classic trading account..
+- [`cancel_spot_oco_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/oco/order/{orderId}; classic trading account..
+- [`cancel_spot_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/oco/client-order/{clientOid}; classic trading account..
+- [`cancel_spot_oco_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v3/oco/orders; classic trading account..
+- [`cancel_spot_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/hf/orders/client-order/{clientOid}; classic trading account..
+- [`cancel_spot_order_by_client_oid_sync`](../dcex/kucoin/_trade_http.py) — Cancel using the endpoint that returns the completed cancellation result..
+- [`cancel_spot_order_sync`](../dcex/kucoin/_trade_http.py) — Cancel using the endpoint that returns the completed cancellation result..
+- [`cancel_spot_partial_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/hf/orders/cancel/{orderId}; classic trading account..
+- [`cancel_spot_stop_order`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stop-order/{orderId}; classic trading account..
+- [`cancel_spot_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stop-order/cancelOrderByClientOid; classic trading account..
+- [`cancel_spot_stop_orders`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/stop-order/cancel; classic trading account..
+- [`cancel_uta_orders_by_symbol`](../dcex/kucoin/_trade_http.py) — Cancel UTA orders for a symbol and NORMAL or ADVANCED order filter..
 - [`create_deposit_address_v3`](../dcex/kucoin/_trade_http.py) — POST /api/v3/deposit-address/create.
 - [`delete_sub_account_api`](../dcex/kucoin/_trade_http.py) — DELETE /api/v1/sub/api-key.
 - [`delete_uta_sub_account_api`](../dcex/kucoin/_trade_http.py) — DELETE /api/ua/v2/user/sub-api-key.
 - [`get_account_info`](../dcex/kucoin/_trade_http.py) — GET /api/v2/user-info.
+- [`get_accounts`](../dcex/kucoin/_trade_http.py) — GET /api/v1/otc-loan/accounts.
 - [`get_announcements`](../dcex/kucoin/_market_http.py) — GET /api/v3/announcements.
 - [`get_apikey_info`](../dcex/kucoin/_trade_http.py) — GET /api/v1/user/api-key.
 - [`get_basic_fee`](../dcex/kucoin/_trade_http.py) — GET /api/v1/base-fee.
 - [`get_call_auction_info`](../dcex/kucoin/_market_http.py) — GET /api/v1/market/callauctionData.
 - [`get_call_auction_part_order_book`](../dcex/kucoin/_market_http.py) — GET /api/v1/market/orderbook/callauction/level2_{size}.
-- [`get_classic_account_balances_v2`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/balance``.
+- [`get_classic_account_balances_v2`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/balance``..
 - [`get_client_ip_address`](../dcex/kucoin/_market_http.py) — GET /api/v1/my-ip.
 - [`get_convert_currencies`](../dcex/kucoin/_market_http.py) — GET /api/v1/convert/currencies.
 - [`get_convert_limit_order_detail`](../dcex/kucoin/_trade_http.py) — GET /api/v1/convert/limit/order/detail.
@@ -866,203 +1183,315 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_convert_order_history`](../dcex/kucoin/_trade_http.py) — GET /api/v1/convert/order/history.
 - [`get_convert_quote`](../dcex/kucoin/_trade_http.py) — GET /api/v1/convert/quote.
 - [`get_convert_symbol`](../dcex/kucoin/_market_http.py) — GET /api/v1/convert/symbol.
+- [`get_currencies_v3`](../dcex/kucoin/_market_http.py) — List current currency metadata..
 - [`get_deposit_addresses_v3`](../dcex/kucoin/_trade_http.py) — GET /api/v3/deposit-addresses.
-- [`get_deposit_history`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/deposits``.
+- [`get_deposit_history`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/deposits``..
+- [`get_discount_rate_configs`](../dcex/kucoin/_trade_http.py) — GET /api/v1/otc-loan/discount-rate-configs.
 - [`get_fiat_price`](../dcex/kucoin/_market_http.py) — GET /api/v1/prices.
 - [`get_futures_24h_statistics`](../dcex/kucoin/_market_http.py) — GET /api/v1/trade-statistics.
-- [`get_futures_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/transaction-history``.
-- [`get_futures_all_tickers`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/allTickers``.
-- [`get_futures_cross_margin_requirement`](../dcex/kucoin/_trade_http.py) — POST /api/v2/getCrossModeMarginRequirement; classic trading account.
-- [`get_futures_cross_margin_risk_limit`](../dcex/kucoin/_trade_http.py) — GET /api/v2/batchGetCrossOrderLimit; classic trading account.
-- [`get_futures_current_funding_rate`](../dcex/kucoin/_market_http.py) — GET /api/v1/funding-rate/{symbol}/current; public market data.
-- [`get_futures_funding_history`](../dcex/kucoin/_trade_http.py) — GET /api/v1/funding-history; classic trading account.
+- [`get_futures_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/transaction-history``..
+- [`get_futures_all_tickers`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/allTickers``..
+- [`get_futures_cross_margin_requirement`](../dcex/kucoin/_trade_http.py) — POST /api/v2/getCrossModeMarginRequirement; classic trading account..
+- [`get_futures_cross_margin_risk_limit`](../dcex/kucoin/_trade_http.py) — GET /api/v2/batchGetCrossOrderLimit; classic trading account..
+- [`get_futures_current_funding_rate`](../dcex/kucoin/_market_http.py) — GET /api/v1/funding-rate/{symbol}/current; public market data..
+- [`get_futures_funding_history`](../dcex/kucoin/_trade_http.py) — GET /api/v1/funding-history; classic trading account..
 - [`get_futures_interest_rate_index`](../dcex/kucoin/_market_http.py) — GET /api/v1/interest/query.
-- [`get_futures_isolated_margin_risk_limit`](../dcex/kucoin/_trade_http.py) — GET /api/v1/contracts/risk-limit/{symbol}; classic trading account.
-- [`get_futures_margin_mode`](../dcex/kucoin/_trade_http.py) — GET /api/v2/position/getMarginMode; classic trading account.
-- [`get_futures_mark_price`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/mark-price/{symbol}/current``.
-- [`get_futures_max_open_size`](../dcex/kucoin/_trade_http.py) — GET /api/v2/getMaxOpenSize; classic trading account.
-- [`get_futures_max_withdraw_margin`](../dcex/kucoin/_trade_http.py) — GET /api/v1/margin/maxWithdrawMargin; classic trading account.
-- [`get_futures_position_history`](../dcex/kucoin/_trade_http.py) — GET /api/v1/history-positions; classic trading account.
+- [`get_futures_isolated_margin_risk_limit`](../dcex/kucoin/_trade_http.py) — GET /api/v1/contracts/risk-limit/{symbol}; classic trading account..
+- [`get_futures_margin_mode`](../dcex/kucoin/_trade_http.py) — GET /api/v2/position/getMarginMode; classic trading account..
+- [`get_futures_mark_price`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/mark-price/{symbol}/current``..
+- [`get_futures_max_open_size`](../dcex/kucoin/_trade_http.py) — GET /api/v2/getMaxOpenSize; classic trading account..
+- [`get_futures_max_withdraw_margin`](../dcex/kucoin/_trade_http.py) — GET /api/v1/margin/maxWithdrawMargin; classic trading account..
+- [`get_futures_position_history`](../dcex/kucoin/_trade_http.py) — GET /api/v1/history-positions; classic trading account..
 - [`get_futures_premium_index`](../dcex/kucoin/_market_http.py) — GET /api/v1/premium/query.
-- [`get_futures_public_funding_history`](../dcex/kucoin/_market_http.py) — GET /api/v1/contract/funding-rates; public market data.
-- [`get_futures_recent_closed_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/recentDoneOrders; classic trading account.
-- [`get_futures_server_time`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/timestamp``.
-- [`get_futures_service_status`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/status``.
-- [`get_futures_stop_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/stopOrders; classic trading account.
+- [`get_futures_public_funding_history`](../dcex/kucoin/_market_http.py) — GET /api/v1/contract/funding-rates; public market data..
+- [`get_futures_recent_closed_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/recentDoneOrders; classic trading account..
+- [`get_futures_server_time`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/timestamp``..
+- [`get_futures_service_status`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/status``..
+- [`get_futures_stop_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/stopOrders; classic trading account..
 - [`get_kyc_regions`](../dcex/kucoin/_market_http.py) — GET /api/kyc/regions/v4.
-- [`get_margin_active_order_symbols`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/order/active/symbols; classic trading account.
-- [`get_margin_closed_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/done; classic trading account.
+- [`get_loan_info`](../dcex/kucoin/_trade_http.py) — GET /api/v1/otc-loan/loan.
+- [`get_margin_active_order_symbols`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/order/active/symbols; classic trading account..
+- [`get_margin_closed_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/done; classic trading account..
 - [`get_margin_config`](../dcex/kucoin/_market_http.py) — GET /api/v1/margin/config.
-- [`get_margin_currency_risk_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v3/margin/currencies``.
-- [`get_margin_hf_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v3/hf/margin/account/ledgers``.
-- [`get_margin_mark_price`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/mark-price/{symbol}/current``.
-- [`get_margin_mark_prices`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v3/mark-price/all-symbols``.
-- [`get_margin_oco_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-order/orderId; classic trading account.
-- [`get_margin_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-order/clientOid; classic trading account.
-- [`get_margin_oco_order_details`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-order/detail/orderId; classic trading account.
-- [`get_margin_oco_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-orders; classic trading account.
-- [`get_margin_open_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/active; classic trading account.
-- [`get_margin_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/{orderId}; classic trading account.
-- [`get_margin_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/client-order/{clientOid}; classic trading account.
-- [`get_margin_stop_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/stop-order/orderId; classic trading account.
-- [`get_margin_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/stop-order/clientOid; classic trading account.
-- [`get_margin_stop_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/stop-orders; classic trading account.
-- [`get_margin_trade_history`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/fills; classic trading account.
+- [`get_margin_currency_risk_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v3/margin/currencies``..
+- [`get_margin_hf_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v3/hf/margin/account/ledgers``..
+- [`get_margin_mark_price`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/mark-price/{symbol}/current``..
+- [`get_margin_mark_prices`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v3/mark-price/all-symbols``..
+- [`get_margin_oco_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-order/orderId; classic trading account..
+- [`get_margin_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-order/clientOid; classic trading account..
+- [`get_margin_oco_order_details`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-order/detail/orderId; classic trading account..
+- [`get_margin_oco_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/oco-orders; classic trading account..
+- [`get_margin_open_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/active; classic trading account..
+- [`get_margin_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/{orderId}; classic trading account..
+- [`get_margin_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/orders/client-order/{clientOid}; classic trading account..
+- [`get_margin_stop_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/stop-order/orderId; classic trading account..
+- [`get_margin_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/stop-order/clientOid; classic trading account..
+- [`get_margin_stop_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/stop-orders; classic trading account..
+- [`get_margin_trade_history`](../dcex/kucoin/_trade_http.py) — GET /api/v3/hf/margin/fills; classic trading account..
 - [`get_market_list`](../dcex/kucoin/_market_http.py) — GET /api/v1/markets.
 - [`get_spot_24h_statistics`](../dcex/kucoin/_market_http.py) — GET /api/v1/market/stats.
-- [`get_spot_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/accounts/ledgers``.
+- [`get_spot_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/accounts/ledgers``..
 - [`get_spot_account_type`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/accounts/opened.
-- [`get_spot_active_order_symbols`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/active/symbols; classic trading account.
-- [`get_spot_active_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/active; classic trading account.
-- [`get_spot_closed_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/done; classic trading account.
+- [`get_spot_active_order_symbols`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/active/symbols; classic trading account..
+- [`get_spot_active_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/active; classic trading account..
+- [`get_spot_closed_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/done; classic trading account..
 - [`get_spot_currency_v3`](../dcex/kucoin/_market_http.py) — GET /api/v3/currencies/{currency}.
-- [`get_spot_full_orderbook`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v3/market/orderbook/level2``. Requires API authentication.
-- [`get_spot_hf_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/hf/accounts/ledgers``.
+- [`get_spot_full_orderbook`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v3/market/orderbook/level2``.
+- [`get_spot_hf_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/v1/hf/accounts/ledgers``..
 - [`get_spot_index_price`](../dcex/kucoin/_market_http.py) — GET /api/v1/index/query.
-- [`get_spot_oco_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/order/{orderId}; classic trading account.
-- [`get_spot_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/client-order/{clientOid}; classic trading account.
-- [`get_spot_oco_order_details`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/order/details/{orderId}; classic trading account.
-- [`get_spot_oco_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/orders; classic trading account.
-- [`get_spot_order`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/{orderId}; classic trading account.
-- [`get_spot_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/client-order/{clientOid}; classic trading account.
-- [`get_spot_server_time`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/timestamp``.
-- [`get_spot_service_status`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/status``.
-- [`get_spot_stop_order`](../dcex/kucoin/_trade_http.py) — GET /api/v1/stop-order/{orderId}; classic trading account.
-- [`get_spot_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — Query a spot stop order by client ID.
-- [`get_spot_stop_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/stop-order; classic trading account.
+- [`get_spot_oco_order`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/order/{orderId}; classic trading account..
+- [`get_spot_oco_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/client-order/{clientOid}; classic trading account..
+- [`get_spot_oco_order_details`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/order/details/{orderId}; classic trading account..
+- [`get_spot_oco_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v3/oco/orders; classic trading account..
+- [`get_spot_order`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/{orderId}; classic trading account..
+- [`get_spot_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — GET /api/v1/hf/orders/client-order/{clientOid}; classic trading account..
+- [`get_spot_server_time`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/timestamp``..
+- [`get_spot_service_status`](../dcex/kucoin/_market_http.py) — Call ``GET /api/v1/status``..
+- [`get_spot_stop_order`](../dcex/kucoin/_trade_http.py) — GET /api/v1/stop-order/{orderId}; classic trading account..
+- [`get_spot_stop_order_by_client_oid`](../dcex/kucoin/_trade_http.py) — Query a spot stop order by client ID..
+- [`get_spot_stop_orders`](../dcex/kucoin/_trade_http.py) — GET /api/v1/stop-order; classic trading account..
 - [`get_spot_symbol_v2`](../dcex/kucoin/_market_http.py) — GET /api/v2/symbols/{symbol}.
 - [`get_sub_account_api_list`](../dcex/kucoin/_trade_http.py) — GET /api/v1/sub/api-key.
-- [`get_uta_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/ledger``.
-- [`get_uta_account_mode`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/mode``.
-- [`get_uta_all_rate_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/rate-limit/query-all``.
+- [`get_uta_account_ledgers`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/ledger``..
+- [`get_uta_account_mode`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/mode``..
+- [`get_uta_accounts`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/otc-loan/account.
+- [`get_uta_all_rate_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/rate-limit/query-all``..
 - [`get_uta_announcements`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/market/announcement.
 - [`get_uta_apikey_info`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/user/api-key.
-- [`get_uta_borrowable_currencies`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/borrowable-currency``.
-- [`get_uta_borrowing_rates_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/interest-limits``.
+- [`get_uta_borrowable_currencies`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/borrowable-currency``..
+- [`get_uta_borrowing_rates_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/interest-limits``..
 - [`get_uta_call_auction_info`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/market/call-auction-info.
 - [`get_uta_client_ip_address`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/user/my-ip.
-- [`get_uta_collateral_ratios`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/collateral-discount-ratio``.
+- [`get_uta_collateral_ratios`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/collateral-discount-ratio``..
 - [`get_uta_currencies`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/asset/currencies.
 - [`get_uta_currency`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/market/currency.
-- [`get_uta_current_funding_rates`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/funding-rate``.
+- [`get_uta_current_funding_rates`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/funding-rate``..
 - [`get_uta_deposit_address`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/asset/deposit/address.
 - [`get_uta_deposit_history`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/asset/deposit/history.
+- [`get_uta_discount_rate_configs`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/otc-loan/discount-rate.
 - [`get_uta_fiat_price`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/market/fiat-price.
-- [`get_uta_funding_history`](../dcex/kucoin/_trade_http.py) — Retrieve UTA private funding fee history with cursor pagination.
-- [`get_uta_funding_rate_history`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/funding-rate-history``.
-- [`get_uta_index_prices`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/index-price``.
-- [`get_uta_instruments`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/instrument``.
-- [`get_uta_interest_history`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/interest-history``.
-- [`get_uta_interest_rate_index`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/interest-rate-index``.
-- [`get_uta_klines`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/kline``. Times are in seconds; futures do not support 6hour or 3day intervals.
+- [`get_uta_funding_history`](../dcex/kucoin/_trade_http.py) — Retrieve UTA private funding fee history with cursor pagination..
+- [`get_uta_funding_rate_history`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/funding-rate-history``..
+- [`get_uta_index_prices`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/index-price``..
+- [`get_uta_instruments`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/instrument``..
+- [`get_uta_interest_history`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/interest-history``..
+- [`get_uta_interest_rate_index`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/interest-rate-index``..
+- [`get_uta_klines`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/kline``.
 - [`get_uta_kyc_regions`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/user/kyc-region.
-- [`get_uta_leverage`](../dcex/kucoin/_trade_http.py) — Query UTA leverage for FUTURES or MARGIN.
-- [`get_uta_margin_mode`](../dcex/kucoin/_trade_http.py) — Query UTA futures margin modes.
-- [`get_uta_max_order_quantity`](../dcex/kucoin/_trade_http.py) — Query maximum UTA buy and sell size at an optional order price.
-- [`get_uta_orderbook`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/market/orderbook``. Requires API authentication.
-- [`get_uta_position_history`](../dcex/kucoin/_trade_http.py) — Retrieve UTA position history with cursor pagination.
-- [`get_uta_public_trades`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/trade``.
-- [`get_uta_rate_limit_cap`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/rate-limit/query-cap``.
-- [`get_uta_rate_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/rate-limit/query``.
-- [`get_uta_service_status`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/server/status``.
+- [`get_uta_leverage`](../dcex/kucoin/_trade_http.py) — Query UTA leverage for FUTURES or MARGIN..
+- [`get_uta_loan_info`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/otc-loan/loan.
+- [`get_uta_margin_mode`](../dcex/kucoin/_trade_http.py) — Query UTA futures margin modes..
+- [`get_uta_max_order_quantity`](../dcex/kucoin/_trade_http.py) — Query maximum UTA buy and sell size at an optional order price..
+- [`get_uta_oe_scurrency`](../dcex/kucoin/_market_http.py) — GET /api/ua/v2/oes/currency.
+- [`get_uta_oes_custody_quota`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/oes/custody-quota.
+- [`get_uta_orderbook`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/market/orderbook``.
+- [`get_uta_position_history`](../dcex/kucoin/_trade_http.py) — Retrieve UTA position history with cursor pagination..
+- [`get_uta_public_trades`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/trade``..
+- [`get_uta_rate_limit_cap`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/rate-limit/query-cap``..
+- [`get_uta_rate_limits`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/rate-limit/query``..
+- [`get_uta_service_status`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/server/status``..
 - [`get_uta_sub_account_api_list`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/user/sub-api-key.
-- [`get_uta_tickers`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/ticker``.
-- [`get_uta_trade_statistics`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/trade-statistics``.
-- [`get_uta_transfer_quota`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/transfer-quota``.
+- [`get_uta_tickers`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/market/ticker``..
+- [`get_uta_trade_statistics`](../dcex/kucoin/_market_http.py) — Call ``GET /api/ua/v2/trade-statistics``..
+- [`get_uta_transfer_quota`](../dcex/kucoin/_trade_http.py) — Call ``GET /api/ua/v2/account/transfer-quota``..
+- [`get_uta_withdrawal_history`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/asset/withdrawal/history.
+- [`get_uta_withdrawal_quotas`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/withdrawals/quotas.
+- [`get_withdrawal_history`](../dcex/kucoin/_trade_http.py) — GET /api/v1/withdrawals.
+- [`get_withdrawal_history_by_id`](../dcex/kucoin/_trade_http.py) — GET /api/v1/withdrawals/{withdrawalId}.
+- [`get_withdrawal_quotas`](../dcex/kucoin/_trade_http.py) — GET /api/v1/withdrawals/quotas.
 - [`modify_sub_account_api`](../dcex/kucoin/_trade_http.py) — POST /api/v1/sub/api-key/update.
-- [`modify_uta_cross_margin_leverage`](../dcex/kucoin/_trade_http.py) — Modify UTA cross margin leverage for an optional currency.
-- [`modify_uta_futures_leverage`](../dcex/kucoin/_trade_http.py) — Modify UTA futures leverage.
-- [`modify_uta_position_margin`](../dcex/kucoin/_trade_http.py) — Add (DEPOSIT) or reduce (WITHDRAW) isolated UTA futures position margin.
+- [`modify_uta_cross_margin_leverage`](../dcex/kucoin/_trade_http.py) — Modify UTA cross margin leverage for an optional currency..
+- [`modify_uta_futures_leverage`](../dcex/kucoin/_trade_http.py) — Modify UTA futures leverage..
+- [`modify_uta_position_margin`](../dcex/kucoin/_trade_http.py) — Add (DEPOSIT) or reduce (WITHDRAW) isolated UTA futures position margin..
 - [`modify_uta_sub_account_api`](../dcex/kucoin/_trade_http.py) — POST /api/ua/v2/user/modify-sub-api-key.
-- [`place_futures_batch_orders`](../dcex/kucoin/_trade_http.py) — Place 1 to 20 futures orders with native order fields or product_symbol.
-- [`place_futures_tpsl_order`](../dcex/kucoin/_trade_http.py) — POST /api/v1/st-orders; classic trading account.
-- [`place_margin_oco_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/oco-order; classic trading account.
-- [`place_margin_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/order; classic trading account.
-- [`place_margin_stop_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/stop-order; classic trading account.
-- [`place_spot_batch_orders_sync`](../dcex/kucoin/_trade_http.py) — Place orders using the endpoint that waits for the matching result.
-- [`place_spot_oco_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/oco/order; classic trading account.
-- [`place_spot_order_sync`](../dcex/kucoin/_trade_http.py) — Place orders using the endpoint that waits for the matching result.
-- [`place_spot_stop_order`](../dcex/kucoin/_trade_http.py) — POST /api/v1/stop-order; classic trading account.
-- [`remove_futures_isolated_margin`](../dcex/kucoin/_trade_http.py) — POST /api/v1/margin/withdrawMargin; classic trading account.
-- [`set_futures_batch_margin_mode`](../dcex/kucoin/_trade_http.py) — Change margin mode for a list of contracts.
-- [`set_futures_isolated_margin_risk_limit`](../dcex/kucoin/_trade_http.py) — POST /api/v1/position/risk-limit-level/change; classic trading account.
-- [`set_futures_margin_mode`](../dcex/kucoin/_trade_http.py) — POST /api/v2/position/changeMarginMode; classic trading account.
-- [`set_futures_position_mode`](../dcex/kucoin/_trade_http.py) — POST /api/v2/position/switchPositionMode; classic trading account.
+- [`place_futures_batch_orders`](../dcex/kucoin/_trade_http.py) — Place 1 to 20 futures orders with native order fields or product_symbol..
+- [`place_futures_tpsl_order`](../dcex/kucoin/_trade_http.py) — POST /api/v1/st-orders; classic trading account..
+- [`place_margin_oco_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/oco-order; classic trading account..
+- [`place_margin_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/order; classic trading account..
+- [`place_margin_stop_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/stop-order; classic trading account..
+- [`place_spot_batch_orders_sync`](../dcex/kucoin/_trade_http.py) — Place orders using the endpoint that waits for the matching result..
+- [`place_spot_oco_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/oco/order; classic trading account..
+- [`place_spot_order_sync`](../dcex/kucoin/_trade_http.py) — Place orders using the endpoint that waits for the matching result..
+- [`place_spot_stop_order`](../dcex/kucoin/_trade_http.py) — POST /api/v1/stop-order; classic trading account..
+- [`remove_futures_isolated_margin`](../dcex/kucoin/_trade_http.py) — POST /api/v1/margin/withdrawMargin; classic trading account..
+- [`set_futures_batch_margin_mode`](../dcex/kucoin/_trade_http.py) — Change margin mode for a list of contracts..
+- [`set_futures_isolated_margin_risk_limit`](../dcex/kucoin/_trade_http.py) — POST /api/v1/position/risk-limit-level/change; classic trading account..
+- [`set_futures_margin_mode`](../dcex/kucoin/_trade_http.py) — POST /api/v2/position/changeMarginMode; classic trading account..
+- [`set_futures_position_mode`](../dcex/kucoin/_trade_http.py) — POST /api/v2/position/switchPositionMode; classic trading account..
+- [`set_uta_account_mode`](../dcex/kucoin/_trade_http.py) — Set the account mode; exchange migration eligibility applies..
 - [`set_uta_kcs_fee_deduction`](../dcex/kucoin/_trade_http.py) — GET /api/ua/v2/account/fee/kcs-deduct.
-- [`set_uta_margin_mode`](../dcex/kucoin/_trade_http.py) — Set CROSS or ISOLATED margin mode for a UTA futures symbol.
+- [`set_uta_margin_mode`](../dcex/kucoin/_trade_http.py) — Set CROSS or ISOLATED margin mode for a UTA futures symbol..
 - [`set_uta_rate_limit`](../dcex/kucoin/_trade_http.py) — POST /api/ua/v2/rate-limit/set.
 - [`set_uta_sub_account_transfer_permission`](../dcex/kucoin/_trade_http.py) — POST /api/ua/v2/sub-account/canTransferOut.
-- [`test_margin_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/order/test; classic trading account.
-- [`transfer_uta_accounts`](../dcex/kucoin/_trade_http.py) — Call ``POST /api/ua/v2/account/transfer``.
+- [`test_margin_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/order/test; classic trading account..
+- [`transfer_uta_accounts`](../dcex/kucoin/_trade_http.py) — Call ``POST /api/ua/v2/account/transfer``..
 
 ## Hyperliquid
 
-- [`frontend_open_orders`](../dcex/hyperliquid/_account_http.py) — Get open orders including trigger and other frontend information.
-- [`get_all_borrow_lend_reserve_states`](../dcex/hyperliquid/_market_http.py) — Query allBorrowLendReserveStates using POST /info.
-- [`get_all_perp_metas`](../dcex/hyperliquid/_market_http.py) — Query allPerpMetas using POST /info.
-- [`get_borrow_lend_reserve_state`](../dcex/hyperliquid/_market_http.py) — Query borrowLendReserveState using POST /info.
-- [`get_borrow_lend_user_state`](../dcex/hyperliquid/_account_http.py) — Query borrowLendUserState using POST /info.
-- [`get_perp_annotation`](../dcex/hyperliquid/_market_http.py) — Query perpAnnotation using POST /info.
-- [`get_perp_categories`](../dcex/hyperliquid/_market_http.py) — Query perpCategories using POST /info.
-- [`get_perp_concise_annotations`](../dcex/hyperliquid/_market_http.py) — Query perpConciseAnnotations using POST /info.
-- [`get_perp_dex_limits`](../dcex/hyperliquid/_market_http.py) — Query perpDexLimits using POST /info.
-- [`get_perp_dex_status`](../dcex/hyperliquid/_market_http.py) — Query perpDexStatus using POST /info. An empty dex selects the first perpetual DEX.
-- [`get_perps_at_open_interest_cap`](../dcex/hyperliquid/_market_http.py) — Query perpsAtOpenInterestCap using POST /info.
-- [`get_predicted_fundings`](../dcex/hyperliquid/_market_http.py) — Get predicted funding rates across venues for the first perpetual DEX.
-- [`get_token_details`](../dcex/hyperliquid/_market_http.py) — Query tokenDetails using POST /info.
-- [`get_user_abstraction`](../dcex/hyperliquid/_account_http.py) — Query userAbstraction using POST /info.
-- [`get_user_dex_abstraction`](../dcex/hyperliquid/_account_http.py) — Query userDexAbstraction using POST /info.
-- [`noop`](../dcex/hyperliquid/_trade_http.py) — Attempt to invalidate a pending request by signing the same nonce; success is not guaranteed.
-- [`reserve_request_weight`](../dcex/hyperliquid/_trade_http.py) — Reserve actions for this account at 0.0005 USDC each, paid from its perps balance.
-- [`set_agent_abstraction`](../dcex/hyperliquid/_trade_http.py) — Set account mode using agent signing: i=disabled, u=unified, p=portfolio margin.
+- [`approve_agent_signed`](../dcex/hyperliquid/_trade_http.py) — Submit a caller-supplied wallet EIP-712 agent approval signature..
+- [`create_sub_account`](../dcex/hyperliquid/_trade_http.py) — createSubAccount within the authenticated master/subaccount family..
+- [`delegate_tokens_signed`](../dcex/hyperliquid/_trade_http.py) — tokenDelegate.
+- [`deposit_staking_signed`](../dcex/hyperliquid/_trade_http.py) — cDeposit.
+- [`enable_agent_dex_abstraction`](../dcex/hyperliquid/_trade_http.py) — agentEnableDexAbstraction.
+- [`frontend_open_orders`](../dcex/hyperliquid/_account_http.py) — Get open orders including trigger and other frontend information..
+- [`get_active_asset_data`](../dcex/hyperliquid/_market_http.py) — Query the documented Hyperliquid REST info type..
+- [`get_all_borrow_lend_reserve_states`](../dcex/hyperliquid/_market_http.py) — Query allBorrowLendReserveStates using POST /info..
+- [`get_all_mids`](../dcex/hyperliquid/_market_http.py) — Query the documented Hyperliquid REST info type..
+- [`get_all_perp_metas`](../dcex/hyperliquid/_market_http.py) — Query allPerpMetas using POST /info..
+- [`get_borrow_lend_reserve_state`](../dcex/hyperliquid/_market_http.py) — Query borrowLendReserveState using POST /info..
+- [`get_borrow_lend_user_state`](../dcex/hyperliquid/_account_http.py) — Query borrowLendUserState using POST /info..
+- [`get_delegations`](../dcex/hyperliquid/_market_http.py) — Query delegations using POST /info..
+- [`get_delegator_history`](../dcex/hyperliquid/_market_http.py) — Query delegatorHistory using POST /info..
+- [`get_delegator_rewards`](../dcex/hyperliquid/_market_http.py) — Query delegatorRewards using POST /info..
+- [`get_delegator_summary`](../dcex/hyperliquid/_market_http.py) — Query delegatorSummary using POST /info..
+- [`get_outcome_deployer_limits`](../dcex/hyperliquid/_market_http.py) — Query outcomeDeployerLimits using POST /info..
+- [`get_outcome_meta`](../dcex/hyperliquid/_market_http.py) — Query outcomeMeta using POST /info..
+- [`get_perp_annotation`](../dcex/hyperliquid/_market_http.py) — Query perpAnnotation using POST /info..
+- [`get_perp_categories`](../dcex/hyperliquid/_market_http.py) — Query perpCategories using POST /info..
+- [`get_perp_concise_annotations`](../dcex/hyperliquid/_market_http.py) — Query perpConciseAnnotations using POST /info..
+- [`get_perp_deploy_auction_status`](../dcex/hyperliquid/_market_http.py) — Query perpDeployAuctionStatus using POST /info..
+- [`get_perp_dex_limits`](../dcex/hyperliquid/_market_http.py) — Query perpDexLimits using POST /info..
+- [`get_perp_dex_status`](../dcex/hyperliquid/_market_http.py) — Query perpDexStatus using POST /info.
+- [`get_perps_at_open_interest_cap`](../dcex/hyperliquid/_market_http.py) — Query perpsAtOpenInterestCap using POST /info..
+- [`get_predicted_fundings`](../dcex/hyperliquid/_market_http.py) — Get predicted funding rates across venues for the first perpetual DEX..
+- [`get_settled_outcome`](../dcex/hyperliquid/_market_http.py) — Query settledOutcome using POST /info..
+- [`get_spot_deploy_state`](../dcex/hyperliquid/_market_http.py) — Query spotDeployState using POST /info..
+- [`get_spot_pair_deploy_auction_status`](../dcex/hyperliquid/_market_http.py) — Query spotPairDeployAuctionStatus using POST /info..
+- [`get_token_details`](../dcex/hyperliquid/_market_http.py) — Query tokenDetails using POST /info..
+- [`get_user_abstraction`](../dcex/hyperliquid/_account_http.py) — Query userAbstraction using POST /info..
+- [`get_user_dex_abstraction`](../dcex/hyperliquid/_account_http.py) — Query userDexAbstraction using POST /info..
+- [`get_user_twap_slice_fills`](../dcex/hyperliquid/_market_http.py) — Query the documented Hyperliquid REST info type..
+- [`get_vault_details`](../dcex/hyperliquid/_market_http.py) — Query vaultDetails using POST /info..
+- [`noop`](../dcex/hyperliquid/_trade_http.py) — Attempt to invalidate a pending request by signing the same nonce; success is not guaranteed..
+- [`reserve_request_weight`](../dcex/hyperliquid/_trade_http.py) — Reserve actions for this account at 0.0005 USDC each, paid from its perps balance..
+- [`set_agent_abstraction`](../dcex/hyperliquid/_trade_http.py) — Set account mode using agent signing: i=disabled, u=unified, p=portfolio margin..
 - [`set_user_abstraction`](../dcex/hyperliquid/_trade_http.py) — Submit a wallet-signed userSetAbstraction action for this user or its subaccount.
+- [`set_user_dex_abstraction_signed`](../dcex/hyperliquid/_trade_http.py) — userDexAbstraction.
+- [`transfer_hip3_liquidator`](../dcex/hyperliquid/_trade_http.py) — hip3LiquidatorTransfer.
+- [`transfer_sub_account_spot`](../dcex/hyperliquid/_trade_http.py) — subAccountSpotTransfer within the authenticated master/subaccount family..
+- [`transfer_sub_account_usd`](../dcex/hyperliquid/_trade_http.py) — subAccountTransfer within the authenticated master/subaccount family..
+- [`transfer_vault_usd`](../dcex/hyperliquid/_trade_http.py) — vaultTransfer.
+- [`withdraw_staking_signed`](../dcex/hyperliquid/_trade_http.py) — cWithdraw.
 
 ## Lighter
 
 - [`acknowledge_notification`](../dcex/lighter/_trade_http.py) — POST /api/v1/notification/ack.
+- [`burn_shares`](../dcex/lighter/_trade_http.py) — Submit Lighter transaction 19.
 - [`change_account_tier`](../dcex/lighter/_trade_http.py) — POST /api/v1/changeAccountTier.
-- [`change_api_key_signed`](../dcex/lighter/_trade_http.py) — Sign/submit key rotation with an explicit nonce and caller-signed L1 authorization. Recreate the client with the new key after confirmation.
+- [`change_api_key_signed`](../dcex/lighter/_trade_http.py) — Sign/submit key rotation with an explicit nonce and caller-signed L1 authorization.
 - [`create_deposit_intent_address`](../dcex/lighter/_market_http.py) — POST /api/v1/createIntentAddress.
 - [`create_grouped_orders`](../dcex/lighter/_trade_http.py) — Submit OTO (1), OCO (2), or OTOCO (3) as one type-28 transaction.
+- [`create_public_pool`](../dcex/lighter/_trade_http.py) — Submit Lighter transaction 10.
 - [`create_read_only_token`](../dcex/lighter/_trade_http.py) — POST /api/v1/tokens/create.
-- [`create_sub_account`](../dcex/lighter/_trade_http.py) — Sign/submit creation of a subaccount by its master account.
+- [`create_sub_account`](../dcex/lighter/_trade_http.py) — Sign/submit creation of a subaccount by its master account..
+- [`export_historical_trades`](../dcex/lighter/_trade_http.py) — Request a historical export URL; server access requirements apply..
+- [`get_explorer_account_assets`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_account_logs`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_account_positions`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_batch`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_batches`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_block`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_blocks`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_log`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_market_logs`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_markets`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_total`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`get_explorer_transaction_stats`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
 - [`get_latest_deposit`](../dcex/lighter/_market_http.py) — GET /api/v1/deposit/latest.
+- [`get_pnl_leaderboard`](../dcex/lighter/_market_http.py) — Query the official Lighter leaderboard API..
 - [`get_transaction`](../dcex/lighter/_market_http.py) — GET /api/v1/tx.
 - [`get_transaction_by_l1_hash`](../dcex/lighter/_market_http.py) — GET /api/v1/txFromL1TxHash.
+- [`mint_shares`](../dcex/lighter/_trade_http.py) — Submit Lighter transaction 18.
 - [`revoke_read_only_token`](../dcex/lighter/_trade_http.py) — POST /api/v1/tokens/revoke.
-- [`sign_change_api_key_signed`](../dcex/lighter/_trade_http.py) — Sign/submit key rotation with an explicit nonce and caller-signed L1 authorization. Recreate the client with the new key after confirmation.
+- [`search_explorer`](../dcex/lighter/_market_http.py) — Query the official Lighter explorer API..
+- [`set_maker_only_api_keys`](../dcex/lighter/_trade_http.py) — Replace the complete maker-only key list; an empty list clears restrictions..
+- [`sign_burn_shares`](../dcex/lighter/_trade_http.py) — Sign Lighter transaction 19.
+- [`sign_change_api_key_signed`](../dcex/lighter/_trade_http.py) — Sign/submit key rotation with an explicit nonce and caller-signed L1 authorization.
 - [`sign_create_grouped_orders`](../dcex/lighter/_trade_http.py) — Sign OTO (1), OCO (2), or OTOCO (3) as one type-28 transaction.
-- [`sign_create_sub_account`](../dcex/lighter/_trade_http.py) — Sign/submit creation of a subaccount by its master account.
+- [`sign_create_public_pool`](../dcex/lighter/_trade_http.py) — Sign Lighter transaction 10.
+- [`sign_create_sub_account`](../dcex/lighter/_trade_http.py) — Sign/submit creation of a subaccount by its master account..
+- [`sign_mint_shares`](../dcex/lighter/_trade_http.py) — Sign Lighter transaction 18.
+- [`sign_stake_assets`](../dcex/lighter/_trade_http.py) — Sign Lighter transaction 35.
+- [`sign_transfer_same_master_account`](../dcex/lighter/_trade_http.py) — Transfer within one master account; amounts and fees use raw integer units..
+- [`sign_unstake_assets`](../dcex/lighter/_trade_http.py) — Sign Lighter transaction 36.
 - [`sign_update_account_asset_config`](../dcex/lighter/_trade_http.py) — Sign account asset margin mode (0 disabled, 1 enabled) as transaction 42.
 - [`sign_update_account_config`](../dcex/lighter/_trade_http.py) — Sign account trading mode (0 or 1) as transaction 41.
+- [`sign_update_public_pool`](../dcex/lighter/_trade_http.py) — Sign Lighter transaction 11.
+- [`stake_assets`](../dcex/lighter/_trade_http.py) — Submit Lighter transaction 35.
+- [`submit_lit_lease`](../dcex/lighter/_trade_http.py) — Submit caller-signed JSON.
+- [`transfer_same_master_account`](../dcex/lighter/_trade_http.py) — Transfer within one master account; amounts and fees use raw integer units..
+- [`unstake_assets`](../dcex/lighter/_trade_http.py) — Submit Lighter transaction 36.
 - [`update_account_asset_config`](../dcex/lighter/_trade_http.py) — Submit account asset margin mode (0 disabled, 1 enabled) as transaction 42.
 - [`update_account_config`](../dcex/lighter/_trade_http.py) — Submit account trading mode (0 or 1) as transaction 41.
+- [`update_public_pool`](../dcex/lighter/_trade_http.py) — Submit Lighter transaction 11.
 
 ## Backpack
 
-- [`cancel_open_strategies`](../dcex/backpack/_trade_http.py) — Cancel open strategies using the dedicated Strategy API instruction.
-- [`cancel_strategy`](../dcex/backpack/_trade_http.py) — Cancel strategy using the dedicated Strategy API instruction.
-- [`create_strategy`](../dcex/backpack/_trade_http.py) — Create strategy using the dedicated Strategy API instruction.
-- [`get_open_strategies`](../dcex/backpack/_trade_http.py) — Get open strategies using the dedicated Strategy API instruction.
-- [`get_open_strategy`](../dcex/backpack/_trade_http.py) — Get open strategy using the dedicated Strategy API instruction.
-- [`get_strategy_history`](../dcex/backpack/_trade_http.py) — Get strategy history using the dedicated Strategy API instruction.
+- [`cancel_open_strategies`](../dcex/backpack/_trade_http.py) — Cancel open strategies using the dedicated Strategy API instruction..
+- [`cancel_strategy`](../dcex/backpack/_trade_http.py) — Cancel strategy using the dedicated Strategy API instruction..
+- [`create_strategy`](../dcex/backpack/_trade_http.py) — Create strategy using the dedicated Strategy API instruction..
+- [`execute_borrow_lend`](../dcex/backpack/_trade_http.py) — Borrow or lend; positions net against existing balances.
+- [`get_open_strategies`](../dcex/backpack/_trade_http.py) — Get open strategies using the dedicated Strategy API instruction..
+- [`get_open_strategy`](../dcex/backpack/_trade_http.py) — Get open strategy using the dedicated Strategy API instruction..
+- [`get_prediction_events`](../dcex/backpack/_market_http.py) — GET /api/v1/prediction.
+- [`get_prediction_tags`](../dcex/backpack/_market_http.py) — GET /api/v1/prediction/tags.
+- [`get_strategy_history`](../dcex/backpack/_trade_http.py) — Get strategy history using the dedicated Strategy API instruction..
+- [`get_vault_history`](../dcex/backpack/_market_http.py) — GET /api/v1/vaults/history.
+- [`get_vault_nav`](../dcex/backpack/_trade_http.py) — GET /api/v1/vault/nav.
+- [`get_vault_pending_redeems`](../dcex/backpack/_trade_http.py) — GET /api/v1/vault/redeems/pending.
+- [`get_vaults`](../dcex/backpack/_market_http.py) — GET /api/v1/vaults.
+- [`vault_mint`](../dcex/backpack/_trade_http.py) — POST /api/v1/vault/mint.
+- [`vault_redeem`](../dcex/backpack/_trade_http.py) — POST /api/v1/vault/redeem.
+- [`vault_redeem_cancel`](../dcex/backpack/_trade_http.py) — DELETE /api/v1/vault/redeem.
 
 ## Aster
 
-- [`bind_sub_account_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/sub-accounts/bind. Supply wallet signatures created exactly as documented by Aster; the nonce and signatures are forwarded unchanged.
-- [`create_sub_account_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/createSubAccount. Supply wallet signatures created exactly as documented by Aster; the nonce and signatures are forwarded unchanged.
-- [`exchange_futures_assets`](../dcex/aster/_trade_http.py) — POST /fapi/v3/assetExchange.
-- [`get_asset_logos`](../dcex/aster/_market_http.py) — GET /fapi/v3/common/asset/all-asset-logo.
-- [`get_direct_announcement`](../dcex/aster/_trade_http.py) — GET /fapi/v3/announcement/directById.
-- [`get_direct_announcements`](../dcex/aster/_trade_http.py) — GET /fapi/v3/announcement/direct.
-- [`get_sub_accounts`](../dcex/aster/_trade_http.py) — GET /fapi/v3/getSubAccountList.
-- [`guarded_cancel_futures_batch_orders`](../dcex/aster/_trade_http.py) — Cancel using the nonce of the original batch placement.
-- [`guarded_cancel_futures_order`](../dcex/aster/_trade_http.py) — Cancel using the nonce of the original order placement.
+- [`bind_sub_account_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/sub-accounts/bind.
+- [`cancel_prediction_listen_key`](../dcex/aster/_trade_http.py) — DELETE /api/v3/listenKey on the prediction host.
+- [`cancel_prediction_order`](../dcex/aster/_trade_http.py) — DELETE /api/v3/order on the prediction host.
+- [`create_prediction_asset_wallet_transfer`](../dcex/aster/_trade_http.py) — POST /api/v3/asset/wallet/transfer on the prediction host.
+- [`create_prediction_burn`](../dcex/aster/_trade_http.py) — POST /api/v3/prediction/burn on the prediction host.
+- [`create_prediction_listen_key`](../dcex/aster/_trade_http.py) — POST /api/v3/listenKey on the prediction host.
+- [`create_prediction_merge`](../dcex/aster/_trade_http.py) — POST /api/v3/prediction/merge on the prediction host.
+- [`create_prediction_mint`](../dcex/aster/_trade_http.py) — POST /api/v3/prediction/mint on the prediction host.
+- [`create_prediction_order`](../dcex/aster/_trade_http.py) — POST /api/v3/order on the prediction host.
+- [`create_prediction_split`](../dcex/aster/_trade_http.py) — POST /api/v3/prediction/split on the prediction host.
+- [`create_sub_account_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/createSubAccount.
+- [`exchange_futures_assets`](../dcex/aster/_trade_http.py) — POST /fapi/v3/assetExchange..
+- [`get_asset_logos`](../dcex/aster/_market_http.py) — GET /fapi/v3/common/asset/all-asset-logo..
+- [`get_asset_migration_history`](../dcex/aster/_trade_http.py) — Query a migration batch with the authenticated destination account..
+- [`get_direct_announcement`](../dcex/aster/_trade_http.py) — GET /fapi/v3/announcement/directById..
+- [`get_direct_announcements`](../dcex/aster/_trade_http.py) — GET /fapi/v3/announcement/direct..
+- [`get_prediction_account`](../dcex/aster/_trade_http.py) — GET /api/v3/account on the prediction host.
+- [`get_prediction_agg_trades`](../dcex/aster/_market_http.py) — GET /api/v3/aggTrades on the prediction host.
+- [`get_prediction_all_orders`](../dcex/aster/_trade_http.py) — GET /api/v3/allOrders on the prediction host.
+- [`get_prediction_commission_rate`](../dcex/aster/_trade_http.py) — GET /api/v3/commissionRate on the prediction host.
+- [`get_prediction_depth`](../dcex/aster/_market_http.py) — GET /api/v3/depth on the prediction host.
+- [`get_prediction_exchange_info`](../dcex/aster/_market_http.py) — GET /api/v3/prediction/exchangeInfo on the prediction host.
+- [`get_prediction_historical_trades`](../dcex/aster/_market_http.py) — GET /api/v3/historicalTrades on the prediction host.
+- [`get_prediction_klines`](../dcex/aster/_market_http.py) — GET /api/v3/klines on the prediction host.
+- [`get_prediction_open_order`](../dcex/aster/_trade_http.py) — GET /api/v3/openOrder on the prediction host.
+- [`get_prediction_open_orders`](../dcex/aster/_trade_http.py) — GET /api/v3/openOrders on the prediction host.
+- [`get_prediction_order`](../dcex/aster/_trade_http.py) — GET /api/v3/order on the prediction host.
+- [`get_prediction_ping`](../dcex/aster/_market_http.py) — GET /api/v3/ping on the prediction host.
+- [`get_prediction_position_histories`](../dcex/aster/_trade_http.py) — GET /api/v3/prediction/positionHistories on the prediction host.
+- [`get_prediction_positions`](../dcex/aster/_trade_http.py) — GET /api/v3/prediction/positions on the prediction host.
+- [`get_prediction_settlement_histories`](../dcex/aster/_trade_http.py) — GET /api/v3/prediction/settlementHistories on the prediction host.
+- [`get_prediction_ticker_24hr`](../dcex/aster/_market_http.py) — GET /api/v3/ticker/24hr on the prediction host.
+- [`get_prediction_ticker_book_ticker`](../dcex/aster/_market_http.py) — GET /api/v3/ticker/bookTicker on the prediction host.
+- [`get_prediction_ticker_price`](../dcex/aster/_market_http.py) — GET /api/v3/ticker/price on the prediction host.
+- [`get_prediction_time`](../dcex/aster/_market_http.py) — GET /api/v3/time on the prediction host.
+- [`get_prediction_trades`](../dcex/aster/_market_http.py) — GET /api/v3/trades on the prediction host.
+- [`get_prediction_user_trades`](../dcex/aster/_trade_http.py) — GET /api/v3/userTrades on the prediction host.
+- [`get_sub_accounts`](../dcex/aster/_trade_http.py) — GET /fapi/v3/getSubAccountList..
+- [`guarded_cancel_futures_batch_orders`](../dcex/aster/_trade_http.py) — Cancel using the nonce of the original batch placement..
+- [`guarded_cancel_futures_order`](../dcex/aster/_trade_http.py) — Cancel using the nonce of the original order placement..
 - [`noop_futures`](../dcex/aster/_trade_http.py) — Attempt to invalidate a pending request using its original nonce.
 - [`noop_spot`](../dcex/aster/_trade_http.py) — Attempt to invalidate a pending request using its original nonce.
-- [`register_agent_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/registerAndApproveAgent. Supply wallet signatures created exactly as documented by Aster; the nonce and signatures are forwarded unchanged.
+- [`register_agent_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/registerAndApproveAgent.
 - [`transfer_sub_account`](../dcex/aster/_trade_http.py) — Transfer within one master/sub-account family using the approved agent.
-- [`update_sub_account_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/updateSubAccount. Supply wallet signatures created exactly as documented by Aster; the nonce and signatures are forwarded unchanged.
+- [`update_prediction_listen_key`](../dcex/aster/_trade_http.py) — PUT /api/v3/listenKey on the prediction host.
+- [`update_sub_account_signed`](../dcex/aster/_trade_http.py) — POST /fapi/v3/updateSubAccount.
 
 ## Extended
 
@@ -1078,42 +1507,55 @@ See [coverage status and limitations](endpoint-audit.md). These Python methods w
 - [`get_account_vault_equity_history`](../dcex/extended/_account_http.py) — Get account vault equity history.
 - [`get_cumulative_account_pnl_history`](../dcex/extended/_account_http.py) — Get cumulative account pnl history.
 - [`get_cumulative_account_pnl_percentage_history`](../dcex/extended/_account_http.py) — Get cumulative account pnl percentage history.
+- [`get_earned_points`](../dcex/extended/_account_http.py) — GET /api/v1/user/rewards/earned..
 - [`get_interest_daily_metrics`](../dcex/extended/_account_http.py) — Get interest daily metrics.
 - [`get_interest_key_metrics`](../dcex/extended/_account_http.py) — Get interest key metrics.
 - [`get_interest_payment_chart`](../dcex/extended/_account_http.py) — Get interest payment chart.
 - [`get_interest_payments_history`](../dcex/extended/_account_http.py) — Get interest payments history.
 - [`get_interest_rate_curves_history`](../dcex/extended/_market_http.py) — Get interest rate curves history.
 - [`get_latest_interest_rate_curve`](../dcex/extended/_market_http.py) — Get latest interest rate curve.
+- [`get_points_leaderboard_stats`](../dcex/extended/_account_http.py) — GET /api/v1/user/rewards/leaderboard/stats..
+- [`get_vault_performance`](../dcex/extended/_market_http.py) — GET /api/v1/vault/public/performance..
+- [`get_vault_summary`](../dcex/extended/_market_http.py) — GET /api/v1/vault/public/summary..
 
 ## Ondo
 
-- [`complete_login_challenge`](../dcex/ondo/_market_http.py) — Exchange a caller-signed SIWE challenge for a JWT.
-- [`get_login_challenge`](../dcex/ondo/_market_http.py) — Request a SIWE challenge for Ethereum (1) or Avalanche (43114).
-- [`hello`](../dcex/ondo/_market_http.py) — Get the public service greeting and health response.
-- [`invalidate_jwt`](../dcex/ondo/_account_http.py) — Invalidate all JWT sessions for this account using API key authentication.
-- [`ping`](../dcex/ondo/_market_http.py) — Alias for the public /hello service check.
+- [`complete_login_challenge`](../dcex/ondo/_market_http.py) — Exchange a caller-signed SIWE challenge for a JWT..
+- [`get_login_challenge`](../dcex/ondo/_market_http.py) — Request a SIWE challenge for Ethereum (1) or Avalanche (43114)..
+- [`hello`](../dcex/ondo/_market_http.py) — Get the public service greeting and health response..
+- [`invalidate_jwt`](../dcex/ondo/_account_http.py) — Invalidate all JWT sessions for this account using API key authentication..
+- [`ping`](../dcex/ondo/_market_http.py) — Alias for the public /hello service check..
 
 ## Arcus
 
 - [`create_api_key_signed`](../dcex/arcus/client.py) — Submit a caller wallet-authorized API key creation body unchanged.
+- [`delete_user_preference_signed`](../dcex/arcus/client.py) — Delete a preference using caller signing headers; timestamp is nanoseconds..
 - [`get_account_stats`](../dcex/arcus/client.py) — GET /v1/account/stats; time bounds use epoch microseconds.
-- [`get_api_keys`](../dcex/arcus/client.py) — List API keys; omitting account_index lists every subaccount scope.
+- [`get_api_keys`](../dcex/arcus/client.py) — List API keys; omitting account_index lists every subaccount scope..
 - [`get_candles`](../dcex/arcus/client.py) — GET /v1/candles; time bounds use epoch microseconds.
 - [`get_compliance`](../dcex/arcus/client.py) — GET /v1/compliance; time bounds use epoch microseconds.
 - [`get_fill`](../dcex/arcus/client.py) — GET /v1/fill/{tradeId}; time bounds use epoch microseconds.
 - [`get_funding`](../dcex/arcus/client.py) — GET /v1/funding; time bounds use epoch microseconds.
 - [`get_funding_rates`](../dcex/arcus/client.py) — GET /v1/fundingRates; time bounds use epoch microseconds.
 - [`get_interest`](../dcex/arcus/client.py) — GET /v1/interest; time bounds use epoch microseconds.
+- [`get_leaderboard`](../dcex/arcus/client.py) — Query trader rankings; PnL is realized and the hourly rollup can lag..
 - [`get_live_prices`](../dcex/arcus/client.py) — GET /v1/prices; time bounds use epoch microseconds.
+- [`get_market_metadata`](../dcex/arcus/client.py) — Public market metadata..
+- [`get_market_overview`](../dcex/arcus/client.py) — Public consolidated market overview..
+- [`get_metadata_candles`](../dcex/arcus/client.py) — Metadata candles: timestamps use seconds; from_ or countback is required..
 - [`get_mid_prices`](../dcex/arcus/client.py) — GET /v1/mids; time bounds use epoch microseconds.
 - [`get_order_history`](../dcex/arcus/client.py) — GET /v1/orders; time bounds use epoch microseconds.
 - [`get_portfolio_history`](../dcex/arcus/client.py) — GET /v1/portfolio; time bounds use epoch microseconds.
 - [`get_rate_limit`](../dcex/arcus/client.py) — GET /v1/rateLimit; time bounds use epoch microseconds.
 - [`get_service_info`](../dcex/arcus/client.py) — GET /; time bounds use epoch microseconds.
 - [`get_spot_fills`](../dcex/arcus/client.py) — GET /v1/spotFills; time bounds use epoch microseconds.
+- [`get_spot_market_overview`](../dcex/arcus/client.py) — Public spot universe and reference data..
 - [`get_spot_positions`](../dcex/arcus/client.py) — GET /v1/spotPositions; time bounds use epoch microseconds.
 - [`get_time`](../dcex/arcus/client.py) — GET /v1/time; time bounds use epoch microseconds.
 - [`get_trade`](../dcex/arcus/client.py) — GET /v1/trade/{tradeId}; time bounds use epoch microseconds.
 - [`get_trades`](../dcex/arcus/client.py) — GET /v1/trades; time bounds use epoch microseconds.
+- [`get_user_preferences`](../dcex/arcus/client.py) — Public preferences for the selected wallet..
 - [`health`](../dcex/arcus/client.py) — GET /health; time bounds use epoch microseconds.
-- [`revoke_api_key_signed`](../dcex/arcus/client.py) — Revoke an API key with a caller wallet-authorized signed body.
+- [`revoke_api_key_signed`](../dcex/arcus/client.py) — Revoke an API key with a caller wallet-authorized signed body..
+- [`sign_websocket_request`](../dcex/arcus/client.py) — Build a signed WS frame using the named REST method and its parameters.
+- [`upsert_user_preferences`](../dcex/arcus/client.py) — Patch preferences with the native Ed25519 signing key; no address in the body..

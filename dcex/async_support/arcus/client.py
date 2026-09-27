@@ -608,13 +608,13 @@ class Client(BaseHTTPManager):
 
     async def get_api_keys(
         self, *, address: str | None = None, account_index: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """List API keys; omitting account_index lists every subaccount scope."""
         return await self.public_request(
             "get_api_keys", address=address or self.address, accountIndex=account_index
         )
 
-    async def create_api_key_signed(self, body: dict[str, Any]) -> Any:
+    async def create_api_key_signed(self, body: dict[str, Any]) -> Any:  # noqa: ANN401
         """
         Submit a caller wallet-authorized API key creation body unchanged.
 
@@ -625,8 +625,83 @@ class Client(BaseHTTPManager):
             "create_api_key_signed", body=json.dumps(body, separators=(",", ":"), allow_nan=False)
         )
 
-    async def revoke_api_key_signed(self, body: dict[str, Any]) -> Any:
+    async def revoke_api_key_signed(self, body: dict[str, Any]) -> Any:  # noqa: ANN401
         """Revoke an API key with a caller wallet-authorized signed body."""
         return await self.private_request(
             "revoke_api_key_signed", body=json.dumps(body, separators=(",", ":"), allow_nan=False)
+        )
+
+    async def get_market_metadata(self, *, market: str | None = None) -> Any:  # noqa: ANN401
+        """Public market metadata."""
+        return await self.public_request("get_market_metadata", market=market)
+
+    async def get_market_overview(self) -> Any:  # noqa: ANN401
+        """Public consolidated market overview."""
+        return await self.public_request("get_market_overview")
+
+    async def get_spot_market_overview(self) -> Any:  # noqa: ANN401
+        """Public spot universe and reference data."""
+        return await self.public_request("get_spot_market_overview")
+
+    async def get_metadata_candles(
+        self,
+        *,
+        market: str,
+        timeframe: str,
+        to: int,
+        from_: int | None = None,
+        countback: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Metadata candles: timestamps use seconds; from_ or countback is required."""
+        return await self.public_request(
+            "get_metadata_candles",
+            **{
+                "market": market,
+                "timeframe": timeframe,
+                "to": to,
+                "from": from_,
+                "countback": countback,
+            },
+        )
+
+    async def get_user_preferences(self, *, address: str | None = None) -> Any:  # noqa: ANN401
+        """Public preferences for the selected wallet."""
+        return await self.public_request("get_user_preferences", address=address or self.address)
+
+    async def upsert_user_preferences(self, preferences: dict[str, Any]) -> Any:  # noqa: ANN401
+        """Patch preferences with the native Ed25519 signing key; no address in the body."""
+        return await self.private_request(
+            "upsert_user_preferences",
+            preferences=json.dumps(preferences, separators=(",", ":"), allow_nan=False),
+        )
+
+    async def delete_user_preference_signed(
+        self, *, key: str, timestamp: int, signature: str
+    ) -> Any:  # noqa: ANN401
+        """Delete a preference using caller signing headers; timestamp is nanoseconds."""
+        return await self.private_request(
+            "delete_user_preference_signed", key=key, timestamp=timestamp, signature=signature
+        )
+
+    async def get_leaderboard(
+        self,
+        *,
+        window: str | None = None,
+        sort_by: str | None = None,
+        address: str | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Query trader rankings; PnL is realized and the hourly rollup can lag."""
+        return await self.public_request(
+            "get_leaderboard",
+            **{
+                k: v
+                for k, v in {
+                    "window": window,
+                    "sortBy": sort_by,
+                    "address": address,
+                    "limit": limit,
+                }.items()
+                if v is not None
+            },
         )

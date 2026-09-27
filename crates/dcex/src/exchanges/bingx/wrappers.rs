@@ -177,3 +177,11 @@ get_sub_account_deposit_history(),
 get_api_restrictions(),
 create_sub_account_deposit_address(coin => "coin",sub_uid => "subUid",network => "network",wallet_type => "walletType"),
 ]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BingxClient; public [
+
+]; private [
+get_withdrawal_history(),
+get_internal_transfer_records(coin => "coin"),
+get_sub_account_internal_transfer_records(coin => "coin"),
+]; }

@@ -20,6 +20,7 @@ pub struct BinancePrivateWebSocket {
     timeout: Duration,
     connection: Option<WebSocketConnection>,
     listen_key: Option<String>,
+    profile: String,
 }
 
 impl BinancePrivateWebSocket {
@@ -53,10 +54,43 @@ impl BinancePrivateWebSocket {
         )?;
         Ok(Self {
             http_client,
+            profile: "futures".into(),
             websocket_base_url: normalize_base_url(&websocket_base_url)?,
             timeout,
             connection: None,
             listen_key: None,
+        })
+    }
+
+    /// Use an existing HTTP client, preserving its market-specific base URLs.
+    /// Margin risk covers cross-margin liability/call events; trade/account events
+    /// use SpotApiClient userDataStream.subscribe.listenToken instead.
+    pub fn with_profile(
+        http_client: BinanceClient,
+        profile: &str,
+        timeout: Duration,
+        websocket_base_url: Option<String>,
+    ) -> Result<Self> {
+        let default_url = match profile {
+            "futures" | "options" => FUTURES_PRIVATE_WS_BASE_URL,
+            "coin_futures" => "wss://dstream.binance.com",
+            "portfolio_margin" => "wss://fstream.binance.com/pm",
+            "margin_risk" => "wss://margin-stream.binance.com",
+            _ => {
+                return Err(DcexError::InvalidInput(format!(
+                    "unsupported Binance private stream profile: {profile}"
+                )));
+            }
+        };
+        Ok(Self {
+            http_client,
+            websocket_base_url: normalize_base_url(
+                websocket_base_url.as_deref().unwrap_or(default_url),
+            )?,
+            timeout,
+            connection: None,
+            listen_key: None,
+            profile: profile.into(),
         })
     }
 
@@ -93,7 +127,13 @@ impl BinancePrivateWebSocket {
     }
 
     pub async fn create_listen_key(&self) -> Result<String> {
-        let response = self.http_client.create_futures_listen_key().await?;
+        let response = match self.profile.as_str() {
+            "coin_futures" => self.http_client.create_coin_futures_listen_key().await?,
+            "options" => self.http_client.create_options_listen_key().await?,
+            "portfolio_margin" => self.http_client.create_pm_listen_key().await?,
+            "margin_risk" => self.http_client.create_margin_listen_key().await?,
+            _ => self.http_client.create_futures_listen_key().await?,
+        };
         extract_listen_key(&response)
     }
 
@@ -103,13 +143,34 @@ impl BinancePrivateWebSocket {
                 "Binance listen key is not available; call connect first.".to_string(),
             ));
         }
-        self.http_client.keep_alive_futures_listen_key().await?;
+        match self.profile.as_str() {
+            "coin_futures" => {
+                self.http_client
+                    .keep_alive_coin_futures_listen_key()
+                    .await?
+            }
+            "options" => self.http_client.keep_alive_options_listen_key().await?,
+            "portfolio_margin" => self.http_client.keep_alive_pm_listen_key().await?,
+            "margin_risk" => {
+                self.http_client
+                    .keep_alive_margin_listen_key(self.listen_key.as_deref().expect("checked key"))
+                    .await?
+            }
+            _ => self.http_client.keep_alive_futures_listen_key().await?,
+        };
         Ok(())
     }
 
     pub async fn close_listen_key(&mut self) -> Result<()> {
-        if self.listen_key.take().is_some() {
-            self.http_client.close_futures_listen_key().await?;
+        if self.listen_key.is_some() {
+            match self.profile.as_str() {
+                "coin_futures" => self.http_client.close_coin_futures_listen_key().await?,
+                "options" => self.http_client.close_options_listen_key().await?,
+                "portfolio_margin" => self.http_client.close_pm_listen_key().await?,
+                "margin_risk" => self.http_client.close_margin_listen_key().await?,
+                _ => self.http_client.close_futures_listen_key().await?,
+            };
+            self.listen_key = None;
         }
         Ok(())
     }
@@ -189,7 +250,10 @@ fn validate_listen_key(listen_key: &str) -> Result<String> {
             "Binance listen key must not be empty.".to_string(),
         ));
     }
-    if listen_key.contains('/') || listen_key.contains('\\') {
+    if !listen_key
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+    {
         return Err(DcexError::InvalidInput(
             "Binance listen key must not contain path separators.".to_string(),
         ));

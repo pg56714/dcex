@@ -17,3 +17,5 @@ pub use params::{
     AsterIndexPriceKlinesParams, AsterKlinesParams, AsterLimitParams, AsterOptionalSymbolParams,
 };
 pub use signing::sign_message;
+
+mod prediction;

@@ -1,5 +1,7 @@
 mod config;
 mod grouped;
+mod pools;
+mod transfer;
 
 use serde_json::json;
 
@@ -46,6 +48,21 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<Option<ValidatedResponse>> {
         match method_name {
+            "transfer_same_master_account" => Ok(Some(
+                self.submit_signed_tx(
+                    self.sign_internal_transfer(params).await?,
+                    params.optional_bool("price_protection")?,
+                )
+                .await?,
+            )),
+            "create_public_pool" | "update_public_pool" | "mint_shares" | "burn_shares"
+            | "stake_assets" | "unstake_assets" => Ok(Some(
+                self.submit_signed_tx(
+                    self.sign_pool_from_params(method_name, params).await?,
+                    params.optional_bool("price_protection")?,
+                )
+                .await?,
+            )),
             "create_sub_account" | "change_api_key_signed" => Ok(Some(
                 self.submit_signed_tx(
                     self.sign_account_admin_from_params(
@@ -238,6 +255,18 @@ impl LighterClient {
         params: &LighterParams,
     ) -> Result<LighterSignedTransaction> {
         match method_name {
+            "sign_transfer_same_master_account" => self.sign_internal_transfer(params).await,
+
+            "sign_create_public_pool"
+            | "sign_update_public_pool"
+            | "sign_mint_shares"
+            | "sign_burn_shares"
+            | "sign_stake_assets"
+            | "sign_unstake_assets" => {
+                self.sign_pool_from_params(method_name.trim_start_matches("sign_"), params)
+                    .await
+            }
+
             "sign_create_sub_account" | "sign_change_api_key_signed" => {
                 self.sign_account_admin_from_params(
                     params,

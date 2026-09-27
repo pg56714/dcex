@@ -65,6 +65,16 @@ impl KrakenClient {
                 return Err(invalid(format!("invalid {}", field.key)));
             }
             match field.kind {
+                "signed_integer" => {
+                    value
+                        .parse::<i32>()
+                        .map_err(|_| invalid("userref must be an int32"))?;
+                }
+                "positive" => {
+                    if !value.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0) {
+                        return Err(invalid(format!("{} must be positive", field.key)));
+                    }
+                }
                 "integer" => {
                     if !value.parse::<u64>().is_ok_and(|v| v >= field.minimum) {
                         return Err(invalid(format!("invalid {} integer", field.key)));
@@ -118,6 +128,9 @@ impl KrakenClient {
             } else {
                 query.push((field.key.to_string(), value));
             }
+        }
+        if name == "edit_spot_order" && params.required("txid")?.contains(',') {
+            return Err(invalid("EditOrder requires one order identifier"));
         }
         if let Some(ids) = params.get("txid") {
             let ids: Vec<_> = ids.split(',').collect();

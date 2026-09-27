@@ -52,6 +52,51 @@ class Case:
 
 CASES: tuple[Case, ...] = (
     Case(
+        "execute_borrow_lend",
+        {"quantity": "1", "side": "Borrow", "symbol": "BTC"},
+        "POST /api/v1/borrowLend",
+        body={"quantity": "1", "side": "Borrow", "symbol": "BTC"},
+    ),
+    Case("get_prediction_events", {}, "GET /api/v1/prediction", signed=False, query={}),
+    Case("get_prediction_tags", {}, "GET /api/v1/prediction/tags", signed=False, query={}),
+    Case("get_vaults", {}, "GET /api/v1/vaults", signed=False, query={}),
+    Case(
+        "vault_mint",
+        {"vault_id": 1, "symbol": "USDC", "quantity": "1"},
+        "POST /api/v1/vault/mint",
+        signed=True,
+        body={"vaultId": 1, "symbol": "USDC", "quantity": "1"},
+    ),
+    Case(
+        "vault_redeem",
+        {"vault_id": 1},
+        "POST /api/v1/vault/redeem",
+        signed=True,
+        body={"vaultId": 1},
+    ),
+    Case(
+        "vault_redeem_cancel",
+        {"vault_id": 1},
+        "DELETE /api/v1/vault/redeem",
+        signed=True,
+        body={"vaultId": 1},
+    ),
+    Case(
+        "get_vault_pending_redeems",
+        {"vault_id": 1},
+        "GET /api/v1/vault/redeems/pending",
+        signed=True,
+        query={"vaultId": "1"},
+    ),
+    Case("get_vault_nav", {}, "GET /api/v1/vault/nav", signed=True, query={}),
+    Case(
+        "get_vault_history",
+        {"interval": "1d"},
+        "GET /api/v1/vaults/history",
+        signed=False,
+        query={"interval": "1d"},
+    ),
+    Case(
         "create_strategy",
         {
             "product_symbol": "BTC-USDC-SWAP",

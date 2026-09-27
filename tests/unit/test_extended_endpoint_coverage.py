@@ -138,6 +138,10 @@ def priv(
 PRESIGNED = _presigned_order()
 
 CASES = [
+    pub("get_vault_performance", "/api/v1/vault/public/performance?interval=WEEK", interval="WEEK"),
+    pub("get_vault_summary", "/api/v1/vault/public/summary"),
+    priv("get_earned_points", "/api/v1/user/rewards/earned"),
+    priv("get_points_leaderboard_stats", "/api/v1/user/rewards/leaderboard/stats"),
     priv(
         "get_account_equity_history",
         "/api/v1/portfolio/charts/equities?accountId=1000&accountId=1001&interval=WEEK",

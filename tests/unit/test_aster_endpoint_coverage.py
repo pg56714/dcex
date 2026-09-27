@@ -83,6 +83,147 @@ OCO_LEGS = [
 ]
 
 CASES = [
+    priv(
+        "get_asset_migration_history",
+        "/fapi/v3/asset/migrateUser/history",
+        {"batchId": "batch1"},
+        batch_id="batch1",
+    ),
+    pub("get_prediction_ping", "/api/v3/ping", {}, **{}),
+    pub("get_prediction_time", "/api/v3/time", {}, **{}),
+    pub("get_prediction_exchange_info", "/api/v3/prediction/exchangeInfo", {}, **{}),
+    pub(
+        "get_prediction_depth",
+        "/api/v3/depth",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+    ),
+    pub(
+        "get_prediction_trades",
+        "/api/v3/trades",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+    ),
+    pub(
+        "get_prediction_historical_trades",
+        "/api/v3/historicalTrades",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+    ),
+    pub(
+        "get_prediction_agg_trades",
+        "/api/v3/aggTrades",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+    ),
+    pub(
+        "get_prediction_klines",
+        "/api/v3/klines",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "interval": "1m"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "interval": "1m"},
+    ),
+    pub("get_prediction_ticker_24hr", "/api/v3/ticker/24hr", {}, **{}),
+    pub("get_prediction_ticker_price", "/api/v3/ticker/price", {}, **{}),
+    pub("get_prediction_ticker_book_ticker", "/api/v3/ticker/bookTicker", {}, **{}),
+    priv(
+        "get_prediction_commission_rate",
+        "/api/v3/commissionRate",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+    ),
+    priv(
+        "create_prediction_order",
+        "/api/v3/order",
+        {
+            "symbol": "EVENT4_ALGERIA_WIN_YUSDT",
+            "side": "BUY",
+            "type": "LIMIT",
+            "quantity": "1",
+            "price": "0.5",
+            "timeInForce": "GTC",
+        },
+        **{
+            "symbol": "EVENT4_ALGERIA_WIN_YUSDT",
+            "side": "BUY",
+            "type_": "LIMIT",
+            "quantity": "1",
+            "price": "0.5",
+            "time_in_force": "GTC",
+        },
+    ),
+    priv(
+        "cancel_prediction_order",
+        "/api/v3/order",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "orderId": "1"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "order_id": 1},
+    ),
+    priv(
+        "get_prediction_order",
+        "/api/v3/order",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "orderId": "1"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "order_id": 1},
+    ),
+    priv(
+        "get_prediction_open_order",
+        "/api/v3/openOrder",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "orderId": "1"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "order_id": 1},
+    ),
+    priv("get_prediction_open_orders", "/api/v3/openOrders", {}, **{}),
+    priv(
+        "get_prediction_all_orders",
+        "/api/v3/allOrders",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT"},
+    ),
+    priv(
+        "create_prediction_asset_wallet_transfer",
+        "/api/v3/asset/wallet/transfer",
+        {"amount": "1", "asset": "USDT", "clientTranId": "example", "kindType": "FUTURE_SPOT"},
+        **{"amount": "1", "asset": "USDT", "client_tran_id": "example", "kind_type": "FUTURE_SPOT"},
+    ),
+    priv(
+        "create_prediction_mint",
+        "/api/v3/prediction/mint",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "quantity": "1"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "quantity": "1"},
+    ),
+    priv(
+        "create_prediction_burn",
+        "/api/v3/prediction/burn",
+        {"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "quantity": "1"},
+        **{"symbol": "EVENT4_ALGERIA_WIN_YUSDT", "quantity": "1"},
+    ),
+    priv(
+        "create_prediction_split",
+        "/api/v3/prediction/split",
+        {"event": "EVENT4", "symbol": "EVENT4_ALGERIA_WIN_YUSDT", "quantity": "1"},
+        **{"event": "EVENT4", "symbol": "EVENT4_ALGERIA_WIN_YUSDT", "quantity": "1"},
+    ),
+    priv(
+        "create_prediction_merge",
+        "/api/v3/prediction/merge",
+        {"event": "EVENT4", "quantity": "1"},
+        **{"event": "EVENT4", "quantity": "1"},
+    ),
+    priv("get_prediction_positions", "/api/v3/prediction/positions", {}, **{}),
+    priv("get_prediction_position_histories", "/api/v3/prediction/positionHistories", {}, **{}),
+    priv("get_prediction_settlement_histories", "/api/v3/prediction/settlementHistories", {}, **{}),
+    priv("get_prediction_account", "/api/v3/account", {}, **{}),
+    priv("get_prediction_user_trades", "/api/v3/userTrades", {}, **{}),
+    priv("create_prediction_listen_key", "/api/v3/listenKey", {}, **{}),
+    priv(
+        "update_prediction_listen_key",
+        "/api/v3/listenKey",
+        {"listenKey": "example"},
+        **{"listen_key": "example"},
+    ),
+    priv(
+        "cancel_prediction_listen_key",
+        "/api/v3/listenKey",
+        {"listenKey": "example"},
+        **{"listen_key": "example"},
+    ),
     pub("get_asset_logos", "/fapi/v3/common/asset/all-asset-logo", {}, **{}),
     priv("exchange_futures_assets", "/fapi/v3/assetExchange", {}, **{}),
     priv("get_sub_accounts", "/fapi/v3/getSubAccountList", {}, **{}),
@@ -97,8 +238,16 @@ CASES = [
             "nonce": "1700000000000123",
             "user": "0x0000000000000000000000000000000000000001",
             "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
-            "childSignature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "childSignature": (
+                "0x22222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222"
+            ),
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
         },
         **{
             "sub_account_name": "desk",
@@ -106,8 +255,16 @@ CASES = [
             "nonce": 1700000000000123,
             "user": "0x0000000000000000000000000000000000000001",
             "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
-            "child_signature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "child_signature": (
+                "0x22222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222"
+            ),
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
         },
     ),
     priv(
@@ -118,7 +275,11 @@ CASES = [
             "nonce": "1700000000000123",
             "user": "0x0000000000000000000000000000000000000001",
             "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
             "status": "FROZEN",
         },
         **{
@@ -126,7 +287,11 @@ CASES = [
             "nonce": 1700000000000123,
             "user": "0x0000000000000000000000000000000000000001",
             "signer": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
             "status": "FROZEN",
         },
     ),
@@ -138,16 +303,32 @@ CASES = [
             "name": "desk",
             "nonce": "1700000000000123",
             "user": "0x0000000000000000000000000000000000000001",
-            "childSignature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "childSignature": (
+                "0x22222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222"
+            ),
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
         },
         **{
             "child_address": "0x0000000000000000000000000000000000000002",
             "name": "desk",
             "nonce": 1700000000000123,
             "user": "0x0000000000000000000000000000000000000001",
-            "child_signature": "0x2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222",
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "child_signature": (
+                "0x22222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222222222222222222222222222222222222"
+                "2222222222222222222222"
+            ),
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
         },
     ),
     priv(
@@ -163,7 +344,11 @@ CASES = [
             "canSpotTrade": "true",
             "canPerpTrade": "true",
             "canWithdraw": "false",
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
         },
         **{
             "user": "0x0000000000000000000000000000000000000001",
@@ -175,7 +360,11 @@ CASES = [
             "can_spot_trade": True,
             "can_perp_trade": True,
             "can_withdraw": False,
-            "signature": "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+            "signature": (
+                "0x11111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111111111111111111111111111111111111"
+                "1111111111111111111111"
+            ),
         },
     ),
     priv("noop_spot", "/api/v3/noop", {"nonce": "1700000000000123"}, nonce=1700000000000123),
@@ -711,6 +900,7 @@ def _client_kwargs(base_url: str) -> dict[str, Any]:
         "private_key": PRIVATE_KEY,
         "spot_base_url": base_url,
         "futures_base_url": base_url,
+        "prediction_base_url": base_url,
         "preload_product_table": False,
     }
 

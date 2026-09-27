@@ -93,3 +93,5 @@ get_interest_payments_history(account_id => "accountId",interval => "interval"),
         set_deadmanswitch(countdown_time => "countdownTime")
     ];
 );
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; ExtendedClient; public [get_vault_performance(interval => "interval"),get_vault_summary()]; private [get_earned_points(),get_points_leaderboard_stats()]; }

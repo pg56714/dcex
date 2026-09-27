@@ -1,5 +1,6 @@
 """Lighter async public market-data HTTP client backed by Rust."""
 
+import json
 from typing import Any
 
 from ._http_manager import HTTPManager
@@ -298,3 +299,112 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_latest_deposit", self._native_params(l1_address=l1_address)
         )
+
+    async def get_pnl_leaderboard(
+        self,
+        *,
+        time_window: str,
+        sort_by: str,
+        sort_dir: str,
+        limit: int,
+        offset: int,
+        search: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter leaderboard API."""
+        return await self._native_public(
+            "get_pnl_leaderboard",
+            self._native_params(
+                **{
+                    "time_window": time_window,
+                    "sort_by": sort_by,
+                    "sort_dir": sort_dir,
+                    "limit": limit,
+                    "offset": offset,
+                    "search": search,
+                }
+            ),
+        )
+
+    async def get_explorer_account_logs(
+        self, *, param: str, limit: int, offset: str, pub_data_type: list[str] | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public(
+            "get_explorer_account_logs",
+            self._native_params(
+                **{
+                    "param": param,
+                    "pub_data_type": json.dumps(pub_data_type)
+                    if pub_data_type is not None
+                    else None,
+                    "limit": limit,
+                    "offset": offset,
+                }
+            ),
+        )
+
+    async def get_explorer_account_positions(self, *, param: str) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public(
+            "get_explorer_account_positions", self._native_params(**{"param": param})
+        )
+
+    async def get_explorer_account_assets(self, *, param: str) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public(
+            "get_explorer_account_assets", self._native_params(**{"param": param})
+        )
+
+    async def get_explorer_batches(self) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public("get_explorer_batches", self._native_params(**{}))
+
+    async def get_explorer_batch(self, *, batch_id: int) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public(
+            "get_explorer_batch", self._native_params(**{"batchId": batch_id})
+        )
+
+    async def get_explorer_blocks(self) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public("get_explorer_blocks", self._native_params(**{}))
+
+    async def get_explorer_block(self, *, block_id: int) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public(
+            "get_explorer_block", self._native_params(**{"blockId": block_id})
+        )
+
+    async def get_explorer_log(self, *, hash: str) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public("get_explorer_log", self._native_params(**{"hash": hash}))
+
+    async def get_explorer_markets(self) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public("get_explorer_markets", self._native_params(**{}))
+
+    async def get_explorer_market_logs(
+        self, *, symbol: str, limit: int | None = None, offset: str | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public(
+            "get_explorer_market_logs",
+            self._native_params(**{"symbol": symbol, "limit": limit, "offset": offset}),
+        )
+
+    async def search_explorer(self, *, q: str) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public("search_explorer", self._native_params(**{"q": q}))
+
+    async def get_explorer_transaction_stats(
+        self, *, aggregation_period: str
+    ) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public(
+            "get_explorer_transaction_stats",
+            self._native_params(**{"aggregation_period": aggregation_period}),
+        )
+
+    async def get_explorer_total(self) -> dict[str, Any] | list[Any]:
+        """Query the official Lighter explorer API."""
+        return await self._native_public("get_explorer_total", self._native_params(**{}))

@@ -18,6 +18,9 @@ impl ArcusClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        if super::metadata::handles(method_name, false) {
+            return self.metadata_request(method_name, params).await;
+        }
         if matches!(
             method_name,
             "create_api_key_signed" | "revoke_api_key_signed"

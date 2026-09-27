@@ -13,3 +13,5 @@ mod trade;
 pub mod websocket;
 
 pub use client::{BackpackClient, SignaturePayload};
+
+mod additional;

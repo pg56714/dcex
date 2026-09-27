@@ -149,6 +149,8 @@ fn client(base_url: &str) -> AsterClient {
         base_url.to_string(),
     )
     .expect("client")
+    .with_prediction_base_url(base_url.into())
+    .expect("prediction host")
 }
 
 fn run(
@@ -157,7 +159,13 @@ fn run(
     params: &[(&str, &str)],
 ) -> (Result<(), String>, Vec<String>) {
     let (base_url, stop, handle) = multi_request_server();
-    let client = client(&base_url);
+    let client = if name.contains("prediction") {
+        client("http://127.0.0.1:1")
+            .with_prediction_base_url(base_url.clone())
+            .expect("prediction host")
+    } else {
+        client(&base_url)
+    };
     let params: Vec<(String, String)> = params
         .iter()
         .map(|(key, value)| ((*key).to_string(), (*value).to_string()))
@@ -1381,4 +1389,236 @@ fn additional_account_routes() {
             &[],
         ),
     ]);
+}
+
+#[test]
+fn prediction_routes_use_dedicated_host() {
+    assert_cases(&[
+        public("get_prediction_ping", &[], "GET", "/api/v3/ping", &[]),
+        public("get_prediction_time", &[], "GET", "/api/v3/time", &[]),
+        public(
+            "get_prediction_exchange_info",
+            &[],
+            "GET",
+            "/api/v3/prediction/exchangeInfo",
+            &[],
+        ),
+        public(
+            "get_prediction_depth",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT")],
+            "GET",
+            "/api/v3/depth",
+            &[],
+        ),
+        public(
+            "get_prediction_trades",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT")],
+            "GET",
+            "/api/v3/trades",
+            &[],
+        ),
+        public(
+            "get_prediction_historical_trades",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT")],
+            "GET",
+            "/api/v3/historicalTrades",
+            &[],
+        ),
+        public(
+            "get_prediction_agg_trades",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT")],
+            "GET",
+            "/api/v3/aggTrades",
+            &[],
+        ),
+        public(
+            "get_prediction_klines",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT"), ("interval", "1m")],
+            "GET",
+            "/api/v3/klines",
+            &[],
+        ),
+        public(
+            "get_prediction_ticker_24hr",
+            &[],
+            "GET",
+            "/api/v3/ticker/24hr",
+            &[],
+        ),
+        public(
+            "get_prediction_ticker_price",
+            &[],
+            "GET",
+            "/api/v3/ticker/price",
+            &[],
+        ),
+        public(
+            "get_prediction_ticker_book_ticker",
+            &[],
+            "GET",
+            "/api/v3/ticker/bookTicker",
+            &[],
+        ),
+        private(
+            "get_prediction_commission_rate",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT")],
+            "GET",
+            "/api/v3/commissionRate",
+            &[],
+        ),
+        private(
+            "create_prediction_order",
+            &[
+                ("symbol", "EVENT4_ALGERIA_WIN_YUSDT"),
+                ("side", "BUY"),
+                ("type", "LIMIT"),
+                ("quantity", "1"),
+                ("price", "0.5"),
+                ("timeInForce", "GTC"),
+            ],
+            "POST",
+            "/api/v3/order",
+            &[],
+        ),
+        private(
+            "cancel_prediction_order",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT"), ("orderId", "1")],
+            "DELETE",
+            "/api/v3/order",
+            &[],
+        ),
+        private(
+            "get_prediction_order",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT"), ("orderId", "1")],
+            "GET",
+            "/api/v3/order",
+            &[],
+        ),
+        private(
+            "get_prediction_open_order",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT"), ("orderId", "1")],
+            "GET",
+            "/api/v3/openOrder",
+            &[],
+        ),
+        private(
+            "get_prediction_open_orders",
+            &[],
+            "GET",
+            "/api/v3/openOrders",
+            &[],
+        ),
+        private(
+            "get_prediction_all_orders",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT")],
+            "GET",
+            "/api/v3/allOrders",
+            &[],
+        ),
+        private(
+            "create_prediction_asset_wallet_transfer",
+            &[
+                ("amount", "1"),
+                ("asset", "USDT"),
+                ("clientTranId", "example"),
+                ("kindType", "FUTURE_SPOT"),
+            ],
+            "POST",
+            "/api/v3/asset/wallet/transfer",
+            &[],
+        ),
+        private(
+            "create_prediction_mint",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT"), ("quantity", "1")],
+            "POST",
+            "/api/v3/prediction/mint",
+            &[],
+        ),
+        private(
+            "create_prediction_burn",
+            &[("symbol", "EVENT4_ALGERIA_WIN_YUSDT"), ("quantity", "1")],
+            "POST",
+            "/api/v3/prediction/burn",
+            &[],
+        ),
+        private(
+            "create_prediction_split",
+            &[
+                ("event", "EVENT4"),
+                ("symbol", "EVENT4_ALGERIA_WIN_YUSDT"),
+                ("quantity", "1"),
+            ],
+            "POST",
+            "/api/v3/prediction/split",
+            &[],
+        ),
+        private(
+            "create_prediction_merge",
+            &[("event", "EVENT4"), ("quantity", "1")],
+            "POST",
+            "/api/v3/prediction/merge",
+            &[],
+        ),
+        private(
+            "get_prediction_positions",
+            &[],
+            "GET",
+            "/api/v3/prediction/positions",
+            &[],
+        ),
+        private(
+            "get_prediction_position_histories",
+            &[],
+            "GET",
+            "/api/v3/prediction/positionHistories",
+            &[],
+        ),
+        private(
+            "get_prediction_settlement_histories",
+            &[],
+            "GET",
+            "/api/v3/prediction/settlementHistories",
+            &[],
+        ),
+        private("get_prediction_account", &[], "GET", "/api/v3/account", &[]),
+        private(
+            "get_prediction_user_trades",
+            &[],
+            "GET",
+            "/api/v3/userTrades",
+            &[],
+        ),
+        private(
+            "create_prediction_listen_key",
+            &[],
+            "POST",
+            "/api/v3/listenKey",
+            &[],
+        ),
+        private(
+            "update_prediction_listen_key",
+            &[("listenKey", "example")],
+            "PUT",
+            "/api/v3/listenKey",
+            &[],
+        ),
+        private(
+            "cancel_prediction_listen_key",
+            &[("listenKey", "example")],
+            "DELETE",
+            "/api/v3/listenKey",
+            &[],
+        ),
+    ]);
+}
+
+#[test]
+fn migration_history_route() {
+    assert_cases(&[private(
+        "get_asset_migration_history",
+        &[("batchId", "batch1")],
+        "GET",
+        "/fapi/v3/asset/migrateUser/history",
+        &["batchId=batch1"],
+    )]);
 }

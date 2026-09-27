@@ -152,3 +152,26 @@ get_contract_fee_deduction_config(),
 get_contract_fee_discount_config(),
 get_contract_discount_usage(),
 ]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; MexcClient; public []; private [
+get_stp_strategy_group(trade_group_name => "tradeGroupName"),
+remove_stp_strategy_group_members(uid => "uid",trade_group_id => "tradeGroupId"),
+get_withdrawal_addresses(),
+delete_stp_strategy_group(trade_group_id => "tradeGroupId"),
+create_stp_strategy_group(trade_group_name => "tradeGroupName"),
+add_stp_strategy_group_members(uid => "uid",trade_group_id => "tradeGroupId"),
+]; }
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;MexcClient;public [];private [delete_sub_account_api_key(sub_account => "subAccount",api_key => "apiKey"),
+create_sub_account_api_key(sub_account => "subAccount",note => "note",permissions => "permissions"),
+get_sub_account_api_keys(sub_account => "subAccount"),];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;MexcClient;public [];private [create_deposit_address(coin => "coin",network => "network")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;MexcClient;public [];private [create_spot_listen_key()];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;MexcClient;public [];private [get_spot_listen_keys()];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;MexcClient;public [];private [keep_alive_spot_listen_key(listen_key => "listenKey")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;MexcClient;public [];private [close_spot_listen_key(listen_key => "listenKey")];}

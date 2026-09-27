@@ -119,6 +119,9 @@ def _http_server(
         def do_POST(self) -> None:  # noqa: N802
             self._handle()
 
+        def do_PATCH(self) -> None:  # noqa: N802
+            self._handle()
+
         def do_PUT(self) -> None:  # noqa: N802
             self._handle()
 

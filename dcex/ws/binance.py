@@ -10,14 +10,22 @@ _native = load_native()
 
 
 class PublicClient(AsyncWebSocketMixin):
-    """Async Binance Spot public market WebSocket client."""
+    """Binance market streams; select a market/routing profile for each connection."""
 
-    def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
+    def __init__(
+        self, timeout: float = 10.0, base_url: str | None = None, profile: str = "spot"
+    ) -> None:
         """Create a Binance public WebSocket client."""
         self._native_client = _native.BinancePublicWebSocketClient(
             timeout=timeout,
             base_url=base_url,
+            profile=profile,
         )
+
+    @property
+    def url(self) -> str:
+        """Return the selected market stream URL."""
+        return str(self._native_client.url())
 
     async def connect(self) -> None:
         """Open the WebSocket connection."""
@@ -75,6 +83,10 @@ class PrivateClient(AsyncWebSocketMixin):
         spot_http_base_url: str | None = None,
         futures_http_base_url: str | None = None,
         ws_base_url: str | None = None,
+        profile: str = "futures",
+        coin_futures_http_base_url: str | None = None,
+        options_http_base_url: str | None = None,
+        portfolio_margin_http_base_url: str | None = None,
     ) -> None:
         """Create a Binance private WebSocket client."""
         self._native_client = _native.BinancePrivateWebSocketClient(
@@ -84,6 +96,10 @@ class PrivateClient(AsyncWebSocketMixin):
             spot_http_base_url=spot_http_base_url,
             futures_http_base_url=futures_http_base_url,
             ws_base_url=ws_base_url,
+            profile=profile,
+            coin_futures_http_base_url=coin_futures_http_base_url,
+            options_http_base_url=options_http_base_url,
+            portfolio_margin_http_base_url=portfolio_margin_http_base_url,
         )
 
     async def connect(self) -> str:
@@ -160,9 +176,11 @@ class EquityClient(AsyncWebSocketMixin):
         raise RuntimeError(f"Unexpected Binance Equity WebSocket event payload: {event!r}")
 
 
-def public(timeout: float = 10.0, base_url: str | None = None) -> PublicClient:
+def public(
+    timeout: float = 10.0, base_url: str | None = None, profile: str = "spot"
+) -> PublicClient:
     """Create an async Binance Spot public market WebSocket client."""
-    return PublicClient(timeout=timeout, base_url=base_url)
+    return PublicClient(timeout=timeout, base_url=base_url, profile=profile)
 
 
 def private(
@@ -172,6 +190,10 @@ def private(
     spot_http_base_url: str | None = None,
     futures_http_base_url: str | None = None,
     ws_base_url: str | None = None,
+    profile: str = "futures",
+    coin_futures_http_base_url: str | None = None,
+    options_http_base_url: str | None = None,
+    portfolio_margin_http_base_url: str | None = None,
 ) -> PrivateClient:
     """Create an async Binance futures private user data WebSocket client."""
     return PrivateClient(
@@ -181,6 +203,10 @@ def private(
         spot_http_base_url=spot_http_base_url,
         futures_http_base_url=futures_http_base_url,
         ws_base_url=ws_base_url,
+        profile=profile,
+        coin_futures_http_base_url=coin_futures_http_base_url,
+        options_http_base_url=options_http_base_url,
+        portfolio_margin_http_base_url=portfolio_margin_http_base_url,
     )
 
 
@@ -507,6 +533,12 @@ class SpotApiClient(ApiClient):
         ``recv``.
         """
         return await self.request("userDataStream.subscribe", params)
+
+    async def subscribe_user_data_listen_token(self, listen_token: str) -> int:
+        """Subscribe with a caller-provided Margin token; renew before its expiration."""
+        return await self.request(
+            "userDataStream.subscribe.listenToken", {"listenToken": listen_token}
+        )
 
     async def unsubscribe_user_data(self, params: dict[str, Any] | None = None) -> int:
         """

@@ -83,6 +83,50 @@ impl BinanceClient {
                         .parse::<bool>()
                         .map_err(|_| invalid(format!("{} must be true or false", field.key)))?;
                 }
+                'j' => {
+                    let items: Vec<serde_json::Value> = serde_json::from_str(value)
+                        .map_err(|_| invalid("orderArgs must be a JSON array"))?;
+                    if items.is_empty() || items.len() > 10 {
+                        return Err(invalid("orderArgs must contain 1..10 positions"));
+                    }
+                    for (index, item) in items.iter().enumerate() {
+                        let object = item
+                            .as_object()
+                            .ok_or_else(|| invalid("position must be an object"))?;
+                        if object.len() != 3
+                            || !object.keys().all(|k| {
+                                matches!(k.as_str(), "symbol" | "quantity" | "positionSide")
+                            })
+                        {
+                            return Err(invalid(
+                                "position requires symbol, quantity and positionSide",
+                            ));
+                        }
+                        let symbol = item["symbol"]
+                            .as_str()
+                            .filter(|s| {
+                                !s.is_empty()
+                                    && s.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
+                            })
+                            .ok_or_else(|| invalid("invalid position symbol"))?;
+                        let quantity = item["quantity"]
+                            .as_str()
+                            .filter(|s| s.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0))
+                            .ok_or_else(|| invalid("quantity must be a positive decimal string"))?;
+                        let side = item["positionSide"]
+                            .as_str()
+                            .filter(|s| ["BOTH", "LONG", "SHORT"].contains(s))
+                            .ok_or_else(|| invalid("invalid positionSide"))?;
+                        for (key, value) in [
+                            ("symbol", symbol),
+                            ("quantity", quantity),
+                            ("positionSide", side),
+                        ] {
+                            query.push((format!("orderArgs[{index}].{key}"), value.to_string()));
+                        }
+                    }
+                    continue;
+                }
                 'a' => {
                     let values: Vec<String> = serde_json::from_str(value)
                         .map_err(|_| invalid("symbols must be a JSON string array"))?;
@@ -152,6 +196,25 @@ fn validate(endpoint: &Endpoint, p: &PublicParams) -> Result<()> {
         }
     }
     let path = endpoint.path;
+    if path.ends_with("/capital/deposit/subAddress")
+        && p.get("network") == Some("LIGHTNING")
+        && p.get("amount").is_none()
+    {
+        return Err(invalid("amount is required for LIGHTNING deposits"));
+    }
+    if path.ends_with("/sub-account/subAccountApi") && endpoint.method == HttpMethod::Post {
+        match p.get("status") {
+            Some("1") => {}
+            Some("2") if p.get("ipAddress").is_some() => {}
+            Some("3") if p.get("thirdPartyName").is_some() => {}
+            _ => {
+                return Err(invalid(
+                    "status must be 1, 2 with ipAddress, or 3 with thirdPartyName",
+                ));
+            }
+        }
+    }
+
     if path.starts_with("/sapi/v1/algo/") {
         if endpoint.method == HttpMethod::Delete
             && p.get("algoId").is_none()

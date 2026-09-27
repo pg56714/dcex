@@ -3467,3 +3467,817 @@ class TradeHTTP(HTTPManager):
                 fromUid=from_uid, toUid=to_uid, category=category, positionList=position_list
             ),
         )
+
+    async def get_uta_account_max_withdrawal(self, *, coin: str) -> dict[str, Any]:
+        """
+        GET /api/v3/account/max-withdrawal. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/account/assets-balance#get-max-withdrawal
+        """
+        return await self._native_private(
+            "get_uta_account_max_withdrawal", self._native_params(coin=coin)
+        )
+
+    async def get_classic_account_bot_assets(
+        self, *, account_type: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/account/bot-assets. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/classic-common-account/classic-common-account#bot-account
+        """
+        return await self._native_private(
+            "get_classic_account_bot_assets", self._native_params(accountType=account_type)
+        )
+
+    async def get_classic_spot_wallet_withdrawal_records(
+        self,
+        *,
+        start_time: str,
+        end_time: str,
+        coin: str | None = None,
+        client_oid: str | None = None,
+        id_less_than: str | None = None,
+        order_id: str | None = None,
+        limit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/spot/wallet/withdrawal-records. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#get-withdrawal-records
+        """
+        return await self._native_private(
+            "get_classic_spot_wallet_withdrawal_records",
+            self._native_params(
+                startTime=start_time,
+                endTime=end_time,
+                coin=coin,
+                clientOid=client_oid,
+                idLessThan=id_less_than,
+                orderId=order_id,
+                limit=limit,
+            ),
+        )
+
+    async def get_uta_account_withdrawal_records(
+        self,
+        *,
+        start_time: str,
+        end_time: str,
+        coin: str | None = None,
+        order_id: str | None = None,
+        client_oid: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v3/account/withdrawal-records. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-withdrawal-records
+        """
+        return await self._native_private(
+            "get_uta_account_withdrawal_records",
+            self._native_params(
+                startTime=start_time,
+                endTime=end_time,
+                coin=coin,
+                orderId=order_id,
+                clientOid=client_oid,
+                limit=limit,
+                cursor=cursor,
+            ),
+        )
+
+    async def get_uta_account_withdraw_address(
+        self,
+        *,
+        coin: str | None = None,
+        type_: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v3/account/withdraw-address. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-withdraw-address-book
+        """
+        return await self._native_private(
+            "get_uta_account_withdraw_address",
+            self._native_params(coin=coin, type=type_, limit=limit, cursor=cursor),
+        )
+
+    async def get_classic_earn_elite_product(self) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/elite/product. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#get-elite-product
+        """
+        return await self._native_private("get_classic_earn_elite_product", self._native_params())
+
+    async def classic_earn_elite_subscribe(
+        self,
+        *,
+        product_sub_id: str,
+        amount: str,
+        coin: str | None = None,
+        payment_account: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v2/earn/elite/subscribe. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#elite-subscribe
+        """
+        return await self._native_private(
+            "classic_earn_elite_subscribe",
+            self._native_params(
+                productSubId=product_sub_id,
+                amount=amount,
+                coin=coin,
+                paymentAccount=payment_account,
+            ),
+        )
+
+    async def get_classic_earn_elite_subscribe_result(self, *, order_id: str) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/elite/subscribe-result. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#get-elite-subscribe-result
+        """
+        return await self._native_private(
+            "get_classic_earn_elite_subscribe_result", self._native_params(orderId=order_id)
+        )
+
+    async def get_classic_earn_elite_subscribe_info(self, *, product_id: str) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/elite/subscribe-info. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#get-elite-subscribe-info
+        """
+        return await self._native_private(
+            "get_classic_earn_elite_subscribe_info", self._native_params(productId=product_id)
+        )
+
+    async def classic_earn_elite_redeem(
+        self,
+        *,
+        product_id: str,
+        product_sub_id: str,
+        redeem_type: str,
+        amount: str,
+        receive_account: str,
+        advanced_settle: str | None = None,
+        coin: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v2/earn/elite/redeem. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#elite-redeem
+        """
+        return await self._native_private(
+            "classic_earn_elite_redeem",
+            self._native_params(
+                productId=product_id,
+                productSubId=product_sub_id,
+                redeemType=redeem_type,
+                amount=amount,
+                receiveAccount=receive_account,
+                advancedSettle=advanced_settle,
+                coin=coin,
+            ),
+        )
+
+    async def get_classic_earn_elite_redeem_info(self, *, product_id: str) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/elite/redeem-info. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#get-redeem-info
+        """
+        return await self._native_private(
+            "get_classic_earn_elite_redeem_info", self._native_params(productId=product_id)
+        )
+
+    async def get_classic_earn_elite_assets(self) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/elite/assets. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#get-elite-assets
+        """
+        return await self._native_private("get_classic_earn_elite_assets", self._native_params())
+
+    async def get_classic_earn_elite_records(
+        self,
+        *,
+        type_: str,
+        start_time: str | None = None,
+        end_time: str | None = None,
+        limit: str | None = None,
+        cursor: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/elite/records. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-elite/classic-earn-elite#get-elite-records
+        """
+        return await self._native_private(
+            "get_classic_earn_elite_records",
+            self._native_params(
+                type=type_, startTime=start_time, endTime=end_time, limit=limit, cursor=cursor
+            ),
+        )
+
+    async def classic_earn_loan_borrow(
+        self,
+        *,
+        loan_coin: str,
+        pledge_coin: str,
+        daily: str,
+        pledge_amount: str | None = None,
+        loan_amount: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v2/earn/loan/borrow. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#borrow
+        """
+        return await self._native_private(
+            "classic_earn_loan_borrow",
+            self._native_params(
+                loanCoin=loan_coin,
+                pledgeCoin=pledge_coin,
+                daily=daily,
+                pledgeAmount=pledge_amount,
+                loanAmount=loan_amount,
+            ),
+        )
+
+    async def get_classic_earn_loan_ongoing_orders(
+        self,
+        *,
+        order_id: str | None = None,
+        loan_coin: str | None = None,
+        pledge_coin: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/loan/ongoing-orders. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#get-loan-orders
+        """
+        return await self._native_private(
+            "get_classic_earn_loan_ongoing_orders",
+            self._native_params(orderId=order_id, loanCoin=loan_coin, pledgeCoin=pledge_coin),
+        )
+
+    async def classic_earn_loan_repay(
+        self,
+        *,
+        order_id: str,
+        repay_all: str,
+        amount: str | None = None,
+        repay_unlock: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v2/earn/loan/repay. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#repay
+        """
+        return await self._native_private(
+            "classic_earn_loan_repay",
+            self._native_params(
+                orderId=order_id, repayAll=repay_all, amount=amount, repayUnlock=repay_unlock
+            ),
+        )
+
+    async def get_classic_earn_loan_repay_history(
+        self,
+        *,
+        start_time: str,
+        end_time: str,
+        order_id: str | None = None,
+        loan_coin: str | None = None,
+        pledge_coin: str | None = None,
+        page_no: str | None = None,
+        page_size: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/loan/repay-history. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#get-repay-history
+        """
+        return await self._native_private(
+            "get_classic_earn_loan_repay_history",
+            self._native_params(
+                startTime=start_time,
+                endTime=end_time,
+                orderId=order_id,
+                loanCoin=loan_coin,
+                pledgeCoin=pledge_coin,
+                pageNo=page_no,
+                pageSize=page_size,
+            ),
+        )
+
+    async def classic_earn_loan_revise_pledge(
+        self, *, order_id: str, amount: str, pledge_coin: str, revise_type: str
+    ) -> dict[str, Any]:
+        """
+        POST /api/v2/earn/loan/revise-pledge. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#modify-pledge-rate
+        """
+        return await self._native_private(
+            "classic_earn_loan_revise_pledge",
+            self._native_params(
+                orderId=order_id, amount=amount, pledgeCoin=pledge_coin, reviseType=revise_type
+            ),
+        )
+
+    async def get_classic_earn_loan_revise_history(
+        self,
+        *,
+        start_time: str,
+        end_time: str,
+        order_id: str | None = None,
+        revise_side: str | None = None,
+        pledge_coin: str | None = None,
+        page_no: str | None = None,
+        page_size: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/loan/revise-history. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#get-pledge-rate-history
+        """
+        return await self._native_private(
+            "get_classic_earn_loan_revise_history",
+            self._native_params(
+                startTime=start_time,
+                endTime=end_time,
+                orderId=order_id,
+                reviseSide=revise_side,
+                pledgeCoin=pledge_coin,
+                pageNo=page_no,
+                pageSize=page_size,
+            ),
+        )
+
+    async def get_classic_earn_loan_borrow_history(
+        self,
+        *,
+        start_time: str,
+        end_time: str,
+        order_id: str | None = None,
+        loan_coin: str | None = None,
+        pledge_coin: str | None = None,
+        status: str | None = None,
+        page_no: str | None = None,
+        page_size: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/loan/borrow-history. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#get-loan-history
+        """
+        return await self._native_private(
+            "get_classic_earn_loan_borrow_history",
+            self._native_params(
+                startTime=start_time,
+                endTime=end_time,
+                orderId=order_id,
+                loanCoin=loan_coin,
+                pledgeCoin=pledge_coin,
+                status=status,
+                pageNo=page_no,
+                pageSize=page_size,
+            ),
+        )
+
+    async def get_classic_earn_loan_debts(self) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/loan/debts. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#get-debts
+        """
+        return await self._native_private("get_classic_earn_loan_debts", self._native_params())
+
+    async def get_classic_earn_loan_reduces(
+        self,
+        *,
+        start_time: str,
+        end_time: str,
+        order_id: str | None = None,
+        loan_coin: str | None = None,
+        pledge_coin: str | None = None,
+        status: str | None = None,
+        page_no: str | None = None,
+        page_size: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v2/earn/loan/reduces. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/earn-classic-loan/classic-earn-loan#get-liquidation-records
+        """
+        return await self._native_private(
+            "get_classic_earn_loan_reduces",
+            self._native_params(
+                startTime=start_time,
+                endTime=end_time,
+                orderId=order_id,
+                loanCoin=loan_coin,
+                pledgeCoin=pledge_coin,
+                status=status,
+                pageNo=page_no,
+                pageSize=page_size,
+            ),
+        )
+
+    async def uta_trade_grid_add_investment(
+        self,
+        *,
+        category: str,
+        bot_id: str,
+        coin: str,
+        size: str,
+        funds_source: list[str],
+        adjust_type: str | None = None,
+        reinvest_profit: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/add-investment. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#add-investment-amount
+        """
+        return await self._native_private(
+            "uta_trade_grid_add_investment",
+            self._native_params(
+                category=category,
+                botId=bot_id,
+                coin=coin,
+                size=size,
+                fundsSource=funds_source,
+                adjustType=adjust_type,
+                reinvestProfit=reinvest_profit,
+            ),
+        )
+
+    async def get_uta_trade_grid_bot_detail(self, *, bot_id: str) -> dict[str, Any]:
+        """
+        GET /api/v3/trade/grid/bot-detail. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#get-grid-bot-detail
+        """
+        return await self._native_private(
+            "get_uta_trade_grid_bot_detail", self._native_params(botId=bot_id)
+        )
+
+    async def uta_trade_grid_close_bot(self, *, bot_id: str) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/close-bot. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#close-grid-bot
+        """
+        return await self._native_private(
+            "uta_trade_grid_close_bot", self._native_params(botId=bot_id)
+        )
+
+    async def uta_trade_grid_create_bot(
+        self,
+        *,
+        category: str,
+        symbol: str,
+        max_price: str,
+        min_price: str,
+        grid_num: str,
+        grid_order_mode: str,
+        investment_amount: list[dict[str, str]],
+        funds_source: list[str],
+        slippage: str,
+        auto_transfer_profits: str,
+        grid_type: str | None = None,
+        leverage: str | None = None,
+        auto_reserve_margin: str | None = None,
+        reserved_margin: str | None = None,
+        trigger_condition: str | None = None,
+        trigger_params: list[dict[str, str]] | None = None,
+        trigger_price: str | None = None,
+        termination_condition: str | None = None,
+        termination_params: list[dict[str, str]] | None = None,
+        termination_sell: str | None = None,
+        stop_loss: str | None = None,
+        take_profit: str | None = None,
+        trailing_grid: str | None = None,
+        moving_average_gains: str | None = None,
+        stop_upward_price: str | None = None,
+        hodl_mode: str | None = None,
+        market_open: str | None = None,
+        loss_reserve: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/create-bot. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#create-grid-bot
+        """
+        return await self._native_private(
+            "uta_trade_grid_create_bot",
+            self._native_params(
+                category=category,
+                symbol=symbol,
+                maxPrice=max_price,
+                minPrice=min_price,
+                gridNum=grid_num,
+                gridOrderMode=grid_order_mode,
+                investmentAmount=investment_amount,
+                fundsSource=funds_source,
+                slippage=slippage,
+                autoTransferProfits=auto_transfer_profits,
+                gridType=grid_type,
+                leverage=leverage,
+                autoReserveMargin=auto_reserve_margin,
+                reservedMargin=reserved_margin,
+                triggerCondition=trigger_condition,
+                triggerParams=trigger_params,
+                triggerPrice=trigger_price,
+                terminationCondition=termination_condition,
+                terminationParams=termination_params,
+                terminationSell=termination_sell,
+                stopLoss=stop_loss,
+                takeProfit=take_profit,
+                trailingGrid=trailing_grid,
+                movingAverageGains=moving_average_gains,
+                stopUpwardPrice=stop_upward_price,
+                hodlMode=hodl_mode,
+                marketOpen=market_open,
+                lossReserve=loss_reserve,
+            ),
+        )
+
+    async def uta_trade_grid_create_neutral_bot(
+        self,
+        *,
+        category: str,
+        symbol: str,
+        max_price: str,
+        min_price: str,
+        grid_num: str,
+        grid_order_mode: str,
+        funds_source: list[str],
+        leverage: str | None = None,
+        investment_amount: list[dict[str, str]] | None = None,
+        trigger_price: str | None = None,
+        stop_loss: str | None = None,
+        take_profit: str | None = None,
+        auto_transfer_profits: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/create-neutral-bot. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#create-neutral-grid-bot
+        """
+        return await self._native_private(
+            "uta_trade_grid_create_neutral_bot",
+            self._native_params(
+                category=category,
+                symbol=symbol,
+                maxPrice=max_price,
+                minPrice=min_price,
+                gridNum=grid_num,
+                gridOrderMode=grid_order_mode,
+                fundsSource=funds_source,
+                leverage=leverage,
+                investmentAmount=investment_amount,
+                triggerPrice=trigger_price,
+                stopLoss=stop_loss,
+                takeProfit=take_profit,
+                autoTransferProfits=auto_transfer_profits,
+            ),
+        )
+
+    async def get_uta_trade_grid_list_details(
+        self, *, category: str, bot_id: str
+    ) -> dict[str, Any]:
+        """
+        GET /api/v3/trade/grid/list-details. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#get-grid-bot-order-details
+        """
+        return await self._native_private(
+            "get_uta_trade_grid_list_details", self._native_params(category=category, botId=bot_id)
+        )
+
+    async def uta_trade_grid_modify_bot(
+        self,
+        *,
+        bot_id: str,
+        category: str | None = None,
+        take_profit: str | None = None,
+        stop_loss: str | None = None,
+        termination_condition: str | None = None,
+        termination_params: list[dict[str, str]] | None = None,
+        hodl_mode: str | None = None,
+        auto_transfer_profits: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/modify-bot. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#modify-grid-bot-parameters
+        """
+        return await self._native_private(
+            "uta_trade_grid_modify_bot",
+            self._native_params(
+                botId=bot_id,
+                category=category,
+                takeProfit=take_profit,
+                stopLoss=stop_loss,
+                terminationCondition=termination_condition,
+                terminationParams=termination_params,
+                hodlMode=hodl_mode,
+                autoTransferProfits=auto_transfer_profits,
+            ),
+        )
+
+    async def uta_trade_grid_modify_grid_interval(
+        self, *, category: str, bot_id: str, max_price: str, min_price: str, grid_num: str
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/modify-grid-interval. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#modify-grid-interval-and-grid-number
+        """
+        return await self._native_private(
+            "uta_trade_grid_modify_grid_interval",
+            self._native_params(
+                category=category,
+                botId=bot_id,
+                maxPrice=max_price,
+                minPrice=min_price,
+                gridNum=grid_num,
+            ),
+        )
+
+    async def uta_trade_grid_modify_neutral_bot(
+        self,
+        *,
+        bot_id: str,
+        category: str,
+        take_profit: str | None = None,
+        stop_loss: str | None = None,
+        auto_transfer_profits: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/modify-neutral-bot. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#modify-neutral-grid-bot-parameters
+        """
+        return await self._native_private(
+            "uta_trade_grid_modify_neutral_bot",
+            self._native_params(
+                botId=bot_id,
+                category=category,
+                takeProfit=take_profit,
+                stopLoss=stop_loss,
+                autoTransferProfits=auto_transfer_profits,
+            ),
+        )
+
+    async def uta_trade_grid_modify_neutral_grid_interval(
+        self, *, category: str, bot_id: str, max_price: str, min_price: str, grid_num: str
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/modify-neutral-grid-interval. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#modify-neutral-grid-interval-and-grid-number
+        """
+        return await self._native_private(
+            "uta_trade_grid_modify_neutral_grid_interval",
+            self._native_params(
+                category=category,
+                botId=bot_id,
+                maxPrice=max_price,
+                minPrice=min_price,
+                gridNum=grid_num,
+            ),
+        )
+
+    async def get_uta_trade_grid_neutral_bot_detail(self, *, bot_id: str) -> dict[str, Any]:
+        """
+        GET /api/v3/trade/grid/neutral-bot-detail. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#get-neutral-grid-bot-detail
+        """
+        return await self._native_private(
+            "get_uta_trade_grid_neutral_bot_detail", self._native_params(botId=bot_id)
+        )
+
+    async def get_uta_trade_grid_neutral_list_details(
+        self, *, category: str, bot_id: str
+    ) -> dict[str, Any]:
+        """
+        GET /api/v3/trade/grid/neutral-list-details. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#get-neutral-grid-bot-order-details
+        """
+        return await self._native_private(
+            "get_uta_trade_grid_neutral_list_details",
+            self._native_params(category=category, botId=bot_id),
+        )
+
+    async def uta_trade_grid_validate_neutral(
+        self,
+        *,
+        category: str,
+        symbol: str,
+        max_price: str,
+        min_price: str,
+        grid_num: str,
+        grid_order_mode: str,
+        leverage: str | None = None,
+        investment_amount: list[dict[str, str]] | None = None,
+        trigger_price: str | None = None,
+        stop_loss: str | None = None,
+        take_profit: str | None = None,
+        auto_transfer_profits: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/validate-neutral. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#validate-neutral-grid-parameters
+        """
+        return await self._native_private(
+            "uta_trade_grid_validate_neutral",
+            self._native_params(
+                category=category,
+                symbol=symbol,
+                maxPrice=max_price,
+                minPrice=min_price,
+                gridNum=grid_num,
+                gridOrderMode=grid_order_mode,
+                leverage=leverage,
+                investmentAmount=investment_amount,
+                triggerPrice=trigger_price,
+                stopLoss=stop_loss,
+                takeProfit=take_profit,
+                autoTransferProfits=auto_transfer_profits,
+            ),
+        )
+
+    async def uta_trade_grid_validate(
+        self,
+        *,
+        category: str,
+        symbol: str,
+        max_price: str,
+        min_price: str,
+        grid_num: str,
+        grid_order_mode: str,
+        investment_amount: list[dict[str, str]],
+        auto_transfer_profits: str,
+        grid_type: str | None = None,
+        leverage: str | None = None,
+        reserved_margin: str | None = None,
+        trigger_condition: str | None = None,
+        trigger_params: list[dict[str, str]] | None = None,
+        trigger_price: str | None = None,
+        termination_condition: str | None = None,
+        termination_params: list[dict[str, str]] | None = None,
+        stop_loss: str | None = None,
+        take_profit: str | None = None,
+        trailing_grid: str | None = None,
+        moving_average_gains: str | None = None,
+        stop_upward_price: str | None = None,
+        hodl_mode: str | None = None,
+        market_open: str | None = None,
+        loss_reserve: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        POST /api/v3/trade/grid/validate. Native symbols and decimal strings.
+
+        Source: https://www.bitget.com/docs/catalog/trading/grid-trading#validate-grid-parameters
+        """
+        return await self._native_private(
+            "uta_trade_grid_validate",
+            self._native_params(
+                category=category,
+                symbol=symbol,
+                maxPrice=max_price,
+                minPrice=min_price,
+                gridNum=grid_num,
+                gridOrderMode=grid_order_mode,
+                investmentAmount=investment_amount,
+                autoTransferProfits=auto_transfer_profits,
+                gridType=grid_type,
+                leverage=leverage,
+                reservedMargin=reserved_margin,
+                triggerCondition=trigger_condition,
+                triggerParams=trigger_params,
+                triggerPrice=trigger_price,
+                terminationCondition=termination_condition,
+                terminationParams=termination_params,
+                stopLoss=stop_loss,
+                takeProfit=take_profit,
+                trailingGrid=trailing_grid,
+                movingAverageGains=moving_average_gains,
+                stopUpwardPrice=stop_upward_price,
+                hodlMode=hodl_mode,
+                marketOpen=market_open,
+                lossReserve=loss_reserve,
+            ),
+        )

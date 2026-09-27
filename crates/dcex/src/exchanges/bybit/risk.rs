@@ -69,6 +69,48 @@ impl BybitClient {
                     .map_err(|_| invalid("integer parameters must be nonnegative"))?;
             }
         }
+        if let Some(raw) = params.get("collateralList") {
+            let items: Vec<Value> = serde_json::from_str(raw)
+                .map_err(|_| invalid("collateralList must be an array"))?;
+            if items.is_empty() || items.len() > 100 {
+                return Err(invalid("collateralList must contain 1..100 currencies"));
+            }
+            let currency_key = if endpoint.path.ends_with("/max-loan") {
+                "ccy"
+            } else {
+                "currency"
+            };
+            let mut currencies = std::collections::HashSet::new();
+            for item in &items {
+                let object = item
+                    .as_object()
+                    .ok_or_else(|| invalid("collateral must be an object"))?;
+                if object.len() != 2 || !object.keys().all(|k| k == currency_key || k == "amount") {
+                    return Err(invalid("collateral requires currency and amount"));
+                }
+                let currency = item[currency_key]
+                    .as_str()
+                    .filter(|s| !s.is_empty())
+                    .ok_or_else(|| invalid("collateral currency is required"))?;
+                if !currencies.insert(currency) {
+                    return Err(invalid("duplicate collateral currency"));
+                }
+                if !item["amount"]
+                    .as_str()
+                    .is_some_and(|s| s.parse::<f64>().is_ok_and(|n| n.is_finite() && n > 0.0))
+                {
+                    return Err(invalid(
+                        "collateral amount must be a positive decimal string",
+                    ));
+                }
+            }
+        }
+        if endpoint.path.ends_with("/fully-repay")
+            && params.get("loanId").is_none()
+            && params.get("loanCurrency").is_none()
+        {
+            return Err(invalid("loanId or loanCurrency is required"));
+        }
         validate(name, params)?;
         let response = if endpoint.post {
             let mut body = Map::new();
@@ -81,7 +123,7 @@ impl BybitClient {
                     )
                 } else if matches!(
                     key.as_str(),
-                    "request" | "list" | "fromCoinList" | "permissions"
+                    "request" | "list" | "fromCoinList" | "permissions" | "collateralList"
                 ) {
                     params.json_required(&key)?
                 } else if matches!(key.as_str(), "modifyEnable" | "agree") {

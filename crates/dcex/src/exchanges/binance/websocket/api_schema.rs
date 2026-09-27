@@ -24,6 +24,14 @@ pub(super) fn schema(
     method: &str,
 ) -> Option<(Auth, &'static [Field])> {
     match (market, method) {
+        (BinanceWebSocketApiMarket::Spot, "userDataStream.subscribe.listenToken") => Some((
+            Auth::Public,
+            &[Field {
+                name: "listenToken",
+                kind: Kind::Text,
+                required: true,
+            }],
+        )),
         (BinanceWebSocketApiMarket::CoinFutures, "account.status") => Some((
             Auth::Signed,
             &[

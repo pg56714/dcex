@@ -41,6 +41,7 @@ class HTTPManager(BaseHTTPManager):
     EXCHANGE = Common.LIGHTER
 
     base_url: str | None = field(default=None)
+    explorer_base_url: str | None = field(default=None)
     account_index: int | None = field(default=None)
     api_key_index: int | None = field(default=None)
     api_private_key: str | None = field(default=None, repr=False)
@@ -93,6 +94,7 @@ class HTTPManager(BaseHTTPManager):
                 api_private_key=self.api_private_key,
                 network=resolved_network.value,
                 chain_id=self.chain_id,
+                explorer_base_url=self.explorer_base_url,
             )
         if (
             self.preload_product_table

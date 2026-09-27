@@ -1716,3 +1716,89 @@ class TradeHTTP(HTTPManager):
                 recvWindow=recv_window,
             )
         )
+
+    async def get_withdrawal_history(
+        self,
+        *,
+        id: str | None = None,
+        coin: str | None = None,
+        withdraw_order_id: str | None = None,
+        status: int | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        tx_id: str | None = None,
+        recv_window: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """GET /openApi/api/v3/capital/withdraw/history. Timestamps use milliseconds."""
+        return await self._native_private(
+            "get_withdrawal_history",
+            self._native_params(
+                id=id,
+                coin=coin,
+                withdrawOrderId=withdraw_order_id,
+                status=status,
+                startTime=start_time,
+                endTime=end_time,
+                offset=offset,
+                limit=limit,
+                txId=tx_id,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_internal_transfer_records(
+        self,
+        *,
+        coin: str,
+        id: str | None = None,
+        transfer_client_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> dict[str, Any]:
+        """GET /openApi/wallets/v1/capital/innerTransfer/records. Timestamps use milliseconds."""
+        return await self._native_private(
+            "get_internal_transfer_records",
+            self._native_params(
+                coin=coin,
+                id=id,
+                transferClientId=transfer_client_id,
+                startTime=start_time,
+                endTime=end_time,
+                offset=offset,
+                limit=limit,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_sub_account_internal_transfer_records(
+        self,
+        *,
+        coin: str,
+        transfer_client_id: str | None = None,
+        start_time: int | None = None,
+        end_time: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /openApi/wallets/v1/capital/subAccount/innerTransfer/records. Timestamps use
+        milliseconds.
+        """
+        return await self._native_private(
+            "get_sub_account_internal_transfer_records",
+            self._native_params(
+                coin=coin,
+                transferClientId=transfer_client_id,
+                startTime=start_time,
+                endTime=end_time,
+                offset=offset,
+                limit=limit,
+                recvWindow=recv_window,
+            ),
+        )

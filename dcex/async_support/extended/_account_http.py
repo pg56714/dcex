@@ -458,3 +458,11 @@ class AccountHTTP(HTTPManager):
             "get_interest_payments_history",
             self._native_params(accountId=account_id, interval=interval),
         )
+
+    async def get_earned_points(self) -> Any:  # noqa: ANN401
+        """GET /api/v1/user/rewards/earned."""
+        return await self._native_private("get_earned_points", self._native_params())
+
+    async def get_points_leaderboard_stats(self) -> Any:  # noqa: ANN401
+        """GET /api/v1/user/rewards/leaderboard/stats."""
+        return await self._native_private("get_points_leaderboard_stats", self._native_params())

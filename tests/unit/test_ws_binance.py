@@ -4,7 +4,10 @@ import pytest
 
 
 class _FakeNativeBinancePublicWebSocketClient:
-    def __init__(self, timeout: float = 10.0, base_url: str | None = None) -> None:
+    def __init__(
+        self, timeout: float = 10.0, base_url: str | None = None, profile: str = "spot"
+    ) -> None:
+        self.profile = profile
         self.timeout = timeout
         self.base_url = base_url
         self.connected = False
@@ -58,6 +61,10 @@ class _FakeNativeBinancePrivateWebSocketClient:
         spot_http_base_url: str | None = None,
         futures_http_base_url: str | None = None,
         ws_base_url: str | None = None,
+        profile: str = "futures",
+        coin_futures_http_base_url: str | None = None,
+        options_http_base_url: str | None = None,
+        portfolio_margin_http_base_url: str | None = None,
     ) -> None:
         self.api_key = api_key
         self.api_secret = api_secret

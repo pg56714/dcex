@@ -151,6 +151,14 @@ impl AsterClient {
                     "signature",
                 ],
             ),
+            "get_asset_migration_history" => (
+                "/fapi/v3/asset/migrateUser/history",
+                HttpMethod::Get,
+                false,
+                false,
+                &["batchId"],
+                &["batchId"],
+            ),
             _ => return Ok(None),
         };
         if public != is_public {

@@ -236,6 +236,24 @@ const SWAP_SIDED_LIMIT: &[(&str, &str)] = &[SWAP, ("quantity", "1"), ("price", "
 
 /// (dispatch name, params, HTTP method, documented path)
 const PRIVATE_ROUTES: &[Case] = &[
+    (
+        "get_withdrawal_history",
+        &[],
+        "GET",
+        "/openApi/api/v3/capital/withdraw/history",
+    ),
+    (
+        "get_internal_transfer_records",
+        &[("coin", "USDT")],
+        "GET",
+        "/openApi/wallets/v1/capital/innerTransfer/records",
+    ),
+    (
+        "get_sub_account_internal_transfer_records",
+        &[("coin", "USDT")],
+        "GET",
+        "/openApi/wallets/v1/capital/subAccount/innerTransfer/records",
+    ),
     // Account / wallet / sub-accounts.
     (
         "get_account_balance",

@@ -141,6 +141,60 @@ fn private_payload(method: &'static str, params: &[(&str, &str)]) -> Recorded {
 fn info_requests_match_official_request_types() {
     let cases: Vec<(&'static str, Vec<(&str, &str)>, Value)> = vec![
         (
+            "get_vault_details",
+            vec![
+                ("vaultAddress", "0xabababababababababababababababababababab"),
+                ("user", "0xabababababababababababababababababababab"),
+            ],
+            json!({"type": "vaultDetails", "vaultAddress": "0xabababababababababababababababababababab", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_delegations",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "delegations", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_delegator_summary",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "delegatorSummary", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_delegator_history",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "delegatorHistory", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_delegator_rewards",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "delegatorRewards", "user": "0xabababababababababababababababababababab"}),
+        ),
+        (
+            "get_spot_deploy_state",
+            vec![("user", "0xabababababababababababababababababababab")],
+            json!({"type": "spotDeployState", "user": "0xabababababababababababababababababababab"}),
+        ),
+        ("get_outcome_meta", vec![], json!({"type": "outcomeMeta"})),
+        (
+            "get_settled_outcome",
+            vec![("outcome", "1")],
+            json!({"type": "settledOutcome", "outcome": 1}),
+        ),
+        (
+            "get_outcome_deployer_limits",
+            vec![("venue", "test")],
+            json!({"type": "outcomeDeployerLimits", "venue": "test"}),
+        ),
+        (
+            "get_perp_deploy_auction_status",
+            vec![],
+            json!({"type": "perpDeployAuctionStatus"}),
+        ),
+        (
+            "get_spot_pair_deploy_auction_status",
+            vec![],
+            json!({"type": "spotPairDeployAuctionStatus"}),
+        ),
+        (
             "get_perps_at_open_interest_cap",
             vec![("dex", "xyz")],
             json!({"type": "perpsAtOpenInterestCap", "dex": "xyz"}),
@@ -1471,4 +1525,151 @@ fn account_risk_queries_and_actions_reject_invalid_parameters() {
             "{name}: {error}"
         );
     }
+}
+
+#[test]
+fn vault_staking_and_abstraction_actions() {
+    let body = private_payload(
+        "transfer_vault_usd",
+        &[
+            ("targetVault", "0xabababababababababababababababababababab"),
+            ("isDeposit", "true"),
+            ("usd", "100"),
+        ],
+    );
+    assert_eq!(body.body["action"]["type"], "vaultTransfer");
+    assert!(body.body.get("vaultAddress").is_none());
+    let body = private_payload("enable_agent_dex_abstraction", &[]);
+    assert_eq!(body.body["action"]["type"], "agentEnableDexAbstraction");
+    let body = private_payload(
+        "transfer_hip3_liquidator",
+        &[("dex", "xyz"), ("ntl", "100"), ("isDeposit", "true")],
+    );
+    assert_eq!(body.body["action"]["type"], "hip3LiquidatorTransfer");
+    let body = private_payload(
+        "deposit_staking_signed",
+        &[
+            ("wei", "100"),
+            ("nonce", "100"),
+            (
+                "signature",
+                "{\"r\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"s\":\"0x2222222222222222222222222222222222222222222222222222222222222222\",\"v\":27}",
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+    );
+    assert_eq!(body.body["action"]["type"], "cDeposit");
+    let body = private_payload(
+        "withdraw_staking_signed",
+        &[
+            ("wei", "100"),
+            ("nonce", "100"),
+            (
+                "signature",
+                "{\"r\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"s\":\"0x2222222222222222222222222222222222222222222222222222222222222222\",\"v\":27}",
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+    );
+    assert_eq!(body.body["action"]["type"], "cWithdraw");
+    let body = private_payload(
+        "delegate_tokens_signed",
+        &[
+            ("validator", "0xabababababababababababababababababababab"),
+            ("wei", "100"),
+            ("isUndelegate", "true"),
+            ("nonce", "100"),
+            (
+                "signature",
+                "{\"r\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"s\":\"0x2222222222222222222222222222222222222222222222222222222222222222\",\"v\":27}",
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+    );
+    assert_eq!(body.body["action"]["type"], "tokenDelegate");
+    let body = private_payload(
+        "set_user_dex_abstraction_signed",
+        &[
+            ("user", "0xabababababababababababababababababababab"),
+            ("enabled", "true"),
+            ("nonce", "100"),
+            (
+                "signature",
+                "{\"r\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"s\":\"0x2222222222222222222222222222222222222222222222222222222222222222\",\"v\":27}",
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+    );
+    assert_eq!(body.body["action"]["type"], "userDexAbstraction");
+}
+
+#[test]
+fn subaccount_actions_use_master_signer() {
+    let r = private_payload("create_sub_account", &[("name", "desk")]);
+    assert_eq!(r.body["action"]["type"], "createSubAccount");
+    assert!(r.body.get("vaultAddress").is_none());
+    let r = private_payload(
+        "transfer_sub_account_usd",
+        &[
+            (
+                "subAccountUser",
+                "0xabababababababababababababababababababab",
+            ),
+            ("isDeposit", "true"),
+            ("usd", "100"),
+        ],
+    );
+    assert_eq!(r.body["action"]["type"], "subAccountTransfer");
+    assert!(r.body.get("vaultAddress").is_none());
+    let r = private_payload(
+        "transfer_sub_account_spot",
+        &[
+            (
+                "subAccountUser",
+                "0xabababababababababababababababababababab",
+            ),
+            ("isDeposit", "true"),
+            ("token", "USDC"),
+            ("amount", "1"),
+        ],
+    );
+    assert_eq!(r.body["action"]["type"], "subAccountSpotTransfer");
+    assert!(r.body.get("vaultAddress").is_none());
+}
+
+#[test]
+fn agent_approval_preserves_wallet_signature() {
+    let body = private_payload(
+        "approve_agent_signed",
+        &[
+            ("agentAddress", "0xabababababababababababababababababababab"),
+            ("nonce", "100"),
+            (
+                "signature",
+                "{\"r\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"s\":\"0x2222222222222222222222222222222222222222222222222222222222222222\",\"v\":27}",
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+    );
+    assert_eq!(body.body["action"]["type"], "approveAgent");
+    assert!(body.body["action"].get("agentName").is_none());
+}
+
+#[test]
+fn info_queries_are_independent_of_websocket_subscriptions() {
+    let r = public_payload("get_all_mids", &[("dex", "")]);
+    assert_eq!(r.body, json!({"type":"allMids","dex":""}));
+    let r = public_payload(
+        "get_active_asset_data",
+        &[("user", USER), ("product_symbol", "BTC-USDC-SWAP")],
+    );
+    assert_eq!(
+        r.body,
+        json!({"type":"activeAssetData","user":USER_LOWER,"coin":"BTC"})
+    );
+    let r = public_payload("get_user_twap_slice_fills", &[("user", USER)]);
+    assert_eq!(
+        r.body,
+        json!({"type":"userTwapSliceFills","user":USER_LOWER})
+    );
 }

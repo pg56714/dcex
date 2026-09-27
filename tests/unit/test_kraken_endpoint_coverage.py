@@ -33,6 +33,53 @@ FUTURES = "FUTURES"
 
 # method name -> (kwargs, HTTP method, official path, API family)
 CASES: dict[str, tuple[dict[str, Any], str, str, str]] = {
+    "get_futures_liquidity_pool_statistics": (
+        {"since": 1, "interval": 60},
+        "GET",
+        "/api/charts/v1/analytics/liquidity-pool",
+        FUTURES,
+    ),
+    "get_futures_market_price": (
+        {"tradeable": "PF_XBTUSD"},
+        "GET",
+        "/api/history/v3/market/PF_XBTUSD/price",
+        FUTURES,
+    ),
+    "get_futures_market_orders": (
+        {"tradeable": "PF_XBTUSD"},
+        "GET",
+        "/api/history/v3/market/PF_XBTUSD/orders",
+        FUTURES,
+    ),
+    "get_futures_market_executions": (
+        {"tradeable": "PF_XBTUSD"},
+        "GET",
+        "/api/history/v3/market/PF_XBTUSD/executions",
+        FUTURES,
+    ),
+    "get_futures_chart_resolutions": (
+        {"tick_type": "trade", "symbol": "PF_XBTUSD"},
+        "GET",
+        "/api/charts/v1/trade/PF_XBTUSD",
+        FUTURES,
+    ),
+    "get_futures_chart_markets": ({"tick_type": "trade"}, "GET", "/api/charts/v1/trade", FUTURES),
+    "get_futures_chart_types": ({}, "GET", "/api/charts/v1/", FUTURES),
+    "edit_spot_order": (
+        {"pair": "XBTUSD", "txid": "OID", "price": "+5%", "userref": -1, "validate": True},
+        "POST",
+        "/0/private/EditOrder",
+        SPOT,
+    ),
+    "get_withdrawal_addresses": ({}, "POST", "/0/private/WithdrawAddresses", SPOT),
+    "get_withdrawal_information": (
+        {"asset": "XBT", "key": "destination", "amount": "1"},
+        "POST",
+        "/0/private/WithdrawInfo",
+        SPOT,
+    ),
+    "get_withdrawal_methods": ({}, "POST", "/0/private/WithdrawMethods", SPOT),
+    "get_withdrawal_status": ({}, "POST", "/0/private/WithdrawStatus", SPOT),
     "delete_spot_export_report": (
         {"id": "report1", "report_action": "cancel"},
         "POST",
@@ -713,8 +760,11 @@ def _assert_route(request: dict[str, Any], method_name: str) -> None:
         expected[0].pop("product_symbol")
         expected[0]["symbol"] = "PF_XBTUSD"
         assert value == {"batchOrder": expected}
-    if family == FUTURES and method_name in _PRIVATE_FUTURES:
-        assert request["authent"], method_name
+    if family == FUTURES:
+        if method_name in _PRIVATE_FUTURES:
+            assert request["authent"], method_name
+        else:
+            assert request["authent"] is None, method_name
 
 
 def _fail_if_stale_native(exc: Exception) -> None:
@@ -784,11 +834,14 @@ _PRIVATE_FUTURES = {
         "get_futures_instrument_statuses",
         "get_futures_ticker",
     }
-    and not path.startswith("/api/charts")
+    and not path.startswith(("/api/charts", "/api/history/v3/market/"))
     and not path.endswith(
         ("/instruments", "/tickers", "/orderbook", "/history", "/historical-funding-rates")
     )
 }
+
+# Account-specific /trading/instruments requires authentication, unlike /instruments.
+_PRIVATE_FUTURES.add("get_futures_trading_instruments")
 
 
 @pytest.mark.parametrize("mode", ["sync", "async"])
@@ -1008,5 +1061,14 @@ RISK_FIELDS.update(
         "get_futures_subaccounts": [],
         "get_spot_post_trade_data": [("symbol", "BTC/USD")],
         "get_spot_pre_trade_data": [("symbol", "BTC/USD")],
+    }
+)
+
+RISK_FIELDS.update(
+    {
+        "get_withdrawal_addresses": [],
+        "get_withdrawal_information": [("asset", "XBT"), ("key", "destination"), ("amount", "1")],
+        "get_withdrawal_methods": [],
+        "get_withdrawal_status": [],
     }
 )

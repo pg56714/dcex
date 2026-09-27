@@ -49,6 +49,40 @@ impl BitgetClient {
                 required(params, key)?;
             }
         }
+        if endpoint.path.contains("/grid/") {
+            for key in ["minPrice", "maxPrice", "size", "leverage", "reservedMargin"] {
+                if params
+                    .get(key)
+                    .is_some_and(|s| !s.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0))
+                {
+                    return Err(invalid("grid prices and amounts must be positive decimals"));
+                }
+            }
+            if let (Some(min), Some(max)) = (params.get("minPrice"), params.get("maxPrice")) {
+                if min.parse::<f64>().unwrap_or_default() >= max.parse::<f64>().unwrap_or_default()
+                {
+                    return Err(invalid("grid minPrice must be below maxPrice"));
+                }
+            }
+            if params
+                .get("gridNum")
+                .is_some_and(|s| !s.parse::<u64>().is_ok_and(|n| n > 0))
+            {
+                return Err(invalid("gridNum must be positive"));
+            }
+            if params
+                .get("gridOrderMode")
+                .is_some_and(|s| !["arithmetic", "geometric"].contains(&s))
+            {
+                return Err(invalid("invalid gridOrderMode"));
+            }
+            if endpoint.path.ends_with("/create-bot")
+                && params.get("category") != Some("SPOT")
+                && params.get("gridType").is_none()
+            {
+                return Err(invalid("gridType is required for futures"));
+            }
+        }
         validate(name, params, &endpoint)?;
         if name == "batch_create_classic_sub_accounts" {
             let body: Value = serde_json::from_str(required(params, "accounts")?)
@@ -144,6 +178,44 @@ impl BitgetClient {
                     {
                         return Err(invalid(
                             "position requires native symbol, buy/sell side and positive decimal qty",
+                        ));
+                    }
+                }
+                body.insert(key, value);
+            } else if endpoint.path.contains("/grid/")
+                && ["investmentAmount", "triggerParams", "terminationParams"]
+                    .contains(&key.as_str())
+            {
+                let value: Value =
+                    serde_json::from_str(&value).map_err(|_| invalid("invalid grid array JSON"))?;
+                let items = value
+                    .as_array()
+                    .filter(|a| !a.is_empty())
+                    .ok_or_else(|| invalid("grid array cannot be empty"))?;
+                for item in items {
+                    let object = item
+                        .as_object()
+                        .ok_or_else(|| invalid("grid array entries must be objects"))?;
+                    let fields: &[&str] = if key == "investmentAmount" {
+                        &["coin", "amount"]
+                    } else {
+                        &["indicatorLength", "threshold", "multiplier", "interval"]
+                    };
+                    if object.keys().any(|k| !fields.contains(&k.as_str()))
+                        || object
+                            .values()
+                            .any(|v| !v.as_str().is_some_and(|s| !s.is_empty()))
+                    {
+                        return Err(invalid("invalid grid object fields"));
+                    }
+                    if key == "investmentAmount"
+                        && (object.len() != 2
+                            || !item["amount"].as_str().is_some_and(|s| {
+                                s.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0)
+                            }))
+                    {
+                        return Err(invalid(
+                            "investment requires coin and positive decimal amount",
                         ));
                     }
                 }

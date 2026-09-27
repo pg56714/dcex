@@ -33,6 +33,81 @@ SWAP = "BTC-USDT-SWAP"
 
 # method name -> (kwargs, HTTP method, official path, signed?)
 CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
+    "close_spot_listen_key": ({"listen_key": "test-key"}, "DELETE", "/api/v3/userDataStream", True),
+    "keep_alive_spot_listen_key": (
+        {"listen_key": "test-key"},
+        "PUT",
+        "/api/v3/userDataStream",
+        True,
+    ),
+    "get_spot_listen_keys": ({}, "GET", "/api/v3/userDataStream", True),
+    "create_spot_listen_key": ({}, "POST", "/api/v3/userDataStream", True),
+    "create_deposit_address": (
+        {"coin": "USDT", "network": "TRC20"},
+        "POST",
+        "/api/v3/capital/deposit/address",
+        True,
+    ),
+    "delete_sub_account_api_key": (
+        {"sub_account": "sub1", "api_key": "test-key", "recv_window": 5000},
+        "DELETE",
+        "/api/v3/sub-account/apiKey",
+        True,
+    ),
+    "create_sub_account_api_key": (
+        {
+            "sub_account": "sub1",
+            "note": "trading",
+            "permissions": "SPOT_ACCOUNT_READ",
+            "ip": "127.0.0.1",
+            "recv_window": 5000,
+        },
+        "POST",
+        "/api/v3/sub-account/apiKey",
+        True,
+    ),
+    "get_sub_account_api_keys": (
+        {"sub_account": "sub1", "recv_window": 5000},
+        "GET",
+        "/api/v3/sub-account/apiKey",
+        True,
+    ),
+    "get_stp_strategy_group": (
+        {"trade_group_name": "group1"},
+        "GET",
+        "/api/v3/strategy/group",
+        True,
+    ),
+    "remove_stp_strategy_group_members": (
+        {"uid": "1001,1002", "trade_group_id": "91"},
+        "DELETE",
+        "/api/v3/strategy/group/uid",
+        True,
+    ),
+    "get_withdrawal_addresses": (
+        {"coin": "USDT", "page": 1, "limit": 1},
+        "GET",
+        "/api/v3/capital/withdraw/address",
+        True,
+    ),
+    "delete_stp_strategy_group": (
+        {"trade_group_id": "91"},
+        "DELETE",
+        "/api/v3/strategy/group",
+        True,
+    ),
+    "create_stp_strategy_group": (
+        {"trade_group_name": "group1"},
+        "POST",
+        "/api/v3/strategy/group",
+        True,
+    ),
+    "add_stp_strategy_group_members": (
+        {"uid": "1001,1002", "trade_group_id": "91"},
+        "POST",
+        "/api/v3/strategy/group/uid",
+        True,
+    ),
     "get_spot_offline_symbols": ({}, "GET", "/api/v3/symbol/offline", False),
     "get_announcements": (
         {"language": "en-US", "page": 1, "limit": 20},

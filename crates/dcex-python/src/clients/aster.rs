@@ -14,7 +14,8 @@ impl PythonAsterHttpClient {
         private_key=None,
         timeout=10.0,
         spot_base_url=None,
-        futures_base_url=None
+        futures_base_url=None,
+        prediction_base_url=None
     ))]
     fn new(
         user_address: Option<String>,
@@ -23,6 +24,7 @@ impl PythonAsterHttpClient {
         timeout: f64,
         spot_base_url: Option<String>,
         futures_base_url: Option<String>,
+        prediction_base_url: Option<String>,
     ) -> PyResult<Self> {
         let timeout = http_timeout(timeout)?;
         Ok(Self {
@@ -34,6 +36,11 @@ impl PythonAsterHttpClient {
                 spot_base_url.unwrap_or_else(|| "https://sapi.asterdex.com".to_string()),
                 futures_base_url.unwrap_or_else(|| "https://fapi.asterdex.com".to_string()),
             )
+            .and_then(|client| {
+                client.with_prediction_base_url(
+                    prediction_base_url.unwrap_or_else(|| "https://papi.asterdex.com".into()),
+                )
+            })
             .map_err(to_py_runtime_error)?,
         })
     }

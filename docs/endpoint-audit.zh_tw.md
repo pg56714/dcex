@@ -1,68 +1,87 @@
-# 端點覆蓋與驗證紀錄
+# 端點覆蓋與驗證
 
 [English](endpoint-audit.md) | **繁體中文**
 
-對照日期：2026-09-27。基準為使用者提供的端點覆蓋表與本次查閱的官方 API 文件。範圍涵蓋一般行情、交易、帳戶、內部轉帳與風控；外部提領提交、做市商／合作夥伴專用流程不納入。
+核對日期：2026-09-27。依提供的 3,180 列報告、官方 API 文件及目前原始碼逐列核對。範圍包括一般行情、交易、帳戶、同帳戶體系轉帳、投資與風控。
 
-## 驗證狀態
+[完整可搜尋表](endpoint-coverage.html) · [逐列 JSON 與證據](endpoint-coverage-ledger.json) · [剩餘項目](endpoint-recheck.zh_tw.md) · [新增方法索引](endpoint-methods.zh_tw.md)
 
-**離線驗證已通過。** `cargo test --workspace --all-features`：639 項通過（636 項核心測試、3 項介面／安全檢查），53 項線上測試依設定略過。以本次原始碼重新建立並安裝 native extension 後，`pytest tests/unit` 全部 10,993 項通過，0 失敗、0 略過。Ruff lint／格式、Rust 格式及 Pyright 均通過（0 型別錯誤）。沒有對正式帳戶下單或執行管理操作。離線測試可確認請求路徑、動詞、型別、簽章及回應處理，無法證明帳戶權限或交易所即時可用性。
+## 覆蓋狀態
 
-**覆蓋完整性更正：尚未全部補完。** 重新核對發現唯讀帳務查詢、Arcus api-meta、KuCoin 槓桿止損撤單及其他功能仍未封裝。測試通過不代表原表每列已完成。詳見[尚未完成項目](endpoint-recheck.zh_tw.md)。
+**所有列都有處理結果，但尚未全部實作。** 列數可能包含重複或合併操作，不能換算為官方端點完成率。
 
-## 各交易所
+| Status | Rows | Meaning |
+| --- | ---: | --- |
+| `implemented` | 2838 | Rust 與 Python sync/async 封裝及路由證據 |
+| `protocol` | 173 | 共用非同步 WebSocket 協定支援；非每個主題都有專用封裝 |
+| `superseded` | 37 | 舊路徑已由目前 API 取代；見各列對應 |
+| `excluded` | 111 | 依先前確認的範圍排除 |
+| `unavailable` | 9 | 已停用、維護中或缺乏有效官方介面 |
+| `blocked` | 10 | 必要規格或權限範圍未確認 |
+| `partial` | 2 | 合併列部分完成，仍有明確缺口 |
 
-下列數字是公開 REST／簽名便利方法數量，包含別名與不同操作，不是官方端點覆蓋率。Rust 提供相同 named dispatch 與 typed request builder；二進位下載及離線簽名有獨立方法。新增方法詳見[索引](endpoint-methods.zh_tw.md)。
+## 交易所與 Python 方法數
 
-| 交易所／官方文件 | Python 同步 | Python 非同步 | 本次新增方法 | 本次補強 |
-| --- | ---: | ---: | ---: | --- |
-| [Binance](https://developers.binance.com/) | 566 | 566 | 257 | 現貨訂單清單與撤改單；USD-M／COIN-M 與 PM 風控；SAPI 帳戶、內部轉帳、兌換；TWAP／VP；WS 交易 |
-| [Bybit](https://bybit-exchange.github.io/docs/v5/intro) | 249 | 249 | 79 | 帳戶風控、抵押品、持倉移轉、批次交易、歷史資料與 PRO 配額 |
-| [OKX](https://www.okx.com/docs-v5/en/) | 266 | 266 | 90 | 策略單、價差交易、保證金／投資組合模擬、持倉移轉、兌換、子帳戶與 RFQ taker 操作 |
-| [Bitget](https://www.bitget.com/api-doc/common/intro) | 352 | 352 | 214 | Classic／UTA 帳戶風控、批次操作、計畫單、內部轉帳、配額、子帳戶管理與 WS 交易 |
-| [Kraken](https://docs.kraken.com/api-reference/) | 117 | 117 | 51 | 現貨批次單與匯出；期貨風控、歷史、分析及子帳戶；現貨 WS 交易及期貨串流 |
-| [MEXC](https://www.mexc.com/api-docs/) | 141 | 141 | 21 | 現貨與合約行情／帳戶控制、兌換及合約 WS 訂閱 |
-| [BingX](https://bingx-api.github.io/docs/) | 165 | 165 | 76 | USD-M／COIN-M 控制；現貨 OCO／撤改單；二進位報表；COIN-M WS |
-| [KuCoin](https://www.kucoin.com/docs-new) | 295 | 295 | 179 | Classic 現貨／槓桿／期貨及 UTA 交易風控、批次單、兌換及子帳戶 |
-| [Hyperliquid](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) | 65 | 65 | 19 | 行情與帳戶查詢、交易控制及呼叫端預簽 WS 操作 |
-| [Lighter](https://github.com/elliottech/lighter-python) | 89 | 89 | 18 | 組合單、帳戶／資產模式、子帳戶、金鑰變更、唯讀 token、入金及已簽名 WS 提交 |
-| [Backpack](https://docs.backpack.exchange/) | 70 | 70 | 6 | 策略單生命週期與自成交防護 |
-| [Aster](https://github.com/asterdex/api-docs) | 102 | 102 | 14 | V3 帳戶／行情查詢、受限撤單、內部轉帳、資產兌換及呼叫端預簽錢包管理 |
-| [Extended](https://api.docs.extended.exchange/) | 59 | 59 | 18 | 投資組合資金費率、利息／回撤分析及 RFQ 訂單簿串流 |
-| [Ondo](https://docs.ondoperps.xyz/api-reference) | 74 | 74 | 5 | 永續行情／帳戶／交易端點、SIWE 登入及 JWT 撤銷 |
-| [Arcus](https://docs.arcus.xyz/api-reference) | 46 | 46 | 22 | 永續查詢、TP／SL 組合、簽名 WS 請求建立及錢包授權 API key |
+方法數包含公開便利方法、別名與簽章輔助方法，非官方端點數；新增數相對 `d0bbf8b0`。同步與非同步名稱集合已比較一致。
 
-## 限制與未封裝項目
+| Exchange / official docs | Sync | Async | New | Implemented rows | Protocol rows | Blocked / partial |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| [binance](https://developers.binance.com/en/docs) | 645 | 645 | 335 | 645 | 12 | 0 / 1 |
+| [bybit](https://bybit-exchange.github.io/docs/v5/intro) | 301 | 301 | 130 | 287 | 23 | 0 / 0 |
+| [okx](https://www.okx.com/docs-v5/en/#overview-rest-authentication-making-requests) | 378 | 378 | 201 | 361 | 0 | 0 / 0 |
+| [bitget](https://www.bitget.com/docs/catalog/classic-contract-market/classic-contract-market) | 400 | 400 | 261 | 380 | 19 | 0 / 0 |
+| [bingx](https://github.com/BingX-API/api-ai-skills) | 169 | 169 | 79 | 149 | 11 | 1 / 0 |
+| [kraken](https://docs.kraken.com/api-reference/) | 130 | 130 | 63 | 97 | 29 | 1 / 0 |
+| [mexc](https://www.mexc.com/api-docs/spot-v3/introduction) | 156 | 156 | 35 | 128 | 26 | 0 / 0 |
+| [kucoin](https://www.kucoin.com/docs-new/v2/rest/ua/get-announcements) | 311 | 311 | 194 | 292 | 4 | 1 / 0 |
+| [hyperliquid](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) | 91 | 91 | 44 | 63 | 23 | 0 / 0 |
+| [lighter](https://apidocs.lighter.xyz/) | 122 | 122 | 49 | 80 | 14 | 1 / 1 |
+| [backpack](https://docs.backpack.exchange/#tag/Account) | 81 | 81 | 16 | 77 | 0 | 1 / 0 |
+| [aster](https://github.com/asterdex/api-docs) | 135 | 135 | 46 | 107 | 2 | 5 / 0 |
+| [extended](https://api.docs.extended.exchange/) | 64 | 64 | 22 | 47 | 3 | 0 / 0 |
+| [ondo](https://docs.ondoperps.xyz/api-reference) | 77 | 77 | 5 | 70 | 3 | 0 / 0 |
+| [arcus](https://docs.arcus.xyz/api-reference) | 58 | 58 | 31 | 55 | 4 | 0 / 0 |
 
-| 項目 | 狀態與原因 |
+## 這次補齊的主要項目
+
+- **Binance:** 子帳戶與帳戶管理、入金問卷／唯讀歷史、PM Earn、逐倉啟停；多市場 WS profiles、COIN-M 時間查詢及呼叫端 token 訂閱。
+- **Bybit / OKX / Bitget:** 借貸、槓桿代幣、伺服器時間；網格、DCA、Signal、定投與跟單；UTA 網格與 Reality 基本面。
+- **Kraken / MEXC / KuCoin / BingX:** Kraken EditOrder、圖表與市場歷史／資金池統計；MEXC STP、子帳戶 API key、入金及 listen-key；KuCoin UTA/OES/OTC 與各家唯讀對帳查詢。
+- **Hyperliquid / Lighter:** 資訊查詢、資金池、質押、帳戶抽象；Lighter 同主帳戶轉帳、租用、explorer、匯出與 maker-only API key。
+- **Backpack / Aster / Extended / Arcus:** Backpack vault／prediction／借貸；Aster prediction；Extended 圖表／利息／vault；Arcus api-meta 與排行榜。
+
+## Binance WebSocket 市場選擇
+
+`dcex.ws.binance.PublicClient(profile=...)`：
+
+| Profile | Base URL |
 | --- | --- |
-| 外部提領提交、轉出至非帳戶家族、broker／affiliate、MM 專用操作 | 依指定範圍排除；提領紀錄等唯讀查詢仍有漏項，詳見重新核對清單。 |
-| Kraken 舊 Futures fee schedules | 官方標示 2026-06-22 起數值不再反映實際費率；使用 Spot GetTradeVolume。 |
-| Kraken 投資組合模擬 | 已提供封裝；官方限定 pre-production，須設定對應 base URL。 |
-| Kraken assignment program／off-book RFQ 管理 | 尚未封裝；不列為一般訂單端點已支援。 |
-| OKX SBE 二進位訂單簿 | 已以 get_sbe_orderbook 封裝 REST snapshot bytes；使用官方版本化 XML schema 解碼 template 1006。未內建 SBE 解碼器。 |
-| Lighter historicalTrades 匯出 | 不知道目前有效的官方請求規格；現行查閱的 SDK 未提供該方法，因此不猜測路徑與欄位。 |
-| Binance COIN-M algo、BingX 舊 spot/time、報告中的過時路徑 | 無法從目前官方文件確認的項目不以猜測新增；既有明確記載的行情與交易路徑另行支援。 |
-| 理財／質押／公共池、借出投資產品、推薦／租賃、預測市場與鏈瀏覽器資料 | 本次尚未完成。須逐項依約定的排除範圍判斷；使用者並未同意整類排除，詳見重新核對清單。 |
+| `spot` (default) | `wss://stream.binance.com:9443/ws` |
+| `futures_public`, `options_public` | `wss://fstream.binance.com/public/ws` |
+| `futures_market`, `options_market` | `wss://fstream.binance.com/market/ws` |
+| `coin_futures` | `wss://dstream.binance.com/ws` |
 
-以上不宣稱涵蓋交易所所有業務或協定。原報表中的合併列、動態路徑及別名必須逐項解讀，不能由字串出現次數推導覆蓋率。
+Futures 深度／bookTicker 使用 public；其他市場資料使用 market，需分開連線。Options 每連線上限 200 個訂閱。可用 `subscribe([...])` 傳入官方串流名稱。Rust 對應 `BinancePublicWebSocket::with_profile(profile, timeout)`。
 
-## 使用注意
+`PrivateClient(profile=...)` 支援 `futures`（預設）、`coin_futures`、`options`、`portfolio_margin`、`margin_risk`。Rust 用 `BinancePrivateWebSocket::with_profile(http_client, profile, timeout, base_url)`。會建立／延長／刪除 listen key，但呼叫端須排程 `keep_alive()`。`margin_risk` 僅涵蓋跨槓桿風險事件；一般交易事件用 `SpotApiClient.subscribe_user_data_listen_token(token)`。建立 Margin token 的 REST 認證規格仍待確認；token 到期前須由呼叫端取得新 token 並重新訂閱。
 
-- Arcus API key 的建立／撤銷、Aster 錢包管理與 Lighter API key 變更保留呼叫端錢包授權。不可用交易 API key 取代錢包簽章。
-- Lighter `change_api_key_signed` 必須提供明確 nonce；簽署官方 `Register Lighter Account` 訊息，金鑰更新確認後以新 key 重建 client。
-- Binance PM／PM Pro、Bybit PRO 配額、Kraken 機構子帳戶等仍受交易所帳戶資格限制。
-- Bitget 持倉移轉會影響兩帳戶的待成交訂單；API key 管理與 JWT 撤銷會改變帳戶存取狀態。
-- Kraken 匯出回傳 ZIP bytes；BingX 收益匯出回傳 Excel bytes。不要當作 JSON 解碼。
-- KuCoin convert 使用十進位字串輸入，以 JSON number 原樣編碼；不可先轉為浮點數。 期貨批次撤單會保留 DELETE 的 JSON 本文，並將完全相同的位元組納入簽章。
+[USD-M stream docs](https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect) · [Margin token docs](https://developers.binance.com/en/docs/products/margin-trading/listen-token-data-stream)
 
-## 測試位置
+## 限制與驗證
 
-Rust：`crates/dcex/src/exchanges/*/tests*`；Python：`tests/unit/test_*_endpoint_coverage.py`、`test_*risk*`、`test_ws_*` 與二進位匯出測試。簽章測試使用本機假憑證與本機 HTTP／WS 伺服器。
+<!-- VERIFICATION -->
+Rust `cargo test --workspace --all-features`：**656 項通過**，**53 項需真實交易所存取的測試維持忽略**。原生套件已重新建置並安裝至專案虛擬環境。
 
-## 相關官方說明
+Python 全量收集 **12,818 項不重複測試**，分為八組，已確認分組聯集等於完整收集清單。首次執行 12,810 項通過，8 項因測試預期錯誤失敗（Kraken 公開端點認證、Binance 例外型別）。修正後，相關 **315 項 Kraken／Binance 測試全部通過**。最後調整原生綁定以維持空憑證的 `ValueError`，重新建置後 **38 項 Binance WS 測試全部通過**。上述執行結果已無尚未解決的失敗。
 
-- [Kraken Futures fee schedules](https://docs.kraken.com/api-reference/fee-schedules/get-fee-schedules)
-- [Kraken portfolio simulation](https://docs.kraken.com/api-reference/account-information/calculate-portfolio-margin-pnl-and-greeks)
-- [Lighter transaction definitions](https://github.com/elliottech/lighter-go/tree/main/types/txtypes)
-- [Arcus API key onboarding](https://docs.arcus.xyz/api-reference/onboarding/create-api-key)
+修改的 73 個 Python 檔案通過 Ruff 與格式檢查；`pyright dcex` 為 0 錯誤、0 警告。Rust 格式、Git 空白檢查、3,180 列總數與本機文件索引均驗證通過。
+<!-- /VERIFICATION -->
+
+未對真實交易所送出下單或帳戶管理操作。離線測試驗證路由、HTTP 動詞、參數、簽章、WS 訊息及回應處理；不代表真實帳戶權限或目前服務可用性。
+
+- OKX SBE 回傳原始位元組，未內建解碼器。
+- Lighter explorer 可用 `explorer_base_url` 指定；歷史匯出需要授權，不會自動支付費用。
+- 要求錢包授權的操作保留呼叫端簽章；Arcus userPreferences DELETE 需呼叫端提供認證標頭。
+- 外部提領／控制與 MM／合作夥伴限定操作排除，唯讀歷史未整類排除。
+
+Source report SHA-256: `6479d7c578f35b2bd9b6a243c37b239dbea399f17054dbecd1edfe98ffd92e07`.

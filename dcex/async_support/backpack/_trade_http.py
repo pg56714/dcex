@@ -567,3 +567,60 @@ class TradeHTTP(HTTPManager):
                 sortDirection=sort_direction,
             ),
         )
+
+    async def vault_mint(
+        self,
+        *,
+        vault_id: int,
+        symbol: str,
+        quantity: str,
+        auto_borrow: bool | None = None,
+        auto_lend_redeem: bool | None = None,
+    ) -> Any:  # noqa: ANN401
+        """POST /api/v1/vault/mint. Native asset symbols; vault operator permissions may apply."""
+        return await self._native_private(
+            "vault_mint",
+            self._native_params(
+                vaultId=vault_id,
+                symbol=symbol,
+                quantity=quantity,
+                autoBorrow=auto_borrow,
+                autoLendRedeem=auto_lend_redeem,
+            ),
+        )
+
+    async def vault_redeem(self, *, vault_id: int, vault_token_quantity: str | None = None) -> Any:  # noqa: ANN401
+        """POST /api/v1/vault/redeem. Native asset symbols; vault operator permissions may apply."""
+        return await self._native_private(
+            "vault_redeem",
+            self._native_params(vaultId=vault_id, vaultTokenQuantity=vault_token_quantity),
+        )
+
+    async def vault_redeem_cancel(self, *, vault_id: int) -> Any:  # noqa: ANN401
+        """
+        DELETE /api/v1/vault/redeem. Native asset symbols; vault operator permissions may apply.
+        """
+        return await self._native_private(
+            "vault_redeem_cancel", self._native_params(vaultId=vault_id)
+        )
+
+    async def get_vault_pending_redeems(self, *, vault_id: int) -> Any:  # noqa: ANN401
+        """
+        GET /api/v1/vault/redeems/pending. Native asset symbols; vault operator permissions may
+        apply.
+        """
+        return await self._native_private(
+            "get_vault_pending_redeems", self._native_params(vaultId=vault_id)
+        )
+
+    async def get_vault_nav(self) -> Any:  # noqa: ANN401
+        """GET /api/v1/vault/nav. Native asset symbols; vault operator permissions may apply."""
+        return await self._native_private("get_vault_nav", self._native_params())
+
+    async def execute_borrow_lend(self, *, quantity: str, side: str, symbol: str) -> Any:  # noqa: ANN401
+        """
+        Borrow or lend; positions net against existing balances. Margin capability is required.
+        """
+        return await self._native_private(
+            "execute_borrow_lend", self._native_params(quantity=quantity, side=side, symbol=symbol)
+        )

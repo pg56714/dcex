@@ -159,7 +159,7 @@ class MarketHTTP(HTTPManager):
         return params
 
     async def get_server_time(self, market_type: str = BinanceProductType.SPOT) -> dict:
-        """Get Binance server time for spot, futures, equity, or options."""
+        """Get server time for spot, swap, coin_futures, equity, or options."""
         return await self._native_public(
             "get_server_time",
             self._params(market_type=str(market_type)),
@@ -445,7 +445,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/aggTrades.
@@ -471,7 +471,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/continuousKlines.
@@ -493,7 +493,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def get_coin_futures_funding_info(self) -> Any:
+    async def get_coin_futures_funding_info(self) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/fundingInfo.
@@ -513,7 +513,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/indexPriceKlines.
@@ -538,7 +538,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/markPriceKlines.
@@ -559,7 +559,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def get_coin_futures_open_interest(self, *, symbol: str) -> Any:
+    async def get_coin_futures_open_interest(self, *, symbol: str) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/openInterest.
@@ -581,7 +581,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/premiumIndexKlines.
@@ -604,7 +604,7 @@ class MarketHTTP(HTTPManager):
 
     async def get_coin_futures_book_ticker(
         self, *, symbol: str | None = None, pair: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/ticker/bookTicker.
@@ -620,7 +620,7 @@ class MarketHTTP(HTTPManager):
 
     async def get_coin_futures_24h_ticker(
         self, *, symbol: str | None = None, pair: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /dapi/v1/ticker/24hr.
@@ -642,7 +642,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/aggTrades.
@@ -672,7 +672,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/continuousKlines.
@@ -694,7 +694,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def get_futures_funding_info(self) -> Any:
+    async def get_futures_funding_info(self) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/fundingInfo.
@@ -714,7 +714,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/indexPriceKlines.
@@ -739,7 +739,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/markPriceKlines.
@@ -768,7 +768,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/premiumIndexKlines.
@@ -791,7 +791,7 @@ class MarketHTTP(HTTPManager):
 
     async def get_futures_recent_trades(
         self, *, product_symbol: str, limit: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/trades.
@@ -805,7 +805,7 @@ class MarketHTTP(HTTPManager):
             "get_futures_recent_trades", self._params(product_symbol=product_symbol, limit=limit)
         )
 
-    async def get_futures_price_ticker_v1(self, *, product_symbol: str | None = None) -> Any:
+    async def get_futures_price_ticker_v1(self, *, product_symbol: str | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/ticker/price.
@@ -819,7 +819,7 @@ class MarketHTTP(HTTPManager):
             "get_futures_price_ticker_v1", self._params(product_symbol=product_symbol)
         )
 
-    async def get_futures_price_ticker(self, *, product_symbol: str | None = None) -> Any:
+    async def get_futures_price_ticker(self, *, product_symbol: str | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v2/ticker/price.
@@ -833,7 +833,7 @@ class MarketHTTP(HTTPManager):
             "get_futures_price_ticker", self._params(product_symbol=product_symbol)
         )
 
-    async def get_futures_24h_ticker(self, *, product_symbol: str | None = None) -> Any:
+    async def get_futures_24h_ticker(self, *, product_symbol: str | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /fapi/v1/ticker/24hr.
@@ -847,7 +847,7 @@ class MarketHTTP(HTTPManager):
             "get_futures_24h_ticker", self._params(product_symbol=product_symbol)
         )
 
-    async def get_margin_delist_schedule(self, *, recv_window: int | None = None) -> Any:
+    async def get_margin_delist_schedule(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/margin/delist-schedule.
@@ -869,7 +869,7 @@ class MarketHTTP(HTTPManager):
         start_time: int | None = None,
         end_time: int | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /api/v3/aggTrades.
@@ -890,7 +890,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def get_spot_average_price(self, *, product_symbol: str) -> Any:
+    async def get_spot_average_price(self, *, product_symbol: str) -> Any:  # noqa: ANN401
         """
 
         GET /api/v3/avgPrice.
@@ -911,7 +911,7 @@ class MarketHTTP(HTTPManager):
         symbols: list[str] | None = None,
         kind_type: str | None = None,
         symbol_status: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /api/v3/ticker/24hr.
@@ -937,7 +937,7 @@ class MarketHTTP(HTTPManager):
         product_symbol: str | None = None,
         symbols: list[str] | None = None,
         symbol_status: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         GET /api/v3/ticker/bookTicker.
@@ -956,7 +956,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def get_spot_delist_schedule(self, *, recv_window: int | None = None) -> Any:
+    async def get_spot_delist_schedule(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/spot/delist-schedule.
@@ -970,7 +970,7 @@ class MarketHTTP(HTTPManager):
             "get_spot_delist_schedule", self._params(recvWindow=recv_window)
         )
 
-    async def get_system_status(self) -> Any:
+    async def get_system_status(self) -> Any:  # noqa: ANN401
         """
 
         GET /sapi/v1/system/status.
@@ -984,7 +984,7 @@ class MarketHTTP(HTTPManager):
 
     async def coin_futures_old_trades_lookup(
         self, *, symbol: str, limit: int | None = None, from_id: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Old Trades Lookup (MARKET_DATA).
@@ -999,7 +999,7 @@ class MarketHTTP(HTTPManager):
             self._params(symbol=symbol, limit=limit, fromId=from_id),
         )
 
-    async def query_coin_futures_index_price_constituents(self, *, symbol: str) -> Any:
+    async def query_coin_futures_index_price_constituents(self, *, symbol: str) -> Any:  # noqa: ANN401
         """
 
         Query Index Price Constituents.
@@ -1022,7 +1022,7 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         start_time: int | None = None,
         end_time: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Taker Buy/Sell Volume.
@@ -1044,7 +1044,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def coin_futures_test_connectivity(self) -> Any:
+    async def coin_futures_test_connectivity(self) -> Any:  # noqa: ANN401
         """
 
         Test Connectivity.
@@ -1056,7 +1056,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("coin_futures_test_connectivity", self._params())
 
-    async def pm_test_connectivity(self) -> Any:
+    async def pm_test_connectivity(self) -> Any:  # noqa: ANN401
         """
 
         Test Connectivity.
@@ -1070,7 +1070,7 @@ class MarketHTTP(HTTPManager):
 
     async def futures_list_all_convert_pairs(
         self, *, from_asset: str | None = None, to_asset: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         List All Convert Pairs.
@@ -1084,7 +1084,7 @@ class MarketHTTP(HTTPManager):
             "futures_list_all_convert_pairs", self._params(fromAsset=from_asset, toAsset=to_asset)
         )
 
-    async def futures_adl_risk(self, *, symbol: str | None = None) -> Any:
+    async def futures_adl_risk(self, *, symbol: str | None = None) -> Any:  # noqa: ANN401
         """
 
         ADL Risk.
@@ -1096,7 +1096,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("futures_adl_risk", self._params(symbol=symbol))
 
-    async def futures_asset_index(self, *, symbol: str | None = None) -> Any:
+    async def futures_asset_index(self, *, symbol: str | None = None) -> Any:  # noqa: ANN401
         """
 
         Multi-Assets Mode Asset Index.
@@ -1108,7 +1108,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("futures_asset_index", self._params(symbol=symbol))
 
-    async def futures_composite_index_symbol_information(self, *, symbol: str | None = None) -> Any:
+    async def futures_composite_index_symbol_information(self, *, symbol: str | None = None) -> Any:  # noqa: ANN401
         """
 
         Composite Index Symbol Information.
@@ -1124,7 +1124,7 @@ class MarketHTTP(HTTPManager):
 
     async def futures_old_trades_lookup(
         self, *, symbol: str, limit: int | None = None, from_id: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Old Trades Lookup (MARKET_DATA).
@@ -1138,7 +1138,7 @@ class MarketHTTP(HTTPManager):
             "futures_old_trades_lookup", self._params(symbol=symbol, limit=limit, fromId=from_id)
         )
 
-    async def futures_quarterly_contract_settlement_price(self, *, pair: str) -> Any:
+    async def futures_quarterly_contract_settlement_price(self, *, pair: str) -> Any:  # noqa: ANN401
         """
 
         Quarterly Contract Settlement Price.
@@ -1152,7 +1152,7 @@ class MarketHTTP(HTTPManager):
             "futures_quarterly_contract_settlement_price", self._params(pair=pair)
         )
 
-    async def query_futures_index_price_constituents(self, *, symbol: str) -> Any:
+    async def query_futures_index_price_constituents(self, *, symbol: str) -> Any:  # noqa: ANN401
         """
 
         Query Index Price Constituents.
@@ -1168,7 +1168,7 @@ class MarketHTTP(HTTPManager):
 
     async def query_futures_insurance_fund_balance_snapshot(
         self, *, symbol: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Insurance Fund Balance Snapshot.
@@ -1182,7 +1182,7 @@ class MarketHTTP(HTTPManager):
             "query_futures_insurance_fund_balance_snapshot", self._params(symbol=symbol)
         )
 
-    async def futures_rpi_order_book(self, *, symbol: str, limit: int | None = None) -> Any:
+    async def futures_rpi_order_book(self, *, symbol: str, limit: int | None = None) -> Any:  # noqa: ANN401
         """
 
         RPI Order Book.
@@ -1196,7 +1196,7 @@ class MarketHTTP(HTTPManager):
             "futures_rpi_order_book", self._params(symbol=symbol, limit=limit)
         )
 
-    async def futures_test_connectivity(self) -> Any:
+    async def futures_test_connectivity(self) -> Any:  # noqa: ANN401
         """
 
         Test Connectivity.
@@ -1208,7 +1208,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("futures_test_connectivity", self._params())
 
-    async def futures_trading_schedule(self) -> Any:
+    async def futures_trading_schedule(self) -> Any:  # noqa: ANN401
         """
 
         Trading Schedule.
@@ -1220,7 +1220,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("futures_trading_schedule", self._params())
 
-    async def margin_cross_margin_collateral_ratio(self) -> Any:
+    async def margin_cross_margin_collateral_ratio(self) -> Any:  # noqa: ANN401
         """
 
         Cross margin collateral ratio (MARKET_DATA).
@@ -1233,7 +1233,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("margin_cross_margin_collateral_ratio", self._params())
 
-    async def get_margin_limit_price_pairs(self) -> Any:
+    async def get_margin_limit_price_pairs(self) -> Any:  # noqa: ANN401
         """
 
         Get Limit Price Pairs (MARKET_DATA).
@@ -1246,7 +1246,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("get_margin_limit_price_pairs", self._params())
 
-    async def get_margin_list_schedule(self, *, recv_window: int | None = None) -> Any:
+    async def get_margin_list_schedule(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
 
         Get list Schedule (MARKET_DATA).
@@ -1260,7 +1260,7 @@ class MarketHTTP(HTTPManager):
             "get_margin_list_schedule", self._params(recvWindow=recv_window)
         )
 
-    async def get_margin_margin_asset_risk_based_liquidation_ratio(self) -> Any:
+    async def get_margin_margin_asset_risk_based_liquidation_ratio(self) -> Any:  # noqa: ANN401
         """
 
         Get Margin Asset Risk-Based Liquidation Ratio (MARKET_DATA).
@@ -1275,7 +1275,7 @@ class MarketHTTP(HTTPManager):
             "get_margin_margin_asset_risk_based_liquidation_ratio", self._params()
         )
 
-    async def get_margin_margin_restricted_assets(self) -> Any:
+    async def get_margin_margin_restricted_assets(self) -> Any:  # noqa: ANN401
         """
 
         Get Margin Restricted Assets (MARKET_DATA).
@@ -1288,7 +1288,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("get_margin_margin_restricted_assets", self._params())
 
-    async def query_margin_liability_coin_leverage_bracket_in_cross_margin_pro_mode(self) -> Any:
+    async def query_margin_liability_coin_leverage_bracket_in_cross_margin_pro_mode(self) -> Any:  # noqa: ANN401
         """
 
         Query Liability Coin Leverage Bracket in Cross Margin Pro Mode (MARKET_DATA).
@@ -1309,7 +1309,7 @@ class MarketHTTP(HTTPManager):
         symbol: str | None = None,
         symbols: list[str] | None = None,
         symbol_status: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Execution Rules.
@@ -1328,7 +1328,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def spot_ping(self) -> Any:
+    async def spot_ping(self) -> Any:  # noqa: ANN401
         """
 
         Test connectivity.
@@ -1342,7 +1342,7 @@ class MarketHTTP(HTTPManager):
 
     async def spot_historical_block_trades(
         self, *, symbol: str, from_id: int, limit: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Historical Block Trades (MARKET_DATA).
@@ -1358,7 +1358,7 @@ class MarketHTTP(HTTPManager):
 
     async def spot_historical_trades(
         self, *, symbol: str, limit: int | None = None, from_id: int | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Old trade lookup.
@@ -1372,7 +1372,7 @@ class MarketHTTP(HTTPManager):
             "spot_historical_trades", self._params(symbol=symbol, limit=limit, fromId=from_id)
         )
 
-    async def spot_reference_price(self, *, symbol: str) -> Any:
+    async def spot_reference_price(self, *, symbol: str) -> Any:  # noqa: ANN401
         """
 
         Query Reference Price.
@@ -1386,7 +1386,7 @@ class MarketHTTP(HTTPManager):
 
     async def spot_reference_price_calculation(
         self, *, symbol: str, symbol_status: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Reference Price Calculation.
@@ -1410,7 +1410,7 @@ class MarketHTTP(HTTPManager):
         window_size: str | None = None,
         kind_type: str | None = None,
         symbol_status: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Rolling window price change statistics.
@@ -1439,7 +1439,7 @@ class MarketHTTP(HTTPManager):
         time_zone: str | None = None,
         kind_type: str | None = None,
         symbol_status: str | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Trading Day Ticker.
@@ -1469,7 +1469,7 @@ class MarketHTTP(HTTPManager):
         end_time: int | None = None,
         time_zone: str | None = None,
         limit: int | None = None,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         UIKlines.
@@ -1491,7 +1491,7 @@ class MarketHTTP(HTTPManager):
             ),
         )
 
-    async def get_wallet_open_symbol_list(self) -> Any:
+    async def get_wallet_open_symbol_list(self) -> Any:  # noqa: ANN401
         """
 
         Get Open Symbol List (MARKET_DATA).
@@ -1504,7 +1504,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("get_wallet_open_symbol_list", self._params())
 
-    async def get_wallet_spot_asset_tags(self, *, tag: str | None = None) -> Any:
+    async def get_wallet_spot_asset_tags(self, *, tag: str | None = None) -> Any:  # noqa: ANN401
         """
 
         Get Spot Asset Tags (MARKET_DATA).
@@ -1516,7 +1516,7 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public("get_wallet_spot_asset_tags", self._params(tag=tag))
 
-    async def pm_pro_portfolio_margin_collateral_rate(self) -> Any:
+    async def pm_pro_portfolio_margin_collateral_rate(self) -> Any:  # noqa: ANN401
         """
 
         Portfolio Margin Collateral Rate (MARKET_DATA).
@@ -1531,7 +1531,7 @@ class MarketHTTP(HTTPManager):
 
     async def query_pm_pro_portfolio_margin_asset_index_price(
         self, *, asset: str | None = None
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
 
         Query Portfolio Margin Asset Index Price (MARKET_DATA).
@@ -1544,4 +1544,32 @@ class MarketHTTP(HTTPManager):
         """
         return await self._native_public(
             "query_pm_pro_portfolio_margin_asset_index_price", self._params(asset=asset)
+        )
+
+    async def get_dual_investment_product_list(
+        self,
+        *,
+        option_type: str,
+        exercised_coin: str,
+        invest_coin: str,
+        page_size: int | None = None,
+        page_index: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        GET /sapi/v1/dci/product/list.
+
+        Native symbols; decimal amounts are strings. Exchange eligibility applies.
+        Source: https://developers.binance.com/en/docs/catalog/investment-and-services-dual-investment/api/rest-api/market-data#get-dual-investment-product-list
+        """
+        return await self._native_public(
+            "get_dual_investment_product_list",
+            self._params(
+                optionType=option_type,
+                exercisedCoin=exercised_coin,
+                investCoin=invest_coin,
+                pageSize=page_size,
+                pageIndex=page_index,
+                recvWindow=recv_window,
+            ),
         )

@@ -1380,3 +1380,129 @@ class TradeHTTP(HTTPManager):
         use commas.
         """
         return await self._native_private("get_contract_discount_usage", self._native_params())
+
+    async def get_stp_strategy_group(self, *, trade_group_name: str) -> dict[str, Any] | list[Any]:
+        """GET /api/v3/strategy/group. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private(
+            "get_stp_strategy_group", self._native_params(tradeGroupName=trade_group_name)
+        )
+
+    async def remove_stp_strategy_group_members(
+        self, *, uid: str, trade_group_id: str
+    ) -> dict[str, Any] | list[Any]:
+        """
+        DELETE /api/v3/strategy/group/uid. Timestamps use milliseconds; asset/IP lists use
+        commas.
+        """
+        return await self._native_private(
+            "remove_stp_strategy_group_members",
+            self._native_params(uid=uid, tradeGroupId=trade_group_id),
+        )
+
+    async def get_withdrawal_addresses(
+        self, *, coin: str | None = None, page: int | None = None, limit: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/capital/withdraw/address. Timestamps use milliseconds; asset/IP lists use
+        commas.
+        """
+        return await self._native_private(
+            "get_withdrawal_addresses", self._native_params(coin=coin, page=page, limit=limit)
+        )
+
+    async def delete_stp_strategy_group(self, *, trade_group_id: str) -> dict[str, Any] | list[Any]:
+        """DELETE /api/v3/strategy/group. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private(
+            "delete_stp_strategy_group", self._native_params(tradeGroupId=trade_group_id)
+        )
+
+    async def create_stp_strategy_group(
+        self, *, trade_group_name: str
+    ) -> dict[str, Any] | list[Any]:
+        """POST /api/v3/strategy/group. Timestamps use milliseconds; asset/IP lists use commas."""
+        return await self._native_private(
+            "create_stp_strategy_group", self._native_params(tradeGroupName=trade_group_name)
+        )
+
+    async def add_stp_strategy_group_members(
+        self, *, uid: str, trade_group_id: str
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v3/strategy/group/uid. Timestamps use milliseconds; asset/IP lists use commas.
+        """
+        return await self._native_private(
+            "add_stp_strategy_group_members",
+            self._native_params(uid=uid, tradeGroupId=trade_group_id),
+        )
+
+    async def delete_sub_account_api_key(
+        self, *, sub_account: str, api_key: str, recv_window: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        DELETE /api/v3/sub-account/apiKey. Timestamps use milliseconds; asset/IP lists use
+        commas.
+        """
+        return await self._native_private(
+            "delete_sub_account_api_key",
+            self._native_params(subAccount=sub_account, apiKey=api_key, recvWindow=recv_window),
+        )
+
+    async def create_sub_account_api_key(
+        self,
+        *,
+        sub_account: str,
+        note: str,
+        permissions: str,
+        ip: str | None = None,
+        recv_window: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        POST /api/v3/sub-account/apiKey. Timestamps use milliseconds; asset/IP lists use commas.
+        """
+        return await self._native_private(
+            "create_sub_account_api_key",
+            self._native_params(
+                subAccount=sub_account,
+                note=note,
+                permissions=permissions,
+                ip=ip,
+                recvWindow=recv_window,
+            ),
+        )
+
+    async def get_sub_account_api_keys(
+        self, *, sub_account: str, recv_window: int | None = None
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/v3/sub-account/apiKey. Timestamps use milliseconds; asset/IP lists use commas.
+        """
+        return await self._native_private(
+            "get_sub_account_api_keys",
+            self._native_params(subAccount=sub_account, recvWindow=recv_window),
+        )
+
+    async def create_deposit_address(self, *, coin: str, network: str) -> Any:  # noqa: ANN401
+        """Generate a deposit address. MEXC requires SPOT_WITHDRAW_WRITE permission."""
+        return await self._native_private(
+            "create_deposit_address", self._native_params(coin=coin, network=network)
+        )
+
+    async def create_spot_listen_key(self) -> dict[str, Any]:
+        """Manage the Spot user-data listen key through signed REST."""
+        return await self._native_private("create_spot_listen_key", self._native_params())
+
+    async def get_spot_listen_keys(self) -> dict[str, Any]:
+        """Manage the Spot user-data listen key through signed REST."""
+        return await self._native_private("get_spot_listen_keys", self._native_params())
+
+    async def keep_alive_spot_listen_key(self, *, listen_key: str) -> dict[str, Any]:
+        """Manage the Spot user-data listen key through signed REST."""
+        return await self._native_private(
+            "keep_alive_spot_listen_key", self._native_params(listenKey=listen_key)
+        )
+
+    async def close_spot_listen_key(self, *, listen_key: str) -> dict[str, Any]:
+        """Manage the Spot user-data listen key through signed REST."""
+        return await self._native_private(
+            "close_spot_listen_key", self._native_params(listenKey=listen_key)
+        )

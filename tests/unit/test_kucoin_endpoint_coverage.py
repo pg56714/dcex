@@ -59,6 +59,131 @@ LIMIT = {"size": "1", "price": "100"}
 FUT_LIMIT = {"size": "1", "price": "100", "leverage": 3}
 
 CASES: tuple[Case, ...] = (
+    Case("get_currencies_v3", {}, "GET /api/v3/currencies", body={}, signed=False),
+    Case(
+        "set_uta_account_mode",
+        {"account_type": "UNIFIED"},
+        "POST /api/ua/v2/account/mode",
+        body={"accountType": "UNIFIED"},
+        signed=True,
+    ),
+    Case(
+        "get_withdrawal_history_by_id",
+        {"withdrawal_id": "example"},
+        "GET /api/v1/withdrawals/example",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_withdrawal_history",
+        {"currency": "USDT"},
+        "GET /api/v1/withdrawals",
+        host="spot",
+        query={"currency": "USDT"},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_withdrawal_quotas",
+        {"currency": "USDT"},
+        "GET /api/v1/withdrawals/quotas",
+        host="spot",
+        query={"currency": "USDT"},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_loan_info",
+        {},
+        "GET /api/v1/otc-loan/loan",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_accounts",
+        {},
+        "GET /api/v1/otc-loan/accounts",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_discount_rate_configs",
+        {},
+        "GET /api/v1/otc-loan/discount-rate-configs",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_uta_oes_custody_quota",
+        {},
+        "GET /api/ua/v2/oes/custody-quota",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_uta_oe_scurrency",
+        {},
+        "GET /api/ua/v2/oes/currency",
+        host="spot",
+        query={},
+        body={},
+        signed=False,
+    ),
+    Case(
+        "get_uta_accounts",
+        {},
+        "GET /api/ua/v2/otc-loan/account",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_uta_discount_rate_configs",
+        {},
+        "GET /api/ua/v2/otc-loan/discount-rate",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_uta_loan_info",
+        {},
+        "GET /api/ua/v2/otc-loan/loan",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_uta_withdrawal_history",
+        {},
+        "GET /api/ua/v2/asset/withdrawal/history",
+        host="spot",
+        query={},
+        body={},
+        signed=True,
+    ),
+    Case(
+        "get_uta_withdrawal_quotas",
+        {"currency": "USDT", "withdraw_type": "ADDRESS"},
+        "GET /api/ua/v2/withdrawals/quotas",
+        host="spot",
+        query={"currency": "USDT", "withdrawType": "ADDRESS"},
+        body={},
+        signed=True,
+    ),
     Case(
         "get_account_info", {}, "GET /api/v2/user-info", host="spot", query={}, body={}, signed=True
     ),
@@ -2854,8 +2979,8 @@ def test_uta_amend_rejects_spot_symbol_and_place_requires_size_unit() -> None:
 async def test_kucoin_risk_conditions_before_transport(
     method: str, kwargs: dict[str, Any], mode: str
 ) -> None:
-    from dcex.kucoin.client import Client
     from dcex.async_support.kucoin.client import Client as AsyncClient
+    from dcex.kucoin.client import Client
 
     options = _client_kwargs("http://127.0.0.1:1", "http://127.0.0.1:1")
     if mode == "sync":
@@ -2878,10 +3003,11 @@ async def test_kucoin_risk_conditions_before_transport(
 @pytest.mark.parametrize("mode", ["sync", "async"])
 async def test_convert_decimal_precision_and_repeated_query_arrays(mode: str) -> None:
     """Decimal input survives JSON encoding; array filters remain repeated query keys."""
-    from dcex.kucoin.client import Client
-    from dcex.async_support.kucoin.client import Client as AsyncClient
-    from tests.unit.native_http_helpers import _http_server
     from urllib.parse import parse_qsl, urlsplit
+
+    from dcex.async_support.kucoin.client import Client as AsyncClient
+    from dcex.kucoin.client import Client
+    from tests.unit.native_http_helpers import _http_server
 
     amount = "0.123456789012345678901234567890"
     with _http_server({"code": "200000", "data": {}}) as (base, received):

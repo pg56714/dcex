@@ -3,6 +3,17 @@ use super::HyperliquidClient;
 crate::exchanges::impl_exchange_method_wrappers! {
     HyperliquidClient;
     public [
+get_vault_details(vault_address => "vaultAddress"),
+get_delegations(user => "user"),
+get_delegator_summary(user => "user"),
+get_delegator_history(user => "user"),
+get_delegator_rewards(user => "user"),
+get_spot_deploy_state(user => "user"),
+get_outcome_meta(),
+get_settled_outcome(outcome => "outcome"),
+get_outcome_deployer_limits(venue => "venue"),
+get_perp_deploy_auction_status(),
+get_spot_pair_deploy_auction_status(),
 get_perps_at_open_interest_cap(),
 get_perp_dex_limits(dex => "dex"),
 get_perp_dex_status(dex => "dex"),
@@ -72,3 +83,19 @@ set_user_abstraction(user => "user", abstraction => "abstraction", nonce => "non
         update_leverage(product_symbol => "product_symbol", is_cross => "isCross", leverage => "leverage")
     ];
 }
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;HyperliquidClient;public [];private [transfer_vault_usd(vault_address => "targetVault",is_deposit => "isDeposit",usd => "usd"),
+enable_agent_dex_abstraction(),
+transfer_hip3_liquidator(dex => "dex",ntl => "ntl",is_deposit => "isDeposit"),
+deposit_staking_signed(wei => "wei",nonce => "nonce",signature => "signature",signature_chain_id => "signatureChainId"),
+withdraw_staking_signed(wei => "wei",nonce => "nonce",signature => "signature",signature_chain_id => "signatureChainId"),
+delegate_tokens_signed(validator => "validator",wei => "wei",is_undelegate => "isUndelegate",nonce => "nonce",signature => "signature",signature_chain_id => "signatureChainId"),
+set_user_dex_abstraction_signed(user => "user",enabled => "enabled",nonce => "nonce",signature => "signature",signature_chain_id => "signatureChainId"),];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;HyperliquidClient;public [];private [create_sub_account(account_name => "name"),
+transfer_sub_account_usd(sub_account_user => "subAccountUser",is_deposit => "isDeposit",usd => "usd"),
+transfer_sub_account_spot(sub_account_user => "subAccountUser",is_deposit => "isDeposit",token => "token",amount => "amount"),];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;HyperliquidClient;public [];private [approve_agent_signed(agent_address => "agentAddress",nonce => "nonce",signature => "signature",signature_chain_id => "signatureChainId")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;HyperliquidClient;public [get_all_mids(),get_active_asset_data(user => "user",product_symbol => "product_symbol"),get_user_twap_slice_fills(user => "user")];private [];}

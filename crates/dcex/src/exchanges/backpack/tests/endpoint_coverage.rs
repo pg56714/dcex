@@ -62,6 +62,14 @@ const SPOT: &str = "BTC-USDC-SPOT";
 const RFQ: &str = "AAPL.US-USDC-RFQ";
 
 const PUBLIC_CASES: &[Case] = &[
+    public("get_prediction_events", &[], "GET /api/v1/prediction"),
+    public("get_prediction_tags", &[], "GET /api/v1/prediction/tags"),
+    public("get_vaults", &[], "GET /api/v1/vaults"),
+    public(
+        "get_vault_history",
+        &[("interval", "1d")],
+        "GET /api/v1/vaults/history?interval=1d",
+    ),
     public("get_assets", &[], "GET /api/v1/assets"),
     public("get_collateral", &[], "GET /api/v1/collateral"),
     public(
@@ -149,6 +157,42 @@ const PUBLIC_CASES: &[Case] = &[
 ];
 
 const PRIVATE_CASES: &[Case] = &[
+    private(
+        "execute_borrow_lend",
+        "borrowLendExecute",
+        &[("quantity", "1"), ("side", "Borrow"), ("symbol", "BTC")],
+        "POST /api/v1/borrowLend",
+    ),
+    private(
+        "vault_mint",
+        "vaultMint",
+        &[("vaultId", "1"), ("symbol", "USDC"), ("quantity", "1")],
+        "POST /api/v1/vault/mint",
+    ),
+    private(
+        "vault_redeem",
+        "vaultRedeemRequest",
+        &[("vaultId", "1")],
+        "POST /api/v1/vault/redeem",
+    ),
+    private(
+        "vault_redeem_cancel",
+        "vaultRedeemCancel",
+        &[("vaultId", "1")],
+        "DELETE /api/v1/vault/redeem",
+    ),
+    private(
+        "get_vault_pending_redeems",
+        "vaultPendingRedeemsQuery",
+        &[("vaultId", "1")],
+        "GET /api/v1/vault/redeems/pending?vaultId=1",
+    ),
+    private(
+        "get_vault_nav",
+        "vaultNavQuery",
+        &[],
+        "GET /api/v1/vault/nav",
+    ),
     private(
         "create_strategy",
         "strategyCreate",

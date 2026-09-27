@@ -362,3 +362,59 @@ crate::exchanges::impl_exchange_method_wrappers! {
 }
 
 crate::exchanges::impl_exchange_method_wrappers! { @extend; BitgetClient; public []; private [batch_create_classic_sub_accounts(accounts => "accounts"), move_uta_positions(from_uid => "fromUid", to_uid => "toUid", category => "category", position_list => "positionList")]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BitgetClient; public [
+get_classic_earn_loan_public_coin_infos(),
+get_classic_earn_loan_public_hour_interest(loan_coin => "loanCoin",pledge_coin => "pledgeCoin",daily => "daily",pledge_amount => "pledgeAmount"),
+]; private [
+get_uta_account_max_withdrawal(coin => "coin"),
+get_classic_account_bot_assets(),
+get_classic_spot_wallet_withdrawal_records(start_time => "startTime",end_time => "endTime"),
+get_uta_account_withdrawal_records(start_time => "startTime",end_time => "endTime"),
+get_uta_account_withdraw_address(),
+get_classic_earn_elite_product(),
+classic_earn_elite_subscribe(product_sub_id => "productSubId",amount => "amount"),
+get_classic_earn_elite_subscribe_result(order_id => "orderId"),
+get_classic_earn_elite_subscribe_info(product_id => "productId"),
+classic_earn_elite_redeem(product_id => "productId",product_sub_id => "productSubId",redeem_type => "redeemType",amount => "amount",receive_account => "receiveAccount"),
+get_classic_earn_elite_redeem_info(product_id => "productId"),
+get_classic_earn_elite_assets(),
+get_classic_earn_elite_records(type_ => "type"),
+classic_earn_loan_borrow(loan_coin => "loanCoin",pledge_coin => "pledgeCoin",daily => "daily"),
+get_classic_earn_loan_ongoing_orders(),
+classic_earn_loan_repay(order_id => "orderId",repay_all => "repayAll"),
+get_classic_earn_loan_repay_history(start_time => "startTime",end_time => "endTime"),
+classic_earn_loan_revise_pledge(order_id => "orderId",amount => "amount",pledge_coin => "pledgeCoin",revise_type => "reviseType"),
+get_classic_earn_loan_revise_history(start_time => "startTime",end_time => "endTime"),
+get_classic_earn_loan_borrow_history(start_time => "startTime",end_time => "endTime"),
+get_classic_earn_loan_debts(),
+get_classic_earn_loan_reduces(start_time => "startTime",end_time => "endTime"),
+uta_trade_grid_add_investment(category => "category",bot_id => "botId",coin => "coin",size => "size",funds_source => "fundsSource"),
+get_uta_trade_grid_bot_detail(bot_id => "botId"),
+uta_trade_grid_close_bot(bot_id => "botId"),
+uta_trade_grid_create_bot(category => "category",symbol => "symbol",max_price => "maxPrice",min_price => "minPrice",grid_num => "gridNum",grid_order_mode => "gridOrderMode",investment_amount => "investmentAmount",funds_source => "fundsSource",slippage => "slippage",auto_transfer_profits => "autoTransferProfits"),
+uta_trade_grid_create_neutral_bot(category => "category",symbol => "symbol",max_price => "maxPrice",min_price => "minPrice",grid_num => "gridNum",grid_order_mode => "gridOrderMode",funds_source => "fundsSource"),
+get_uta_trade_grid_list_details(category => "category",bot_id => "botId"),
+uta_trade_grid_modify_bot(bot_id => "botId"),
+uta_trade_grid_modify_grid_interval(category => "category",bot_id => "botId",max_price => "maxPrice",min_price => "minPrice",grid_num => "gridNum"),
+uta_trade_grid_modify_neutral_bot(bot_id => "botId",category => "category"),
+uta_trade_grid_modify_neutral_grid_interval(category => "category",bot_id => "botId",max_price => "maxPrice",min_price => "minPrice",grid_num => "gridNum"),
+get_uta_trade_grid_neutral_bot_detail(bot_id => "botId"),
+get_uta_trade_grid_neutral_list_details(category => "category",bot_id => "botId"),
+uta_trade_grid_validate_neutral(category => "category",symbol => "symbol",max_price => "maxPrice",min_price => "minPrice",grid_num => "gridNum",grid_order_mode => "gridOrderMode"),
+uta_trade_grid_validate(category => "category",symbol => "symbol",max_price => "maxPrice",min_price => "minPrice",grid_num => "gridNum",grid_order_mode => "gridOrderMode",investment_amount => "investmentAmount",auto_transfer_profits => "autoTransferProfits"),
+]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; BitgetClient; public [
+get_reality_company_overview(code => "code"),
+get_reality_valuation_indicators(code => "code"),
+get_reality_earnings_forecast(code => "code"),
+get_reality_suspension_resumption_info(code => "code"),
+get_reality_dividends(code => "code"),
+get_reality_share_capital_change(code => "code"),
+get_reality_inner_trades(code => "code"),
+get_reality_executive_shareholdings(code => "code"),
+get_reality_sharehold_detail(code => "code"),
+]; private [
+
+]; }

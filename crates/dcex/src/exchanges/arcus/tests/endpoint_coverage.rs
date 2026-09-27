@@ -181,6 +181,11 @@ fn header<'a>(request: &'a str, name: &str) -> Option<&'a str> {
 
 /// (dispatch name, params, exact expected request line target)
 const PUBLIC_CASES: &[(&str, &[(&str, &str)], &str)] = &[
+    (
+        "get_leaderboard",
+        &[("window", "30d"), ("sortBy", "pnl"), ("limit", "10")],
+        "/v1/leaderboard?limit=10&sortBy=pnl&window=30d",
+    ),
     ("get_service_info", &[], "/"),
     ("health", &[], "/health"),
     ("get_time", &[], "/v1/time"),
@@ -786,4 +791,79 @@ fn wallet_key_administration_preserves_scope_and_caller_signature() {
     );
     assert!(result.is_err());
     assert!(requests.is_empty());
+}
+
+#[test]
+fn metadata_routes_and_preference_signature_are_exact() {
+    for (name, params, target) in [
+        (
+            "get_market_metadata",
+            vec![("market", "BTC-USD")],
+            "/v1/api-meta/markets?market=BTC-USD",
+        ),
+        ("get_market_overview", vec![], "/v1/api-meta/overview"),
+        (
+            "get_spot_market_overview",
+            vec![],
+            "/v1/api-meta/spot/overview",
+        ),
+        (
+            "get_user_preferences",
+            vec![],
+            "/v1/api-meta/userPreferences?address=0x4444444444444444444444444444444444444444",
+        ),
+        (
+            "get_metadata_candles",
+            vec![
+                ("market", "BTC-USD"),
+                ("timeframe", "1m"),
+                ("to", "1700000060"),
+                ("countback", "10"),
+            ],
+            "/v1/api-meta/candles?countback=10&market=BTC-USD&timeframe=1m&to=1700000060",
+        ),
+    ] {
+        let (result, requests) = run(Kind::Public, name, pairs(&params));
+        result.unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(line(&requests[0]), format!("GET {target} HTTP/1.1"));
+    }
+    let (result, requests) = run(
+        Kind::Private,
+        "upsert_user_preferences",
+        pairs(&[("preferences", r#"{"colorTheme":"dark"}"#)]),
+    );
+    result.unwrap();
+    let request = &requests[0];
+    assert!(line(request).starts_with("PATCH /v1/api-meta/userPreferences "));
+    let timestamp = header(request, "X-Timestamp").unwrap();
+    let message = format!("{}userPreferences{{\"colorTheme\":\"dark\"}}", timestamp);
+    let pubkey: [u8; 32] = hex::decode(header(request, "X-API-Key").unwrap())
+        .unwrap()
+        .try_into()
+        .unwrap();
+    let sig = ed25519_dalek::Signature::from_slice(
+        &hex::decode(header(request, "X-Signature").unwrap()).unwrap(),
+    )
+    .unwrap();
+    ed25519_dalek::VerifyingKey::from_bytes(&pubkey)
+        .unwrap()
+        .verify_strict(message.as_bytes(), &sig)
+        .unwrap();
+    let sig = "11".repeat(64);
+    let (result, requests) = run(
+        Kind::Private,
+        "delete_user_preference_signed",
+        pairs(&[
+            ("key", "colorTheme"),
+            ("timestamp", "1700000000000000000"),
+            ("signature", &sig),
+        ]),
+    );
+    result.unwrap();
+    assert_eq!(
+        line(&requests[0]),
+        "DELETE /v1/api-meta/userPreferences?key=colorTheme HTTP/1.1"
+    );
+    assert_eq!(header(&requests[0], "X-Signature"), Some(sig.as_str()));
 }

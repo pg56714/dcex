@@ -29,6 +29,7 @@ pub enum LighterContentType {
 pub struct LighterClient {
     pub(super) transport: AsyncHttpClient,
     pub(super) base_url: String,
+    pub(super) explorer_base_url: String,
     pub(super) network: Option<LighterNetwork>,
     pub(super) chain_id: Option<u64>,
     pub(super) account_index: Option<u64>,
@@ -38,6 +39,15 @@ pub struct LighterClient {
 }
 
 impl LighterClient {
+    /// Override the separate public explorer API origin.
+    pub fn with_explorer_base_url(mut self, base_url: String) -> Result<Self> {
+        let url = url::Url::parse(&base_url).map_err(|e| DcexError::InvalidInput(e.to_string()))?;
+        if !matches!(url.scheme(), "http" | "https") || url.host_str().is_none() {
+            return Err(DcexError::InvalidInput("invalid explorer base URL".into()));
+        }
+        self.explorer_base_url = base_url;
+        Ok(self)
+    }
     pub fn new(timeout: Duration) -> Result<Self> {
         Self::with_network(timeout, LighterNetwork::Mainnet)
     }
@@ -189,6 +199,7 @@ impl LighterClient {
         Ok(Self {
             transport: AsyncHttpClient::new(timeout)?,
             base_url,
+            explorer_base_url: "https://explorer.elliot.ai/api".into(),
             network,
             chain_id,
             account_index,

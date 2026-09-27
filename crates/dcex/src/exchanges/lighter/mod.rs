@@ -4,6 +4,7 @@ pub mod chains;
 mod client;
 mod credentials;
 mod endpoints;
+mod explorer;
 mod market;
 mod params;
 mod signing;

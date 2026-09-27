@@ -97,6 +97,257 @@ def _action(
 
 
 WRAPPER_CASES = [
+    _info("get_all_mids", (), [("dex", "")], "allMids"),
+    _info(
+        "get_active_asset_data",
+        (),
+        [("user", USER), ("product_symbol", "BTC-USDC-SWAP")],
+        "activeAssetData",
+        user=USER,
+        product_symbol="BTC-USDC-SWAP",
+    ),
+    _info("get_user_twap_slice_fills", (), [("user", USER)], "userTwapSliceFills", user=USER),
+    _action(
+        "approve_agent_signed",
+        (),
+        [
+            ("agentAddress", "0xabababababababababababababababababababab"),
+            ("nonce", "100"),
+            (
+                "signature",
+                '{"r":"0x1111111111111111111111111111111111111111111111111111111111111111","s":"0x2222222222222222222222222222222222222222222222222222222222222222","v":27}',
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+        "approveAgent",
+        **{
+            "agent_address": "0xabababababababababababababababababababab",
+            "nonce": 100,
+            "signature": {
+                "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+                "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+                "v": 27,
+            },
+            "signature_chain_id": "0xa4b1",
+        },
+    ),
+    _action(
+        "create_sub_account", (), [("name", "desk")], "createSubAccount", **{"account_name": "desk"}
+    ),
+    _action(
+        "transfer_sub_account_usd",
+        (),
+        [
+            ("subAccountUser", "0xabababababababababababababababababababab"),
+            ("isDeposit", "true"),
+            ("usd", "100"),
+        ],
+        "subAccountTransfer",
+        **{
+            "sub_account_user": "0xabababababababababababababababababababab",
+            "is_deposit": True,
+            "usd": 100,
+        },
+    ),
+    _action(
+        "transfer_sub_account_spot",
+        (),
+        [
+            ("subAccountUser", "0xabababababababababababababababababababab"),
+            ("isDeposit", "true"),
+            ("token", "USDC"),
+            ("amount", "1"),
+        ],
+        "subAccountSpotTransfer",
+        **{
+            "sub_account_user": "0xabababababababababababababababababababab",
+            "is_deposit": True,
+            "token": "USDC",
+            "amount": "1",
+        },
+    ),
+    _action(
+        "transfer_vault_usd",
+        (),
+        [
+            ("targetVault", "0xabababababababababababababababababababab"),
+            ("isDeposit", "true"),
+            ("usd", "100"),
+        ],
+        "vaultTransfer",
+        **{
+            "vault_address": "0xabababababababababababababababababababab",
+            "is_deposit": True,
+            "usd": 100,
+        },
+    ),
+    _action("enable_agent_dex_abstraction", (), [], "agentEnableDexAbstraction", **{}),
+    _action(
+        "transfer_hip3_liquidator",
+        (),
+        [("dex", "xyz"), ("ntl", "100"), ("isDeposit", "true")],
+        "hip3LiquidatorTransfer",
+        **{"dex": "xyz", "ntl": 100, "is_deposit": True},
+    ),
+    _action(
+        "deposit_staking_signed",
+        (),
+        [
+            ("wei", "100"),
+            ("nonce", "100"),
+            (
+                "signature",
+                '{"r":"0x1111111111111111111111111111111111111111111111111111111111111111","s":"0x2222222222222222222222222222222222222222222222222222222222222222","v":27}',
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+        "cDeposit",
+        **{
+            "wei": 100,
+            "nonce": 100,
+            "signature": {
+                "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+                "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+                "v": 27,
+            },
+            "signature_chain_id": "0xa4b1",
+        },
+    ),
+    _action(
+        "withdraw_staking_signed",
+        (),
+        [
+            ("wei", "100"),
+            ("nonce", "100"),
+            (
+                "signature",
+                '{"r":"0x1111111111111111111111111111111111111111111111111111111111111111","s":"0x2222222222222222222222222222222222222222222222222222222222222222","v":27}',
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+        "cWithdraw",
+        **{
+            "wei": 100,
+            "nonce": 100,
+            "signature": {
+                "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+                "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+                "v": 27,
+            },
+            "signature_chain_id": "0xa4b1",
+        },
+    ),
+    _action(
+        "delegate_tokens_signed",
+        (),
+        [
+            ("validator", "0xabababababababababababababababababababab"),
+            ("wei", "100"),
+            ("isUndelegate", "true"),
+            ("nonce", "100"),
+            (
+                "signature",
+                '{"r":"0x1111111111111111111111111111111111111111111111111111111111111111","s":"0x2222222222222222222222222222222222222222222222222222222222222222","v":27}',
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+        "tokenDelegate",
+        **{
+            "validator": "0xabababababababababababababababababababab",
+            "wei": 100,
+            "is_undelegate": True,
+            "nonce": 100,
+            "signature": {
+                "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+                "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+                "v": 27,
+            },
+            "signature_chain_id": "0xa4b1",
+        },
+    ),
+    _action(
+        "set_user_dex_abstraction_signed",
+        (),
+        [
+            ("user", "0xabababababababababababababababababababab"),
+            ("enabled", "true"),
+            ("nonce", "100"),
+            (
+                "signature",
+                '{"r":"0x1111111111111111111111111111111111111111111111111111111111111111","s":"0x2222222222222222222222222222222222222222222222222222222222222222","v":27}',
+            ),
+            ("signatureChainId", "0xa4b1"),
+        ],
+        "userDexAbstraction",
+        **{
+            "user": "0xabababababababababababababababababababab",
+            "enabled": True,
+            "nonce": 100,
+            "signature": {
+                "r": "0x1111111111111111111111111111111111111111111111111111111111111111",
+                "s": "0x2222222222222222222222222222222222222222222222222222222222222222",
+                "v": 27,
+            },
+            "signature_chain_id": "0xa4b1",
+        },
+    ),
+    _info(
+        "get_vault_details",
+        (),
+        [
+            ("vaultAddress", "0xabababababababababababababababababababab"),
+            ("user", "0xabababababababababababababababababababab"),
+        ],
+        "vaultDetails",
+        vault_address="0xabababababababababababababababababababab",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info(
+        "get_delegations",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "delegations",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info(
+        "get_delegator_summary",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "delegatorSummary",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info(
+        "get_delegator_history",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "delegatorHistory",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info(
+        "get_delegator_rewards",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "delegatorRewards",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info(
+        "get_spot_deploy_state",
+        (),
+        [("user", "0xabababababababababababababababababababab")],
+        "spotDeployState",
+        user="0xabababababababababababababababababababab",
+    ),
+    _info("get_outcome_meta", (), [], "outcomeMeta"),
+    _info("get_settled_outcome", (), [("outcome", "1")], "settledOutcome", outcome=1),
+    _info(
+        "get_outcome_deployer_limits",
+        (),
+        [("venue", "test")],
+        "outcomeDeployerLimits",
+        venue="test",
+    ),
+    _info("get_perp_deploy_auction_status", (), [], "perpDeployAuctionStatus"),
+    _info("get_spot_pair_deploy_auction_status", (), [], "spotPairDeployAuctionStatus"),
     _action("reserve_request_weight", (100,), [("weight", "100")], "reserveRequestWeight"),
     _action("set_agent_abstraction", ("u",), [("abstraction", "u")], "agentSetAbstraction"),
     _action(

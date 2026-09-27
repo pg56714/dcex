@@ -3955,3 +3955,567 @@ fn algorithm_and_pm_pro_endpoints_use_documented_routes() {
         ),
     ]);
 }
+
+#[test]
+fn completion_account_endpoints_use_official_routes() {
+    assert_cases(&[
+        private(
+            "tradfi_options_contract",
+            &[],
+            "POST",
+            "/eapi/v1/stock/contract",
+        ),
+        private(
+            "get_cloud_mining_payment_and_refund_history",
+            &[("startTime", "1700000000000"), ("endTime", "1700000010000")],
+            "GET",
+            "/sapi/v1/asset/ledger-transfer/cloud-mining/queryByPage",
+        ),
+        private(
+            "query_user_delegation_history",
+            &[
+                ("email", "sub@example.com"),
+                ("startTime", "1700000000000"),
+                ("endTime", "1700000010000"),
+            ],
+            "GET",
+            "/sapi/v1/asset/custody/transfer-history",
+        ),
+        private(
+            "fetch_withdraw_address_list",
+            &[],
+            "GET",
+            "/sapi/v1/capital/withdraw/address/list",
+        ),
+        private(
+            "fetch_withdraw_quota",
+            &[],
+            "GET",
+            "/sapi/v1/capital/withdraw/quota",
+        ),
+        private(
+            "get_withdrawal_history",
+            &[],
+            "GET",
+            "/sapi/v1/capital/withdraw/history",
+        ),
+        private(
+            "check_questionnaire_requirements",
+            &[],
+            "GET",
+            "/sapi/v1/localentity/questionnaire-requirements",
+        ),
+        private(
+            "get_travel_rule_deposit_history",
+            &[],
+            "GET",
+            "/sapi/v1/localentity/deposit/history",
+        ),
+        private(
+            "get_travel_rule_deposit_history_v2",
+            &[],
+            "GET",
+            "/sapi/v2/localentity/deposit/history",
+        ),
+        private(
+            "fetch_address_verification_list",
+            &[],
+            "GET",
+            "/sapi/v1/addressVerify/list",
+        ),
+        private(
+            "get_country_list",
+            &[],
+            "GET",
+            "/sapi/v1/localentity/country/list",
+        ),
+        private(
+            "get_region_list",
+            &[("countryCode", "example")],
+            "GET",
+            "/sapi/v1/localentity/region/list",
+        ),
+        private(
+            "submit_deposit_questionnaire_travel_rule",
+            &[("tranId", "1"), ("questionnaire", "{}")],
+            "PUT",
+            "/sapi/v1/localentity/deposit/provide-info",
+        ),
+        private(
+            "submit_deposit_questionnaire_v2",
+            &[("depositId", "1"), ("questionnaire", "{}")],
+            "PUT",
+            "/sapi/v2/localentity/deposit/provide-info",
+        ),
+        private("vasp_list", &[], "GET", "/sapi/v1/localentity/vasp"),
+        private(
+            "get_travel_rule_withdrawal_history",
+            &[],
+            "GET",
+            "/sapi/v1/localentity/withdraw/history",
+        ),
+        private(
+            "get_travel_rule_withdrawal_history_v2",
+            &[],
+            "GET",
+            "/sapi/v2/localentity/withdraw/history",
+        ),
+        private(
+            "get_futures_lead_trader_status",
+            &[],
+            "GET",
+            "/sapi/v1/copyTrading/futures/userStatus",
+        ),
+        private(
+            "get_futures_lead_trading_symbol_whitelist",
+            &[],
+            "GET",
+            "/sapi/v1/copyTrading/futures/leadSymbol",
+        ),
+        public(
+            "get_dual_investment_product_list",
+            &[
+                ("optionType", "CALL"),
+                ("exercisedCoin", "example"),
+                ("investCoin", "example"),
+            ],
+            "GET",
+            "/sapi/v1/dci/product/list",
+        ),
+        private(
+            "change_auto_compound_status",
+            &[("positionId", "example"), ("autoCompoundPlan", "NONE")],
+            "POST",
+            "/sapi/v1/dci/product/auto_compound/edit-status",
+        ),
+        private(
+            "check_dual_investment_accounts",
+            &[],
+            "GET",
+            "/sapi/v1/dci/product/accounts",
+        ),
+        private(
+            "get_dual_investment_positions",
+            &[],
+            "GET",
+            "/sapi/v1/dci/product/positions",
+        ),
+        private(
+            "subscribe_dual_investment_products",
+            &[
+                ("id", "example"),
+                ("orderId", "example"),
+                ("depositAmount", "1.25"),
+                ("autoCompoundPlan", "NONE"),
+            ],
+            "POST",
+            "/sapi/v1/dci/product/subscribe",
+        ),
+        private("get_bfusd_account", &[], "GET", "/sapi/v1/bfusd/account"),
+        private(
+            "get_bfusd_quota_details",
+            &[],
+            "GET",
+            "/sapi/v1/bfusd/quota",
+        ),
+        private(
+            "get_bfusd_rate_history",
+            &[],
+            "GET",
+            "/sapi/v1/bfusd/history/rateHistory",
+        ),
+        private(
+            "get_bfusd_redemption_history",
+            &[],
+            "GET",
+            "/sapi/v1/bfusd/history/redemptionHistory",
+        ),
+        private(
+            "get_bfusd_rewards_history",
+            &[],
+            "GET",
+            "/sapi/v1/bfusd/history/rewardsHistory",
+        ),
+        private(
+            "get_bfusd_subscription_history",
+            &[],
+            "GET",
+            "/sapi/v1/bfusd/history/subscriptionHistory",
+        ),
+        private(
+            "redeem_bfusd",
+            &[("amount", "1.25"), ("type", "FAST")],
+            "POST",
+            "/sapi/v1/bfusd/redeem",
+        ),
+        private(
+            "subscribe_bfusd",
+            &[("asset", "USDT"), ("amount", "1.25")],
+            "POST",
+            "/sapi/v1/bfusd/subscribe",
+        ),
+        private(
+            "get_collateral_record",
+            &[],
+            "GET",
+            "/sapi/v1/simple-earn/flexible/history/collateralRecord",
+        ),
+        private(
+            "get_flexible_personal_left_quota",
+            &[("productId", "example")],
+            "GET",
+            "/sapi/v1/simple-earn/flexible/personalLeftQuota",
+        ),
+        private(
+            "get_flexible_subscription_preview",
+            &[("productId", "example"), ("amount", "1.25")],
+            "GET",
+            "/sapi/v1/simple-earn/flexible/subscriptionPreview",
+        ),
+        private(
+            "get_locked_personal_left_quota",
+            &[("projectId", "example")],
+            "GET",
+            "/sapi/v1/simple-earn/locked/personalLeftQuota",
+        ),
+        private(
+            "get_locked_subscription_preview",
+            &[("projectId", "example"), ("amount", "1.25")],
+            "GET",
+            "/sapi/v1/simple-earn/locked/subscriptionPreview",
+        ),
+        private(
+            "get_flexible_rate_history",
+            &[("productId", "example")],
+            "GET",
+            "/sapi/v1/simple-earn/flexible/history/rateHistory",
+        ),
+        private(
+            "set_flexible_auto_subscribe",
+            &[("productId", "example"), ("autoSubscribe", "true")],
+            "POST",
+            "/sapi/v1/simple-earn/flexible/setAutoSubscribe",
+        ),
+        private(
+            "set_locked_auto_subscribe",
+            &[("positionId", "example"), ("autoSubscribe", "true")],
+            "POST",
+            "/sapi/v1/simple-earn/locked/setAutoSubscribe",
+        ),
+        private(
+            "set_locked_product_redeem_option",
+            &[("positionId", "example"), ("redeemTo", "SPOT")],
+            "POST",
+            "/sapi/v1/simple-earn/locked/setRedeemOption",
+        ),
+        private("get_rwusd_account", &[], "GET", "/sapi/v1/rwusd/account"),
+        private(
+            "get_rwusd_quota_details",
+            &[],
+            "GET",
+            "/sapi/v1/rwusd/quota",
+        ),
+        private(
+            "get_rwusd_rate_history",
+            &[],
+            "GET",
+            "/sapi/v1/rwusd/history/rateHistory",
+        ),
+        private(
+            "get_rwusd_redemption_history",
+            &[],
+            "GET",
+            "/sapi/v1/rwusd/history/redemptionHistory",
+        ),
+        private(
+            "get_rwusd_rewards_history",
+            &[],
+            "GET",
+            "/sapi/v1/rwusd/history/rewardsHistory",
+        ),
+        private(
+            "get_rwusd_subscription_history",
+            &[],
+            "GET",
+            "/sapi/v1/rwusd/history/subscriptionHistory",
+        ),
+        private(
+            "redeem_rwusd",
+            &[("amount", "1.25"), ("type", "FAST")],
+            "POST",
+            "/sapi/v1/rwusd/redeem",
+        ),
+        private(
+            "subscribe_rwusd",
+            &[("asset", "USDT"), ("amount", "1.25")],
+            "POST",
+            "/sapi/v1/rwusd/subscribe",
+        ),
+        private(
+            "get_yield_arena_activities",
+            &[],
+            "GET",
+            "/sapi/v1/earn/arena/activities",
+        ),
+        private(
+            "create_a_virtual_sub_account",
+            &[("subAccountString", "example")],
+            "POST",
+            "/sapi/v1/sub-account/virtualSubAccount",
+        ),
+        private(
+            "enable_futures_for_sub_account",
+            &[("email", "sub@example.com")],
+            "POST",
+            "/sapi/v1/sub-account/futures/enable",
+        ),
+        private(
+            "enable_options_for_sub_account",
+            &[("email", "sub@example.com")],
+            "POST",
+            "/sapi/v1/sub-account/eoptions/enable",
+        ),
+        private(
+            "add_ip_restriction_for_sub_account_api_key",
+            &[
+                ("email", "sub@example.com"),
+                ("subAccountApiKey", "example"),
+                ("status", "1"),
+            ],
+            "POST",
+            "/sapi/v2/sub-account/subAccountApi/ipRestriction",
+        ),
+        private(
+            "create_sub_account_api_key",
+            &[
+                ("email", "sub@example.com"),
+                ("apiName", "example"),
+                ("status", "1"),
+            ],
+            "POST",
+            "/sapi/v1/sub-account/subAccountApi",
+        ),
+        private(
+            "delete_ip_list_for_a_sub_account_api_key",
+            &[
+                ("email", "sub@example.com"),
+                ("subAccountApiKey", "example"),
+                ("ipAddress", "example"),
+            ],
+            "DELETE",
+            "/sapi/v1/sub-account/subAccountApi/ipRestriction/ipList",
+        ),
+        private(
+            "delete_sub_account_api_key",
+            &[
+                ("email", "sub@example.com"),
+                ("subAccountApiKey", "example"),
+            ],
+            "DELETE",
+            "/sapi/v1/sub-account/subAccountApi",
+        ),
+        private(
+            "get_ip_restriction_for_a_sub_account_api_key",
+            &[
+                ("email", "sub@example.com"),
+                ("subAccountApiKey", "example"),
+            ],
+            "GET",
+            "/sapi/v1/sub-account/subAccountApi/ipRestriction",
+        ),
+        private(
+            "modify_sub_account_api_key_permission",
+            &[
+                ("email", "sub@example.com"),
+                ("subAccountApiKey", "example"),
+            ],
+            "POST",
+            "/sapi/v1/sub-account/subAccountApiPermission",
+        ),
+        private(
+            "query_sub_account_api_key",
+            &[("email", "sub@example.com")],
+            "GET",
+            "/sapi/v1/sub-account/subAccountApi",
+        ),
+        private(
+            "get_move_position_history_for_sub_account",
+            &[("symbol", "BTCUSDT"), ("page", "1"), ("rows", "1")],
+            "GET",
+            "/sapi/v1/sub-account/futures/move-position",
+        ),
+        private(
+            "get_sub_account_deposit_address",
+            &[("email", "sub@example.com"), ("coin", "BTC")],
+            "GET",
+            "/sapi/v1/capital/deposit/subAddress",
+        ),
+        private(
+            "get_sub_account_deposit_history",
+            &[("email", "sub@example.com")],
+            "GET",
+            "/sapi/v1/capital/deposit/subHisrec",
+        ),
+        private(
+            "move_position_for_sub_account",
+            &[
+                ("fromUserEmail", "parent@example.com"),
+                ("toUserEmail", "sub@example.com"),
+                ("productType", "UM"),
+                (
+                    "orderArgs",
+                    "[{\"symbol\":\"BTCUSDT\",\"quantity\":\"0.001\",\"positionSide\":\"BOTH\"}]",
+                ),
+            ],
+            "POST",
+            "/sapi/v1/sub-account/futures/move-position",
+        ),
+        private(
+            "deposit_assets_into_the_managed_sub_account",
+            &[
+                ("toEmail", "example"),
+                ("asset", "USDT"),
+                ("amount", "1.25"),
+            ],
+            "POST",
+            "/sapi/v1/managed-subaccount/deposit",
+        ),
+        private(
+            "get_managed_sub_account_deposit_address",
+            &[("email", "sub@example.com"), ("coin", "BTC")],
+            "GET",
+            "/sapi/v1/managed-subaccount/deposit/address",
+        ),
+        private(
+            "query_managed_sub_account_asset_details",
+            &[("email", "sub@example.com")],
+            "GET",
+            "/sapi/v1/managed-subaccount/asset",
+        ),
+        private(
+            "query_managed_sub_account_futures_asset_details",
+            &[("email", "sub@example.com")],
+            "GET",
+            "/sapi/v1/managed-subaccount/fetch-future-asset",
+        ),
+        private(
+            "query_managed_sub_account_list",
+            &[],
+            "GET",
+            "/sapi/v1/managed-subaccount/info",
+        ),
+        private(
+            "query_managed_sub_account_margin_asset_details",
+            &[("email", "sub@example.com")],
+            "GET",
+            "/sapi/v1/managed-subaccount/marginAsset",
+        ),
+        private(
+            "query_managed_sub_account_snapshot",
+            &[("email", "sub@example.com"), ("type", "SPOT")],
+            "GET",
+            "/sapi/v1/managed-subaccount/accountSnapshot",
+        ),
+        private(
+            "query_managed_sub_account_transfer_log_master_account_investor",
+            &[
+                ("email", "sub@example.com"),
+                ("startTime", "1700000000000"),
+                ("endTime", "1700000010000"),
+                ("page", "1"),
+                ("limit", "1"),
+            ],
+            "GET",
+            "/sapi/v1/managed-subaccount/queryTransLogForInvestor",
+        ),
+        private(
+            "query_managed_sub_account_transfer_log_master_account_trading",
+            &[
+                ("email", "sub@example.com"),
+                ("startTime", "1700000000000"),
+                ("endTime", "1700000010000"),
+                ("page", "1"),
+                ("limit", "1"),
+            ],
+            "GET",
+            "/sapi/v1/managed-subaccount/queryTransLogForTradeParent",
+        ),
+        private(
+            "query_managed_sub_account_transfer_log_sub_account_trading",
+            &[
+                ("startTime", "1700000000000"),
+                ("endTime", "1700000010000"),
+                ("page", "1"),
+                ("limit", "1"),
+            ],
+            "GET",
+            "/sapi/v1/managed-subaccount/query-trans-log",
+        ),
+    ]);
+}
+
+#[test]
+fn portfolio_earn_endpoints_use_official_routes() {
+    assert_cases(&[
+        private(
+            "get_transferable_earn_asset_balance_for_portfolio_margin",
+            &[("asset", "LDUSDT"), ("transferType", "EARN_TO_FUTURE")],
+            "GET",
+            "/sapi/v1/portfolio/earn-asset-balance",
+        ),
+        private(
+            "transfer_ldusdt_rwusd_for_portfolio_margin",
+            &[
+                ("asset", "LDUSDT"),
+                ("transferType", "EARN_TO_FUTURE"),
+                ("amount", "1.25"),
+            ],
+            "POST",
+            "/sapi/v1/portfolio/earn-asset-transfer",
+        ),
+    ]);
+}
+
+#[test]
+fn enable_isolated_margin_account_route() {
+    assert_cases(&[private(
+        "enable_isolated_margin_account",
+        &[("symbol", "BTCUSDT")],
+        "POST",
+        "/sapi/v1/margin/isolated/account",
+    )]);
+}
+
+#[test]
+fn disable_isolated_margin_account_route() {
+    assert_cases(&[private(
+        "disable_isolated_margin_account",
+        &[("symbol", "BTCUSDT")],
+        "DELETE",
+        "/sapi/v1/margin/isolated/account",
+    )]);
+}
+
+#[test]
+fn server_time_uses_each_market_host_and_route() {
+    assert_cases(&[
+        public(
+            "get_server_time",
+            &[("market_type", "coin_futures")],
+            "GET",
+            "/dapi/v1/time",
+        ),
+        public(
+            "get_server_time",
+            &[("market_type", "options")],
+            "GET",
+            "/eapi/v1/time",
+        ),
+        public(
+            "get_server_time",
+            &[("market_type", "swap")],
+            "GET",
+            "/fapi/v1/time",
+        ),
+    ]);
+}

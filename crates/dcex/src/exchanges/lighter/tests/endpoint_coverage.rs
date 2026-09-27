@@ -1552,6 +1552,17 @@ fn account_config_rejects_invalid_modes_before_nonce_lookup() {
 fn additional_account_and_deposit_routes_preserve_form_and_authorization() {
     let cases: &[(&str, bool, &str, &str, &[(&str, &str)])] = &[
         (
+            "set_maker_only_api_keys",
+            false,
+            "POST",
+            "/api/v1/setMakerOnlyApiKeys",
+            &[
+                ("account_index", "12"),
+                ("api_key_indexes", "[]"),
+                ("authorization", "test-token"),
+            ],
+        ),
+        (
             "change_account_tier",
             false,
             "POST",
@@ -1663,4 +1674,212 @@ fn additional_account_and_deposit_routes_preserve_form_and_authorization() {
             if *public { None } else { Some(TOKEN) }
         );
     }
+}
+
+#[test]
+fn pool_transactions_have_official_types_and_fields() {
+    for (method, params, tx_type, expected) in [
+        (
+            "create_public_pool",
+            vec![
+                ("operator_fee", "1"),
+                ("initial_total_shares", "1"),
+                ("min_operator_share_rate", "1"),
+                ("nonce", "5"),
+            ],
+            10,
+            json!({"OperatorFee": 1, "InitialTotalShares": 1, "MinOperatorShareRate": 1}),
+        ),
+        (
+            "update_public_pool",
+            vec![
+                ("public_pool_index", "1"),
+                ("status", "1"),
+                ("operator_fee", "1"),
+                ("min_operator_share_rate", "1"),
+                ("nonce", "5"),
+            ],
+            11,
+            json!({"PublicPoolIndex": 1, "Status": 1, "OperatorFee": 1, "MinOperatorShareRate": 1}),
+        ),
+        (
+            "mint_shares",
+            vec![
+                ("public_pool_index", "140737488355328"),
+                ("share_amount", "1"),
+                ("nonce", "5"),
+            ],
+            18,
+            json!({"PublicPoolIndex": 140737488355328_u64, "ShareAmount": 1}),
+        ),
+        (
+            "burn_shares",
+            vec![
+                ("public_pool_index", "140737488355328"),
+                ("share_amount", "1"),
+                ("nonce", "5"),
+            ],
+            19,
+            json!({"PublicPoolIndex": 140737488355328_u64, "ShareAmount": 1}),
+        ),
+        (
+            "stake_assets",
+            vec![
+                ("staking_pool_index", "140737488355328"),
+                ("share_amount", "1"),
+                ("nonce", "5"),
+            ],
+            35,
+            json!({"StakingPoolIndex": 140737488355328_u64, "ShareAmount": 1}),
+        ),
+        (
+            "unstake_assets",
+            vec![
+                ("staking_pool_index", "140737488355328"),
+                ("share_amount", "1"),
+                ("nonce", "5"),
+            ],
+            36,
+            json!({"StakingPoolIndex": 140737488355328_u64, "ShareAmount": 1}),
+        ),
+    ] {
+        let (base, server) = serve(vec!["{\"code\":200}"]);
+        let client = signing_client(base);
+        let params = pairs(&params);
+        block_on(async move { client.private_request(method, params).await }).expect(method);
+        let requests = server.join().unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].form_value("tx_type"), Some(tx_type.to_string()));
+        let tx: Value = serde_json::from_str(&requests[0].form_value("tx_info").unwrap()).unwrap();
+        for (key, value) in expected.as_object().unwrap() {
+            assert_eq!(&tx[key], value);
+        }
+        assert_eq!(tx["Nonce"], 5);
+        assert!(tx["Sig"].as_str().is_some_and(|s| !s.is_empty()));
+    }
+}
+
+#[test]
+fn explorer_uses_separate_origin_and_official_paths() {
+    for (name, private, path, params) in [
+        (
+            "get_pnl_leaderboard",
+            false,
+            "/api/v1/pnlLeaderboard",
+            vec![
+                ("time_window", "24h"),
+                ("sort_by", "pnl"),
+                ("sort_dir", "asc"),
+                ("limit", "10"),
+                ("offset", "0"),
+            ],
+        ),
+        (
+            "export_historical_trades",
+            true,
+            "/api/v1/export/historicalTrades",
+            vec![
+                ("l1_address", "0x1111111111111111111111111111111111111111"),
+                ("date", "2026-09-01"),
+                ("authorization", "test-token"),
+            ],
+        ),
+        (
+            "get_explorer_account_logs",
+            false,
+            "/accounts/1/logs",
+            vec![("param", "1"), ("limit", "1"), ("offset", "1")],
+        ),
+        (
+            "get_explorer_account_positions",
+            false,
+            "/accounts/1/positions",
+            vec![("param", "1")],
+        ),
+        (
+            "get_explorer_account_assets",
+            false,
+            "/accounts/1/assets",
+            vec![("param", "1")],
+        ),
+        ("get_explorer_batches", false, "/batches", vec![]),
+        (
+            "get_explorer_batch",
+            false,
+            "/batches/1",
+            vec![("batchId", "1")],
+        ),
+        ("get_explorer_blocks", false, "/blocks", vec![]),
+        (
+            "get_explorer_block",
+            false,
+            "/blocks/1",
+            vec![("blockId", "1")],
+        ),
+        ("get_explorer_log", false, "/logs/1", vec![("hash", "1")]),
+        ("get_explorer_markets", false, "/markets", vec![]),
+        (
+            "get_explorer_market_logs",
+            false,
+            "/markets/1/logs",
+            vec![("symbol", "1")],
+        ),
+        ("search_explorer", false, "/search", vec![("q", "1")]),
+        (
+            "get_explorer_transaction_stats",
+            false,
+            "/stats/tx",
+            vec![("aggregation_period", "1")],
+        ),
+        ("get_explorer_total", false, "/total", vec![]),
+    ] {
+        let (url, server) = serve(vec!["{\"code\":200}"]);
+        let client = account_client(if name.contains("explorer") {
+            "http://127.0.0.1:1".into()
+        } else {
+            url.clone()
+        })
+        .with_explorer_base_url(url)
+        .expect("explorer URL");
+        block_on(async move {
+            if private {
+                client.private_request(name, pairs(&params)).await
+            } else {
+                client.public_request(name, pairs(&params)).await
+            }
+        })
+        .expect(name);
+        let request = server.join().expect("server").pop().expect("request");
+        assert_eq!(request.path, path);
+        assert_eq!(request.method, "GET");
+        assert!(!request.query.iter().any(|(key, _)| matches!(
+            key.as_str(),
+            "authorization" | "param" | "batchId" | "blockId" | "hash" | "symbol"
+        )));
+    }
+}
+
+#[test]
+fn same_master_transfer_has_no_external_wallet_signature() {
+    let client = signing_client("http://127.0.0.1:1".into());
+    let tx = block_on(async move {
+        client
+            .sign_transfer_same_master_account(pairs(&[
+                ("to_account_index", "13"),
+                ("asset_index", "3"),
+                ("from_route_type", "0"),
+                ("to_route_type", "1"),
+                ("amount", "4294967297"),
+                ("nonce", "5"),
+            ]))
+            .await
+    })
+    .expect("sign");
+    assert_eq!(tx.tx_type, 12);
+    let info: Value = serde_json::from_str(&tx.tx_info).expect("JSON");
+    assert_eq!(info["FromAccountIndex"], 12);
+    assert_eq!(info["ToAccountIndex"], 13);
+    assert_eq!(info["L1Sig"], "");
+    assert_eq!(info["Memo"], json!([0; 32].to_vec()));
+    assert_eq!(info["Amount"], 4294967297_u64);
 }

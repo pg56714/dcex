@@ -28,10 +28,21 @@ impl OkxClient {
         if public != e.public {
             return Ok(None);
         }
+        let schema = e
+            .schema
+            .map(serde_json::from_str::<Value>)
+            .transpose()
+            .map_err(|error| invalid(&error.to_string()))?;
         let pairs = p.without(&[]);
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
-            if !e.keys.contains(&key.as_str()) || !seen.insert(key) || value.trim().is_empty() {
+            if !e.keys.contains(&key.as_str())
+                || !seen.insert(key)
+                || (value.trim().is_empty()
+                    && !schema
+                        .as_ref()
+                        .is_some_and(|sc| sc["properties"][key]["x-allow-empty"] == true))
+            {
                 return Err(invalid("unknown, duplicate or empty parameter"));
             }
         }
@@ -68,11 +79,6 @@ impl OkxClient {
             }
         }
         validate(name, p)?;
-        let schema = e
-            .schema
-            .map(serde_json::from_str::<Value>)
-            .transpose()
-            .map_err(|error| invalid(&error.to_string()))?;
         if let Some(schema) = &schema {
             validate_additional(name, p, schema)?;
         }
@@ -86,7 +92,7 @@ impl OkxClient {
                         || schema.as_ref().is_some_and(|s| {
                             matches!(
                                 s["properties"][&key]["type"].as_str(),
-                                Some("array" | "object")
+                                Some("array" | "object" | "integer")
                             )
                         })
                     {
@@ -98,7 +104,16 @@ impl OkxClient {
                     Ok((key, value))
                 })
                 .collect::<Result<serde_json::Map<String, Value>>>()?;
-            self.post_request(e.path, Value::Object(body)).await
+            let body = if schema.as_ref().is_some_and(|sc| sc["x-body-array"] == true) {
+                body.get("orders")
+                    .cloned()
+                    .ok_or_else(|| invalid("orders are required"))?
+            } else {
+                Value::Object(body)
+            };
+            let body = serde_json::to_vec(&body).map_err(|error| invalid(&error.to_string()))?;
+            self.request(HttpMethod::Post, e.path, Vec::new(), Some(body), !public)
+                .await
         } else {
             self.request(HttpMethod::Get, e.path, query, None, !public)
                 .await
@@ -130,6 +145,18 @@ fn validate_json_shape(value: &Value, schema: &Value) -> Result<()> {
             }
         }
         Some("array") => {
+            let items = value
+                .as_array()
+                .ok_or_else(|| invalid("expected a JSON array"))?;
+            if schema["minItems"]
+                .as_u64()
+                .is_some_and(|n| items.len() < n as usize)
+                || schema["maxItems"]
+                    .as_u64()
+                    .is_some_and(|n| items.len() > n as usize)
+            {
+                return Err(invalid("array length is outside the documented limits"));
+            }
             for value in value
                 .as_array()
                 .ok_or_else(|| invalid("expected a JSON array"))?
@@ -137,7 +164,10 @@ fn validate_json_shape(value: &Value, schema: &Value) -> Result<()> {
                 validate_json_shape(value, &schema["items"])?;
             }
         }
-        Some("string") if value.as_str().is_some_and(|s| !s.trim().is_empty()) => {}
+        Some("string")
+            if value
+                .as_str()
+                .is_some_and(|s| !s.trim().is_empty() || schema["x-allow-empty"] == true) => {}
         Some("boolean") if value.is_boolean() => {}
         Some("integer") if value.as_i64().is_some() => {}
         _ => return Err(invalid("nested field has an invalid type or is empty")),

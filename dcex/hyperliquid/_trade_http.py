@@ -2,6 +2,7 @@
 # Exchange responses retain their native, heterogeneous JSON schemas.
 """Trading-related HTTP API client for Hyperliquid exchange backed by Rust."""
 
+import json
 from typing import Any
 
 from ._http_manager import HTTPManager
@@ -388,13 +389,13 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def reserve_request_weight(self, weight: int, *, expires_after: int | None = None) -> Any:
+    def reserve_request_weight(self, weight: int, *, expires_after: int | None = None) -> Any:  # noqa: ANN401
         """Reserve actions for this account at 0.0005 USDC each, paid from its perps balance."""
         return self._native_private(
             "reserve_request_weight", self._native_params(weight=weight, expiresAfter=expires_after)
         )
 
-    def set_agent_abstraction(self, abstraction: str) -> Any:
+    def set_agent_abstraction(self, abstraction: str) -> Any:  # noqa: ANN401
         """Set account mode using agent signing: i=disabled, u=unified, p=portfolio margin."""
         return self._native_private(
             "set_agent_abstraction", self._native_params(abstraction=abstraction)
@@ -407,7 +408,7 @@ class TradeHTTP(HTTPManager):
         nonce: int,
         signature: dict[str, str | int],
         signature_chain_id: str,
-    ) -> Any:
+    ) -> Any:  # noqa: ANN401
         """
         Submit a wallet-signed userSetAbstraction action for this user or its subaccount.
 
@@ -422,5 +423,210 @@ class TradeHTTP(HTTPManager):
                 nonce=nonce,
                 signature=signature,
                 signatureChainId=signature_chain_id,
+            ),
+        )
+
+    def transfer_vault_usd(
+        self,
+        *,
+        vault_address: str,
+        is_deposit: bool,
+        usd: int,
+        nonce: int | None = None,
+        expires_after: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """vaultTransfer. Amounts use the integer units defined by Hyperliquid."""
+        return self._native_private(
+            "transfer_vault_usd",
+            self._native_params(
+                targetVault=vault_address,
+                isDeposit=is_deposit,
+                usd=usd,
+                nonce=nonce,
+                expiresAfter=expires_after,
+            ),
+        )
+
+    def enable_agent_dex_abstraction(
+        self, *, nonce: int | None = None, expires_after: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """agentEnableDexAbstraction. Amounts use the integer units defined by Hyperliquid."""
+        return self._native_private(
+            "enable_agent_dex_abstraction",
+            self._native_params(nonce=nonce, expiresAfter=expires_after),
+        )
+
+    def transfer_hip3_liquidator(
+        self,
+        *,
+        dex: str,
+        ntl: int,
+        is_deposit: bool,
+        nonce: int | None = None,
+        expires_after: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """hip3LiquidatorTransfer. Amounts use the integer units defined by Hyperliquid."""
+        return self._native_private(
+            "transfer_hip3_liquidator",
+            self._native_params(
+                dex=dex, ntl=ntl, isDeposit=is_deposit, nonce=nonce, expiresAfter=expires_after
+            ),
+        )
+
+    def deposit_staking_signed(
+        self, *, wei: int, nonce: int, signature: dict[str, Any], signature_chain_id: str
+    ) -> Any:  # noqa: ANN401
+        """
+        cDeposit. Supply the documented wallet EIP-712 signature; nonce and chain ID are
+        forwarded unchanged.
+        """
+        return self._native_private(
+            "deposit_staking_signed",
+            self._native_params(
+                wei=wei,
+                nonce=nonce,
+                signature=json.dumps(signature, separators=(",", ":"), allow_nan=False),
+                signatureChainId=signature_chain_id,
+            ),
+        )
+
+    def withdraw_staking_signed(
+        self, *, wei: int, nonce: int, signature: dict[str, Any], signature_chain_id: str
+    ) -> Any:  # noqa: ANN401
+        """
+        cWithdraw. Supply the documented wallet EIP-712 signature; nonce and chain ID are
+        forwarded unchanged.
+        """
+        return self._native_private(
+            "withdraw_staking_signed",
+            self._native_params(
+                wei=wei,
+                nonce=nonce,
+                signature=json.dumps(signature, separators=(",", ":"), allow_nan=False),
+                signatureChainId=signature_chain_id,
+            ),
+        )
+
+    def delegate_tokens_signed(
+        self,
+        *,
+        validator: str,
+        wei: int,
+        is_undelegate: bool,
+        nonce: int,
+        signature: dict[str, Any],
+        signature_chain_id: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        tokenDelegate. Supply the documented wallet EIP-712 signature; nonce and chain ID are
+        forwarded unchanged.
+        """
+        return self._native_private(
+            "delegate_tokens_signed",
+            self._native_params(
+                validator=validator,
+                wei=wei,
+                isUndelegate=is_undelegate,
+                nonce=nonce,
+                signature=json.dumps(signature, separators=(",", ":"), allow_nan=False),
+                signatureChainId=signature_chain_id,
+            ),
+        )
+
+    def set_user_dex_abstraction_signed(
+        self,
+        *,
+        user: str,
+        enabled: bool,
+        nonce: int,
+        signature: dict[str, Any],
+        signature_chain_id: str,
+    ) -> Any:  # noqa: ANN401
+        """
+        userDexAbstraction. Supply the documented wallet EIP-712 signature; nonce and chain ID
+        are forwarded unchanged.
+        """
+        return self._native_private(
+            "set_user_dex_abstraction_signed",
+            self._native_params(
+                user=user,
+                enabled=enabled,
+                nonce=nonce,
+                signature=json.dumps(signature, separators=(",", ":"), allow_nan=False),
+                signatureChainId=signature_chain_id,
+            ),
+        )
+
+    def create_sub_account(
+        self, *, account_name: str, nonce: int | None = None, expires_after: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """createSubAccount within the authenticated master/subaccount family."""
+        return self._native_private(
+            "create_sub_account",
+            self._native_params(name=account_name, nonce=nonce, expiresAfter=expires_after),
+        )
+
+    def transfer_sub_account_usd(
+        self,
+        *,
+        sub_account_user: str,
+        is_deposit: bool,
+        usd: int,
+        nonce: int | None = None,
+        expires_after: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """subAccountTransfer within the authenticated master/subaccount family."""
+        return self._native_private(
+            "transfer_sub_account_usd",
+            self._native_params(
+                subAccountUser=sub_account_user,
+                isDeposit=is_deposit,
+                usd=usd,
+                nonce=nonce,
+                expiresAfter=expires_after,
+            ),
+        )
+
+    def transfer_sub_account_spot(
+        self,
+        *,
+        sub_account_user: str,
+        is_deposit: bool,
+        token: str,
+        amount: str,
+        nonce: int | None = None,
+        expires_after: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """subAccountSpotTransfer within the authenticated master/subaccount family."""
+        return self._native_private(
+            "transfer_sub_account_spot",
+            self._native_params(
+                subAccountUser=sub_account_user,
+                isDeposit=is_deposit,
+                token=token,
+                amount=amount,
+                nonce=nonce,
+                expiresAfter=expires_after,
+            ),
+        )
+
+    def approve_agent_signed(
+        self,
+        *,
+        agent_address: str,
+        nonce: int,
+        signature: dict[str, Any],
+        signature_chain_id: str,
+        agent_name: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """Submit a caller-supplied wallet EIP-712 agent approval signature."""
+        return self._native_private(
+            "approve_agent_signed",
+            self._native_params(
+                agentAddress=agent_address,
+                nonce=nonce,
+                signature=json.dumps(signature, separators=(",", ":"), allow_nan=False),
+                signatureChainId=signature_chain_id,
+                agentName=agent_name,
             ),
         )

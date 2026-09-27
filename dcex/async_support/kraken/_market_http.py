@@ -332,3 +332,116 @@ class MarketHTTP(HTTPManager):
         return await self._native_public(
             "get_spot_pre_trade_data", self._native_params(symbol=symbol)
         )
+
+    async def get_futures_chart_types(self) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/charts/v1/; public discovery/history; preserve response headers for pagination.
+        """
+        return await self._native_public("get_futures_chart_types", self._native_params())
+
+    async def get_futures_chart_markets(self, *, tick_type: str) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/charts/v1/{tick_type}; public discovery/history; preserve response headers for
+        pagination.
+        """
+        return await self._native_public(
+            "get_futures_chart_markets", self._native_params(tick_type=tick_type)
+        )
+
+    async def get_futures_chart_resolutions(
+        self, *, tick_type: str, symbol: str
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/charts/v1/{tick_type}/{symbol}; public discovery/history; preserve response
+        headers for pagination.
+        """
+        return await self._native_public(
+            "get_futures_chart_resolutions", self._native_params(tick_type=tick_type, symbol=symbol)
+        )
+
+    async def get_futures_market_executions(
+        self,
+        *,
+        tradeable: str,
+        since: int | None = None,
+        before: int | None = None,
+        sort: str | None = None,
+        continuation_token: str | None = None,
+        count: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/history/v3/market/{tradeable}/executions; public discovery/history; preserve
+        response headers for pagination.
+        """
+        return await self._native_public(
+            "get_futures_market_executions",
+            self._native_params(
+                tradeable=tradeable,
+                since=since,
+                before=before,
+                sort=sort,
+                continuation_token=continuation_token,
+                count=count,
+            ),
+        )
+
+    async def get_futures_market_orders(
+        self,
+        *,
+        tradeable: str,
+        since: int | None = None,
+        before: int | None = None,
+        sort: str | None = None,
+        continuation_token: str | None = None,
+        count: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/history/v3/market/{tradeable}/orders; public discovery/history; preserve response
+        headers for pagination.
+        """
+        return await self._native_public(
+            "get_futures_market_orders",
+            self._native_params(
+                tradeable=tradeable,
+                since=since,
+                before=before,
+                sort=sort,
+                continuation_token=continuation_token,
+                count=count,
+            ),
+        )
+
+    async def get_futures_market_price(
+        self,
+        *,
+        tradeable: str,
+        since: int | None = None,
+        before: int | None = None,
+        sort: str | None = None,
+        continuation_token: str | None = None,
+        count: int | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        """
+        GET /api/history/v3/market/{tradeable}/price; public discovery/history; preserve response
+        headers for pagination.
+        """
+        return await self._native_public(
+            "get_futures_market_price",
+            self._native_params(
+                tradeable=tradeable,
+                since=since,
+                before=before,
+                sort=sort,
+                continuation_token=continuation_token,
+                count=count,
+            ),
+        )
+
+    async def get_futures_liquidity_pool_statistics(
+        self, *, since: int, interval: int, to: int | None = None
+    ) -> dict[str, Any]:
+        """Retrieve public liquidity-pool statistics; time filters are epoch seconds."""
+        return await self._native_public(
+            "get_futures_liquidity_pool_statistics",
+            self._native_params(since=since, interval=interval, to=to),
+        )

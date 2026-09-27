@@ -3,6 +3,7 @@
 mod client;
 mod endpoints;
 mod market;
+mod metadata;
 mod onboarding;
 mod params;
 mod signing;

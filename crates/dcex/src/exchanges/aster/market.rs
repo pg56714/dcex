@@ -596,6 +596,9 @@ impl AsterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = AsterParams::from_pairs(params);
+        if let Some(response) = self.prediction_dispatch(method_name, &params, true).await? {
+            return Ok(response);
+        }
         if let Some(response) = self.additional_request(method_name, &params, true).await? {
             return Ok(response);
         }

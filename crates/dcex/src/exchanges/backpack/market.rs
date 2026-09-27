@@ -12,6 +12,10 @@ impl BackpackClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BackpackParams::from_pairs(params);
+        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
+
         self.validate_public_params(method_name, &params)?;
         let response = match method_name {
             "get_assets" => self.public_get(ASSETS, params.only(&["country"])).await,

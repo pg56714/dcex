@@ -81,6 +81,12 @@ impl AsterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = AsterParams::from_pairs(normalize_order_side(method_name, params));
+        if let Some(response) = self
+            .prediction_dispatch(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
         if let Some(response) = self.additional_request(method_name, &params, false).await? {
             return Ok(response);
         }

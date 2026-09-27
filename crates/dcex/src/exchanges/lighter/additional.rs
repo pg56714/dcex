@@ -12,6 +12,9 @@ impl LighterClient {
         p: &LighterParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
+        if let Some(response) = self.explorer_request(name, p, public).await? {
+            return Ok(Some(response));
+        }
         let (path, post, is_public, fields, required, integers, bools): (
             &str,
             bool,
@@ -21,6 +24,15 @@ impl LighterClient {
             &[&str],
             &[&str],
         ) = match name {
+            "set_maker_only_api_keys" => (
+                "/api/v1/setMakerOnlyApiKeys",
+                true,
+                false,
+                &["account_index", "api_key_indexes", "authorization"],
+                &["account_index", "api_key_indexes"],
+                &["account_index"],
+                &[],
+            ),
             "change_account_tier" => (
                 "/api/v1/changeAccountTier",
                 true,
@@ -100,6 +112,15 @@ impl LighterClient {
                 &[],
                 &[],
             ),
+            "submit_lit_lease" => (
+                "/api/v1/litLease",
+                true,
+                false,
+                &["tx_info", "lease_amount", "duration_days", "authorization"],
+                &["tx_info", "lease_amount", "duration_days"],
+                &["duration_days"],
+                &[],
+            ),
             _ => return Ok(None),
         };
         if public != is_public {
@@ -129,6 +150,43 @@ impl LighterClient {
             return Err(DcexError::InvalidInput(
                 "Lighter deposit amount must be positive".into(),
             ));
+        }
+        if name == "submit_lit_lease" {
+            let tx: serde_json::Value =
+                serde_json::from_str(p.required("tx_info")?).map_err(|_| {
+                    DcexError::InvalidInput("tx_info must be signed transaction JSON".into())
+                })?;
+            if !tx.is_object()
+                || tx
+                    .get("Sig")
+                    .and_then(serde_json::Value::as_str)
+                    .is_none_or(str::is_empty)
+            {
+                return Err(DcexError::InvalidInput("tx_info must contain Sig".into()));
+            }
+            p.required_u64_range("duration_days", 1, u64::MAX)?;
+            let amount = p.required("lease_amount")?;
+            if amount.is_empty()
+                || !amount.bytes().all(|b| b.is_ascii_digit())
+                || amount.bytes().all(|b| b == b'0')
+            {
+                return Err(DcexError::InvalidInput(
+                    "lease_amount must be positive integer raw units".into(),
+                ));
+            }
+        }
+        if name == "set_maker_only_api_keys" {
+            let indexes: Vec<u64> =
+                serde_json::from_str(p.required("api_key_indexes")?).map_err(|_| {
+                    DcexError::InvalidInput("api_key_indexes must be a JSON integer array".into())
+                })?;
+            let distinct: std::collections::BTreeSet<_> = indexes.iter().copied().collect();
+            if indexes.iter().any(|v| *v > 254) || distinct.len() != indexes.len() {
+                return Err(DcexError::InvalidInput(
+                    "API key indexes must be distinct and within 0..254".into(),
+                ));
+            }
+            p.required_u64_range("account_index", 0, 281474976710654)?;
         }
         let headers = if public {
             std::collections::BTreeMap::new()

@@ -126,6 +126,17 @@ impl ExtendedClient {
                 &["accountId", "interval"],
                 &["accountId", "interval"],
             ),
+            "get_vault_performance" => (
+                "/api/v1/vault/public/performance",
+                true,
+                &["interval"],
+                &["interval"],
+            ),
+            "get_vault_summary" => ("/api/v1/vault/public/summary", true, &[], &[]),
+            "get_earned_points" => ("/api/v1/user/rewards/earned", false, &[], &[]),
+            "get_points_leaderboard_stats" => {
+                ("/api/v1/user/rewards/leaderboard/stats", false, &[], &[])
+            }
             _ => return Ok(None),
         };
         if is_public != public {
@@ -137,6 +148,9 @@ impl ExtendedClient {
         }
         params.repeated_u64_range("accountId", 0, u64::MAX)?;
         params.optional_one_of("interval", &["DAY", "WEEK", "MONTH", "YEAR", "ALL"])?;
+        if name == "get_vault_performance" {
+            params.optional_one_of("interval", &["WEEK", "MONTH", "YEAR", "ALL"])?;
+        }
         params.optional_one_of("pnlType", &["TOTAL_PNL", "REALISED_PNL"])?;
         params.optional_one_of("instrumentType", &["ALL", "PERPS", "SPOT"])?;
         params.optional_one_of("marketType", &["ALL", "PERPS", "SPOT"])?;

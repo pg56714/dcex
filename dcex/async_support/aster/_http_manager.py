@@ -30,6 +30,7 @@ class HTTPManager(BaseHTTPManager):
     private_key: str | None = field(default=None, repr=False)
     spot_base_url: str = field(default="https://sapi.asterdex.com")
     futures_base_url: str = field(default="https://fapi.asterdex.com")
+    prediction_base_url: str = field(default="https://papi.asterdex.com")
     timeout: int = field(default=10)
     logger: logging.Logger | None = field(default=None)
     ptm: ProductTableManager = field(init=False)
@@ -50,6 +51,7 @@ class HTTPManager(BaseHTTPManager):
                 timeout=self.timeout,
                 spot_base_url=self.spot_base_url,
                 futures_base_url=self.futures_base_url,
+                prediction_base_url=self.prediction_base_url,
             )
         if self.preload_product_table:
             self.ptm = await ProductTableManager.get_instance(Common.ASTER)

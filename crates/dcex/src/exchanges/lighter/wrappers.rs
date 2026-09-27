@@ -172,3 +172,60 @@ impl LighterClient {
             .await
     }
 }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; LighterClient; public []; private [create_public_pool(operator_fee => "operator_fee",initial_total_shares => "initial_total_shares",min_operator_share_rate => "min_operator_share_rate"),update_public_pool(public_pool_index => "public_pool_index",status => "status",operator_fee => "operator_fee",min_operator_share_rate => "min_operator_share_rate"),mint_shares(public_pool_index => "public_pool_index",share_amount => "share_amount"),burn_shares(public_pool_index => "public_pool_index",share_amount => "share_amount"),stake_assets(staking_pool_index => "staking_pool_index",share_amount => "share_amount"),unstake_assets(staking_pool_index => "staking_pool_index",share_amount => "share_amount")];}
+impl LighterClient {
+    pub async fn sign_create_public_pool(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_create_public_pool", params).await
+    }
+    pub async fn sign_update_public_pool(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_update_public_pool", params).await
+    }
+    pub async fn sign_mint_shares(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_mint_shares", params).await
+    }
+    pub async fn sign_burn_shares(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_burn_shares", params).await
+    }
+    pub async fn sign_stake_assets(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_stake_assets", params).await
+    }
+    pub async fn sign_unstake_assets(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_unstake_assets", params).await
+    }
+}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;LighterClient;public [];private [submit_lit_lease(tx_info => "tx_info",lease_amount => "lease_amount",duration_days => "duration_days")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public [get_pnl_leaderboard(time_window => "time_window",sort_by => "sort_by",sort_dir => "sort_dir",limit => "limit",offset => "offset"),get_explorer_account_logs(param => "param",limit => "limit",offset => "offset"),get_explorer_account_positions(param => "param"),get_explorer_account_assets(param => "param"),get_explorer_batches(),get_explorer_batch(batch_id => "batchId"),get_explorer_blocks(),get_explorer_block(block_id => "blockId"),get_explorer_log(hash => "hash"),get_explorer_markets(),get_explorer_market_logs(symbol => "symbol"),search_explorer(q => "q"),get_explorer_transaction_stats(aggregation_period => "aggregation_period"),get_explorer_total()]; private [export_historical_trades(l1_address => "l1_address",date => "date")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public []; private [transfer_same_master_account(to_account_index => "to_account_index",asset_index => "asset_index",from_route_type => "from_route_type",to_route_type => "to_route_type",amount => "amount")];}
+impl LighterClient {
+    pub async fn sign_transfer_same_master_account(
+        &self,
+        params: Vec<(String, String)>,
+    ) -> Result<LighterSignedTransaction> {
+        self.sign_request("sign_transfer_same_master_account", params)
+            .await
+    }
+}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;LighterClient;public [];private [set_maker_only_api_keys(account_index => "account_index",api_key_indexes => "api_key_indexes")];}

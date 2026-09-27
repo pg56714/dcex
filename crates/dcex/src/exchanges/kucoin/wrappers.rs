@@ -311,3 +311,24 @@ get_account_info(),
 get_spot_account_type(),
 add_sub_account(password => "password",sub_name => "subName",access => "access"),
 ]; }
+
+crate::exchanges::impl_exchange_method_wrappers! { @extend; KucoinClient; public [
+get_uta_oe_scurrency(),
+]; private [
+get_withdrawal_history_by_id(withdrawal_id => "withdrawalId"),
+get_withdrawal_history(currency => "currency"),
+get_withdrawal_quotas(currency => "currency"),
+get_loan_info(),
+get_accounts(),
+get_discount_rate_configs(),
+get_uta_oes_custody_quota(),
+get_uta_accounts(),
+get_uta_discount_rate_configs(),
+get_uta_loan_info(),
+get_uta_withdrawal_history(),
+get_uta_withdrawal_quotas(currency => "currency",withdraw_type => "withdrawType"),
+]; }
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KucoinClient;public [];private [set_uta_account_mode(account_type => "accountType")];}
+
+crate::exchanges::impl_exchange_method_wrappers! {@extend;KucoinClient;public [get_currencies_v3()];private [];}

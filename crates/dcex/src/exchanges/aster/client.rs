@@ -38,6 +38,7 @@ pub struct AsterClient {
     transport: AsyncHttpClient,
     spot_base_url: String,
     futures_base_url: String,
+    prediction_base_url: String,
     user_address: Option<String>,
     signer_address: Option<String>,
     private_key: Option<[u8; 32]>,
@@ -95,6 +96,7 @@ impl AsterClient {
             transport: AsyncHttpClient::new(timeout)?,
             spot_base_url: spot_base_url.trim_end_matches('/').to_string(),
             futures_base_url: futures_base_url.trim_end_matches('/').to_string(),
+            prediction_base_url: "https://papi.asterdex.com".into(),
             user_address,
             signer_address,
             private_key: private_key.map(|key| parse_private_key(&key)).transpose()?,
@@ -103,6 +105,28 @@ impl AsterClient {
         })
     }
 
+    pub fn with_prediction_base_url(mut self, url: String) -> Result<Self> {
+        if url.trim().is_empty() {
+            return Err(DcexError::InvalidInput(
+                "prediction base URL cannot be empty".into(),
+            ));
+        }
+        self.prediction_base_url = url.trim_end_matches('/').into();
+        Ok(self)
+    }
+    pub(super) async fn prediction_request(
+        &self,
+        method: HttpMethod,
+        path: &str,
+        params: Vec<(String, String)>,
+        signed: bool,
+    ) -> Result<ValidatedResponse> {
+        let mut client = self.clone();
+        client.spot_base_url = self.prediction_base_url.clone();
+        client
+            .request(method, AsterMarket::Spot, path, params, signed)
+            .await
+    }
     pub fn with_product_table(mut self, product_table: ProductTable) -> Self {
         self.product_table = Some(Arc::new(product_table));
         self

@@ -2,67 +2,86 @@
 
 **English** | [繁體中文](endpoint-audit.zh_tw.md)
 
-Reviewed: 2026-09-27. Inputs are the supplied endpoint coverage report and the official API documentation inspected during this audit. Scope covers ordinary market data, trading, accounts, internal transfers and risk controls. External withdrawal submission and market-maker/partner-only workflows are excluded.
+Reviewed: 2026-09-27 against the supplied 3,180-row report, official API documentation and current source. Scope includes ordinary market data, trading, accounts, same-account-family transfers, investment and risk controls.
 
-## Verification status
+[Searchable full table](endpoint-coverage.html) · [Per-row JSON and evidence](endpoint-coverage-ledger.json) · [Remaining items](endpoint-recheck.md) · [New method index](endpoint-methods.md)
 
-**Offline validation passed.** `cargo test --workspace --all-features`: 639 passed (636 core tests and 3 interface/safety tests); 53 live tests intentionally ignored. After rebuilding and installing the native extension from this source, `pytest tests/unit` passed all 10,993 tests with no failures or skips. Ruff lint/format, Rust format and Pyright passed (0 type errors). No orders or account administration operations were sent to live exchanges. Offline tests check routes, verbs, types, signatures and response handling; they do not establish account eligibility or current server availability.
+## Coverage status
 
-**Coverage correction: implementation is not complete.** The recheck found missing read-only account queries, Arcus api-meta, KuCoin margin stop cancellation and additional families. Passing tests do not establish completion of every report row. See [remaining work](endpoint-recheck.md).
+**Every row has a disposition; implementation is not complete.** Rows may duplicate or group operations and cannot be converted into an official endpoint coverage percentage.
 
-## Exchanges
+| Status | Rows | Meaning |
+| --- | ---: | --- |
+| `implemented` | 2838 | Rust and Python sync/async wrapper and route evidence |
+| `protocol` | 173 | Generic async WS protocol support, not dedicated coverage of every topic |
+| `superseded` | 37 | Older route replaced by a current API; see row-level mapping |
+| `excluded` | 111 | Excluded under the agreed scope |
+| `unavailable` | 9 | Retired, under maintenance or without a usable documented interface |
+| `blocked` | 10 | Required specification or eligibility remains unconfirmed |
+| `partial` | 2 | Grouped row partly implemented with a documented gap |
 
-Counts below are public REST/signing convenience methods, including aliases and separate operations, not percentages of official endpoint coverage. Rust exposes the corresponding named dispatch and typed request builders; binary downloads and offline signing have dedicated methods. See the [new-method index](endpoint-methods.md).
+## Exchanges and Python methods
 
-| Exchange / official docs | Python sync | Python async | New methods | Areas added or expanded |
-| --- | ---: | ---: | ---: | --- |
-| [Binance](https://developers.binance.com/) | 566 | 566 | 257 | Spot order lists and cancel/replace; USD-M/COIN-M and PM risk; SAPI account, transfers, conversion; TWAP/VP; WS trading |
-| [Bybit](https://bybit-exchange.github.io/docs/v5/intro) | 249 | 249 | 79 | Account risk, collateral, position moves, batch trading, historical data and PRO rate limits |
-| [OKX](https://www.okx.com/docs-v5/en/) | 266 | 266 | 90 | Algo orders, spreads, margin/portfolio simulation, position moves, conversion, subaccounts and RFQ taker operations |
-| [Bitget](https://www.bitget.com/api-doc/common/intro) | 352 | 352 | 214 | Classic and UTA account/risk, batch operations, plans, internal transfers, quotas, subaccount administration and WS trading |
-| [Kraken](https://docs.kraken.com/api-reference/) | 117 | 117 | 51 | Spot batch orders and exports; Futures risk, history, analytics and subaccounts; Spot WS trading and Futures streams |
-| [MEXC](https://www.mexc.com/api-docs/) | 141 | 141 | 21 | Spot and contract market/account controls, conversion and contract WS subscriptions |
-| [BingX](https://bingx-api.github.io/docs/) | 165 | 165 | 76 | USD-M and COIN-M controls; spot OCO/cancel-replace; report bytes; COIN-M WS |
-| [KuCoin](https://www.kucoin.com/docs-new) | 295 | 295 | 179 | Classic spot/margin/futures and UTA trading/risk, batch orders, conversion and subaccounts |
-| [Hyperliquid](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) | 65 | 65 | 19 | Market/account information, trading controls and caller-signed WS actions |
-| [Lighter](https://github.com/elliottech/lighter-python) | 89 | 89 | 18 | Grouped orders, account/asset modes, subaccounts, key rotation, read-only tokens, deposits and signed WS submissions |
-| [Backpack](https://docs.backpack.exchange/) | 70 | 70 | 6 | Strategy-order lifecycle and self-trade prevention |
-| [Aster](https://github.com/asterdex/api-docs) | 102 | 102 | 14 | V3 account/market queries, guarded cancellation, internal transfers, asset exchange and caller-signed wallet administration |
-| [Extended](https://api.docs.extended.exchange/) | 59 | 59 | 18 | Portfolio funding, interest/drawdown analytics and RFQ orderbook stream |
-| [Ondo](https://docs.ondoperps.xyz/api-reference) | 74 | 74 | 5 | Perpetual market/account/trade endpoints, SIWE login and JWT invalidation |
-| [Arcus](https://docs.arcus.xyz/api-reference) | 46 | 46 | 22 | Perps queries, TP/SL grouping, signed WS request construction and wallet-authorized API keys |
+Counts include public convenience methods, aliases and signing helpers, not official endpoints. Additions are relative to `d0bbf8b0`. Sync/async method-name sets were checked for equality.
 
-## Limitations and unwrapped areas
+| Exchange / official docs | Sync | Async | New | Implemented rows | Protocol rows | Blocked / partial |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| [binance](https://developers.binance.com/en/docs) | 645 | 645 | 335 | 645 | 12 | 0 / 1 |
+| [bybit](https://bybit-exchange.github.io/docs/v5/intro) | 301 | 301 | 130 | 287 | 23 | 0 / 0 |
+| [okx](https://www.okx.com/docs-v5/en/#overview-rest-authentication-making-requests) | 378 | 378 | 201 | 361 | 0 | 0 / 0 |
+| [bitget](https://www.bitget.com/docs/catalog/classic-contract-market/classic-contract-market) | 400 | 400 | 261 | 380 | 19 | 0 / 0 |
+| [bingx](https://github.com/BingX-API/api-ai-skills) | 169 | 169 | 79 | 149 | 11 | 1 / 0 |
+| [kraken](https://docs.kraken.com/api-reference/) | 130 | 130 | 63 | 97 | 29 | 1 / 0 |
+| [mexc](https://www.mexc.com/api-docs/spot-v3/introduction) | 156 | 156 | 35 | 128 | 26 | 0 / 0 |
+| [kucoin](https://www.kucoin.com/docs-new/v2/rest/ua/get-announcements) | 311 | 311 | 194 | 292 | 4 | 1 / 0 |
+| [hyperliquid](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api) | 91 | 91 | 44 | 63 | 23 | 0 / 0 |
+| [lighter](https://apidocs.lighter.xyz/) | 122 | 122 | 49 | 80 | 14 | 1 / 1 |
+| [backpack](https://docs.backpack.exchange/#tag/Account) | 81 | 81 | 16 | 77 | 0 | 1 / 0 |
+| [aster](https://github.com/asterdex/api-docs) | 135 | 135 | 46 | 107 | 2 | 5 / 0 |
+| [extended](https://api.docs.extended.exchange/) | 64 | 64 | 22 | 47 | 3 | 0 / 0 |
+| [ondo](https://docs.ondoperps.xyz/api-reference) | 77 | 77 | 5 | 70 | 3 | 0 / 0 |
+| [arcus](https://docs.arcus.xyz/api-reference) | 58 | 58 | 31 | 55 | 4 | 0 / 0 |
 
-| Item | Status and reason |
+## Main additions in this completion pass
+
+- **Binance:** Subaccounts/account administration, deposit questionnaires/read-only history, PM Earn and isolated-margin enable/disable; multi-market WS profiles, COIN-M time and caller-token subscriptions.
+- **Bybit / OKX / Bitget:** Loans, leveraged tokens and server time; grid, DCA, Signal, recurring/copy trading; UTA grid and Reality fundamentals.
+- **Kraken / MEXC / KuCoin / BingX:** Kraken EditOrder, charts, market history and pool statistics; MEXC STP, subaccount keys, deposits and listen keys; KuCoin UTA/OES/OTC and read-only reconciliation.
+- **Hyperliquid / Lighter:** Info queries, pools, staking and account abstraction; Lighter same-master transfers, leases, explorer, exports and maker-only API keys.
+- **Backpack / Aster / Extended / Arcus:** Backpack vault/prediction/borrow-lend; Aster prediction; Extended charts/interest/vaults; Arcus api-meta and leaderboard.
+
+## Binance WebSocket market selection
+
+`dcex.ws.binance.PublicClient(profile=...)`:
+
+| Profile | Base URL |
 | --- | --- |
-| External withdrawal submission, transfers outside an account family, broker/affiliate and MM-only operations | Excluded by scope; read-only withdrawal history is separate and remains partially unwrapped. |
-| Kraken legacy Futures fee schedules | Officially deprecated: values no longer reflect actual fees from 2026-06-22. Use Spot GetTradeVolume. |
-| Kraken portfolio simulation | Wrapped, but officially limited to pre-production. Configure the appropriate base URL. |
-| Kraken assignment programs / off-book RFQ administration | Not wrapped; not counted as supported ordinary order endpoints. |
-| OKX SBE binary orderbook | REST snapshot bytes are wrapped with get_sbe_orderbook; decode template 1006 with the official versioned XML schema. No built-in SBE decoder. |
-| Lighter historicalTrades export | Current official request schema is unknown. It was absent from the inspected current SDK; no guessed route or fields were added. |
-| Binance COIN-M algo, legacy BingX spot/time and obsolete report paths | Items not confirmed in current official documentation were not guessed. Documented market and trading paths are supported separately. |
-| Earn/staking/public pools, lending investment products, referral/leasing, prediction markets and explorer data | Not completed in this expansion. Classify each operation against the agreed exclusions; these product families were not collectively excluded by the user. See the remaining-work report. |
+| `spot` (default) | `wss://stream.binance.com:9443/ws` |
+| `futures_public`, `options_public` | `wss://fstream.binance.com/public/ws` |
+| `futures_market`, `options_market` | `wss://fstream.binance.com/market/ws` |
+| `coin_futures` | `wss://dstream.binance.com/ws` |
 
-This does not claim coverage of every exchange business or protocol. Combined report rows, dynamic paths and aliases need individual interpretation; literal path counts are not a coverage percentage.
+Futures depth/bookTicker use public; other market data use market on a separate connection. Options allow 200 subscriptions per connection. Pass official stream names to `subscribe([...])`. Rust uses `BinancePublicWebSocket::with_profile(profile, timeout)`.
 
-## Operational details
+`PrivateClient(profile=...)` supports `futures` (default), `coin_futures`, `options`, `portfolio_margin` and `margin_risk`. Rust uses `BinancePrivateWebSocket::with_profile(http_client, profile, timeout, base_url)`. Listen-key create/renew/delete are supported; callers must schedule `keep_alive()`. `margin_risk` only covers cross-margin risk events. For trading events, use `SpotApiClient.subscribe_user_data_listen_token(token)`. Margin token creation REST authentication remains unconfirmed; callers must obtain and resubscribe with a fresh token before expiration.
 
-- Arcus API key creation/revocation, Aster wallet administration and Lighter key rotation preserve caller wallet authorization. Trading API keys cannot replace wallet signatures.
-- Lighter `change_api_key_signed` requires an explicit nonce and the official `Register Lighter Account` wallet signature. Recreate the client with the new key after confirmed rotation.
-- Binance PM/PM Pro, Bybit PRO quotas and Kraken institutional subaccounts remain subject to exchange account eligibility.
-- Bitget position moves affect pending orders on both accounts. API key administration and JWT invalidation alter account access.
-- Kraken exports return ZIP bytes; BingX income exports return Excel bytes. Do not decode them as JSON.
-- KuCoin convert accepts decimal strings and preserves them as JSON numbers. Do not convert inputs to floats first. Futures batch cancellation preserves its DELETE JSON body and includes those exact bytes in the signature.
+[USD-M stream docs](https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect) · [Margin token docs](https://developers.binance.com/en/docs/products/margin-trading/listen-token-data-stream)
 
-## Test locations
+## Limits and verification
 
-Rust: `crates/dcex/src/exchanges/*/tests*`. Python: `tests/unit/test_*_endpoint_coverage.py`, `test_*risk*`, `test_ws_*` and binary export tests. Signing tests use local dummy credentials and local HTTP/WS peers.
+<!-- VERIFICATION -->
+Rust `cargo test --workspace --all-features`: **656 passed**, **53 live tests ignored**. The native extension was rebuilt and installed in the project virtual environment.
 
-## Specific official references
+Python full collection: **12,818 unique tests**, assigned across eight disjoint groups with their union checked against the complete collection. The first run had 12,810 passes and eight incorrect test expectations (public Kraken authentication and Binance exception types). After correcting these expectations, all **315 affected Kraken/Binance tests passed**. A final binding adjustment preserved `ValueError` for empty Binance credentials; all **38 Binance WS tests passed** against that rebuilt extension. There are no outstanding failures from these runs.
 
-- [Kraken Futures fee schedules](https://docs.kraken.com/api-reference/fee-schedules/get-fee-schedules)
-- [Kraken portfolio simulation](https://docs.kraken.com/api-reference/account-information/calculate-portfolio-margin-pnl-and-greeks)
-- [Lighter transaction definitions](https://github.com/elliottech/lighter-go/tree/main/types/txtypes)
-- [Arcus API key onboarding](https://docs.arcus.xyz/api-reference/onboarding/create-api-key)
+Ruff lint and format checks passed for the 73 changed Python files; `pyright dcex` reported 0 errors and 0 warnings. Rust format, Git whitespace checks, the 3,180-row ledger totals and local documentation links passed validation.
+<!-- /VERIFICATION -->
+
+No live orders or account administration operations were submitted. Offline tests verify routes, verbs, parameters, signatures, WS messages and response handling; they do not establish live eligibility or availability.
+
+- OKX SBE returns raw bytes without a built-in decoder.
+- Lighter explorer accepts `explorer_base_url`; historical exports require authorization and never automatically pay a fee.
+- Wallet-authorized operations retain caller-provided signatures; Arcus userPreferences DELETE requires caller-provided authentication headers.
+- External withdrawal/control and MM/partner-only operations are excluded; read-only history is not blanket-excluded.
+
+Source report SHA-256: `6479d7c578f35b2bd9b6a243c37b239dbea399f17054dbecd1edfe98ffd92e07`.

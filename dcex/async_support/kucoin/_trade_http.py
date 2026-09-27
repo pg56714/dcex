@@ -2966,3 +2966,175 @@ class TradeHTTP(HTTPManager):
                 password=password, remarks=remarks, subName=sub_name, access=access, mode=mode
             ),
         )
+
+    async def get_withdrawal_history_by_id(self, *, withdrawal_id: str) -> dict[str, Any]:
+        """
+        GET /api/v1/withdrawals/{withdrawalId}.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-by-id
+        """
+        return await self._native_private(
+            "get_withdrawal_history_by_id", self._native_params(withdrawalId=withdrawal_id)
+        )
+
+    async def get_withdrawal_history(
+        self,
+        *,
+        currency: str,
+        status: str | None = None,
+        start_at: int | None = None,
+        end_at: int | None = None,
+        current_page: int | None = None,
+        page_size: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/v1/withdrawals.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-history
+        """
+        return await self._native_private(
+            "get_withdrawal_history",
+            self._native_params(
+                currency=currency,
+                status=status,
+                startAt=start_at,
+                endAt=end_at,
+                currentPage=current_page,
+                pageSize=page_size,
+            ),
+        )
+
+    async def get_withdrawal_quotas(
+        self, *, currency: str, chain: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /api/v1/withdrawals/quotas.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-quotas
+        """
+        return await self._native_private(
+            "get_withdrawal_quotas", self._native_params(currency=currency, chain=chain)
+        )
+
+    async def get_loan_info(self) -> dict[str, Any]:
+        """
+        GET /api/v1/otc-loan/loan.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/vip-lending/get-account-detail
+        """
+        return await self._native_private("get_loan_info", self._native_params())
+
+    async def get_accounts(self) -> dict[str, Any]:
+        """
+        GET /api/v1/otc-loan/accounts.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/vip-lending/get-accounts
+        """
+        return await self._native_private("get_accounts", self._native_params())
+
+    async def get_discount_rate_configs(self) -> dict[str, Any]:
+        """
+        GET /api/v1/otc-loan/discount-rate-configs.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/vip-lending/get-collateral-ratio
+        """
+        return await self._native_private("get_discount_rate_configs", self._native_params())
+
+    async def get_uta_oes_custody_quota(
+        self, *, custodian: str | None = None, currency: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /api/ua/v2/oes/custody-quota.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/get-oes-custody-quota
+        """
+        return await self._native_private(
+            "get_uta_oes_custody_quota", self._native_params(custodian=custodian, currency=currency)
+        )
+
+    async def get_uta_accounts(self, *, account_type: str | None = None) -> dict[str, Any]:
+        """
+        GET /api/ua/v2/otc-loan/account.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/vip-lending/get-accounts
+        """
+        return await self._native_private(
+            "get_uta_accounts", self._native_params(accountType=account_type)
+        )
+
+    async def get_uta_discount_rate_configs(
+        self, *, account_type: str | None = None
+    ) -> dict[str, Any]:
+        """
+        GET /api/ua/v2/otc-loan/discount-rate.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/vip-lending/get-collateral-ratio
+        """
+        return await self._native_private(
+            "get_uta_discount_rate_configs", self._native_params(accountType=account_type)
+        )
+
+    async def get_uta_loan_info(self, *, account_type: str | None = None) -> dict[str, Any]:
+        """
+        GET /api/ua/v2/otc-loan/loan.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/vip-lending/get-loan-info
+        """
+        return await self._native_private(
+            "get_uta_loan_info", self._native_params(accountType=account_type)
+        )
+
+    async def get_uta_withdrawal_history(
+        self,
+        *,
+        currency: str | None = None,
+        id: str | None = None,
+        status: str | None = None,
+        start_at: int | None = None,
+        end_at: int | None = None,
+        current_page: int | None = None,
+        page_size: int | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/ua/v2/asset/withdrawal/history.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal-history
+        """
+        return await self._native_private(
+            "get_uta_withdrawal_history",
+            self._native_params(
+                currency=currency,
+                id=id,
+                status=status,
+                startAt=start_at,
+                endAt=end_at,
+                currentPage=current_page,
+                pageSize=page_size,
+            ),
+        )
+
+    async def get_uta_withdrawal_quotas(
+        self,
+        *,
+        currency: str,
+        withdraw_type: str,
+        chain: str | None = None,
+        is_inner: bool | None = None,
+    ) -> dict[str, Any]:
+        """
+        GET /api/ua/v2/withdrawals/quotas.
+
+        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal-quota
+        """
+        return await self._native_private(
+            "get_uta_withdrawal_quotas",
+            self._native_params(
+                chain=chain, currency=currency, isInner=is_inner, withdrawType=withdraw_type
+            ),
+        )
+
+    async def set_uta_account_mode(self, *, account_type: str) -> dict[str, Any]:
+        """Set the account mode; exchange migration eligibility applies."""
+        return await self._native_private(
+            "set_uta_account_mode", self._native_params(accountType=account_type)
+        )

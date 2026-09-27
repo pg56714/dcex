@@ -66,6 +66,18 @@ const SWAP: &str = "BTC-USDT-SWAP";
 
 const PUBLIC_CASES: &[Case] = &[
     public(
+        "get_currencies_v3",
+        Host::Spot,
+        &[],
+        "GET /api/v3/currencies",
+    ),
+    public(
+        "get_uta_oe_scurrency",
+        Host::Spot,
+        &[],
+        "GET /api/ua/v2/oes/currency",
+    ),
+    public(
         "get_spot_24h_statistics",
         Host::Spot,
         &[("symbol", "BTC-USDT")],
@@ -472,6 +484,84 @@ const PUBLIC_CASES: &[Case] = &[
 ];
 
 const PRIVATE_CASES: &[Case] = &[
+    private(
+        "set_uta_account_mode",
+        Host::Spot,
+        &[("accountType", "UNIFIED")],
+        "POST /api/ua/v2/account/mode",
+    ),
+    private(
+        "get_withdrawal_history_by_id",
+        Host::Spot,
+        &[("withdrawalId", "example")],
+        "GET /api/v1/withdrawals/example",
+    ),
+    private(
+        "get_withdrawal_history",
+        Host::Spot,
+        &[("currency", "USDT")],
+        "GET /api/v1/withdrawals?currency=USDT",
+    ),
+    private(
+        "get_withdrawal_quotas",
+        Host::Spot,
+        &[("currency", "USDT")],
+        "GET /api/v1/withdrawals/quotas?currency=USDT",
+    ),
+    private(
+        "get_loan_info",
+        Host::Spot,
+        &[],
+        "GET /api/v1/otc-loan/loan",
+    ),
+    private(
+        "get_accounts",
+        Host::Spot,
+        &[],
+        "GET /api/v1/otc-loan/accounts",
+    ),
+    private(
+        "get_discount_rate_configs",
+        Host::Spot,
+        &[],
+        "GET /api/v1/otc-loan/discount-rate-configs",
+    ),
+    private(
+        "get_uta_oes_custody_quota",
+        Host::Spot,
+        &[],
+        "GET /api/ua/v2/oes/custody-quota",
+    ),
+    private(
+        "get_uta_accounts",
+        Host::Spot,
+        &[],
+        "GET /api/ua/v2/otc-loan/account",
+    ),
+    private(
+        "get_uta_discount_rate_configs",
+        Host::Spot,
+        &[],
+        "GET /api/ua/v2/otc-loan/discount-rate",
+    ),
+    private(
+        "get_uta_loan_info",
+        Host::Spot,
+        &[],
+        "GET /api/ua/v2/otc-loan/loan",
+    ),
+    private(
+        "get_uta_withdrawal_history",
+        Host::Spot,
+        &[],
+        "GET /api/ua/v2/asset/withdrawal/history",
+    ),
+    private(
+        "get_uta_withdrawal_quotas",
+        Host::Spot,
+        &[("currency", "USDT"), ("withdrawType", "ADDRESS")],
+        "GET /api/ua/v2/withdrawals/quotas?currency=USDT&withdrawType=ADDRESS",
+    ),
     private("get_account_info", Host::Spot, &[], "GET /api/v2/user-info"),
     private(
         "get_spot_account_type",

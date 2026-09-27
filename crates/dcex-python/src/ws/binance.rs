@@ -115,18 +115,22 @@ impl PythonBinanceEquityWebSocketClient {
 #[pymethods]
 impl PythonBinancePublicWebSocketClient {
     #[new]
-    #[pyo3(signature = (timeout=10.0, base_url=None))]
-    fn new(timeout: f64, base_url: Option<String>) -> PyResult<Self> {
+    #[pyo3(signature = (timeout=10.0, base_url=None, profile="spot"))]
+    fn new(timeout: f64, base_url: Option<String>, profile: &str) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
-        let client = if let Some(base_url) = base_url {
-            BinancePublicWebSocket::with_url(base_url, timeout)
-        } else {
-            BinancePublicWebSocket::new(timeout)
-        }
-        .map_err(to_py_runtime_error)?;
+        let client = BinancePublicWebSocket::with_profile_url(profile, base_url, timeout)
+            .map_err(to_py_runtime_error)?;
         Ok(Self {
             client: Arc::new(Mutex::new(client)),
         })
+    }
+
+    fn url(&self) -> PyResult<String> {
+        let client = self
+            .client
+            .try_lock()
+            .map_err(|_| PyRuntimeError::new_err("Binance WebSocket client is busy"))?;
+        Ok(client.url().to_string())
     }
 
     fn set_product_table(&self, table: PyRef<'_, PythonProductTable>) -> PyResult<()> {
@@ -293,7 +297,11 @@ impl PythonBinancePrivateWebSocketClient {
         timeout=10.0,
         spot_http_base_url=None,
         futures_http_base_url=None,
-        ws_base_url=None
+        ws_base_url=None,
+        profile="futures",
+        coin_futures_http_base_url=None,
+        options_http_base_url=None,
+        portfolio_margin_http_base_url=None
     ))]
     fn new(
         api_key: String,
@@ -302,22 +310,35 @@ impl PythonBinancePrivateWebSocketClient {
         spot_http_base_url: Option<String>,
         futures_http_base_url: Option<String>,
         ws_base_url: Option<String>,
+        profile: &str,
+        coin_futures_http_base_url: Option<String>,
+        options_http_base_url: Option<String>,
+        portfolio_margin_http_base_url: Option<String>,
     ) -> PyResult<Self> {
         let timeout = websocket_timeout(timeout)?;
-        let client = match (spot_http_base_url, futures_http_base_url, ws_base_url) {
-            (None, None, None) => BinancePrivateWebSocket::new(api_key, api_secret, timeout),
-            (spot_http_base_url, futures_http_base_url, ws_base_url) => {
-                BinancePrivateWebSocket::with_urls(
-                    api_key,
-                    api_secret,
-                    timeout,
-                    spot_http_base_url.unwrap_or_else(|| "https://api.binance.com".to_string()),
-                    futures_http_base_url.unwrap_or_else(|| "https://fapi.binance.com".to_string()),
-                    ws_base_url.unwrap_or_else(|| "wss://fstream.binance.com/private".to_string()),
-                )
-            }
+        if api_key.trim().is_empty() || api_secret.trim().is_empty() {
+            return Err(PyValueError::new_err(
+                "Binance API key and secret must not be empty.",
+            ));
         }
+        let mut http_client = dcex::exchanges::binance::BinanceClient::with_all_base_urls(
+            Some(api_key),
+            Some(api_secret),
+            timeout,
+            spot_http_base_url.unwrap_or_else(|| "https://api.binance.com".into()),
+            futures_http_base_url.unwrap_or_else(|| "https://fapi.binance.com".into()),
+            options_http_base_url.unwrap_or_else(|| "https://eapi.binance.com".into()),
+        )
         .map_err(to_py_runtime_error)?;
+        if let Some(url) = coin_futures_http_base_url {
+            http_client = http_client.with_coin_futures_base_url(url);
+        }
+        if let Some(url) = portfolio_margin_http_base_url {
+            http_client = http_client.with_portfolio_margin_base_url(url);
+        }
+        let client =
+            BinancePrivateWebSocket::with_profile(http_client, profile, timeout, ws_base_url)
+                .map_err(to_py_runtime_error)?;
         Ok(Self {
             client: Arc::new(Mutex::new(client)),
         })
