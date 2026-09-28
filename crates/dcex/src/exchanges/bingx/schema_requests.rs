@@ -33,7 +33,15 @@ impl BingxClient {
         }
         params.ensure_allowed(e.fields)?;
         let supplied = params.only(e.fields);
-        crate::exchanges::schema::validate_pairs(&supplied)?;
+        let scalar_fields: Vec<_> = supplied
+            .iter()
+            .filter(|(key, _)| {
+                name != "place_coin_swap_order"
+                    || !matches!(key.as_str(), "takeProfit" | "stopLoss")
+            })
+            .cloned()
+            .collect();
+        crate::exchanges::schema::validate_pairs(&scalar_fields)?;
         if supplied
             .iter()
             .map(|(k, _)| k)
@@ -214,12 +222,15 @@ impl BingxClient {
                         if (k == "stopPrice"
                             || ["STOP", "TAKE_PROFIT"].contains(&kind)
                             || obj.contains_key(k))
-                            && !obj
-                                .get(k)
-                                .and_then(Value::as_f64)
-                                .is_some_and(|v| v.is_finite() && v > 0.0)
+                            && !obj.get(k).is_some_and(|v| {
+                                let text = v
+                                    .as_str()
+                                    .map(str::to_owned)
+                                    .unwrap_or_else(|| v.to_string());
+                                crate::common::is_positive_plain_decimal(&text)
+                            })
                         {
-                            return Err(invalid("TP/SL prices must be positive JSON numbers"));
+                            return Err(invalid("TP/SL prices must be positive plain decimals"));
                         }
                     }
                     if obj.get("workingType").is_some_and(|v| {
@@ -252,6 +263,32 @@ impl BingxClient {
             }
         }
         let mut query = params.only(e.fields);
+        if name == "place_coin_swap_order" {
+            static COIN_SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(|| {
+                serde_json::from_str(include_str!("schemas/coin_futures.json"))
+                    .expect("coin schema")
+            });
+            let order = COIN_SCHEMA
+                .as_array()
+                .expect("coin endpoints")
+                .iter()
+                .find(|row| row["name"] == "post_cswap_v2_trade_order")
+                .expect("coin order schema");
+            for (key, raw) in &mut query {
+                if matches!(key.as_str(), "takeProfit" | "stopLoss") {
+                    let field = order["fields"]
+                        .as_array()
+                        .expect("coin fields")
+                        .iter()
+                        .find(|field| field["name"] == *key)
+                        .expect("TP/SL schema");
+                    let value =
+                        serde_json::from_str(raw).map_err(|_| invalid("invalid TP/SL JSON"))?;
+                    *raw = crate::exchanges::schema::encode_shape(value, &field["schema"], key)?
+                        .to_string();
+                }
+            }
+        }
         query.retain(|(k, _)| k != "product_symbol");
         if let Some(product) = params.get("product_symbol") {
             let symbol = self.exchange_symbol(product)?;

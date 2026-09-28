@@ -2136,3 +2136,39 @@ fn sided_swap_helpers_require_and_preserve_explicit_position_side() {
         }
     }
 }
+
+#[test]
+fn coin_swap_attached_tpsl_preserves_fractional_json_numbers() {
+    let (url, receiver) = recording_server();
+    let client = signed_client(url);
+    private_call(
+        &client,
+        "place_coin_swap_order",
+        &[
+            ("product_symbol", "BTC-USD-SWAP"),
+            ("side", "BUY"),
+            ("type_", "MARKET"),
+            ("quantity", "1"),
+            (
+                "takeProfit",
+                r#"{"type":"TAKE_PROFIT","stopPrice":"61000.5","price":"61000.125000000000000001"}"#,
+            ),
+            (
+                "stopLoss",
+                r#"{"type":"STOP_MARKET","stopPrice":"59000.75"}"#,
+            ),
+        ],
+    );
+    let request = next(&receiver, "place_coin_swap_order");
+    assert_eq!(request.method, "POST");
+    assert_eq!(request.path, "/openApi/cswap/v1/trade/order");
+    for (field, key, expected) in [
+        ("takeProfit", "stopPrice", "61000.5"),
+        ("takeProfit", "price", "61000.125000000000000001"),
+        ("stopLoss", "stopPrice", "59000.75"),
+    ] {
+        let value: serde_json::Value = serde_json::from_str(request.get(field).unwrap()).unwrap();
+        assert!(value[key].is_number());
+        assert_eq!(value[key].to_string(), expected);
+    }
+}
