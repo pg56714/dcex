@@ -18,7 +18,6 @@ API withdrawals have no second confirmation; they execute on submit. Trading API
 | 1367 | okx | POST /api/v5/finance/stable-rewards/quote | `unavailable` | [Docs](https://www.okx.com/docs-v5/en/#financial-product-stable-rewards) |
 | 1368 | okx | POST /api/v5/finance/stable-rewards/trade | `unavailable` | [Docs](https://www.okx.com/docs-v5/en/#financial-product-stable-rewards) |
 | 1369 | okx | GET /api/v5/finance/stable-rewards/subscribe-redeem-history | `unavailable` | [Docs](https://www.okx.com/docs-v5/en/#financial-product-stable-rewards) |
-| 1906 | bingx | GET /openApi/spot/v1/server/time | `unverified` | [Docs](https://bingx-api.github.io/docs-v3/#/en/Spot/Market%20Data/Server%20Time) |
 | 1986 | bingx | - | `unavailable` | [Docs](https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/swap-ws-account/api-reference.md#L3) |
 | 2065 | kraken | GET /derivatives/api/v3/feeschedules | `unavailable` | [Docs](https://docs.kraken.com/api-reference/fee-schedules/get-fee-schedules) |
 | 2066 | kraken | GET /derivatives/api/v3/feeschedules/volumes | `unavailable` | [Docs](https://docs.kraken.com/api-reference/fee-schedules/get-fee-schedule-volumes) |
@@ -71,6 +70,7 @@ API withdrawals have no second confirmation; they execute on submit. Trading API
 | 4245 | aster | WS How to correctly maintain a local copy of an order book (channel=How to correctly maintain a local copy of an order book) | `unavailable` | [Docs](https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-prediction-api.md#L2427) |
 | 4258 | aster | WS How to correctly maintain a local copy of an order book (channel=How to correctly maintain a local copy of an order book) | `unavailable` | [Docs](https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-testnet.md#L2056) |
 | 4271 | aster | WS How to correctly maintain a local copy of an order book (channel=How to correctly maintain a local copy of an order book) | `unavailable` | [Docs](https://github.com/asterdex/api-docs/blob/eeddec8d97cd1250351f62b976973ae2a0d583c5/V3%28Recommended%29/EN/aster-finance-spot-api-v3.md#L2058) |
+| 4378 | binance | WS /session.logon (channel=session_logon) | `unavailable` | [Docs](https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/ws-api/auth#session-logon) |
 | 4711 | mexc | WS /ws (channel=enum-definitions) | `unavailable` | [Docs](https://www.mexc.com/api-docs/futures/websocket-api/enum-definitions) |
 | 4712 | mexc | WS /ws (channel=incremental-order-book-maintenance-mechanism) | `unavailable` | [Docs](https://www.mexc.com/api-docs/futures/websocket-api/incremental-order-book-maintenance-mechanism) |
 | 4718 | mexc | WS /ws (channel=how-to-properly-maintain-a-local-copy-of-the-order-book) | `unavailable` | [Docs](https://www.mexc.com/api-docs/spot-v3/websocket-market-streams/how-to-properly-maintain-a-local-copy-of-the-order-book) |

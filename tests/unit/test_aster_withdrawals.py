@@ -23,7 +23,7 @@ async def test_aster_futures_withdraw_signature_chain_id(asynchronous):
         receiver="0x" + "22" * 20,
         user_nonce="123",
         user_signature="0x" + "11" * 65,
-        signature_chain_id="0x38",
+        signature_chain_id=56,
     )
     with _http_server() as (base, received):
         client = (AsyncClient if asynchronous else Client)(**_client_kwargs(base))
@@ -39,7 +39,7 @@ async def test_aster_futures_withdraw_signature_chain_id(asynchronous):
     request = next(r for r in requests if "user-withdraw" in r["path"])
     assert request["method"] == "POST"
     params = dict(parse_qsl(request["body"] or urlsplit(request["path"]).query))
-    assert params["signatureChainId"] == "0x38"
+    assert params["signatureChainId"] == "56"
     assert params["userNonce"] == "123"
 
 

@@ -5,6 +5,7 @@
     "path": "/api/v3/cfd/account/fund-detail",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#get-cfd-fund-detail",
     "summary": "Get Fund Detail"
@@ -15,6 +16,7 @@
     "path": "/api/v3/cfd/account/transfer",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -74,6 +76,7 @@
     "path": "/api/v3/cfd/account/transfer-records",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "transferId",
@@ -150,6 +153,7 @@
     "path": "/api/v3/cfd/account/financial-records",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "type",
@@ -210,6 +214,7 @@
     "path": "/api/v3/cfd/account/instruments",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -232,6 +237,7 @@
     "path": "/api/v3/cfd/market/tickers",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -254,6 +260,7 @@
     "path": "/api/v3/cfd/market/history-candlestick",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -331,6 +338,7 @@
     "path": "/api/v3/cfd/trade/place-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -417,6 +425,7 @@
     "path": "/api/v3/cfd/trade/modify-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -467,6 +476,7 @@
     "path": "/api/v3/cfd/trade/cancel-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -490,6 +500,7 @@
     "path": "/api/v3/cfd/trade/cancel-all",
     "public": false,
     "confirm": true,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -510,6 +521,7 @@
     "path": "/api/v3/cfd/trade/close-positions",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "positionId",
@@ -545,6 +557,7 @@
     "path": "/api/v3/cfd/trade/close-all-positions",
     "public": false,
     "confirm": true,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -565,6 +578,7 @@
     "path": "/api/v3/cfd/trade/unfilled-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -595,6 +609,7 @@
     "path": "/api/v3/cfd/trade/history-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -666,6 +681,7 @@
     "path": "/api/v3/cfd/trade/current-positions",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",

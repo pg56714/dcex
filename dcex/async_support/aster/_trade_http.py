@@ -1284,7 +1284,7 @@ class TradeHTTP(HTTPManager):
         user_nonce: str,
         user_signature: str,
         signature_type: str | None = None,
-        signature_chain_id: str | None = None,
+        signature_chain_id: int | None = None,
     ) -> Any:  # noqa: ANN401
         """
         Submit a wallet-authorized futures withdrawal.

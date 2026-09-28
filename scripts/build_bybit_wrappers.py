@@ -56,7 +56,8 @@ def main() -> None:
             ]
             if endpoint["path"] == "/v5/asset/withdraw/create":
                 text += [
-                    "        API withdrawals have no second confirmation; they execute on submit."
+                    "        API withdrawals have no second confirmation; they execute on submit.",
+                    "        With force_chain=2 the recipient may be another Bybit user.",
                 ]
             if endpoint.get("verification_note"):
                 text += textwrap.wrap(
@@ -111,6 +112,12 @@ def main() -> None:
                 for field in endpoint["fields"]
                 if field["required"]
             ]
+            if endpoint["path"] == "/v5/asset/withdraw/create":
+                rust += [
+                    "        /// API withdrawals have no second confirmation; "
+                    "they execute on submit.",
+                    "        /// With forceChain=2 the recipient may be another Bybit user.",
+                ]
             rust += [f"        {endpoint['name']}({', '.join(args)}),"]
         rust += ["    ];"]
     rust += ["}"]

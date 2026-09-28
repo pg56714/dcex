@@ -692,7 +692,9 @@ class TradeHTTP(HTTPManager):
         """
         Transfer between L2 account indices using raw integer amount and fee units.
 
-        Account-family membership is not verified locally. The exchange enforces eligibility.
+        The recipient may be another user. Transfers have no second confirmation;
+        they execute on submit. Account-family membership is not verified locally.
+        The exchange enforces eligibility.
         """
         return self._native_private("transfer_l2_account", self._native_params(**locals()))
 
@@ -713,7 +715,9 @@ class TradeHTTP(HTTPManager):
         """
         Transfer between L2 account indices using raw integer amount and fee units.
 
-        Account-family membership is not verified locally. The exchange enforces eligibility.
+        The recipient may be another user. Transfers have no second confirmation;
+        they execute on submit. Account-family membership is not verified locally.
+        The exchange enforces eligibility.
         """
         return self._native_sign("sign_transfer_l2_account", self._native_params(**locals()))
 

@@ -7,10 +7,10 @@
   "counts": {
     "protocol": 403,
     "partial": 1,
-    "implemented": 3732,
-    "superseded": 650,
-    "unavailable": 18,
-    "unverified": 12,
+    "implemented": 3696,
+    "superseded": 686,
+    "unavailable": 19,
+    "unverified": 11,
     "blocked": 30
   },
   "rows": [
@@ -458,11 +458,12 @@
       "python_sync": null,
       "python_async": true,
       "methods": [],
-      "note": "SpotApiClient/FuturesApiClient/CoinFuturesApiClient exposes schema-checked WS API methods and signed requests; Spot user streams use WS API subscription, not retired REST listenKey.",
+      "note": "SpotApiClient/FuturesApiClient/CoinFuturesApiClient exposes schema-checked WS API methods and signed requests; Spot user streams use WS API subscription, not retired REST listenKey. All native schema methods have request/signature wire cases; session.logon is explicitly rejected because the client supports HMAC rather than Ed25519 session authentication.",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
-        "tests/unit/test_ws_binance_api.py"
+        "tests/unit/test_ws_binance_api.py",
+        "tests/unit/test_ws_binance_schema_wire.py::test_every_schema_method_reaches_wire"
       ],
       "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/ws-api/auth#session-logon",
       "official_sources": [
@@ -542,7 +543,6 @@
         "order_cancel",
         "order_cancel_replace",
         "order_list_cancel",
-        "order_list_place",
         "order_list_place_oco",
         "order_list_place_opo",
         "order_list_place_opoco",
@@ -555,7 +555,6 @@
         "ping",
         "reference_price",
         "reference_price_calculation",
-        "session_logon",
         "session_logout",
         "session_status",
         "sor_order_place",
@@ -585,11 +584,12 @@
       "python_sync": null,
       "python_async": true,
       "methods": [],
-      "note": "SpotApiClient/FuturesApiClient/CoinFuturesApiClient exposes schema-checked WS API methods and signed requests; Spot user streams use WS API subscription, not retired REST listenKey.",
+      "note": "SpotApiClient/FuturesApiClient/CoinFuturesApiClient exposes schema-checked WS API methods and signed requests; Spot user streams use WS API subscription, not retired REST listenKey. All native schema methods have request/signature wire cases; session.logon is explicitly rejected because the client supports HMAC rather than Ed25519 session authentication.",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
-        "tests/unit/test_ws_binance_api.py"
+        "tests/unit/test_ws_binance_api.py",
+        "tests/unit/test_ws_binance_schema_wire.py::test_every_schema_method_reaches_wire"
       ],
       "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/ws-api/account#open-order-lists-status",
       "official_sources": [
@@ -616,19 +616,16 @@
         "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/ws-api/account#order-status"
       ],
       "channels": [
-        "account_information",
         "account_information_v2",
         "cancel_algo_order",
         "cancel_order",
         "close_user_data_stream",
-        "futures_account_balance",
         "futures_account_balance_v2",
         "keepalive_user_data_stream",
         "modify_order",
         "new_algo_order",
         "new_order",
         "order_book",
-        "position_information",
         "position_information_v2",
         "query_order",
         "start_user_data_stream",
@@ -649,11 +646,12 @@
       "python_sync": null,
       "python_async": true,
       "methods": [],
-      "note": "SpotApiClient/FuturesApiClient/CoinFuturesApiClient exposes schema-checked WS API methods and signed requests; Spot user streams use WS API subscription, not retired REST listenKey.",
+      "note": "SpotApiClient/FuturesApiClient/CoinFuturesApiClient exposes schema-checked WS API methods and signed requests; Spot user streams use WS API subscription, not retired REST listenKey. All native schema methods have request/signature wire cases; session.logon is explicitly rejected because the client supports HMAC rather than Ed25519 session authentication.",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
-        "tests/unit/test_ws_binance_api.py"
+        "tests/unit/test_ws_binance_api.py",
+        "tests/unit/test_ws_binance_schema_wire.py::test_every_schema_method_reaches_wire"
       ],
       "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/ws-api/account#account-rate-limits-orders",
       "official_sources": [
@@ -44642,7 +44640,7 @@
       "category": "Spot market",
       "endpoint": "GET /openApi/spot/v1/server/time",
       "source_status": "missing",
-      "status": "unverified",
+      "status": "implemented",
       "rust": true,
       "python_sync": true,
       "python_async": true,
@@ -47265,8 +47263,8 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3589.",
       "evidence": [
-        "dcex/async_support/kraken/_trade_http.py:1256",
-        "dcex/kraken/_trade_http.py:1247",
+        "dcex/async_support/kraken/_trade_http.py::get_spot_export_status",
+        "dcex/kraken/_trade_http.py::get_spot_export_status",
         "tests/unit/test_kraken_endpoint_coverage.py"
       ],
       "official_source": "https://docs.kraken.com/api-reference/account-data/request-export-report",
@@ -48188,10 +48186,10 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3590, 3591.",
       "evidence": [
-        "dcex/async_support/kraken/_market_http.py:285",
-        "dcex/async_support/kraken/_market_http.py:440",
-        "dcex/kraken/_market_http.py:285",
-        "dcex/kraken/_market_http.py:438"
+        "dcex/async_support/kraken/_market_http.py::get_futures_market_analytics",
+        "dcex/async_support/kraken/_market_http.py::get_futures_liquidity_pool_statistics",
+        "dcex/kraken/_market_http.py::get_futures_market_analytics",
+        "dcex/kraken/_market_http.py::get_futures_liquidity_pool_statistics"
       ],
       "official_source": "https://docs.kraken.com/api-reference/analytics/market-analytics"
     },
@@ -48210,12 +48208,12 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3592, 3593, 3594.",
       "evidence": [
-        "dcex/async_support/kraken/_market_http.py:362",
-        "dcex/async_support/kraken/_market_http.py:388",
-        "dcex/async_support/kraken/_market_http.py:414",
-        "dcex/kraken/_market_http.py:360",
-        "dcex/kraken/_market_http.py:386",
-        "dcex/kraken/_market_http.py:412"
+        "dcex/async_support/kraken/_market_http.py::get_futures_market_executions",
+        "dcex/async_support/kraken/_market_http.py::get_futures_market_orders",
+        "dcex/async_support/kraken/_market_http.py::get_futures_market_price",
+        "dcex/kraken/_market_http.py::get_futures_market_executions",
+        "dcex/kraken/_market_http.py::get_futures_market_orders",
+        "dcex/kraken/_market_http.py::get_futures_market_price"
       ],
       "official_source": "https://docs.kraken.com/api-reference/market-history/get-public-execution-events"
     },
@@ -48856,10 +48854,10 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3595, 3596.",
       "evidence": [
-        "dcex/async_support/kraken/_trade_http.py:1212",
-        "dcex/async_support/kraken/_trade_http.py:1223",
-        "dcex/kraken/_trade_http.py:1205",
-        "dcex/kraken/_trade_http.py:1216"
+        "dcex/async_support/kraken/_trade_http.py::get_futures_trading_instruments",
+        "dcex/async_support/kraken/_trade_http.py::get_futures_subaccount_trading_status",
+        "dcex/kraken/_trade_http.py::get_futures_trading_instruments",
+        "dcex/kraken/_trade_http.py::get_futures_subaccount_trading_status"
       ],
       "official_source": "https://docs.kraken.com/api-reference/subaccounts/check-subaccount-trading-status",
       "official_sources": [
@@ -48905,14 +48903,14 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3597, 3598, 3599, 3600.",
       "evidence": [
-        "dcex/async_support/kraken/_trade_http.py:814",
-        "dcex/async_support/kraken/_trade_http.py:844",
-        "dcex/async_support/kraken/_trade_http.py:878",
-        "dcex/async_support/kraken/_trade_http.py:926",
-        "dcex/kraken/_trade_http.py:809",
-        "dcex/kraken/_trade_http.py:839",
-        "dcex/kraken/_trade_http.py:873",
-        "dcex/kraken/_trade_http.py:921"
+        "dcex/async_support/kraken/_trade_http.py::get_futures_account_log",
+        "dcex/async_support/kraken/_trade_http.py::get_futures_execution_events",
+        "dcex/async_support/kraken/_trade_http.py::get_futures_order_events",
+        "dcex/async_support/kraken/_trade_http.py::get_futures_position_events",
+        "dcex/kraken/_trade_http.py::get_futures_account_log",
+        "dcex/kraken/_trade_http.py::get_futures_execution_events",
+        "dcex/kraken/_trade_http.py::get_futures_order_events",
+        "dcex/kraken/_trade_http.py::get_futures_position_events"
       ],
       "official_source": "https://docs.kraken.com/api-reference/account-history/get-execution-events"
     },
@@ -56131,7 +56129,7 @@
       "category": "Classic > Account Info > Trade Fee",
       "endpoint": "GET /api/v1/trade-fees",
       "source_status": "supported",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
@@ -56139,13 +56137,14 @@
         "get_futures_fee_rates",
         "get_spot_fee_rates"
       ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "note": "Same route as row 2394; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/account-info/trade-fee/get-actual-fee-futures",
       "path": "/api/v1/trade-fees",
-      "http_method": "GET"
+      "http_method": "GET",
+      "superseded_by": 2394
     },
     {
       "row": 2396,
@@ -58768,7 +58767,7 @@
       "category": "Classic > Futures Trading > Market Data",
       "endpoint": "GET /api/v1/mark-price/{symbol}/current",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
@@ -58776,13 +58775,14 @@
         "get_futures_mark_price",
         "get_margin_mark_price"
       ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "note": "Same route as row 2455; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-mark-price",
       "path": "/api/v1/mark-price/{symbol}/current",
-      "http_method": "GET"
+      "http_method": "GET",
+      "superseded_by": 2455
     },
     {
       "row": 2510,
@@ -58884,7 +58884,7 @@
       "category": "Classic > Futures Trading > Market Data",
       "endpoint": "GET /api/v1/timestamp",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
@@ -58892,13 +58892,14 @@
         "get_futures_server_time",
         "get_spot_server_time"
       ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "note": "Same route as row 2413; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-server-time",
       "path": "/api/v1/timestamp",
-      "http_method": "GET"
+      "http_method": "GET",
+      "superseded_by": 2413
     },
     {
       "row": 2515,
@@ -58908,7 +58909,7 @@
       "category": "Classic > Futures Trading > Market Data",
       "endpoint": "GET /api/v1/status",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
@@ -58916,13 +58917,14 @@
         "get_futures_service_status",
         "get_spot_service_status"
       ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "note": "Same route as row 2414; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/futures-trading/market-data/get-service-status",
       "path": "/api/v1/status",
-      "http_method": "GET"
+      "http_method": "GET",
+      "superseded_by": 2414
     },
     {
       "row": 2516,
@@ -61763,7 +61765,8 @@
         "place_future_market_buy_order",
         "place_future_market_order",
         "place_future_market_sell_order",
-        "place_order"
+        "place_order",
+        "place_batch_orders"
       ],
       "note": "Hyperliquid /info type or /exchange action; see wire-type/signature fixtures. Signed wallet actions require caller-provided signatures.",
       "evidence": [
@@ -61784,14 +61787,14 @@
       "category": "Order",
       "endpoint": "order (batch: several orders in one action)",
       "source_status": "fixed",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "place_batch_orders"
       ],
-      "note": "Hyperliquid /info type or /exchange action; see wire-type/signature fixtures. Signed wallet actions require caller-provided signatures.",
+      "note": "Same route as row 2633; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_hyperliquid_endpoint_coverage.py"
       ],
@@ -61800,7 +61803,8 @@
       "path": "/exchange",
       "actions": [
         "order"
-      ]
+      ],
+      "superseded_by": 2633
     },
     {
       "row": 2635,
@@ -61815,7 +61819,8 @@
       "python_sync": true,
       "python_async": true,
       "methods": [
-        "cancel_order"
+        "cancel_order",
+        "cancel_batch_orders"
       ],
       "note": "Hyperliquid /info type or /exchange action; see wire-type/signature fixtures. Signed wallet actions require caller-provided signatures.",
       "evidence": [
@@ -61836,14 +61841,14 @@
       "category": "Order",
       "endpoint": "cancel (batch)",
       "source_status": "fixed",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "cancel_batch_orders"
       ],
-      "note": "Hyperliquid /info type or /exchange action; see wire-type/signature fixtures. Signed wallet actions require caller-provided signatures.",
+      "note": "Same route as row 2635; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_hyperliquid_endpoint_coverage.py"
       ],
@@ -61852,7 +61857,8 @@
       "path": "/exchange",
       "actions": [
         "cancel"
-      ]
+      ],
+      "superseded_by": 2635
     },
     {
       "row": 2637,
@@ -64715,32 +64721,32 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3601, 3602, 3603, 3604, 3605, 3606, 3607, 3608, 3609, 3610, 3611, 3612, 3613.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/explorer.rs",
-        "dcex/async_support/lighter/_market_http.py:328",
-        "dcex/async_support/lighter/_market_http.py:346",
-        "dcex/async_support/lighter/_market_http.py:352",
-        "dcex/async_support/lighter/_market_http.py:358",
-        "dcex/async_support/lighter/_market_http.py:362",
-        "dcex/async_support/lighter/_market_http.py:368",
-        "dcex/async_support/lighter/_market_http.py:372",
-        "dcex/async_support/lighter/_market_http.py:378",
-        "dcex/async_support/lighter/_market_http.py:382",
-        "dcex/async_support/lighter/_market_http.py:386",
-        "dcex/async_support/lighter/_market_http.py:395",
-        "dcex/async_support/lighter/_market_http.py:399",
-        "dcex/async_support/lighter/_market_http.py:408",
-        "dcex/lighter/_market_http.py:318",
-        "dcex/lighter/_market_http.py:336",
-        "dcex/lighter/_market_http.py:342",
-        "dcex/lighter/_market_http.py:348",
-        "dcex/lighter/_market_http.py:352",
-        "dcex/lighter/_market_http.py:358",
-        "dcex/lighter/_market_http.py:362",
-        "dcex/lighter/_market_http.py:368",
-        "dcex/lighter/_market_http.py:372",
-        "dcex/lighter/_market_http.py:376",
-        "dcex/lighter/_market_http.py:385",
-        "dcex/lighter/_market_http.py:389",
-        "dcex/lighter/_market_http.py:398",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_account_logs",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_account_positions",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_account_assets",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_batches",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_batch",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_blocks",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_block",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_log",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_markets",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_market_logs",
+        "dcex/async_support/lighter/_market_http.py::search_explorer",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_transaction_stats",
+        "dcex/async_support/lighter/_market_http.py::get_explorer_total",
+        "dcex/lighter/_market_http.py::get_explorer_account_logs",
+        "dcex/lighter/_market_http.py::get_explorer_account_positions",
+        "dcex/lighter/_market_http.py::get_explorer_account_assets",
+        "dcex/lighter/_market_http.py::get_explorer_batches",
+        "dcex/lighter/_market_http.py::get_explorer_batch",
+        "dcex/lighter/_market_http.py::get_explorer_blocks",
+        "dcex/lighter/_market_http.py::get_explorer_block",
+        "dcex/lighter/_market_http.py::get_explorer_log",
+        "dcex/lighter/_market_http.py::get_explorer_markets",
+        "dcex/lighter/_market_http.py::get_explorer_market_logs",
+        "dcex/lighter/_market_http.py::search_explorer",
+        "dcex/lighter/_market_http.py::get_explorer_transaction_stats",
+        "dcex/lighter/_market_http.py::get_explorer_total",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/get_accounts-param-assets",
@@ -65062,10 +65068,10 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3614, 3615.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade.rs",
-        "dcex/async_support/lighter/_trade_http.py:505",
-        "dcex/async_support/lighter/_trade_http.py:532",
-        "dcex/lighter/_trade_http.py:499",
-        "dcex/lighter/_trade_http.py:526",
+        "dcex/async_support/lighter/_trade_http.py::create_public_pool",
+        "dcex/async_support/lighter/_trade_http.py::update_public_pool",
+        "dcex/lighter/_trade_http.py::create_public_pool",
+        "dcex/lighter/_trade_http.py::update_public_pool",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
@@ -65089,10 +65095,10 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3616, 3617.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade.rs",
-        "dcex/async_support/lighter/_trade_http.py:561",
-        "dcex/async_support/lighter/_trade_http.py:586",
-        "dcex/lighter/_trade_http.py:555",
-        "dcex/lighter/_trade_http.py:580",
+        "dcex/async_support/lighter/_trade_http.py::mint_shares",
+        "dcex/async_support/lighter/_trade_http.py::burn_shares",
+        "dcex/lighter/_trade_http.py::mint_shares",
+        "dcex/lighter/_trade_http.py::burn_shares",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
@@ -65116,10 +65122,10 @@
       "note": "Grouped row split into individually sourced endpoint/transaction rows during the 2026-09-28 review.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade/pools.rs",
-        "dcex/async_support/lighter/_trade_http.py:611",
-        "dcex/async_support/lighter/_trade_http.py:636",
-        "dcex/lighter/_trade_http.py:605",
-        "dcex/lighter/_trade_http.py:630"
+        "dcex/async_support/lighter/_trade_http.py::stake_assets",
+        "dcex/async_support/lighter/_trade_http.py::unstake_assets",
+        "dcex/lighter/_trade_http.py::stake_assets",
+        "dcex/lighter/_trade_http.py::unstake_assets"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx"
     },
@@ -65139,10 +65145,10 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3618, 3619.",
       "evidence": [
         "crates/dcex/src/exchanges/lighter/trade.rs",
-        "dcex/async_support/lighter/_trade_http.py:304",
-        "dcex/async_support/lighter/_trade_http.py:343",
-        "dcex/lighter/_trade_http.py:304",
-        "dcex/lighter/_trade_http.py:341",
+        "dcex/async_support/lighter/_trade_http.py::update_account_config",
+        "dcex/async_support/lighter/_trade_http.py::update_account_asset_config",
+        "dcex/lighter/_trade_http.py::update_account_config",
+        "dcex/lighter/_trade_http.py::update_account_asset_config",
         "tests/unit/test_lighter_endpoint_coverage.py"
       ],
       "official_source": "https://apidocs.lighter.xyz/reference/sendtx",
@@ -70442,68 +70448,58 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3620, 3621, 3622, 3623, 3624, 3625, 3626, 3627, 3628, 3629, 3630, 3631, 3632, 3633, 3634, 3635, 3636, 3637, 3638, 3639, 3640, 3641, 3642, 3643, 3644, 3645, 3646, 3647, 3648, 3649, 3650.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/prediction.rs",
-        "dcex/aster/_market_http.py:422",
-        "dcex/aster/_market_http.py:426",
-        "dcex/aster/_market_http.py:430",
-        "dcex/aster/_market_http.py:437",
-        "dcex/aster/_market_http.py:445",
-        "dcex/aster/_market_http.py:453",
-        "dcex/aster/_market_http.py:462",
-        "dcex/aster/_market_http.py:479",
-        "dcex/aster/_market_http.py:500",
-        "dcex/aster/_market_http.py:506",
-        "dcex/aster/_market_http.py:514",
-        "dcex/aster/_trade_http.py:724",
-        "dcex/aster/_trade_http.py:730",
-        "dcex/aster/_trade_http.py:759",
-        "dcex/aster/_trade_http.py:770",
-        "dcex/aster/_trade_http.py:781",
-        "dcex/aster/_trade_http.py:792",
-        "dcex/aster/_trade_http.py:800",
-        "dcex/aster/_trade_http.py:817",
-        "dcex/aster/_trade_http.py:831",
-        "dcex/aster/_trade_http.py:842",
-        "dcex/aster/_trade_http.py:853",
-        "dcex/aster/_trade_http.py:864",
-        "dcex/aster/_trade_http.py:875",
-        "dcex/aster/_trade_http.py:881",
-        "dcex/aster/_trade_http.py:898",
-        "dcex/aster/_trade_http.py:915",
-        "dcex/aster/_trade_http.py:919",
-        "dcex/aster/_trade_http.py:942",
-        "dcex/aster/_trade_http.py:946",
-        "dcex/aster/_trade_http.py:952",
-        "dcex/async_support/aster/_market_http.py:426",
-        "dcex/async_support/aster/_market_http.py:430",
-        "dcex/async_support/aster/_market_http.py:434",
-        "dcex/async_support/aster/_market_http.py:441",
-        "dcex/async_support/aster/_market_http.py:449",
-        "dcex/async_support/aster/_market_http.py:457",
-        "dcex/async_support/aster/_market_http.py:466",
-        "dcex/async_support/aster/_market_http.py:483",
-        "dcex/async_support/aster/_market_http.py:504",
-        "dcex/async_support/aster/_market_http.py:512",
-        "dcex/async_support/aster/_market_http.py:520",
-        "dcex/async_support/aster/_trade_http.py:724",
-        "dcex/async_support/aster/_trade_http.py:730",
-        "dcex/async_support/aster/_trade_http.py:759",
-        "dcex/async_support/aster/_trade_http.py:770",
-        "dcex/async_support/aster/_trade_http.py:781",
-        "dcex/async_support/aster/_trade_http.py:792",
-        "dcex/async_support/aster/_trade_http.py:800",
-        "dcex/async_support/aster/_trade_http.py:817",
-        "dcex/async_support/aster/_trade_http.py:831",
-        "dcex/async_support/aster/_trade_http.py:842",
-        "dcex/async_support/aster/_trade_http.py:853",
-        "dcex/async_support/aster/_trade_http.py:864",
-        "dcex/async_support/aster/_trade_http.py:875",
-        "dcex/async_support/aster/_trade_http.py:885",
-        "dcex/async_support/aster/_trade_http.py:902",
-        "dcex/async_support/aster/_trade_http.py:919",
-        "dcex/async_support/aster/_trade_http.py:923",
-        "dcex/async_support/aster/_trade_http.py:946",
-        "dcex/async_support/aster/_trade_http.py:950",
-        "dcex/async_support/aster/_trade_http.py:956",
+        "dcex/aster/_market_http.py::get_prediction_ping",
+        "dcex/aster/_market_http.py::get_prediction_time",
+        "dcex/aster/_market_http.py::get_prediction_exchange_info",
+        "dcex/aster/_market_http.py::get_prediction_depth",
+        "dcex/aster/_market_http.py::get_prediction_trades",
+        "dcex/aster/_market_http.py::get_prediction_historical_trades",
+        "dcex/aster/_market_http.py::get_prediction_agg_trades",
+        "dcex/aster/_market_http.py::get_prediction_klines",
+        "dcex/aster/_market_http.py::get_prediction_ticker_24hr",
+        "dcex/aster/_market_http.py::get_prediction_ticker_price",
+        "dcex/aster/_market_http.py::get_prediction_ticker_book_ticker",
+        "dcex/aster/_trade_http.py::register_agent_signed",
+        "dcex/aster/_trade_http.py::create_prediction_order",
+        "dcex/aster/_trade_http.py::cancel_prediction_order",
+        "dcex/aster/_trade_http.py::get_prediction_order",
+        "dcex/aster/_trade_http.py::get_prediction_open_order",
+        "dcex/aster/_trade_http.py::get_prediction_all_orders",
+        "dcex/aster/_trade_http.py::TradeHTTP",
+        "dcex/aster/_trade_http.py::create_prediction_asset_wallet_transfer",
+        "dcex/aster/_trade_http.py::create_prediction_mint",
+        "dcex/aster/_trade_http.py::create_prediction_burn",
+        "dcex/aster/_trade_http.py::create_prediction_split",
+        "dcex/aster/_trade_http.py::create_prediction_merge",
+        "dcex/aster/_trade_http.py::get_prediction_position_histories",
+        "dcex/aster/_trade_http.py::get_prediction_settlement_histories",
+        "dcex/aster/_trade_http.py::get_prediction_user_trades",
+        "dcex/async_support/aster/_market_http.py::get_prediction_ping",
+        "dcex/async_support/aster/_market_http.py::get_prediction_time",
+        "dcex/async_support/aster/_market_http.py::get_prediction_exchange_info",
+        "dcex/async_support/aster/_market_http.py::get_prediction_depth",
+        "dcex/async_support/aster/_market_http.py::get_prediction_trades",
+        "dcex/async_support/aster/_market_http.py::get_prediction_historical_trades",
+        "dcex/async_support/aster/_market_http.py::get_prediction_agg_trades",
+        "dcex/async_support/aster/_market_http.py::get_prediction_klines",
+        "dcex/async_support/aster/_market_http.py::get_prediction_ticker_24hr",
+        "dcex/async_support/aster/_market_http.py::get_prediction_ticker_price",
+        "dcex/async_support/aster/_market_http.py::get_prediction_ticker_book_ticker",
+        "dcex/async_support/aster/_trade_http.py::register_agent_signed",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_order",
+        "dcex/async_support/aster/_trade_http.py::cancel_prediction_order",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_order",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_open_order",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_all_orders",
+        "dcex/async_support/aster/_trade_http.py::TradeHTTP",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_asset_wallet_transfer",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_mint",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_burn",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_split",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_merge",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_position_histories",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_settlement_histories",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_user_trades",
         "tests/unit/test_aster_endpoint_coverage.py"
       ],
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#24h-price-change",
@@ -70555,26 +70551,18 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into explicit verb/path/operation rows. See rows 3651, 3652, 3653, 3654, 3655, 3656, 3657, 3658.",
+      "note": "Grouped prediction operations are replaced by their exact individual routes: 3623, 3625, 3626, 3628.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
-        "dcex/aster/_market_http.py:430",
-        "dcex/aster/_trade_http.py:831",
-        "dcex/aster/_trade_http.py:842",
-        "dcex/aster/_trade_http.py:853",
-        "dcex/aster/_trade_http.py:864",
-        "dcex/aster/_trade_http.py:875",
-        "dcex/aster/_trade_http.py:881",
-        "dcex/aster/_trade_http.py:898",
-        "dcex/async_support/aster/_market_http.py:434",
-        "dcex/async_support/aster/_trade_http.py:831",
-        "dcex/async_support/aster/_trade_http.py:842",
-        "dcex/async_support/aster/_trade_http.py:853",
-        "dcex/async_support/aster/_trade_http.py:864",
-        "dcex/async_support/aster/_trade_http.py:875",
-        "dcex/async_support/aster/_trade_http.py:885",
-        "dcex/async_support/aster/_trade_http.py:902",
-        "tests/unit/test_aster_endpoint_coverage.py"
+        "tests/unit/test_aster_endpoint_coverage.py",
+        "dcex/aster/_trade_http.py::create_prediction_mint",
+        "dcex/aster/_trade_http.py::create_prediction_burn",
+        "dcex/aster/_trade_http.py::create_prediction_split",
+        "dcex/aster/_trade_http.py::create_prediction_merge",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_mint",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_burn",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_split",
+        "dcex/async_support/aster/_trade_http.py::create_prediction_merge"
       ],
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade",
       "host": "papi",
@@ -70587,6 +70575,34 @@
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-position-history-user_data",
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-settlement-histories-user_data",
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#trading-specification-information"
+      ],
+      "superseded_by": [
+        3623,
+        3625,
+        3626,
+        3628
+      ],
+      "replacement_routes": [
+        {
+          "http_method": "POST",
+          "path": "/api/v3/prediction/burn",
+          "host": "papi"
+        },
+        {
+          "http_method": "POST",
+          "path": "/api/v3/prediction/merge",
+          "host": "papi"
+        },
+        {
+          "http_method": "POST",
+          "path": "/api/v3/prediction/mint",
+          "host": "papi"
+        },
+        {
+          "http_method": "POST",
+          "path": "/api/v3/prediction/split",
+          "host": "papi"
+        }
       ]
     },
     {
@@ -70602,26 +70618,16 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Grouped row split into explicit verb/path/operation rows. See rows 3659, 3660, 3661, 3662, 3663, 3664, 3665, 3666.",
+      "note": "Grouped prediction operations are replaced by their exact individual routes: 3641, 3642, 3643.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
-        "dcex/aster/_market_http.py:430",
-        "dcex/aster/_trade_http.py:831",
-        "dcex/aster/_trade_http.py:842",
-        "dcex/aster/_trade_http.py:853",
-        "dcex/aster/_trade_http.py:864",
-        "dcex/aster/_trade_http.py:875",
-        "dcex/aster/_trade_http.py:881",
-        "dcex/aster/_trade_http.py:898",
-        "dcex/async_support/aster/_market_http.py:434",
-        "dcex/async_support/aster/_trade_http.py:831",
-        "dcex/async_support/aster/_trade_http.py:842",
-        "dcex/async_support/aster/_trade_http.py:853",
-        "dcex/async_support/aster/_trade_http.py:864",
-        "dcex/async_support/aster/_trade_http.py:875",
-        "dcex/async_support/aster/_trade_http.py:885",
-        "dcex/async_support/aster/_trade_http.py:902",
-        "tests/unit/test_aster_endpoint_coverage.py"
+        "tests/unit/test_aster_endpoint_coverage.py",
+        "dcex/aster/_trade_http.py::get_prediction_positions",
+        "dcex/aster/_trade_http.py::get_prediction_position_histories",
+        "dcex/aster/_trade_http.py::get_prediction_settlement_histories",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_positions",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_position_histories",
+        "dcex/async_support/aster/_trade_http.py::get_prediction_settlement_histories"
       ],
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade",
       "host": "papi",
@@ -70634,6 +70640,28 @@
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-position-history-user_data",
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-settlement-histories-user_data",
         "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#trading-specification-information"
+      ],
+      "superseded_by": [
+        3641,
+        3642,
+        3643
+      ],
+      "replacement_routes": [
+        {
+          "http_method": "GET",
+          "path": "/api/v3/prediction/positionHistories",
+          "host": "papi"
+        },
+        {
+          "http_method": "GET",
+          "path": "/api/v3/prediction/positions",
+          "host": "papi"
+        },
+        {
+          "http_method": "GET",
+          "path": "/api/v3/prediction/settlementHistories",
+          "host": "papi"
+        }
       ]
     },
     {
@@ -71481,20 +71509,21 @@
       "category": "Order",
       "endpoint": "POST /api/v1/user/order (MARKET / CONDITIONAL / TPSL / edit via cancelId)",
       "source_status": "supported",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "place_order"
       ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "note": "Same route as row 3019; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#create-or-edit-order",
       "path": "/api/v1/user/order",
-      "http_method": "POST"
+      "http_method": "POST",
+      "superseded_by": 3019
     },
     {
       "row": 3021,
@@ -71819,10 +71848,10 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3667, 3668.",
       "evidence": [
         "crates/dcex/src/exchanges/extended/tests/endpoint_coverage.rs",
-        "dcex/async_support/extended/_account_http.py:375",
-        "dcex/async_support/extended/_account_http.py:392",
-        "dcex/extended/_account_http.py:368",
-        "dcex/extended/_account_http.py:385",
+        "dcex/async_support/extended/_account_http.py::get_account_performance",
+        "dcex/async_support/extended/_account_http.py::get_account_funding_stats",
+        "dcex/extended/_account_http.py::get_account_performance",
+        "dcex/extended/_account_http.py::get_account_funding_stats",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-account-funding-history",
@@ -71850,22 +71879,22 @@
         "crates/dcex/src/exchanges/extended/interest.rs",
         "crates/dcex/src/exchanges/extended/vault.rs",
         "crates/dcex/src/exchanges/extended/rewards.rs",
-        "dcex/async_support/extended/_account_http.py:195",
-        "dcex/async_support/extended/_account_http.py:208",
-        "dcex/async_support/extended/_account_http.py:231",
-        "dcex/async_support/extended/_account_http.py:256",
-        "dcex/async_support/extended/_account_http.py:279",
-        "dcex/async_support/extended/_account_http.py:304",
-        "dcex/async_support/extended/_account_http.py:317",
-        "dcex/async_support/extended/_account_http.py:330",
-        "dcex/extended/_account_http.py:190",
-        "dcex/extended/_account_http.py:201",
-        "dcex/extended/_account_http.py:224",
-        "dcex/extended/_account_http.py:249",
-        "dcex/extended/_account_http.py:272",
-        "dcex/extended/_account_http.py:297",
-        "dcex/extended/_account_http.py:310",
-        "dcex/extended/_account_http.py:323",
+        "dcex/async_support/extended/_account_http.py::get_bridge_quote",
+        "dcex/async_support/extended/_account_http.py::get_account_equity_history",
+        "dcex/async_support/extended/_account_http.py::get_account_pnl_history",
+        "dcex/async_support/extended/_account_http.py::get_account_pnl_percentage_history",
+        "dcex/async_support/extended/_account_http.py::get_cumulative_account_pnl_history",
+        "dcex/async_support/extended/_account_http.py::get_cumulative_account_pnl_percentage_history",
+        "dcex/async_support/extended/_account_http.py::get_account_vault_equity_history",
+        "dcex/async_support/extended/_account_http.py::get_account_max_drawdown_history",
+        "dcex/extended/_account_http.py::get_bridge_quote",
+        "dcex/extended/_account_http.py::get_account_equity_history",
+        "dcex/extended/_account_http.py::get_account_pnl_history",
+        "dcex/extended/_account_http.py::get_account_pnl_percentage_history",
+        "dcex/extended/_account_http.py::get_cumulative_account_pnl_history",
+        "dcex/extended/_account_http.py::get_cumulative_account_pnl_percentage_history",
+        "dcex/extended/_account_http.py::get_account_vault_equity_history",
+        "dcex/extended/_account_http.py::get_account_max_drawdown_history",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-account-equity-history",
@@ -71896,10 +71925,10 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3677, 3678.",
       "evidence": [
         "crates/dcex/src/exchanges/extended/tests/endpoint_coverage.rs",
-        "dcex/async_support/extended/_market_http.py:128",
-        "dcex/async_support/extended/_market_http.py:134",
-        "dcex/extended/_market_http.py:124",
-        "dcex/extended/_market_http.py:128",
+        "dcex/async_support/extended/_market_http.py::get_vault_performance",
+        "dcex/async_support/extended/_market_http.py::get_vault_summary",
+        "dcex/extended/_market_http.py::get_vault_performance",
+        "dcex/extended/_market_http.py::get_vault_summary",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-vault-performance",
@@ -71927,18 +71956,18 @@
         "crates/dcex/src/exchanges/extended/interest.rs",
         "crates/dcex/src/exchanges/extended/vault.rs",
         "crates/dcex/src/exchanges/extended/rewards.rs",
-        "dcex/async_support/extended/_account_http.py:413",
-        "dcex/async_support/extended/_account_http.py:423",
-        "dcex/async_support/extended/_account_http.py:436",
-        "dcex/async_support/extended/_account_http.py:449",
-        "dcex/async_support/extended/_market_http.py:110",
-        "dcex/async_support/extended/_market_http.py:120",
-        "dcex/extended/_account_http.py:406",
-        "dcex/extended/_account_http.py:416",
-        "dcex/extended/_account_http.py:427",
-        "dcex/extended/_account_http.py:440",
-        "dcex/extended/_market_http.py:106",
-        "dcex/extended/_market_http.py:116",
+        "dcex/async_support/extended/_account_http.py::get_account_funding_history",
+        "dcex/async_support/extended/_account_http.py::get_interest_key_metrics",
+        "dcex/async_support/extended/_account_http.py::get_interest_daily_metrics",
+        "dcex/async_support/extended/_account_http.py::get_interest_payment_chart",
+        "dcex/async_support/extended/_market_http.py::get_interest_rate_curves_history",
+        "dcex/async_support/extended/_market_http.py::get_latest_interest_rate_curve",
+        "dcex/extended/_account_http.py::get_account_funding_history",
+        "dcex/extended/_account_http.py::get_interest_key_metrics",
+        "dcex/extended/_account_http.py::get_interest_daily_metrics",
+        "dcex/extended/_account_http.py::get_interest_payment_chart",
+        "dcex/extended/_market_http.py::get_interest_rate_curves_history",
+        "dcex/extended/_market_http.py::get_latest_interest_rate_curve",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-interest-daily-metrics",
@@ -71990,8 +72019,8 @@
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3685.",
       "evidence": [
         "crates/dcex/src/exchanges/extended/tests/endpoint_coverage.rs",
-        "dcex/async_support/extended/_account_http.py:462",
-        "dcex/extended/_account_http.py:453",
+        "dcex/async_support/extended/_account_http.py::get_interest_payments_history",
+        "dcex/extended/_account_http.py::get_interest_payments_history",
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-earned-points",
@@ -72025,6 +72054,44 @@
         "https://api.docs.extended.exchange/#mark-price-stream",
         "https://api.docs.extended.exchange/#order-book-stream",
         "https://api.docs.extended.exchange/#trades-stream"
+      ],
+      "covered_routes": [
+        {
+          "http_method": "WS",
+          "path": "/v1/orderbooks/{market}"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/publicTrades/{market}"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/funding/{market}"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/candles/{market}/trades"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/prices/mark/{market}"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/prices/index/{market}"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/candles/{market}/mark-prices"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/candles/{market}/index-prices"
+        },
+        {
+          "http_method": "WS",
+          "path": "/v1/candles/{market}/{candleType}"
+        }
       ]
     },
     {
@@ -72048,6 +72115,12 @@
       "official_source": "https://api.docs.extended.exchange/#order-book-stream",
       "official_sources": [
         "https://api.docs.extended.exchange/#order-book-stream"
+      ],
+      "covered_routes": [
+        {
+          "http_method": "WS",
+          "path": "/v1/orderbooks/rfq/{market}"
+        }
       ]
     },
     {
@@ -72072,6 +72145,12 @@
       "official_sources": [
         "https://api.docs.extended.exchange/#account-updates-stream",
         "https://api.docs.extended.exchange/#trades-stream"
+      ],
+      "covered_routes": [
+        {
+          "http_method": "WS",
+          "path": "/v1/account"
+        }
       ]
     },
     {
@@ -74723,20 +74802,21 @@
       "category": "Conditional",
       "endpoint": "POST /v1/batchPlaceOrders grouping=partialTpsl|positionTpsl|entryTpsl (tpslType/stopPrice, op=4)",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "batch_place_orders"
       ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "note": "Same route as row 3152; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_arcus_endpoint_coverage.py"
       ],
       "official_source": "https://docs.arcus.xyz/api-reference/exchange/place-batch-orders",
       "path": "/v1/batchPlaceOrders",
-      "http_method": "POST"
+      "http_method": "POST",
+      "superseded_by": 3152
     },
     {
       "row": 3154,
@@ -75073,14 +75153,14 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3686, 3687, 3688, 3689.",
       "evidence": [
-        "dcex/arcus/client.py:627",
-        "dcex/arcus/client.py:631",
-        "dcex/arcus/client.py:635",
-        "dcex/arcus/client.py:639",
-        "dcex/async_support/arcus/client.py:634",
-        "dcex/async_support/arcus/client.py:638",
-        "dcex/async_support/arcus/client.py:642",
-        "dcex/async_support/arcus/client.py:646"
+        "dcex/arcus/client.py::get_market_metadata",
+        "dcex/arcus/client.py::get_market_overview",
+        "dcex/arcus/client.py::get_spot_market_overview",
+        "dcex/arcus/client.py::get_metadata_candles",
+        "dcex/async_support/arcus/client.py::get_market_metadata",
+        "dcex/async_support/arcus/client.py::get_market_overview",
+        "dcex/async_support/arcus/client.py::get_spot_market_overview",
+        "dcex/async_support/arcus/client.py::get_metadata_candles"
       ],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-metadata",
       "official_sources": [
@@ -75105,12 +75185,12 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3690, 3691, 3692.",
       "evidence": [
-        "dcex/arcus/client.py:660",
-        "dcex/arcus/client.py:664",
-        "dcex/arcus/client.py:671",
-        "dcex/async_support/arcus/client.py:667",
-        "dcex/async_support/arcus/client.py:671",
-        "dcex/async_support/arcus/client.py:678"
+        "dcex/arcus/client.py::get_user_preferences",
+        "dcex/arcus/client.py::upsert_user_preferences",
+        "dcex/arcus/client.py::delete_user_preference_signed",
+        "dcex/async_support/arcus/client.py::get_user_preferences",
+        "dcex/async_support/arcus/client.py::upsert_user_preferences",
+        "dcex/async_support/arcus/client.py::delete_user_preference_signed"
       ],
       "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
       "official_sources": [
@@ -75144,20 +75224,21 @@
       "category": "Spot RFQ",
       "endpoint": "GET /health (router)",
       "source_status": "supported",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "health"
       ],
-      "note": "HTTP verb/path matched route fixture(s); Python sync/async method exposure checked. Offline tests do not prove live account eligibility or every optional parameter.",
+      "note": "Same route as row 3119; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_arcus_endpoint_coverage.py"
       ],
       "official_source": "https://github.com/arcus-xyz/arcus-spot-sdk/blob/7f91c67e1a93f3dd62964bdbee08e41ea4c8b8e0/go/client.go#L92",
       "path": "/health",
-      "http_method": "GET"
+      "http_method": "GET",
+      "superseded_by": 3119
     },
     {
       "row": 3172,
@@ -86271,14 +86352,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/burn",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_burn"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3623; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86286,7 +86367,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/burn"
+      "path": "/api/v3/prediction/burn",
+      "superseded_by": 3623
     },
     {
       "row": 3652,
@@ -86296,14 +86378,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/merge",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_merge"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3625; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86311,7 +86393,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-merge-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/merge"
+      "path": "/api/v3/prediction/merge",
+      "superseded_by": 3625
     },
     {
       "row": 3653,
@@ -86321,14 +86404,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/mint",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_mint"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3626; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86336,7 +86419,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-mint-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/mint"
+      "path": "/api/v3/prediction/mint",
+      "superseded_by": 3626
     },
     {
       "row": 3654,
@@ -86346,14 +86430,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/split",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_split"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3628; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86361,7 +86445,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-split-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/split"
+      "path": "/api/v3/prediction/split",
+      "superseded_by": 3628
     },
     {
       "row": 3655,
@@ -86371,14 +86456,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/exchangeInfo",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_exchange_info"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3634; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86386,7 +86471,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#trading-specification-information",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/exchangeInfo"
+      "path": "/api/v3/prediction/exchangeInfo",
+      "superseded_by": 3634
     },
     {
       "row": 3656,
@@ -86396,14 +86482,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/positionHistories",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_position_histories"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3641; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86411,7 +86497,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-position-history-user_data",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/positionHistories"
+      "path": "/api/v3/prediction/positionHistories",
+      "superseded_by": 3641
     },
     {
       "row": 3657,
@@ -86421,14 +86508,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/positions",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_positions"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3642; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86436,7 +86523,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-current-positions-user_data",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/positions"
+      "path": "/api/v3/prediction/positions",
+      "superseded_by": 3642
     },
     {
       "row": 3658,
@@ -86446,14 +86534,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/settlementHistories",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_settlement_histories"
       ],
-      "note": "Split from grouped row 2987; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3643; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86461,7 +86549,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-settlement-histories-user_data",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/settlementHistories"
+      "path": "/api/v3/prediction/settlementHistories",
+      "superseded_by": 3643
     },
     {
       "row": 3659,
@@ -86471,14 +86560,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/burn",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_burn"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3623; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86486,7 +86575,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-burn-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/burn"
+      "path": "/api/v3/prediction/burn",
+      "superseded_by": 3623
     },
     {
       "row": 3660,
@@ -86496,14 +86586,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/merge",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_merge"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3625; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86511,7 +86601,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-merge-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/merge"
+      "path": "/api/v3/prediction/merge",
+      "superseded_by": 3625
     },
     {
       "row": 3661,
@@ -86521,14 +86612,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/mint",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_mint"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3626; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86536,7 +86627,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-mint-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/mint"
+      "path": "/api/v3/prediction/mint",
+      "superseded_by": 3626
     },
     {
       "row": 3662,
@@ -86546,14 +86638,14 @@
       "category": "Prediction",
       "endpoint": "POST /api/v3/prediction/split",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "create_prediction_split"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3628; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86561,7 +86653,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#prediction-market-split-trade",
       "host": "papi",
       "http_method": "POST",
-      "path": "/api/v3/prediction/split"
+      "path": "/api/v3/prediction/split",
+      "superseded_by": 3628
     },
     {
       "row": 3663,
@@ -86571,14 +86664,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/exchangeInfo",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_exchange_info"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3634; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86586,7 +86679,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#trading-specification-information",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/exchangeInfo"
+      "path": "/api/v3/prediction/exchangeInfo",
+      "superseded_by": 3634
     },
     {
       "row": 3664,
@@ -86596,14 +86690,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/positionHistories",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_position_histories"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3641; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86611,7 +86705,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-position-history-user_data",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/positionHistories"
+      "path": "/api/v3/prediction/positionHistories",
+      "superseded_by": 3641
     },
     {
       "row": 3665,
@@ -86621,14 +86716,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/positions",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_positions"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3642; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86636,7 +86731,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-current-positions-user_data",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/positions"
+      "path": "/api/v3/prediction/positions",
+      "superseded_by": 3642
     },
     {
       "row": 3666,
@@ -86646,14 +86742,14 @@
       "category": "Prediction",
       "endpoint": "GET /api/v3/prediction/settlementHistories",
       "source_status": "missing",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_prediction_settlement_histories"
       ],
-      "note": "Split from grouped row 2988; exact verb/path and typed operation verified by the cited offline suites.",
+      "note": "Same route as row 3643; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/aster/tests/endpoint_coverage.rs",
         "tests/unit/test_aster_endpoint_coverage.py"
@@ -86661,7 +86757,8 @@
       "official_source": "https://github.com/asterdex/api-docs/blob/master/V3%28Recommended%29/EN/aster-finance-prediction-api.md#query-prediction-market-settlement-histories-user_data",
       "host": "papi",
       "http_method": "GET",
-      "path": "/api/v3/prediction/settlementHistories"
+      "path": "/api/v3/prediction/settlementHistories",
+      "superseded_by": 3643
     },
     {
       "row": 3667,
@@ -88298,7 +88395,14 @@
       "http_method": "GET",
       "path": "/fapi/v3/leverageBracket",
       "host": "fapi",
-      "superseded_by": 2952
+      "superseded_by": 2952,
+      "replacement_routes": [
+        {
+          "http_method": "GET",
+          "path": "/fapi/v3/leverageBrackets",
+          "host": "fapi"
+        }
+      ]
     },
     {
       "row": 3737,
@@ -97432,7 +97536,16 @@
       "actions": [
         "hip3LiquidatorTransfer"
       ],
-      "superseded_by": 2659
+      "superseded_by": 2659,
+      "replacement_routes": [
+        {
+          "http_method": "POST",
+          "path": "/exchange",
+          "actions": [
+            "hip3LiquidatorTransfer"
+          ]
+        }
+      ]
     },
     {
       "row": 4115,
@@ -97878,7 +97991,18 @@
       "actions": [
         "outcomeMeta"
       ],
-      "superseded_by": 2610
+      "superseded_by": 2610,
+      "replacement_routes": [
+        {
+          "http_method": "POST",
+          "path": "/info",
+          "actions": [
+            "outcomeDeployerLimits",
+            "outcomeMeta",
+            "settledOutcome"
+          ]
+        }
+      ]
     },
     {
       "row": 4131,
@@ -98607,20 +98731,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /derivatives/api/v3/rfqs/closed-offers",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_closed_rfq_offers"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 3566; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kraken_endpoint_coverage.py"
       ],
       "official_source": "https://docs.kraken.com/api-reference/rfqs/list-offers-placed-by-the-account-on-closed-rfqs",
       "http_method": "GET",
-      "path": "/derivatives/api/v3/rfqs/closed-offers"
+      "path": "/derivatives/api/v3/rfqs/closed-offers",
+      "superseded_by": 3566
     },
     {
       "row": 4161,
@@ -98630,20 +98755,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /derivatives/api/v3/rfqs/open-rfqs",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_open_rfqs_for_account"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 3568; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kraken_endpoint_coverage.py"
       ],
       "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-rfqs-for-account",
       "http_method": "GET",
-      "path": "/derivatives/api/v3/rfqs/open-rfqs"
+      "path": "/derivatives/api/v3/rfqs/open-rfqs",
+      "superseded_by": 3568
     },
     {
       "row": 4162,
@@ -98653,20 +98779,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /api/v1/accounts/transferable",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_transfer_quotas"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 2391; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/account-info/transfer/get-transfer-quotas",
       "http_method": "GET",
-      "path": "/api/v1/accounts/transferable"
+      "path": "/api/v1/accounts/transferable",
+      "superseded_by": 2391
     },
     {
       "row": 4163,
@@ -98676,20 +98803,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /api/v1/hf/orders/done",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_spot_closed_orders"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 2434; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-closed-orders",
       "http_method": "GET",
-      "path": "/api/v1/hf/orders/done"
+      "path": "/api/v1/hf/orders/done",
+      "superseded_by": 2434
     },
     {
       "row": 4164,
@@ -98699,20 +98827,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /api/v1/info/candles/{market}/mark-prices",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_candles"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 4082; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_extended_endpoint_coverage.py"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-candles-history",
       "http_method": "GET",
-      "path": "/api/v1/info/candles/{market}/mark-prices"
+      "path": "/api/v1/info/candles/{market}/mark-prices",
+      "superseded_by": 4082
     },
     {
       "row": 4165,
@@ -98722,20 +98851,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /api/v1/info/candles/{market}/index-prices",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_candles"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 4083; method and wire evidence merged there.",
       "evidence": [
         "crates/dcex/src/exchanges/extended/tests/endpoint_coverage.rs"
       ],
       "official_source": "https://api.docs.extended.exchange/#get-candles-history",
       "http_method": "GET",
-      "path": "/api/v1/info/candles/{market}/index-prices"
+      "path": "/api/v1/info/candles/{market}/index-prices",
+      "superseded_by": 4083
     },
     {
       "row": 4166,
@@ -98791,20 +98921,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /derivatives/api/v3/rfqs/closed-offers",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_closed_rfq_offers"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 3566; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kraken_endpoint_coverage.py"
       ],
       "official_source": "https://docs.kraken.com/api-reference/rfqs/list-offers-placed-by-the-account-on-closed-rfqs",
       "http_method": "GET",
-      "path": "/derivatives/api/v3/rfqs/closed-offers"
+      "path": "/derivatives/api/v3/rfqs/closed-offers",
+      "superseded_by": 3566
     },
     {
       "row": 4169,
@@ -98814,20 +98945,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /derivatives/api/v3/rfqs/open-rfqs",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_open_rfqs_for_account"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 3568; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kraken_endpoint_coverage.py"
       ],
       "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-rfqs-for-account",
       "http_method": "GET",
-      "path": "/derivatives/api/v3/rfqs/open-rfqs"
+      "path": "/derivatives/api/v3/rfqs/open-rfqs",
+      "superseded_by": 3568
     },
     {
       "row": 4170,
@@ -98837,20 +98969,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /api/v1/accounts/transferable",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_transfer_quotas"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 2391; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/account-info/transfer/get-transfer-quotas",
       "http_method": "GET",
-      "path": "/api/v1/accounts/transferable"
+      "path": "/api/v1/accounts/transferable",
+      "superseded_by": 2391
     },
     {
       "row": 4171,
@@ -98860,20 +98993,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /api/v1/hf/orders/done",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_spot_closed_orders"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 2434; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/get-closed-orders",
       "http_method": "GET",
-      "path": "/api/v1/hf/orders/done"
+      "path": "/api/v1/hf/orders/done",
+      "superseded_by": 2434
     },
     {
       "row": 4172,
@@ -98883,20 +99017,21 @@
       "category": "Official documentation inventory",
       "endpoint": "DELETE /api/v1/stop-order/cancelOrderByClientOid",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "cancel_spot_stop_order_by_client_oid"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 2439; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/spot-trading/orders/cancel-stop-order-by-clientoid",
       "http_method": "DELETE",
-      "path": "/api/v1/stop-order/cancelOrderByClientOid"
+      "path": "/api/v1/stop-order/cancelOrderByClientOid",
+      "superseded_by": 2439
     },
     {
       "row": 4173,
@@ -98906,20 +99041,21 @@
       "category": "Official documentation inventory",
       "endpoint": "GET /api/v3/hf/margin/orders/done",
       "source_status": "official inventory",
-      "status": "implemented",
+      "status": "superseded",
       "rust": true,
       "python_sync": true,
       "python_async": true,
       "methods": [
         "get_margin_closed_orders"
       ],
-      "note": "Official inventory reconciliation: exact offline route evidence and public wrappers exist.",
+      "note": "Same route as row 2467; method and wire evidence merged there.",
       "evidence": [
         "tests/unit/test_kucoin_endpoint_coverage.py"
       ],
       "official_source": "https://www.kucoin.com/docs-new/rest/margin-trading/orders/get-closed-orders",
       "http_method": "GET",
-      "path": "/api/v3/hf/margin/orders/done"
+      "path": "/api/v3/hf/margin/orders/done",
+      "superseded_by": 2467
     },
     {
       "row": 4174,
@@ -100055,7 +100191,14 @@
       "path": "predictionEvents \\- Prediction Events",
       "host": "aster-finance-prediction-api-tesetnet",
       "channel": "predictionEvents \\- Prediction Events",
-      "superseded_by": 3634
+      "superseded_by": 3634,
+      "replacement_routes": [
+        {
+          "http_method": "GET",
+          "path": "/api/v3/prediction/exchangeInfo",
+          "host": "papi"
+        }
+      ]
     },
     {
       "row": 4220,
@@ -100388,7 +100531,14 @@
       "path": "predictionEvents \\- Prediction Events",
       "host": "aster-finance-prediction-api",
       "channel": "predictionEvents \\- Prediction Events",
-      "superseded_by": 3634
+      "superseded_by": 3634,
+      "replacement_routes": [
+        {
+          "http_method": "GET",
+          "path": "/api/v3/prediction/exchangeInfo",
+          "host": "papi"
+        }
+      ]
     },
     {
       "row": 4234,
@@ -102702,7 +102852,7 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Duplicate of row 12; the existing operation covers this official inventory entry.",
+      "note": "Legacy method is not accepted by this client; use v2/account.status (row 4327).",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
@@ -102713,7 +102863,15 @@
       "path": "/account.status",
       "host": "derivatives_trading_usds_futures",
       "channel": "account_information",
-      "superseded_by": 12
+      "superseded_by": 4327,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "/v2/account.status",
+          "host": "derivatives_trading_usds_futures",
+          "channel": "account_information_v2"
+        }
+      ]
     },
     {
       "row": 4327,
@@ -102754,7 +102912,7 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Duplicate of row 12; the existing operation covers this official inventory entry.",
+      "note": "Legacy method is not accepted by this client; use v2/account.balance (row 4329).",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
@@ -102765,7 +102923,15 @@
       "path": "/account.balance",
       "host": "derivatives_trading_usds_futures",
       "channel": "futures_account_balance",
-      "superseded_by": 12
+      "superseded_by": 4329,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "/v2/account.balance",
+          "host": "derivatives_trading_usds_futures",
+          "channel": "futures_account_balance_v2"
+        }
+      ]
     },
     {
       "row": 4329,
@@ -103014,7 +103180,7 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Duplicate of row 12; the existing operation covers this official inventory entry.",
+      "note": "Legacy method is not accepted by this client; use v2/account.position (row 4339).",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
@@ -103025,7 +103191,15 @@
       "path": "/account.position",
       "host": "derivatives_trading_usds_futures",
       "channel": "position_information",
-      "superseded_by": 12
+      "superseded_by": 4339,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "/v2/account.position",
+          "host": "derivatives_trading_usds_futures",
+          "channel": "position_information_v2"
+        }
+      ]
     },
     {
       "row": 4339,
@@ -104049,12 +104223,12 @@
       "category": "Official documentation inventory",
       "endpoint": "WS /session.logon (channel=session_logon)",
       "source_status": "official inventory",
-      "status": "superseded",
+      "status": "unavailable",
       "rust": false,
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Duplicate of row 11; the existing operation covers this official inventory entry.",
+      "note": "Ed25519 session.logon is explicitly rejected before transport; use per-request HMAC authentication.",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
@@ -104064,8 +104238,7 @@
       "http_method": "WS",
       "path": "/session.logon",
       "host": "spot",
-      "channel": "session_logon",
-      "superseded_by": 11
+      "channel": "session_logon"
     },
     {
       "row": 4379,
@@ -104756,7 +104929,7 @@
       "python_sync": false,
       "python_async": false,
       "methods": [],
-      "note": "Duplicate of row 11; the existing operation covers this official inventory entry.",
+      "note": "Legacy method is not accepted by this client; use orderList.place.oco (row 4406).",
       "evidence": [
         "crates/dcex/src/exchanges/binance/websocket",
         "dcex/ws/binance.py",
@@ -104767,7 +104940,15 @@
       "path": "/orderList.place",
       "host": "spot",
       "channel": "order_list_place",
-      "superseded_by": 11
+      "superseded_by": 4406,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "/orderList.place.oco",
+          "host": "spot",
+          "channel": "order_list_place_oco"
+        }
+      ]
     },
     {
       "row": 4406,
@@ -110689,7 +110870,14 @@
       "http_method": "WS",
       "path": "Order V2",
       "channel": "3470256w0",
-      "superseded_by": 4640
+      "superseded_by": 4640,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "Order V2",
+          "channel": "3470073w0"
+        }
+      ]
     },
     {
       "row": 4647,
@@ -110713,7 +110901,14 @@
       "http_method": "WS",
       "path": "Order V1",
       "channel": "3470257w0",
-      "superseded_by": 4641
+      "superseded_by": 4641,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "Order V1",
+          "channel": "3470074w0"
+        }
+      ]
     },
     {
       "row": 4648,
@@ -110737,7 +110932,14 @@
       "http_method": "WS",
       "path": "Balance",
       "channel": "3470258w0",
-      "superseded_by": 4642
+      "superseded_by": 4642,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "Balance",
+          "channel": "3470075w0"
+        }
+      ]
     },
     {
       "row": 4649,
@@ -110761,7 +110963,14 @@
       "http_method": "WS",
       "path": "Stop Order",
       "channel": "3470259w0",
-      "superseded_by": 4643
+      "superseded_by": 4643,
+      "replacement_routes": [
+        {
+          "http_method": "WS",
+          "path": "Stop Order",
+          "channel": "3470139w0"
+        }
+      ]
     },
     {
       "row": 4650,

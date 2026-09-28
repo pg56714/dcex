@@ -40,6 +40,8 @@ pub(super) fn validate(
                 | "close_uta_positions"
                 | "cancel_futures_plan_orders"
                 | "cancel_spot_plan_orders"
+                | "classic_copytrading_future_copytrade_follower_close_positions"
+                | "classic_copytrading_future_copytrade_trader_trader_order_close_positions"
         ),
         "bingx" => matches!(
             method,
@@ -70,6 +72,7 @@ pub(super) fn validate(
                 })
             });
         let ids = params.iter().any(|(k, v)| match k.as_str() {
+            "trackingNo" => !v.trim().is_empty(),
             "orderIds" => !v.trim().is_empty() && v.split(',').all(|id| !id.trim().is_empty()),
             "orderIdList" => {
                 serde_json::from_str::<Vec<serde_json::Value>>(v).is_ok_and(|values| {

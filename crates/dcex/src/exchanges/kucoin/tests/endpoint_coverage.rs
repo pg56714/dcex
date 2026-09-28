@@ -2852,6 +2852,26 @@ async fn uta_amend_forwards_documented_fields_and_rejects_spot_symbols() {
 }
 
 #[tokio::test]
+async fn uta_trade_type_and_batch_symbols_reject_mismatches() {
+    let client = offline_private_client();
+    for (trade_type, symbol) in [("MARGIN", SWAP), ("SPOT", "XBTUSDTM"), ("FUTURES", SPOT)] {
+        for method in ["get_uta_leverage", "batch_cancel_uta_orders"] {
+            let mut params = vec![("tradeType".into(), trade_type.into())];
+            if method == "batch_cancel_uta_orders" {
+                params.push((
+                    "cancelOrderList".into(),
+                    serde_json::json!([{"symbol":symbol,"orderId":"123"}]).to_string(),
+                ));
+            } else {
+                params.push(("product_symbol".into(), symbol.into()));
+            }
+            let error = client.private_request(method, params).await.unwrap_err();
+            assert!(error.to_string().contains("tradeType"), "{method}: {error}");
+        }
+    }
+}
+
+#[tokio::test]
 async fn uta_risk_and_batch_endpoints_follow_official_payloads() {
     {
         let case = private(

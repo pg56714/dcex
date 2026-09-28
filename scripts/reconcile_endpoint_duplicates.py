@@ -210,6 +210,9 @@ def main() -> None:
             aliases[row["row"]] = min(r["row"] for r in matches)
     for number, target in aliases.items():
         row, original = rows[number], rows[target]
+        # Explicit migration decisions supersede this historical grouping pass.
+        if row.get("replacement_routes") or row["status"] == "unavailable":
+            continue
         if original["status"] not in {"protocol", "implemented"}:
             raise ValueError(f"Duplicate {number} has unimplemented target {target}")
         row.update(

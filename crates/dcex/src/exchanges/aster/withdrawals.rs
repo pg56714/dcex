@@ -50,6 +50,9 @@ impl AsterClient {
             p.required("userNonce")?;
             p.required("userSignature")?;
             p.optional_one_of("signatureType", &["EOA", "SafeWallet"])?;
+            if p.get("signatureChainId").is_some() {
+                p.required_u64_range("signatureChainId", 1, u64::MAX)?;
+            }
         }
         let prefix = if market == AsterMarket::Spot {
             "/api/v3"

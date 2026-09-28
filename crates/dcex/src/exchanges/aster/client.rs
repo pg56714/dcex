@@ -387,8 +387,8 @@ impl AsterClient {
                         );
                     if !original_order_nonce {
                         validate_nonce_window(nonce)?;
+                        self.last_nonce.fetch_max(nonce, Ordering::Relaxed);
                     }
-                    self.last_nonce.fetch_max(nonce, Ordering::Relaxed);
                     nonce
                 }
                 None => self.next_nonce()?,
@@ -501,13 +501,15 @@ impl AsterClient {
             .as_nanos()
             / 1_000;
         let now = u64::try_from(now).unwrap_or(u64::MAX);
-        Ok(self
+        let nonce = self
             .last_nonce
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |previous| {
                 Some(now.max(previous.saturating_add(1)))
             })
             .map(|previous| now.max(previous.saturating_add(1)))
-            .unwrap_or(now))
+            .unwrap_or(now);
+        validate_nonce_window(nonce)?;
+        Ok(nonce)
     }
 
     pub(super) fn exchange_symbol(&self, product_symbol: &str) -> Result<String> {
@@ -656,5 +658,18 @@ mod review_nonce_tests {
         });
         let unique: std::collections::HashSet<_> = values.iter().collect();
         assert_eq!(unique.len(), 1600);
+    }
+
+    #[test]
+    fn automatic_nonce_rejects_counter_outside_time_window() {
+        let client = signed_client();
+        client.last_nonce.store(u64::MAX - 1, Ordering::Relaxed);
+        assert!(
+            client
+                .next_nonce()
+                .unwrap_err()
+                .to_string()
+                .contains("within 60 seconds")
+        );
     }
 }

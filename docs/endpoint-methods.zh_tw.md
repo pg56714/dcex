@@ -111,6 +111,7 @@
 - [`get_bfusd_subscription_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/bfusd/history/subscriptionHistory.
 - [`get_borrow_interest_rate`](../dcex/binance/_generated/loan_http.py) — Get Borrow Interest Rate (USER_DATA).
 - [`get_c2_c_trade_history`](../dcex/binance/_generated/c2c_http.py) — Get C2C Trade History (USER_DATA).
+- [`get_c2c_trade_history`](../dcex/binance/_generated/c2c_http.py) — Get C2C Trade History (USER_DATA).
 - [`get_cloud_mining_payment_and_refund_history`](../dcex/binance/_trade_http.py) — GET /sapi/v1/asset/ledger-transfer/cloud-mining/queryByPage.
 - [`get_coin_futures_24h_ticker`](../dcex/binance/_market_http.py) — GET /dapi/v1/ticker/24hr.
 - [`get_coin_futures_account_trades`](../dcex/binance/_trade_http.py) — Call ``GET /dapi/v1/userTrades`` with signed authentication.
@@ -1146,6 +1147,8 @@
 - [`classic_tax_get_p2_p_account_record`](../dcex/bitget/_generated/p2p_http.py) — P2P Transaction Records.
 - [`classic_tax_get_spot_account_record`](../dcex/bitget/_generated/tax_http.py) — Spot Transaction Records.
 - [`classic_trade`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/convert/trade``.
+- [`close_copy_futures_follower_positions`](../dcex/bitget/_generated/copy_trading_http.py) — Close Positions.
+- [`close_copy_futures_trader_positions`](../dcex/bitget/_generated/copy_trading_http.py) — Close Tracking Order.
 - [`close_futures_positions`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/mix/order/close-positions``.
 - [`close_uta_positions`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v3/trade/close-positions``.
 - [`convert_classic_asset`](../dcex/bitget/_trade_http.py) — Call ``POST /api/v2/convert/trade``.
@@ -1966,6 +1969,7 @@
 - [`modify_uta_futures_leverage`](../dcex/kucoin/_trade_http.py) — Modify UTA futures leverage.
 - [`modify_uta_position_margin`](../dcex/kucoin/_trade_http.py) — Add (DEPOSIT) or reduce (WITHDRAW) isolated UTA futures position margin.
 - [`modify_uta_sub_account_api`](../dcex/kucoin/_trade_http.py) — POST /api/ua/v2/user/modify-sub-api-key.
+- [`place_copy_futures_stop_order`](../dcex/kucoin/_generated/copy_trading_http.py) — Add Take Profit And Stop Loss Order.
 - [`place_futures_batch_orders`](../dcex/kucoin/_trade_http.py) — Place 1 to 20 futures orders with native order fields or product_symbol.
 - [`place_futures_tpsl_order`](../dcex/kucoin/_trade_http.py) — POST /api/v1/st-orders; classic trading account.
 - [`place_margin_oco_order`](../dcex/kucoin/_trade_http.py) — POST /api/v3/hf/margin/oco-order; classic trading account.

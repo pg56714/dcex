@@ -5,6 +5,7 @@
     "path": "/api/v3/stockplus/asset/transfer",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -40,6 +41,7 @@
     "path": "/api/v3/stockplus/asset/transfer-records",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "transferId",
@@ -91,6 +93,7 @@
     "path": "/api/v3/stockplus/asset/account",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "currency",
@@ -110,6 +113,7 @@
     "path": "/api/v3/stockplus/asset/cash-flow",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -169,6 +173,7 @@
     "path": "/api/v3/stockplus/asset/stock-position",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -188,6 +193,7 @@
     "path": "/api/v3/stockplus/market/option-quote",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -207,6 +213,7 @@
     "path": "/api/v3/stockplus/market/option-chain-info",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -234,6 +241,7 @@
     "path": "/api/v3/stockplus/market/option-expiry-date",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -253,6 +261,7 @@
     "path": "/api/v3/stockplus/market/option-volume",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -272,6 +281,7 @@
     "path": "/api/v3/stockplus/trade/place-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -411,6 +421,7 @@
     "path": "/api/v3/stockplus/trade/modify-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -510,6 +521,7 @@
     "path": "/api/v3/stockplus/trade/cancel-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -545,6 +557,7 @@
     "path": "/api/v3/stockplus/trade/today-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -596,6 +609,7 @@
     "path": "/api/v3/stockplus/trade/history-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -655,6 +669,7 @@
     "path": "/api/v3/stockplus/trade/order-detail",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -674,6 +689,7 @@
     "path": "/api/v3/stockplus/trade/today-executions",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -701,6 +717,7 @@
     "path": "/api/v3/stockplus/trade/history-executions",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -736,6 +753,7 @@
     "path": "/api/v3/stockplus/market/static",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -755,6 +773,7 @@
     "path": "/api/v3/stockplus/market/candlestick",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -806,6 +825,7 @@
     "path": "/api/v3/stockplus/market/history-candlestick",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -873,6 +893,7 @@
     "path": "/api/v3/stockplus/market/depth",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -892,6 +913,7 @@
     "path": "/api/v3/stockplus/market/intraday",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -911,6 +933,7 @@
     "path": "/api/v3/stockplus/market/quote",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -930,6 +953,7 @@
     "path": "/api/v3/stockplus/market/trade",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",

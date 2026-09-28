@@ -54,7 +54,16 @@ def test_arcus_spot_native_public_routes() -> None:
         assert client.public_request_json("health", [])[2] == {"ok": True}
         assert received.get_nowait()["path"] == "/health"
         assert client.public_request_json("get_tokens", [])[2] == {"ok": True}
-        assert received.get_nowait()["path"] == "/v1/tokens"
+        tokens = received.get_nowait()
+        assert tokens["method"] == "GET"
+        assert tokens["path"] == "/v1/tokens"
+        assert client.public_request_json(
+            "get_price", [("sellToken", SELL), ("buyToken", BUY), ("sellAmount", "1000000")]
+        )[2] == {"ok": True}
+        price = received.get_nowait()
+        assert price["method"] == "GET"
+        assert urlsplit(price["path"]).path == "/v1/price"
+        assert parse_qs(urlsplit(price["path"]).query)["sellAmount"] == ["1000000"]
         assert client.public_request_json(
             "get_quote",
             [
@@ -66,6 +75,7 @@ def test_arcus_spot_native_public_routes() -> None:
             ],
         )[2] == {"ok": True}
         request = received.get_nowait()
+        assert request["method"] == "GET"
         assert urlsplit(request["path"]).path == "/v1/quote"
         query = parse_qs(urlsplit(request["path"]).query)
         assert query["chainId"] == ["4663"]
@@ -123,12 +133,15 @@ def test_arcus_spot_signed_submit_and_status_routes_are_complete() -> None:
         signed_quote = _signed_spot_quote(4663)
         assert client.submit_signed_quote(signed_quote) == {"ok": True}
         submit = received.get_nowait()
+        assert submit["method"] == "POST"
         assert submit["path"] == "/v1/submit"
         assert json.loads(submit["body"]) == signed_quote
 
         tx_hash = "0x" + "55" * 32
         assert client.get_status(tx_hash) == {"ok": True}
-        status = urlsplit(received.get_nowait()["path"])
+        status_request = received.get_nowait()
+        assert status_request["method"] == "GET"
+        status = urlsplit(status_request["path"])
         assert status.path == "/v1/status"
         assert parse_qs(status.query) == {
             "chainId": ["4663"],

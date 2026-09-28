@@ -5,6 +5,7 @@
     "path": "/api/v2/copy/mix-follower/copy-settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -106,6 +107,7 @@
     "path": "/api/v2/copy/mix-follower/query-current-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "idLessThan",
@@ -181,6 +183,7 @@
     "path": "/api/v2/copy/mix-follower/query-history-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "idLessThan",
@@ -256,6 +259,7 @@
     "path": "/api/v2/copy/mix-follower/setting-tpsl",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "trackingNo",
@@ -312,6 +316,7 @@
     "path": "/api/v2/copy/mix-follower/close-positions",
     "public": false,
     "confirm": false,
+    "scoped": true,
     "fields": [
       {
         "wire": "productType",
@@ -377,6 +382,7 @@
     "path": "/api/v2/copy/mix-follower/query-settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -396,6 +402,7 @@
     "path": "/api/v2/copy/mix-follower/settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -504,6 +511,7 @@
     "path": "/api/v2/copy/mix-follower/cancel-trader",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -524,6 +532,7 @@
     "path": "/api/v2/copy/mix-follower/query-traders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -567,6 +576,7 @@
     "path": "/api/v2/copy/mix-follower/query-quantity-limit",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -594,6 +604,7 @@
     "path": "/api/v2/copy/mix-trader/create-copy-api",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "passphrase",
@@ -614,6 +625,7 @@
     "path": "/api/v2/copy/mix-trader/order-current-track",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -681,6 +693,7 @@
     "path": "/api/v2/copy/mix-trader/order-history-track",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "idLessThan",
@@ -756,6 +769,7 @@
     "path": "/api/v2/copy/mix-trader/order-close-positions",
     "public": false,
     "confirm": false,
+    "scoped": true,
     "fields": [
       {
         "wire": "trackingNo",
@@ -794,6 +808,7 @@
     "path": "/api/v2/copy/mix-trader/order-modify-tpsl",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -850,6 +865,7 @@
     "path": "/api/v2/copy/mix-trader/order-total-detail",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-tracking-order-summary",
     "summary": "Get Tracking Order Summary"
@@ -860,6 +876,7 @@
     "path": "/api/v2/copy/mix-trader/profit-history-summarys",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-history-profit-summary",
     "summary": "Get History Profit Summary"
@@ -870,6 +887,7 @@
     "path": "/api/v2/copy/mix-trader/profit-history-details",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -929,6 +947,7 @@
     "path": "/api/v2/copy/mix-trader/profit-details",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -964,6 +983,7 @@
     "path": "/api/v2/copy/mix-trader/profits-group-coin-date",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "pageSize",
@@ -991,6 +1011,7 @@
     "path": "/api/v2/copy/mix-trader/config-query-symbols",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "productType",
@@ -1010,6 +1031,7 @@
     "path": "/api/v2/copy/mix-trader/config-setting-symbols",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "settingList",
@@ -1060,6 +1082,7 @@
     "path": "/api/v2/copy/mix-trader/config-settings-base",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "enable",
@@ -1098,6 +1121,7 @@
     "path": "/api/v2/copy/mix-trader/config-query-followers",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "pageNo",
@@ -1141,6 +1165,7 @@
     "path": "/api/v2/copy/mix-trader/config-remove-follower",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "followerUid",
@@ -1161,6 +1186,7 @@
     "path": "/api/v2/copy/spot-follower/cancel-trader",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -1181,6 +1207,7 @@
     "path": "/api/v2/copy/spot-follower/order-close-tracking",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "trackingNoList",
@@ -1213,6 +1240,7 @@
     "path": "/api/v2/copy/spot-follower/query-current-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -1280,6 +1308,7 @@
     "path": "/api/v2/copy/spot-follower/query-history-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -1347,6 +1376,7 @@
     "path": "/api/v2/copy/spot-follower/query-settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -1366,6 +1396,7 @@
     "path": "/api/v2/copy/spot-follower/query-trader-symbols",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -1385,6 +1416,7 @@
     "path": "/api/v2/copy/spot-follower/query-traders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "pageNo",
@@ -1428,6 +1460,7 @@
     "path": "/api/v2/copy/spot-follower/setting-tpsl",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "trackingNo",
@@ -1466,6 +1499,7 @@
     "path": "/api/v2/copy/spot-follower/settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "traderId",
@@ -1548,6 +1582,7 @@
     "path": "/api/v2/copy/spot-follower/stop-order",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "trackingNoList",
@@ -1571,6 +1606,7 @@
     "path": "/api/v2/copy/spot-trader/config-query-followers",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "pageNo",
@@ -1614,6 +1650,7 @@
     "path": "/api/v2/copy/spot-trader/config-query-settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-copytrade-configuration",
     "summary": "Get Copytrade Configuration"
@@ -1624,6 +1661,7 @@
     "path": "/api/v2/copy/spot-trader/config-remove-follower",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "followerUid",
@@ -1644,6 +1682,7 @@
     "path": "/api/v2/copy/spot-trader/config-setting-symbols",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbolList",
@@ -1676,6 +1715,7 @@
     "path": "/api/v2/copy/spot-trader/order-close-tracking",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "trackingNoList",
@@ -1708,6 +1748,7 @@
     "path": "/api/v2/copy/spot-trader/order-current-track",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",
@@ -1767,6 +1808,7 @@
     "path": "/api/v2/copy/spot-trader/order-history-track",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "idLessThan",
@@ -1826,6 +1868,7 @@
     "path": "/api/v2/copy/spot-trader/order-modify-tpsl",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "trackingNo",
@@ -1864,6 +1907,7 @@
     "path": "/api/v2/copy/spot-trader/order-total-detail",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-data-indicator-statistics",
     "summary": "Get Data Indicator Statistics"
@@ -1874,6 +1918,7 @@
     "path": "/api/v2/copy/spot-trader/profit-details",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -1909,6 +1954,7 @@
     "path": "/api/v2/copy/spot-trader/profit-history-details",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "idLessThan",
@@ -1968,6 +2014,7 @@
     "path": "/api/v2/copy/spot-trader/profit-summarys",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-profit-summary",
     "summary": "Get Profit Summary"
@@ -1978,6 +2025,7 @@
     "path": "/api/v3/copy/futures/follower-settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2077,6 +2125,7 @@
     "path": "/api/v3/copy/futures/modify-follower-settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2152,6 +2201,7 @@
     "path": "/api/v3/copy/futures/unfollow",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2179,6 +2229,7 @@
     "path": "/api/v3/copy/futures/copy-settings",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2198,6 +2249,7 @@
     "path": "/api/v3/copy/futures/copy-transfer",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2249,6 +2301,7 @@
     "path": "/api/v3/copy/futures/copy-transfer-record",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2284,6 +2337,7 @@
     "path": "/api/v3/copy/futures/current-copy",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2303,6 +2357,7 @@
     "path": "/api/v3/copy/futures/copy-profit-details",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2354,6 +2409,7 @@
     "path": "/api/v3/copy/futures/close-positions",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2397,6 +2453,7 @@
     "path": "/api/v3/copy/futures/close-all",
     "public": false,
     "confirm": true,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2416,6 +2473,7 @@
     "path": "/api/v3/copy/futures/current-positions",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2451,6 +2509,7 @@
     "path": "/api/v3/copy/futures/place-tpsl",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2510,6 +2569,7 @@
     "path": "/api/v3/copy/futures/modify-tpsl",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2569,6 +2629,7 @@
     "path": "/api/v3/copy/futures/cancel-tpsl",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2596,6 +2657,7 @@
     "path": "/api/v3/copy/futures/current-tpsl-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2615,6 +2677,7 @@
     "path": "/api/v3/copy/futures/tpsl-order-history",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "projectId",
@@ -2666,6 +2729,7 @@
     "path": "/api/v3/copy/futures/position-summary",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-position-summary",
     "summary": "Get Position Summary"
@@ -2676,6 +2740,7 @@
     "path": "/api/v3/copy/futures/trading-pairs",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-trading-pairs",
     "summary": "Get Trading Pairs"
@@ -2686,6 +2751,7 @@
     "path": "/api/v3/copy/futures/max-transferable",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -2705,6 +2771,7 @@
     "path": "/api/v3/copy/futures/transfer",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "type",
@@ -2748,6 +2815,7 @@
     "path": "/api/v3/copy/futures/transfer-record",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -2791,6 +2859,7 @@
     "path": "/api/v3/copy/futures/current-follower",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "limit",
@@ -2818,6 +2887,7 @@
     "path": "/api/v3/copy/futures/history-follower",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "limit",
@@ -2845,6 +2915,7 @@
     "path": "/api/v3/copy/futures/profit-summary",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-profit-summary",
     "summary": "Get Profit Summary"
@@ -2855,6 +2926,7 @@
     "path": "/api/v3/copy/futures/profit-details",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -2898,6 +2970,7 @@
     "path": "/api/v3/copy/futures/portfolio-overview",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "period",

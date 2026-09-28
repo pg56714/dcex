@@ -114,6 +114,11 @@ impl KucoinClient {
                         .ok_or_else(|| {
                             DcexError::InvalidInput("KuCoin batch cancel requires symbol".into())
                         })?;
+                    if is_spot_symbol(symbol) == uta_is_futures(params) {
+                        return Err(DcexError::InvalidInput(
+                            "symbol does not match tradeType".into(),
+                        ));
+                    }
                     let symbol = self.exchange_symbol(symbol, uta_is_futures(params))?;
                     object.insert("symbol".into(), Value::String(symbol));
                 }

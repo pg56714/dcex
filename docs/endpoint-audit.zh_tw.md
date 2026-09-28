@@ -16,11 +16,11 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 
 | 狀態 | 列數 | 定義 |
 | --- | ---: | --- |
-| `implemented` | 3,732 | 具備精確離線 HTTP 路由證據及 Rust／Python 公開方法 |
+| `implemented` | 3,696 | 具備精確離線 HTTP 路由證據及 Rust／Python 公開方法 |
 | `protocol` | 403 | 非同步 WebSocket 協定支援，附離線驗證證據；不代表線上認證 |
-| `superseded` | 650 | 歷史端點或群組列，已由目前的明確列取代 |
-| `unavailable` | 18 | 官方停用、目前不可用的操作，或沒有獨立端點的文件章節 |
-| `unverified` | 12 | 已有包裝，但部分官方規格不完整 |
+| `superseded` | 686 | 歷史端點或群組列，已由目前的明確列取代 |
+| `unavailable` | 19 | 官方停用、目前不可用的操作，或沒有獨立端點的文件章節 |
+| `unverified` | 11 | 已有包裝，但部分官方規格不完整 |
 | `blocked` | 30 | 缺少必要簽章或授權規格 |
 | `partial` | 1 | 群組能力仍有明確記錄的缺口 |
 | `pending` | 0 | 已列入官方清冊，待實作或專屬驗證 |
@@ -31,21 +31,21 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 
 | 交易所 | 公開方法 | 新增 | 已實作列 | 待處理列 |
 | --- | ---: | ---: | ---: | ---: |
-| [binance](official-endpoint-inventory/binance.json) | 757 | 448 | 748 | 0 |
+| [binance](official-endpoint-inventory/binance.json) | 758 | 449 | 748 | 0 |
 | [bybit](official-endpoint-inventory/bybit.json) | 448 | 278 | 434 | 0 |
 | [okx](official-endpoint-inventory/okx.json) | 404 | 228 | 388 | 0 |
-| [bitget](official-endpoint-inventory/bitget.json) | 636 | 498 | 610 | 0 |
-| [bingx](official-endpoint-inventory/bingx.json) | 210 | 121 | 190 | 0 |
-| [kraken](official-endpoint-inventory/kraken.json) | 164 | 98 | 152 | 0 |
+| [bitget](official-endpoint-inventory/bitget.json) | 638 | 500 | 610 | 0 |
+| [bingx](official-endpoint-inventory/bingx.json) | 210 | 121 | 191 | 0 |
+| [kraken](official-endpoint-inventory/kraken.json) | 164 | 98 | 148 | 0 |
 | [mexc](official-endpoint-inventory/mexc.json) | 176 | 56 | 157 | 0 |
-| [kucoin](official-endpoint-inventory/kucoin.json) | 367 | 251 | 350 | 0 |
-| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 146 | 100 | 120 | 0 |
+| [kucoin](official-endpoint-inventory/kucoin.json) | 368 | 252 | 340 | 0 |
+| [hyperliquid](official-endpoint-inventory/hyperliquid.json) | 146 | 100 | 118 | 0 |
 | [lighter](official-endpoint-inventory/lighter.json) | 136 | 64 | 110 | 0 |
 | [backpack](official-endpoint-inventory/backpack.json) | 82 | 18 | 79 | 0 |
-| [aster](official-endpoint-inventory/aster.json) | 157 | 69 | 168 | 0 |
-| [extended](official-endpoint-inventory/extended.json) | 72 | 31 | 75 | 0 |
+| [aster](official-endpoint-inventory/aster.json) | 157 | 69 | 152 | 0 |
+| [extended](official-endpoint-inventory/extended.json) | 72 | 31 | 72 | 0 |
 | [ondo](official-endpoint-inventory/ondo.json) | 78 | 7 | 72 | 0 |
-| [arcus](official-endpoint-inventory/arcus.json) | 90 | 50 | 79 | 0 |
+| [arcus](official-endpoint-inventory/arcus.json) | 90 | 50 | 77 | 0 |
 
 ## 驗證與限制
 

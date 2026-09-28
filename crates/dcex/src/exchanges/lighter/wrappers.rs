@@ -217,7 +217,9 @@ crate::exchanges::impl_exchange_method_wrappers! {@extend;LighterClient;public [
 
 crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public [get_pnl_leaderboard(time_window => "time_window",sort_by => "sort_by",sort_dir => "sort_dir",limit => "limit",offset => "offset"),get_explorer_account_logs(param => "param",limit => "limit",offset => "offset"),get_explorer_account_positions(param => "param"),get_explorer_account_assets(param => "param"),get_explorer_batches(),get_explorer_batch(batch_id => "batchId"),get_explorer_blocks(),get_explorer_block(block_id => "blockId"),get_explorer_log(hash => "hash"),get_explorer_markets(),get_explorer_market_logs(symbol => "symbol"),search_explorer(q => "q"),get_explorer_transaction_stats(aggregation_period => "aggregation_period"),get_explorer_total()]; private [export_historical_trades(l1_address => "l1_address",date => "date")];}
 
-crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public []; private [transfer_same_master_account(to_account_index => "to_account_index",asset_index => "asset_index",from_route_type => "from_route_type",to_route_type => "to_route_type",amount => "amount"),transfer_l2_account(to_account_index => "to_account_index",asset_index => "asset_index",from_route_type => "from_route_type",to_route_type => "to_route_type",amount => "amount")];}
+crate::exchanges::impl_exchange_method_wrappers! {@extend; LighterClient; public []; private [transfer_same_master_account(to_account_index => "to_account_index",asset_index => "asset_index",from_route_type => "from_route_type",to_route_type => "to_route_type",amount => "amount"),
+/// The recipient may be another user. Transfers have no second confirmation; they execute on submit.
+transfer_l2_account(to_account_index => "to_account_index",asset_index => "asset_index",from_route_type => "from_route_type",to_route_type => "to_route_type",amount => "amount")];}
 impl LighterClient {
     pub async fn sign_transfer_same_master_account(
         &self,

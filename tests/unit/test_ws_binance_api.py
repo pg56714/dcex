@@ -331,7 +331,7 @@ async def test_coin_m_ws_conditionals_point_to_current_algo_endpoint(kind):
 
     client = CoinFuturesApiClient("key", "secret", base_url="ws://127.0.0.1:9")
     try:
-        with pytest.raises(ValueError, match="/dapi/v1/algoOrder"):
+        with pytest.raises(ValueError, match="place_coin_futures_algo_order"):
             await client.place_order(
                 {"symbol": "BTCUSD_PERP", "side": "SELL", "type": kind, "quantity": "1"}
             )

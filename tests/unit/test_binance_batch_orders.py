@@ -74,7 +74,7 @@ async def test_conditional_batch_rejected_before_any_transport(asynchronous, coi
         protective["stopPrice"] = "49000"
     if kind in {"STOP", "TAKE_PROFIT"}:
         protective["price"] = "49000"
-    expected = "/dapi/v1/algoOrder" if coin else "place_futures_algo_order"
+    expected = "place_coin_futures_algo_order" if coin else "place_futures_algo_order"
     with _http_server() as (base, received):
         async with batch_client(asynchronous, base) as client:
             with pytest.raises(ValueError, match=expected):

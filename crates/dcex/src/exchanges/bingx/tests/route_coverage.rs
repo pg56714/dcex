@@ -2057,6 +2057,12 @@ fn coin_swap_and_oco_routes_match_official_paths() {
         let request = next(&receiver, name);
         assert_eq!(request.method, *verb);
         assert_eq!(request.path, *path);
+        if matches!(
+            name,
+            &"create_sub_account_api_key" | &"modify_sub_account_api_key"
+        ) {
+            assert_eq!(request.body["permissions"], serde_json::json!([4, 5]));
+        }
         assert_eq!(
             request.get("signature").is_some() || request.body.get("signature").is_some(),
             !public

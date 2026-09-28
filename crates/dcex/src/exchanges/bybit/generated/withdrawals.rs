@@ -6,6 +6,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         cancel_withdrawal(id => "id"),
+        /// API withdrawals have no second confirmation; they execute on submit.
+        /// With forceChain=2 the recipient may be another Bybit user.
         create_withdrawal(coin => "coin", address => "address", amount => "amount", timestamp => "timestamp", account_type => "accountType"),
     ];
 }

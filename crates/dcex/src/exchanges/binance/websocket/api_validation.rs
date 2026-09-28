@@ -137,7 +137,7 @@ pub(super) fn validate(
                     "unsupported order type; USD-M conditional orders use algoOrder.place"
                 }
                 BinanceWebSocketApiMarket::CoinFutures => {
-                    "unsupported order type; COIN-M conditional orders use REST /dapi/v1/algoOrder after migration"
+                    "unsupported order type; COIN-M conditional orders use place_coin_futures_algo_order (REST /dapi/v1/algoOrder) after migration"
                 }
                 BinanceWebSocketApiMarket::Spot => "unsupported order type",
             }));

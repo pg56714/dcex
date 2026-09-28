@@ -5,6 +5,7 @@
     "path": "/api/v2/p2p/merchantList",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "online",
@@ -40,6 +41,7 @@
     "path": "/api/v2/p2p/merchantInfo",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-information",
     "summary": "Get Merchant Information"
@@ -50,6 +52,7 @@
     "path": "/api/v2/p2p/advList",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -165,6 +168,7 @@
     "path": "/api/v2/p2p/orderList",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -264,6 +268,7 @@
     "path": "/api/v2/tax/p2p-record",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coin",
@@ -315,6 +320,7 @@
     "path": "/api/v3/p2p/ad-list",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -374,6 +380,7 @@
     "path": "/api/v3/p2p/exchange-rate",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -401,6 +408,7 @@
     "path": "/api/v3/p2p/fee-simulate",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -452,6 +460,7 @@
     "path": "/api/v3/p2p/ad-limit",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -487,6 +496,7 @@
     "path": "/api/v3/p2p/ad-create",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -615,6 +625,7 @@
     "path": "/api/v3/p2p/ad-update",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "advId",
@@ -727,6 +738,7 @@
     "path": "/api/v3/p2p/ad-operate",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "advId",
@@ -754,6 +766,7 @@
     "path": "/api/v3/p2p/ad-info",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "advId",
@@ -773,6 +786,7 @@
     "path": "/api/v3/p2p/my-ads",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -848,6 +862,7 @@
     "path": "/api/v3/p2p/balance",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "token",
@@ -867,6 +882,7 @@
     "path": "/api/v3/p2p/pending-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -926,6 +942,7 @@
     "path": "/api/v3/p2p/all-orders",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "startTime",
@@ -993,6 +1010,7 @@
     "path": "/api/v3/p2p/order-info",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -1012,6 +1030,7 @@
     "path": "/api/v3/p2p/order-pay",
     "public": false,
     "confirm": true,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -1031,6 +1050,7 @@
     "path": "/api/v3/p2p/order-release",
     "public": false,
     "confirm": true,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",
@@ -1050,6 +1070,7 @@
     "path": "/api/v3/p2p/user-info",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-user-info",
     "summary": "Get User Info"
@@ -1060,6 +1081,7 @@
     "path": "/api/v3/p2p/currencies",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-currencies",
     "summary": "Get Currencies"
@@ -1070,6 +1092,7 @@
     "path": "/api/v3/p2p/pay-method",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-pay-methods",
     "summary": "Get Pay Methods"

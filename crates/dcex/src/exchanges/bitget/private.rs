@@ -11,6 +11,12 @@ impl BitgetClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let method_name = match method_name {
+            "close_copy_futures_follower_positions" => {
+                "classic_copytrading_future_copytrade_follower_close_positions"
+            }
+            "close_copy_futures_trader_positions" => {
+                "classic_copytrading_future_copytrade_trader_trader_order_close_positions"
+            }
             "convert_classic_asset" => "classic_trade",
             "convert_uta_small_assets" => "uta_small_assets_trade",
             "subscribe_classic_elite" => "classic_earn_elite_subscribe",

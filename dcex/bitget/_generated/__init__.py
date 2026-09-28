@@ -33,3 +33,10 @@ class GeneratedHTTP(
     MarketHTTP,
 ):
     """Business-specific generated methods with compatible base precedence."""
+
+    close_copy_futures_follower_positions = vars(GeneratedCopyTradingHTTP)[
+        "classic_copytrading_future_copytrade_follower_close_positions"
+    ]
+    close_copy_futures_trader_positions = vars(GeneratedCopyTradingHTTP)[
+        "classic_copytrading_future_copytrade_trader_trader_order_close_positions"
+    ]

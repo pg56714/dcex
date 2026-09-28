@@ -17,7 +17,7 @@ ALIASES = json.loads(
 @pytest.mark.parametrize("case", ALIASES, ids=lambda c: c["file"] + ":" + c["method"])
 def test_canonical_signature_and_legacy_metadata(case):
     module = case["file"].replace("\\", ".").replace("/", ".").removesuffix(".py")
-    cls = import_module(module).TradeHTTP
+    cls = getattr(import_module(module), case["class"])
     method = getattr(cls, case["method"])
     params = inspect.signature(method).parameters
     assert all(new in params and old not in params for old, new in case["aliases"].items())

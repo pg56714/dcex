@@ -10,6 +10,10 @@ impl KucoinClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
+        let method_name = match method_name {
+            "place_copy_futures_stop_order" => "post_v1_copy_trade_futures_st_orders",
+            other => other,
+        };
         if method_name == "cancel_margin_stop_order_by_id_raw" {
             // Official docs omit all request parameters. Preserve the caller's query.
             return self

@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from dcex._operation_guards import require_confirmation
+from dcex._operation_guards import require_confirmation, require_scope
 
 from .._market_http import MarketHTTP
 
@@ -153,13 +153,17 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
         margin_coin: str | None = None,
         margin_mode: str | None = None,
         hold_side: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
         """
         Close Positions.
 
         Use native exchange symbols. Optional fields retain their documented types.
         Source: https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#close-positions
+        Supply symbol or tracking_no, or explicitly set all_symbols=True.
+        The official documentation does not define unfiltered scope precisely.
         """
+        require_scope(symbol or tracking_no, all_symbols)
         return await self._native_private(
             "classic_copytrading_future_copytrade_follower_close_positions",
             self._native_params(
@@ -170,6 +174,7 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
                     "marginCoin": margin_coin,
                     "marginMode": margin_mode,
                     "holdSide": hold_side,
+                    "all_symbols": all_symbols,
                 }
             ),
         )
@@ -344,18 +349,31 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
         )
 
     async def classic_copytrading_future_copytrade_trader_trader_order_close_positions(
-        self, *, product_type: str, tracking_no: str | None = None, symbol: str | None = None
+        self,
+        *,
+        product_type: str,
+        tracking_no: str | None = None,
+        symbol: str | None = None,
+        all_symbols: bool = False,
     ) -> dict[str, Any]:
         """
         Close Tracking Order.
 
         Use native exchange symbols. Optional fields retain their documented types.
         Source: https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#close-tracking-order
+        Supply symbol or tracking_no, or explicitly set all_symbols=True.
+        The official documentation does not define unfiltered scope precisely.
         """
+        require_scope(symbol or tracking_no, all_symbols)
         return await self._native_private(
             "classic_copytrading_future_copytrade_trader_trader_order_close_positions",
             self._native_params(
-                **{"productType": product_type, "trackingNo": tracking_no, "symbol": symbol}
+                **{
+                    "productType": product_type,
+                    "trackingNo": tracking_no,
+                    "symbol": symbol,
+                    "all_symbols": all_symbols,
+                }
             ),
         )
 

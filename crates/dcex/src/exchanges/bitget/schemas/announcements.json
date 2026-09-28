@@ -5,6 +5,7 @@
     "path": "/api/v2/public/annoucements",
     "public": true,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "annType",

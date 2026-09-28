@@ -1,12 +1,13 @@
 """Offline coverage for binance order and asset requests."""
 # ruff: noqa: ANN001, ANN201, D103
 
+
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
 
 from tests.unit.native_http_helpers import _http_server
-from tests.unit.test_binance_batch_orders import batch_client, invoke
+from tests.unit.test_binance_batch_orders import batch_client, batch_kwargs, invoke
 
 
 @pytest.mark.asyncio
@@ -87,14 +88,6 @@ async def test_binance_review_names_and_fields(asynchronous, method, kwargs, pat
         assert dict(pairs)["symbol"] == "BTCUSD_PERP"
 
 
-import inspect
-import json
-
-import pytest
-
-from tests.unit.test_binance_batch_orders import batch_kwargs
-
-
 @pytest.mark.asyncio
 @pytest.mark.parametrize("asynchronous", [False, True])
 @pytest.mark.parametrize(
@@ -169,96 +162,6 @@ async def test_batch_amend_rejects_undocumented_reduce_only(asynchronous, method
             with pytest.raises(ValueError, match="unsupported order field"):
                 await invoke(client, method, **kwargs)
         assert received.empty()
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize(
-    "exchange,method,base_kwargs,id_kwargs,path,verb",
-    [
-        (
-            "kucoin",
-            "cancel_spot_stop_orders",
-            {},
-            {"order_ids": "123,456"},
-            "/api/v1/stop-order/cancel",
-            "DELETE",
-        ),
-        (
-            "kucoin",
-            "cancel_spot_oco_orders",
-            {},
-            {"order_ids": "123,456"},
-            "/api/v3/oco/orders",
-            "DELETE",
-        ),
-        (
-            "kucoin",
-            "cancel_margin_oco_orders",
-            {},
-            {"order_ids": "123,456"},
-            "/api/v3/hf/margin/oco-order/cancel",
-            "DELETE",
-        ),
-        (
-            "bitget",
-            "cancel_futures_plan_orders",
-            {"product_type": "USDT-FUTURES"},
-            {"order_id_list": [{"orderId": "123"}]},
-            "/api/v2/mix/order/cancel-plan-order",
-            "POST",
-        ),
-    ],
-)
-@pytest.mark.parametrize("scope", ["ids", "symbol", "conflict"])
-async def test_id_scoped_cancel_wire(
-    asynchronous, exchange, method, base_kwargs, id_kwargs, path, verb, scope
-):
-    import importlib
-
-    helper = importlib.import_module(f"tests.unit.test_{exchange}_endpoint_coverage")
-    prefix = "dcex.async_support" if asynchronous else "dcex"
-    cls = importlib.import_module(f"{prefix}.{exchange}.client").Client
-    payload = {"code": "200000" if exchange == "kucoin" else "00000", "data": {}}
-    with _http_server(payload) as (base, received):
-        config = (
-            helper._client_kwargs(base, base)
-            if exchange == "kucoin"
-            else helper._client_kwargs(base)
-        )
-        client = cls(**config)
-        if asynchronous:
-            await client.async_init()
-        kwargs = dict(base_kwargs)
-        if scope == "ids":
-            kwargs.update(id_kwargs)
-        else:
-            kwargs["product_symbol"] = "BTC-USDT-SPOT" if exchange == "kucoin" else "BTC-USDT-SWAP"
-        try:
-            if scope == "conflict":
-                with pytest.raises(ValueError, match="exclusively"):
-                    await invoke(client, method, **kwargs, all_symbols=True)
-                assert received.empty()
-                return
-            await invoke(client, method, **kwargs)
-        finally:
-            result = client.close()
-            if inspect.isawaitable(result):
-                await result
-        request = received.get_nowait()
-        assert request["method"] == verb
-        assert urlsplit(request["path"]).path == path
-        fields = (
-            json.loads(request["body"])
-            if exchange == "bitget"
-            else dict(parse_qsl(urlsplit(request["path"]).query))
-        )
-        assert "all_symbols" not in fields
-        if scope == "ids":
-            assert "symbol" not in fields
-            assert fields["orderIdList" if exchange == "bitget" else "orderIds"] == (
-                id_kwargs.get("order_id_list") or id_kwargs["order_ids"]
-            )
 
 
 @pytest.mark.asyncio

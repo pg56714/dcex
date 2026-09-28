@@ -1,6 +1,7 @@
 """Every implemented ledger claim must have callable wrappers and wire-test evidence."""
 
 import importlib
+import ast
 import json
 import re
 from functools import cache
@@ -17,6 +18,88 @@ from tests.unit.ledger_route_evidence import (
 
 LEDGER = json.loads((ROOT / "docs/endpoint-coverage-ledger.json").read_text(encoding="utf-8"))
 IMPLEMENTED = [r for r in LEDGER["rows"] if r["status"] == "implemented"]
+
+
+def _route_identity(row):
+    # An action's suboperation and a Lighter transaction type are route selectors.
+    return tuple(
+        json.dumps(row.get(key), sort_keys=True)
+        for key in (
+            "exchange",
+            "http_method",
+            "path",
+            "host",
+            "channel",
+            "actions",
+            "tx_types",
+            "operation",
+        )
+    )
+
+
+def test_implemented_routes_are_unique():
+    seen = {}
+    for row in IMPLEMENTED:
+        key = _route_identity(row)
+        assert key not in seen, (seen.get(key), row["row"])
+        seen[key] = row["row"]
+
+
+def test_superseded_rows_target_same_route_or_declared_replacement():
+    rows = {r["row"]: r for r in LEDGER["rows"]}
+    failures = []
+    for row in rows.values():
+        if row["status"] != "superseded" or "superseded_by" not in row:
+            continue
+        targets = row["superseded_by"]
+        for number in targets if isinstance(targets, list) else [targets]:
+            target = rows[number]
+            assert target["exchange"] == row["exchange"]
+            same = all(
+                row.get(key) == target.get(key)
+                for key in (
+                    "http_method",
+                    "path",
+                    "host",
+                    "channel",
+                    "actions",
+                    "tx_types",
+                    "operation",
+                )
+            )
+            grouped = row.get("channel") is not None and row["channel"] in target.get(
+                "channels", []
+            )
+            declared = any(
+                all(target.get(k) == v for k, v in route.items())
+                for route in row.get("replacement_routes", [])
+            )
+            grouped = grouped or any(
+                all(row.get(k) == v for k, v in route.items())
+                for route in target.get("covered_routes", [])
+            )
+            if not (same or grouped or declared):
+                failures.append((row["row"], number, row.get("path"), row.get("channel")))
+    assert not failures, failures
+
+
+def test_evidence_symbols_exist_and_numeric_anchors_are_forbidden():
+    for row in LEDGER["rows"]:
+        for evidence in row.get("evidence", []):
+            assert not re.search(r":\d+$", evidence), (row["row"], evidence)
+            if "::" not in evidence:
+                continue
+            path, symbol = evidence.split("::", 1)
+            source = (ROOT / path).read_text(encoding="utf8")
+            if path.endswith(".py"):
+                names = {
+                    node.name
+                    for node in ast.walk(ast.parse(source))
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                }
+                assert symbol.split(".")[-1] in names, (row["row"], evidence)
+            else:
+                assert re.search(r"\b" + re.escape(symbol) + r"\b", source), (row["row"], evidence)
 
 
 @cache

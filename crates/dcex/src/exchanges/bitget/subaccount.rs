@@ -29,36 +29,6 @@ impl BitgetClient {
         for key in required {
             nonempty(params, key)?;
         }
-        if name.starts_with("create_") && name.ends_with("withdrawal") {
-            let transfer_type = nonempty(params, "transferType")?;
-            if !["on_chain", "internal_transfer"].contains(&transfer_type) {
-                return Err(invalid(
-                    "transferType must be on_chain or internal_transfer",
-                ));
-            }
-            if transfer_type == "on_chain" {
-                nonempty(params, "chain")?;
-            }
-            if !crate::common::is_positive_plain_decimal(params.required("size")?) {
-                return Err(invalid("size must be a positive plain decimal string"));
-            }
-            if let Some(kind) = params.get("innerToType") {
-                if !["uid", "email", "mobile"].contains(&kind) {
-                    return Err(invalid("invalid innerToType"));
-                }
-                if kind == "mobile" {
-                    nonempty(params, "areaCode")?;
-                }
-            }
-            for (key, values) in [
-                ("memberCode", &["bithumb", "korbit", "coinone"][..]),
-                ("identityType", &["user", "company"][..]),
-            ] {
-                if params.get(key).is_some_and(|v| !values.contains(&v)) {
-                    return Err(invalid(&format!("invalid {key}")));
-                }
-            }
-        }
         {
             let username = nonempty(params, "username")?;
             if username.len() > 20 || !username.bytes().all(|b| b.is_ascii_lowercase()) {

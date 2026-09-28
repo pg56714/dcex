@@ -322,7 +322,7 @@ fn validate_order(
             return Err(invalid(if market == BinanceMarket::Futures {
                 "USD-M conditional orders cannot be batched; use place_futures_algo_order"
             } else {
-                "COIN-M conditional orders cannot be batched after migration; use REST /dapi/v1/algoOrder"
+                "COIN-M conditional orders cannot be batched after migration; use place_coin_futures_algo_order (REST /dapi/v1/algoOrder)"
             }));
         }
         let close_all = order.get("closePosition").and_then(Value::as_str) == Some("true");

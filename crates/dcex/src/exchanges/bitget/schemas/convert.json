@@ -5,6 +5,7 @@
     "path": "/api/v2/convert/bgb-convert",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "coinList",
@@ -28,6 +29,7 @@
     "path": "/api/v2/convert/bgb-convert-coin-list",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [],
     "source": "https://www.bitget.com/docs/catalog/classic-spot-bgb-convert/classic-spot-bgb-convert#get-bgb-convert-coins",
     "summary": "Get BGB Convert Coins"
@@ -38,6 +40,7 @@
     "path": "/api/v2/convert/bgb-convert-records",
     "public": false,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "orderId",

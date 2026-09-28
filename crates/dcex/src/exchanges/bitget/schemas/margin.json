@@ -5,6 +5,7 @@
     "path": "/api/v2/margin/market/long-short-ratio",
     "public": true,
     "confirm": false,
+    "scoped": false,
     "fields": [
       {
         "wire": "symbol",

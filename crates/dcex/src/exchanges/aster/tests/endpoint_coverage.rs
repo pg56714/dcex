@@ -21,6 +21,55 @@ const SIGNER: &str = "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a";
 const SPOT: &str = "BTC-USDT-SPOT";
 const SWAP: &str = "BTC-USDT-SWAP";
 
+#[test]
+fn guarded_cancel_future_nonce_does_not_poison_automatic_nonce() {
+    use crate::exchanges::aster::AsterMarket;
+    use crate::http::HttpMethod;
+    let client = client("http://127.0.0.1:1");
+    let before = client.reserve_nonce().unwrap();
+    for path in ["/fapi/v3/guardedCancelOrder", "/fapi/v3/guardedBatchOrders"] {
+        client
+            .build_request(
+                HttpMethod::Delete,
+                AsterMarket::Futures,
+                path,
+                vec![],
+                true,
+                Some(before * 1000),
+            )
+            .unwrap();
+        let after = client.reserve_nonce().unwrap();
+        assert!(after > before && after - before < 60_000_000);
+    }
+}
+
+#[test]
+fn withdrawal_signature_chain_requires_positive_decimal_integer() {
+    for name in ["withdraw_spot_signed", "withdraw_futures_signed"] {
+        for chain in ["56", "0", "-1", "0x38", "1.5", "abc"] {
+            let fields = [
+                ("chainId", "56"),
+                ("asset", "USDT"),
+                ("amount", "1"),
+                ("fee", "0.1"),
+                ("receiver", USER),
+                ("userNonce", "123"),
+                ("userSignature", "signed-by-wallet"),
+                ("signatureChainId", chain),
+            ];
+            let (result, requests) = run(Kind::Private, name, &fields);
+            if chain == "56" {
+                result.unwrap();
+                assert_eq!(requests.len(), 1);
+                assert!(requests[0].contains("signatureChainId=56"));
+            } else {
+                assert!(result.unwrap_err().contains("signatureChainId"));
+                assert!(requests.is_empty());
+            }
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 enum Kind {
     Public,

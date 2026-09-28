@@ -40,6 +40,7 @@ class GeneratedWithdrawalsHTTP(MarketHTTP):
         Withdraw. POST /v5/asset/withdraw/create.
 
         API withdrawals have no second confirmation; they execute on submit.
+        With force_chain=2 the recipient may be another Bybit user.
         Source: https://bybit-exchange.github.io/docs/v5/asset/withdraw/withdraw
 
         Args:
