@@ -1,6 +1,6 @@
 //! Transfers between owned accounts.
 
-mod from_trade_hyperliquidclient {
+mod trade_operations {
     use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
     use crate::exchanges::hyperliquid::client::HyperliquidClient;
     use crate::exchanges::hyperliquid::endpoints::EXCHANGE;
@@ -78,10 +78,10 @@ mod from_trade_hyperliquidclient {
     }
 }
 
-mod from_direct_dispatch {
+mod signed_requests {
     use crate::exchanges::hyperliquid::trade::*;
     impl HyperliquidClient {
-        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_sub_account_usd(
+        pub(in crate::exchanges::hyperliquid) async fn dispatch_transfer_sub_account_usd(
             &self,
             params: &HyperliquidParams,
         ) -> Result<ValidatedResponse> {
@@ -101,7 +101,7 @@ mod from_direct_dispatch {
                 .await
             }
         }
-        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_sub_account_spot(
+        pub(in crate::exchanges::hyperliquid) async fn dispatch_transfer_sub_account_spot(
             &self,
             params: &HyperliquidParams,
         ) -> Result<ValidatedResponse> {
@@ -126,7 +126,7 @@ mod from_direct_dispatch {
                 .await
             }
         }
-        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_vault_usd(
+        pub(in crate::exchanges::hyperliquid) async fn dispatch_transfer_vault_usd(
             &self,
             params: &HyperliquidParams,
         ) -> Result<ValidatedResponse> {
@@ -146,7 +146,7 @@ mod from_direct_dispatch {
                 .await
             }
         }
-        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_hip3_liquidator(
+        pub(in crate::exchanges::hyperliquid) async fn dispatch_transfer_hip3_liquidator(
             &self,
             params: &HyperliquidParams,
         ) -> Result<ValidatedResponse> {
@@ -169,7 +169,7 @@ mod from_direct_dispatch {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::hyperliquid::HyperliquidClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; HyperliquidClient;

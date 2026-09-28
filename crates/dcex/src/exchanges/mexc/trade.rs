@@ -82,7 +82,7 @@ impl MexcClient {
         let result = match method_name {
             "cancel_contract_batch_orders_by_external_id"
             | "get_contract_batch_orders_by_external_id" => {
-                self.moved_trade_cancel_contract_batch_orders_by_external_id(method_name, params)
+                self.dispatch_cancel_contract_batch_orders_by_external_id(method_name, params)
                     .await
             }
             "get_contract_closed_orders" | "get_contract_fee_details" => {
@@ -257,7 +257,7 @@ impl MexcClient {
                     .await
             }
             "place_spot_batch_orders" => {
-                self.moved_trade_place_spot_batch_orders(method_name, params)
+                self.dispatch_place_spot_batch_orders(method_name, params)
                     .await
             }
             "cancel_spot_order" => {

@@ -123,7 +123,7 @@ impl BingxClient {
                     .await
             }
             "place_spot_batch_order" => {
-                self.moved_trade_place_spot_batch_order(method_name, params)
+                self.dispatch_place_spot_batch_order(method_name, params)
                     .await
             }
             "replace_spot_order" => {
@@ -206,7 +206,7 @@ impl BingxClient {
                 self.private_post(SPOT_CANCEL_ORDER, query).await
             }
             "cancel_spot_batch_orders" => {
-                self.moved_trade_cancel_spot_batch_orders(method_name, params)
+                self.dispatch_cancel_spot_batch_orders(method_name, params)
                     .await
             }
             "cancel_spot_open_orders" => {
@@ -451,7 +451,7 @@ impl BingxClient {
                 .await
             }
             "place_swap_batch_order" => {
-                self.moved_trade_place_swap_batch_order(method_name, params)
+                self.dispatch_place_swap_batch_order(method_name, params)
                     .await
             }
             "cancel_swap_order" => {
@@ -470,7 +470,7 @@ impl BingxClient {
                 self.private_delete(SWAP_PLACE_ORDER, query).await
             }
             "cancel_swap_batch_order" => {
-                self.moved_trade_cancel_swap_batch_order(method_name, params)
+                self.dispatch_cancel_swap_batch_order(method_name, params)
                     .await
             }
             "cancel_swap_all_orders" => {
@@ -484,7 +484,7 @@ impl BingxClient {
             }
             "replace_swap_order" => self.replace_swap_order_from_params(params).await,
             "replace_swap_batch_orders" => {
-                self.moved_trade_replace_swap_batch_orders(method_name, params)
+                self.dispatch_replace_swap_batch_orders(method_name, params)
                     .await
             }
             "close_swap_position" => {

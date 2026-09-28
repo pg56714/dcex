@@ -106,3 +106,25 @@ pub(super) fn require_one_identifier(params: &BitgetParams, keys: &[&str]) -> Re
         keys.join(" or ")
     )))
 }
+
+pub(super) fn invalid(message: &str) -> DcexError {
+    DcexError::InvalidInput(message.into())
+}
+
+pub(super) fn nonempty<'a>(params: &'a BitgetParams, key: &str) -> Result<&'a str> {
+    params
+        .get(key)
+        .filter(|v| !v.is_empty())
+        .ok_or_else(|| invalid(&format!("{key} is required")))
+}
+
+pub(super) fn schema_invalid(message: &str) -> DcexError {
+    DcexError::InvalidInput(format!("Bitget: {message}"))
+}
+
+pub(super) fn schema_required<'a>(params: &'a BitgetParams, key: &str) -> Result<&'a str> {
+    params
+        .get(key)
+        .filter(|value| !value.trim().is_empty())
+        .ok_or_else(|| schema_invalid(&format!("{key} is required")))
+}

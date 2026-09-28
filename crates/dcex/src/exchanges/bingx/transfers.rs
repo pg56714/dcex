@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_account {
+mod account_requests {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bingx::account::*;
     use crate::exchanges::bingx::client::BingxClient;
@@ -11,7 +11,7 @@ mod dispatch_from_account {
         validate_time_range, validate_u64_range,
     };
     impl BingxClient {
-        pub(in crate::exchanges::bingx) async fn moved_account_get_transferable_coins(
+        pub(in crate::exchanges::bingx) async fn dispatch_get_transferable_coins(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -28,7 +28,7 @@ mod dispatch_from_account {
                 .await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_account_asset_transfer(
+        pub(in crate::exchanges::bingx) async fn dispatch_asset_transfer(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -54,7 +54,7 @@ mod dispatch_from_account {
                 .await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_account_get_asset_transfer_records(
+        pub(in crate::exchanges::bingx) async fn dispatch_get_asset_transfer_records(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -96,7 +96,7 @@ mod dispatch_from_account {
                 self.private_get(TRANSFER_RECORDS, query).await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_account_get_subaccount_transfer_history(
+        pub(in crate::exchanges::bingx) async fn dispatch_get_subaccount_transfer_history(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -134,7 +134,7 @@ mod dispatch_from_account {
                 .await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_account_get_subaccount_transferable_amounts(
+        pub(in crate::exchanges::bingx) async fn dispatch_get_subaccount_transferable_amounts(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -168,7 +168,7 @@ mod dispatch_from_account {
                 .await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_account_transfer_subaccount_assets(
+        pub(in crate::exchanges::bingx) async fn dispatch_transfer_subaccount_assets(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -228,7 +228,7 @@ mod dispatch_from_account {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::bingx::BingxClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BingxClient;

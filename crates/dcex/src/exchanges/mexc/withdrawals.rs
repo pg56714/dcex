@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_account {
+mod account_requests {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::mexc::account::*;
     use crate::exchanges::mexc::client::MexcClient;
@@ -10,7 +10,7 @@ mod dispatch_from_account {
     use crate::http::HttpMethod;
 
     impl MexcClient {
-        pub(in crate::exchanges::mexc) async fn moved_account_get_withdraw_history(
+        pub(in crate::exchanges::mexc) async fn dispatch_get_withdraw_history(
             &self,
             _method_name: &str,
             params: &MexcParams,
@@ -44,7 +44,7 @@ mod dispatch_from_account {
     }
 }
 
-mod from_wallet {
+mod wallet_requests {
     // Wallet operations.
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::mexc::client::{MexcApi, MexcClient};
@@ -116,7 +116,7 @@ mod from_wallet {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::mexc::MexcClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; MexcClient;

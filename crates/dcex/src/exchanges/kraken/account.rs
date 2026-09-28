@@ -65,7 +65,7 @@ impl KrakenClient {
                     .await
             }
             "wallet_transfer_to_futures" => {
-                self.moved_account_wallet_transfer_to_futures(method_name, params)
+                self.dispatch_wallet_transfer_to_futures(method_name, params)
                     .await
             }
             "get_futures_accounts" => {
@@ -85,11 +85,11 @@ impl KrakenClient {
                 .await
             }
             "futures_wallet_transfer" => {
-                self.moved_account_futures_wallet_transfer(method_name, params)
+                self.dispatch_futures_wallet_transfer(method_name, params)
                     .await
             }
             "withdraw_futures_to_spot_wallet" => {
-                self.moved_account_withdraw_futures_to_spot_wallet(method_name, params)
+                self.dispatch_withdraw_futures_to_spot_wallet(method_name, params)
                     .await
             }
             _ => return Ok(None),

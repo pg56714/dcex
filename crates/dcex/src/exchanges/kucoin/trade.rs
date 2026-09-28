@@ -107,7 +107,7 @@ impl KucoinClient {
                     .await
             }
             "place_spot_batch_orders_sync" => {
-                self.moved_trade_place_spot_batch_orders_sync(method_name, params)
+                self.dispatch_place_spot_batch_orders_sync(method_name, params)
                     .await
             }
             "cancel_spot_order_sync" | "cancel_spot_order_by_client_oid_sync" => {
@@ -194,15 +194,15 @@ impl KucoinClient {
                     .await
             }
             "place_spot_batch_orders" => {
-                self.moved_trade_place_spot_batch_orders(method_name, params)
+                self.dispatch_place_spot_batch_orders(method_name, params)
                     .await
             }
             "place_spot_batch_limit_orders" => {
-                self.moved_trade_place_spot_batch_limit_orders(method_name, params)
+                self.dispatch_place_spot_batch_limit_orders(method_name, params)
                     .await
             }
             "place_spot_batch_market_orders" => {
-                self.moved_trade_place_spot_batch_market_orders(method_name, params)
+                self.dispatch_place_spot_batch_market_orders(method_name, params)
                     .await
             }
             "cancel_spot_order" => {

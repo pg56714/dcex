@@ -73,14 +73,7 @@ impl BackpackClient {
                 )
                 .await
             }
-            "get_max_withdrawal_quantity" => {
-                self.private_get(
-                    MAX_WITHDRAWAL_QUANTITY,
-                    params.only(&["symbol", "autoBorrow", "autoLendRedeem"]),
-                    "maxWithdrawalQuantity",
-                )
-                .await
-            }
+            "get_max_withdrawal_quantity" => self.get_max_withdrawal_quantity_request(params).await,
             "get_borrow_lend_positions" => {
                 self.private_get(BORROW_LEND_POSITIONS, Vec::new(), "borrowLendPositionQuery")
                     .await
@@ -161,14 +154,7 @@ impl BackpackClient {
                 )
                 .await
             }
-            "get_withdrawals" => {
-                self.private_get(
-                    WITHDRAWALS,
-                    params.only(&["id", "clientId", "from", "to", "limit", "offset"]),
-                    "withdrawalQueryAll",
-                )
-                .await
-            }
+            "get_withdrawals" => self.get_withdrawals_request(params).await,
             "get_dust_conversion_history" => {
                 self.private_get(
                     DUST_CONVERSION_HISTORY,
@@ -250,11 +236,7 @@ impl BackpackClient {
                     ],
                 )
             }
-            "get_max_withdrawal_quantity" => {
-                params.ensure_allowed(&["symbol", "autoBorrow", "autoLendRedeem"], &[])?;
-                params.required("symbol")?;
-                validate_optional_bools(params, &["autoBorrow", "autoLendRedeem"])
-            }
+            "get_max_withdrawal_quantity" => self.get_max_withdrawal_quantity_validation(params),
             "get_borrow_history" => {
                 params.ensure_allowed(
                     &[
@@ -315,12 +297,7 @@ impl BackpackClient {
                 params.required("blockchain")?;
                 Ok(())
             }
-            "get_withdrawals" => {
-                params.ensure_allowed(&["id", "clientId", "from", "to", "limit", "offset"], &[])?;
-                params.optional_i64_range("id", i32::MIN.into(), i32::MAX.into())?;
-                params.ensure_time_order("from", "to")?;
-                validate_history_pagination(params)
-            }
+            "get_withdrawals" => self.get_withdrawals_validation(params),
             "get_dust_conversion_history" => {
                 params
                     .ensure_allowed(&["id", "symbol", "limit", "offset", "sortDirection"], &[])?;
@@ -346,14 +323,14 @@ impl BackpackClient {
     }
 }
 
-fn validate_optional_bools(params: &BackpackParams, keys: &[&str]) -> Result<()> {
+pub(super) fn validate_optional_bools(params: &BackpackParams, keys: &[&str]) -> Result<()> {
     for key in keys {
         params.optional_bool(key)?;
     }
     Ok(())
 }
 
-fn validate_history_pagination(params: &BackpackParams) -> Result<()> {
+pub(super) fn validate_history_pagination(params: &BackpackParams) -> Result<()> {
     params.optional_u64_range("limit", 1, 1_000)?;
     params.optional_u64_range("offset", 0, u64::MAX)?;
     params.optional_one_of("sortDirection", &["Asc", "Desc"])

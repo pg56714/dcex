@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_account {
+mod account_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bitget::account::*;
@@ -9,7 +9,7 @@ mod dispatch_from_account {
     use crate::exchanges::bitget::params::BitgetParams;
     use serde_json::Value;
     impl BitgetClient {
-        pub(in crate::exchanges::bitget) async fn moved_account_transfer(
+        pub(in crate::exchanges::bitget) async fn dispatch_transfer(
             &self,
             _method_name: &str,
             params: &BitgetParams,
@@ -37,7 +37,7 @@ mod dispatch_from_account {
                 .await
             }
         }
-        pub(in crate::exchanges::bitget) async fn moved_account_get_transfer_records(
+        pub(in crate::exchanges::bitget) async fn dispatch_get_transfer_records(
             &self,
             _method_name: &str,
             params: &BitgetParams,
@@ -60,7 +60,7 @@ mod dispatch_from_account {
                 .await
             }
         }
-        pub(in crate::exchanges::bitget) async fn moved_account_get_transferable_coins(
+        pub(in crate::exchanges::bitget) async fn dispatch_get_transferable_coins(
             &self,
             _method_name: &str,
             params: &BitgetParams,
@@ -78,7 +78,7 @@ mod dispatch_from_account {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::bitget::BitgetClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BitgetClient;

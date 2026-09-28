@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_bitgetclient {
+mod trade_operations {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bitget::client::BitgetClient;
@@ -75,7 +75,7 @@ mod from_trade_bitgetclient {
     }
 }
 
-mod dispatch_from_trade {
+mod trade_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bitget::client::BitgetClient;
@@ -83,21 +83,21 @@ mod dispatch_from_trade {
     use crate::exchanges::bitget::params::BitgetParams;
 
     impl BitgetClient {
-        pub(in crate::exchanges::bitget) async fn moved_trade_place_spot_batch_orders(
+        pub(in crate::exchanges::bitget) async fn dispatch_place_spot_batch_orders(
             &self,
             _method_name: &str,
             params: &BitgetParams,
         ) -> Result<ValidatedResponse> {
             self.place_spot_batch_orders_from_params(params).await
         }
-        pub(in crate::exchanges::bitget) async fn moved_trade_cancel_spot_batch_orders(
+        pub(in crate::exchanges::bitget) async fn dispatch_cancel_spot_batch_orders(
             &self,
             _method_name: &str,
             params: &BitgetParams,
         ) -> Result<ValidatedResponse> {
             self.cancel_spot_batch_orders_from_params(params).await
         }
-        pub(in crate::exchanges::bitget) async fn moved_trade_place_uta_batch_orders(
+        pub(in crate::exchanges::bitget) async fn dispatch_place_uta_batch_orders(
             &self,
             _method_name: &str,
             params: &BitgetParams,
@@ -107,7 +107,7 @@ mod dispatch_from_trade {
                     .await
             }
         }
-        pub(in crate::exchanges::bitget) async fn moved_trade_cancel_uta_batch_orders(
+        pub(in crate::exchanges::bitget) async fn dispatch_cancel_uta_batch_orders(
             &self,
             _method_name: &str,
             params: &BitgetParams,
@@ -117,14 +117,14 @@ mod dispatch_from_trade {
                     .await
             }
         }
-        pub(in crate::exchanges::bitget) async fn moved_trade_place_futures_batch_orders(
+        pub(in crate::exchanges::bitget) async fn dispatch_place_futures_batch_orders(
             &self,
             _method_name: &str,
             params: &BitgetParams,
         ) -> Result<ValidatedResponse> {
             self.place_futures_batch_orders_from_params(params).await
         }
-        pub(in crate::exchanges::bitget) async fn moved_trade_cancel_futures_batch_orders(
+        pub(in crate::exchanges::bitget) async fn dispatch_cancel_futures_batch_orders(
             &self,
             _method_name: &str,
             params: &BitgetParams,
@@ -134,11 +134,11 @@ mod dispatch_from_trade {
     }
 }
 
-mod from_batch_controls {
+mod controls {
     // Batch trading bodies verified against official request examples.
+    use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bitget::{client::BitgetClient, params::BitgetParams};
-    use crate::{DcexError, Result};
     use serde_json::{Map, Value};
     use std::collections::HashSet;
 
@@ -389,15 +389,8 @@ mod from_batch_controls {
         }
     }
 
-    fn invalid(message: &str) -> DcexError {
-        DcexError::InvalidInput(format!("Bitget: {message}"))
-    }
-    fn required<'a>(params: &'a BitgetParams, key: &str) -> Result<&'a str> {
-        params
-            .get(key)
-            .filter(|value| !value.trim().is_empty())
-            .ok_or_else(|| invalid(&format!("{key} is required")))
-    }
+    use crate::exchanges::bitget::params::schema_invalid as invalid;
+    use crate::exchanges::bitget::params::schema_required as required;
     fn identifier(params: &BitgetParams) -> Result<(bool, String)> {
         if let Some(value) = params.get("orderId") {
             return Ok((true, value.to_string()));
@@ -406,7 +399,7 @@ mod from_batch_controls {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::bitget::BitgetClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BitgetClient;

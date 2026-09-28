@@ -22,7 +22,7 @@ pub use signing::sign_message;
 
 mod prediction;
 
-mod asset;
+mod funding;
 
 mod subaccount;
 

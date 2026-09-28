@@ -282,12 +282,7 @@ impl LighterClient {
                 params.optional_i64("to_account_index")?;
                 validate_optional_nonempty(params, &["authorization"])
             }
-            "get_withdraw_history" => {
-                params.ensure_allowed(&["account_index", "cursor", "filter", "authorization"])?;
-                self.validate_private_account(params)?;
-                params.optional_one_of("filter", &["all", "pending", "claimable"])?;
-                validate_optional_nonempty(params, &["cursor", "authorization"])
-            }
+            "get_withdraw_history" => self.get_withdraw_history_validation(params),
             "get_position_funding" => {
                 params.ensure_allowed(&[
                     "account_index",
@@ -335,7 +330,7 @@ impl LighterClient {
         }
     }
 
-    fn validate_private_account(&self, params: &LighterParams) -> Result<()> {
+    pub(super) fn validate_private_account(&self, params: &LighterParams) -> Result<()> {
         self.private_account_index(params.optional_u64("account_index")?)?;
         Ok(())
     }
@@ -379,7 +374,7 @@ fn validate_optional_timestamp_range(params: &LighterParams, min: u64, max: u64)
     params.ensure_time_order("start_timestamp", "end_timestamp")
 }
 
-fn validate_optional_nonempty(params: &LighterParams, keys: &[&str]) -> Result<()> {
+pub(super) fn validate_optional_nonempty(params: &LighterParams, keys: &[&str]) -> Result<()> {
     for key in keys {
         if params.get(key).is_some() {
             params.required(key)?;

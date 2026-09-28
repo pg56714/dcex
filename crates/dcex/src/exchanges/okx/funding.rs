@@ -29,11 +29,8 @@ impl OkxClient {
                 push_optional_owned(&mut query, "ccy", params.csv("ccy")?);
                 self.get_request(ASSET_VALUATION, query).await
             }
-            "funds_transfer" => self.moved_asset_funds_transfer(method_name, params).await,
-            "get_transfer_state" => {
-                self.moved_asset_get_transfer_state(method_name, params)
-                    .await
-            }
+            "funds_transfer" => self.dispatch_funds_transfer(method_name, params).await,
+            "get_transfer_state" => self.dispatch_get_transfer_state(method_name, params).await,
             "get_bills" => {
                 self.get_request(
                     ASSET_BILLS,
@@ -64,7 +61,7 @@ impl OkxClient {
                 .await
             }
             "get_deposit_withdraw_status" => {
-                self.moved_asset_get_deposit_withdraw_status(method_name, params)
+                self.dispatch_get_deposit_withdraw_status(method_name, params)
                     .await
             }
             "get_exchange_list" => self.get_request(ASSET_EXCHANGE_LIST, Vec::new()).await,

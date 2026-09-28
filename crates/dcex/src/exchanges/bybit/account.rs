@@ -50,7 +50,7 @@ impl BybitClient {
                 self.get_request(GET_WALLET_BALANCE, query).await
             }
             "get_transferable_amount" => {
-                self.moved_account_get_transferable_amount(method_name, params)
+                self.dispatch_get_transferable_amount(method_name, params)
                     .await
             }
             "upgrade_to_unified_trading_account" => {

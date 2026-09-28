@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_trading_controls {
+mod trading_controls_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::kraken::client::{KrakenAuth, KrakenClient};
@@ -9,7 +9,7 @@ mod dispatch_from_trading_controls {
     use crate::http::HttpMethod;
     use serde_json::json;
     impl KrakenClient {
-        pub(in crate::exchanges::kraken) async fn moved_trading_controls_manage_futures_batch_orders(
+        pub(in crate::exchanges::kraken) async fn dispatch_manage_futures_batch_orders(
             &self,
             _name: &str,
             params: &KrakenParams,
@@ -53,7 +53,7 @@ mod dispatch_from_trading_controls {
                 .await?
             })
         }
-        pub(in crate::exchanges::kraken) async fn moved_trading_controls_place_spot_batch_orders(
+        pub(in crate::exchanges::kraken) async fn dispatch_place_spot_batch_orders(
             &self,
             _name: &str,
             params: &KrakenParams,
@@ -101,7 +101,7 @@ mod dispatch_from_trading_controls {
                 .await?
             })
         }
-        pub(in crate::exchanges::kraken) async fn moved_trading_controls_cancel_spot_batch_orders(
+        pub(in crate::exchanges::kraken) async fn dispatch_cancel_spot_batch_orders(
             &self,
             _name: &str,
             params: &KrakenParams,
@@ -147,7 +147,7 @@ mod dispatch_from_trading_controls {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::kraken::KrakenClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; KrakenClient;

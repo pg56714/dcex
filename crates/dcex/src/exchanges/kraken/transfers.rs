@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_account {
+mod account_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::kraken::account::*;
@@ -8,7 +8,7 @@ mod dispatch_from_account {
 
     use crate::exchanges::kraken::params::{KrakenParams, push_optional};
     impl KrakenClient {
-        pub(in crate::exchanges::kraken) async fn moved_account_wallet_transfer_to_futures(
+        pub(in crate::exchanges::kraken) async fn dispatch_wallet_transfer_to_futures(
             &self,
             _method_name: &str,
             params: &KrakenParams,
@@ -32,7 +32,7 @@ mod dispatch_from_account {
                     .await
             }
         }
-        pub(in crate::exchanges::kraken) async fn moved_account_futures_wallet_transfer(
+        pub(in crate::exchanges::kraken) async fn dispatch_futures_wallet_transfer(
             &self,
             _method_name: &str,
             params: &KrakenParams,
@@ -50,7 +50,7 @@ mod dispatch_from_account {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::kraken::KrakenClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; KrakenClient;

@@ -486,7 +486,7 @@ mod tests {
     }
 }
 
-mod from_options_binanceclient {
+mod options_operations {
 
     use crate::exchanges::binance::client::BinanceClient;
 
@@ -515,7 +515,7 @@ mod from_options_binanceclient {
     }
 }
 
-mod wrappers_from_trading_controls {
+mod wrappers {
     use crate::exchanges::binance::BinanceClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BinanceClient;

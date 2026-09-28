@@ -1,17 +1,17 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_asset {
+mod asset_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
-    use crate::exchanges::okx::asset::*;
     use crate::exchanges::okx::client::OkxClient;
+    use crate::exchanges::okx::funding::*;
 
     use crate::exchanges::okx::params::{
         OkxParams, insert_optional_bool, insert_optional_string, okx_account_id,
     };
     use serde_json::Value;
     impl OkxClient {
-        pub(in crate::exchanges::okx) async fn moved_asset_funds_transfer(
+        pub(in crate::exchanges::okx) async fn dispatch_funds_transfer(
             &self,
             _method_name: &str,
             params: &OkxParams,
@@ -34,7 +34,7 @@ mod dispatch_from_asset {
                 self.post_request(ASSET_TRANSFER, Value::Object(body)).await
             }
         }
-        pub(in crate::exchanges::okx) async fn moved_asset_get_transfer_state(
+        pub(in crate::exchanges::okx) async fn dispatch_get_transfer_state(
             &self,
             _method_name: &str,
             params: &OkxParams,
@@ -50,7 +50,7 @@ mod dispatch_from_asset {
     }
 }
 
-mod dispatch_from_subaccount {
+mod subaccount_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::okx::client::OkxClient;
@@ -59,7 +59,7 @@ mod dispatch_from_subaccount {
 
     use serde_json::Value;
     impl OkxClient {
-        pub(in crate::exchanges::okx) async fn moved_subaccount_transfer_between_subaccounts(
+        pub(in crate::exchanges::okx) async fn dispatch_transfer_between_subaccounts(
             &self,
             _method_name: &str,
             params: &OkxParams,
@@ -84,7 +84,7 @@ mod dispatch_from_subaccount {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::okx::OkxClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; OkxClient;

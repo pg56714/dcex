@@ -39,7 +39,7 @@ impl KrakenClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match name {
             "manage_futures_batch_orders" => {
-                self.moved_trading_controls_manage_futures_batch_orders(name, params)
+                self.dispatch_manage_futures_batch_orders(name, params)
                     .await?
             }
             "get_spot_extended_balance" => {
@@ -97,12 +97,10 @@ impl KrakenClient {
                 .await?
             }
             "place_spot_batch_orders" => {
-                self.moved_trading_controls_place_spot_batch_orders(name, params)
-                    .await?
+                self.dispatch_place_spot_batch_orders(name, params).await?
             }
             "cancel_spot_batch_orders" => {
-                self.moved_trading_controls_cancel_spot_batch_orders(name, params)
-                    .await?
+                self.dispatch_cancel_spot_batch_orders(name, params).await?
             }
             _ => return Ok(None),
         };

@@ -68,7 +68,7 @@ impl KucoinClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "batch_cancel_uta_orders" => {
-                self.moved_uta_batch_cancel_uta_orders(method_name, params)
+                self.dispatch_batch_cancel_uta_orders(method_name, params)
                     .await
             }
             "cancel_uta_orders_by_symbol" => {

@@ -141,10 +141,10 @@ impl HyperliquidClient {
     }
 }
 
-mod from_direct_dispatch {
+mod signed_requests {
     use crate::exchanges::hyperliquid::trade::*;
     impl HyperliquidClient {
-        pub(in crate::exchanges::hyperliquid) async fn moved_withdraw_staking_signed(
+        pub(in crate::exchanges::hyperliquid) async fn dispatch_withdraw_staking_signed(
             &self,
             params: &HyperliquidParams,
         ) -> Result<ValidatedResponse> {
@@ -153,7 +153,7 @@ mod from_direct_dispatch {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::hyperliquid::HyperliquidClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; HyperliquidClient;

@@ -176,10 +176,7 @@ impl OkxClient {
                 )
                 .await
             }
-            "get_max_withdrawal" => {
-                self.moved_account_get_max_withdrawal(method_name, params)
-                    .await
-            }
+            "get_max_withdrawal" => self.dispatch_get_max_withdrawal(method_name, params).await,
             "get_interest_limits" => {
                 self.get_request(ACCOUNT_INTEREST_LIMITS, params.only(&["type", "ccy"]))
                     .await

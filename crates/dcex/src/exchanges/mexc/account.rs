@@ -102,7 +102,7 @@ impl MexcClient {
                 .await
             }
             "get_withdraw_history" => {
-                self.moved_account_get_withdraw_history(method_name, params)
+                self.dispatch_get_withdraw_history(method_name, params)
                     .await
             }
             "get_deposit_address" => {
@@ -146,27 +146,27 @@ impl MexcClient {
                 .await
             }
             "transfer_subaccount_assets" => {
-                self.moved_account_transfer_subaccount_assets(method_name, params)
+                self.dispatch_transfer_subaccount_assets(method_name, params)
                     .await
             }
             "get_subaccount_transfer_history" => {
-                self.moved_account_get_subaccount_transfer_history(method_name, params)
+                self.dispatch_get_subaccount_transfer_history(method_name, params)
                     .await
             }
             "user_universal_transfer" => {
-                self.moved_account_user_universal_transfer(method_name, params)
+                self.dispatch_user_universal_transfer(method_name, params)
                     .await
             }
             "get_user_universal_transfer_history" => {
-                self.moved_account_get_user_universal_transfer_history(method_name, params)
+                self.dispatch_get_user_universal_transfer_history(method_name, params)
                     .await
             }
             "get_user_universal_transfer_by_id" => {
-                self.moved_account_get_user_universal_transfer_by_id(method_name, params)
+                self.dispatch_get_user_universal_transfer_by_id(method_name, params)
                     .await
             }
             "get_internal_transfer_history" => {
-                self.moved_account_get_internal_transfer_history(method_name, params)
+                self.dispatch_get_internal_transfer_history(method_name, params)
                     .await
             }
             "get_contract_assets" => {
@@ -187,7 +187,7 @@ impl MexcClient {
                 self.contract_get(&path, Vec::new()).await
             }
             "get_contract_transfer_records" => {
-                self.moved_account_get_contract_transfer_records(method_name, params)
+                self.dispatch_get_contract_transfer_records(method_name, params)
                     .await
             }
             "get_contract_history_positions" => {

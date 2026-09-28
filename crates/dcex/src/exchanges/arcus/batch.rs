@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_arcusclient {
+mod trade_operations {
 
     use crate::exchanges::arcus::client::ArcusClient;
     use crate::exchanges::arcus::params::required;
@@ -139,7 +139,7 @@ mod from_trade_arcusclient {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::arcus::ArcusClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; ArcusClient;

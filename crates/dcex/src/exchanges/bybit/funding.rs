@@ -56,27 +56,27 @@ impl BybitClient {
                 self.get_request(GET_SINGLE_COIN_BALANCE, query).await
             }
             "get_withdrawable_amount" => {
-                self.moved_asset_get_withdrawable_amount(method_name, params)
+                self.dispatch_get_withdrawable_amount(method_name, params)
                     .await
             }
             "get_internal_transfer_records" => {
-                self.moved_asset_get_internal_transfer_records(method_name, params)
+                self.dispatch_get_internal_transfer_records(method_name, params)
                     .await
             }
             "get_transferable_coin" => {
-                self.moved_asset_get_transferable_coin(method_name, params)
+                self.dispatch_get_transferable_coin(method_name, params)
                     .await
             }
             "create_internal_transfer" => {
-                self.moved_asset_create_internal_transfer(method_name, params)
+                self.dispatch_create_internal_transfer(method_name, params)
                     .await
             }
             "create_universal_transfer" => {
-                self.moved_asset_create_universal_transfer(method_name, params)
+                self.dispatch_create_universal_transfer(method_name, params)
                     .await
             }
             "get_universal_transfer_records" => {
-                self.moved_asset_get_universal_transfer_records(method_name, params)
+                self.dispatch_get_universal_transfer_records(method_name, params)
                     .await
             }
             "set_deposit_account" => {

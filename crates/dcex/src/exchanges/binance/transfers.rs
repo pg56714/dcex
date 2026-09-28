@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_account_binanceclient {
+mod account_operations {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::binance::account::*;
@@ -88,7 +88,7 @@ mod from_account_binanceclient {
     }
 }
 
-mod from_subaccount_binanceclient {
+mod subaccount_operations {
 
     use crate::exchanges::binance::client::BinanceClient;
 

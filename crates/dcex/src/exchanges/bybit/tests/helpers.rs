@@ -12,7 +12,7 @@ pub(super) use std::time::Duration;
 
 pub(super) use super::super::client::BybitClient;
 
-pub(super) use super::fixtures::*;
+pub(super) use super::route_cases::*;
 
 pub(super) fn single_shot_server() -> (SocketAddr, thread::JoinHandle<String>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind");

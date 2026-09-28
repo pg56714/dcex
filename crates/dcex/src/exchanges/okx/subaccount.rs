@@ -40,7 +40,7 @@ impl OkxClient {
                 .await
             }
             "transfer_between_subaccounts" => {
-                self.moved_subaccount_transfer_between_subaccounts(method_name, params)
+                self.dispatch_transfer_between_subaccounts(method_name, params)
                     .await
             }
             "get_entrusted_subaccount_list" => {

@@ -1,10 +1,10 @@
 //! Withdrawals operations.
 use serde_json::Value;
 
+use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::exchanges::bitget::client::BitgetClient;
 use crate::exchanges::bitget::params::BitgetParams;
-use crate::{DcexError, Result};
 
 impl BitgetClient {
     pub(in crate::exchanges::bitget) async fn withdrawals_schema_request(
@@ -142,12 +142,5 @@ const UTA_WITHDRAWAL_FIELDS: &[&str] = &[
     "accountType",
 ];
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(message.into())
-}
-fn nonempty<'a>(params: &'a BitgetParams, key: &str) -> Result<&'a str> {
-    params
-        .get(key)
-        .filter(|v| !v.is_empty())
-        .ok_or_else(|| invalid(&format!("{key} is required")))
-}
+use crate::exchanges::bitget::params::invalid;
+use crate::exchanges::bitget::params::nonempty;

@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_trade {
+mod trade_requests {
 
     use crate::Result;
     use crate::exchange::ValidatedResponse;
@@ -10,7 +10,7 @@ mod dispatch_from_trade {
     use crate::exchanges::okx::trade::*;
 
     impl OkxClient {
-        pub(in crate::exchanges::okx) async fn moved_trade_place_batch_orders(
+        pub(in crate::exchanges::okx) async fn dispatch_place_batch_orders(
             &self,
             _method_name: &str,
             params: &OkxParams,
@@ -21,7 +21,7 @@ mod dispatch_from_trade {
                 self.post_request(TRADE_BATCH_ORDERS, orders).await
             }
         }
-        pub(in crate::exchanges::okx) async fn moved_trade_cancel_batch_orders(
+        pub(in crate::exchanges::okx) async fn dispatch_cancel_batch_orders(
             &self,
             _method_name: &str,
             params: &OkxParams,
@@ -34,7 +34,7 @@ mod dispatch_from_trade {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::okx::OkxClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; OkxClient;

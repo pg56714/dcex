@@ -1,7 +1,7 @@
 mod account;
 mod algo;
-mod asset;
 mod client;
+mod funding;
 
 mod endpoints;
 mod finance;

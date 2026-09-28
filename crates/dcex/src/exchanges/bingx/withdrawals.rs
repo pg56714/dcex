@@ -1,6 +1,6 @@
 //! Withdrawals request implementations.
 
-mod from_wallet {
+mod wallet_requests {
     // Wallet writes from the official BingX documentation request tables.
     use crate::exchanges::bingx::{client::BingxClient, params::BingxParams};
     use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
@@ -121,7 +121,7 @@ mod from_wallet {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::bingx::BingxClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BingxClient;

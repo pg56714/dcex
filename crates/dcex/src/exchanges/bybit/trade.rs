@@ -94,21 +94,12 @@ impl BybitClient {
             "amend_order" => self.amend_order_from_params(params).await,
             "cancel_order" => self.cancel_order_from_params(params).await,
             "get_open_orders" => self.get_open_orders_from_params(params).await,
-            "cancel_batch_orders" => {
-                self.moved_trade_cancel_batch_orders(method_name, params)
-                    .await
-            }
+            "cancel_batch_orders" => self.dispatch_cancel_batch_orders(method_name, params).await,
             "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
             "get_order_history" => self.get_order_history_from_params(params).await,
             "get_execution_list" => self.get_execution_list_from_params(params).await,
-            "place_batch_order" => {
-                self.moved_trade_place_batch_order(method_name, params)
-                    .await
-            }
-            "amend_batch_order" => {
-                self.moved_trade_amend_batch_order(method_name, params)
-                    .await
-            }
+            "place_batch_order" => self.dispatch_place_batch_order(method_name, params).await,
+            "amend_batch_order" => self.dispatch_amend_batch_order(method_name, params).await,
             "get_borrow_quota" => {
                 let product_symbol = params.required("product_symbol")?;
                 let query = vec![

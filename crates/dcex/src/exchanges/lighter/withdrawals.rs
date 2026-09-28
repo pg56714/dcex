@@ -1,6 +1,6 @@
 //! L2 withdrawals and recipient transfers.
 
-mod from_trade_withdraw {
+mod withdrawal_signing {
     // Transaction 13 and 45 follow lighter-go's typed transaction hashes.
     use crate::exchanges::lighter::trade::*;
 
@@ -125,7 +125,7 @@ mod from_trade_withdraw {
     }
 }
 
-mod from_trade_transfer {
+mod transfer_signing {
     // L2 transfers follow lighter-go L2TransferTxInfo; account-family eligibility is exchange-enforced.
     use crate::exchanges::lighter::trade::*;
     impl LighterClient {
@@ -203,7 +203,7 @@ mod from_trade_transfer {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::lighter::LighterClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; LighterClient;
@@ -214,5 +214,23 @@ mod wrappers_from_wrappers {
     get_fastwithdraw_info(),
     get_withdraw_history()
      ];
+    }
+}
+
+mod account_requests {
+    use crate::Result;
+    use crate::exchanges::lighter::{
+        account::validate_optional_nonempty, client::LighterClient, params::LighterParams,
+    };
+    impl LighterClient {
+        pub(in crate::exchanges::lighter) fn get_withdraw_history_validation(
+            &self,
+            params: &LighterParams,
+        ) -> Result<()> {
+            params.ensure_allowed(&["account_index", "cursor", "filter", "authorization"])?;
+            self.validate_private_account(params)?;
+            params.optional_one_of("filter", &["all", "pending", "claimable"])?;
+            validate_optional_nonempty(params, &["cursor", "authorization"])
+        }
     }
 }

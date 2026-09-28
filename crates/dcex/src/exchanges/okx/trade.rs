@@ -93,10 +93,7 @@ impl OkxClient {
                 self.post_request(TRADE_CANCEL_ALL_AFTER, Value::Object(body))
                     .await
             }
-            "place_batch_orders" => {
-                self.moved_trade_place_batch_orders(method_name, params)
-                    .await
-            }
+            "place_batch_orders" => self.dispatch_place_batch_orders(method_name, params).await,
             "place_market_order" => {
                 let mut pairs = params.without(&["ordType"]);
                 pairs.push(("ordType".to_string(), "market".to_string()));
@@ -158,10 +155,7 @@ impl OkxClient {
                     .await
             }
             "cancel_order" => self.cancel_order_from_params(params).await,
-            "cancel_batch_orders" => {
-                self.moved_trade_cancel_batch_orders(method_name, params)
-                    .await
-            }
+            "cancel_batch_orders" => self.dispatch_cancel_batch_orders(method_name, params).await,
             "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
             "amend_order" => self.amend_order_from_params(params).await,
             "amend_multiple_orders" => {

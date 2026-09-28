@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_mexcclient {
+mod trade_operations {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::mexc::client::MexcClient;
     use crate::exchanges::mexc::endpoints::*;
@@ -130,7 +130,7 @@ mod from_trade_mexcclient {
     }
 }
 
-mod dispatch_from_trade {
+mod trade_requests {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::mexc::client::MexcClient;
 
@@ -139,7 +139,7 @@ mod dispatch_from_trade {
     use crate::{DcexError, Result};
     use serde_json::Value;
     impl MexcClient {
-        pub(in crate::exchanges::mexc) async fn moved_trade_cancel_contract_batch_orders_by_external_id(
+        pub(in crate::exchanges::mexc) async fn dispatch_cancel_contract_batch_orders_by_external_id(
             &self,
             method_name: &str,
             params: &MexcParams,
@@ -202,7 +202,7 @@ mod dispatch_from_trade {
                 .await
             }
         }
-        pub(in crate::exchanges::mexc) async fn moved_trade_place_spot_batch_orders(
+        pub(in crate::exchanges::mexc) async fn dispatch_place_spot_batch_orders(
             &self,
             _method_name: &str,
             params: &MexcParams,
@@ -212,7 +212,7 @@ mod dispatch_from_trade {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::mexc::MexcClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; MexcClient;

@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_trade {
+mod trade_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bingx::client::BingxClient;
@@ -11,7 +11,7 @@ mod dispatch_from_trade {
     };
     use crate::exchanges::bingx::trade::*;
     impl BingxClient {
-        pub(in crate::exchanges::bingx) async fn moved_trade_place_spot_batch_order(
+        pub(in crate::exchanges::bingx) async fn dispatch_place_spot_batch_order(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -29,7 +29,7 @@ mod dispatch_from_trade {
                 self.private_post(SPOT_PLACE_BATCH_ORDER, query).await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_trade_cancel_spot_batch_orders(
+        pub(in crate::exchanges::bingx) async fn dispatch_cancel_spot_batch_orders(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -60,7 +60,7 @@ mod dispatch_from_trade {
                 self.private_post(SPOT_CANCEL_BATCH_ORDERS, query).await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_trade_place_swap_batch_order(
+        pub(in crate::exchanges::bingx) async fn dispatch_place_swap_batch_order(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -76,7 +76,7 @@ mod dispatch_from_trade {
                 self.private_post(SWAP_PLACE_BATCH_ORDER, query).await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_trade_cancel_swap_batch_order(
+        pub(in crate::exchanges::bingx) async fn dispatch_cancel_swap_batch_order(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -105,7 +105,7 @@ mod dispatch_from_trade {
                 self.private_delete(SWAP_CANCEL_BATCH_ORDER, query).await
             }
         }
-        pub(in crate::exchanges::bingx) async fn moved_trade_replace_swap_batch_orders(
+        pub(in crate::exchanges::bingx) async fn dispatch_replace_swap_batch_orders(
             &self,
             _method_name: &str,
             params: &BingxParams,
@@ -185,7 +185,7 @@ mod dispatch_from_trade {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::bingx::BingxClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BingxClient;

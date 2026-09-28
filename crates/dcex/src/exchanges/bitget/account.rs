@@ -53,13 +53,13 @@ impl BitgetClient {
                 )
                 .await
             }
-            "transfer" => self.moved_account_transfer(method_name, params).await,
+            "transfer" => self.dispatch_transfer(method_name, params).await,
             "get_transfer_records" => {
-                self.moved_account_get_transfer_records(method_name, params)
+                self.dispatch_get_transfer_records(method_name, params)
                     .await
             }
             "get_transferable_coins" => {
-                self.moved_account_get_transferable_coins(method_name, params)
+                self.dispatch_get_transferable_coins(method_name, params)
                     .await
             }
             "get_deposit_records" => {

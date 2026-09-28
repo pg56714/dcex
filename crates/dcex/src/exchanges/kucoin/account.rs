@@ -60,11 +60,8 @@ impl KucoinClient {
                 )
                 .await
             }
-            "get_transfer_quotas" => {
-                self.moved_account_get_transfer_quotas(method_name, params)
-                    .await
-            }
-            "flex_transfer" => self.moved_account_flex_transfer(method_name, params).await,
+            "get_transfer_quotas" => self.dispatch_get_transfer_quotas(method_name, params).await,
+            "flex_transfer" => self.dispatch_flex_transfer(method_name, params).await,
             "get_subaccounts" | "get_spot_subaccount_balances" | "get_uta_subaccounts" => {
                 params.ensure_allowed(&["currentPage", "pageSize"])?;
                 let path = match method_name {

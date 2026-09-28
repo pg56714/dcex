@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_account {
+mod account_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::okx::account::*;
@@ -9,7 +9,7 @@ mod dispatch_from_account {
     use crate::exchanges::okx::params::{OkxParams, push_optional_owned};
 
     impl OkxClient {
-        pub(in crate::exchanges::okx) async fn moved_account_get_max_withdrawal(
+        pub(in crate::exchanges::okx) async fn dispatch_get_max_withdrawal(
             &self,
             _method_name: &str,
             params: &OkxParams,
@@ -23,16 +23,16 @@ mod dispatch_from_account {
     }
 }
 
-mod dispatch_from_asset {
+mod asset_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
-    use crate::exchanges::okx::asset::*;
     use crate::exchanges::okx::client::OkxClient;
+    use crate::exchanges::okx::funding::*;
 
     use crate::exchanges::okx::params::{OkxParams, validate_deposit_withdraw_status};
 
     impl OkxClient {
-        pub(in crate::exchanges::okx) async fn moved_asset_get_deposit_withdraw_status(
+        pub(in crate::exchanges::okx) async fn dispatch_get_deposit_withdraw_status(
             &self,
             _method_name: &str,
             params: &OkxParams,
@@ -49,7 +49,7 @@ mod dispatch_from_asset {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::okx::OkxClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; OkxClient;

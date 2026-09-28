@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_asterclient {
+mod trade_operations {
 
     use crate::exchanges::aster::client::AsterClient;
 
@@ -82,7 +82,7 @@ mod from_trade_asterclient {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::aster::AsterClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; AsterClient;

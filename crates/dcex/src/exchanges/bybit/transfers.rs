@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_account {
+mod account_requests {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::bybit::account::*;
     use crate::exchanges::bybit::client::BybitClient;
@@ -9,7 +9,7 @@ mod dispatch_from_account {
     use crate::{DcexError, Result};
 
     impl BybitClient {
-        pub(in crate::exchanges::bybit) async fn moved_account_get_transferable_amount(
+        pub(in crate::exchanges::bybit) async fn dispatch_get_transferable_amount(
             &self,
             _method_name: &str,
             params: &BybitParams,
@@ -37,18 +37,18 @@ mod dispatch_from_account {
     }
 }
 
-mod dispatch_from_asset {
+mod asset_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
-    use crate::exchanges::bybit::asset::*;
     use crate::exchanges::bybit::client::BybitClient;
+    use crate::exchanges::bybit::funding::*;
 
     use crate::exchanges::bybit::params::{
         BybitParams, generate_transfer_id, push_optional, string_body,
     };
     use serde_json::Value;
     impl BybitClient {
-        pub(in crate::exchanges::bybit) async fn moved_asset_get_internal_transfer_records(
+        pub(in crate::exchanges::bybit) async fn dispatch_get_internal_transfer_records(
             &self,
             _method_name: &str,
             params: &BybitParams,
@@ -67,7 +67,7 @@ mod dispatch_from_asset {
                 self.get_request(GET_INTERNAL_TRANSFER_RECORDS, query).await
             }
         }
-        pub(in crate::exchanges::bybit) async fn moved_asset_get_transferable_coin(
+        pub(in crate::exchanges::bybit) async fn dispatch_get_transferable_coin(
             &self,
             _method_name: &str,
             params: &BybitParams,
@@ -86,7 +86,7 @@ mod dispatch_from_asset {
                 self.get_request(GET_TRANSFERABLE_COIN, query).await
             }
         }
-        pub(in crate::exchanges::bybit) async fn moved_asset_create_internal_transfer(
+        pub(in crate::exchanges::bybit) async fn dispatch_create_internal_transfer(
             &self,
             _method_name: &str,
             params: &BybitParams,
@@ -106,7 +106,7 @@ mod dispatch_from_asset {
                 self.post_request(CREATE_INTERNAL_TRANSFER, body).await
             }
         }
-        pub(in crate::exchanges::bybit) async fn moved_asset_create_universal_transfer(
+        pub(in crate::exchanges::bybit) async fn dispatch_create_universal_transfer(
             &self,
             _method_name: &str,
             params: &BybitParams,
@@ -128,7 +128,7 @@ mod dispatch_from_asset {
                 self.post_request(CREATE_UNIVERSAL_TRANSFER, body).await
             }
         }
-        pub(in crate::exchanges::bybit) async fn moved_asset_get_universal_transfer_records(
+        pub(in crate::exchanges::bybit) async fn dispatch_get_universal_transfer_records(
             &self,
             _method_name: &str,
             params: &BybitParams,
@@ -153,7 +153,7 @@ mod dispatch_from_asset {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::bybit::BybitClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BybitClient;

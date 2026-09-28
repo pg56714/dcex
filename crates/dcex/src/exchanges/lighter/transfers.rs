@@ -1,6 +1,6 @@
 //! Transfers requests.
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::lighter::LighterClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; LighterClient;

@@ -1,6 +1,6 @@
 //! Fund and batch request implementations.
 
-mod dispatch_from_account {
+mod account_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::kucoin::account::*;
@@ -12,7 +12,7 @@ mod dispatch_from_account {
     };
     use serde_json::{Map, Value};
     impl KucoinClient {
-        pub(in crate::exchanges::kucoin) async fn moved_account_get_transfer_quotas(
+        pub(in crate::exchanges::kucoin) async fn dispatch_get_transfer_quotas(
             &self,
             _method_name: &str,
             params: &KucoinParams,
@@ -41,7 +41,7 @@ mod dispatch_from_account {
                     .await
             }
         }
-        pub(in crate::exchanges::kucoin) async fn moved_account_flex_transfer(
+        pub(in crate::exchanges::kucoin) async fn dispatch_flex_transfer(
             &self,
             _method_name: &str,
             params: &KucoinParams,
@@ -107,7 +107,7 @@ mod dispatch_from_account {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::kucoin::KucoinClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; KucoinClient;

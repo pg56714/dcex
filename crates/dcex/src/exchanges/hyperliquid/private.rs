@@ -59,9 +59,9 @@ impl HyperliquidClient {
                 )
                 .await
             }
-            "transfer_sub_account_usd" => self.moved_transfer_sub_account_usd(&params).await,
-            "transfer_sub_account_spot" => self.moved_transfer_sub_account_spot(&params).await,
-            "transfer_vault_usd" => self.moved_transfer_vault_usd(&params).await,
+            "transfer_sub_account_usd" => self.dispatch_transfer_sub_account_usd(&params).await,
+            "transfer_sub_account_spot" => self.dispatch_transfer_sub_account_spot(&params).await,
+            "transfer_vault_usd" => self.dispatch_transfer_vault_usd(&params).await,
             "enable_agent_dex_abstraction" => {
                 self.submit_action(
                     object(vec![("type", string("agentEnableDexAbstraction"))]),
@@ -69,9 +69,9 @@ impl HyperliquidClient {
                 )
                 .await
             }
-            "transfer_hip3_liquidator" => self.moved_transfer_hip3_liquidator(&params).await,
+            "transfer_hip3_liquidator" => self.dispatch_transfer_hip3_liquidator(&params).await,
             "deposit_staking_signed" => self.additional_user_action("cDeposit", &params).await,
-            "withdraw_staking_signed" => self.moved_withdraw_staking_signed(&params).await,
+            "withdraw_staking_signed" => self.dispatch_withdraw_staking_signed(&params).await,
             "delegate_tokens_signed" => self.additional_user_action("tokenDelegate", &params).await,
             "set_user_dex_abstraction_signed" => {
                 self.additional_user_action("userDexAbstraction", &params)

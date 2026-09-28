@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_kucoinclient {
+mod trade_operations {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::kucoin::client::{KucoinClient, KucoinMarket};
     use crate::exchanges::kucoin::endpoints::*;
@@ -94,7 +94,7 @@ mod from_trade_kucoinclient {
     }
 }
 
-mod dispatch_from_trade {
+mod trade_requests {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::kucoin::client::KucoinClient;
 
@@ -103,7 +103,7 @@ mod dispatch_from_trade {
     use crate::Result;
 
     impl KucoinClient {
-        pub(in crate::exchanges::kucoin) async fn moved_trade_place_spot_batch_orders_sync(
+        pub(in crate::exchanges::kucoin) async fn dispatch_place_spot_batch_orders_sync(
             &self,
             _method_name: &str,
             params: &KucoinParams,
@@ -113,14 +113,14 @@ mod dispatch_from_trade {
                     .await
             }
         }
-        pub(in crate::exchanges::kucoin) async fn moved_trade_place_spot_batch_orders(
+        pub(in crate::exchanges::kucoin) async fn dispatch_place_spot_batch_orders(
             &self,
             _method_name: &str,
             params: &KucoinParams,
         ) -> Result<ValidatedResponse> {
             self.spot_batch_orders_from_params(params, None).await
         }
-        pub(in crate::exchanges::kucoin) async fn moved_trade_place_spot_batch_limit_orders(
+        pub(in crate::exchanges::kucoin) async fn dispatch_place_spot_batch_limit_orders(
             &self,
             _method_name: &str,
             params: &KucoinParams,
@@ -130,7 +130,7 @@ mod dispatch_from_trade {
                     .await
             }
         }
-        pub(in crate::exchanges::kucoin) async fn moved_trade_place_spot_batch_market_orders(
+        pub(in crate::exchanges::kucoin) async fn dispatch_place_spot_batch_market_orders(
             &self,
             _method_name: &str,
             params: &KucoinParams,
@@ -143,7 +143,7 @@ mod dispatch_from_trade {
     }
 }
 
-mod dispatch_from_uta {
+mod uta_requests {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::kucoin::client::{KucoinClient, KucoinMarket};
     use crate::exchanges::kucoin::endpoints::*;
@@ -152,7 +152,7 @@ mod dispatch_from_uta {
     use crate::{DcexError, Result};
     use serde_json::Value;
     impl KucoinClient {
-        pub(in crate::exchanges::kucoin) async fn moved_uta_batch_cancel_uta_orders(
+        pub(in crate::exchanges::kucoin) async fn dispatch_batch_cancel_uta_orders(
             &self,
             _method_name: &str,
             params: &KucoinParams,
@@ -222,7 +222,7 @@ mod dispatch_from_uta {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::kucoin::KucoinClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; KucoinClient;

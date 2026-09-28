@@ -1,6 +1,6 @@
 mod account;
-mod asset;
 mod client;
+mod funding;
 
 mod endpoints;
 

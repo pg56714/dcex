@@ -1,6 +1,6 @@
 //! Batch requests.
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::ondo::OndoClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; OndoClient;

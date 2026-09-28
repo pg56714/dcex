@@ -1,8 +1,8 @@
 mod account;
 mod advanced_earn;
-mod asset;
 mod byusdt;
 mod client;
+mod funding;
 
 mod earn;
 mod endpoints;

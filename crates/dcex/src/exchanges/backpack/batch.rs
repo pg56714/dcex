@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_backpackclient {
+mod trade_operations {
 
     use crate::exchanges::backpack::client::BackpackClient;
 
@@ -41,7 +41,7 @@ mod from_trade_backpackclient {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::backpack::BackpackClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BackpackClient;

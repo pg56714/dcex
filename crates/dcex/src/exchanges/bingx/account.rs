@@ -89,12 +89,12 @@ impl BingxClient {
                 .await
             }
             "get_transferable_coins" => {
-                self.moved_account_get_transferable_coins(method_name, params)
+                self.dispatch_get_transferable_coins(method_name, params)
                     .await
             }
-            "asset_transfer" => self.moved_account_asset_transfer(method_name, params).await,
+            "asset_transfer" => self.dispatch_asset_transfer(method_name, params).await,
             "get_asset_transfer_records" => {
-                self.moved_account_get_asset_transfer_records(method_name, params)
+                self.dispatch_get_asset_transfer_records(method_name, params)
                     .await
             }
             "get_subaccounts" => {
@@ -161,15 +161,15 @@ impl BingxClient {
                 .await
             }
             "get_subaccount_transfer_history" => {
-                self.moved_account_get_subaccount_transfer_history(method_name, params)
+                self.dispatch_get_subaccount_transfer_history(method_name, params)
                     .await
             }
             "get_subaccount_transferable_amounts" => {
-                self.moved_account_get_subaccount_transferable_amounts(method_name, params)
+                self.dispatch_get_subaccount_transferable_amounts(method_name, params)
                     .await
             }
             "transfer_subaccount_assets" => {
-                self.moved_account_transfer_subaccount_assets(method_name, params)
+                self.dispatch_transfer_subaccount_assets(method_name, params)
                     .await
             }
             "get_open_positions" => {

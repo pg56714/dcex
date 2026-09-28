@@ -10,7 +10,7 @@ mod params;
 mod private;
 mod signing;
 mod trade;
-mod wallet;
+mod wallet_queries;
 mod wrappers;
 
 #[cfg(test)]

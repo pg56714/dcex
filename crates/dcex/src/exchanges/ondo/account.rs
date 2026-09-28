@@ -145,29 +145,7 @@ impl OndoClient {
                 validate_account_wallet_key(&body, "deposit_destination")?;
                 self.private_post(PROVISION_ADDRESS, body).await
             }
-            "get_withdrawal_status" => {
-                let body = params.body(
-                    &["withdrawal_id", "customer_withdrawal_id"],
-                    &[],
-                    &[],
-                    &[],
-                    &[],
-                )?;
-                let count = ["withdrawal_id", "customer_withdrawal_id"]
-                    .iter()
-                    .filter(|key| body.get(**key).is_some())
-                    .count();
-                if count != 1 {
-                    return Err(DcexError::InvalidInput(
-                        "Ondo withdrawal status requires exactly one of withdrawal_id or customer_withdrawal_id"
-                            .to_string(),
-                    ));
-                }
-                for key in ["withdrawal_id", "customer_withdrawal_id"] {
-                    optional_string_field(&body, key)?;
-                }
-                self.private_post(WITHDRAWAL_STATUS, body).await
-            }
+            "get_withdrawal_status" => self.get_withdrawal_status_request(params).await,
             "edit_address_book_entry" => {
                 let body = params.body(
                     &["withdrawalAddress", "addressLabel"],
@@ -235,12 +213,7 @@ impl OndoClient {
                 self.private_get(&path_with_id(DEPOSITS, id), Vec::new())
                     .await
             }
-            "get_withdrawal" => {
-                params.ensure_allowed(&["withdrawalID"])?;
-                let id = params.path_segment("withdrawalID")?;
-                self.private_get(&path_with_id(WITHDRAWALS, id), Vec::new())
-                    .await
-            }
+            "get_withdrawal" => self.get_withdrawal_request(params).await,
             "get_deposit_addresses" => {
                 let body = params.body(
                     &["coins", "network", "depositDestination"],
@@ -348,7 +321,7 @@ fn require_string_fields(body: &Value, keys: &[&str]) -> Result<()> {
     Ok(())
 }
 
-fn optional_string_field(body: &Value, key: &str) -> Result<()> {
+pub(super) fn optional_string_field(body: &Value, key: &str) -> Result<()> {
     if body.get(key).is_some()
         && body
             .get(key)

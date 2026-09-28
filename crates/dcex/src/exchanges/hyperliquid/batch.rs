@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_hyperliquidclient {
+mod trade_operations {
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::hyperliquid::client::HyperliquidClient;
 
@@ -106,7 +106,7 @@ mod from_trade_hyperliquidclient {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::hyperliquid::HyperliquidClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; HyperliquidClient;

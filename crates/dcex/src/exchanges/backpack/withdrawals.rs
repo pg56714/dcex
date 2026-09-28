@@ -121,7 +121,7 @@ fn invalid(message: impl Into<String>) -> DcexError {
     DcexError::InvalidInput(format!("Backpack: {}", message.into()))
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::backpack::BackpackClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BackpackClient;
@@ -132,5 +132,56 @@ mod wrappers_from_wrappers {
     get_max_withdrawal_quantity(symbol => "symbol"),
     get_withdrawals()
      ];
+    }
+}
+
+mod account_requests {
+    use crate::exchanges::backpack::{
+        account::{validate_history_pagination, validate_optional_bools},
+        client::BackpackClient,
+        endpoints::{MAX_WITHDRAWAL_QUANTITY, WITHDRAWALS},
+        params::BackpackParams,
+    };
+    use crate::{Result, exchange::ValidatedResponse};
+    impl BackpackClient {
+        pub(in crate::exchanges::backpack) async fn get_max_withdrawal_quantity_request(
+            &self,
+            params: &BackpackParams,
+        ) -> Result<ValidatedResponse> {
+            self.private_get(
+                MAX_WITHDRAWAL_QUANTITY,
+                params.only(&["symbol", "autoBorrow", "autoLendRedeem"]),
+                "maxWithdrawalQuantity",
+            )
+            .await
+        }
+        pub(in crate::exchanges::backpack) fn get_max_withdrawal_quantity_validation(
+            &self,
+            params: &BackpackParams,
+        ) -> Result<()> {
+            params.ensure_allowed(&["symbol", "autoBorrow", "autoLendRedeem"], &[])?;
+            params.required("symbol")?;
+            validate_optional_bools(params, &["autoBorrow", "autoLendRedeem"])
+        }
+        pub(in crate::exchanges::backpack) async fn get_withdrawals_request(
+            &self,
+            params: &BackpackParams,
+        ) -> Result<ValidatedResponse> {
+            self.private_get(
+                WITHDRAWALS,
+                params.only(&["id", "clientId", "from", "to", "limit", "offset"]),
+                "withdrawalQueryAll",
+            )
+            .await
+        }
+        pub(in crate::exchanges::backpack) fn get_withdrawals_validation(
+            &self,
+            params: &BackpackParams,
+        ) -> Result<()> {
+            params.ensure_allowed(&["id", "clientId", "from", "to", "limit", "offset"], &[])?;
+            params.optional_i64_range("id", i32::MIN.into(), i32::MAX.into())?;
+            params.ensure_time_order("from", "to")?;
+            validate_history_pagination(params)
+        }
     }
 }

@@ -3,8 +3,8 @@ use serde_json::Value;
 
 use super::client::BitgetClient;
 use super::params::BitgetParams;
+use crate::Result;
 use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
 
 #[path = "generated/schema_tables.rs"]
 mod endpoints;
@@ -254,9 +254,7 @@ impl BitgetClient {
     }
 }
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(format!("Bitget: {message}"))
-}
+use crate::exchanges::bitget::params::schema_invalid as invalid;
 fn validate_passphrase(value: &str) -> Result<()> {
     if !(8..=32).contains(&value.len())
         || !value.bytes().all(|b| b.is_ascii_alphanumeric())
@@ -286,12 +284,7 @@ fn validate_string_list(value: &Value, key: &str, max: usize, choices: &[&str]) 
     }
     Ok(())
 }
-fn required<'a>(params: &'a BitgetParams, key: &str) -> Result<&'a str> {
-    params
-        .get(key)
-        .filter(|value| !value.trim().is_empty())
-        .ok_or_else(|| invalid(&format!("{key} is required")))
-}
+use crate::exchanges::bitget::params::schema_required as required;
 fn symbol(params: &BitgetParams) -> Result<&str> {
     params
         .get("product_symbol")

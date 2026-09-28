@@ -21,3 +21,5 @@ mod interest;
 mod vault;
 
 mod rewards;
+
+mod withdrawals;

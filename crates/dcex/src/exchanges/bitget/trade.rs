@@ -116,12 +116,12 @@ impl BitgetClient {
                 .await
             }
             "place_spot_batch_orders" => {
-                self.moved_trade_place_spot_batch_orders(method_name, params)
+                self.dispatch_place_spot_batch_orders(method_name, params)
                     .await
             }
             "cancel_spot_order" => self.cancel_spot_order_from_params(params).await,
             "cancel_spot_batch_orders" => {
-                self.moved_trade_cancel_spot_batch_orders(method_name, params)
+                self.dispatch_cancel_spot_batch_orders(method_name, params)
                     .await
             }
             "get_spot_order" => {
@@ -169,13 +169,13 @@ impl BitgetClient {
             "place_uta_order" => self.place_uta_order_from_params(params).await,
             "place_reality_order" => self.place_reality_order_from_params(params).await,
             "place_uta_batch_orders" => {
-                self.moved_trade_place_uta_batch_orders(method_name, params)
+                self.dispatch_place_uta_batch_orders(method_name, params)
                     .await
             }
             "cancel_uta_order" => self.cancel_uta_order_from_params(params).await,
             "cancel_reality_order" => self.cancel_reality_order_from_params(params).await,
             "cancel_uta_batch_orders" => {
-                self.moved_trade_cancel_uta_batch_orders(method_name, params)
+                self.dispatch_cancel_uta_batch_orders(method_name, params)
                     .await
             }
             "get_uta_order" => {
@@ -349,12 +349,12 @@ impl BitgetClient {
                 .await
             }
             "place_futures_batch_orders" => {
-                self.moved_trade_place_futures_batch_orders(method_name, params)
+                self.dispatch_place_futures_batch_orders(method_name, params)
                     .await
             }
             "cancel_futures_order" => self.cancel_futures_order_from_params(params).await,
             "cancel_futures_batch_orders" => {
-                self.moved_trade_cancel_futures_batch_orders(method_name, params)
+                self.dispatch_cancel_futures_batch_orders(method_name, params)
                     .await
             }
             "get_futures_order" => {

@@ -1,6 +1,6 @@
 //! Fund movement and batch request implementations.
 
-mod from_trade_bybitclient {
+mod trade_operations {
     use crate::Result;
 
     use crate::exchange::ValidatedResponse;
@@ -26,7 +26,7 @@ mod from_trade_bybitclient {
     }
 }
 
-mod dispatch_from_trade {
+mod trade_requests {
     use crate::Result;
 
     use crate::exchange::ValidatedResponse;
@@ -35,21 +35,21 @@ mod dispatch_from_trade {
     use crate::exchanges::bybit::params::BybitParams;
 
     impl BybitClient {
-        pub(in crate::exchanges::bybit) async fn moved_trade_cancel_batch_orders(
+        pub(in crate::exchanges::bybit) async fn dispatch_cancel_batch_orders(
             &self,
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
             self.batch_request(CANCEL_BATCH_ORDERS, params).await
         }
-        pub(in crate::exchanges::bybit) async fn moved_trade_place_batch_order(
+        pub(in crate::exchanges::bybit) async fn dispatch_place_batch_order(
             &self,
             _method_name: &str,
             params: &BybitParams,
         ) -> Result<ValidatedResponse> {
             self.batch_request(BATCH_PLACE_ORDER, params).await
         }
-        pub(in crate::exchanges::bybit) async fn moved_trade_amend_batch_order(
+        pub(in crate::exchanges::bybit) async fn dispatch_amend_batch_order(
             &self,
             _method_name: &str,
             params: &BybitParams,
@@ -59,7 +59,7 @@ mod dispatch_from_trade {
     }
 }
 
-mod wrappers_from_wrappers {
+mod wrappers {
     use crate::exchanges::bybit::BybitClient;
     crate::exchanges::impl_exchange_method_wrappers! {
      @extend; BybitClient;

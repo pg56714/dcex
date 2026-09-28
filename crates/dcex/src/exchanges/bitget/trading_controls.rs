@@ -1,8 +1,8 @@
 //! Additional classic and UTA trading and risk endpoints.
 use super::client::BitgetClient;
 use super::params::BitgetParams;
+use crate::Result;
 use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
 use serde_json::Value;
 type TradingRoute<'a> = (
     &'a str,
@@ -610,9 +610,7 @@ impl BitgetClient {
     }
 }
 
-fn invalid(message: &str) -> DcexError {
-    DcexError::InvalidInput(message.into())
-}
+use crate::exchanges::bitget::params::invalid;
 fn enum_value(params: &BitgetParams, key: &str, choices: &[&str]) -> Result<()> {
     if params.get(key).is_some_and(|v| !choices.contains(&v)) {
         return Err(invalid(&format!("unsupported {key}")));
