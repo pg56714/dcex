@@ -12,7 +12,7 @@ use crate::Result;
 use crate::http::block_on;
 use crate::product_table::{MarketInfo, ProductTable};
 
-use super::LighterClient;
+use super::helpers::LighterClient;
 
 const ACCOUNT: u64 = 12;
 const API_KEY: u64 = 3;

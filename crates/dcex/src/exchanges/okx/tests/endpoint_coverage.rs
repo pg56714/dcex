@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use serde_json::Value;
 
-use super::OkxClient;
+use super::helpers::OkxClient;
 
 struct Case {
     name: &'static str,

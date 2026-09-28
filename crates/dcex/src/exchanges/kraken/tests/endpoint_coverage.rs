@@ -4,7 +4,7 @@
 use std::collections::{BTreeSet, HashMap};
 use std::time::Duration;
 
-use super::{KrakenClient, SECRET};
+use super::helpers::{KrakenClient, SECRET};
 
 /// Rows: (public, method name, params, HTTP method, path).
 #[allow(clippy::type_complexity)]

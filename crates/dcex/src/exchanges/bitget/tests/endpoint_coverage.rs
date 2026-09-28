@@ -7,7 +7,7 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 
-use super::BitgetClient;
+use super::helpers::BitgetClient;
 
 struct Recorded {
     method: String,

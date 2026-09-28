@@ -9,6 +9,7 @@ mod params;
 mod rfq;
 mod signing;
 mod strategy;
+#[cfg(test)]
 mod tests;
 mod trade;
 pub mod websocket;

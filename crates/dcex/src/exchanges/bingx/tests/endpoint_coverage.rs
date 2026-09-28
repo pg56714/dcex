@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use crate::http::block_on;
 
-use super::BingxClient;
+use super::helpers::BingxClient;
 
 struct Recorded {
     method: String,
