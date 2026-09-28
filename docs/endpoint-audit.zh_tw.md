@@ -2,7 +2,7 @@
 
 [English](endpoint-audit.md) | **繁體中文**
 
-核對日期：2026-09-28。原始報表有 3,180 列；目前清冊共 4,846 列，另保存 15 家交易所的官方文件清冊。
+核對日期：2026-09-29。原始報表有 3,180 列；目前清冊共 4,846 列，另保存 15 家交易所的官方文件清冊。
 
 所有官方端點均納入範圍，包含提款、地址管理、做市商、RFQ、經紀商、推薦與合作夥伴操作。原先 111 個 excluded 列已處理，沒有保留範圍排除；這不代表所有新發現端點均已實作。
 
@@ -50,9 +50,9 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 ## 驗證與限制
 
 <!-- VERIFICATION -->
-- Rust passed: `680`
+- Rust passed: `685`
 - Rust live ignored: `53`
-- Python passed: `16935`
+- Python passed: `21985`
 - Python deselected: `944`
 - Python skipped: `0`
 - Python xfailed: `0`

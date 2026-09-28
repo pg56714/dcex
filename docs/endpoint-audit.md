@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-audit.zh_tw.md)
 
-Reviewed: 2026-09-28. The original report contained 3,180 rows; the reconciled ledger contains 4,846 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-29. The original report contained 3,180 rows; the reconciled ledger contains 4,846 rows, with official documentation inventories for all 15 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
@@ -50,9 +50,9 @@ Method counts include aliases and signing helpers, not endpoints. Additions are 
 ## Verification and limits
 
 <!-- VERIFICATION -->
-- Rust passed: `680`
+- Rust passed: `685`
 - Rust live ignored: `53`
-- Python passed: `16935`
+- Python passed: `21985`
 - Python deselected: `944`
 - Python skipped: `0`
 - Python xfailed: `0`

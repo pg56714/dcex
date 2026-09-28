@@ -2,7 +2,7 @@
 
 **English** | [繁體中文](endpoint-recheck.zh_tw.md)
 
-Reviewed: 2026-09-28. The original report contained 3,180 rows; the reconciled ledger contains 4,846 rows, with official documentation inventories for all 15 exchanges.
+Reviewed: 2026-09-29. The original report contained 3,180 rows; the reconciled ledger contains 4,846 rows, with official documentation inventories for all 15 exchanges.
 
 All documented endpoints are in scope, including withdrawals, address management, market making, RFQ, broker, referral and partner operations. All 111 originally excluded rows have been addressed; there are no scope exclusions. This does not mean every newly discovered endpoint is implemented.
 
