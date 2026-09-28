@@ -1,0 +1,240 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/fiat/balance-query",
+    "title": "Get Balance",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/balance-query",
+    "name": "get_fiat_balance_query",
+    "public": false,
+    "fields": [
+      {
+        "name": "currency",
+        "python_name": "currency",
+        "type": "string",
+        "required": false,
+        "description": "Fiat`: fiat currency code (ISO 4217) etc: KZT. not set will query all fiat balance list"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/asset/fiat-convert/balance-query.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fiat/trade-execute",
+    "title": "Confirm a Quote ",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/confirm-quote",
+    "name": "request_fiat_trade_execute",
+    "public": false,
+    "fields": [
+      {
+        "name": "quoteTxId",
+        "python_name": "quote_tx_id",
+        "type": "string",
+        "required": true,
+        "description": "The quote tx ID from Request a Quote"
+      },
+      {
+        "name": "subUserId",
+        "python_name": "sub_user_id",
+        "type": "string",
+        "required": true,
+        "description": "The user's sub userId in bybit"
+      },
+      {
+        "name": "webhookUrl",
+        "python_name": "webhook_url",
+        "type": "string",
+        "required": false,
+        "description": "API URL to call when order is successful or failed (max 256 characters)"
+      },
+      {
+        "name": "MerchantRequestId",
+        "python_name": "merchant_request_id",
+        "type": "string",
+        "required": false,
+        "description": "Customised request ID(maximum length of 36)Generally it is useless, but it is convenient to track the quote request internally if you fill this field"
+      }
+    ],
+    "example": {
+      "quoteTxId": "QuoteTaxId123456",
+      "subUserId": "43456"
+    },
+    "has_example": true,
+    "source_file": "v5/asset/fiat-convert/confirm-quote.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/fiat/query-coin-list",
+    "title": "Get Trading Pair List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-coin-list",
+    "name": "get_fiat_query_coin_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "side",
+        "python_name": "side",
+        "type": "string",
+        "required": false,
+        "description": "0`: buy, buy crypto sell fiat; `1`: sell, sell crypto buy fiat"
+      }
+    ],
+    "example": {
+      "side": "0"
+    },
+    "has_example": true,
+    "source_file": "v5/asset/fiat-convert/query-coin-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/fiat/query-trade-history",
+    "title": "Get Convert History",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-trade-history",
+    "name": "get_fiat_query_trade_history",
+    "public": false,
+    "fields": [
+      {
+        "name": "index",
+        "python_name": "index",
+        "type": "integer",
+        "required": false,
+        "description": "Page number,started from 1, default 1"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Page Size [20-100] 20 records by default,up to 100 records, return 100 when exceeds 100"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "string",
+        "required": false,
+        "description": "Query start time(Millisecond timestamp)"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "string",
+        "required": false,
+        "description": "Query end time(Millisecond timestamp)"
+      }
+    ],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/asset/fiat-convert/query-trade-history.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/fiat/trade-query",
+    "title": "Get Convert Status",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/query-trade",
+    "name": "get_fiat_trade_query",
+    "public": false,
+    "fields": [
+      {
+        "name": "tradeNo",
+        "python_name": "trade_no",
+        "type": "string",
+        "required": false,
+        "description": "Trade order No,tradeNo or merchantRequestId must be provided"
+      },
+      {
+        "name": "merchantRequestId",
+        "python_name": "merchant_request_id",
+        "type": "string",
+        "required": false,
+        "description": "Customised request ID,tradeNo or merchantRequestId must be provided"
+      }
+    ],
+    "example": {
+      "tradeNo": "TradeNo123456"
+    },
+    "has_example": true,
+    "source_file": "v5/asset/fiat-convert/query-trade.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fiat/quote-apply",
+    "title": "Request a Quote ",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/quote-apply",
+    "name": "request_fiat_quote_apply",
+    "public": false,
+    "fields": [
+      {
+        "name": "fromCoin",
+        "python_name": "from_coin",
+        "type": "string",
+        "required": true,
+        "description": "Convert from coin (coin to sell)"
+      },
+      {
+        "name": "fromCoinType",
+        "python_name": "from_coin_type",
+        "type": "string",
+        "required": true,
+        "description": "fiat` or `crypto"
+      },
+      {
+        "name": "toCoin",
+        "python_name": "to_coin",
+        "type": "string",
+        "required": true,
+        "description": "Convert to coin (coin to buy)"
+      },
+      {
+        "name": "toCoinType",
+        "python_name": "to_coin_type",
+        "type": "string",
+        "required": true,
+        "description": "fiat` or `crypto"
+      },
+      {
+        "name": "requestAmount",
+        "python_name": "request_amount",
+        "type": "string",
+        "required": true,
+        "description": "request coin amount (the amount you want to sell)"
+      },
+      {
+        "name": "requestCoinType",
+        "python_name": "request_coin_type",
+        "type": "string",
+        "required": false,
+        "description": "coinType you want to sell, `fiat` or `crypto`, default to `fiat"
+      }
+    ],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/asset/fiat-convert/quote-apply.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/fiat/reference-price",
+    "title": "Get Reference Price",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/asset/fiat-convert/reference-price",
+    "name": "get_fiat_reference_price",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Coin Pair, such as EUR-USDT"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/asset/fiat-convert/reference-price.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

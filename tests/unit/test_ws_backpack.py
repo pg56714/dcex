@@ -216,3 +216,15 @@ async def test_backpack_ws_rejects_unexpected_payload(
     ws = backpack.public()
     with pytest.raises(RuntimeError, match="Unexpected Backpack WebSocket event payload"):
         await ws.recv()
+
+
+import inspect
+
+import pytest
+
+
+def test_backpack_liquidation_stream_requires_a_symbol() -> None:
+    from dcex.ws.backpack import PublicClient
+
+    parameter = inspect.signature(PublicClient.subscribe_liquidation).parameters["product_symbol"]
+    assert parameter.default is inspect.Parameter.empty

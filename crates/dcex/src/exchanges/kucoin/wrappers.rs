@@ -334,3 +334,24 @@ get_uta_withdrawal_quotas(currency => "currency",withdraw_type => "withdrawType"
 crate::exchanges::impl_exchange_method_wrappers! {@extend;KucoinClient;public [];private [set_uta_account_mode(account_type => "accountType")];}
 
 crate::exchanges::impl_exchange_method_wrappers! {@extend;KucoinClient;public [get_currencies_v3()];private [];}
+
+mod business_methods {
+    use crate::exchanges::kucoin::client::KucoinClient;
+
+    crate::exchanges::impl_exchange_method_wrappers! {
+        @extend;
+        KucoinClient;
+        public [
+
+        ];
+        private [
+            /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+            create_withdrawal(currency => "currency", amount => "amount", to_address => "toAddress", withdraw_type => "withdrawType"),
+            /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+            create_uta_withdrawal(currency => "currency", amount => "amount", to_address => "toAddress", withdraw_type => "withdrawType"),
+            cancel_withdrawal(withdrawal_id => "withdrawalId"),
+            cancel_uta_withdrawal(withdraw_id => "withdrawId"),
+            cancel_margin_stop_order_by_id_raw(),
+        ];
+    }
+}

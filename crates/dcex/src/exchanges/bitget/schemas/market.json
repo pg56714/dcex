@@ -1,0 +1,185 @@
+[
+  {
+    "name": "classic_common_apidata_account_long_short",
+    "method": "GET",
+    "path": "/api/v2/mix/market/account-long-short",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-futures-active-long-short-account-data",
+    "summary": "Get Futures Active Long Short Account Data"
+  },
+  {
+    "name": "classic_common_apidata_fund_net_flow",
+    "method": "GET",
+    "path": "/api/v2/spot/market/fund-net-flow",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-spot-24h-net-capital-inflow-info",
+    "summary": "Get Spot 24H Net Capital Inflow Info"
+  },
+  {
+    "name": "classic_common_apidata_get_big_data_symbol",
+    "method": "GET",
+    "path": "/api/v2/spot/market/support-symbols",
+    "public": true,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-trade-data-support-symbols",
+    "summary": "Get Trade data support symbols"
+  },
+  {
+    "name": "classic_common_apidata_get_spot_fund_flow",
+    "method": "GET",
+    "path": "/api/v2/spot/market/fund-flow",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-spot-fund-flow",
+    "summary": "Get spot fund flow"
+  },
+  {
+    "name": "classic_common_apidata_long_short",
+    "method": "GET",
+    "path": "/api/v2/mix/market/long-short",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-futures-long-and-short-ratio-data",
+    "summary": "Get Futures Long and Short Ratio Data"
+  },
+  {
+    "name": "classic_common_apidata_position_long_short",
+    "method": "GET",
+    "path": "/api/v2/mix/market/position-long-short",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-futures-active-long-short-position-data",
+    "summary": "Get Futures Active Long Short Position Data"
+  },
+  {
+    "name": "classic_common_apidata_taker_buy_sell",
+    "method": "GET",
+    "path": "/api/v2/mix/market/taker-buy-sell",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-futures-active-buy-sell-volume-data",
+    "summary": "Get Futures Active Buy Sell Volume Data"
+  },
+  {
+    "name": "classic_common_apidata_whale_net_flow",
+    "method": "GET",
+    "path": "/api/v2/spot/market/whale-net-flow",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-spot-whale-net-flow-data",
+    "summary": "Get Spot Whale Net Flow Data"
+  }
+]

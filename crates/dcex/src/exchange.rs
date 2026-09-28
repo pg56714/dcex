@@ -148,6 +148,10 @@ pub fn unix_timestamp_ms() -> Result<u64> {
     u64::try_from(duration.as_millis()).map_err(|error| DcexError::Runtime(error.to_string()))
 }
 
+pub fn exchange_names() -> Vec<&'static str> {
+    Exchange::ALL.into_iter().map(Exchange::as_str).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -392,3 +392,99 @@ fn validate_history_common(params: &BackpackParams) -> Result<()> {
     params.optional_one_of("sortDirection", &["Asc", "Desc"])?;
     params.optional_bool("deferredSettlement")
 }
+
+mod rfq_requests {
+    use crate::exchanges::backpack::{BackpackClient, params::BackpackParams};
+    use crate::{DcexError, Result, exchange::ValidatedResponse};
+    use serde_json::{Map, Value};
+
+    impl BackpackClient {
+        pub(in crate::exchanges::backpack) async fn rfq_schema_request(
+            &self,
+            name: &str,
+            p: &BackpackParams,
+        ) -> Result<Option<ValidatedResponse>> {
+            let (path, instruction, required, strings, decimals): (
+                &str,
+                &str,
+                &[&str],
+                &[&str],
+                &[&str],
+            ) = match name {
+                "submit_rfq_quote" => (
+                    "/api/v1/rfq/quote",
+                    "quoteSubmit",
+                    &["rfqId", "bidPrice", "askPrice"],
+                    &["rfqId"],
+                    &["bidPrice", "askPrice"],
+                ),
+                _ => return Ok(None),
+            };
+            let allowed: &[&str] = {
+                &[
+                    "rfqId",
+                    "bidPrice",
+                    "askPrice",
+                    "clientId",
+                    "autoLend",
+                    "autoLendRedeem",
+                    "autoBorrow",
+                    "autoBorrowRepay",
+                ]
+            };
+            p.ensure_allowed(allowed, &[])?;
+            for key in required {
+                p.required(key)?;
+            }
+            let mut body = Map::new();
+            for key in strings.iter().chain(decimals.iter()) {
+                if let Some(raw) = p.get(key) {
+                    body.insert((*key).into(), Value::String(raw.into()));
+                }
+            }
+            for key in decimals {
+                if !p
+                    .get(key)
+                    .is_some_and(crate::common::is_positive_plain_decimal)
+                {
+                    return Err(invalid(format!(
+                        "{key} requires a positive plain decimal string"
+                    )));
+                }
+            }
+            for key in [
+                "autoLend",
+                "autoLendRedeem",
+                "autoBorrow",
+                "autoBorrowRepay",
+            ] {
+                if let Some(raw) = p.get(key) {
+                    body.insert(
+                        key.into(),
+                        Value::Bool(
+                            raw.parse::<bool>()
+                                .map_err(|_| invalid(format!("{key} requires a boolean")))?,
+                        ),
+                    );
+                }
+            }
+            {
+                if let Some(raw) = p.get("clientId") {
+                    body.insert(
+                        "clientId".into(),
+                        Value::from(
+                            raw.parse::<u32>()
+                                .map_err(|_| invalid("clientId requires uint32"))?,
+                        ),
+                    );
+                }
+            }
+            self.private_post_value(path, Value::Object(body), instruction)
+                .await
+                .map(Some)
+        }
+    }
+    fn invalid(message: impl Into<String>) -> DcexError {
+        DcexError::InvalidInput(format!("Backpack: {}", message.into()))
+    }
+}

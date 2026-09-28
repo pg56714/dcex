@@ -13,11 +13,11 @@ they do not establish live account eligibility or server availability.
 Run generators from the repository root, for example:
 
 ```sh
-python -m scripts.build_binance_inventory_wrappers
-python -m scripts.build_bingx_inventory_wrappers
-python -m scripts.build_bitget_inventory_wrappers
-python -m scripts.build_hyperliquid_inventory_wrappers
-python -m scripts.build_kucoin_inventory_wrappers
+python -m scripts.build_binance_wrappers
+python -m scripts.build_bingx_wrappers
+python -m scripts.build_bitget_wrappers
+python -m scripts.build_hyperliquid_wrappers
+python -m scripts.build_kucoin_wrappers
 ruff check --fix dcex
 ruff format dcex
 cargo fmt --all

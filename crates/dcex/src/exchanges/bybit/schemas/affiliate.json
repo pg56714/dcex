@@ -1,0 +1,126 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/affiliate/affiliate-sub-list",
+    "title": "Get Affiliate Sub-Affiliate List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-sub-list",
+    "name": "get_affiliate_affiliate_sub_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set"
+      },
+      {
+        "name": "size",
+        "python_name": "size",
+        "type": "integer",
+        "required": false,
+        "description": "Limit for data size per page. [`0`, `100`]. Default: `0"
+      },
+      {
+        "name": "startDate",
+        "python_name": "start_date",
+        "type": "string",
+        "required": false,
+        "description": "Start date of the query period, format `YYYY-MM-DD`. The range between \"startDate\" and \"endTime\" cannot exceed 3 months"
+      },
+      {
+        "name": "endDate",
+        "python_name": "end_date",
+        "type": "string",
+        "required": false,
+        "description": "End date of the query period, format `YYYY-MM-DD`. \"startDate\" and \"endDate\" must either both be provided or both be omitted. If both are omitted, it returns T-1 data by default"
+      },
+      {
+        "name": "subAffId",
+        "python_name": "sub_aff_id",
+        "type": "integer",
+        "required": false,
+        "description": "Sub-affiliate ID for exact lookup. Pass `0` or omit to return all sub-affiliates without filtering"
+      }
+    ],
+    "example": {
+      "size": "100",
+      "startDate": "2024-01-01",
+      "endDate": "2024-01-31"
+    },
+    "has_example": true,
+    "source_file": "v5/affiliate/affiliate-sub-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/affiliate/aff-user-list",
+    "title": "Get Affiliate User List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-user-list",
+    "name": "get_affiliate_aff_user_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "size",
+        "python_name": "size",
+        "type": "integer",
+        "required": false,
+        "description": "Limit for data size per page. [`0`, `100`]. Default: `0"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set"
+      },
+      {
+        "name": "needDeposit",
+        "python_name": "need_deposit",
+        "type": "boolean",
+        "required": false,
+        "description": "true`: return deposit info; `false`(default): does not return deposit info"
+      },
+      {
+        "name": "need30",
+        "python_name": "need30",
+        "type": "boolean",
+        "required": false,
+        "description": "true`: return 30 days trading info; `false`(default): does not return 30 days trading info"
+      },
+      {
+        "name": "need365",
+        "python_name": "need365",
+        "type": "boolean",
+        "required": false,
+        "description": "true`: return 365 days trading info; `false`(default): does not return 365 days trading info"
+      },
+      {
+        "name": "startDate",
+        "python_name": "start_date",
+        "type": "string",
+        "required": false,
+        "description": "Start date of the query period, format `YYYY-MM-DD"
+      },
+      {
+        "name": "endDate",
+        "python_name": "end_date",
+        "type": "string",
+        "required": false,
+        "description": "End date of the query period, format `YYYY-MM-DD"
+      }
+    ],
+    "example": {
+      "cursor": "0",
+      "size": "2",
+      "need365": "true",
+      "need30": "true",
+      "needDeposit": "true",
+      "startDate": "2025-10-21",
+      "endDate": "2025-10-22"
+    },
+    "has_example": true,
+    "source_file": "v5/affiliate/affiliate-user-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

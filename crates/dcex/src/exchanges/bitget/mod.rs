@@ -1,11 +1,10 @@
 mod account;
 mod client;
-mod completion;
-mod completion_wrappers;
+
 mod earn;
 mod endpoints;
-mod inventory_completion;
-mod inventory_wrappers;
+
+mod generated;
 mod loan;
 mod market;
 mod params;
@@ -22,4 +21,8 @@ mod tests;
 pub use client::BitgetClient;
 
 mod batch_controls;
-mod risk;
+mod schema_requests;
+
+mod withdrawals;
+
+mod subaccount;

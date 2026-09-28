@@ -1,0 +1,407 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/broker/ip/changelog",
+    "title": "Get Broker IP Change Log",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/ip-changelog",
+    "name": "get_broker_ip_changelog",
+    "public": false,
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "string",
+        "required": false,
+        "description": "Filter start time, Unix timestamp in milliseconds"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "string",
+        "required": false,
+        "description": "Filter end time, Unix timestamp in milliseconds"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Records per page. Range: [1, 50]. Default: 20"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor. Use the `nextPageCursor` value from the previous response"
+      }
+    ],
+    "example": {
+      "limit": "3"
+    },
+    "has_example": true,
+    "source_file": "v5/broker/api-broker/ip-changelog.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/broker/whitelist/ip",
+    "title": "Get Broker Whitelist IP",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/api-broker/whitelist-ip",
+    "name": "get_broker_whitelist_ip",
+    "public": true,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/broker/api-broker/whitelist-ip.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/broker/account-info",
+    "title": "Get Account Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/account-info",
+    "name": "get_broker_account_info",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/broker/exchange-broker/account-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/broker/earnings-info",
+    "title": "Get Earning",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/exchange-earning",
+    "name": "get_broker_earnings_info",
+    "public": false,
+    "fields": [
+      {
+        "name": "bizType",
+        "python_name": "biz_type",
+        "type": "string",
+        "required": false,
+        "description": "Business type. `SPOT`, `DERIVATIVES`, `OPTIONS`, `CONVERT`, `FIAT_CONVERT"
+      },
+      {
+        "name": "begin",
+        "python_name": "begin",
+        "type": "string",
+        "required": false,
+        "description": "Begin date, in the format of YYYYMMDD, e.g, 20231201, search the data from 1st Dec 2023 00:00:00 UTC (include)"
+      },
+      {
+        "name": "end",
+        "python_name": "end",
+        "type": "string",
+        "required": false,
+        "description": "End date, in the format of YYYYMMDD, e.g, 20231201, search the data before 2nd Dec 2023 00:00:00 UTC (exclude)"
+      },
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": false,
+        "description": "To get results for a specific subaccount: Enter the subaccount UIDTo get results for all subaccounts: Leave the field empty"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Limit for data size per page. [`1`, `1000`]. Default: `1000"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set"
+      }
+    ],
+    "example": {
+      "begin": "20231129",
+      "end": "20231129",
+      "uid": "117894077"
+    },
+    "has_example": true,
+    "source_file": "v5/broker/exchange-broker/exchange-earning.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/broker/apilimit/query-all",
+    "title": "Get All Rate Limits",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/query-all",
+    "name": "get_broker_apilimit_query_all",
+    "public": false,
+    "fields": [
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Limit for data size per page. [`1`, `1000`]. Default: `1000"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set"
+      },
+      {
+        "name": "uids",
+        "python_name": "uids",
+        "type": "string",
+        "required": false,
+        "description": "Multiple UIDs across different master accounts, separated by commas. Returns all subaccounts by default"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/broker/exchange-broker/rate-limit/query-all.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/broker/apilimit/query-cap",
+    "title": "Get Rate Limit Cap",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/query-cap",
+    "name": "get_broker_apilimit_query_cap",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/broker/exchange-broker/rate-limit/query-cap.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/broker/apilimit/set",
+    "title": "Set Rate Limit",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/rate-limit/set",
+    "name": "set_broker_apilimit",
+    "public": false,
+    "fields": [
+      {
+        "name": "list",
+        "python_name": "list_",
+        "type": "array",
+        "required": true,
+        "description": "Object"
+      }
+    ],
+    "example": {
+      "list": [
+        {
+          "uids": "290118",
+          "bizType": "SPOT",
+          "rate": 600
+        }
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/broker/exchange-broker/rate-limit/set.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/broker/asset/query-sub-member-deposit-record",
+    "title": "Get Sub Account Deposit Records",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/exchange-broker/sub-deposit-record",
+    "name": "get_broker_asset_query_sub_member_deposit_record",
+    "public": false,
+    "fields": [
+      {
+        "name": "id",
+        "python_name": "id",
+        "type": "string",
+        "required": false,
+        "description": "Internal ID: Can be used to uniquely identify and filter the deposit. When combined with other parameters, this field takes the highest priority"
+      },
+      {
+        "name": "txID",
+        "python_name": "tx_id",
+        "type": "string",
+        "required": false,
+        "description": "Transaction ID: Please note that data generated before Jan 1, 2024 cannot be queried using txID"
+      },
+      {
+        "name": "subMemberId",
+        "python_name": "sub_member_id",
+        "type": "string",
+        "required": false,
+        "description": "Sub UID"
+      },
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": false,
+        "description": "Coin, uppercase only"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "The start timestamp (ms) _Note: the query logic is actually effective based on **second** level_"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "The end timestamp (ms) _Note: the query logic is actually effective based on **second** level_"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Limit for data size per page. [`1`, `50`]. Default: `50"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Cursor. Use the `nextPageCursor` token from the response to retrieve the next page of the result set"
+      }
+    ],
+    "example": {
+      "coin": "USDT",
+      "limit": "1"
+    },
+    "has_example": true,
+    "source_file": "v5/broker/exchange-broker/sub-deposit-record.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/broker/award/distribution-record",
+    "title": "Get Issued Voucher",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/reward/get-issue-voucher",
+    "name": "request_broker_award_distribution_record",
+    "public": false,
+    "fields": [
+      {
+        "name": "accountId",
+        "python_name": "account_id",
+        "type": "string",
+        "required": true,
+        "description": "User ID"
+      },
+      {
+        "name": "awardId",
+        "python_name": "award_id",
+        "type": "string",
+        "required": true,
+        "description": "Voucher ID"
+      },
+      {
+        "name": "specCode",
+        "python_name": "spec_code",
+        "type": "string",
+        "required": true,
+        "description": "Customised unique spec code, up to 8 characters"
+      },
+      {
+        "name": "withUsedAmount",
+        "python_name": "with_used_amount",
+        "type": "boolean",
+        "required": false,
+        "description": "Whether or not to return the amount used by the user `true``false` (default)"
+      }
+    ],
+    "example": {
+      "accountId": "5714139",
+      "awardId": "189528",
+      "specCode": "demo000",
+      "withUsedAmount": false
+    },
+    "has_example": true,
+    "source_file": "v5/broker/reward/get-issue-voucher.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/broker/award/distribute-award",
+    "title": "Issue Voucher",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/reward/issue-voucher",
+    "name": "request_broker_award_distribute_award",
+    "public": false,
+    "fields": [
+      {
+        "name": "accountId",
+        "python_name": "account_id",
+        "type": "string",
+        "required": true,
+        "description": "User ID"
+      },
+      {
+        "name": "awardId",
+        "python_name": "award_id",
+        "type": "string",
+        "required": true,
+        "description": "Voucher ID"
+      },
+      {
+        "name": "specCode",
+        "python_name": "spec_code",
+        "type": "string",
+        "required": true,
+        "description": "Customised unique spec code, up to 8 characters"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "Issue amount Spot airdrop supports up to 16 decimalsOther types supports up to 4 decimals"
+      },
+      {
+        "name": "brokerId",
+        "python_name": "broker_id",
+        "type": "string",
+        "required": true,
+        "description": "Broker ID"
+      }
+    ],
+    "example": {
+      "accountId": "2846381",
+      "awardId": "123456",
+      "specCode": "award-001",
+      "amount": "100",
+      "brokerId": "v-28478"
+    },
+    "has_example": true,
+    "source_file": "v5/broker/reward/issue-voucher.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/broker/award/info",
+    "title": "Get Voucher Spec",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/broker/reward/voucher",
+    "name": "get_broker_award_info",
+    "public": false,
+    "fields": [
+      {
+        "name": "id",
+        "python_name": "id",
+        "type": "string",
+        "required": true,
+        "description": "Voucher ID"
+      }
+    ],
+    "example": {
+      "id": "80209"
+    },
+    "has_example": true,
+    "source_file": "v5/broker/reward/voucher.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

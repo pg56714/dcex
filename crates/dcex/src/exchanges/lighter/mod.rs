@@ -1,5 +1,5 @@
 mod account;
-mod additional;
+
 pub mod chains;
 mod client;
 mod credentials;
@@ -20,5 +20,8 @@ pub use trade::LighterSignedTransaction;
 #[cfg(test)]
 mod tests;
 
-mod completion;
-mod completion_wrappers;
+mod deposits;
+
+mod leases;
+
+mod schema_requests;

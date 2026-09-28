@@ -1,0 +1,34 @@
+[
+  {
+    "name": "get_content_v1_announcement",
+    "method": "GET",
+    "path": "/openApi/content/v1/announcement",
+    "signed": false,
+    "fields": [
+      {
+        "name": "contentType",
+        "type": "string",
+        "required": false,
+        "description": "Module type: `LatestAnnouncements`, `LatestPromotions`, `ProductUpdates`, `AssetMaintenance`, `SystemMaintenance`, `SpotListing`, `FuturesListing`, `InnovationListing`, `FundingRate`, `Delisting`, `CryptoScout`. Omit for default.",
+        "kind": "str"
+      },
+      {
+        "name": "language",
+        "type": "string",
+        "required": false,
+        "description": "Language: `zh-tw` (Traditional Chinese), `en-us` (English).",
+        "kind": "str"
+      },
+      {
+        "name": "page",
+        "type": "integer",
+        "required": false,
+        "description": "Page number for pagination; minimum `1`.",
+        "kind": "int"
+      }
+    ],
+    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/announcement/api-reference.md#L7",
+    "summary": "1. Get Announcements",
+    "scoped": false
+  }
+]

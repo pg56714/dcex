@@ -39,10 +39,10 @@ impl BingxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BingxParams::from_pairs(params);
-        if let Some(response) = self.inventory_request(method_name, &params, true).await? {
+        if let Some(response) = self.catalog_request(method_name, &params, true).await? {
             return Ok(response);
         }
-        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+        if let Some(response) = self.table_request(method_name, &params, true).await? {
             return Ok(response);
         }
         match method_name {

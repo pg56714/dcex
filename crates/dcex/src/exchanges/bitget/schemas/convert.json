@@ -1,0 +1,86 @@
+[
+  {
+    "name": "classic_spot_bgb_convert_bgb_convert",
+    "method": "POST",
+    "path": "/api/v2/convert/bgb-convert",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coinList",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "swap coins"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-spot-bgb-convert/classic-spot-bgb-convert#convert-bgb",
+    "summary": "Convert BGB"
+  },
+  {
+    "name": "classic_spot_bgb_convert_get_bgb_convert_coins",
+    "method": "GET",
+    "path": "/api/v2/convert/bgb-convert-coin-list",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-spot-bgb-convert/classic-spot-bgb-convert#get-bgb-convert-coins",
+    "summary": "Get BGB Convert Coins"
+  },
+  {
+    "name": "classic_spot_bgb_convert_get_bgb_convert_record",
+    "method": "GET",
+    "path": "/api/v2/convert/bgb-convert-records",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-spot-bgb-convert/classic-spot-bgb-convert#get-bgb-convert-history",
+    "summary": "Get BGB Convert History"
+  }
+]

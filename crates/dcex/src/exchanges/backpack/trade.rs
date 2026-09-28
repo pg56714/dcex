@@ -49,13 +49,31 @@ impl BackpackClient {
     ) -> Result<ValidatedResponse> {
         let params = super::super::operation_guards::validate("backpack", method_name, params)?;
         let params = BackpackParams::from_pairs(params);
+        if let Some(response) = self.rfq_schema_request(method_name, &params).await? {
+            return Ok(response);
+        }
         if let Some(response) = self
-            .completion_private_request(method_name, &params)
+            .withdrawals_schema_request(method_name, &params)
             .await?
         {
             return Ok(response);
         }
-        if let Some(response) = self.additional_request(method_name, &params, false).await? {
+        if let Some(response) = self
+            .borrow_lend_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .prediction_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .vault_schema_request(method_name, &params, false)
+            .await?
+        {
             return Ok(response);
         }
 

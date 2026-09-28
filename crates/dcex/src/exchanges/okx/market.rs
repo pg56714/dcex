@@ -13,7 +13,7 @@ impl OkxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let raw = OkxParams::from_pairs(params);
-        if let Some(result) = self.risk_request(method_name, &raw, true).await? {
+        if let Some(result) = self.table_request(method_name, &raw, true).await? {
             return Ok(result);
         }
         if let Some(result) = self.spread_public_request(method_name, &raw).await? {

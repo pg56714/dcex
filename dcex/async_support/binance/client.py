@@ -5,13 +5,13 @@ from typing import Any
 
 from ._coin_futures_http import CoinFuturesHTTP
 from ._convert_http import ConvertHTTP
-from ._inventory_http import InventoryHTTP
+from ._generated import GeneratedHTTP
 
 
 class Client(
     CoinFuturesHTTP,
     ConvertHTTP,
-    InventoryHTTP,
+    GeneratedHTTP,
 ):
     """Binance async client for trading operations."""
 

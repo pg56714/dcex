@@ -109,11 +109,35 @@ impl AsterClient {
         {
             return Ok(response);
         }
-        if let Some(response) = self.additional_request(method_name, &params, false).await? {
+        if let Some(response) = self
+            .market_schema_request(method_name, &params, false)
+            .await?
+        {
             return Ok(response);
         }
         if let Some(response) = self
-            .completion_private_request(method_name, &params)
+            .asset_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .subaccount_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .agents_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self.builder_private_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .withdrawals_private_request(method_name, &params)
             .await?
         {
             return Ok(response);

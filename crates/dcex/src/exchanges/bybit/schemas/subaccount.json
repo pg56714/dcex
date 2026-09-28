@@ -1,0 +1,32 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/user/escrow_sub_members",
+    "title": "Get Fund Custodial Sub Acct",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/user/fund-subuid-list",
+    "name": "get_user_escrow_sub_members",
+    "public": false,
+    "fields": [
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "string",
+        "required": false,
+        "description": "Data size per page. Return up to 100 records per request"
+      },
+      {
+        "name": "nextCursor",
+        "python_name": "next_cursor",
+        "type": "string",
+        "required": false,
+        "description": "Cursor. Use the `nextCursor` token from the response to retrieve the next page of the result set"
+      }
+    ],
+    "example": {
+      "pageSize": "2"
+    },
+    "has_example": true,
+    "source_file": "v5/user/fund-subuid-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

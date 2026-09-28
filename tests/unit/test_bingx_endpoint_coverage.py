@@ -24,7 +24,8 @@ import pytest
 pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
-WRAPPER_FILES = ("_account_http.py", "_market_http.py", "_trade_http.py", "_inventory_http.py")
+WRAPPER_FILES = ("_account_http.py", "_market_http.py", "_trade_http.py")
+WRAPPER_FILES += tuple(str(p.relative_to(ROOT / "dcex/bingx")) for p in sorted((ROOT / "dcex/bingx/_generated").glob("*_http.py")))
 
 SPOT_ORDER = ("POST", "/openApi/spot/v1/trade/order")
 SWAP_ORDER = ("POST", "/openApi/swap/v2/trade/order")
@@ -1190,7 +1191,8 @@ def test_route_table_matches_python_surface() -> None:
     sync_names = _wrapper_names("sync")
     async_names = _wrapper_names("async")
     assert sync_names == async_names
-    from tests.unit.test_bingx_inventory_completion import NAMES
+    from tests.unit.test_bingx_schema_requests import NAMES
+
     assert sync_names == set(ROUTES) | NAMES
 
 

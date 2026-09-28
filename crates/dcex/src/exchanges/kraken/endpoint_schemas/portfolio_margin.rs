@@ -1,0 +1,30 @@
+//! Business-specific endpoint and field metadata.
+use super::super::*;
+pub(super) const ENDPOINTS: &[Endpoint] = &[
+    Endpoint {
+        name: "get_futures_portfolio_margin_parameters",
+        path: "/derivatives/api/v3/portfolio-margining/parameters",
+        method: HttpMethod::Get,
+        auth: KrakenAuth::Futures,
+        public: false,
+        allowed: &[],
+        fields: &[],
+        symbol_key: None,
+    },
+    Endpoint {
+        name: "simulate_futures_portfolio",
+        path: "/derivatives/api/v3/portfolio-margining/simulate",
+        method: HttpMethod::Post,
+        auth: KrakenAuth::Futures,
+        public: false,
+        allowed: &["json"],
+        fields: &[Field {
+            key: "json",
+            kind: "string",
+            required: true,
+            values: &[],
+            minimum: 0,
+        }],
+        symbol_key: None,
+    },
+];

@@ -2908,7 +2908,7 @@ CASES = tuple(CASES) + tuple(
 
 @pytest.mark.parametrize("mode", ["sync", "async"])
 def test_every_kucoin_wrapper_has_a_route_case(mode: str) -> None:
-    from tests.unit.test_kucoin_inventory_completion import NAMES
+    from tests.unit.test_kucoin_schema_requests import NAMES
 
     covered = {case.method_name for case in CASES} | NAMES
     missing = _wrapper_names(mode) - covered

@@ -893,3 +893,14 @@ def _patch_lighter_native_client(client: Any) -> None:
 
 
 __all__ = [name for name in globals() if not name.startswith("__")]
+
+
+def generated_method_members(cls):
+    """Collect declared generated methods across business mixins only."""
+    return {
+        name: value
+        for base in reversed(cls.__mro__)
+        if base.__module__.startswith(cls.__module__ + ".")
+        for name, value in vars(base).items()
+        if not name.startswith("_") and callable(value)
+    }

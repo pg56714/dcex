@@ -1,0 +1,693 @@
+[
+  {
+    "name": "cfd_account_get_fund_detail",
+    "method": "GET",
+    "path": "/api/v3/cfd/account/fund-detail",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#get-cfd-fund-detail",
+    "summary": "Get Fund Detail"
+  },
+  {
+    "name": "cfd_account_transfer",
+    "method": "POST",
+    "path": "/api/v3/cfd/account/transfer",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Coin to transfer",
+          "examples": [
+            "USDT"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "amount",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Amount to transfer",
+          "examples": [
+            "100"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "accountType",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Account type<br/>`funding`: Spot/Funding account<br/>`uta`: Unified Trading Account",
+          "examples": [
+            "uta"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "direction",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Transfer direction<br/>`in`: Deposit into the CFD account<br/>`out`: Withdraw from the CFD account",
+          "examples": [
+            "in"
+          ]
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#cfd-transfer",
+    "summary": "Transfer"
+  },
+  {
+    "name": "cfd_account_get_transfer_records",
+    "method": "GET",
+    "path": "/api/v3/cfd/account/transfer-records",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "transferId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "subUid",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "direction",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "10"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#get-cfd-transfer-records",
+    "summary": "Get Transfer Records"
+  },
+  {
+    "name": "cfd_account_get_financial_records",
+    "method": "GET",
+    "path": "/api/v3/cfd/account/financial-records",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "type",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "10"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#get-cfd-financial-records",
+    "summary": "Get Financial Records"
+  },
+  {
+    "name": "cfd_account_get_instruments",
+    "method": "GET",
+    "path": "/api/v3/cfd/account/instruments",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XAUUSD"
+          ]
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-account/cfd-account#get-cfd-instruments",
+    "summary": "Get Instruments"
+  },
+  {
+    "name": "cfd_market_get_tickers",
+    "method": "GET",
+    "path": "/api/v3/cfd/market/tickers",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XAUUSD"
+          ]
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-market/cfd-market#get-cfd-tickers",
+    "summary": "Get Tickers"
+  },
+  {
+    "name": "cfd_market_get_history_candlestick",
+    "method": "GET",
+    "path": "/api/v3/cfd/market/history-candlestick",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XAUUSD"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "interval",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1m"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "buy"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "100"
+          ]
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-market/cfd-market#get-cfd-kline-candlestick-history",
+    "summary": "Get Kline/Candlestick History"
+  },
+  {
+    "name": "cfd_trade_place_order",
+    "method": "POST",
+    "path": "/api/v3/cfd/trade/place-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair name",
+          "examples": [
+            "XAUUSD"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "orderType",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Order type<br/>`limit`: Limit order<br/>`market`: Market order",
+          "examples": [
+            "market"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Trade side<br/>`buy`: Buy<br/>`sell`: Sell",
+          "examples": [
+            "buy"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "price",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Order price<br/>Required when `orderType=limit`<br/>The price must be an integer multiple of the trading pair's precision"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "qty",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Order quantity",
+          "examples": [
+            "1"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "takeProfit",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Take-profit price<br/>The price must be an integer multiple of the trading pair's precision"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopLoss",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Stop-loss price<br/>The price must be an integer multiple of the trading pair's precision"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#place-cfd-order",
+    "summary": "Place CFD Order"
+  },
+  {
+    "name": "cfd_trade_modify_order",
+    "method": "POST",
+    "path": "/api/v3/cfd/trade/modify-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Order ID",
+          "examples": [
+            "111111111111111111"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "price",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Order price<br/>Required when `orderType=limit`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "takeProfit",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Take-profit price"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopLoss",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Stop-loss price"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#modify-cfd-order",
+    "summary": "Modify CFD Order"
+  },
+  {
+    "name": "cfd_trade_cancel_order",
+    "method": "POST",
+    "path": "/api/v3/cfd/trade/cancel-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Order ID",
+          "examples": [
+            "111111111111111111"
+          ]
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#cancel-cfd-order",
+    "summary": "Cancel CFD Order"
+  },
+  {
+    "name": "cfd_trade_cancel_all_orders",
+    "method": "POST",
+    "path": "/api/v3/cfd/trade/cancel-all",
+    "public": false,
+    "confirm": true,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair name<br/>If not provided, all orders are canceled<br/>If `symbol` is provided, only orders for the specified trading pair are canceled"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#cancel-all-cfd-orders",
+    "summary": "Cancel All CFD Orders"
+  },
+  {
+    "name": "cfd_trade_close_positions",
+    "method": "POST",
+    "path": "/api/v3/cfd/trade/close-positions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "positionId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Position ID<br/>Can be obtained via the position list endpoint",
+          "examples": [
+            "111111111111111111"
+          ]
+        },
+        "location": "body"
+      },
+      {
+        "wire": "qty",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Order quantity",
+          "examples": [
+            "1"
+          ]
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#close-cfd-positions",
+    "summary": "Close CFD Positions"
+  },
+  {
+    "name": "cfd_trade_close_all_positions",
+    "method": "POST",
+    "path": "/api/v3/cfd/trade/close-all-positions",
+    "public": false,
+    "confirm": true,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair name<br/>If not provided, all positions are closed<br/>If `symbol` is provided, only positions for the specified trading pair are closed"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#close-all-cfd-positions",
+    "summary": "Close All CFD Positions"
+  },
+  {
+    "name": "cfd_trade_get_unfilled_orders",
+    "method": "GET",
+    "path": "/api/v3/cfd/trade/unfilled-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XAUUSD"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "subUid",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#get-cfd-unfilled-orders",
+    "summary": "Get CFD Unfilled Orders"
+  },
+  {
+    "name": "cfd_trade_get_order_history",
+    "method": "GET",
+    "path": "/api/v3/cfd/trade/history-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XAUUSD"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "subUid",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "1672410780000"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "10"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#get-cfd-order-history",
+    "summary": "Get CFD Order History"
+  },
+  {
+    "name": "cfd_trade_get_current_positions",
+    "method": "GET",
+    "path": "/api/v3/cfd/trade/current-positions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XAUUSD"
+          ]
+        },
+        "location": "query"
+      },
+      {
+        "wire": "subUid",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/cfd-trade/cfd-trade#get-cfd-current-positions",
+    "summary": "Get CFD Current Positions"
+  }
+]

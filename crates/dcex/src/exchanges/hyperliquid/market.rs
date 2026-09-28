@@ -13,7 +13,7 @@ impl HyperliquidClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = HyperliquidParams::from_pairs(params);
-        if let Some(response) = self.inventory_request(method_name, &params, true).await? {
+        if let Some(response) = self.catalog_request(method_name, &params, true).await? {
             return Ok(response);
         }
         let payload = match method_name {

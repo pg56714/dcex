@@ -23,7 +23,13 @@ import pytest
 pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
-WRAPPER_FILES = ("_account_http.py", "_earn_http.py", "_market_http.py", "_trade_http.py", "_inventory_http.py")
+WRAPPER_FILES = (
+    "_account_http.py",
+    "_earn_http.py",
+    "_market_http.py",
+    "_trade_http.py",
+)
+WRAPPER_FILES += tuple(str(p.relative_to(ROOT / "dcex/bitget")) for p in sorted((ROOT / "dcex/bitget/_generated").glob("*_http.py")))
 
 PLACE_SPOT = ("POST", "/api/v2/spot/trade/place-order")
 PLACE_FUTURES = ("POST", "/api/v2/mix/order/place-order")
@@ -2832,7 +2838,7 @@ CONTROL_CASES.extend(
 )
 ROUTES.update({name: (verb, path) for name, _, verb, path, _, _ in CONTROL_CASES})
 COMPLETION_CASES = json.loads(
-    (Path(__file__).parents[1] / "fixtures/bitget_completion.json").read_text(encoding="utf-8")
+    (Path(__file__).parents[1] / "fixtures/bitget_request_cases.json").read_text(encoding="utf-8")
 )
 CONTROL_CASES.extend(
     (c["method"], c["kwargs"], "POST", c["path"], False, c["body"]) for c in COMPLETION_CASES
@@ -2977,7 +2983,8 @@ def test_route_table_matches_python_surface() -> None:
     sync_names = _wrapper_names("sync")
     async_names = _wrapper_names("async")
     assert sync_names == async_names
-    from tests.unit.test_bitget_inventory_completion import NAMES
+    from tests.unit.test_bitget_schema_requests import NAMES
+
     assert sync_names == set(ROUTES) | NAMES
 
 

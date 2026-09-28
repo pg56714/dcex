@@ -1,0 +1,129 @@
+[
+  {
+    "name": "post_cswap_v2_trade_order",
+    "method": "POST",
+    "path": "/openApi/cswap/v2/trade/order",
+    "signed": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Trading pair, for example: BTC-USD, please use capital letters",
+        "kind": "str"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "required": true,
+        "description": "LIMIT: Limit order/MARKET: Market order/STOP_MARKET: Market stop loss order/TAKE_PROFIT_MARKET: Market take profit order/STOP: Limit stop loss order/TAKE_PROFIT: Limit stop profit order",
+        "kind": "str"
+      },
+      {
+        "name": "side",
+        "type": "string",
+        "required": true,
+        "description": "Buying and selling direction SELL, BUY",
+        "kind": "str"
+      },
+      {
+        "name": "positionSide",
+        "type": "string",
+        "required": true,
+        "description": "Position direction. Use BOTH in one-way mode; use LONG or SHORT in hedge mode",
+        "kind": "str"
+      },
+      {
+        "name": "price",
+        "type": "float64",
+        "required": false,
+        "description": "Order price",
+        "kind": "decimal"
+      },
+      {
+        "name": "quantity",
+        "type": "float64",
+        "required": false,
+        "description": "The order quantity and the number of contracts. It is not supported to place orders with U quantity at the moment.",
+        "kind": "decimal"
+      },
+      {
+        "name": "stopPrice",
+        "type": "float64",
+        "required": false,
+        "description": "Trigger price, only STOP_MARKET,TAKE_PROFIT_MARKET,STOP,TAKE_PROFIT require this parameter",
+        "kind": "decimal"
+      },
+      {
+        "name": "workingType",
+        "type": "string",
+        "required": false,
+        "description": "stopPrice trigger price price type: MARK_PRICE, CONTRACT_PRICE, INDEX_PRICE, default MARK_PRICE",
+        "kind": "str"
+      },
+      {
+        "name": "stopLoss",
+        "type": "string",
+        "required": false,
+        "description": "Support placing orders and setting stop loss at the same time. But only supports type: STOP_MARKET/STOP",
+        "kind": "str"
+      },
+      {
+        "name": "takeProfit",
+        "type": "string",
+        "required": false,
+        "description": "Support placing orders and setting take profit at the same time. But only supports type: TAKE_PROFIT_MARKET/TAKE_PROFIT",
+        "kind": "str"
+      },
+      {
+        "name": "clientOrderId",
+        "type": "string",
+        "required": false,
+        "description": "User-defined order ID. The system converts this field to lowercase. Length: 1-40 characters; clientOrderId must be unique for each order",
+        "kind": "str"
+      },
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": false,
+        "description": "Request validity window in milliseconds",
+        "kind": "int"
+      },
+      {
+        "name": "timeInForce",
+        "type": "string",
+        "required": false,
+        "description": "Time in force. Supported values: GTC, IOC, FOK, and PostOnly",
+        "kind": "str"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Trade%20order",
+    "summary": "Trade order",
+    "scoped": false
+  },
+  {
+    "name": "delete_cswap_v1_trade_all_open_orders",
+    "method": "DELETE",
+    "path": "/openApi/cswap/v1/trade/allOpenOrders",
+    "signed": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "string",
+        "required": false,
+        "description": "Trading pair, example: BTC-USD, use uppercase letters",
+        "kind": "str"
+      },
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": false,
+        "description": "Request valid time window value, unit: milliseconds",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Coin-M%20Futures/Trades%20Endpoints/Cancel%20all%20orders",
+    "summary": "Cancel all orders",
+    "scoped": true
+  }
+]

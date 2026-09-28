@@ -1,0 +1,41 @@
+[
+  {
+    "name": "get_spot_rebate_history_records",
+    "method": "GET",
+    "path": "/sapi/v1/rebate/taxQuery",
+    "public": false,
+    "fields": [
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "page",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "page",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-rebate/api/rest-api/~#get-spot-rebate-history-records",
+    "summary": "Get Spot Rebate History Records (USER_DATA)"
+  }
+]

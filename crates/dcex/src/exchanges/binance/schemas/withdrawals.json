@@ -1,0 +1,125 @@
+[
+  {
+    "method": "POST",
+    "path": "/sapi/v1/managed-subaccount/withdraw",
+    "sdk_method": "withdrawl_assets_from_the_managed_sub_account",
+    "official_source": "https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#withdrawl-assets-from-the-managed-sub-account",
+    "parameters": [
+      {
+        "name": "from_email",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "fromEmail",
+        "kind": "str"
+      },
+      {
+        "name": "asset",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "asset",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "transfer_date",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "transferDate",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "withdraw_managed_sub_account"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/capital/withdraw/apply",
+    "sdk_method": "withdraw",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#withdraw",
+    "parameters": [
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "withdraw_order_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "withdrawOrderId",
+        "kind": "str"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      },
+      {
+        "name": "transaction_fee_flag",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "transactionFeeFlag",
+        "kind": "bool"
+      },
+      {
+        "name": "name",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "name",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_type",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "walletType",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "create_withdrawal"
+  }
+]

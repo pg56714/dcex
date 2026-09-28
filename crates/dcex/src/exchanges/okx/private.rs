@@ -11,7 +11,7 @@ impl OkxClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = OkxParams::from_pairs(params);
-        if let Some(result) = self.risk_request(method_name, &params, false).await? {
+        if let Some(result) = self.table_request(method_name, &params, false).await? {
             return Ok(result);
         }
         if let Some(result) = self.algo_private_request(method_name, &params).await? {

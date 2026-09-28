@@ -1,0 +1,53 @@
+[
+  {
+    "name": "transfer_spot_internal",
+    "method": "POST",
+    "path": "/api/v3/capital/transfer/internal",
+    "fields": [
+      {
+        "name": "toAccountType",
+        "python_name": "to_account_type",
+        "type": "string",
+        "required": true,
+        "description": "toAccountTyp:EMAIL/UID/MOBILE"
+      },
+      {
+        "name": "toAccount",
+        "python_name": "to_account",
+        "type": "string",
+        "required": true,
+        "description": "toAccount:EMAIL/UID/MOBILE"
+      },
+      {
+        "name": "areaCode",
+        "python_name": "area_code",
+        "type": "string",
+        "required": false,
+        "description": "areaCode of mobile"
+      },
+      {
+        "name": "asset",
+        "python_name": "asset",
+        "type": "string",
+        "required": true,
+        "description": "asset"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "amount"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Internal Transfer",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer"
+  }
+]

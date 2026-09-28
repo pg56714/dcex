@@ -2,13 +2,13 @@ mod account;
 mod algo;
 mod asset;
 mod client;
-mod completion_wrappers;
+
 mod endpoints;
 mod finance;
 mod market;
 mod params;
 mod private;
-mod risk;
+mod schema_requests;
 mod signing;
 mod spread;
 mod subaccount;

@@ -1,0 +1,954 @@
+[
+  {
+    "name": "stock_plus_assets_transfer",
+    "method": "POST",
+    "path": "/api/v3/stockplus/asset/transfer",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "amount",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "direction",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#transfer",
+    "summary": "Transfer"
+  },
+  {
+    "name": "stock_plus_assets_get_transfer_records",
+    "method": "GET",
+    "path": "/api/v3/stockplus/asset/transfer-records",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "transferId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#check-transfer-records",
+    "summary": "Check Transfer Records"
+  },
+  {
+    "name": "stock_plus_assets_get_account",
+    "method": "GET",
+    "path": "/api/v3/stockplus/asset/account",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "currency",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#check-account",
+    "summary": "Check Account"
+  },
+  {
+    "name": "stock_plus_assets_get_cash_flow",
+    "method": "GET",
+    "path": "/api/v3/stockplus/asset/cash-flow",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": true,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": true,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "businessType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "page",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "size",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#check-cash-flow",
+    "summary": "Check Cash Flow"
+  },
+  {
+    "name": "stock_plus_assets_get_stock_position",
+    "method": "GET",
+    "path": "/api/v3/stockplus/asset/stock-position",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/assets#check-stock-position",
+    "summary": "Check Stock Position"
+  },
+  {
+    "name": "stock_plus_options_quotes_get_option_quote",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/option-quote",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/options-quotes#get-option-quote",
+    "summary": "Check Option Real-time Quote"
+  },
+  {
+    "name": "stock_plus_options_quotes_get_option_chain_info",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/option-chain-info",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "expiryDate",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/options-quotes#get-option-chain-info",
+    "summary": "Check Option Chain"
+  },
+  {
+    "name": "stock_plus_options_quotes_get_option_expiry_date",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/option-expiry-date",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/options-quotes#get-option-expiry-date",
+    "summary": "Check Option Expiry Date List"
+  },
+  {
+    "name": "stock_plus_options_quotes_get_option_volume",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/option-volume",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/options-quotes#get-option-volume",
+    "summary": "Check Option Volume"
+  },
+  {
+    "name": "stock_plus_orders_place_order",
+    "method": "POST",
+    "path": "/api/v3/stockplus/trade/place-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "orderType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "submittedQuantity",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "timeInForce",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "submittedPrice",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "triggerPrice",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limitOffset",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "trailingAmount",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "trailingPercent",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "expireDate",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "outsideRth",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limitDepthLevel",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "triggerCount",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "monitorPrice",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "remark",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#place-order",
+    "summary": "Place Order"
+  },
+  {
+    "name": "stock_plus_orders_modify_order",
+    "method": "POST",
+    "path": "/api/v3/stockplus/trade/modify-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "quantity",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "price",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "triggerPrice",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limitOffset",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "trailingAmount",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "trailingPercent",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limitDepthLevel",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "triggerCount",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "monitorPrice",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "remark",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#modify-order",
+    "summary": "Modify Order"
+  },
+  {
+    "name": "stock_plus_orders_cancel_order",
+    "method": "POST",
+    "path": "/api/v3/stockplus/trade/cancel-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "clientOid",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#cancel-order",
+    "summary": "Cancel Order"
+  },
+  {
+    "name": "stock_plus_orders_get_today_orders",
+    "method": "GET",
+    "path": "/api/v3/stockplus/trade/today-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "status",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "market",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-today-orders",
+    "summary": "Check Today Orders"
+  },
+  {
+    "name": "stock_plus_orders_get_history_orders",
+    "method": "GET",
+    "path": "/api/v3/stockplus/trade/history-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "status",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "market",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startAt",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endAt",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-history-orders",
+    "summary": "Check History Orders"
+  },
+  {
+    "name": "stock_plus_orders_get_order_detail",
+    "method": "GET",
+    "path": "/api/v3/stockplus/trade/order-detail",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-order-detail",
+    "summary": "Check Order Detail"
+  },
+  {
+    "name": "stock_plus_orders_get_today_executions",
+    "method": "GET",
+    "path": "/api/v3/stockplus/trade/today-executions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-today-executions",
+    "summary": "Check Today Executions"
+  },
+  {
+    "name": "stock_plus_orders_get_history_executions",
+    "method": "GET",
+    "path": "/api/v3/stockplus/trade/history-executions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startAt",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endAt",
+        "required": false,
+        "schema": {
+          "type": "number"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/orders#check-history-executions",
+    "summary": "Check History Executions"
+  },
+  {
+    "name": "stock_plus_stock_quotes_get_static_info",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/static",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/stock-quotes#check-basic-information",
+    "summary": "Check Basic Information"
+  },
+  {
+    "name": "stock_plus_stock_quotes_get_candlestick",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/candlestick",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "count",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "adjustType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tradeSessions",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/stock-quotes#check-candlestick",
+    "summary": "Check Candlestick"
+  },
+  {
+    "name": "stock_plus_stock_quotes_get_history_candlestick",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/history-candlestick",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "count",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "adjustType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "forward",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "time",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tradeSessions",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/stock-quotes#check-history-candlestick",
+    "summary": "Check History Candlestick"
+  },
+  {
+    "name": "stock_plus_stock_quotes_get_depth",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/depth",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/stock-quotes#check-order-book",
+    "summary": "Check Order Book"
+  },
+  {
+    "name": "stock_plus_stock_quotes_get_intraday",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/intraday",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/stock-quotes#check-intraday-data",
+    "summary": "Check Intraday Data"
+  },
+  {
+    "name": "stock_plus_stock_quotes_get_quote",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/quote",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/stock-quotes#check-real-time-quote",
+    "summary": "Check Real-time Quote"
+  },
+  {
+    "name": "stock_plus_stock_quotes_get_trade_detail",
+    "method": "GET",
+    "path": "/api/v3/stockplus/market/trade",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "count",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/stock-plus/stock-quotes#check-trade-detail",
+    "summary": "Check Trade Detail"
+  }
+]

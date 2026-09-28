@@ -1,0 +1,127 @@
+[
+  {
+    "name": "reset_mmp",
+    "method": "POST",
+    "path": "/api/v5/account/mmp-reset",
+    "public": false,
+    "fields": [
+      {
+        "name": "instType",
+        "python_name": "inst_type",
+        "type": "string",
+        "required": false,
+        "description": "Instrument type OPTION The default is `OPTION"
+      },
+      {
+        "name": "instFamily",
+        "python_name": "inst_family",
+        "type": "string",
+        "required": true,
+        "description": "Instrument family"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instType": {
+          "type": "string"
+        },
+        "instFamily": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "instFamily"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-reset-mmp-status",
+    "row": 1066
+  },
+  {
+    "name": "set_mmp_config",
+    "method": "POST",
+    "path": "/api/v5/account/mmp-config",
+    "public": false,
+    "fields": [
+      {
+        "name": "instFamily",
+        "python_name": "inst_family",
+        "type": "string",
+        "required": true,
+        "description": "Instrument family"
+      },
+      {
+        "name": "timeInterval",
+        "python_name": "time_interval",
+        "type": "string",
+        "required": true,
+        "description": "Time window (ms). MMP interval where monitoring is done \"0\" means disable MMP"
+      },
+      {
+        "name": "frozenInterval",
+        "python_name": "frozen_interval",
+        "type": "string",
+        "required": true,
+        "description": "Frozen period (ms). \"0\" means the trade will remain frozen until you request \"Reset MMP Status\" to unfrozen"
+      },
+      {
+        "name": "qtyLimit",
+        "python_name": "qty_limit",
+        "type": "string",
+        "required": true,
+        "description": "Trade qty limit in number of contracts Must be > 0"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instFamily": {
+          "type": "string"
+        },
+        "timeInterval": {
+          "type": "string"
+        },
+        "frozenInterval": {
+          "type": "string"
+        },
+        "qtyLimit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "instFamily",
+        "timeInterval",
+        "frozenInterval",
+        "qtyLimit"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-set-mmp",
+    "row": 1067
+  },
+  {
+    "name": "get_mmp_config",
+    "method": "GET",
+    "path": "/api/v5/account/mmp-config",
+    "public": false,
+    "fields": [
+      {
+        "name": "instFamily",
+        "python_name": "inst_family",
+        "type": "string",
+        "required": false,
+        "description": "Instrument Family"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instFamily": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-mmp-config",
+    "row": 1068
+  }
+]

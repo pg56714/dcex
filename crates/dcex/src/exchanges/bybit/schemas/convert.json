@@ -1,0 +1,36 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/ins-loan/ltv-convert",
+    "title": "Get LTV",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/ltv-convert",
+    "name": "get_ins_loan_ltv_convert",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/otc/ltv-convert.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins-loan/ensure-tokens-convert",
+    "title": "Get Margin Coin Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/margin-coin-convert-info",
+    "name": "get_ins_loan_ensure_tokens_convert",
+    "public": true,
+    "fields": [
+      {
+        "name": "productId",
+        "python_name": "product_id",
+        "type": "string",
+        "required": false,
+        "description": "Product ID. If not passed, returns all margin products. For spot, it returns coins with a `convertRatio` greater than 0."
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/otc/margin-coin-convert-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

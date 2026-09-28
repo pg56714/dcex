@@ -16,13 +16,13 @@ impl HyperliquidClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = HyperliquidParams::from_pairs(params);
-        if let Some(response) = self.inventory_request(method_name, &params, false).await? {
+        if let Some(response) = self.catalog_request(method_name, &params, false).await? {
             return Ok(response);
         }
-        if let Some(response) = self
-            .completion_private_request(method_name, &params)
-            .await?
-        {
+        if let Some(response) = self.transfers_schema_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.builder_schema_request(method_name, &params).await? {
             return Ok(response);
         }
         validate_private_params(method_name, &params)?;

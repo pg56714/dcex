@@ -18,8 +18,8 @@ impl ArcusClient {
         method_name: &str,
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
-        if super::completion::handles(method_name, false) {
-            return self.completion_request(method_name, params).await;
+        if super::schema_requests::field_schemas::handles(method_name, false) {
+            return self.field_schema_request(method_name, params).await;
         }
         if super::metadata::handles(method_name, false) {
             return self.metadata_request(method_name, params).await;
@@ -28,7 +28,7 @@ impl ArcusClient {
             method_name,
             "create_api_key_signed" | "revoke_api_key_signed"
         ) {
-            return self.onboarding_request(method_name, params).await;
+            return self.api_keys_request(method_name, params).await;
         }
         if method_name == "submit_internal_transfer" {
             return self.submit_internal_transfer_request(params).await;

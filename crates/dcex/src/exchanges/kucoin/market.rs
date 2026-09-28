@@ -33,7 +33,7 @@ impl KucoinClient {
                 .ok_or_else(|| DcexError::InvalidInput("unsupported funding endpoint".into()));
         }
         if let Some(response) = self
-            .risk_request(method_name, &KucoinParams::from_pairs(params.clone()), true)
+            .table_request(method_name, &KucoinParams::from_pairs(params.clone()), true)
             .await?
         {
             return Ok(response);

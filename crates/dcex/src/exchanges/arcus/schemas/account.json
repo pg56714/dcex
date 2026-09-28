@@ -1,0 +1,15 @@
+[
+  {
+    "name": "get_commission_rates",
+    "method": "GET",
+    "path": "/v1/commissionrates",
+    "signed": false,
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/public/get-referral-commission-rate-schedule"
+  }
+]

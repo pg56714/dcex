@@ -1,0 +1,23 @@
+[
+  {
+    "name": "get_v1_accounts_account_id",
+    "method": "GET",
+    "path": "/api/v1/accounts/{accountId}",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "accountId",
+        "required": true,
+        "location": "path",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-detail-spot",
+    "summary": "Get Account Detail - Spot",
+    "withdrawal": false,
+    "confirm": false
+  }
+]

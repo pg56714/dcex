@@ -1,5 +1,5 @@
-use crate::Result;
 use crate::exchange::ValidatedResponse;
+use crate::{DcexError, Result};
 
 use super::client::BingxClient;
 use super::endpoints::*;
@@ -396,4 +396,72 @@ impl BingxClient {
 
 fn validate_recv_window(params: &BingxParams) -> Result<()> {
     validate_u64_range(params, "recvWindow", 1, 5000)
+}
+
+impl BingxClient {
+    /// Export swap income as the original Excel bytes. JSON errors are validated.
+    pub async fn export_swap_income(&self, params: Vec<(String, String)>) -> Result<Vec<u8>> {
+        let params = BingxParams::from_pairs(params);
+        let fields = [
+            "product_symbol",
+            "incomeType",
+            "startTime",
+            "endTime",
+            "limit",
+            "recvWindow",
+        ];
+        params.ensure_allowed(&fields)?;
+        validate_u64_range(&params, "limit", 1, 1000)?;
+        validate_u64_range(&params, "recvWindow", 1, 5000)?;
+        validate_time_range(&params, "startTime", "endTime", None)?;
+        validate_enum(
+            &params,
+            "incomeType",
+            &[
+                "REALIZED_PNL",
+                "FUNDING_FEE",
+                "TRADING_FEE",
+                "INSURANCE_CLEAR",
+                "TRIAL_FUND",
+                "ADL",
+                "SYSTEM_DEDUCTION",
+            ],
+        )?;
+        let mut query = params.only(&fields);
+        query.retain(|(k, _)| k != "product_symbol");
+        if let Some(symbol) = params.get("product_symbol") {
+            query.push(("symbol".into(), self.exchange_symbol(symbol)?));
+        }
+        let response = self
+            .request_raw(
+                crate::http::HttpMethod::Get,
+                "/openApi/swap/v2/user/income/export",
+                query,
+                true,
+                vec![],
+                None,
+            )
+            .await?;
+        response.ensure_success()?;
+        if response
+            .headers
+            .iter()
+            .any(|(k, v)| k.eq_ignore_ascii_case("content-type") && v.contains("json"))
+            || response.body.iter().find(|b| !b.is_ascii_whitespace()) == Some(&b'{')
+        {
+            crate::exchange::ResponseValidator::validate(
+                &super::signing::BingxResponseValidator,
+                &response,
+            )?;
+            return Err(DcexError::Decode(
+                "BingX income export returned JSON instead of an Excel file".into(),
+            ));
+        }
+        if response.body.is_empty() {
+            return Err(DcexError::Decode(
+                "BingX income export returned an empty file".into(),
+            ));
+        }
+        Ok(response.body)
+    }
 }

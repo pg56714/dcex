@@ -1,0 +1,2914 @@
+[
+  {
+    "name": "classic_copytrading_future_copytrade_follower_copy_settings",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-follower/copy-settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "ID of the elite trader that you followed"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "copyAmount",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Copy trading amount, must be a positive integer not less than 50, denominated in USDT.."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "copyAllPostions",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Whether to follow all positions of the trader. \n\n`yes`Follow all positions. `no` Do not follow all positions \n\n If not provided, the default value is`no`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "autoCopy",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Whether to automatically follow new symbol opened by traders(only takes effect when mode is basic).\n\n `on`Automatic following. `off`Not automatically following \n\n If not provided, the default value is`on`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "equityGuardian",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Equity protection switch.\n\n `on`Enabled \n\n `off`Disabled \n\n  If not provided,the default value is`off`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "equityGuardianMode",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Equity protection mode, triggered when equityGuardian=on. \n\n `amount`Fixed amount protection \n\n `percentage`Percentage-based protection \n\n  If not provided, the default value is`amount`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "equity",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Equity protection trigger value. Required when equityGuardian=on. Must be a positive integer. If equityGuardian Mode=percentage, range is [1-100], representing 1%-100%. If equityGuardianMode=amount, it represents a fixeed loss amount."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "marginMode",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Margin mode.\n\n `follow_trader`Follow the trader's leverage.\n\n`crossed_margin`Cross margin \n\n`isolated_margin`Isolated margin.\n\n If not provided, the default value is`follow_trader`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "leverage",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Leverage mode, effective when marginMode=follow_trader.\n\n `follow_trader`Follow trader.\n\n `fixed_leverage`Use fixed leverage. \n\n Default: follow_trader."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "multiple",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Leverage multiple, ranging from [1,125]. Default: 10."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#copy-settings",
+    "summary": "Copy settings"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_query_current_orders",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-follower/query-current-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "traderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-current-tracking-orders",
+    "summary": "Get Current Tracking Orders"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_query_history_orders",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-follower/query-history-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "traderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-history-tracking-orders",
+    "summary": "Get History Tracking Orders"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_setting_tpsl",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-follower/setting-tpsl",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "trackingNo",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Order tracking number"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Product type\n\n`USDT-FUTURES` USDT-M Futures\n\n`COIN-FUTURES` Coin-M Futures\n\n`USDC-FUTURES` USDC-M Futures"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopSurplusPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Take profit price\n\nWhen it is empty, it is ignored or not updated, no matter take-profit exists or not,\n\nWhen it is 0, it means the original take-profit is canceled if there is a take-profit already.\n\nWhen it is greater than or equal to 0, it means take-profit is updated or set."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopLossPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Stop loss price\n\nWhen it is empty, it is ignored or not updated, no matter stop-loss exists or not,\n\nWhen it is 0, it means the original stop-loss is canceled if there is a stop-loss already.\n\nWhen it is greater than or equal to 0, it means stop-loss is updated or set."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#set-tpsl",
+    "summary": "Set TPSL"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_close_positions",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-follower/close-positions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Product type\n\n`USDT-FUTURES` USDT-M Futures\n\n`COIN-FUTURES` Coin-M Futures\n\n`USDC-FUTURES` USDC-M Futures"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "trackingNo",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Tracking numbers of buying orders grouped by trading pair\n\n（If you pass the trackingNo and ensure that the symbol, marginCoin, marginMode, and holdSide are not empty, you need to ensure that the trackingNo corresponds to them.）"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "marginCoin",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "margin coin"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "marginMode",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Position mode\n\n`isolated`: isolated margin \n\n`cross`: cross margin"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "holdSide",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Position direction \n\n1. In the buying and selling (one-way position) mode: you don’t have to fill it in, if you fill it in, it will be ignored. \n\n2. In the opening and closing position (hedge mode): This parameter must be filled in.  \n\n`long`: long position in hedging mode\n\n`short`: short position in hedging mode"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#close-positions",
+    "summary": "Close Positions"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_query_settings",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-follower/query-settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-copy-trade-settings",
+    "summary": "Get Copy Trade Settings"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_settings",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-follower/settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "ID of the elite trader that you followed"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "autoCopy",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Whether to automatically follow new symbol opened by traders(only take effect when parameter mode is basic)  \n\n on：auto \n\n off：no"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "mode",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "follow mode    \n\n basic：basic mode \n\n advanced（default）：advanced mode"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "settings",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "description": "Trading pair"
+              },
+              "productType": {
+                "type": "string",
+                "description": "Product type\n\n`USDT-FUTURES` USDT-M Futures\n\n`COIN-FUTURES` Coin-M Futures\n\n`USDC-FUTURES` USDC-M Futures"
+              },
+              "marginType": {
+                "type": "string",
+                "description": "Margin type(only take effect when parameter mode is advanced)\n\n`trader` margin type of the elite trader that you followed;\n\n`specify` your own margin type."
+              },
+              "marginCoin": {
+                "type": "string",
+                "description": "Margin currency"
+              },
+              "leverType": {
+                "type": "string",
+                "description": "Leverage type(only take effect when parameter mode is advanced)\n\n`position` use position leverage;\n\n`specify` use the specified leverage;\n\n`trader` use the leverage of the elite trader;"
+              },
+              "longLeverage": {
+                "type": "string",
+                "description": "Leverage of long positions  (only take effect when parameter mode is advanced)"
+              },
+              "shortLeverage": {
+                "type": "string",
+                "description": "Leverage of short positions    (only take effect when parameter mode is advanced)"
+              },
+              "traceType": {
+                "type": "string",
+                "description": "Copy trade position type\n\n`percent` Set the percentage of the copy trade amount to the trader's elite trade amount. For example, 1 means the follower invests the same amount to open a position as the elite trader, and 2 means the follower invests twice the amount of the elite trader.\n\n`amount` the fixed volume specified for copy trading\n\n`count` number of copy trade orders with fixed volume (only take effect when parameter mode is advanced)"
+              },
+              "traceValue": {
+                "type": "string",
+                "description": "Copy trade position value"
+              },
+              "maxHoldSize": {
+                "type": "string",
+                "description": "Maximum number of orders"
+              },
+              "stopSurplusRatio": {
+                "type": "string",
+                "description": "Take-profit ratio\n\n Positive integers within 1-400,\n\nValue exceeding this number is invalid."
+              },
+              "stopLossRatio": {
+                "type": "string",
+                "description": "Stop-loss ratio \n\n Positive integers within 1-400,\n\nValue exceeding this number is invalid.\n\nStop-loss ratio"
+              }
+            },
+            "required": [
+              "symbol",
+              "productType",
+              "marginType",
+              "leverType",
+              "traceType",
+              "traceValue"
+            ]
+          },
+          "description": "Settings of copy trading (based on trading pair)\n\nMaximum: 10"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#set-copy-trade-settings",
+    "summary": "Set Copy Trade Settings"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_cancel_trader",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-follower/cancel-trader",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Trader user ID"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#unfollow-the-trader",
+    "summary": "Unfollow the Trader"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_query_traders",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-follower/query-traders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageSize",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-my-traders",
+    "summary": "Get My Traders"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_follower_query_quantity_limit",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-follower/query-quantity-limit",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-follower/classic-copytrading-future-copytrade-follower#get-follow-limit",
+    "summary": "Get Follow Limit"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_create_copy_api",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-trader/create-copy-api",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "passphrase",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Password length must be 8 to 32 characters, consisting of English letters and numbers."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#create-copy-apikey",
+    "summary": "Create Copy ApiKey"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_order_current_track",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/order-current-track",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-current-tracking-orders",
+    "summary": "Get Current Tracking Orders"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_order_history_track",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/order-history-track",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "order",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-history-tracking-orders",
+    "summary": "Get History Tracking Orders"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_order_close_positions",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-trader/order-close-positions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "trackingNo",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Track order number \n\nTracking ID from the current elite trade interface\n\nIf a symbol is also passed, make sure the order ID pair corresponds to it."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair\n\nSupports capital and lower-case letters"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Product type\n\n`USDT-FUTURES` USDT-M Futures\n\n`COIN-FUTURES` Coin-M Futures\n\n`USDC-FUTURES` USDC-M Futures\n\nIf only productType is passed, all positions under that line of business will be closed."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#close-tracking-order",
+    "summary": "Close Tracking Order"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_order_modify_tpsl",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-trader/order-modify-tpsl",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Symbol name\n\ne.g.,`BTCUSDT`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "trackingNo",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Elite trade order ID"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Product type\n\n`USDT-FUTURES` USDT-M Futures\n\n`COIN-FUTURES` Coin-M Futures\n\n`USDC-FUTURES` USDC-M Futures"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopSurplusPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "TP price\n\nOne of stopSurplusPrice and stopLossPrice must be passed.\n\nWhen it is empty, it is ignored or not updated, no matter take-profit exists or not,\n\nWhen it is 0, it means the original take-profit is canceled if there is a take-profit already.\n\nWhen it is greater than or equal to 0, it means take-profit is updated or set."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopLossPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "SL price\n\nOne of stopSurplusPrice and stopLossPrice must be passed.\n\nWhen it is empty, it is ignored or not updated, no matter stop-loss exists or not,\n\nWhen it is 0, it means the original stop-loss is canceled if there is a stop-loss already.\n\nWhen it is greater than or equal to 0, it means stop-loss is updated or set."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#modify-tracking-order-tpsl",
+    "summary": "Modify Tracking Order TPSL"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_order_total_detail",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/order-total-detail",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-tracking-order-summary",
+    "summary": "Get Tracking Order Summary"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_profit_history_summarys",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/profit-history-summarys",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-history-profit-summary",
+    "summary": "Get History Profit Summary"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_profit_history_details",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/profit-history-details",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-history-profit-share-detail",
+    "summary": "Get History Profit Share Detail"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_profit_details",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/profit-details",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageSize",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-profit-share-detail",
+    "summary": "Get Profit Share Detail"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_get_profits_group_coin_date",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/profits-group-coin-date",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "pageSize",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-profit-share-group-by-coin-date",
+    "summary": "Get Profit Share Group by Coin & Date"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_get_config_query_symbols",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/config-query-symbols",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-copy-trade-symbol-settings",
+    "summary": "Get Copy Trade Symbol Settings"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_config_setting_symbols",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-trader/config-setting-symbols",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "settingList",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "description": "Trading pair"
+              },
+              "productType": {
+                "type": "string",
+                "description": "Product type\n\n`USDT-FUTURES` USDT-M Futures\n\n`COIN-FUTURES` Coin-M Futures\n\n`USDC-FUTURES` USDC-M Futures"
+              },
+              "settingType": {
+                "type": "string",
+                "description": "Setting type, `ADD`, `DELETE`, `UPDATE`"
+              },
+              "stopSurplusRatio": {
+                "type": "string",
+                "description": "Take-profit ratio \n\npositive integers within 1-400,Value exceeding this number is invalid.\n\n2. When a type is deleted: this value is invalid.\n\n3. When a type is added: when the take-profit ratio is empty, then the take-profit ratio is not set by default.\n\n4. When a type is updated: if the value is empty, it means that no change is made; if it is 0, it means that the previously set take-profit is canceled; if it is greater than 0, it means that the take-profit is added or updated.\n\nOne of stopSurplusRatio and stopLossRatio must be passed when the type is updated."
+              },
+              "stopLossRatio": {
+                "type": "string",
+                "description": "Stop-loss ratio\n\npositive integers within 1-400,Value exceeding this number is invalid.\n\n2. When a type is deleted: this value is invalid.\n\n3. When a type is added: when the stop-loss ratio is empty, then the stop-loss ratio is not set by default.\n\n4. When a type is updated: if the value is empty, it means that no change is made; if it is 0, it means that the previously set take-profit is canceled; if it is greater than 0, it means that the stop-loss is added or updated.`\n\nOne of stopSurplusRatio and stopLossRatio must be passed when the type is updated."
+              }
+            },
+            "required": [
+              "symbol",
+              "productType",
+              "settingType"
+            ]
+          },
+          "description": "Setting overview\n\nMaximum: 50"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#change-copy-trade-symbol-setting",
+    "summary": "Change Copy Trade Symbol Setting"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_trader_config_settings_base",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-trader/config-settings-base",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "enable",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "One of the three must be passed.\n\nActivates elite trading or not? \n\n`YES` \n\n `NO`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "showTotalEquity",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "One of the three must be passed.\n\nDisplays total assets (USDT) or not? \n\n`YES` \n\n `NO`"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "showTpsl",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "One of the three must be passed.\n\nTP/SL price of orders will be displayed publicly. \n\n`YES` \n\n `NO`"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#change-global-copy-trade-setting",
+    "summary": "Change Global Copy Trade Setting"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_config_query_followers",
+    "method": "GET",
+    "path": "/api/v2/copy/mix-trader/config-query-followers",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageSize",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#get-my-followers",
+    "summary": "Get My Followers"
+  },
+  {
+    "name": "classic_copytrading_future_copytrade_trader_config_remove_follower",
+    "method": "POST",
+    "path": "/api/v2/copy/mix-trader/config-remove-follower",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "followerUid",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Follower UID"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-future-trader/classic-copytrading-future-copytrade-trader#remove-follower",
+    "summary": "Remove Follower"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_cancel_trader",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-follower/cancel-trader",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Trader user ID"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#cancel-follow",
+    "summary": "Cancel Follow"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_order_close_tracking",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-follower/order-close-tracking",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "trackingNoList",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tracking numbers of buying orders grouped by trading pair; all successful or all failed; up to 50 order tracking numbers"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#sell-and-sell-in-batch",
+    "summary": "Sell And Sell in Batch"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_query_current_orders",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-follower/query-current-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "traderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#get-current-copy-trade-orders",
+    "summary": "Get Current Copy Trade Orders"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_query_history_orders",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-follower/query-history-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "traderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#get-history-tracking-orders",
+    "summary": "Get History Tracking Orders"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_query_settings",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-follower/query-settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#get-follow-configuration",
+    "summary": "Get Follow Configuration"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_query_trader_symbols",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-follower/query-trader-symbols",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#get-traders-current-trading-pair",
+    "summary": "Get Trader's Current Trading Pair"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_query_traders",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-follower/query-traders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageSize",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#my-trader-list",
+    "summary": "My Trader List"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_setting_tpsl",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-follower/setting-tpsl",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "trackingNo",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "tracking Order number"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopSurplusPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "One of stopSurplusPrice and stopLossPrice must be passed.\n\nTP price\n\nWhen it is empty, it is ignored or not updated, no matter take-profit exists or not,\n\nWhen it is 0, it means the original take-profit is canceled if there is a take-profit already.\n\nWhen it is greater than or equal to 0, it means take-profit is updated or set."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopLossPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "One of stopSurplusPrice and stopLossPrice must be passed.\n\nSL price\n\nWhen it is empty, it is ignored or not updated, no matter stop-loss exists or not,\n\nWhen it is 0, it means the original stop-loss is canceled if there is a stop-loss already.\n\nWhen it is greater than or equal to 0, it means stop-loss is updated or set."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#set-take-profit-and-stop-loss",
+    "summary": "Set Take Profit And Stop Loss"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_settings",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-follower/settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "traderId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Trader user ID"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "autoCopy",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Whether to automatically follow new symbol opened by traders(only take effect when parameter mode is basic)  \n\n on：auto \n\n off：no"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "mode",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "follow mode    \n\n basic：basic mode \n\n advanced（default）：advanced mode"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "settings",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "description": "Trading pair"
+              },
+              "traceType": {
+                "type": "string",
+                "description": "Copy trade type\n\n`percent` Set the percentage of the copy trade amount to the trader's elite trade amount. For example, 1 means the follower invests the same amount to open a position as the elite trader, and 2 means the follower invests twice the amount of the elite trader.\n\n`amount` The fixed volume specified for copy trading\n\n`count` Number of copy trade orders with fixed volume (only take effect when parameter mode is advanced)"
+              },
+              "maxHoldSize": {
+                "type": "string",
+                "description": "Maximum following buying quantity"
+              },
+              "traceValue": {
+                "type": "string",
+                "description": "Copy trade investment amount \n\n100 or 0.1 \n\nTraceType parameter corresponding to the value"
+              },
+              "stopLossRatio": {
+                "type": "string",
+                "description": "The stop-loss ratio can only be a positive integer. 10 means 10%."
+              },
+              "stopSurplusRatio": {
+                "type": "string",
+                "description": "The take-profit ratio can only be a positive integer. 10 means 10%."
+              }
+            },
+            "required": [
+              "symbol",
+              "traceType",
+              "maxHoldSize",
+              "traceValue"
+            ]
+          },
+          "description": "settings"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#add-or-modify-following-configurations",
+    "summary": "Add or Modify Following Configurations"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_follower_stop_order",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-follower/stop-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "trackingNoList",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Order tracking number groups\n\nUp to 50.\n\nAtomic execution results, either all successful or all failed."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-follower/classic-copytrading-spot-copytrade-follower#stop-the-order",
+    "summary": "Stop The Order"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_config_query_followers",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/config-query-followers",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageSize",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#my-follower-list",
+    "summary": "My Follower List"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_config_query_settings",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/config-query-settings",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-copytrade-configuration",
+    "summary": "Get Copytrade Configuration"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_config_remove_follower",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-trader/config-remove-follower",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "followerUid",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Follower UID"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#remove-followers",
+    "summary": "Remove Followers"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_config_setting_symbols",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-trader/config-setting-symbols",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbolList",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Collection with single currency pairs\n\nMaximum 50"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "settingType",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Setting type\n\nadd new;\n\ndelete delete;"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#set-copytrade-symbols",
+    "summary": "Set Copytrade Symbols"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_order_close_tracking",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-trader/order-close-tracking",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "trackingNoList",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Categorizing trackingNo by buying trading pairs\n\nAll success or all fail, track order number, maximum: 50"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Trading pair"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#sell-and-sell-in-batch",
+    "summary": "Sell And Sell in Batch"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_order_current_track",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/order-current-track",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-current-tracking-orders",
+    "summary": "Get Current Tracking Orders"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_order_history_track",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/order-history-track",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-history-tracking-orders",
+    "summary": "Get History Tracking Orders"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_order_modify_tpsl",
+    "method": "POST",
+    "path": "/api/v2/copy/spot-trader/order-modify-tpsl",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "trackingNo",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Track order number"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopSurplusPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "One of stopSurplusPrice and stopLossPrice must be passed.\n\nTP price\n\nWhen it is empty, it is ignored or not updated, no matter take-profit exists or not,\n\nWhen it is 0, it means the original take-profit is canceled if there is a take-profit already.\n\nWhen it is greater than or equal to 0, it means take-profit is updated or set."
+        },
+        "location": "body"
+      },
+      {
+        "wire": "stopLossPrice",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "One of stopSurplusPrice and stopLossPrice must be passed.\n\nWhen it is empty, it is ignored or not updated, no matter stop-loss exists or not,\n\nWhen it is 0, it means the original stop-loss is canceled if there is a stop-loss already.\n\nWhen it is greater than or equal to 0, it means stop-loss is updated or set."
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#modify-take-profit-and-stop-loss",
+    "summary": "Modify Take Profit and Stop Loss"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_order_total_detail",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/order-total-detail",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-data-indicator-statistics",
+    "summary": "Get Data Indicator Statistics"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_profit_details",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/profit-details",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageSize",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-unrealized-profit-sharing-details",
+    "summary": "Get Unrealized Profit Sharing Details"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_profit_history_details",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/profit-history-details",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idGreaterThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-history-profit-sharing-details",
+    "summary": "Get History Profit Sharing Details"
+  },
+  {
+    "name": "classic_copytrading_spot_copytrade_trader_profit_summarys",
+    "method": "GET",
+    "path": "/api/v2/copy/spot-trader/profit-summarys",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-copytrading-spot-trader/classic-copytrading-spot-copytrade-trader#get-profit-summary",
+    "summary": "Get Profit Summary"
+  },
+  {
+    "name": "copy_trading_follower_create_copy",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/follower-settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "accountType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "type",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "amount",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tradingPairList",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "marginPerOrder",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "autoCopy",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "leverage",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxEntrySlippage",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxMarginRatio",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxPostionValue",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#create-copy",
+    "summary": "Create Copy"
+  },
+  {
+    "name": "copy_trading_follower_modify_settings",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/modify-follower-settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tradingPairList",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "marginPerOrder",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "autoCopy",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "leverage",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxEntrySlippage",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxMarginRatio",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxPostionValue",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#modify-follower-settings",
+    "summary": "Modify Follower Settings"
+  },
+  {
+    "name": "copy_trading_follower_unfollow",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/unfollow",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "closeType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#unfollow",
+    "summary": "Unfollow"
+  },
+  {
+    "name": "copy_trading_follower_get_copy_settings",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/copy-settings",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-copy-settings",
+    "summary": "Get Copy Settings"
+  },
+  {
+    "name": "copy_trading_follower_copy_transfer",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/copy-transfer",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "type",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "inAccountType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "amount",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#copy-transfer",
+    "summary": "Copy Transfer"
+  },
+  {
+    "name": "copy_trading_follower_get_copy_transfer_record",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/copy-transfer-record",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-copy-transfer-record",
+    "summary": "Get Copy Transfer Record"
+  },
+  {
+    "name": "copy_trading_follower_get_current_copy",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/current-copy",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-current-copy",
+    "summary": "Get Current Copy"
+  },
+  {
+    "name": "copy_trading_follower_get_copy_profit_details",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/copy-profit-details",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-copy-profit-details",
+    "summary": "Get Copy Profit Details"
+  },
+  {
+    "name": "copy_trading_follower_close_positions",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/close-positions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "qty",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "holdSide",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#close-positions",
+    "summary": "Close Positions"
+  },
+  {
+    "name": "copy_trading_follower_close_all",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/close-all",
+    "public": false,
+    "confirm": true,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#close-all",
+    "summary": "Close All"
+  },
+  {
+    "name": "copy_trading_follower_get_current_positions",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/current-positions",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "symbol",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "posSide",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-current-positions",
+    "summary": "Get Current Positions"
+  },
+  {
+    "name": "copy_trading_follower_place_tpsl",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/place-tpsl",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "positionId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tpTriggerBy",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "slTriggerBy",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "takeProfit",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "stopLoss",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#place-tpsl",
+    "summary": "Place TPSL"
+  },
+  {
+    "name": "copy_trading_follower_modify_tpsl",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/modify-tpsl",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "strategyId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tpTriggerBy",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "slTriggerBy",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "takeProfit",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "stopLoss",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#modify-tpsl",
+    "summary": "Modify TPSL"
+  },
+  {
+    "name": "copy_trading_follower_cancel_tpsl",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/cancel-tpsl",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "strategyId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#cancel-tpsl",
+    "summary": "Cancel TPSL"
+  },
+  {
+    "name": "copy_trading_follower_get_current_tpsl_orders",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/current-tpsl-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-current-tpsl-orders",
+    "summary": "Get Current TPSL Orders"
+  },
+  {
+    "name": "copy_trading_follower_get_tpsl_order_history",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/tpsl-order-history",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/follower#get-tpsl-order-history",
+    "summary": "Get TPSL Order History"
+  },
+  {
+    "name": "copy_trading_public_private_get_position_summary",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/position-summary",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-position-summary",
+    "summary": "Get Position Summary"
+  },
+  {
+    "name": "copy_trading_public_private_get_trading_pairs",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/trading-pairs",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-trading-pairs",
+    "summary": "Get Trading Pairs"
+  },
+  {
+    "name": "copy_trading_public_private_get_max_transferable",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/max-transferable",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-max-transferable",
+    "summary": "Get Max Transferable"
+  },
+  {
+    "name": "copy_trading_public_private_transfer",
+    "method": "POST",
+    "path": "/api/v3/copy/futures/transfer",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "type",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "inAccountType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "amount",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#transfer",
+    "summary": "Transfer"
+  },
+  {
+    "name": "copy_trading_public_private_get_transfer_record",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/transfer-record",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-transfer-record",
+    "summary": "Get Transfer Record"
+  },
+  {
+    "name": "copy_trading_public_private_get_current_followers",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/current-follower",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-current-followers",
+    "summary": "Get Current Followers"
+  },
+  {
+    "name": "copy_trading_public_private_get_history_followers",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/history-follower",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-history-followers",
+    "summary": "Get History Followers"
+  },
+  {
+    "name": "copy_trading_public_private_get_profit_summary",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/profit-summary",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-profit-summary",
+    "summary": "Get Profit Summary"
+  },
+  {
+    "name": "copy_trading_public_private_get_profit_details",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/profit-details",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-profit-details",
+    "summary": "Get Profit Details"
+  },
+  {
+    "name": "copy_trading_public_private_get_portfolio_overview",
+    "method": "GET",
+    "path": "/api/v3/copy/futures/portfolio-overview",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "period",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/copy-trading/public-private#get-portfolio-overview",
+    "summary": "Get Portfolio Overview"
+  }
+]

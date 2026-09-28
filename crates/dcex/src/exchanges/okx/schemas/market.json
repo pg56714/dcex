@@ -1,0 +1,38 @@
+[
+  {
+    "name": "get_mm_instrument_types",
+    "method": "GET",
+    "path": "/api/v5/public/mm-instrument-types",
+    "public": true,
+    "fields": [
+      {
+        "name": "instType",
+        "python_name": "inst_type",
+        "type": "string",
+        "required": false,
+        "description": "Instrument type. SPOT SWAP When not specified, returns all types."
+      },
+      {
+        "name": "instId",
+        "python_name": "inst_id",
+        "type": "string",
+        "required": false,
+        "description": "Instrument ID, e.g. BTC-USDT , BTC-USDT-SWAP . When specified, returns at most one record."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instType": {
+          "type": "string"
+        },
+        "instId": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-mm-instrument-types",
+    "row": 1282
+  }
+]

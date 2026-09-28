@@ -1,0 +1,1432 @@
+[
+  {
+    "name": "post_v2_broker_withdrawal",
+    "method": "POST",
+    "path": "/api/v2/broker/withdrawal",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "body",
+        "required": true,
+        "location": "raw_body",
+        "schema": {
+          "type": "object"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/apply-for-fast-withdrawal",
+    "summary": "Apply for Fast Withdrawal",
+    "withdrawal": true,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_api_rebate_download",
+    "method": "GET",
+    "path": "/api/v2/broker/api/rebate/download",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "futures"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-broker-rebate",
+    "summary": "Get Broker Rebate",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_query_my_commission",
+    "method": "GET",
+    "path": "/api/v2/broker/queryMyCommission",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "siteType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "default": "all"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "default": "all",
+          "enum": [
+            "all",
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all trade type"
+            },
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "FUTURE"
+            }
+          ]
+        }
+      },
+      {
+        "name": "rebateType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "",
+              "description": "spot"
+            },
+            {
+              "value": "2",
+              "name": "",
+              "description": "futures"
+            }
+          ]
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-commission",
+    "summary": "Get Commission",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_query_user",
+    "method": "GET",
+    "path": "/api/v2/broker/queryUser",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "all",
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all trade types"
+            },
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "FUTURE"
+            }
+          ],
+          "default": "all"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "rcode",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tag",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-list",
+    "summary": "Get User List",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_broker_query_detail_by_uid",
+    "method": "GET",
+    "path": "/api/v2/broker/queryDetailByUid",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "all",
+            "SPOT",
+            "FUTURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all trade types"
+            },
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURE",
+              "name": "FUTURE",
+              "description": "FUTURE"
+            }
+          ],
+          "default": "all"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "last page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "next page"
+            }
+          ]
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/api-broker/get-user-transactions",
+    "summary": "Get User Transactions",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_rebate_download",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/rebate/download",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "spot"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "futures"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-rebate",
+    "summary": "Get Broker Rebate",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_rebate_download",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/rebate/download",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "enum": [
+            "FUTURE",
+            "SPOT"
+          ],
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-rebatev3",
+    "summary": "Get Broker RebateV3",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_kyc_nd_broker_proxy_client_submit",
+    "method": "POST",
+    "path": "/api/kyc/ndBroker/proxyClient/submit",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "clientUid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "client uid",
+          "examples": [
+            "226383154"
+          ]
+        }
+      },
+      {
+        "name": "firstName",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "first Name"
+        }
+      },
+      {
+        "name": "lastName",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "last Name"
+        }
+      },
+      {
+        "name": "issueCountry",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "ISO country code",
+          "examples": [
+            "CN",
+            "US",
+            "DE",
+            "JP"
+          ]
+        }
+      },
+      {
+        "name": "birthDate",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Birth Date",
+          "examples": [
+            "2000-01-01"
+          ]
+        }
+      },
+      {
+        "name": "identityType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Identity type",
+          "enum": [
+            "idcard",
+            "drivinglicense",
+            "passport",
+            "bvn"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "idcard",
+              "name": "idcard",
+              "description": "id card"
+            },
+            {
+              "value": "drivinglicense",
+              "name": "drivinglicense",
+              "description": "driving license"
+            },
+            {
+              "value": "passport",
+              "name": "passport",
+              "description": "passport"
+            },
+            {
+              "value": "bvn",
+              "name": "bvn",
+              "description": "bvn"
+            }
+          ]
+        }
+      },
+      {
+        "name": "identityNumber",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Identity Number"
+        }
+      },
+      {
+        "name": "expireDate",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "expire Date. If there is no expiration date, please fill in: 2099-01-01",
+          "examples": [
+            "2030-01-01",
+            "2099-01-01"
+          ]
+        }
+      },
+      {
+        "name": "frontPhoto",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional when identityType=bvn\nFront photo of the ID card, in base64 format, PNG or JPG is recommended, and the size cannot exceed 2MB. If it exceeds 2MB, it is recommended to adjust the resolution and compress it to less than 2MB\nPlease note that the ID photo must be the original document; scanned copies are not acceptable.",
+          "examples": [
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJCh..."
+          ]
+        }
+      },
+      {
+        "name": "backendPhoto",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional when identityType=passport/bvn\nBack photo of ID, same as above\nPlease note that the ID photo must be the original document; scanned copies are not acceptable.",
+          "examples": [
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJCh..."
+          ]
+        }
+      },
+      {
+        "name": "facePhoto",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Please submit a selfie showing yourself. Selfie photo, in base64 format, PNG or JPG is recommended, and the size cannot exceed 2MB. If it exceeds 2MB, it is recommended to adjust the resolution and compress it to less than 2MB",
+          "examples": [
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJCh..."
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/submit-kyc",
+    "summary": "Submit KYC",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_kyc_nd_broker_proxy_client_status_list",
+    "method": "GET",
+    "path": "/api/kyc/ndBroker/proxyClient/status/list",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "clientUids",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "examples": [
+            "226383154",
+            "226383154,22341356"
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-kyc-status",
+    "summary": "Get KYC Status",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_kyc_nd_broker_proxy_client_status_page",
+    "method": "GET",
+    "path": "/api/kyc/ndBroker/proxyClient/status/page",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "pageNumber",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 100,
+          "maximum": 100,
+          "minimum": 1
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-kyc-status-list",
+    "summary": "Get KYC Status List",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_info",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/info",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "begin",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "end",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "spot"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "futures"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-broker-info",
+    "summary": "Get Broker Info",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_account",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/account",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "accountName",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account Name. Note that this name is unique across the exchange. It is recommended to add a special identifier to prevent name duplication."
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/add-subaccount",
+    "summary": "Add sub-account",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_account",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/account",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "currentPage",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 20,
+          "maximum": 100,
+          "minimum": 1
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-subaccount",
+    "summary": "Get sub-account",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_account_apikey",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/account/apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account UID",
+          "x-apidog-mock": "226383154"
+        }
+      },
+      {
+        "name": "passphrase",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "API passphrase",
+          "x-apidog-mock": "11223344"
+        }
+      },
+      {
+        "name": "ipWhitelist",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "127.0.0.1"
+          },
+          "description": "IP whitelist list, supports up to 20 IPs.\nWhen permissions include 'Transfer(Withdraw)', ipWhitelist is required. Otherwise, ipWhitelist is optional."
+        }
+      },
+      {
+        "name": "permissions",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "general",
+            "default": "General"
+          },
+          "description": "[Permissions](/docs-new/introduction) group list. Possible values: General, Spot, Margin, Futures, InnerTransfer(Flex Transfer), Transfer(Withdraw), Earn. such as \"General, Trade\". If empty, the default permission is \"General\"."
+        }
+      },
+      {
+        "name": "label",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "apikey remarks (length 4~32)\n",
+          "minLength": 4,
+          "maxLength": 32,
+          "x-apidog-mock": "This is remarks"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/add-subaccount-api",
+    "summary": "Add sub-account API",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_account_apikey",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/account/apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "apiKey",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-subaccount-api",
+    "summary": "Get sub-account API",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_account_update_apikey",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/account/update-apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account UID",
+          "x-apidog-mock": "226383154"
+        }
+      },
+      {
+        "name": "ipWhitelist",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "127.0.0.1"
+          },
+          "description": "IP whitelist list, supports up to 20 IPs.\nWhen permissions include 'Transfer(Withdraw)', ipWhitelist is required. Otherwise, ipWhitelist is optional."
+        }
+      },
+      {
+        "name": "permissions",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-apidog-mock": "general",
+            "default": "General"
+          },
+          "description": "[Permissions](/docs-new/introduction) group list. Possible values: General, Spot, Margin, Futures, InnerTransfer(Flex Transfer), Transfer(Withdraw), Earn. such as \"General, Trade\". If empty, the default permission is \"General\"."
+        }
+      },
+      {
+        "name": "label",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "apikey remarks (length 4~32)\n",
+          "minLength": 4,
+          "maxLength": 32,
+          "x-apidog-mock": "This is remarks"
+        }
+      },
+      {
+        "name": "apiKey",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Sub-account apiKey",
+          "x-apidog-mock": "671afb36cee20f00015cfaf1"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/modify-subaccount-api",
+    "summary": "Modify sub-account API",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "delete_v1_broker_nd_account_apikey",
+    "method": "DELETE",
+    "path": "/api/v1/broker/nd/account/apikey",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "apiKey",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/delete-subaccount-api",
+    "summary": "Delete sub-account API",
+    "withdrawal": false,
+    "confirm": true
+  },
+  {
+    "name": "post_v1_broker_nd_transfer",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/transfer",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "currency",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Currency",
+          "x-apidog-mock": "USDT"
+        }
+      },
+      {
+        "name": "amount",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Transfer Amount (must be a positive integer in the currency's precision)",
+          "x-apidog-mock": "1"
+        }
+      },
+      {
+        "name": "direction",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Fund transfer direction: OUT (Broker account is transferred to Broker sub-account), IN (Broker sub-account is transferred to Broker account)",
+          "enum": [
+            "OUT",
+            "IN"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "OUT",
+              "name": "OUT",
+              "description": "Broker account is transferred to Broker sub-account"
+            },
+            {
+              "value": "IN",
+              "name": "IN",
+              "description": "Broker sub-account is transferred to Broker account"
+            }
+          ],
+          "x-apidog-mock": "OUT"
+        }
+      },
+      {
+        "name": "accountType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Broker account types: MAIN (Funding account), TRADE (Spot trading account)",
+          "enum": [
+            "MAIN",
+            "TRADE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "MAIN",
+              "name": "main",
+              "description": "funding account"
+            },
+            {
+              "value": "TRADE",
+              "name": "trade",
+              "description": "spot trading account"
+            }
+          ],
+          "x-apidog-mock": "MAIN"
+        }
+      },
+      {
+        "name": "specialUid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Broker sub-account UID, must be the Broker sub-account created by the current Broker user.",
+          "x-apidog-mock": "226383154"
+        }
+      },
+      {
+        "name": "specialAccountType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Broker sub-account types: MAIN (Funding account), TRADE (Spot trading account)",
+          "enum": [
+            "MAIN",
+            "TRADE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "MAIN",
+              "name": "main",
+              "description": "funding account"
+            },
+            {
+              "value": "TRADE",
+              "name": "trade",
+              "description": "spot trading account"
+            }
+          ],
+          "x-apidog-mock": "MAIN"
+        }
+      },
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Client Order ID, the unique identifier created by the client. It is recommended to use UUID. The maximum length is 128 bits.",
+          "maxLength": 128,
+          "x-apidog-mock": "e6c24d23-6bc2-401b-bf9e-55e2daddfbc1"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/transfer",
+    "summary": "Transfer",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_transfer_detail",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/transfer/detail",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "orderId",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-transfer-history",
+    "summary": "Get Transfer History",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_asset_ndbroker_deposit_list",
+    "method": "GET",
+    "path": "/api/v1/asset/ndbroker/deposit/list",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "currency",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "status",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "hash",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startTimestamp",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endTimestamp",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "limit",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1000,
+          "maximum": 1000
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-deposit-list",
+    "summary": "Get Deposit List",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_deposit_detail",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/deposit/detail",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "currency",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "hash",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-deposit-detail",
+    "summary": "Get Deposit Detail",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v3_broker_nd_withdraw_detail",
+    "method": "GET",
+    "path": "/api/v3/broker/nd/withdraw/detail",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "withdrawalId",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-withdraw-detail",
+    "summary": "Get Withdraw Detail",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_broker_nd_mark_up",
+    "method": "POST",
+    "path": "/api/v1/broker/nd/mark-up",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "subUids",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "Valid when effectiveType=UID_SPECIFIC; specify the sub‑account UIDs to be set (up to 20). Ignored when effectiveType=DEFAULT."
+        }
+      },
+      {
+        "name": "effectAt",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Effective timestamp for the mark‑up fee (in milliseconds). If not provided, it defaults to 00:10 at the earliest UTC+8 T+1 (the next calendar day).\""
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Business type",
+          "enum": [
+            "SPOT",
+            "FUTURES"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "SPOT"
+            },
+            {
+              "value": "FUTURES",
+              "name": "FUTURES",
+              "description": "FUTURES"
+            }
+          ]
+        }
+      },
+      {
+        "name": "makerMarkUp",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "format": "bigdecimal",
+          "description": "Absolute value of mark‑up for Taker orders – range: [0, 0.03] for spot, [0, 0.001] for futures. Maker and Taker must be set together."
+        }
+      },
+      {
+        "name": "takerMarkUp",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "format": "bigdecimal",
+          "description": "Absolute value of mark‑up for Taker orders – range: [0, 0.03] for spot, [0, 0.001] for futures. Maker and Taker must be set together.\""
+        }
+      },
+      {
+        "name": "effectiveType",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Effective mode for mark‑up fee",
+          "enum": [
+            "DEFAULT",
+            "UID_SPECIFIC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "DEFAULT",
+              "name": "DEFAULT",
+              "description": "Applicable to all sub-accounts"
+            },
+            {
+              "value": "UID_SPECIFIC",
+              "name": "UID_SPECIFIC",
+              "description": "Set by UID"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/setmarkup",
+    "summary": "Set Markup Fee",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_broker_nd_mark_up",
+    "method": "GET",
+    "path": "/api/v1/broker/nd/mark-up",
+    "market": "broker",
+    "fields": [
+      {
+        "name": "subUids",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/broker/exchange-broker/getmarkup",
+    "summary": "Get Markup Fee",
+    "withdrawal": false,
+    "confirm": false
+  }
+]

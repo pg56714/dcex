@@ -1,0 +1,1420 @@
+[
+  {
+    "name": "post_v1_copy_trade_futures_orders",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/orders",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Unique order id created by users to identify their orders, the maximum length cannot exceed 40, e.g. UUID, Only allows numbers, characters, underline(_), and separator(-)",
+          "examples": [
+            "5c52e11203aa677f33e493fb"
+          ]
+        }
+      },
+      {
+        "name": "side",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "specify if the order is to 'buy' or 'sell' ",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "buy",
+              "name": "buy",
+              "description": "buy"
+            },
+            {
+              "value": "sell",
+              "name": "sell",
+              "description": "sell"
+            }
+          ],
+          "examples": [
+            "buy"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) ",
+          "examples": [
+            "XBTUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "leverage",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Used to calculate the margin to be frozen for the order. If you are to close the position, this parameter is not required.",
+          "examples": [
+            3
+          ],
+          "minimum": 1,
+          "maximum": 20
+        }
+      },
+      {
+        "name": "type",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "specify if the order is an 'limit' order or 'market' order",
+          "enum": [
+            "limit",
+            "market"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "limit",
+              "name": "limit",
+              "description": "limit order"
+            },
+            {
+              "value": "market",
+              "name": "market",
+              "description": "market order"
+            }
+          ],
+          "examples": [
+            "limit"
+          ],
+          "default": "limit"
+        }
+      },
+      {
+        "name": "stop",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'down' or 'up'.  If stop is used,parameter stopPrice and stopPriceType also need to be provieded.",
+          "enum": [
+            "down",
+            "up"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "down",
+              "name": "down",
+              "description": "Triggers when the price reaches or goes below the stopPrice."
+            },
+            {
+              "value": "up",
+              "name": "up",
+              "description": "Triggers when the price reaches or goes above the stopPrice"
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPriceType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'TP' or 'MP', Need to be defined if stop is specified.",
+          "enum": [
+            "TP",
+            "MP"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "TP",
+              "name": "trade price",
+              "description": "TP for trade price, The last trade price is the last price at which an order was filled. This price can be found in the latest match message."
+            },
+            {
+              "value": "MP",
+              "name": "mark price",
+              "description": "MP for mark price, The mark price can be obtained through relevant OPEN API for index services"
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Need to be defined if stop is specified. "
+        }
+      },
+      {
+        "name": "reduceOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to reduce the position size only. Set to false by default. Need to set the position size when reduceOnly is true. If set to true, only the orders reducing the position size will be executed. If the reduce-only order size exceeds the position size, the extra size will be canceled.",
+          "default": false
+        }
+      },
+      {
+        "name": "closeOrder",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to close the position. Set to false by default. If closeOrder is set to true, the system will close the position and the position size will become 0. Side, Size and Leverage fields can be left empty and the system will determine the side and size automatically.",
+          "default": false
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin"
+            }
+          ],
+          "default": "ISOLATED",
+          "description": "Margin mode: ISOLATED, CROSS default: ISOLATED."
+        }
+      },
+      {
+        "name": "price",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Required for type is 'limit' order, indicating the operating price",
+          "examples": [
+            "0.1"
+          ]
+        }
+      },
+      {
+        "name": "size",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Order size (Lot), must be a positive integer. The quantity unit of coin-swap contracts is size(lot), and other units are not supported."
+        }
+      },
+      {
+        "name": "timeInForce",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional for type is 'limit' order, [Time in force](/docs-new/enums-definitions) is a special strategy used during trading, default is GTC",
+          "enum": [
+            "GTC",
+            "IOC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "GTC",
+              "name": "Good Till Canceled",
+              "description": "order remains open on the order book until canceled. This is the default type if the field is left empty."
+            },
+            {
+              "value": "IOC",
+              "name": "Immediate Or Cancel",
+              "description": "being matched or not, the remaining size of the order will be instantly canceled instead of entering the order book."
+            }
+          ],
+          "default": "GTC"
+        }
+      },
+      {
+        "name": "postOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Optional for type is 'limit' order,  post only flag, invalid when timeInForce is IOC. The post-only flag ensures that the trader always pays the maker fee and provides liquidity to the order book. If any part of the order is going to pay taker fee, the order will be fully rejected.",
+          "default": false
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order",
+    "summary": "Add Order",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_orders_test",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/orders/test",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Unique order ID created by users to identify their orders. The maximum length cannot exceed 40, e.g. UUID only allows numbers, characters, underline(_), and separator (-).",
+          "examples": [
+            "5c52e11203aa677f33e493fb"
+          ]
+        }
+      },
+      {
+        "name": "side",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is to 'buy' or 'sell'.",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "buy",
+              "name": "buy",
+              "description": "buy"
+            },
+            {
+              "value": "sell",
+              "name": "sell",
+              "description": "sell"
+            }
+          ],
+          "examples": [
+            "buy"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract. Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) ",
+          "examples": [
+            "XBTUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Used to calculate the margin to be frozen for the order. If you are to close the position, this parameter is not required.",
+          "examples": [
+            3
+          ],
+          "minimum": 1,
+          "maximum": 20
+        }
+      },
+      {
+        "name": "type",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is a 'limit' order or 'market' order",
+          "enum": [
+            "limit",
+            "market"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "limit",
+              "name": "limit",
+              "description": "limit order"
+            },
+            {
+              "value": "market",
+              "name": "market",
+              "description": "market order"
+            }
+          ],
+          "examples": [
+            "limit"
+          ],
+          "default": "limit"
+        }
+      },
+      {
+        "name": "stop",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'down' or 'up'.  If stop is used, parameter stopPrice and stopPriceType also need to be provided.",
+          "enum": [
+            "down",
+            "up"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "down",
+              "name": "down",
+              "description": "Triggers when the price reaches or goes below the stopPrice."
+            },
+            {
+              "value": "up",
+              "name": "up",
+              "description": "Triggers when the price reaches or goes above the stopPrice."
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPriceType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'TP' or 'MP' need to be defined if stop is specified.",
+          "enum": [
+            "TP",
+            "MP"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "TP",
+              "name": "trade price",
+              "description": "TP for trade price, The last trade price is the last price at which an order was filled. This price can be found in the latest match message."
+            },
+            {
+              "value": "MP",
+              "name": "mark price",
+              "description": "MP for mark price. The mark price can be obtained through relevant OPEN API for index services."
+            }
+          ]
+        }
+      },
+      {
+        "name": "stopPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Needs to be defined if stop is specified. "
+        }
+      },
+      {
+        "name": "reduceOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to reduce the position size only. Set to false by default. Need to set the position size when reduceOnly is true. If set to true, only the orders reducing the position size will be executed. If the reduce-only order size exceeds the position size, the extra size will be canceled.",
+          "default": false
+        }
+      },
+      {
+        "name": "closeOrder",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to close the position. Set to false by default. If closeOrder is set to true, the system will close the position and the position size will become 0. Side, Size and Leverage fields can be left empty and the system will determine the side and size automatically.",
+          "default": false
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Margin mode: ISOLATED, CROSS default: ISOLATED",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin"
+            }
+          ],
+          "default": "ISOLATED"
+        }
+      },
+      {
+        "name": "price",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Required for type is 'limit' order, indicating the operating price",
+          "examples": [
+            "0.1"
+          ]
+        }
+      },
+      {
+        "name": "size",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Order size (lot), must be a positive integer. The quantity unit of coin-swap contracts is size (lot), and other units are not supported."
+        }
+      },
+      {
+        "name": "timeInForce",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional for type is 'limit' order, [Time in force](/docs-new/enums-definitions) is a special strategy used during trading, default is GTC",
+          "enum": [
+            "GTC",
+            "IOC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "GTC",
+              "name": "Good Till Canceled",
+              "description": "order remains open on the order book until canceled. This is the default type if the field is left empty."
+            },
+            {
+              "value": "IOC",
+              "name": "Immediate Or Cancel",
+              "description": "being matched or not, the remaining size of the order will be instantly canceled instead of entering the order book."
+            }
+          ],
+          "default": "GTC"
+        }
+      },
+      {
+        "name": "postOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Optional for type is 'limit' order, post only flag, invalid when timeInForce is IOC. The post-only flag ensures that the trader always pays the maker fee and provides liquidity to the order book. If any part of the order is going to pay taker fees, the order will be fully rejected.",
+          "default": false
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-order-test",
+    "summary": "Add Order Test",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_st_orders",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/st-orders",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Unique order ID created by users to identify their orders. The maximum length cannot exceed 40, e.g. UUID only allows numbers, characters, underline(_), and separator (-).",
+          "examples": [
+            "5c52e11203aa677f33e493fb"
+          ]
+        }
+      },
+      {
+        "name": "side",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is to 'buy' or 'sell'.",
+          "enum": [
+            "buy",
+            "sell"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "buy",
+              "name": "buy",
+              "description": "buy"
+            },
+            {
+              "value": "sell",
+              "name": "sell",
+              "description": "sell"
+            }
+          ],
+          "examples": [
+            "buy"
+          ]
+        }
+      },
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract. Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) ",
+          "examples": [
+            "XBTUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Used to calculate the margin to be frozen for the order. If you are to close the position, this parameter is not required.",
+          "examples": [
+            3
+          ],
+          "minimum": 1,
+          "maximum": 20,
+          "exclusiveMaximum": 20
+        }
+      },
+      {
+        "name": "type",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Specify if the order is a 'limit' order or 'market' order",
+          "enum": [
+            "limit",
+            "market"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "limit",
+              "name": "limit",
+              "description": "limit order"
+            },
+            {
+              "value": "market",
+              "name": "market",
+              "description": "market order"
+            }
+          ],
+          "examples": [
+            "limit"
+          ],
+          "default": "limit"
+        }
+      },
+      {
+        "name": "stopPriceType",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Either 'TP' or 'MP'",
+          "enum": [
+            "TP",
+            "MP"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "TP",
+              "name": "trade price",
+              "description": "TP for trade price, The last trade price is the last price at which an order was filled. This price can be found in the latest match message."
+            },
+            {
+              "value": "MP",
+              "name": "mark price",
+              "description": "MP for mark price. The mark price can be obtained through relevant OPEN API for index services."
+            }
+          ]
+        }
+      },
+      {
+        "name": "reduceOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to reduce the position size only. Set to false by default. Need to set the position size when reduceOnly is true. If set to true, only the orders reducing the position size will be executed. If the reduce-only order size exceeds the position size, the extra size will be canceled.",
+          "default": false
+        }
+      },
+      {
+        "name": "closeOrder",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "A mark to close the position. Set to false by default. If closeOrder is set to true, the system will close the position and the position size will become 0. Side, Size and Leverage fields can be left empty and the system will determine the side and size automatically.",
+          "default": false
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Margin mode: ISOLATED, CROSS default: ISOLATED",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin"
+            }
+          ],
+          "default": "ISOLATED"
+        }
+      },
+      {
+        "name": "price",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Required for type is 'limit' order, indicating the operating price",
+          "examples": [
+            "0.1"
+          ]
+        }
+      },
+      {
+        "name": "size",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Order size (lot), must be a positive integer. The quantity unit of coin-swap contracts is size (lot), and other units are not supported."
+        }
+      },
+      {
+        "name": "timeInForce",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Optional for type is 'limit' order, [Time in force](/docs-new/enums-definitions) is a special strategy used during trading, default is GTC",
+          "enum": [
+            "GTC",
+            "IOC"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "GTC",
+              "name": "Good Till Canceled",
+              "description": "Order remains open on the order book until canceled. This is the default type if the field is left empty."
+            },
+            {
+              "value": "IOC",
+              "name": "Immediate Or Cancel",
+              "description": "Being matched or not, the remaining size of the order will be instantly canceled instead of entering the order book."
+            }
+          ],
+          "default": "GTC"
+        }
+      },
+      {
+        "name": "postOnly",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Optional for type is 'limit' order, post only flag, invalid when timeInForce is IOC. The post-only flag ensures that the trader always pays the maker fee and provides liquidity to the order book. If any part of the order is going to pay taker fees, the order will be fully rejected.",
+          "default": false
+        }
+      },
+      {
+        "name": "triggerStopUpPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Take profit price"
+        }
+      },
+      {
+        "name": "triggerStopDownPrice",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Stop loss price"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-take-profit-and-stop-loss-order",
+    "summary": "Add Take Profit And Stop Loss Order",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "delete_v1_copy_trade_futures_orders",
+    "method": "DELETE",
+    "path": "/api/v1/copy-trade/futures/orders",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "orderId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-orderid",
+    "summary": "Cancel Order By OrderId",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "delete_v1_copy_trade_futures_orders_client_order",
+    "method": "DELETE",
+    "path": "/api/v1/copy-trade/futures/orders/client-order",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "clientOid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/cancel-order-by-clientoid",
+    "summary": "Cancel Order By ClientOid",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_copy_trade_futures_get_max_open_size",
+    "method": "GET",
+    "path": "/api/v1/copy-trade/futures/get-max-open-size",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "examples": [
+            "XBTUSDTM",
+            "XBTUSDM",
+            "ETHUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "price",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "number"
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-open-size",
+    "summary": "Get Max Open Size",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v1_copy_trade_futures_position_margin_max_withdraw_margin",
+    "method": "GET",
+    "path": "/api/v1/copy-trade/futures/position/margin/max-withdraw-margin",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-max-withdraw-margin",
+    "summary": "Get Max Withdraw Margin",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_margin_deposit_margin",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/margin/deposit-margin",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "margin",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "description": "Margin amount (min. margin amount≥0.00001667XBT）"
+        }
+      },
+      {
+        "name": "bizNo",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "A unique ID generated by the user, to ensure the operation is processed by the system only once, The maximum length cannot exceed 36"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/add-isolated-margin",
+    "summary": "Add Isolated Margin",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_margin_withdraw_margin",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/margin/withdraw-margin",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "withdrawAmount",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "number",
+          "description": "The size of the position that can be deposited. If it is USDT-margin, it represents the amount of USDT. If it is coin-margin, this value represents the number of coins\n"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/remove-isolated-margin",
+    "summary": "Remove Isolated Margin",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_risk_limit_level_change",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/risk-limit-level/change",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract. Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "level",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "integer",
+          "description": "Level"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-isolated-margin-risk-limit",
+    "summary": "Modify Isolated Margin Risk Limit",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_margin_auto_deposit_status",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/margin/auto-deposit-status",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract\n",
+          "examples": [
+            "XBTUSDTM",
+            "ETHUSDTM"
+          ]
+        }
+      },
+      {
+        "name": "status",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "boolean",
+          "description": "Status"
+        }
+      },
+      {
+        "name": "positionSide",
+        "required": false,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position direction, optional in one-way mode, defaults to BOTH. Required in hedge mode.",
+          "enum": [
+            "BOTH",
+            "LONG",
+            "SHORT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "BOTH",
+              "name": "both",
+              "description": "BOTH for one-way mode."
+            },
+            {
+              "value": "LONG",
+              "name": "long",
+              "description": "LONG for long position in hedge mode."
+            },
+            {
+              "value": "SHORT",
+              "name": "short",
+              "description": "SHORT for short position in hedge mode."
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-isolated-margin-auto-deposit-status",
+    "summary": "Modify Isolated Margin Auto-Deposit Status",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v1_copy_trade_futures_position_change_margin_mode",
+    "method": "POST",
+    "path": "/api/v1/copy-trade/futures/position/changeMarginMode",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "marginMode",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Modified margin model: ISOLATED (isolated), CROSS (cross margin).",
+          "enum": [
+            "ISOLATED",
+            "CROSS"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "ISOLATED",
+              "name": "ISOLATED",
+              "description": "Isolated Margin Mode"
+            },
+            {
+              "value": "CROSS",
+              "name": "CROSS",
+              "description": "Cross Margin MOde"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-margin-mode",
+    "summary": "Switch Margin Mode",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v2_copy_trade_futures_change_cross_user_leverage",
+    "method": "POST",
+    "path": "/api/v2/copy-trade/futures/changeCrossUserLeverage",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Symbol of the contract, Please refer to [Get Symbol endpoint: symbol](/docs-new/rest/futures-trading/market-data/get-all-symbols) "
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Leverage multiple"
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/modify-cross-margin-leverage",
+    "summary": "Modify Cross Margin Leverage",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v2_copy_trade_get_cross_mode_margin_requirement",
+    "method": "POST",
+    "path": "/api/v2/copy-trade/getCrossModeMarginRequirement",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "symbol",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Trading pair name, supports up to 50 trading pairs separated by commas."
+        }
+      },
+      {
+        "name": "leverage",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Trading pair leverage multiplier, defaults to the maximum leverage multiplier of the trading pair. An error will be reported if the provided leverage multiplier exceeds the maximum leverage multiplier of the trading pair."
+        }
+      },
+      {
+        "name": "positionValue",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position value,\nFor USDT contracts, the unit is USDT.\nFor USDC contracts, the unit is USDC.\nFor coin-margined contracts, the unit is USD."
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/get-cross-margin-requirement",
+    "summary": "Get Cross Margin Requirement",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "post_v2_copy_trade_position_switch_position_mode",
+    "method": "POST",
+    "path": "/api/v2/copy-trade/position/switchPositionMode",
+    "market": "futures",
+    "fields": [
+      {
+        "name": "positionMode",
+        "required": true,
+        "location": "body",
+        "schema": {
+          "type": "string",
+          "description": "Position mode settings, apply to all futures trading pairs.\n\n0 - one-way mode, one-way position\n\n1 - hedge mode, two-way position",
+          "enum": [
+            "0",
+            "1"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "0",
+              "name": "one-way mode",
+              "description": "one-way position"
+            },
+            {
+              "value": "1",
+              "name": "hedge mode",
+              "description": "two-way position"
+            }
+          ]
+        }
+      }
+    ],
+    "json_body": true,
+    "source": "https://www.kucoin.com/docs-new/rest/copy-trading/switch-position-mode",
+    "summary": "Switch Position Mode",
+    "withdrawal": false,
+    "confirm": false
+  }
+]

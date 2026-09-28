@@ -1836,7 +1836,7 @@ def _public_wrapper_names(module: str) -> set[str]:
 @pytest.mark.parametrize("module", ["dcex.bybit.client", "dcex.async_support.bybit.client"])
 def test_every_bybit_endpoint_wrapper_has_a_route_case(module: str) -> None:
     names = _public_wrapper_names(module) - {"close", "async_init"}
-    from tests.unit.test_bybit_completion import CASES as COMPLETION_CASES
+    from tests.unit.test_bybit_schema_requests import CASES as COMPLETION_CASES
 
     covered = {case.method_name for case in CASES} | {case["name"] for case in COMPLETION_CASES}
     assert sorted(names - covered) == []

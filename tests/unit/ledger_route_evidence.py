@@ -121,36 +121,75 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
                     add(exchange, case.name, case.method, case.path, source)
 
     source = "tests/unit/test_binance_risk_endpoints.py"
-    module = importlib.import_module("tests.unit.test_kucoin_inventory_completion")
+    module = importlib.import_module("tests.unit.test_kucoin_schema_requests")
     for operation in module.OPERATIONS:
-        add("kucoin", module.operation_name(operation), operation["method"].upper(), module.values_for(operation)[1], "tests/unit/test_kucoin_inventory_completion.py::test_inventory_wire")
-    module = importlib.import_module("tests.unit.test_hyperliquid_inventory_completion")
+        add(
+            "kucoin",
+            module.operation_name(operation),
+            operation["method"].upper(),
+            module.values_for(operation)[1],
+            "tests/unit/test_kucoin_schema_requests.py::test_inventory_wire",
+        )
+    module = importlib.import_module("tests.unit.test_hyperliquid_admin_actions")
     for operation in module.OPERATIONS:
         test = "test_info_wire" if operation["public"] else "test_action_wire"
-        add("hyperliquid", operation["name"], "POST", "/info" if operation["public"] else "/exchange", "tests/unit/test_hyperliquid_inventory_completion.py::" + test, operation["type"])
-    module = importlib.import_module("tests.unit.test_aster_auxiliary")
+        add(
+            "hyperliquid",
+            operation["name"],
+            "POST",
+            "/info" if operation["public"] else "/exchange",
+            "tests/unit/test_hyperliquid_admin_actions.py::" + test,
+            operation["type"],
+        )
+    module = importlib.import_module("tests.unit.test_aster_chain_and_announcements")
     for name, _, verb, path, _ in module.CASES:
-        add("aster", name, verb, path, "tests/unit/test_aster_auxiliary.py::test_auxiliary_wire")
-    module = importlib.import_module("tests.unit.test_binance_inventory_completion")
+        add(
+            "aster",
+            name,
+            verb,
+            path,
+            "tests/unit/test_aster_chain_and_announcements.py::test_auxiliary_wire",
+        )
+    module = importlib.import_module("tests.unit.test_binance_schema_requests")
     for operation in module.OPERATIONS:
-        add("binance", module.operation_name(operation), operation["method"], operation["path"], "tests/unit/test_binance_inventory_completion.py::test_inventory_wire")
-    module = importlib.import_module("tests.unit.test_bingx_inventory_completion")
+        add(
+            "binance",
+            module.operation_name(operation),
+            operation["method"],
+            operation["path"],
+            "tests/unit/test_binance_schema_requests.py::test_inventory_wire",
+        )
+    module = importlib.import_module("tests.unit.test_bingx_schema_requests")
     for operation in module.OPERATIONS:
-        add("bingx", module.operation_name(operation), operation["method"], operation["path"], "tests/unit/test_bingx_inventory_completion.py::test_inventory_wire")
-    module = importlib.import_module("tests.unit.test_bitget_inventory_completion")
+        add(
+            "bingx",
+            module.operation_name(operation),
+            operation["method"],
+            operation["path"],
+            "tests/unit/test_bingx_schema_requests.py::test_inventory_wire",
+        )
+    module = importlib.import_module("tests.unit.test_bitget_schema_requests")
     for operation in module.OPERATIONS:
-        add("bitget", module.snake(operation["operationId"]), operation["method"].upper(), operation["path"], "tests/unit/test_bitget_inventory_completion.py::test_inventory_wire")
+        add(
+            "bitget",
+            module.snake(operation["operationId"]),
+            operation["method"].upper(),
+            operation["path"],
+            "tests/unit/test_bitget_schema_requests.py::test_inventory_wire",
+        )
     module = importlib.import_module(source.removesuffix(".py").replace("/", "."))
     for case in module.CASES:
         add("binance", case[0], case[2], case[3], source)
-    bybit = json.loads((ROOT / "tests/fixtures/bybit_completion.json").read_text(encoding="utf-8"))
+    bybit = json.loads(
+        (ROOT / "tests/fixtures/bybit_request_cases.json").read_text(encoding="utf-8")
+    )
     for case in bybit["cases"]:
         add(
             "bybit",
             case["name"],
             case["method"],
             case["path"],
-            "tests/unit/test_bybit_completion.py",
+            "tests/unit/test_bybit_schema_requests.py",
         )
 
     for exchange in ("aster", "arcus", "extended", "ondo"):
@@ -166,7 +205,13 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
             add(exchange, case.method, method, path, source)
         if exchange == "arcus":
             for _, _, case in module._time_sensitive_cases():
-                add(exchange, case.method, module.EXPECTED_VERBS[case.method], case.http_method_path, source)
+                add(
+                    exchange,
+                    case.method,
+                    module.EXPECTED_VERBS[case.method],
+                    case.http_method_path,
+                    source,
+                )
             for case in module.COMPLETION_CASES:
                 add(exchange, case["method"], case["http_method"], case["path"], source)
 
@@ -193,21 +238,115 @@ def route_evidence() -> tuple[RouteEvidence, ...]:
     for case in module.CASES:
         add("binance", case[0], case[2], case[3], "tests/unit/test_binance_options_controls.py")
     extras = [
-        ("okx", "cancel_all_orders", "GET", "/api/v5/trade/orders-pending", "test_okx_endpoint_coverage", "test_sync_cancel_all_orders_batches_only_matching_pending_orders"),
-        ("okx", "cancel_all_orders", "POST", "/api/v5/trade/cancel-batch-orders", "test_okx_endpoint_coverage", "test_sync_cancel_all_orders_batches_only_matching_pending_orders"),
-        ("okx", "get_sbe_orderbook", "GET", "/api/v5/market/books-sbe", "test_okx_sbe", "test_sbe_binary_snapshot_and_json_error"),
-        ("bingx", "export_swap_income", "GET", "/openApi/swap/v2/user/income/export", "test_bingx_income_export", "test_income_export_preserves_bytes_and_checks_errors"),
-        ("extended", "update_leverage", "PATCH", "/api/v1/user/leverage", "test_extended_endpoint_coverage", "test_sync_update_leverage_patches_documented_body"),
-        ("extended", "place_limit_order", "POST", "/api/v1/user/order", "test_extended_endpoint_coverage", "test_sync_auto_signed_order_fetches_market_and_fee"),
-        ("arcus", "submit_internal_transfer", "POST", "/v1/transfer", "test_arcus_endpoint_coverage", "test_internal_transfer_is_wallet_signed_without_api_headers"),
-        ("kraken", "retrieve_spot_export", "POST", "/0/private/RetrieveExport", "test_kraken_export", "test_report_zip_preserves_binary_and_checks_api_errors"),
+        (
+            "okx",
+            "cancel_all_orders",
+            "GET",
+            "/api/v5/trade/orders-pending",
+            "test_okx_endpoint_coverage",
+            "test_sync_cancel_all_orders_batches_only_matching_pending_orders",
+        ),
+        (
+            "okx",
+            "cancel_all_orders",
+            "POST",
+            "/api/v5/trade/cancel-batch-orders",
+            "test_okx_endpoint_coverage",
+            "test_sync_cancel_all_orders_batches_only_matching_pending_orders",
+        ),
+        (
+            "okx",
+            "get_sbe_orderbook",
+            "GET",
+            "/api/v5/market/books-sbe",
+            "test_okx_sbe",
+            "test_sbe_binary_snapshot_and_json_error",
+        ),
+        (
+            "bingx",
+            "export_swap_income",
+            "GET",
+            "/openApi/swap/v2/user/income/export",
+            "test_bingx_income_export",
+            "test_income_export_preserves_bytes_and_checks_errors",
+        ),
+        (
+            "extended",
+            "update_leverage",
+            "PATCH",
+            "/api/v1/user/leverage",
+            "test_extended_endpoint_coverage",
+            "test_sync_update_leverage_patches_documented_body",
+        ),
+        (
+            "extended",
+            "place_limit_order",
+            "POST",
+            "/api/v1/user/order",
+            "test_extended_endpoint_coverage",
+            "test_sync_auto_signed_order_fetches_market_and_fee",
+        ),
+        (
+            "arcus",
+            "submit_internal_transfer",
+            "POST",
+            "/v1/transfer",
+            "test_arcus_endpoint_coverage",
+            "test_internal_transfer_is_wallet_signed_without_api_headers",
+        ),
+        (
+            "kraken",
+            "retrieve_spot_export",
+            "POST",
+            "/0/private/RetrieveExport",
+            "test_kraken_export",
+            "test_report_zip_preserves_binary_and_checks_api_errors",
+        ),
     ]
-    for name, verb in [("get_listen_key", "POST"), ("keep_alive_listen_key", "PUT"), ("close_listen_key", "DELETE")]:
-        extras.append(("binance", name, verb, "/fapi/v1/listenKey", "test_round3_regressions", "test_binance_listen_key_alias_wire"))
-    for name, path in [("get_tokens", "/v1/tokens"), ("get_price", "/v1/price"), ("get_quote", "/v1/quote")]:
-        extras.append(("arcus", name, "GET", path, "test_arcus_spot_public", "test_arcus_spot_native_public_routes"))
-    for name, verb, path in [("get_status", "GET", "/v1/status"), ("submit_signed_quote", "POST", "/v1/submit")]:
-        extras.append(("arcus", name, verb, path, "test_arcus_spot_public", "test_arcus_spot_signed_submit_and_status_routes_are_complete"))
+    for name, verb in [
+        ("get_listen_key", "POST"),
+        ("keep_alive_listen_key", "PUT"),
+        ("close_listen_key", "DELETE"),
+    ]:
+        extras.append(
+            (
+                "binance",
+                name,
+                verb,
+                "/fapi/v1/listenKey",
+                "test_binance_order_and_asset_requests",
+                "test_binance_listen_key_alias_wire",
+            )
+        )
+    for name, path in [
+        ("get_tokens", "/v1/tokens"),
+        ("get_price", "/v1/price"),
+        ("get_quote", "/v1/quote"),
+    ]:
+        extras.append(
+            (
+                "arcus",
+                name,
+                "GET",
+                path,
+                "test_arcus_spot_public",
+                "test_arcus_spot_native_public_routes",
+            )
+        )
+    for name, verb, path in [
+        ("get_status", "GET", "/v1/status"),
+        ("submit_signed_quote", "POST", "/v1/submit"),
+    ]:
+        extras.append(
+            (
+                "arcus",
+                name,
+                verb,
+                path,
+                "test_arcus_spot_public",
+                "test_arcus_spot_signed_submit_and_status_routes_are_complete",
+            )
+        )
     for exchange, name, method, path, test, function in extras:
         module = importlib.import_module("tests.unit." + test)
         assert callable(getattr(module, function)), (test, function)

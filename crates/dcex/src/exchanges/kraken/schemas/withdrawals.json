@@ -1,0 +1,556 @@
+[
+  {
+    "name": "create_funding_withdrawal",
+    "method": "POST",
+    "path": "/funding/v1/withdrawals",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "body",
+        "location": "body",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method_id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                    }
+                  },
+                  "title": "method_id"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "network_id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                    }
+                  },
+                  "title": "network_id"
+                }
+              ]
+            },
+            "address_id": {
+              "type": "string",
+              "pattern": "^AB[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{6}$"
+            },
+            "amount": {
+              "type": "object",
+              "properties": {
+                "asset_amount": {
+                  "type": "object",
+                  "properties": {
+                    "asset": {
+                      "type": "object",
+                      "properties": {
+                        "class": {
+                          "type": "string",
+                          "enum": [
+                            "currency",
+                            "tokenized_asset"
+                          ]
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 16
+                        }
+                      },
+                      "required": [
+                        "class",
+                        "name"
+                      ]
+                    },
+                    "amount": {
+                      "type": "string",
+                      "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))$"
+                    }
+                  },
+                  "required": [
+                    "asset",
+                    "amount"
+                  ]
+                },
+                "rebase_multiplier": {
+                  "type": "string",
+                  "enum": [
+                    "rebased",
+                    "base"
+                  ]
+                }
+              },
+              "required": [
+                "asset_amount"
+              ]
+            },
+            "fee": {
+              "allOf": [
+                {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "current_fee": {
+                          "type": "object",
+                          "properties": {
+                            "max_fee": {
+                              "type": "object",
+                              "properties": {
+                                "asset_amount": {
+                                  "type": "object",
+                                  "properties": {
+                                    "asset": {
+                                      "type": "object",
+                                      "properties": {
+                                        "class": {
+                                          "type": "string",
+                                          "enum": [
+                                            "currency",
+                                            "tokenized_asset"
+                                          ]
+                                        },
+                                        "name": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 16
+                                        }
+                                      },
+                                      "required": [
+                                        "class",
+                                        "name"
+                                      ]
+                                    },
+                                    "amount": {
+                                      "type": "string",
+                                      "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))$"
+                                    }
+                                  },
+                                  "required": [
+                                    "asset",
+                                    "amount"
+                                  ]
+                                },
+                                "rebase_multiplier": {
+                                  "type": "string",
+                                  "enum": [
+                                    "rebased",
+                                    "base"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "asset_amount"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "title": "current_fee"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "quoted_fee": {
+                          "type": "object",
+                          "properties": {
+                            "token": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "rebase_multiplier": {
+                              "type": "string",
+                              "enum": [
+                                "rebased",
+                                "base"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "token"
+                          ]
+                        }
+                      },
+                      "title": "quoted_fee"
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "fee_included": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "fee_included"
+                  ]
+                }
+              ]
+            },
+            "expected_address": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "scope",
+            "address_id",
+            "amount"
+          ]
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/create-funding-withdrawal"
+  },
+  {
+    "name": "get_funding_withdrawal_limits",
+    "method": "GET",
+    "path": "/funding/v1/limits/withdrawal/{asset_class}/{asset}",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "asset_class",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "currency",
+            "tokenized_asset"
+          ]
+        }
+      },
+      {
+        "name": "asset",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        }
+      },
+      {
+        "name": "preferred_asset",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string",
+              "enum": [
+                "currency",
+                "tokenized_asset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawal-limits"
+  },
+  {
+    "name": "get_funding_withdrawals",
+    "method": "GET",
+    "path": "/funding/v1/withdrawals",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "asset",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string",
+              "enum": [
+                "currency",
+                "tokenized_asset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16
+            }
+          },
+          "required": [
+            "class"
+          ]
+        }
+      },
+      {
+        "name": "scope",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "method_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "method_id"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "network_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "network_id"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "network_group_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "network_group_id"
+            }
+          ]
+        }
+      },
+      {
+        "name": "status",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "success",
+            "failed"
+          ]
+        }
+      },
+      {
+        "name": "cursor",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      {
+        "name": "limit",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "exclusiveMinimum": true,
+          "minimum": 0,
+          "maximum": 500
+        }
+      },
+      {
+        "name": "start_time",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "end_time",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "rebase_multiplier",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "rebased",
+            "base"
+          ]
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawals"
+  },
+  {
+    "name": "cancel_spot_withdrawal",
+    "method": "POST",
+    "path": "/0/private/WithdrawCancel",
+    "auth": "spot",
+    "fields": [
+      {
+        "name": "asset",
+        "location": "body_field",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "refid",
+        "location": "body_field",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding/request-withdrawal-cancellation"
+  },
+  {
+    "name": "create_spot_withdrawal",
+    "method": "POST",
+    "path": "/0/private/Withdraw",
+    "auth": "spot",
+    "fields": [
+      {
+        "name": "asset",
+        "location": "body_field",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "aclass",
+        "location": "body_field",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "currency",
+            "tokenized_asset"
+          ],
+          "default": "currency"
+        }
+      },
+      {
+        "name": "key",
+        "location": "body_field",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "address",
+        "location": "body_field",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "amount",
+        "location": "body_field",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "max_fee",
+        "location": "body_field",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "rebase_multiplier",
+        "location": "body_field",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "rebased",
+            "base"
+          ],
+          "default": "rebased",
+          "nullable": true
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding/withdraw-funds"
+  }
+]

@@ -357,3 +357,22 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_sub_account_internal_transfer_records(coin => "coin"),
     ];
 }
+
+mod business_methods {
+    use crate::exchanges::bingx::client::BingxClient;
+
+    crate::exchanges::impl_exchange_method_wrappers! {
+        @extend;
+        BingxClient;
+        public [
+            get_spot_server_time(),
+        ];
+        private [
+            /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+            transfer_master_internal(coin => "coin", user_account_type => "userAccountType", user_account => "userAccount", amount => "amount", wallet_type => "walletType"),
+            transfer_sub_account_internal(coin => "coin", user_account_type => "userAccountType", user_account => "userAccount", amount => "amount", wallet_type => "walletType"),
+            /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+            create_withdrawal(coin => "coin", address => "address", amount => "amount", wallet_type => "walletType"),
+        ];
+    }
+}

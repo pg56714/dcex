@@ -15,7 +15,34 @@ impl LighterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = LighterParams::from_pairs(params);
-        if let Some(response) = self.additional_request(method_name, &params, false).await? {
+        if let Some(response) = self.field_schema_request(method_name, &params).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self.explorer_request(method_name, &params, false).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .account_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .explorer_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .deposits_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .leases_schema_request(method_name, &params, false)
+            .await?
+        {
             return Ok(response);
         }
         if let Some(response) = self.trade_request(method_name, &params).await? {
@@ -606,5 +633,148 @@ mod tests {
         client
             .validate_private_params("get_export", &params)
             .expect("configured account_index is accepted for export");
+    }
+}
+
+mod account_requests {
+    use crate::exchange::ValidatedResponse;
+    use crate::exchanges::lighter::{
+        LighterClient, client::LighterContentType, market::auth_header_required,
+        params::LighterParams,
+    };
+    use crate::http::HttpMethod;
+    use crate::{DcexError, Result};
+    type RequestRoute<'a> = (
+        &'a str,
+        bool,
+        bool,
+        &'a [&'a str],
+        &'a [&'a str],
+        &'a [&'a str],
+        &'a [&'a str],
+    );
+    impl LighterClient {
+        pub(in crate::exchanges::lighter) async fn account_schema_request(
+            &self,
+            name: &str,
+            p: &LighterParams,
+            public: bool,
+        ) -> Result<Option<ValidatedResponse>> {
+            let (path, post, is_public, fields, required, integers, bools): RequestRoute<'_> =
+                match name {
+                    "set_maker_only_api_keys" => (
+                        "/api/v1/setMakerOnlyApiKeys",
+                        true,
+                        false,
+                        &["account_index", "api_key_indexes", "authorization"],
+                        &["account_index", "api_key_indexes"],
+                        &["account_index"],
+                        &[],
+                    ),
+                    "change_account_tier" => (
+                        "/api/v1/changeAccountTier",
+                        true,
+                        false,
+                        &["account_index", "new_tier", "authorization"],
+                        &["account_index", "new_tier"],
+                        &["account_index"],
+                        &[],
+                    ),
+                    "create_read_only_token" => (
+                        "/api/v1/tokens/create",
+                        true,
+                        false,
+                        &[
+                            "name",
+                            "account_index",
+                            "expiry",
+                            "sub_account_access",
+                            "authorization",
+                            "scopes",
+                        ],
+                        &["name", "account_index", "expiry", "sub_account_access"],
+                        &["account_index", "expiry"],
+                        &["sub_account_access"],
+                    ),
+                    "revoke_read_only_token" => (
+                        "/api/v1/tokens/revoke",
+                        true,
+                        false,
+                        &["token_id", "account_index", "authorization"],
+                        &["token_id", "account_index"],
+                        &["token_id", "account_index"],
+                        &[],
+                    ),
+                    "acknowledge_notification" => (
+                        "/api/v1/notification/ack",
+                        true,
+                        false,
+                        &["notif_id", "account_index", "authorization"],
+                        &["notif_id", "account_index"],
+                        &["account_index"],
+                        &[],
+                    ),
+                    _ => return Ok(None),
+                };
+            if public != is_public {
+                return Ok(None);
+            }
+            p.ensure_allowed(fields)?;
+            for key in required {
+                p.required(key)?;
+            }
+            for key in fields {
+                if p.get(key).is_some() {
+                    p.required(key)?;
+                }
+            }
+            for key in integers {
+                p.optional_u64_range(key, 0, u64::MAX)?;
+            }
+            for key in bools {
+                p.optional_one_of(key, &["true", "false"])?;
+            }
+            if name == "set_maker_only_api_keys" {
+                let indexes: Vec<u64> = serde_json::from_str(p.required("api_key_indexes")?)
+                    .map_err(|_| {
+                        DcexError::InvalidInput(
+                            "api_key_indexes must be a JSON integer array".into(),
+                        )
+                    })?;
+                let distinct: std::collections::BTreeSet<_> = indexes.iter().copied().collect();
+                if indexes.iter().any(|v| *v > 254) || distinct.len() != indexes.len() {
+                    return Err(DcexError::InvalidInput(
+                        "API key indexes must be distinct and within 0..254".into(),
+                    ));
+                }
+                p.required_u64_range("account_index", 0, 281474976710654)?;
+            }
+            let headers = if public {
+                std::collections::BTreeMap::new()
+            } else {
+                auth_header_required(self, p)?
+            };
+            let pairs = p.query(
+                &fields
+                    .iter()
+                    .copied()
+                    .filter(|k| *k != "authorization")
+                    .collect::<Vec<_>>(),
+            );
+            let response = if post {
+                self.path_request(
+                    HttpMethod::Post,
+                    path,
+                    Vec::new(),
+                    pairs,
+                    headers,
+                    LighterContentType::Form,
+                )
+                .await
+            } else {
+                self.get_path(path, pairs, headers).await
+            };
+            response.map(Some)
+        }
     }
 }

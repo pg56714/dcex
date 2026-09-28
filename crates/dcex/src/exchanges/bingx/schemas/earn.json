@@ -1,0 +1,225 @@
+[
+  {
+    "name": "get_wealth_v1_product_dual_currency_order_records",
+    "method": "GET",
+    "path": "/openApi/wealth/v1/product/dual-currency/order-records",
+    "signed": true,
+    "fields": [
+      {
+        "name": "orderNo",
+        "type": "string",
+        "required": false,
+        "description": "Order number",
+        "kind": "str"
+      },
+      {
+        "name": "pageId",
+        "type": "integer",
+        "required": true,
+        "description": "Page number",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "integer",
+        "required": true,
+        "description": "Page size",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Order%20Records",
+    "summary": "Dual-Currency Order Records",
+    "scoped": false
+  },
+  {
+    "name": "get_wealth_v1_product_dual_currency_position",
+    "method": "GET",
+    "path": "/openApi/wealth/v1/product/dual-currency/position",
+    "signed": true,
+    "fields": [
+      {
+        "name": "orderNo",
+        "type": "string",
+        "required": false,
+        "description": "Order number, returns all positions if empty",
+        "kind": "str"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Position%20Query",
+    "summary": "Dual-Currency Position Query",
+    "scoped": false
+  },
+  {
+    "name": "post_wealth_v1_product_dual_currency_invest_asset_list",
+    "method": "POST",
+    "path": "/openApi/wealth/v1/product/dual-currency/invest-asset-list",
+    "signed": true,
+    "fields": [
+      {
+        "name": "pageIndex",
+        "type": "integer",
+        "required": false,
+        "description": "Page index, >=0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "integer",
+        "required": false,
+        "description": "Page size, default 10, max 20",
+        "kind": "int"
+      },
+      {
+        "name": "beginDuration",
+        "type": "integer",
+        "required": false,
+        "description": "Begin duration",
+        "kind": "int"
+      },
+      {
+        "name": "endDuration",
+        "type": "integer",
+        "required": false,
+        "description": "End duration, if both begin and end are empty, all durations are returned",
+        "kind": "int"
+      },
+      {
+        "name": "duration",
+        "type": "integer",
+        "required": false,
+        "description": "Specified duration",
+        "kind": "int"
+      },
+      {
+        "name": "investmentAsset",
+        "type": "string",
+        "required": false,
+        "description": "Investment asset",
+        "kind": "str"
+      },
+      {
+        "name": "exerciseAsset",
+        "type": "string",
+        "required": false,
+        "description": "Exercise asset",
+        "kind": "str"
+      },
+      {
+        "name": "direction",
+        "type": "string",
+        "required": false,
+        "description": "Direction, CALL: sell high, PUT: buy low",
+        "kind": "str"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Product%20List",
+    "summary": "Dual-Currency Product List",
+    "scoped": false
+  },
+  {
+    "name": "post_wealth_v1_product_dual_currency_order",
+    "method": "POST",
+    "path": "/openApi/wealth/v1/product/dual-currency/order",
+    "signed": true,
+    "fields": [
+      {
+        "name": "investmentAsset",
+        "type": "string",
+        "required": false,
+        "description": "Investment asset",
+        "kind": "str"
+      },
+      {
+        "name": "exerciseAsset",
+        "type": "string",
+        "required": false,
+        "description": "Exercise asset",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "Purchase amount",
+        "kind": "str"
+      },
+      {
+        "name": "selectAccounts",
+        "type": "array",
+        "required": false,
+        "description": "Selected accounts: FUND-Fund account, SPOT-Spot account",
+        "kind": "array"
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": true,
+        "description": "Dual-currency SKU returned by the Dual-Currency Pre-Order Quote endpoint",
+        "kind": "str"
+      },
+      {
+        "name": "productId",
+        "type": "int64",
+        "required": true,
+        "description": "Product ID returned by the Dual-Currency Pre-Order Quote endpoint",
+        "kind": "int"
+      },
+      {
+        "name": "strikePrice",
+        "type": "string",
+        "required": true,
+        "description": "Strike price returned by the Dual-Currency Pre-Order Quote endpoint",
+        "kind": "str"
+      },
+      {
+        "name": "quoteId",
+        "type": "string",
+        "required": true,
+        "description": "Quote ID returned by the Dual-Currency Pre-Order Quote endpoint",
+        "kind": "str"
+      },
+      {
+        "name": "settleTargetAccount",
+        "type": "string",
+        "required": false,
+        "description": "Settlement target account, default FUND: FUND-Fund account, SPOT-Spot account",
+        "kind": "str"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Place%20Order",
+    "summary": "Dual-Currency Place Order",
+    "scoped": false
+  },
+  {
+    "name": "get_wealth_v1_product_dual_currency_pre_order",
+    "method": "GET",
+    "path": "/openApi/wealth/v1/product/dual-currency/pre-order",
+    "signed": true,
+    "fields": [
+      {
+        "name": "sku",
+        "type": "string",
+        "required": true,
+        "description": "Product SKU",
+        "kind": "str"
+      },
+      {
+        "name": "strikePrice",
+        "type": "string",
+        "required": true,
+        "description": "Strike price",
+        "kind": "str"
+      },
+      {
+        "name": "productId",
+        "type": "integer",
+        "required": true,
+        "description": "Product ID",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Wealth/Dual-Currency/Dual-Currency%20Pre-Order%20Quote",
+    "summary": "Dual-Currency Pre-Order Quote",
+    "scoped": false
+  }
+]

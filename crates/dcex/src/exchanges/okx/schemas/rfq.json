@@ -1,0 +1,419 @@
+[
+  {
+    "name": "create_rfq_quote",
+    "method": "POST",
+    "path": "/api/v5/rfq/create-quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "rfqId",
+        "python_name": "rfq_id",
+        "type": "string",
+        "required": true,
+        "description": "RFQ ID ."
+      },
+      {
+        "name": "clQuoteId",
+        "python_name": "cl_quote_id",
+        "type": "string",
+        "required": false,
+        "description": "Client-supplied Quote ID. A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters."
+      },
+      {
+        "name": "tag",
+        "python_name": "tag",
+        "type": "string",
+        "required": false,
+        "description": "Quote tag. The block trade associated with the Quote will have the same tag. A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters."
+      },
+      {
+        "name": "anonymous",
+        "python_name": "anonymous",
+        "type": "boolean",
+        "required": false,
+        "description": "Submit Quote on a disclosed or anonymous basis. Valid value is true or false . false by default."
+      },
+      {
+        "name": "quoteSide",
+        "python_name": "quote_side",
+        "type": "string",
+        "required": true,
+        "description": "The trading direction of the Quote. Its value can be buy or sell . For example, if quoteSide is buy , all the legs are executed in their leg sides; otherwise, all the legs are executed in the opposite of their leg sides."
+      },
+      {
+        "name": "expiresIn",
+        "python_name": "expires_in",
+        "type": "string",
+        "required": false,
+        "description": "Seconds that a quote expires in. Must be an integer between 10-120. Default is 60."
+      },
+      {
+        "name": "legs",
+        "python_name": "legs",
+        "type": "array",
+        "required": true,
+        "description": "The legs of the Quote."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "rfqId": {
+          "type": "string"
+        },
+        "clQuoteId": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "anonymous": {
+          "type": "boolean"
+        },
+        "quoteSide": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "type": "string"
+        },
+        "legs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "instId": {
+                "type": "string"
+              },
+              "tdMode": {
+                "type": "string"
+              },
+              "ccy": {
+                "type": "string"
+              },
+              "sz": {
+                "type": "string"
+              },
+              "px": {
+                "type": "string"
+              },
+              "side": {
+                "type": "string"
+              },
+              "posSide": {
+                "type": "string"
+              },
+              "tgtCcy": {
+                "type": "string"
+              },
+              "tradeQuoteCcy": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "instId",
+              "sz",
+              "px",
+              "side"
+            ]
+          }
+        }
+      },
+      "required": [
+        "rfqId",
+        "quoteSide",
+        "legs"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-create-quote",
+    "row": 1218
+  },
+  {
+    "name": "cancel_rfq_quote",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "quoteId",
+        "python_name": "quote_id",
+        "type": "string",
+        "required": false,
+        "description": "Quote ID."
+      },
+      {
+        "name": "clQuoteId",
+        "python_name": "cl_quote_id",
+        "type": "string",
+        "required": false,
+        "description": "Client-supplied Quote ID. Either quoteId or clQuoteId is required. If both clQuoteId and quoteId are passed, quoteId will be treated as primary identifier."
+      },
+      {
+        "name": "rfqId",
+        "python_name": "rfq_id",
+        "type": "string",
+        "required": false,
+        "description": "RFQ ID."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "quoteId": {
+          "type": "string"
+        },
+        "clQuoteId": {
+          "type": "string"
+        },
+        "rfqId": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-quote",
+    "row": 1219
+  },
+  {
+    "name": "get_rfq_maker_instrument_settings",
+    "method": "GET",
+    "path": "/api/v5/rfq/maker-instrument-settings",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-quote-products",
+    "row": 1222
+  },
+  {
+    "name": "set_rfq_maker_instrument_settings",
+    "method": "POST",
+    "path": "/api/v5/rfq/maker-instrument-settings",
+    "public": false,
+    "fields": [
+      {
+        "name": "instType",
+        "python_name": "inst_type",
+        "type": "string",
+        "required": true,
+        "description": "Type of instrument. Valid value can be FUTURES , OPTION , SWAP or SPOT ."
+      },
+      {
+        "name": "includeAll",
+        "python_name": "include_all",
+        "type": "boolean",
+        "required": false,
+        "description": "Receive all instruments or not under specific instType setting. Valid value can be boolean ( True / False ). By default, the value will be false ."
+      },
+      {
+        "name": "data",
+        "python_name": "data",
+        "type": "array",
+        "required": true,
+        "description": "Elements of the instType."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "instType": {
+          "type": "string"
+        },
+        "includeAll": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "instFamily": {
+                "type": "string"
+              },
+              "instId": {
+                "type": "string"
+              },
+              "maxBlockSz": {
+                "type": "string"
+              },
+              "makerPxBand": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        }
+      },
+      "required": [
+        "instType",
+        "data"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-quote-products",
+    "row": 1223
+  },
+  {
+    "name": "reset_rfq_mmp",
+    "method": "POST",
+    "path": "/api/v5/rfq/mmp-reset",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-reset-mmp-status",
+    "row": 1224
+  },
+  {
+    "name": "set_rfq_mmp_config",
+    "method": "POST",
+    "path": "/api/v5/rfq/mmp-config",
+    "public": false,
+    "fields": [
+      {
+        "name": "timeInterval",
+        "python_name": "time_interval",
+        "type": "string",
+        "required": true,
+        "description": "Time window (ms). MMP interval where monitoring is done. \"0\" means disable MMP. Maximum time interval is 600,000."
+      },
+      {
+        "name": "frozenInterval",
+        "python_name": "frozen_interval",
+        "type": "string",
+        "required": true,
+        "description": "Frozen period (ms). \"0\" means the trade will remain frozen until you request \"Reset MMP Status\" to unfrozen."
+      },
+      {
+        "name": "countLimit",
+        "python_name": "count_limit",
+        "type": "string",
+        "required": true,
+        "description": "Limit in number of execution attempts."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "timeInterval": {
+          "type": "string"
+        },
+        "frozenInterval": {
+          "type": "string"
+        },
+        "countLimit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "timeInterval",
+        "frozenInterval",
+        "countLimit"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-set-mmp",
+    "row": 1225
+  },
+  {
+    "name": "get_rfq_mmp_config",
+    "method": "GET",
+    "path": "/api/v5/rfq/mmp-config",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-get-mmp-config",
+    "row": 1226
+  },
+  {
+    "name": "cancel_rfq_batch_quotes",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-batch-quotes",
+    "public": false,
+    "fields": [
+      {
+        "name": "quoteIds",
+        "python_name": "quote_ids",
+        "type": "array",
+        "required": false,
+        "description": "Quote IDs ."
+      },
+      {
+        "name": "clQuoteIds",
+        "python_name": "cl_quote_ids",
+        "type": "array",
+        "required": false,
+        "description": "Client-supplied Quote IDs. Either quoteIds or clQuoteIds is required.If both attributes are sent, quoteIds will be used as primary identifier."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "quoteIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "clQuoteIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes",
+    "row": 1227
+  },
+  {
+    "name": "cancel_all_rfq_quotes",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-all-quotes",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-quotes",
+    "row": 1228
+  },
+  {
+    "name": "set_rfq_cancel_all_after",
+    "method": "POST",
+    "path": "/api/v5/rfq/cancel-all-after",
+    "public": false,
+    "fields": [
+      {
+        "name": "timeOut",
+        "python_name": "time_out",
+        "type": "string",
+        "required": true,
+        "description": "The countdown for quotes cancellation, with second as the unit. Range of value can be 0, [10, 120]. Setting timeOut to 0 disables Cancel All After."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "timeOut": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "timeOut"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-all-after",
+    "row": 1229
+  }
+]

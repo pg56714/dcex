@@ -2528,7 +2528,7 @@ CASES = [
 
 
 COMPLETION_CASES = json.loads(
-    (Path(__file__).parents[1] / "fixtures/binance_completion.json").read_text(encoding="utf-8")
+    (Path(__file__).parents[1] / "fixtures/binance_request_cases.json").read_text(encoding="utf-8")
 )
 CASES.extend(
     (x["name"], x["kwargs"], x["method"], x["path"], x["expected"], True, False)

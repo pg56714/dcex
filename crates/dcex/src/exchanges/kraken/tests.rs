@@ -3,7 +3,7 @@ use super::signing::{encode_params, futures_signature, spot_signature};
 use crate::product_table::{MarketInfo, ProductTable};
 use std::time::Duration;
 
-mod routes;
+mod route_coverage;
 
 const SECRET: &str = "c2VjcmV0";
 const NONCE: &str = "1700000000000000000";

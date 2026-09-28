@@ -983,7 +983,9 @@ ALIASES = {"exchange_futures_assets": "trigger_futures_asset_exchange"}
 CASES += [
     WireCase(c["name"], c["kwargs"], c["path"], c["wire"], True, c["verb"])
     for c in json.loads(
-        (Path(__file__).parents[1] / "fixtures/aster_completion.json").read_text(encoding="utf-8")
+        (Path(__file__).parents[1] / "fixtures/aster_request_cases.json").read_text(
+            encoding="utf-8"
+        )
     )
 ]
 CASES += [
@@ -1038,7 +1040,7 @@ def test_every_endpoint_wrapper_has_a_wire_case() -> None:
                 for name, value in vars(base).items()
                 if not name.startswith("_") and callable(value)
             )
-    from tests.unit.test_aster_auxiliary import CASES as AUXILIARY_CASES
+    from tests.unit.test_aster_chain_and_announcements import CASES as AUXILIARY_CASES
 
     assert (
         wrappers - ({case.method for case in CASES} | {case[0] for case in AUXILIARY_CASES})

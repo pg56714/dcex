@@ -12,13 +12,46 @@ impl MexcClient {
     ) -> Result<ValidatedResponse> {
         let params = super::super::operation_guards::validate("mexc", method_name, params)?;
         let params = MexcParams::from_pairs(params);
+        if let Some(result) = self.field_schema_request(method_name, &params).await? {
+            return Ok(result);
+        }
         if let Some(result) = self
-            .completion_private_request(method_name, &params)
+            .stream_schema_request(method_name, &params, false)
             .await?
         {
             return Ok(result);
         }
-        if let Some(result) = self.additional_request(method_name, &params, false).await? {
+        if let Some(result) = self
+            .wallet_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .market_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .account_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .convert_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .subaccount_schema_request(method_name, &params, false)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self.stp_schema_request(method_name, &params, false).await? {
             return Ok(result);
         }
         validate_u64_range(&params, "recvWindow", 1, 60_000)?;

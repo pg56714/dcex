@@ -12,7 +12,22 @@ impl BackpackClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = BackpackParams::from_pairs(params);
-        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+        if let Some(response) = self
+            .borrow_lend_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .prediction_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .vault_schema_request(method_name, &params, true)
+            .await?
+        {
             return Ok(response);
         }
 

@@ -1,0 +1,1447 @@
+[
+  {
+    "name": "prediction_get_market_detail",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/market/detail",
+    "public": true,
+    "fields": [
+      {
+        "name": "market_topic_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "marketTopicId",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#get-market-detail",
+    "summary": "Get Market Detail"
+  },
+  {
+    "name": "prediction_list_prediction_categories",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/category/list",
+    "public": true,
+    "fields": [],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#list-prediction-categories",
+    "summary": "List Prediction Categories"
+  },
+  {
+    "name": "prediction_list_prediction_markets",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/market/list",
+    "public": true,
+    "fields": [
+      {
+        "name": "l1_category",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "l1Category",
+        "kind": "str"
+      },
+      {
+        "name": "l2_category",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "l2Category",
+        "kind": "str"
+      },
+      {
+        "name": "sort_by",
+        "type": "Optional[ListPredictionMarketsSortByEnum]",
+        "required": false,
+        "wire": "sortBy",
+        "kind": "str"
+      },
+      {
+        "name": "order_by",
+        "type": "Optional[ListPredictionMarketsOrderByEnum]",
+        "required": false,
+        "wire": "orderBy",
+        "kind": "str"
+      },
+      {
+        "name": "offset",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "offset",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#list-prediction-markets",
+    "summary": "List Prediction Markets"
+  },
+  {
+    "name": "prediction_market_search",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/market/search",
+    "public": true,
+    "fields": [
+      {
+        "name": "query",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "query",
+        "kind": "str"
+      },
+      {
+        "name": "top_k",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "topK",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#market-search",
+    "summary": "Market Search"
+  },
+  {
+    "name": "prediction_query_last_trade_price",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/order-book/last-trade-price",
+    "public": true,
+    "fields": [
+      {
+        "name": "market_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "marketId",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#query-last-trade-price",
+    "summary": "Query Last Trade Price"
+  },
+  {
+    "name": "prediction_query_order_book",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/order-book",
+    "public": true,
+    "fields": [
+      {
+        "name": "vendor",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "vendor",
+        "kind": "str"
+      },
+      {
+        "name": "market_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "marketId",
+        "kind": "int"
+      },
+      {
+        "name": "token_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "tokenId",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#query-order-book",
+    "summary": "Query Order Book"
+  },
+  {
+    "name": "prediction_create_otc_blocktrade",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/create",
+    "public": false,
+    "fields": [
+      {
+        "name": "market_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "marketId",
+        "kind": "str"
+      },
+      {
+        "name": "token_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "tokenId",
+        "kind": "str"
+      },
+      {
+        "name": "side",
+        "type": "Union[CreateOtcBlocktradeSideEnum, None]",
+        "required": true,
+        "wire": "side",
+        "kind": "str"
+      },
+      {
+        "name": "maker_amount",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "makerAmount",
+        "kind": "str"
+      },
+      {
+        "name": "taker_amount",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "takerAmount",
+        "kind": "str"
+      },
+      {
+        "name": "price_per_share",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "pricePerShare",
+        "kind": "str"
+      },
+      {
+        "name": "expiration",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "expiration",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#create-otc-blocktrade",
+    "summary": "Create OTC Blocktrade (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_fulfil_otc_blocktrade",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/fulfil",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "orderId",
+        "kind": "str"
+      },
+      {
+        "name": "secret_token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "secretToken",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#fulfil-otc-blocktrade",
+    "summary": "Fulfil OTC Blocktrade (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_otc_blocktrade_detail",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "orderId",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#get-otc-blocktrade-detail",
+    "summary": "Get OTC Blocktrade Detail (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_otc_blocktrade_events",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/events",
+    "public": false,
+    "fields": [
+      {
+        "name": "first",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "first",
+        "kind": "int"
+      },
+      {
+        "name": "after",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "after",
+        "kind": "str"
+      },
+      {
+        "name": "event_types",
+        "type": "Optional[List[str]]",
+        "required": false,
+        "wire": "eventTypes",
+        "kind": "array"
+      },
+      {
+        "name": "market_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "marketId",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#get-otc-blocktrade-events",
+    "summary": "Get OTC Blocktrade Events (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_otc_reserved_balances",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/reserved-balances",
+    "public": false,
+    "fields": [
+      {
+        "name": "assets",
+        "type": "Union[List[GetOtcReservedBalancesAssetsParameterInner], None]",
+        "required": true,
+        "wire": "assets",
+        "kind": "array"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#get-otc-reserved-balances",
+    "summary": "Get OTC Reserved Balances (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_list_otc_blocktrades",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "first",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "first",
+        "kind": "int"
+      },
+      {
+        "name": "after",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "after",
+        "kind": "str"
+      },
+      {
+        "name": "status",
+        "type": "Optional[ListOtcBlocktradesStatusEnum]",
+        "required": false,
+        "wire": "status",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#list-otc-blocktrades",
+    "summary": "List OTC Blocktrades (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_preview_otc_blocktrade",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/preview",
+    "public": false,
+    "fields": [
+      {
+        "name": "secret_token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "secretToken",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#preview-otc-blocktrade",
+    "summary": "Preview OTC Blocktrade (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_remove_otc_blocktrades",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/otc/blocktrade/remove",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_ids",
+        "type": "Union[List[str], None]",
+        "required": true,
+        "wire": "orderIds",
+        "kind": "array"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#remove-otc-blocktrades",
+    "summary": "Remove OTC Blocktrades (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_position_by_token",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/position/token",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "token_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "tokenId",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#get-position-by-token",
+    "summary": "Get Position by Token (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_pn_l",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/pnl/query",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "token_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "tokenId",
+        "kind": "str"
+      },
+      {
+        "name": "market_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "marketId",
+        "kind": "int"
+      },
+      {
+        "name": "market_topic_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "marketTopicId",
+        "kind": "int"
+      },
+      {
+        "name": "active_only",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "activeOnly",
+        "kind": "bool"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-pn-l",
+    "summary": "Query PnL (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_positions",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/position/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "tab",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "tab",
+        "kind": "str"
+      },
+      {
+        "name": "offset",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "offset",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-positions",
+    "summary": "Query Positions (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_positions_by_filter",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/position/filter",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "market_topic_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "marketTopicId",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-positions-by-filter",
+    "summary": "Query Positions by Filter (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_settled_position_history",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/position/settled-history",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "l1_category",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "l1Category",
+        "kind": "str"
+      },
+      {
+        "name": "result",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "result",
+        "kind": "int"
+      },
+      {
+        "name": "start_date",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "startDate",
+        "kind": "str"
+      },
+      {
+        "name": "end_date",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "endDate",
+        "kind": "str"
+      },
+      {
+        "name": "offset",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "offset",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-settled-position-history",
+    "summary": "Query Settled Position History (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_batch_redeem",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/batch-redeem",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletId",
+        "kind": "str"
+      },
+      {
+        "name": "token_ids",
+        "type": "Union[List[str], None]",
+        "required": true,
+        "wire": "tokenIds",
+        "kind": "array"
+      },
+      {
+        "name": "chain_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "chainId",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/redeem#batch-redeem",
+    "summary": "Batch Redeem (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_redeem_status",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/redeem/status",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "tx_hash",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "txHash",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/redeem#get-redeem-status",
+    "summary": "Get Redeem Status (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_batch_cancel_orders",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/trade/batch-cancel",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletId",
+        "kind": "str"
+      },
+      {
+        "name": "cancel_info_list",
+        "type": "Optional[List[BatchCancelOrdersCancelInfoListParameterInner]]",
+        "required": false,
+        "wire": "cancelInfoList",
+        "kind": "array"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#batch-cancel-orders",
+    "summary": "Batch Cancel Orders (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_quote",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/trade/get-quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "token_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "tokenId",
+        "kind": "str"
+      },
+      {
+        "name": "side",
+        "type": "Union[GetQuoteSideEnum, None]",
+        "required": true,
+        "wire": "side",
+        "kind": "str"
+      },
+      {
+        "name": "amount_in",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "amountIn",
+        "kind": "str"
+      },
+      {
+        "name": "order_type",
+        "type": "Union[GetQuoteOrderTypeEnum, None]",
+        "required": true,
+        "wire": "orderType",
+        "kind": "str"
+      },
+      {
+        "name": "slippage_bps",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "slippageBps",
+        "kind": "int"
+      },
+      {
+        "name": "price_limit",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "priceLimit",
+        "kind": "str"
+      },
+      {
+        "name": "chain_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "chainId",
+        "kind": "str"
+      },
+      {
+        "name": "fee_rate_bps",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "feeRateBps",
+        "kind": "int"
+      },
+      {
+        "name": "funding_source",
+        "type": "Optional[GetQuoteFundingSourceEnum]",
+        "required": false,
+        "wire": "fundingSource",
+        "kind": "str"
+      },
+      {
+        "name": "fund_transfer_amount",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "fundTransferAmount",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#get-quote",
+    "summary": "Get Quote (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_place_order",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/trade/place-order-bundle",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletId",
+        "kind": "str"
+      },
+      {
+        "name": "quote_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "quoteId",
+        "kind": "str"
+      },
+      {
+        "name": "time_in_force",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "timeInForce",
+        "kind": "str"
+      },
+      {
+        "name": "account_type",
+        "type": "Union[PlaceOrderAccountTypeEnum, None]",
+        "required": true,
+        "wire": "accountType",
+        "kind": "str"
+      },
+      {
+        "name": "order_type",
+        "type": "Union[PlaceOrderOrderTypeEnum, None]",
+        "required": true,
+        "wire": "orderType",
+        "kind": "str"
+      },
+      {
+        "name": "slippage_bps",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "slippageBps",
+        "kind": "int"
+      },
+      {
+        "name": "price_limit",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "priceLimit",
+        "kind": "str"
+      },
+      {
+        "name": "funding_source",
+        "type": "Optional[PlaceOrderFundingSourceEnum]",
+        "required": false,
+        "wire": "fundingSource",
+        "kind": "str"
+      },
+      {
+        "name": "fund_transfer_amount",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "fundTransferAmount",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#place-order",
+    "summary": "Place Order (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_active_orders",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/order/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "trade_side",
+        "type": "Optional[QueryActiveOrdersTradeSideEnum]",
+        "required": false,
+        "wire": "tradeSide",
+        "kind": "str"
+      },
+      {
+        "name": "l1_category",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "l1Category",
+        "kind": "str"
+      },
+      {
+        "name": "market_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "marketId",
+        "kind": "int"
+      },
+      {
+        "name": "offset",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "offset",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#query-active-orders",
+    "summary": "Query Active Orders (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_order_history",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/order/history",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "l1_category",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "l1Category",
+        "kind": "str"
+      },
+      {
+        "name": "order_type",
+        "type": "Optional[QueryOrderHistoryOrderTypeEnum]",
+        "required": false,
+        "wire": "orderType",
+        "kind": "str"
+      },
+      {
+        "name": "status",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "status",
+        "kind": "str"
+      },
+      {
+        "name": "start_date",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "startDate",
+        "kind": "str"
+      },
+      {
+        "name": "end_date",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "endDate",
+        "kind": "str"
+      },
+      {
+        "name": "offset",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "offset",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#query-order-history",
+    "summary": "Query Order History (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_apply_mm_deposit",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/deposit/apply",
+    "public": false,
+    "fields": [
+      {
+        "name": "from_token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "fromToken",
+        "kind": "str"
+      },
+      {
+        "name": "from_token_amount",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "fromTokenAmount",
+        "kind": "str"
+      },
+      {
+        "name": "to_token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "toToken",
+        "kind": "str"
+      },
+      {
+        "name": "account_type",
+        "type": "Union[ApplyMmDepositAccountTypeEnum, None]",
+        "required": true,
+        "wire": "accountType",
+        "kind": "str"
+      },
+      {
+        "name": "chain_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "chainId",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#apply-mm-deposit",
+    "summary": "Apply MM Deposit (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_apply_mm_withdraw",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/withdraw/apply",
+    "public": false,
+    "fields": [
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "network",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "str"
+      },
+      {
+        "name": "withdraw_order_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "withdrawOrderId",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_type",
+        "type": "Optional[ApplyMmWithdrawWalletTypeEnum]",
+        "required": false,
+        "wire": "walletType",
+        "kind": "str"
+      },
+      {
+        "name": "name",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "name",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#apply-mm-withdraw",
+    "summary": "Apply MM Withdraw (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_create_inbound_transfer",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/transfer/inbound",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletId",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "from_token_amount",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "fromTokenAmount",
+        "kind": "str"
+      },
+      {
+        "name": "account_type",
+        "type": "Union[CreateInboundTransferAccountTypeEnum, None]",
+        "required": true,
+        "wire": "accountType",
+        "kind": "str"
+      },
+      {
+        "name": "from_token",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "fromToken",
+        "kind": "str"
+      },
+      {
+        "name": "to_token",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "toToken",
+        "kind": "str"
+      },
+      {
+        "name": "chain_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "chainId",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#create-inbound-transfer",
+    "summary": "Create Inbound Transfer (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_create_outbound_transfer",
+    "method": "POST",
+    "path": "/sapi/v1/w3w/wallet/prediction/transfer/outbound",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletId",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "from_token_amount",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "fromTokenAmount",
+        "kind": "str"
+      },
+      {
+        "name": "account_type",
+        "type": "Union[CreateOutboundTransferAccountTypeEnum, None]",
+        "required": true,
+        "wire": "accountType",
+        "kind": "str"
+      },
+      {
+        "name": "source_biz",
+        "type": "Union[CreateOutboundTransferSourceBizEnum, None]",
+        "required": true,
+        "wire": "sourceBiz",
+        "kind": "str"
+      },
+      {
+        "name": "from_token",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "fromToken",
+        "kind": "str"
+      },
+      {
+        "name": "to_token",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "toToken",
+        "kind": "str"
+      },
+      {
+        "name": "chain_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "chainId",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#create-outbound-transfer",
+    "summary": "Create Outbound Transfer (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_transfer_list",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/transfer/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "start_date",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "startDate",
+        "kind": "str"
+      },
+      {
+        "name": "end_date",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "endDate",
+        "kind": "str"
+      },
+      {
+        "name": "token_symbol",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "tokenSymbol",
+        "kind": "str"
+      },
+      {
+        "name": "direction",
+        "type": "Optional[QueryTransferListDirectionEnum]",
+        "required": false,
+        "wire": "direction",
+        "kind": "str"
+      },
+      {
+        "name": "offset",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "offset",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#query-transfer-list",
+    "summary": "Query Transfer List (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_transfer_status",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/transfer/status",
+    "public": false,
+    "fields": [
+      {
+        "name": "transfer_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "transferId",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#query-transfer-status",
+    "summary": "Query Transfer Status (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_portfolio",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/pnl/portfolio",
+    "public": false,
+    "fields": [
+      {
+        "name": "wallet_address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "walletAddress",
+        "kind": "str"
+      },
+      {
+        "name": "token_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "tokenId",
+        "kind": "str"
+      },
+      {
+        "name": "market_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "marketId",
+        "kind": "int"
+      },
+      {
+        "name": "market_topic_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "marketTopicId",
+        "kind": "int"
+      },
+      {
+        "name": "active_only",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "activeOnly",
+        "kind": "bool"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#get-portfolio",
+    "summary": "Get Portfolio (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_get_quota_status",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/quota/limit/status",
+    "public": false,
+    "fields": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#get-quota-status",
+    "summary": "Get Quota Status (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_list_prediction_wallets",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/wallet/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#list-prediction-wallets",
+    "summary": "List Prediction Wallets (PREDICTION_TRADE)"
+  },
+  {
+    "name": "prediction_query_payment_option_balances",
+    "method": "GET",
+    "path": "/sapi/v1/w3w/wallet/prediction/balance/payment-options",
+    "public": false,
+    "fields": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#query-payment-option-balances",
+    "summary": "Query Payment Option Balances (PREDICTION_TRADE)"
+  }
+]

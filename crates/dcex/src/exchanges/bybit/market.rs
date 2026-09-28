@@ -12,13 +12,13 @@ impl BybitClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         if let Some(result) = self
-            .completion_request(method_name, &BybitParams::from_pairs(params.clone()), true)
+            .field_schema_request(method_name, &BybitParams::from_pairs(params.clone()), true)
             .await?
         {
             return Ok(result);
         }
         if let Some(result) = self
-            .risk_request(method_name, &BybitParams::from_pairs(params.clone()), true)
+            .table_request(method_name, &BybitParams::from_pairs(params.clone()), true)
             .await?
         {
             return Ok(result);

@@ -1,0 +1,122 @@
+[
+  {
+    "method": "POST",
+    "path": "/v5/compliance/appeal/commit",
+    "title": "Commit Appeal",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-commit",
+    "name": "commit_compliance_appeal",
+    "public": false,
+    "fields": [
+      {
+        "name": "appealId",
+        "python_name": "appeal_id",
+        "type": "string",
+        "required": true,
+        "description": "Appeal ID"
+      },
+      {
+        "name": "decisionType",
+        "python_name": "decision_type",
+        "type": "integer",
+        "required": false,
+        "description": "0` = normal submit (default); `1` = refuse submit, appeal will be disused"
+      },
+      {
+        "name": "itemsData",
+        "python_name": "items_data",
+        "type": "array<object>",
+        "required": true,
+        "description": "Submission content per material, one element per material"
+      }
+    ],
+    "example": {
+      "appealId": "01K599X8PGM0HYJCWFR6CSN3ZD",
+      "decisionType": 0,
+      "itemsData": [
+        {
+          "documentCode": "OnchainAttachScreenshot",
+          "resources": [
+            {
+              "resourceId": "1234567890",
+              "fileType": "fiat-image"
+            }
+          ]
+        },
+        {
+          "documentCode": "OnchainWithdrawPurpose",
+          "content": "investment"
+        },
+        {
+          "documentCode": "OnchainTransactionDescription",
+          "content": "Regular withdrawal to my personal cold wallet for long-term holding."
+        }
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/tm-onchain/appeal-commit.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/compliance/appeal/detail",
+    "title": "Get Appeal Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-detail",
+    "name": "get_compliance_appeal_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "appealId",
+        "python_name": "appeal_id",
+        "type": "string",
+        "required": true,
+        "description": "Appeal ID, obtained from the list endpoint or the WebSocket push"
+      }
+    ],
+    "example": {
+      "appealId": "01K599X8PGM0HYJCWFR6CSN3ZD"
+    },
+    "has_example": true,
+    "source_file": "v5/tm-onchain/appeal-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/compliance/appeal/list",
+    "title": "Get Appeal List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/tm-onchain/appeal-list",
+    "name": "get_compliance_appeal_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "appealTypes",
+        "python_name": "appeal_types",
+        "type": "string",
+        "required": false,
+        "description": "Raw query value. Official example uses TM_Onchain; multi-value encoding is not specified."
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "long",
+        "required": false,
+        "description": "Page number, starts from `1`, default `1"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "long",
+        "required": false,
+        "description": "Page size, default `20`, max `100"
+      }
+    ],
+    "example": {
+      "appealTypes": "TM_Onchain",
+      "page": "1",
+      "pageSize": "20"
+    },
+    "has_example": true,
+    "source_file": "v5/tm-onchain/appeal-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75",
+    "verification_note": "Official spec incomplete; not verified live. appeal_types is passed through because array query encoding is unspecified."
+  }
+]

@@ -1,0 +1,459 @@
+[
+  {
+    "name": "check_referral_code",
+    "method": "GET",
+    "path": "/v1/affiliate/codeAvailable",
+    "signed": false,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[A-Z0-9_-]{1,32}$"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/check-whether-a-referral-code-is-available"
+  },
+  {
+    "name": "claim_affiliate_commission",
+    "method": "POST",
+    "path": "/v1/affiliate/claim",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "required": [
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "cutoffFillId": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        },
+        "amountQuantums": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/claim-accrued-commission"
+  },
+  {
+    "name": "create_referral_code",
+    "method": "POST",
+    "path": "/v1/affiliate/createCode",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "required": [
+        "address",
+        "code",
+        "kickbackBps"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[A-Z0-9_-]{1,32}$"
+        },
+        "kickbackBps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5000
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/create-referral-code"
+  },
+  {
+    "name": "get_affiliate_claims",
+    "method": "GET",
+    "path": "/v1/affiliate/claims",
+    "signed": false,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^(0x|0X)?[0-9a-fA-F]{40}$"
+        },
+        "from": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "to": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 1000
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-claim-history"
+  },
+  {
+    "name": "get_affiliate_commissions",
+    "method": "GET",
+    "path": "/v1/affiliate/commissions",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^(0x|0X)?[0-9a-fA-F]{40}$"
+        },
+        "from": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "to": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 1000
+        },
+        "cursor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-commission-history"
+  },
+  {
+    "name": "get_affiliate_info",
+    "method": "GET",
+    "path": "/v1/affiliate/info",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^(0x|0X)?[0-9a-fA-F]{40}$"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-info"
+  },
+  {
+    "name": "get_affiliate_leaderboard",
+    "method": "GET",
+    "path": "/v1/affiliate/leaderboard",
+    "signed": false,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/get-affiliate-leaderboard"
+  },
+  {
+    "name": "get_referrer",
+    "method": "GET",
+    "path": "/v1/affiliate/myReferrer",
+    "signed": false,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^(0x|0X)?[0-9a-fA-F]{40}$"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/get-my-referrer"
+  },
+  {
+    "name": "get_referees",
+    "method": "GET",
+    "path": "/v1/affiliate/referees",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^(0x|0X)?[0-9a-fA-F]{40}$"
+        },
+        "from": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "to": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 1000
+        },
+        "cursor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/get-referees"
+  },
+  {
+    "name": "get_referral_code",
+    "method": "GET",
+    "path": "/v1/affiliate/code",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^(0x|0X)?[0-9a-fA-F]{40}$"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/get-the-callers-referral-code"
+  },
+  {
+    "name": "get_invite_codes",
+    "method": "GET",
+    "path": "/v1/affiliate/inviteCodes",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "available",
+            "used"
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 100
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/list-the-callers-invite-codes"
+  },
+  {
+    "name": "get_affiliate_claim",
+    "method": "GET",
+    "path": "/v1/affiliate/claimStatus",
+    "signed": false,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "pattern": "^(0x|0X)?[0-9a-fA-F]{40}$"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "address",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/look-up-a-single-claim"
+  },
+  {
+    "name": "redeem_invite_code",
+    "method": "POST",
+    "path": "/v1/affiliate/redeemInvite",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "required": [
+        "address",
+        "inviteCode"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "inviteCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/redeem-an-invite-code"
+  },
+  {
+    "name": "register_referral",
+    "method": "POST",
+    "path": "/v1/affiliate/registerAffiliate",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "required": [
+        "address",
+        "code"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[A-Z0-9_-]{1,32}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/register-as-referee"
+  },
+  {
+    "name": "rename_referral_code",
+    "method": "POST",
+    "path": "/v1/affiliate/modifyCode",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "required": [
+        "address",
+        "code"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/rename-referral-code"
+  },
+  {
+    "name": "revoke_referral_code",
+    "method": "POST",
+    "path": "/v1/affiliate/revokeCode",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "required": [
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/revoke-referral-code"
+  },
+  {
+    "name": "update_referral_kickback",
+    "method": "POST",
+    "path": "/v1/affiliate/kickback",
+    "signed": true,
+    "schema": {
+      "type": "object",
+      "required": [
+        "address",
+        "kickbackBps"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "kickbackBps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5000
+        }
+      },
+      "additionalProperties": false
+    },
+    "official_source": "https://docs.arcus.xyz/api-reference/referral/update-kickback-rate"
+  }
+]

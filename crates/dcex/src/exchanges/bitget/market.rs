@@ -22,10 +22,10 @@ impl BitgetClient {
             other => other,
         };
         let params = BitgetParams::from_pairs(params);
-        if let Some(response) = self.inventory_request(method_name, &params, true).await? {
+        if let Some(response) = self.catalog_request(method_name, &params, true).await? {
             return Ok(response);
         }
-        if let Some(response) = self.risk_request(method_name, &params, true).await? {
+        if let Some(response) = self.table_request(method_name, &params, true).await? {
             return Ok(response);
         }
         if let Some(result) = self

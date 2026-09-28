@@ -1,0 +1,157 @@
+[
+  {
+    "name": "alpha_aggregated_trades",
+    "method": "GET",
+    "path": "/bapi/defi/v1/public/alpha-trade/agg-trades",
+    "public": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "symbol",
+        "kind": "str"
+      },
+      {
+        "name": "from_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "fromId",
+        "kind": "int"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/rest-api/market-data#aggregated-trades",
+    "summary": "Aggregated Trades"
+  },
+  {
+    "name": "alpha_full_depth",
+    "method": "GET",
+    "path": "/bapi/defi/v1/public/alpha-trade/fullDepth",
+    "public": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "symbol",
+        "kind": "str"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[FullDepthLimitEnum]",
+        "required": false,
+        "wire": "limit",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/rest-api/market-data#full-depth",
+    "summary": "Full Depth"
+  },
+  {
+    "name": "alpha_get_exchange_info",
+    "method": "GET",
+    "path": "/bapi/defi/v1/public/alpha-trade/get-exchange-info",
+    "public": true,
+    "fields": [],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/rest-api/market-data#get-exchange-info",
+    "summary": "Get Exchange Info"
+  },
+  {
+    "name": "alpha_klines",
+    "method": "GET",
+    "path": "/bapi/defi/v1/public/alpha-trade/klines",
+    "public": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "symbol",
+        "kind": "str"
+      },
+      {
+        "name": "interval",
+        "type": "Union[KlinesIntervalEnum, None]",
+        "required": true,
+        "wire": "interval",
+        "kind": "str"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/rest-api/market-data#klines",
+    "summary": "Klines"
+  },
+  {
+    "name": "alpha_ticker",
+    "method": "GET",
+    "path": "/bapi/defi/v1/public/alpha-trade/ticker",
+    "public": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "symbol",
+        "kind": "str"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/rest-api/market-data#ticker",
+    "summary": "Ticker"
+  },
+  {
+    "name": "alpha_token_list",
+    "method": "GET",
+    "path": "/bapi/defi/v1/public/wallet-direct/buw/wallet/cex/alpha/all/token/list",
+    "public": true,
+    "fields": [],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/advanced-trading-alpha-trading/api/rest-api/market-data#token-list",
+    "summary": "Token List"
+  }
+]

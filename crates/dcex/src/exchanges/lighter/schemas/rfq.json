@@ -1,0 +1,26 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/v1/rfq/respond",
+    "official_source": "https://apidocs.lighter.xyz/reference/rfq_respond",
+    "name": "respond_to_rfq",
+    "fields": [
+      {
+        "type": "integer",
+        "format": "int64",
+        "name": "rfq_id",
+        "required": true
+      },
+      {
+        "type": "string",
+        "enum": [
+          "acknowledged",
+          "liquidity_provided",
+          "not_interested"
+        ],
+        "name": "status",
+        "required": true
+      }
+    ]
+  }
+]

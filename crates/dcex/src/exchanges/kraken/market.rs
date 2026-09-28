@@ -13,7 +13,7 @@ impl KrakenClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         if let Some(result) = self
-            .risk_request(method_name, &KrakenParams::from_pairs(params.clone()), true)
+            .table_request(method_name, &KrakenParams::from_pairs(params.clone()), true)
             .await?
         {
             return Ok(result);

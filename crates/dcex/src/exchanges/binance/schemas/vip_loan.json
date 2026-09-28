@@ -1,0 +1,511 @@
+[
+  {
+    "name": "get_vip_loan_interest_rate_history",
+    "method": "GET",
+    "path": "/sapi/v1/loan/vip/interestRateHistory",
+    "public": false,
+    "fields": [
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "recvWindow",
+        "kind": "int"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "current",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "current",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/market-data#get-viploan-interest-rate-history",
+    "summary": "Get VIP Loan Interest Rate History (USER_DATA)"
+  },
+  {
+    "name": "query_vip_loan_fixed_rate_market",
+    "method": "GET",
+    "path": "/sapi/v1/loan/vip/fixed/market",
+    "public": false,
+    "fields": [
+      {
+        "name": "loan_coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "loanCoin",
+        "kind": "str"
+      },
+      {
+        "name": "duration",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "duration",
+        "kind": "int"
+      },
+      {
+        "name": "current",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "current",
+        "kind": "int"
+      },
+      {
+        "name": "size",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "size",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/market-data#query-viploan-fixed-rate-market",
+    "summary": "Query VIP Loan Fixed Rate Market (USER_DATA)"
+  },
+  {
+    "name": "vip_loan_borrow",
+    "method": "POST",
+    "path": "/sapi/v1/loan/vip/borrow",
+    "public": false,
+    "fields": [
+      {
+        "name": "loan_account_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "loanAccountId",
+        "kind": "int"
+      },
+      {
+        "name": "loan_coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "loanCoin",
+        "kind": "str"
+      },
+      {
+        "name": "loan_amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "loanAmount",
+        "kind": "decimal"
+      },
+      {
+        "name": "collateral_account_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "collateralAccountId",
+        "kind": "str"
+      },
+      {
+        "name": "collateral_coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "collateralCoin",
+        "kind": "str"
+      },
+      {
+        "name": "is_flexible_rate",
+        "type": "Union[bool, None]",
+        "required": true,
+        "wire": "isFlexibleRate",
+        "kind": "bool"
+      },
+      {
+        "name": "loan_term",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "loanTerm",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/trade#vip-loan-borrow",
+    "summary": "VIP Loan Borrow (TRADE)"
+  },
+  {
+    "name": "vip_loan_fixed_rate_borrow",
+    "method": "POST",
+    "path": "/sapi/v1/loan/vip/fixed/borrow",
+    "public": false,
+    "fields": [
+      {
+        "name": "supply_request",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "supplyRequest",
+        "kind": "str"
+      },
+      {
+        "name": "borrow_coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "borrowCoin",
+        "kind": "str"
+      },
+      {
+        "name": "loan_term",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "loanTerm",
+        "kind": "int"
+      },
+      {
+        "name": "borrow_uid",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "borrowUid",
+        "kind": "int"
+      },
+      {
+        "name": "collateral_coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "collateralCoin",
+        "kind": "str"
+      },
+      {
+        "name": "collateral_account_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "collateralAccountId",
+        "kind": "str"
+      },
+      {
+        "name": "auto_repay",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "autoRepay",
+        "kind": "bool"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/trade#vip-loan-fixed-rate-borrow",
+    "summary": "VIP Loan Fixed Rate Borrow (TRADE)"
+  },
+  {
+    "name": "vip_loan_renew",
+    "method": "POST",
+    "path": "/sapi/v1/loan/vip/renew",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "orderId",
+        "kind": "int"
+      },
+      {
+        "name": "loan_term",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "loanTerm",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/trade#vip-loan-renew",
+    "summary": "VIP Loan Renew (TRADE)"
+  },
+  {
+    "name": "vip_loan_repay",
+    "method": "POST",
+    "path": "/sapi/v1/loan/vip/repay",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "orderId",
+        "kind": "int"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/trade#vip-loan-repay",
+    "summary": "VIP Loan Repay (TRADE)"
+  },
+  {
+    "name": "check_vip_loan_collateral_account",
+    "method": "GET",
+    "path": "/sapi/v1/loan/vip/collateral/account",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "orderId",
+        "kind": "int"
+      },
+      {
+        "name": "collateral_account_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "collateralAccountId",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/user-information#check-viploan-collateral-account",
+    "summary": "Check VIP Loan Collateral Account (USER_DATA)"
+  },
+  {
+    "name": "get_vip_loan_accrued_interest",
+    "method": "GET",
+    "path": "/sapi/v1/loan/vip/accruedInterest",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "orderId",
+        "kind": "int"
+      },
+      {
+        "name": "loan_coin",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "loanCoin",
+        "kind": "str"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "current",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "current",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/user-information#get-viploan-accrued-interest",
+    "summary": "Get VIP Loan Accrued Interest (USER_DATA)"
+  },
+  {
+    "name": "get_vip_loan_ongoing_orders",
+    "method": "GET",
+    "path": "/sapi/v1/loan/vip/ongoing/orders",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "orderId",
+        "kind": "int"
+      },
+      {
+        "name": "collateral_account_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "collateralAccountId",
+        "kind": "int"
+      },
+      {
+        "name": "loan_coin",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "loanCoin",
+        "kind": "str"
+      },
+      {
+        "name": "collateral_coin",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "collateralCoin",
+        "kind": "str"
+      },
+      {
+        "name": "current",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "current",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/user-information#get-viploan-ongoing-orders",
+    "summary": "Get VIP Loan Ongoing Orders (USER_DATA)"
+  },
+  {
+    "name": "get_vip_loan_repayment_history",
+    "method": "GET",
+    "path": "/sapi/v1/loan/vip/repay/history",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_id",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "orderId",
+        "kind": "int"
+      },
+      {
+        "name": "loan_coin",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "loanCoin",
+        "kind": "str"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "current",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "current",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-vip-loan/api/rest-api/user-information#get-viploan-repayment-history",
+    "summary": "Get VIP Loan Repayment History (USER_DATA)"
+  }
+]

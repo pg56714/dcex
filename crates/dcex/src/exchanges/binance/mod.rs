@@ -6,8 +6,8 @@ mod convert;
 mod earn;
 mod endpoints;
 mod equity;
-mod inventory_completion;
-mod inventory_wrappers;
+
+mod generated;
 mod loan;
 mod margin;
 mod market;
@@ -57,9 +57,6 @@ impl crate::exchanges::ExchangeMethodRequestClient for BinanceClient {
 }
 
 mod order_lists;
-mod risk;
-mod risk_endpoints;
-mod risk_wrappers;
+mod schema_requests;
 
-mod completion;
-mod completion_wrappers;
+mod wrappers;

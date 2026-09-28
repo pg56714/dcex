@@ -37,5 +37,5 @@ fn signature_matches_python_vector() {
     );
 }
 
-#[path = "endpoint_route_tests.rs"]
+#[path = "tests/route_coverage.rs"]
 mod endpoint_routes;

@@ -1,0 +1,280 @@
+[
+  {
+    "method": "POST",
+    "path": "/v5/card/transaction/query-asset-records",
+    "title": "Query Asset Records",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/asset-records",
+    "name": "get_card_transaction_query_asset_records",
+    "public": false,
+    "fields": [
+      {
+        "name": "statusCode",
+        "python_name": "status_code",
+        "type": "string",
+        "required": false,
+        "description": "Transaction status code. `0`: Pending, `1`: Cleared, `2`: Declined"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `100`. Range: [`1`, `500`]"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "integer",
+        "required": false,
+        "description": "Page number. Default: `1`. Min: `1"
+      },
+      {
+        "name": "pan4",
+        "python_name": "pan4",
+        "type": "string",
+        "required": false,
+        "description": "Last 2/4 digits of card number, used to filter transactions of a specific card"
+      },
+      {
+        "name": "createBeginTime",
+        "python_name": "create_begin_time",
+        "type": "integer",
+        "required": false,
+        "description": "Start time of transaction (Unix ms timestamp)"
+      },
+      {
+        "name": "createEndTime",
+        "python_name": "create_end_time",
+        "type": "integer",
+        "required": false,
+        "description": "End time of transaction (Unix ms timestamp)"
+      },
+      {
+        "name": "merchName",
+        "python_name": "merch_name",
+        "type": "string",
+        "required": false,
+        "description": "Merchant name. Supports fuzzy search"
+      },
+      {
+        "name": "type",
+        "python_name": "type_",
+        "type": "string",
+        "required": false,
+        "description": "Query type.`SIDE_QUERY_AUTH`: Authorization`SIDE_QUERY_FINANCIAL`: Clearing. Requires `txnId` and `orderNo`.`SIDE_QUERY_REFUND`: Refund. Requires `txnId` and `orderNo`.The following query types are available to all users:`SIDE_QUERY_AUTH_ALL`: All authorization transactions`SIDE_QUERY_AUTH_REVERSAL`: Authorization reversals`SIDE_QUERY_FINANCIAL_ALL`: All clearing transactions`SIDE_QUERY_FINANCIAL_REFUND`: Clearing refunds"
+      },
+      {
+        "name": "txnId",
+        "python_name": "txn_id",
+        "type": "string",
+        "required": false,
+        "description": "Transaction ID. Exact match"
+      },
+      {
+        "name": "cardToken",
+        "python_name": "card_token",
+        "type": "string",
+        "required": false,
+        "description": "Card token, used to identify a specific card"
+      },
+      {
+        "name": "orderNo",
+        "python_name": "order_no",
+        "type": "string",
+        "required": false,
+        "description": "Order number. Exact match"
+      }
+    ],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/bybit-card/asset-records.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/card/reward/points/balance",
+    "title": "Query Point Balance",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/balance",
+    "name": "get_card_reward_points_balance",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/bybit-card/point/balance.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/card/reward/point/cashback/detail",
+    "title": "Query Cashback Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/cashback-detail",
+    "name": "get_card_reward_point_cashback_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "bizTxnId",
+        "python_name": "biz_txn_id",
+        "type": "string",
+        "required": true,
+        "description": "Order ID"
+      }
+    ],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/bybit-card/point/cashback-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/card/reward/mall/item/list",
+    "title": "Query Mall Item List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/item-list",
+    "name": "get_card_reward_mall_item_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "pageNo",
+        "python_name": "page_no",
+        "type": "integer",
+        "required": false,
+        "description": "Page number. Default: `1`. Min: `1"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `10`. Min: `1"
+      },
+      {
+        "name": "itemType",
+        "python_name": "item_type",
+        "type": "integer",
+        "required": false,
+        "description": "Item type. `1`: Virtual item, `2`: Physical item"
+      },
+      {
+        "name": "itemBizType",
+        "python_name": "item_biz_type",
+        "type": "integer",
+        "required": false,
+        "description": "Item sub-type. `1`: POINTS, `2`: CURRENCY"
+      },
+      {
+        "name": "orderBy",
+        "python_name": "order_by",
+        "type": "integer",
+        "required": false,
+        "description": "Sort type. `1`: Priority, `2`: Listing time, `3`: Price"
+      },
+      {
+        "name": "asc",
+        "python_name": "asc",
+        "type": "boolean",
+        "required": false,
+        "description": "Whether to sort in ascending order"
+      },
+      {
+        "name": "source",
+        "python_name": "source",
+        "type": "integer",
+        "required": false,
+        "description": "Query source. `0`: Default, `1`: VIP item list"
+      }
+    ],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/bybit-card/point/item-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/card/reward/points/records",
+    "title": "Query Point Records",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/records",
+    "name": "get_card_reward_points_records",
+    "public": false,
+    "fields": [
+      {
+        "name": "type",
+        "python_name": "type_",
+        "type": "string",
+        "required": false,
+        "description": "Point type filter"
+      },
+      {
+        "name": "pageSize",
+        "python_name": "page_size",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `10`. Min: `1"
+      },
+      {
+        "name": "pageNo",
+        "python_name": "page_no",
+        "type": "integer",
+        "required": false,
+        "description": "Page number. Default: `1`. Min: `1"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "Start time (Unix timestamp)"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "End time (Unix timestamp)"
+      },
+      {
+        "name": "outOrderId",
+        "python_name": "out_order_id",
+        "type": "string",
+        "required": false,
+        "description": "External order ID"
+      },
+      {
+        "name": "bizId",
+        "python_name": "biz_id",
+        "type": "string",
+        "required": false,
+        "description": "Point order ID"
+      },
+      {
+        "name": "bizTxnId",
+        "python_name": "biz_txn_id",
+        "type": "string",
+        "required": false,
+        "description": "consumeIdLifecycle"
+      },
+      {
+        "name": "side",
+        "python_name": "side",
+        "type": "string",
+        "required": false,
+        "description": "Point direction. `1`: Earn points, `2`: Deduct points"
+      }
+    ],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/bybit-card/point/records.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/card/reward/points/tier",
+    "title": "Query Tier Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bybit-card/point/tier",
+    "name": "get_card_reward_points_tier",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/bybit-card/point/tier.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

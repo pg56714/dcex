@@ -1,0 +1,443 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/event/instruments-info",
+    "title": "Get Instrument Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/market/instrument-info",
+    "name": "get_event_instruments_info",
+    "public": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": false,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "string",
+        "required": false,
+        "description": "PreLaunch`, `Trading`, `Delivering`, `Closed"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Items per page. Default: `50`, range: [`1`, `100`]"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor. Use `nextPageCursor` from the previous response"
+      }
+    ],
+    "example": {
+      "status": "Trading",
+      "limit": "10"
+    },
+    "has_example": true,
+    "source_file": "v5/event/market/instrument-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/event/orderbook",
+    "title": "Get Orderbook",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/market/orderbook",
+    "name": "get_event_orderbook",
+    "public": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT"
+      }
+    ],
+    "example": {
+      "symbol": "ETHUSDT-28AUG26-2450-2570-OUT"
+    },
+    "has_example": true,
+    "source_file": "v5/event/market/orderbook.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/event/cancel",
+    "title": "Cancel Quote",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/cancel-quote",
+    "name": "cancel_event_quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": false,
+        "description": "User-defined order ID (Quote ID)"
+      },
+      {
+        "name": "orderId",
+        "python_name": "order_id",
+        "type": "string",
+        "required": false,
+        "description": "Order ID"
+      }
+    ],
+    "example": {
+      "orderLinkId": "xxxxxx",
+      "orderId": "xxxxxxxxxxefffff"
+    },
+    "has_example": true,
+    "source_file": "v5/event/trade/cancel-quote.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/event/trades",
+    "title": "Get Event Contract Trade History",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/execution",
+    "name": "get_event_trades",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      {
+        "name": "orderId",
+        "python_name": "order_id",
+        "type": "string",
+        "required": false,
+        "description": "Order ID filter"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": false,
+        "description": "User-defined order ID"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "Start time in milliseconds. Default: 7 days ago"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "End time in milliseconds. Default: now"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `50`, Range: [`1`, `100`]"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor"
+      }
+    ],
+    "example": {
+      "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+      "limit": "50"
+    },
+    "has_example": true,
+    "source_file": "v5/event/trade/execution.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/event/order-realtime",
+    "title": "Get Event Contract Active Orders",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/open-order",
+    "name": "get_event_order_realtime",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": false,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      {
+        "name": "orderId",
+        "python_name": "order_id",
+        "type": "string",
+        "required": false,
+        "description": "Order ID. If both `orderId` and `orderLinkId` are passed, `orderId` takes priority"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": false,
+        "description": "User-defined order ID"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `20`, Range: [`1`, `50`]"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor. Use `nextPageCursor` from the response to retrieve the next page"
+      }
+    ],
+    "example": {
+      "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+      "limit": "20"
+    },
+    "has_example": true,
+    "source_file": "v5/event/trade/open-order.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/event/order-list",
+    "title": "Get Event Contract Order History",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/order-list",
+    "name": "get_event_order_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": false,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      {
+        "name": "orderId",
+        "python_name": "order_id",
+        "type": "string",
+        "required": false,
+        "description": "Order ID"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": false,
+        "description": "User-defined order ID"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "Start time in milliseconds. Default: 7 days ago"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "End time in milliseconds. Default: now"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `50`, Range: [`1`, `100`]"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor"
+      }
+    ],
+    "example": {
+      "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+      "limit": "50"
+    },
+    "has_example": true,
+    "source_file": "v5/event/trade/order-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/event/positions",
+    "title": "Get Event Contract Position Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/position",
+    "name": "get_event_positions",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": false,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT`. If not passed, returns all Event Contract positions"
+      },
+      {
+        "name": "baseCoin",
+        "python_name": "base_coin",
+        "type": "string",
+        "required": false,
+        "description": "Base coin filter, e.g. `BTC"
+      },
+      {
+        "name": "settleCoin",
+        "python_name": "settle_coin",
+        "type": "string",
+        "required": false,
+        "description": "Settle coin filter, e.g. `USDT"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `20`, Range: [`1`, `50`]"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor. Use `nextPageCursor` from the response to retrieve the next page"
+      }
+    ],
+    "example": {
+      "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+      "limit": "20"
+    },
+    "has_example": true,
+    "source_file": "v5/event/trade/position.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/event/settlements",
+    "title": "Get Event Contract Settlement Records",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/settlement",
+    "name": "get_event_settlements",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      {
+        "name": "orderId",
+        "python_name": "order_id",
+        "type": "string",
+        "required": false,
+        "description": "Order ID filter"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "Start time in milliseconds. Default: 7 days ago"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "End time in milliseconds. Default: now"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of items per page. Default: `50`, Range: [`1`, `100`]"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor"
+      }
+    ],
+    "example": {
+      "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+      "limit": "50"
+    },
+    "has_example": true,
+    "source_file": "v5/event/trade/settlement.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/event/quotes",
+    "title": "Submit Quote",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/event/trade/submit-quote",
+    "name": "submit_event_quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Symbol name, e.g. `ETHUSDT-28AUG26-2450-2570-OUT"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined order ID"
+      },
+      {
+        "name": "grossPayoutRatio",
+        "python_name": "gross_payout_ratio",
+        "type": "string",
+        "required": true,
+        "description": "Gross payout ratio reported by the institution"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "Amount for this quote (settle coin)"
+      }
+    ],
+    "example": {
+      "orderLinkId": "xxxx",
+      "symbol": "ETHUSDT-28AUG26-2450-2570-OUT",
+      "grossPayoutRatio": "0.5",
+      "amount": "100"
+    },
+    "has_example": true,
+    "source_file": "v5/event/trade/submit-quote.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

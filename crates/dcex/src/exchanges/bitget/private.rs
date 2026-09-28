@@ -22,19 +22,22 @@ impl BitgetClient {
         };
         let params = super::super::operation_guards::validate("bitget", method_name, params)?;
         let params = BitgetParams::from_pairs(params);
-        if let Some(response) = self.inventory_request(method_name, &params, false).await? {
+        if let Some(response) = self.catalog_request(method_name, &params, false).await? {
             return Ok(response);
         }
         if let Some(response) = self
-            .completion_private_request(method_name, &params)
+            .withdrawals_schema_request(method_name, &params)
             .await?
         {
+            return Ok(response);
+        }
+        if let Some(response) = self.subaccount_schema_request(method_name, &params).await? {
             return Ok(response);
         }
         if let Some(response) = self.batch_controls_request(method_name, &params).await? {
             return Ok(response);
         }
-        if let Some(response) = self.risk_request(method_name, &params, false).await? {
+        if let Some(response) = self.table_request(method_name, &params, false).await? {
             return Ok(response);
         }
         if let Some(result) = self

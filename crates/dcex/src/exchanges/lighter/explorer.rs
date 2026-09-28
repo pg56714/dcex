@@ -220,3 +220,97 @@ impl LighterClient {
         client.get_path(&path, query, headers).await.map(Some)
     }
 }
+
+mod explorer_requests {
+    use crate::Result;
+    use crate::exchange::ValidatedResponse;
+    use crate::exchanges::lighter::{
+        LighterClient, client::LighterContentType, market::auth_header_required,
+        params::LighterParams,
+    };
+    use crate::http::HttpMethod;
+    type RequestRoute<'a> = (
+        &'a str,
+        bool,
+        bool,
+        &'a [&'a str],
+        &'a [&'a str],
+        &'a [&'a str],
+        &'a [&'a str],
+    );
+    impl LighterClient {
+        pub(in crate::exchanges::lighter) async fn explorer_schema_request(
+            &self,
+            name: &str,
+            p: &LighterParams,
+            public: bool,
+        ) -> Result<Option<ValidatedResponse>> {
+            let (path, post, is_public, fields, required, integers, bools): RequestRoute<'_> =
+                match name {
+                    "get_transaction" => (
+                        "/api/v1/tx",
+                        false,
+                        true,
+                        &["by", "value"],
+                        &["by", "value"],
+                        &[],
+                        &[],
+                    ),
+                    "get_transaction_by_l1_hash" => (
+                        "/api/v1/txFromL1TxHash",
+                        false,
+                        true,
+                        &["hash"],
+                        &["hash"],
+                        &[],
+                        &[],
+                    ),
+                    _ => return Ok(None),
+                };
+            if public != is_public {
+                return Ok(None);
+            }
+            p.ensure_allowed(fields)?;
+            for key in required {
+                p.required(key)?;
+            }
+            for key in fields {
+                if p.get(key).is_some() {
+                    p.required(key)?;
+                }
+            }
+            for key in integers {
+                p.optional_u64_range(key, 0, u64::MAX)?;
+            }
+            for key in bools {
+                p.optional_one_of(key, &["true", "false"])?;
+            }
+            let headers = if public {
+                std::collections::BTreeMap::new()
+            } else {
+                auth_header_required(self, p)?
+            };
+            let pairs = p.query(
+                &fields
+                    .iter()
+                    .copied()
+                    .filter(|k| *k != "authorization")
+                    .collect::<Vec<_>>(),
+            );
+            let response = if post {
+                self.path_request(
+                    HttpMethod::Post,
+                    path,
+                    Vec::new(),
+                    pairs,
+                    headers,
+                    LighterContentType::Form,
+                )
+                .await
+            } else {
+                self.get_path(path, pairs, headers).await
+            };
+            response.map(Some)
+        }
+    }
+}

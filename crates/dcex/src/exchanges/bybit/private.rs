@@ -11,10 +11,13 @@ impl BybitClient {
     ) -> Result<ValidatedResponse> {
         let params = super::super::operation_guards::validate("bybit", method_name, params)?;
         let params = BybitParams::from_pairs(params);
-        if let Some(result) = self.completion_request(method_name, &params, false).await? {
+        if let Some(result) = self
+            .field_schema_request(method_name, &params, false)
+            .await?
+        {
             return Ok(result);
         }
-        if let Some(result) = self.risk_request(method_name, &params, false).await? {
+        if let Some(result) = self.table_request(method_name, &params, false).await? {
             return Ok(result);
         }
         if let Some(result) = self.strategy_private_request(method_name, &params).await? {

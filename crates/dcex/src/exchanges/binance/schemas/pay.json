@@ -1,0 +1,41 @@
+[
+  {
+    "name": "get_pay_trade_history",
+    "method": "GET",
+    "path": "/sapi/v1/pay/transactions",
+    "public": false,
+    "fields": [
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "limit",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-pay/api/rest-api/~#get-pay-trade-history",
+    "summary": "Get Pay Trade History"
+  }
+]

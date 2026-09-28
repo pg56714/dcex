@@ -522,3 +522,132 @@ impl MexcClient {
         Ok(Some(result?))
     }
 }
+
+mod account_requests {
+    use crate::exchange::ValidatedResponse;
+    use crate::exchanges::mexc::client::{MexcApi, MexcClient};
+    use crate::exchanges::mexc::params::{MexcParams, validate_enum, validate_u64_range};
+    use crate::http::HttpMethod;
+    use crate::{DcexError, Result};
+    impl MexcClient {
+        pub(in crate::exchanges::mexc) async fn account_schema_request(
+            &self,
+            name: &str,
+            p: &MexcParams,
+            public: bool,
+        ) -> Result<Option<ValidatedResponse>> {
+            let (path, api, verb, signed, allowed, required): (
+                &str,
+                MexcApi,
+                HttpMethod,
+                bool,
+                &[&str],
+                &[&str],
+            ) = match name {
+                "get_uid" => (
+                    "/api/v3/uid",
+                    MexcApi::Spot,
+                    HttpMethod::Get,
+                    true,
+                    &[],
+                    &[],
+                ),
+                "get_api_key_info" => (
+                    "/api/v3/apiKeyInfo",
+                    MexcApi::Spot,
+                    HttpMethod::Get,
+                    true,
+                    &["accessKey"],
+                    &["accessKey"],
+                ),
+                "set_api_key_ip_whitelist" => (
+                    "/api/v3/apiKeyInfo",
+                    MexcApi::Spot,
+                    HttpMethod::Post,
+                    true,
+                    &["apiKey", "ipWhiteList", "note"],
+                    &["apiKey", "ipWhiteList"],
+                ),
+                "get_contract_profit_rate" => (
+                    "/api/v1/private/account/profit_rate/{type}",
+                    MexcApi::Contract,
+                    HttpMethod::Get,
+                    true,
+                    &["type"],
+                    &["type"],
+                ),
+                "get_contract_fee_deduction_config" => (
+                    "/api/v1/private/account/feeDeductConfigs",
+                    MexcApi::Contract,
+                    HttpMethod::Get,
+                    true,
+                    &[],
+                    &[],
+                ),
+                "get_contract_fee_discount_config" => (
+                    "/api/v1/private/account/config/contractFeeDiscountConfig",
+                    MexcApi::Contract,
+                    HttpMethod::Get,
+                    true,
+                    &[],
+                    &[],
+                ),
+                "get_contract_discount_usage" => (
+                    "/api/v1/private/account/discountType",
+                    MexcApi::Contract,
+                    HttpMethod::Get,
+                    true,
+                    &[],
+                    &[],
+                ),
+                _ => return Ok(None),
+            };
+            if public == signed {
+                return Ok(None);
+            }
+            p.ensure_allowed(allowed)?;
+            validate_u64_range(p, "recvWindow", 1, 60_000)?;
+            let mut query = p.only(allowed);
+            let unique: std::collections::BTreeSet<_> = query.iter().map(|(k, _)| k).collect();
+            if unique.len() != query.len() {
+                return Err(DcexError::InvalidInput("duplicate MEXC parameter".into()));
+            }
+            for key in required {
+                if p.required(key)?.trim().is_empty() {
+                    return Err(DcexError::InvalidInput(format!("{key} cannot be empty")));
+                }
+            }
+            validate_u64_range(p, "page", 1, u64::MAX)?;
+            validate_u64_range(p, "limit", 1, 1000)?;
+            validate_u64_range(p, "startTime", 0, u64::MAX)?;
+            validate_u64_range(p, "endTime", 0, u64::MAX)?;
+            if let (Some(start), Some(end)) = (p.get("startTime"), p.get("endTime"))
+                && start.parse::<u64>().unwrap() > end.parse::<u64>().unwrap()
+            {
+                return Err(DcexError::InvalidInput("startTime exceeds endTime".into()));
+            }
+            if name == "set_api_key_ip_whitelist" {
+                let values: Vec<_> = p.required("ipWhiteList")?.split(',').collect();
+                if values.len() > 20
+                    || values
+                        .iter()
+                        .any(|v| v.parse::<std::net::IpAddr>().is_err())
+                {
+                    return Err(DcexError::InvalidInput(
+                        "ipWhiteList requires 1..20 IP addresses".into(),
+                    ));
+                }
+            }
+            let path = if name == "get_contract_profit_rate" {
+                validate_enum(p, "type", &["1", "2"])?;
+                query.retain(|(k, _)| k != "type");
+                path.replace("{type}", p.required("type")?)
+            } else {
+                path.to_string()
+            };
+            Ok(Some(
+                self.request(verb, api, path, query, None, signed).await?,
+            ))
+        }
+    }
+}

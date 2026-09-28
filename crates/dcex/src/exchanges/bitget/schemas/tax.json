@@ -1,0 +1,238 @@
+[
+  {
+    "name": "classic_tax_get_spot_account_record",
+    "method": "GET",
+    "path": "/api/v2/tax/spot-record",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-tax-tax-records/classic-tax#spot-transaction-records",
+    "summary": "Spot Transaction Records"
+  },
+  {
+    "name": "classic_tax_get_future_account_record",
+    "method": "GET",
+    "path": "/api/v2/tax/future-record",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "marginCoin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-tax-tax-records/classic-tax#futures-transaction-records",
+    "summary": "Futures Transaction Records"
+  },
+  {
+    "name": "classic_tax_get_margin_account_record",
+    "method": "GET",
+    "path": "/api/v2/tax/margin-record",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "marginType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-tax-tax-records/classic-tax#margin-transaction-history",
+    "summary": "Margin Transaction History"
+  },
+  {
+    "name": "tax_get_tax_records",
+    "method": "GET",
+    "path": "/api/v3/tax/records",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "bizType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "marginType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/tax/tax-records#get-tax-records",
+    "summary": "Get Unified Account Tax Records"
+  }
+]

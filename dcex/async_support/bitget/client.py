@@ -5,11 +5,11 @@ from typing import Any, Self
 
 from ._account_http import AccountHTTP
 from ._earn_http import EarnHTTP
-from ._inventory_http import InventoryHTTP
+from ._generated import GeneratedHTTP
 from ._trade_http import TradeHTTP
 
 
-class Client(InventoryHTTP, AccountHTTP, EarnHTTP, TradeHTTP):
+class Client(GeneratedHTTP, AccountHTTP, EarnHTTP, TradeHTTP):
     """Bitget async client."""
 
     def __init__(

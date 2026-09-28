@@ -1,0 +1,154 @@
+[
+  {
+    "name": "add_assignment_program",
+    "method": "POST",
+    "path": "/derivatives/api/v3/assignmentprogram/add",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "contractType",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "contract",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "maxSize",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "number"
+        }
+      },
+      {
+        "name": "maxPosition",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "number"
+        }
+      },
+      {
+        "name": "acceptLong",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "acceptShort",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "timeFrame",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "WEEKDAYS",
+            "WEEKEND",
+            "ALL"
+          ],
+          "x-exhaustive": true
+        }
+      },
+      {
+        "name": "enabled",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "baseCurrency",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "quoteCurrency",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "cashAccountOpenPositionMaxNotional",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "number"
+        }
+      },
+      {
+        "name": "minimumProfitabilityPerAssignmentLongBps",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "minimumProfitabilityPerAssignmentShortBps",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/assignment-program/add-assignment-preference"
+  },
+  {
+    "name": "delete_assignment_program",
+    "method": "POST",
+    "path": "/derivatives/api/v3/assignmentprogram/delete",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "id",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "number"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/assignment-program/deletes-assignment-preference"
+  },
+  {
+    "name": "get_assignment_program_history",
+    "method": "GET",
+    "path": "/derivatives/api/v3/assignmentprogram/history",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/assignment-program/list-assignment-preferences-history"
+  },
+  {
+    "name": "get_assignment_program_current",
+    "method": "GET",
+    "path": "/derivatives/api/v3/assignmentprogram/current",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/assignment-program/list-assignment-programs"
+  }
+]

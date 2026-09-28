@@ -1,0 +1,80 @@
+[
+  {
+    "method": "POST",
+    "path": "/v5/file/get-file-upload-sign",
+    "title": "Get File Upload Sign",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/file/file-upload-sign",
+    "name": "request_file_get_file_upload_sign",
+    "public": false,
+    "fields": [
+      {
+        "name": "fileType",
+        "python_name": "file_type",
+        "type": "string",
+        "required": true,
+        "description": "File business type: `fiat-pdf`, `fiat-image`, `fiat-video"
+      },
+      {
+        "name": "fileMd5",
+        "python_name": "file_md5",
+        "type": "string",
+        "required": true,
+        "description": "Base64-encoded MD5 of the file content. Formula: `base64(md5(file_content))`, MD5 is **raw binary (16 bytes), not hex**.Golden cases for self-verification:Empty string `\"\"` → `1B2M2Y8AsgTpgAmY7PhCfg==``\"abc\"` (3 bytes) → `kAFQmDzST7DWlj99KOF/cg=="
+      },
+      {
+        "name": "fileLen",
+        "python_name": "file_len",
+        "type": "integer",
+        "required": true,
+        "description": "Current file size in bytes. Upper limit: `fiat-pdf` / `fiat-image` / `fiat-video` all `104857600` (100 MB)"
+      },
+      {
+        "name": "fileName",
+        "python_name": "file_name",
+        "type": "string",
+        "required": true,
+        "description": "Full file name, e.g. `evidence.pdf`, `screenshot.png`, `video.mp4"
+      },
+      {
+        "name": "fileMimeType",
+        "python_name": "file_mime_type",
+        "type": "string",
+        "required": true,
+        "description": "File `Content-Type`.`fiat-pdf`: `application/pdf``fiat-image`: `image/jpeg`, `image/png`, `image/jpg``fiat-video`: `video/mp4`, `video/quicktime`, `video/3gpp`, `video/x-msvideo`, `video/avi`, `video/rm`, `video/rmvb`, `video/wmv"
+      }
+    ],
+    "example": {
+      "fileType": "fiat-image",
+      "fileMd5": "2kKrf8GF2KJkDRtNGMDSXA==",
+      "fileLen": 67,
+      "fileName": "test.png",
+      "fileMimeType": "image/png"
+    },
+    "has_example": true,
+    "source_file": "v5/file/file-upload-sign.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/file/report-file-upload",
+    "title": "Report File Upload",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/file/report-file-upload",
+    "name": "request_file_report_file_upload",
+    "public": false,
+    "fields": [
+      {
+        "name": "resourceId",
+        "python_name": "resource_id",
+        "type": "string",
+        "required": true,
+        "description": "Resource ID returned by Get File Upload Sign"
+      }
+    ],
+    "example": {
+      "resourceId": "f1e8a33e-67cb-4683-803f-bb61238e435c"
+    },
+    "has_example": true,
+    "source_file": "v5/file/report-file-upload.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

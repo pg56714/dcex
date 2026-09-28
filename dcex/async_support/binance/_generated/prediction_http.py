@@ -1,0 +1,1111 @@
+"""Generated binance prediction HTTP methods."""
+
+from json import dumps
+from typing import Any
+
+from .._market_http import MarketHTTP
+from .._trade_http import TradeHTTP
+
+
+class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
+    """Prediction API methods."""
+
+    async def prediction_get_market_detail(self, *, market_topic_id: int) -> Any:  # noqa: ANN401
+        """
+        Get Market Detail.
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#get-market-detail
+        """
+        return await self._native_public(
+            "prediction_get_market_detail",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"marketTopicId": market_topic_id}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_list_prediction_categories(self) -> Any:  # noqa: ANN401
+        """
+        List Prediction Categories.
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#list-prediction-categories
+        """
+        return await self._native_public(
+            "prediction_list_prediction_categories",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_list_prediction_markets(
+        self,
+        *,
+        l1_category: str | None = None,
+        l2_category: str | None = None,
+        sort_by: str | None = None,
+        order_by: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        List Prediction Markets.
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#list-prediction-markets
+        """
+        return await self._native_public(
+            "prediction_list_prediction_markets",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "l1Category": l1_category,
+                    "l2Category": l2_category,
+                    "sortBy": sort_by,
+                    "orderBy": order_by,
+                    "offset": offset,
+                    "limit": limit,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_market_search(self, *, query: str, top_k: int | None = None) -> Any:  # noqa: ANN401
+        """
+        Market Search.
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#market-search
+        """
+        return await self._native_public(
+            "prediction_market_search",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"query": query, "topK": top_k}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_last_trade_price(self, *, market_id: int) -> Any:  # noqa: ANN401
+        """
+        Query Last Trade Price.
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#query-last-trade-price
+        """
+        return await self._native_public(
+            "prediction_query_last_trade_price",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"marketId": market_id}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_order_book(
+        self, *, vendor: str, market_id: int, token_id: str
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Order Book.
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/market-data#query-order-book
+        """
+        return await self._native_public(
+            "prediction_query_order_book",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "vendor": vendor,
+                    "marketId": market_id,
+                    "tokenId": token_id,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_create_otc_blocktrade(
+        self,
+        *,
+        market_id: str,
+        token_id: str,
+        side: str,
+        maker_amount: str,
+        taker_amount: str,
+        price_per_share: str,
+        expiration: int,
+    ) -> Any:  # noqa: ANN401
+        """
+        Create OTC Blocktrade (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#create-otc-blocktrade
+        """
+        return await self._native_private(
+            "prediction_create_otc_blocktrade",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "marketId": market_id,
+                    "tokenId": token_id,
+                    "side": side,
+                    "makerAmount": maker_amount,
+                    "takerAmount": taker_amount,
+                    "pricePerShare": price_per_share,
+                    "expiration": expiration,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_fulfil_otc_blocktrade(self, *, order_id: str, secret_token: str) -> Any:  # noqa: ANN401
+        """
+        Fulfil OTC Blocktrade (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#fulfil-otc-blocktrade
+        """
+        return await self._native_private(
+            "prediction_fulfil_otc_blocktrade",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"orderId": order_id, "secretToken": secret_token}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_otc_blocktrade_detail(self, *, order_id: str) -> Any:  # noqa: ANN401
+        """
+        Get OTC Blocktrade Detail (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#get-otc-blocktrade-detail
+        """
+        return await self._native_private(
+            "prediction_get_otc_blocktrade_detail",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"orderId": order_id}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_otc_blocktrade_events(
+        self,
+        *,
+        first: int | None = None,
+        after: str | None = None,
+        event_types: list[Any] | None = None,
+        market_id: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get OTC Blocktrade Events (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#get-otc-blocktrade-events
+        """
+        return await self._native_private(
+            "prediction_get_otc_blocktrade_events",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "first": first,
+                    "after": after,
+                    "eventTypes": event_types,
+                    "marketId": market_id,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_otc_reserved_balances(self, *, assets: list[Any]) -> Any:  # noqa: ANN401
+        """
+        Get OTC Reserved Balances (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#get-otc-reserved-balances
+        """
+        return await self._native_private(
+            "prediction_get_otc_reserved_balances",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"assets": assets}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_list_otc_blocktrades(
+        self, *, first: int | None = None, after: str | None = None, status: str | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        List OTC Blocktrades (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#list-otc-blocktrades
+        """
+        return await self._native_private(
+            "prediction_list_otc_blocktrades",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"first": first, "after": after, "status": status}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_preview_otc_blocktrade(self, *, secret_token: str) -> Any:  # noqa: ANN401
+        """
+        Preview OTC Blocktrade (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#preview-otc-blocktrade
+        """
+        return await self._native_private(
+            "prediction_preview_otc_blocktrade",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"secretToken": secret_token}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_remove_otc_blocktrades(self, *, order_ids: list[Any]) -> Any:  # noqa: ANN401
+        """
+        Remove OTC Blocktrades (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/otc#remove-otc-blocktrades
+        """
+        return await self._native_private(
+            "prediction_remove_otc_blocktrades",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"orderIds": order_ids}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_position_by_token(
+        self, *, wallet_address: str, token_id: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Get Position by Token (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#get-position-by-token
+        """
+        return await self._native_private(
+            "prediction_get_position_by_token",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "tokenId": token_id,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_pn_l(
+        self,
+        *,
+        wallet_address: str,
+        token_id: str | None = None,
+        market_id: int | None = None,
+        market_topic_id: int | None = None,
+        active_only: bool | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query PnL (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-pn-l
+        """
+        return await self._native_private(
+            "prediction_query_pn_l",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "tokenId": token_id,
+                    "marketId": market_id,
+                    "marketTopicId": market_topic_id,
+                    "activeOnly": active_only,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_positions(
+        self,
+        *,
+        wallet_address: str,
+        tab: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Positions (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-positions
+        """
+        return await self._native_private(
+            "prediction_query_positions",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "tab": tab,
+                    "offset": offset,
+                    "limit": limit,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_positions_by_filter(
+        self,
+        *,
+        wallet_address: str | None = None,
+        market_topic_id: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Positions by Filter (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-positions-by-filter
+        """
+        return await self._native_private(
+            "prediction_query_positions_by_filter",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "marketTopicId": market_topic_id,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_settled_position_history(
+        self,
+        *,
+        wallet_address: str,
+        l1_category: str | None = None,
+        result: int | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Settled Position History (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/position#query-settled-position-history
+        """
+        return await self._native_private(
+            "prediction_query_settled_position_history",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "l1Category": l1_category,
+                    "result": result,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "offset": offset,
+                    "limit": limit,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_batch_redeem(
+        self,
+        *,
+        wallet_address: str,
+        wallet_id: str,
+        token_ids: list[Any],
+        chain_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Batch Redeem (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/redeem#batch-redeem
+        """
+        return await self._native_private(
+            "prediction_batch_redeem",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "walletId": wallet_id,
+                    "tokenIds": token_ids,
+                    "chainId": chain_id,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_redeem_status(
+        self, *, wallet_address: str, tx_hash: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Get Redeem Status (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/redeem#get-redeem-status
+        """
+        return await self._native_private(
+            "prediction_get_redeem_status",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "txHash": tx_hash,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_batch_cancel_orders(
+        self, *, wallet_address: str, wallet_id: str, cancel_info_list: list[Any] | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Batch Cancel Orders (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#batch-cancel-orders
+        """
+        return await self._native_private(
+            "prediction_batch_cancel_orders",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "walletId": wallet_id,
+                    "cancelInfoList": cancel_info_list,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_quote(
+        self,
+        *,
+        wallet_address: str,
+        token_id: str,
+        side: str,
+        amount_in: str,
+        order_type: str,
+        slippage_bps: int,
+        price_limit: str | None = None,
+        chain_id: str | None = None,
+        fee_rate_bps: int | None = None,
+        funding_source: str | None = None,
+        fund_transfer_amount: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get Quote (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#get-quote
+        """
+        return await self._native_private(
+            "prediction_get_quote",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "tokenId": token_id,
+                    "side": side,
+                    "amountIn": amount_in,
+                    "orderType": order_type,
+                    "slippageBps": slippage_bps,
+                    "priceLimit": price_limit,
+                    "chainId": chain_id,
+                    "feeRateBps": fee_rate_bps,
+                    "fundingSource": funding_source,
+                    "fundTransferAmount": fund_transfer_amount,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_place_order(
+        self,
+        *,
+        wallet_address: str,
+        wallet_id: str,
+        quote_id: str,
+        time_in_force: str,
+        account_type: str,
+        order_type: str,
+        slippage_bps: int,
+        price_limit: str | None = None,
+        funding_source: str | None = None,
+        fund_transfer_amount: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Place Order (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#place-order
+        """
+        return await self._native_private(
+            "prediction_place_order",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "walletId": wallet_id,
+                    "quoteId": quote_id,
+                    "timeInForce": time_in_force,
+                    "accountType": account_type,
+                    "orderType": order_type,
+                    "slippageBps": slippage_bps,
+                    "priceLimit": price_limit,
+                    "fundingSource": funding_source,
+                    "fundTransferAmount": fund_transfer_amount,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_active_orders(
+        self,
+        *,
+        wallet_address: str,
+        trade_side: str | None = None,
+        l1_category: str | None = None,
+        market_id: int | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Active Orders (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#query-active-orders
+        """
+        return await self._native_private(
+            "prediction_query_active_orders",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "tradeSide": trade_side,
+                    "l1Category": l1_category,
+                    "marketId": market_id,
+                    "offset": offset,
+                    "limit": limit,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_order_history(
+        self,
+        *,
+        wallet_address: str,
+        l1_category: str | None = None,
+        order_type: str | None = None,
+        status: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Order History (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/trade#query-order-history
+        """
+        return await self._native_private(
+            "prediction_query_order_history",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "l1Category": l1_category,
+                    "orderType": order_type,
+                    "status": status,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "offset": offset,
+                    "limit": limit,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_apply_mm_deposit(
+        self,
+        *,
+        from_token: str,
+        from_token_amount: str,
+        to_token: str,
+        account_type: str,
+        chain_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Apply MM Deposit (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#apply-mm-deposit
+        """
+        return await self._native_private(
+            "prediction_apply_mm_deposit",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "fromToken": from_token,
+                    "fromTokenAmount": from_token_amount,
+                    "toToken": to_token,
+                    "accountType": account_type,
+                    "chainId": chain_id,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_apply_mm_withdraw(
+        self,
+        *,
+        coin: str,
+        network: str,
+        amount: str,
+        withdraw_order_id: str | None = None,
+        wallet_type: str | None = None,
+        name: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Apply MM Withdraw (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#apply-mm-withdraw
+
+        API withdrawals have no second confirmation; they execute on submit.
+        """
+        return await self._native_private(
+            "prediction_apply_mm_withdraw",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "coin": coin,
+                    "network": network,
+                    "amount": amount,
+                    "withdrawOrderId": withdraw_order_id,
+                    "walletType": wallet_type,
+                    "name": name,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_create_inbound_transfer(
+        self,
+        *,
+        wallet_id: str,
+        wallet_address: str,
+        from_token_amount: str,
+        account_type: str,
+        from_token: str | None = None,
+        to_token: str | None = None,
+        chain_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Create Inbound Transfer (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#create-inbound-transfer
+        """
+        return await self._native_private(
+            "prediction_create_inbound_transfer",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletId": wallet_id,
+                    "walletAddress": wallet_address,
+                    "fromTokenAmount": from_token_amount,
+                    "accountType": account_type,
+                    "fromToken": from_token,
+                    "toToken": to_token,
+                    "chainId": chain_id,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_create_outbound_transfer(
+        self,
+        *,
+        wallet_id: str,
+        wallet_address: str,
+        from_token_amount: str,
+        account_type: str,
+        source_biz: str,
+        from_token: str | None = None,
+        to_token: str | None = None,
+        chain_id: str | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Create Outbound Transfer (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#create-outbound-transfer
+        """
+        return await self._native_private(
+            "prediction_create_outbound_transfer",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletId": wallet_id,
+                    "walletAddress": wallet_address,
+                    "fromTokenAmount": from_token_amount,
+                    "accountType": account_type,
+                    "sourceBiz": source_biz,
+                    "fromToken": from_token,
+                    "toToken": to_token,
+                    "chainId": chain_id,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_transfer_list(
+        self,
+        *,
+        wallet_address: str,
+        start_date: str,
+        end_date: str,
+        token_symbol: str | None = None,
+        direction: str | None = None,
+        offset: int | None = None,
+        limit: int | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Transfer List (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#query-transfer-list
+        """
+        return await self._native_private(
+            "prediction_query_transfer_list",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "startDate": start_date,
+                    "endDate": end_date,
+                    "tokenSymbol": token_symbol,
+                    "direction": direction,
+                    "offset": offset,
+                    "limit": limit,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_transfer_status(
+        self, *, transfer_id: str, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Transfer Status (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/transfer#query-transfer-status
+        """
+        return await self._native_private(
+            "prediction_query_transfer_status",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"transferId": transfer_id, "recvWindow": recv_window}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_portfolio(
+        self,
+        *,
+        wallet_address: str,
+        token_id: str | None = None,
+        market_id: int | None = None,
+        market_topic_id: int | None = None,
+        active_only: bool | None = None,
+        recv_window: int | None = None,
+    ) -> Any:  # noqa: ANN401
+        """
+        Get Portfolio (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#get-portfolio
+        """
+        return await self._native_private(
+            "prediction_get_portfolio",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {
+                    "walletAddress": wallet_address,
+                    "tokenId": token_id,
+                    "marketId": market_id,
+                    "marketTopicId": market_topic_id,
+                    "activeOnly": active_only,
+                    "recvWindow": recv_window,
+                }.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_get_quota_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        Get Quota Status (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#get-quota-status
+        """
+        return await self._native_private(
+            "prediction_get_quota_status",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"recvWindow": recv_window}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_list_prediction_wallets(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
+        """
+        List Prediction Wallets (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#list-prediction-wallets
+        """
+        return await self._native_private(
+            "prediction_list_prediction_wallets",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"recvWindow": recv_window}.items()
+                if value is not None
+            ],
+        )
+
+    async def prediction_query_payment_option_balances(
+        self, *, recv_window: int | None = None
+    ) -> Any:  # noqa: ANN401
+        """
+        Query Payment Option Balances (PREDICTION_TRADE).
+
+        Native symbols and caller-provided field values are preserved.
+        Source: https://developers.binance.com/en/docs/catalog/web3-wallet-prediction-trading/api/rest-api/wallet#query-payment-option-balances
+        """
+        return await self._native_private(
+            "prediction_query_payment_option_balances",
+            [
+                (
+                    key,
+                    dumps(value, separators=(",", ":"))
+                    if isinstance(value, (dict, list, bool))
+                    else str(value),
+                )
+                for key, value in {"recvWindow": recv_window}.items()
+                if value is not None
+            ],
+        )

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "get_glp_today_performance",
+    "method": "GET",
+    "path": "/api/v5/users/glp/todayperformance",
+    "public": false,
+    "fields": [],
+    "schema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-today-performance",
+    "row": 1076
+  },
+  {
+    "name": "get_glp_historical_performance",
+    "method": "GET",
+    "path": "/api/v5/users/glp/historicalperformance",
+    "public": false,
+    "fields": [
+      {
+        "name": "program",
+        "python_name": "program",
+        "type": "string",
+        "required": true,
+        "description": "GLP business line identifier. SPOT PERP FUT_NTO"
+      },
+      {
+        "name": "begin",
+        "python_name": "begin",
+        "type": "string",
+        "required": false,
+        "description": "Begin date filter (inclusive). Unix ms String, e.g. \"1751299200000\" . Default: first day of current month (UTC+8)"
+      },
+      {
+        "name": "end",
+        "python_name": "end",
+        "type": "string",
+        "required": false,
+        "description": "End date filter (inclusive). Unix ms String. Default: today (UTC+8)"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Max records per page. Default \"31\" , max \"100\""
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "program": {
+          "type": "string"
+        },
+        "begin": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "program"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-get-glp-historical-performance",
+    "row": 1077
+  }
+]

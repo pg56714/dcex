@@ -1,0 +1,173 @@
+[
+  {
+    "name": "create_a_dual_token_gift_card",
+    "method": "POST",
+    "path": "/sapi/v1/giftcard/buyCode",
+    "public": false,
+    "fields": [
+      {
+        "name": "base_token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "baseToken",
+        "kind": "str"
+      },
+      {
+        "name": "face_token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "faceToken",
+        "kind": "str"
+      },
+      {
+        "name": "base_token_amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "baseTokenAmount",
+        "kind": "decimal"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#create-adual-token-gift-card",
+    "summary": "Create a dual-token gift card (fixed value, discount feature) (TRADE)"
+  },
+  {
+    "name": "create_a_single_token_gift_card",
+    "method": "POST",
+    "path": "/sapi/v1/giftcard/createCode",
+    "public": false,
+    "fields": [
+      {
+        "name": "token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "token",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#create-asingle-token-gift-card",
+    "summary": "Create a single-token gift card (USER_DATA)"
+  },
+  {
+    "name": "fetch_rsa_public_key",
+    "method": "GET",
+    "path": "/sapi/v1/giftcard/cryptography/rsa-public-key",
+    "public": false,
+    "fields": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#fetch-rsa-public-key",
+    "summary": "Fetch RSA Public Key (USER_DATA)"
+  },
+  {
+    "name": "fetch_token_limit",
+    "method": "GET",
+    "path": "/sapi/v1/giftcard/buyCode/token-limit",
+    "public": false,
+    "fields": [
+      {
+        "name": "base_token",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "baseToken",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#fetch-token-limit",
+    "summary": "Fetch Token Limit (USER_DATA)"
+  },
+  {
+    "name": "redeem_a_binance_gift_card",
+    "method": "POST",
+    "path": "/sapi/v1/giftcard/redeemCode",
+    "public": false,
+    "fields": [
+      {
+        "name": "code",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "code",
+        "kind": "str"
+      },
+      {
+        "name": "external_uid",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "externalUid",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#redeem-abinance-gift-card",
+    "summary": "Redeem a Binance Gift Card (USER_DATA)"
+  },
+  {
+    "name": "verify_binance_gift_card_by_gift_card_number",
+    "method": "GET",
+    "path": "/sapi/v1/giftcard/verify",
+    "public": false,
+    "fields": [
+      {
+        "name": "reference_no",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "referenceNo",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-gift-card/api/rest-api/market-data#verify-binance-gift-card-by-gift-card-number",
+    "summary": "Verify Binance Gift Card by Gift Card Number (USER_DATA)"
+  }
+]

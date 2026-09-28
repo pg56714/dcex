@@ -5,12 +5,12 @@ from typing import Any
 
 from ._account_http import AccountHTTP
 from ._asset_http import AssetHTTP
-from ._inventory_http import InventoryHTTP
+from ._generated import GeneratedHTTP
 from ._market_http import MarketHTTP
 
 
 class Client(
-    InventoryHTTP,
+    GeneratedHTTP,
     AccountHTTP,
     AssetHTTP,
     MarketHTTP,

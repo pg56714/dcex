@@ -1,0 +1,170 @@
+[
+  {
+    "name": "create_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/asset/withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "ccy",
+        "python_name": "ccy",
+        "type": "string",
+        "required": true,
+        "description": "Currency, e.g. USDT"
+      },
+      {
+        "name": "amt",
+        "python_name": "amt",
+        "type": "string",
+        "required": true,
+        "description": "Withdrawal amount Withdrawal fee is not included in withdrawal amount. Please reserve sufficient transaction fees when withdrawing. You can get fee amount by Get currencies . For internal transfer , transaction fee is always 0 ."
+      },
+      {
+        "name": "dest",
+        "python_name": "dest",
+        "type": "string",
+        "required": true,
+        "description": "Withdrawal method 3 : internal transfer 4 : on-chain withdrawal"
+      },
+      {
+        "name": "toAddr",
+        "python_name": "to_addr",
+        "type": "string",
+        "required": true,
+        "description": "toAddr should be a trusted address/account. If your dest is 4 , some crypto currency addresses are formatted as 'address:tag' , e.g. 'ARDOR-7JF3-8F2E-QUWZ-CAN7F:123456' If your dest is 3 , toAddr should be a recipient address which can be UID, email, phone or login account name (account name is only for sub-account)."
+      },
+      {
+        "name": "toAddrType",
+        "python_name": "to_addr_type",
+        "type": "string",
+        "required": false,
+        "description": "Address type 1 : wallet address, email, phone, or login account name 2 : UID (applicable only when dest= 3 )"
+      },
+      {
+        "name": "chain",
+        "python_name": "chain",
+        "type": "string",
+        "required": false,
+        "description": "Chain name There are multiple chains under some currencies, such as USDT has USDT-ERC20 , USDT-TRC20 If the parameter is not filled in, the default will be the main chain. When you withdrawal the non-tradable asset, if the parameter is not filled in, the default will be the unique withdrawal chain. Apply to on-chain withdrawal . You can get supported chain name by the endpoint of Get currencies ."
+      },
+      {
+        "name": "areaCode",
+        "python_name": "area_code",
+        "type": "string",
+        "required": false,
+        "description": "Area code for the phone number, e.g. 86 If toAddr is a phone number, this parameter is required. Apply to internal transfer"
+      },
+      {
+        "name": "rcvrInfo",
+        "python_name": "rcvr_info",
+        "type": "object",
+        "required": false,
+        "description": "Recipient information For the specific entity users to do on-chain withdrawal/lightning withdrawal, this information is required."
+      },
+      {
+        "name": "clientId",
+        "python_name": "client_id",
+        "type": "string",
+        "required": false,
+        "description": "Client-supplied ID A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ccy": {
+          "type": "string"
+        },
+        "amt": {
+          "type": "string"
+        },
+        "dest": {
+          "type": "string"
+        },
+        "toAddr": {
+          "type": "string"
+        },
+        "toAddrType": {
+          "type": "string"
+        },
+        "chain": {
+          "type": "string"
+        },
+        "areaCode": {
+          "type": "string"
+        },
+        "rcvrInfo": {
+          "type": "object",
+          "properties": {
+            "walletType": {
+              "type": "string"
+            },
+            "exchId": {
+              "type": "string"
+            },
+            "rcvrFirstName": {
+              "type": "string"
+            },
+            "rcvrLastName": {
+              "type": "string"
+            },
+            "rcvrCountry": {
+              "type": "string"
+            },
+            "rcvrCountrySubDivision": {
+              "type": "string"
+            },
+            "rcvrTownName": {
+              "type": "string"
+            },
+            "rcvrStreetName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "walletType"
+          ]
+        },
+        "clientId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ccy",
+        "amt",
+        "dest",
+        "toAddr"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-withdrawal",
+    "row": 1309
+  },
+  {
+    "name": "cancel_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/asset/cancel-withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "wdId",
+        "python_name": "wd_id",
+        "type": "string",
+        "required": true,
+        "description": "Withdrawal ID"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "wdId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "wdId"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal",
+    "row": 1310
+  }
+]

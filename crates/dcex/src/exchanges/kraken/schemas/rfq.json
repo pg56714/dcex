@@ -1,0 +1,264 @@
+[
+  {
+    "name": "accept_rfq_offer",
+    "method": "POST",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs/accept-offer/{rfqUid}",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "rfqUid",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "bidAccepted",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "decimal"
+        }
+      },
+      {
+        "name": "askAccepted",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "decimal"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/accept-an-offer-on-an-open-rfq"
+  },
+  {
+    "name": "cancel_user_rfq",
+    "method": "DELETE",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs/{rfqUid}",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "rfqUid",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/cancel-an-open-rfq"
+  },
+  {
+    "name": "cancel_rfq_offer",
+    "method": "DELETE",
+    "path": "/derivatives/api/v3/rfqs/cancel-offer/{rfqUid}",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "rfqUid",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "offerUid",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/cancel-open-offer-on-open-rfq"
+  },
+  {
+    "name": "create_user_rfq",
+    "method": "POST",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "json",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "legs"
+          ],
+          "properties": {
+            "legs": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "type": "object",
+                "required": [
+                  "tradeable",
+                  "size"
+                ],
+                "properties": {
+                  "tradeable": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number",
+                    "format": "double"
+                  }
+                }
+              }
+            },
+            "expiry": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/create-a-new-rfq"
+  },
+  {
+    "name": "get_open_rfqs",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/list-all-open-rfqs"
+  },
+  {
+    "name": "get_closed_rfq_offers",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/closed-offers",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/list-offers-placed-by-the-account-on-closed-rfqs"
+  },
+  {
+    "name": "get_open_rfq_offers",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/open-offers",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-offers-on-open-rfqs"
+  },
+  {
+    "name": "get_open_rfqs_for_account",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/open-rfqs",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/list-open-rfqs-for-account"
+  },
+  {
+    "name": "place_rfq_offer",
+    "method": "POST",
+    "path": "/derivatives/api/v3/rfqs/place-offer/{rfqUid}",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "rfqUid",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      {
+        "name": "bid",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "decimal"
+        }
+      },
+      {
+        "name": "ask",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "decimal"
+        }
+      },
+      {
+        "name": "bidSide",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "askSide",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/place-new-offer-on-an-open-rfq"
+  },
+  {
+    "name": "get_rfq",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfqs/{rfqUid}",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "rfqUid",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/rfqs/retrieve-a-single-rfq-open-or-recently-closed"
+  },
+  {
+    "name": "delete_rfq_assignment_max_leverage",
+    "method": "DELETE",
+    "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/trading-settings/clear-the-off-book-max-leverage-cap"
+  },
+  {
+    "name": "get_rfq_assignment_max_leverage",
+    "method": "GET",
+    "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+    "auth": "futures",
+    "fields": [],
+    "official_source": "https://docs.kraken.com/api-reference/trading-settings/get-the-off-book-max-leverage-cap"
+  },
+  {
+    "name": "update_rfq_assignment_max_leverage",
+    "method": "PUT",
+    "path": "/derivatives/api/v3/rfq-assignment/max-leverage",
+    "auth": "futures",
+    "fields": [
+      {
+        "name": "maxLeverage",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "number"
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/trading-settings/set-the-off-book-max-leverage-cap"
+  }
+]

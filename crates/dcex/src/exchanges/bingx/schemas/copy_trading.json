@@ -1,0 +1,332 @@
+[
+  {
+    "name": "post_copy_trading_v1_swap_trace_set_tpsl",
+    "method": "POST",
+    "path": "/openApi/copyTrading/v1/swap/trace/setTPSL",
+    "signed": true,
+    "fields": [
+      {
+        "name": "positionId",
+        "type": "int64",
+        "required": true,
+        "description": "Order number with order",
+        "kind": "int"
+      },
+      {
+        "name": "takeProfitMarkPrice",
+        "type": "float64",
+        "required": true,
+        "description": "Set the price of the stop profit and stop loss mark, and the price of the stop profit and stop loss mark must be one of two options",
+        "kind": "decimal"
+      },
+      {
+        "name": "stopLossMarkPrice",
+        "type": "float64",
+        "required": true,
+        "description": "Set a stop loss marker price, and the stop loss marker price must be either",
+        "kind": "decimal"
+      },
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": true,
+        "description": "Request valid time empty window value, unit: milliseconds, default to 5 seconds if left blank",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Traders%20set%20take%20profit%20and%20stop%20loss%20based%20on%20order%20numbers",
+    "summary": "Traders set take profit and stop loss based on order numbers",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_p_futures_trading_pairs",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/PFutures/tradingPairs",
+    "signed": true,
+    "fields": [
+      {
+        "name": "contractType",
+        "type": "string",
+        "required": true,
+        "description": "Contract type, SFUTURES: Standard contract, PFUTURES: USDT-margined contract",
+        "kind": "str"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Trader%20Gets%20Copy%20Trading%20Pairs",
+    "summary": "Trader Gets Copy Trading Pairs",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_p_futures_profit_history_summarys",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/PFutures/profitHistorySummarys",
+    "signed": true,
+    "fields": [],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Profit%20Overview",
+    "summary": "Profit Overview",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_p_futures_profit_detail",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/PFutures/profitDetail",
+    "signed": true,
+    "fields": [
+      {
+        "name": "startTime",
+        "type": "int64",
+        "required": false,
+        "description": "Start timestamp for profit distribution, in milliseconds. Queries profits within the time range.",
+        "kind": "int"
+      },
+      {
+        "name": "endTime",
+        "type": "int64",
+        "required": false,
+        "description": "End timestamp for profit distribution, in milliseconds. Queries profits within the time range.",
+        "kind": "int"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": true,
+        "description": "Page number, must be greater than 0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": true,
+        "description": "Number of items per page, must be greater than 0, maximum 100",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Profit%20Details",
+    "summary": "Profit Details",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_p_futures_trader_detail",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/PFutures/traderDetail",
+    "signed": true,
+    "fields": [
+      {
+        "name": "daySize",
+        "type": "int64",
+        "required": false,
+        "description": "Profit rate over the last N days, N must be 7, 30, 90, or 180",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Personal%20Trading%20Overview",
+    "summary": "Personal Trading Overview",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_spot_trader_detail",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/spot/traderDetail",
+    "signed": true,
+    "fields": [
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": false,
+        "description": "Request valid time window in milliseconds",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Personal%20Trading%20Overview",
+    "summary": "Personal Trading Overview",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_spot_profit_detail",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/spot/profitDetail",
+    "signed": true,
+    "fields": [
+      {
+        "name": "startTime",
+        "type": "int64",
+        "required": false,
+        "description": "Start timestamp for commission payout in milliseconds, query commissions within the time range",
+        "kind": "int"
+      },
+      {
+        "name": "endTime",
+        "type": "int64",
+        "required": false,
+        "description": "End timestamp for commission payout in milliseconds, query commissions within the time range",
+        "kind": "int"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": true,
+        "description": "Page index, must be greater than 0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": true,
+        "description": "Number of items per page, must be greater than 0, maximum 100",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Profit%20Details",
+    "summary": "Profit Details",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_spot_history_order",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/spot/historyOrder",
+    "signed": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "string",
+        "required": false,
+        "description": "Trading pair",
+        "kind": "str"
+      },
+      {
+        "name": "startTime",
+        "type": "int64",
+        "required": false,
+        "description": "Start timestamp in milliseconds, query orders within the time range",
+        "kind": "int"
+      },
+      {
+        "name": "endTime",
+        "type": "int64",
+        "required": false,
+        "description": "End timestamp in milliseconds, query orders within the time range",
+        "kind": "int"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": true,
+        "description": "Page index, must be greater than 0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": true,
+        "description": "Number of items per page, must be greater than 0, maximum 100",
+        "kind": "int"
+      },
+      {
+        "name": "recvWindow",
+        "type": "long",
+        "required": false,
+        "description": "Request valid window in milliseconds",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Query%20Historical%20Orders",
+    "summary": "Query Historical Orders",
+    "scoped": false
+  },
+  {
+    "name": "post_copy_trading_v1_spot_trader_sell_order",
+    "method": "POST",
+    "path": "/openApi/copyTrading/v1/spot/trader/sellOrder",
+    "signed": true,
+    "fields": [
+      {
+        "name": "orderId",
+        "type": "int64",
+        "required": true,
+        "description": "Trader's spot buy order number",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Trader%20sells%20spot%20assets%20based%20on%20buy%20order%20number",
+    "summary": "Trader sells spot assets based on buy order number",
+    "scoped": false
+  },
+  {
+    "name": "post_copy_trading_v1_p_futures_set_commission",
+    "method": "POST",
+    "path": "/openApi/copyTrading/v1/PFutures/setCommission",
+    "signed": true,
+    "fields": [
+      {
+        "name": "newCommission",
+        "type": "string",
+        "required": true,
+        "description": "The commission rate to set, must be greater than 10% and less than the current level. Silver level: 16%, Gold level: 20%, Diamond level: 32%",
+        "kind": "str"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/USDT-M%20Perpetual%20Contracts/Set%20Commission%20Rate",
+    "summary": "Set Commission Rate",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_spot_profit_history_summarys",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/spot/profitHistorySummarys",
+    "signed": true,
+    "fields": [],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Copy%20Trade/Spot%20Trading/Profit%20Summary",
+    "summary": "Profit Summary",
+    "scoped": false
+  },
+  {
+    "name": "get_copy_trading_v1_swap_trace_current_track",
+    "method": "GET",
+    "path": "/openApi/copyTrading/v1/swap/trace/currentTrack",
+    "signed": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Filter by trading pair, e.g. `BTC-USDT",
+        "kind": "str"
+      },
+      {
+        "name": "offset",
+        "type": "int",
+        "required": false,
+        "description": "Offset, default is 0.",
+        "kind": "int"
+      },
+      {
+        "name": "limit",
+        "type": "int",
+        "required": false,
+        "description": "Number of results",
+        "kind": "int"
+      }
+    ],
+    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L16",
+    "summary": "1. Trader's Current Orders",
+    "scoped": false
+  },
+  {
+    "name": "post_copy_trading_v1_swap_trace_close_track_order",
+    "method": "POST",
+    "path": "/openApi/copyTrading/v1/swap/trace/closeTrackOrder",
+    "signed": true,
+    "fields": [
+      {
+        "name": "positionId",
+        "type": "int64",
+        "required": true,
+        "description": "Order number with order",
+        "kind": "int"
+      }
+    ],
+    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/copytrade-swap/api-reference.md#L91",
+    "summary": "2. Close Position by Order Number",
+    "scoped": false
+  }
+]

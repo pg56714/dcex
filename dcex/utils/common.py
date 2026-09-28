@@ -1,26 +1,3 @@
-"""Common constants and enumerations used across the library."""
+"""Compatibility import for exchange identifiers."""
 
-from enum import Enum
-
-
-class Common(str, Enum):
-    """Common exchange identifiers."""
-
-    ARCUS = "arcus"
-    ASTER = "aster"
-    BACKPACK = "backpack"
-    BYBIT = "bybit"
-    OKX = "okx"
-    EXTENDED = "extended"
-    BINANCE = "binance"
-    HYPERLIQUID = "hyperliquid"
-    BINGX = "bingx"
-    BITGET = "bitget"
-    KUCOIN = "kucoin"
-    KRAKEN = "kraken"
-    LIGHTER = "lighter"
-    MEXC = "mexc"
-    ONDO = "ondo"
-
-    def __str__(self) -> str:
-        return self.value
+from .exchange_ids import Common as Common

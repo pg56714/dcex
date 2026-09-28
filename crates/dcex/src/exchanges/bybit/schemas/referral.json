@@ -1,0 +1,41 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/user/invitation/referrals",
+    "title": "Get Friend Referrals",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/user/friend-referral",
+    "name": "get_user_invitation_referrals",
+    "public": false,
+    "fields": [
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "string",
+        "required": false,
+        "description": "Invitation relationship status, `0`: alive; `1`: invalid. By default, returns all status"
+      },
+      {
+        "name": "size",
+        "python_name": "size",
+        "type": "string",
+        "required": false,
+        "description": "Data size per page [1, 100]. Return 20 records by default"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Cursor. Use the `nextCursor` token from the response to retrieve the next page of the result set"
+      }
+    ],
+    "example": {
+      "status": "0",
+      "size": "5",
+      "cursor": "6867"
+    },
+    "has_example": true,
+    "source_file": "v5/user/friend-referral.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

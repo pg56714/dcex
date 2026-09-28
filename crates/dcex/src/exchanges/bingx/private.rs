@@ -12,13 +12,13 @@ impl BingxClient {
     ) -> Result<ValidatedResponse> {
         let params = super::super::operation_guards::validate("bingx", method_name, params)?;
         let params = BingxParams::from_pairs(params);
-        if let Some(response) = self.inventory_request(method_name, &params, false).await? {
+        if let Some(response) = self.catalog_request(method_name, &params, false).await? {
             return Ok(response);
         }
-        if let Some(response) = self.wallet_completion_request(method_name, &params).await? {
+        if let Some(response) = self.wallet_request(method_name, &params).await? {
             return Ok(response);
         }
-        if let Some(response) = self.additional_request(method_name, &params, false).await? {
+        if let Some(response) = self.table_request(method_name, &params, false).await? {
             return Ok(response);
         }
         if let Some(result) = self.trading_controls_request(method_name, &params).await? {

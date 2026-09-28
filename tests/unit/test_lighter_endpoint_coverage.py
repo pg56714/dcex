@@ -1004,7 +1004,7 @@ def _public_methods(cls: type) -> set[str]:
 from dataclasses import replace
 
 COMPLETION_CASES = json.loads(
-    (Path(__file__).parents[1] / "fixtures/lighter_completion.json").read_text(encoding="utf-8")
+    (Path(__file__).parents[1] / "fixtures/lighter_request_cases.json").read_text(encoding="utf-8")
 )
 WRAPPER_CASES.extend(
     _case(x["kind"], x["name"], (), [tuple(p) for p in x["params"]], x["path"], **x["kwargs"])

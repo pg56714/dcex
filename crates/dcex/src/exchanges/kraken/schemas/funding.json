@@ -1,0 +1,521 @@
+[
+  {
+    "name": "calculate_funding_fees",
+    "method": "GET",
+    "path": "/funding/v1/fees/{method_id}",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "method_id",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+        }
+      },
+      {
+        "name": "amount",
+        "location": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[+-]?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))$"
+        }
+      },
+      {
+        "name": "fee_included",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "withdrawal_fee_token",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      {
+        "name": "rebase_multiplier",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "rebased",
+            "base"
+          ]
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/calculate-funding-fees"
+  },
+  {
+    "name": "create_funding_address",
+    "method": "POST",
+    "path": "/funding/v1/addresses",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "body",
+        "location": "body",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "method_id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                    }
+                  },
+                  "title": "method_id"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "network_id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                    }
+                  },
+                  "title": "network_id"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "network_group_id": {
+                      "type": "string",
+                      "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                    }
+                  },
+                  "title": "network_group_id"
+                }
+              ]
+            },
+            "address_details": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "crypto": {
+                      "type": "object",
+                      "properties": {
+                        "address": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "tag": {
+                          "type": "string"
+                        },
+                        "memo": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "title": "crypto"
+                }
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "scope",
+            "address_details",
+            "name"
+          ]
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/create-funding-address"
+  },
+  {
+    "name": "delete_funding_address",
+    "method": "DELETE",
+    "path": "/funding/v1/addresses/{id}",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "id",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^AB[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{6}$"
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/delete-funding-address"
+  },
+  {
+    "name": "get_funding_addresses",
+    "method": "GET",
+    "path": "/funding/v1/addresses",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "scope",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "method_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "method_id"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "network_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "network_id"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "network_group_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "network_group_id"
+            }
+          ]
+        }
+      },
+      {
+        "name": "cursor",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      {
+        "name": "limit",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "exclusiveMinimum": true,
+          "minimum": 0,
+          "maximum": 500
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-addresses"
+  },
+  {
+    "name": "get_funding_assets",
+    "method": "GET",
+    "path": "/funding/v1/assets/{direction}",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "direction",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "deposit",
+            "withdraw"
+          ]
+        }
+      },
+      {
+        "name": "asset_class",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "currency",
+            "tokenized_asset"
+          ]
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-assets"
+  },
+  {
+    "name": "get_funding_methods",
+    "method": "GET",
+    "path": "/funding/v1/methods/{direction}",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "direction",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "deposit",
+            "withdraw"
+          ]
+        }
+      },
+      {
+        "name": "asset",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string",
+              "enum": [
+                "currency",
+                "tokenized_asset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16
+            }
+          },
+          "required": [
+            "class"
+          ]
+        }
+      },
+      {
+        "name": "rebase_multiplier",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "rebased",
+            "base"
+          ]
+        }
+      },
+      {
+        "name": "limit",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "exclusiveMinimum": true,
+          "minimum": 0,
+          "maximum": 10000
+        }
+      },
+      {
+        "name": "cursor",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-methods"
+  },
+  {
+    "name": "get_funding_networks",
+    "method": "GET",
+    "path": "/funding/v1/networks",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-networks"
+  },
+  {
+    "name": "update_funding_address",
+    "method": "PUT",
+    "path": "/funding/v1/addresses/{id}",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "id",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^AB[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{6}$"
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "body",
+        "location": "body",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/update-funding-address"
+  }
+]

@@ -140,7 +140,7 @@ impl BitgetClient {
             }
             let entry = BitgetParams::from_pairs(pairs);
             if margin && !cancel {
-                super::risk::validate_margin_order_fields(&entry)?;
+                super::schema_requests::validate_margin_order_fields(&entry)?;
             } else if cancel {
                 entry.ensure_allowed(&["symbol", "orderId", "clientOid"], false)?;
                 identifier(&entry)?;

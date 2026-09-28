@@ -1,0 +1,958 @@
+[
+  {
+    "name": "get_ua_v2_affiliate_query_invitees",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryInvitees",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "userType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2",
+            "3"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "Ordinary user"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "Ordinary affiliate"
+            },
+            {
+              "value": "3",
+              "name": "3",
+              "description": "Multi-level affiliate"
+            }
+          ]
+        }
+      },
+      {
+        "name": "referralCode",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "registrationEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "registrationStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500,
+          "format": "int32"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/invited",
+    "summary": "Get Invited",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_my_commission",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryMyCommission",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "siteType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "rebateType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "rebateStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "rebateEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "dataType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/commission",
+    "summary": "Get Commission",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_transaction_by_uid",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryTransactionByUid",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FEATURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot trading"
+            },
+            {
+              "value": "FEATURE",
+              "name": "FEATURE",
+              "description": "futures trading"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/trade-history",
+    "summary": "Get Trade History",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_transaction_by_time",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryTransactionByTime",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FUTURES"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot oder"
+            },
+            {
+              "value": "FUTURES",
+              "name": "FUTURES",
+              "description": "Futures order"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Pre page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ],
+          "default": "NEXT"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/transaction",
+    "summary": "Get Transaction",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_ua_v2_affiliate_query_kumining",
+    "method": "GET",
+    "path": "/api/ua/v2/affiliate/queryKumining",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Last page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ]
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "format": "int32"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/kumining",
+    "summary": "Get Kumining",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_invitees",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryInvitees",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "userType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "1",
+            "2",
+            "3"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "1",
+              "name": "1",
+              "description": "Ordinary user"
+            },
+            {
+              "value": "2",
+              "name": "2",
+              "description": "Ordinary affiliate"
+            },
+            {
+              "value": "3",
+              "name": "3",
+              "description": "Multi-level affiliate"
+            }
+          ]
+        }
+      },
+      {
+        "name": "referralCode",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "registrationStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "registrationEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "maximum": 500,
+          "minimum": 1
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-invited",
+    "summary": "Get Invited",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_my_commission",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryMyCommission",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "siteType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "all"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "all",
+              "name": "all",
+              "description": "all"
+            }
+          ]
+        }
+      },
+      {
+        "name": "rebateType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "x-apidog-enum": [
+            {
+              "value": 0,
+              "name": "0",
+              "description": "All"
+            },
+            {
+              "value": 1,
+              "name": "1",
+              "description": "Direct rebate"
+            },
+            {
+              "value": 2,
+              "name": "2",
+              "description": "Secondary rebate"
+            }
+          ],
+          "default": 0
+        }
+      },
+      {
+        "name": "rebateStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "rebateEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      {
+        "name": "userId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "dataType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "trade",
+            "kumining"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "trade",
+              "name": "trade",
+              "description": "trade commission"
+            },
+            {
+              "value": "kumining",
+              "name": "kumining",
+              "description": "kumining commission"
+            }
+          ],
+          "default": "trade"
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-commission",
+    "summary": "Get Commission",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_transaction_by_uid",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryTransactionByUid",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FEATURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot trading"
+            },
+            {
+              "value": "FEATURE",
+              "name": "FEATURE",
+              "description": "futures trading"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "page",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1,
+          "minimum": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-trade-history",
+    "summary": "Get Trade History",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_transaction_by_time",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryTransactionByTime",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "tradeType",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "SPOT",
+            "FEATURE"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "SPOT",
+              "name": "SPOT",
+              "description": "spot oder"
+            },
+            {
+              "value": "FEATURE",
+              "name": "FEATURE",
+              "description": "Futures order"
+            }
+          ]
+        }
+      },
+      {
+        "name": "tradeStartAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "tradeEndAt",
+        "required": true,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Pre page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ],
+          "default": "NEXT"
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-transaction",
+    "summary": "Get Transaction",
+    "withdrawal": false,
+    "confirm": false
+  },
+  {
+    "name": "get_v2_affiliate_query_kumining",
+    "method": "GET",
+    "path": "/api/v2/affiliate/queryKumining",
+    "market": "spot",
+    "fields": [
+      {
+        "name": "uid",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "startAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "endAt",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      {
+        "name": "lastId",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "direction",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "PRE",
+            "NEXT"
+          ],
+          "x-apidog-enum": [
+            {
+              "value": "PRE",
+              "name": "PRE",
+              "description": "Last page"
+            },
+            {
+              "value": "NEXT",
+              "name": "NEXT",
+              "description": "Next page"
+            }
+          ]
+        }
+      },
+      {
+        "name": "pageSize",
+        "required": false,
+        "location": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 500
+        }
+      }
+    ],
+    "json_body": false,
+    "source": "https://www.kucoin.com/docs-new/rest/affiliate/get-kumining",
+    "summary": "Get Kumining",
+    "withdrawal": false,
+    "confirm": false
+  }
+]

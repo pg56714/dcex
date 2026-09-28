@@ -1,0 +1,65 @@
+//! Business-specific endpoint and field metadata.
+use super::super::*;
+pub(super) fn endpoint(name: &str) -> Option<RiskEndpoint> {
+    Some(match name {
+        "get_asset_withdrawal_history" => RiskEndpoint {
+            path: "/api/v5/asset/withdrawal-history",
+            post: false,
+            public: false,
+            keys: &[
+                "ccy", "wdId", "clientId", "txId", "type", "state", "after", "before", "limit",
+            ],
+            required: &[],
+            bools: &[],
+            schema: Some(
+                "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\",\"description\":\"Currency, e.g. BTC\"},\"wdId\":{\"type\":\"string\",\"description\":\"Withdrawal ID\"},\"clientId\":{\"type\":\"string\",\"description\":\"Client-supplied ID A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters.\"},\"txId\":{\"type\":\"string\",\"description\":\"Hash record of the deposit\"},\"type\":{\"type\":\"string\",\"description\":\"Withdrawal type 3 : Internal transfer 4 : On-chain withdrawal\"},\"state\":{\"type\":\"string\",\"description\":\"Status of withdrawal Stage 1 : Pending withdrawal 19 : insufficient balance in the hot wallet 17 : Pending response from Travel Rule vendor 10 : Waiting transfer 0 : Waiting withdrawal 4 / 5 / 6 / 8 / 9 / 12 : Waiting manual review 7 : Approved > 0 , 17 , 19 can be cancelled, other statuses cannot be cancelled Stage 2 : Withdrawal in progress (Applicable to on-chain withdrawals, internal transfers do not have this stage) 1 : Broadcasting your transaction to chain 15 : Pending transaction validation 16 : Due to local laws and regulations, your withdrawal may take up to 24 hours to arrive -3 : Canceling Final stage -2 : Canceled -1 : Failed 2 : Success\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested ts, Unix timestamp format in milliseconds, e.g. 1654041600000\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested ts, Unix timestamp format in milliseconds, e.g. 1656633600000\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100 ; The default is 100\"}},\"required\":[]}",
+            ),
+        },
+        // https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-deposit-payment-methods
+        "get_account_subaccount_max_withdrawal" => RiskEndpoint {
+            path: "/api/v5/account/subaccount/max-withdrawal",
+            post: false,
+            public: false,
+            keys: &["subAcct", "ccy"],
+            required: &["subAcct"],
+            bools: &[],
+            schema: Some(
+                "{\"type\":\"object\",\"properties\":{\"subAcct\":{\"type\":\"string\",\"description\":\"Sub-account name\"},\"ccy\":{\"type\":\"string\",\"description\":\"Single currency or multiple currencies (no more than 20) separated with comma, e.g. BTC or BTC,ETH .\"}},\"required\":[\"subAcct\"]}",
+            ),
+        },
+        // https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-history-of-managed-sub-account-transfer
+        "create_withdrawal" => RiskEndpoint {
+            path: "/api/v5/asset/withdrawal",
+            post: true,
+            public: false,
+            keys: &[
+                "ccy",
+                "amt",
+                "dest",
+                "toAddr",
+                "toAddrType",
+                "chain",
+                "areaCode",
+                "rcvrInfo",
+                "clientId",
+            ],
+            required: &["ccy", "amt", "dest", "toAddr"],
+            bools: &[],
+            schema: Some(
+                r#"{"type":"object","properties":{"ccy":{"type":"string"},"amt":{"type":"string"},"dest":{"type":"string"},"toAddr":{"type":"string"},"toAddrType":{"type":"string"},"chain":{"type":"string"},"areaCode":{"type":"string"},"rcvrInfo":{"type":"object","properties":{"walletType":{"type":"string"},"exchId":{"type":"string"},"rcvrFirstName":{"type":"string"},"rcvrLastName":{"type":"string"},"rcvrCountry":{"type":"string"},"rcvrCountrySubDivision":{"type":"string"},"rcvrTownName":{"type":"string"},"rcvrStreetName":{"type":"string"}},"required":["walletType"]},"clientId":{"type":"string"}},"required":["ccy","amt","dest","toAddr"]}"#,
+            ),
+        },
+        "cancel_withdrawal" => RiskEndpoint {
+            path: "/api/v5/asset/cancel-withdrawal",
+            post: true,
+            public: false,
+            keys: &["wdId"],
+            required: &["wdId"],
+            bools: &[],
+            schema: Some(
+                r#"{"type":"object","properties":{"wdId":{"type":"string"}},"required":["wdId"]}"#,
+            ),
+        },
+        _ => return None,
+    })
+}

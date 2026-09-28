@@ -1,0 +1,102 @@
+[
+  {
+    "name": "create_fiat_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/fiat/create-withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "paymentAcctId",
+        "python_name": "payment_acct_id",
+        "type": "string",
+        "required": true,
+        "description": "Payment account id to withdraw to, retrieved from get withdrawal payment methods API"
+      },
+      {
+        "name": "ccy",
+        "python_name": "ccy",
+        "type": "string",
+        "required": true,
+        "description": "Currency for withdrawal, must match currency allowed for paymentMethod"
+      },
+      {
+        "name": "amt",
+        "python_name": "amt",
+        "type": "string",
+        "required": true,
+        "description": "Requested withdrawal amount before fees. Has to be less than or equal to 2 decimal points double"
+      },
+      {
+        "name": "paymentMethod",
+        "python_name": "payment_method",
+        "type": "string",
+        "required": true,
+        "description": "Payment method to use for withdrawal TR_BANKS PIX SEPA XPULSE NPP US_WIRE SG_FAST"
+      },
+      {
+        "name": "clientId",
+        "python_name": "client_id",
+        "type": "string",
+        "required": true,
+        "description": "Client-supplied ID, A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters e.g. 194a6975e98246538faeb0fab0d502df"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "paymentAcctId": {
+          "type": "string"
+        },
+        "ccy": {
+          "type": "string"
+        },
+        "amt": {
+          "type": "string"
+        },
+        "paymentMethod": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "paymentAcctId",
+        "ccy",
+        "amt",
+        "paymentMethod",
+        "clientId"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-create-withdrawal-order",
+    "row": 1323
+  },
+  {
+    "name": "cancel_fiat_withdrawal",
+    "method": "POST",
+    "path": "/api/v5/fiat/cancel-withdrawal",
+    "public": false,
+    "fields": [
+      {
+        "name": "ordId",
+        "python_name": "ord_id",
+        "type": "string",
+        "required": true,
+        "description": "Payment Order Id"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ordId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ordId"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal-order",
+    "row": 1324
+  }
+]

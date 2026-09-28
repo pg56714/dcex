@@ -1,0 +1,420 @@
+[
+  {
+    "name": "get_affiliate_performance_summary",
+    "method": "GET",
+    "path": "/api/v5/affiliate/performance/summary",
+    "public": false,
+    "fields": [
+      {
+        "name": "periodType",
+        "python_name": "period_type",
+        "type": "string",
+        "required": false,
+        "description": "Stats window for all summary fields except uTime . last_7d last_30d this_month last_month total today this_week custom : pass begin and end to define a custom window. The default is total ."
+      },
+      {
+        "name": "begin",
+        "python_name": "begin",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window start, Unix timestamp in millisecond format. Required when periodType=custom , together with end . Inclusive."
+      },
+      {
+        "name": "end",
+        "python_name": "end",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window end, Unix timestamp in millisecond format. Required when periodType=custom , together with begin . Inclusive."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "periodType": {
+          "type": "string"
+        },
+        "begin": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-performance-summary",
+    "row": 1405
+  },
+  {
+    "name": "get_affiliate_invitee_detail",
+    "method": "GET",
+    "path": "/api/v5/affiliate/invitee/detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": true,
+        "description": "UID of the invitee. Only applicable to the UID of invitee master account. The data returned covers invitee master account and invitee sub-accounts."
+      },
+      {
+        "name": "periodType",
+        "python_name": "period_type",
+        "type": "string",
+        "required": false,
+        "description": "Stats window for volPeriod . last_7d last_30d this_month last_month total today this_week When omitted, volPeriod is not returned. custom is not supported on this endpoint; custom or any unknown value returns 51000 ."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "periodType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "uid"
+      ]
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-the-invitee-39-s-detail",
+    "row": 1406
+  },
+  {
+    "name": "get_affiliate_invitee_list",
+    "method": "GET",
+    "path": "/api/v5/affiliate/invitee/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "periodType",
+        "python_name": "period_type",
+        "type": "string",
+        "required": false,
+        "description": "Stats window. last_7d last_30d this_month last_month total today this_week custom : pass begin and end to define a custom window."
+      },
+      {
+        "name": "begin",
+        "python_name": "begin",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window start, Unix timestamp in millisecond format. Required when periodType=custom , together with end . Inclusive."
+      },
+      {
+        "name": "end",
+        "python_name": "end",
+        "type": "string",
+        "required": false,
+        "description": "Custom stats-window end, Unix timestamp in millisecond format. Required when periodType=custom , together with begin . Inclusive."
+      },
+      {
+        "name": "keyword",
+        "python_name": "keyword",
+        "type": "string",
+        "required": false,
+        "description": "Search by UID or channel name."
+      },
+      {
+        "name": "commissionCategory",
+        "python_name": "commission_category",
+        "type": "string",
+        "required": false,
+        "description": "Commission calculation category. SPOT DERIVATIVE BSC"
+      },
+      {
+        "name": "orderBy",
+        "python_name": "order_by",
+        "type": "string",
+        "required": false,
+        "description": "Sort field. cTime depAmt vol fee rebate The default is cTime ."
+      },
+      {
+        "name": "orderDir",
+        "python_name": "order_dir",
+        "type": "string",
+        "required": false,
+        "description": "Sort direction. asc desc The default is desc ."
+      },
+      {
+        "name": "kycStatus",
+        "python_name": "kyc_status",
+        "type": "string",
+        "required": false,
+        "description": "KYC status. unverified verified (passed at least KYC2)"
+      },
+      {
+        "name": "subAffiliateUid",
+        "python_name": "sub_affiliate_uid",
+        "type": "string",
+        "required": false,
+        "description": "Filter invitees under a specific sub-affiliate (external UID)."
+      },
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": false,
+        "description": "External user UIDs for exact match — the same UID returned as uid in the response. Single UID or up to 100 UIDs, comma-separated, e.g. 835449167911924693,835449167911924700 . Unknown UIDs are silently skipped; if none resolve, an empty page is returned (never the full list)."
+      },
+      {
+        "name": "joinTimeBegin",
+        "python_name": "join_time_begin",
+        "type": "string",
+        "required": false,
+        "description": "Filter lower bound on joinTime (the relationship-established time), Unix timestamp in millisecond format. Inclusive. Required when joinTimeEnd is supplied; the two must be sent together. Independent of the periodType / begin / end stats window."
+      },
+      {
+        "name": "joinTimeEnd",
+        "python_name": "join_time_end",
+        "type": "string",
+        "required": false,
+        "description": "Filter upper bound on joinTime (the relationship-established time), Unix timestamp in millisecond format. Inclusive. Required when joinTimeBegin is supplied; the two must be sent together. Independent of the periodType / begin / end stats window."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "periodType": {
+          "type": "string"
+        },
+        "begin": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "commissionCategory": {
+          "type": "string"
+        },
+        "orderBy": {
+          "type": "string"
+        },
+        "orderDir": {
+          "type": "string"
+        },
+        "kycStatus": {
+          "type": "string"
+        },
+        "subAffiliateUid": {
+          "type": "string"
+        },
+        "uid": {
+          "type": "string"
+        },
+        "joinTimeBegin": {
+          "type": "string"
+        },
+        "joinTimeEnd": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-invitee-list",
+    "row": 1407
+  },
+  {
+    "name": "get_affiliate_links",
+    "method": "GET",
+    "path": "/api/v5/affiliate/link/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "linkType",
+        "python_name": "link_type",
+        "type": "string",
+        "required": false,
+        "description": "Link kind filter. standard : regular affiliate invite link co_inviter : co-inviter shared link"
+      },
+      {
+        "name": "linkStatus",
+        "python_name": "link_status",
+        "type": "string",
+        "required": false,
+        "description": "Link status. normal abnormal"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "linkType": {
+          "type": "string"
+        },
+        "linkStatus": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-link-list",
+    "row": 1408
+  },
+  {
+    "name": "get_affiliate_co_inviters",
+    "method": "GET",
+    "path": "/api/v5/affiliate/co-inviter/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "linkStatus",
+        "python_name": "link_status",
+        "type": "string",
+        "required": false,
+        "description": "Link status. normal abnormal"
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "linkStatus": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-co-inviter-link-list",
+    "row": 1409
+  },
+  {
+    "name": "get_sub_affiliates",
+    "method": "GET",
+    "path": "/api/v5/affiliate/sub-affiliate/list",
+    "public": false,
+    "fields": [
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "string",
+        "required": false,
+        "description": "1-indexed page number. Non-numeric values fall back to 1 . The default is 1 ."
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "string",
+        "required": false,
+        "description": "Items per page. Clamped to [1, 100] . The default is 100 ."
+      },
+      {
+        "name": "keyword",
+        "python_name": "keyword",
+        "type": "string",
+        "required": false,
+        "description": "Search by sub-affiliate UID."
+      },
+      {
+        "name": "commissionCategory",
+        "python_name": "commission_category",
+        "type": "string",
+        "required": false,
+        "description": "Commission calculation category. SPOT DERIVATIVE BSC"
+      },
+      {
+        "name": "orderBy",
+        "python_name": "order_by",
+        "type": "string",
+        "required": false,
+        "description": "Sort field. cTime depAmt vol fee rebate The default sorts by joinTime (most recently joined first)."
+      },
+      {
+        "name": "orderDir",
+        "python_name": "order_dir",
+        "type": "string",
+        "required": false,
+        "description": "Sort direction. asc desc The default is desc ."
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "string"
+        },
+        "keyword": {
+          "type": "string"
+        },
+        "commissionCategory": {
+          "type": "string"
+        },
+        "orderBy": {
+          "type": "string"
+        },
+        "orderDir": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "official_source": "https://www.okx.com/docs-v5/en/#affiliate-rest-api-get-sub-affiliate-list",
+    "row": 1410
+  }
+]

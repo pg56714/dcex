@@ -12,7 +12,28 @@ impl ExtendedClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = ExtendedParams::from_pairs(params);
-        if let Some(response) = self.risk_request(method_name, &params, true).await? {
+        if let Some(response) = self
+            .portfolio_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .interest_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .vault_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .rewards_schema_request(method_name, &params, true)
+            .await?
+        {
             return Ok(response);
         }
         let response = match method_name {

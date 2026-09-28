@@ -380,7 +380,7 @@ CASES.extend(
 
 
 COMPLETION_CASES = json.loads(
-    (Path(__file__).parents[1] / "fixtures/arcus_completion.json").read_text(encoding="utf-8")
+    (Path(__file__).parents[1] / "fixtures/arcus_request_cases.json").read_text(encoding="utf-8")
 )
 CASES.extend(
     WireCase(
@@ -423,7 +423,7 @@ def _assert_wire(wire: WireCase, requests: list[dict[str, Any]]) -> dict[str, An
     paths = [urlsplit(request["path"]).path for request in requests]
     assert paths[: wire.lookups] == ["/v1/markets"] * wire.lookups, paths
     assert len(requests) == wire.lookups + 1, paths
-    assert all(request["method"] == "GET" for request in requests[:wire.lookups])
+    assert all(request["method"] == "GET" for request in requests[: wire.lookups])
     final = requests[-1]
     assert final["method"] == EXPECTED_VERBS[wire.method]
     target = urlsplit(final["path"])

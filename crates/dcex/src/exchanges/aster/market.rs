@@ -619,7 +619,28 @@ impl AsterClient {
         if let Some(response) = self.prediction_dispatch(method_name, &params, true).await? {
             return Ok(response);
         }
-        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+        if let Some(response) = self
+            .market_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .asset_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .subaccount_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .agents_schema_request(method_name, &params, true)
+            .await?
+        {
             return Ok(response);
         }
         validate_public_params(method_name, &params)?;
@@ -1037,5 +1058,77 @@ mod validation_tests {
             ("limit".to_string(), "25".to_string()),
         ]);
         assert!(validate_public_params("get_spot_orderbook", &params).is_err());
+    }
+}
+
+mod market_requests {
+    use crate::Result;
+    use crate::exchange::ValidatedResponse;
+    use crate::exchanges::aster::{AsterClient, AsterMarket, params::AsterParams};
+    use crate::http::HttpMethod;
+    impl AsterClient {
+        pub(in crate::exchanges::aster) async fn market_schema_request(
+            &self,
+            name: &str,
+            p: &AsterParams,
+            public: bool,
+        ) -> Result<Option<ValidatedResponse>> {
+            let (path, method, is_public, presigned, fields, required): (
+                &str,
+                HttpMethod,
+                bool,
+                bool,
+                &[&str],
+                &[&str],
+            ) = match name {
+                "get_asset_logos" => (
+                    "/fapi/v3/common/asset/all-asset-logo",
+                    HttpMethod::Get,
+                    true,
+                    false,
+                    &[],
+                    &[],
+                ),
+                "get_direct_announcements" => (
+                    "/fapi/v3/announcement/direct",
+                    HttpMethod::Get,
+                    false,
+                    false,
+                    &["page", "size"],
+                    &[],
+                ),
+                "get_direct_announcement" => (
+                    "/fapi/v3/announcement/directById",
+                    HttpMethod::Get,
+                    false,
+                    false,
+                    &["id"],
+                    &["id"],
+                ),
+                _ => return Ok(None),
+            };
+            if public != is_public {
+                return Ok(None);
+            }
+            p.ensure_allowed(fields, &[])?;
+            for key in required {
+                p.required(key)?;
+            }
+            for key in ["page", "size", "id", "nonce", "expired"] {
+                if p.get(key).is_some() {
+                    p.required_u64_range(key, 1, u64::MAX)?;
+                }
+            }
+
+            self.request(
+                method,
+                AsterMarket::Futures,
+                path,
+                p.only(fields),
+                !is_public && !presigned,
+            )
+            .await
+            .map(Some)
+        }
     }
 }

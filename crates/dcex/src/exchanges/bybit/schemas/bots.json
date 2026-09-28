@@ -1,0 +1,1191 @@
+[
+  {
+    "method": "POST",
+    "path": "/v5/dca/close-bot",
+    "title": "Close DCA Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/dca/close",
+    "name": "request_dca_close_bot",
+    "public": false,
+    "fields": [
+      {
+        "name": "bot_id",
+        "python_name": "bot_id",
+        "type": "string",
+        "required": true,
+        "description": "DCA bot ID to close, obtained from Create Spot DCA Bot response"
+      },
+      {
+        "name": "close_mode",
+        "python_name": "close_mode",
+        "type": "string",
+        "required": true,
+        "description": "Asset settlement mode: `2` Base token, `3` Quote token (e.g. USDT)"
+      }
+    ],
+    "example": {
+      "bot_id": "612349292702654770",
+      "close_mode": 2
+    },
+    "has_example": true,
+    "source_file": "v5/bot/dca/close.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/dca/create-bot",
+    "title": "Create DCA Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/dca/create",
+    "name": "request_dca_create_bot",
+    "public": false,
+    "fields": [
+      {
+        "name": "parameters",
+        "python_name": "parameters",
+        "type": "object",
+        "required": true,
+        "description": "DCA bot configuration object (see below)"
+      }
+    ],
+    "example": {
+      "parameters": {
+        "frequency_in_second": "600",
+        "quote_coin": "USDT",
+        "max_invest_amount": "2000",
+        "pairs": [
+          {
+            "base": "BTC",
+            "amount": "66"
+          },
+          {
+            "base": "ETH",
+            "amount": "88"
+          }
+        ]
+      }
+    },
+    "has_example": true,
+    "source_file": "v5/bot/dca/create.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fcombobot/close",
+    "title": "Close Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/close",
+    "name": "close_fcombobot",
+    "public": false,
+    "fields": [
+      {
+        "name": "bot_id",
+        "python_name": "bot_id",
+        "type": "string",
+        "required": true,
+        "description": "Bot ID to close, obtained from Create Futures Combo Bot response"
+      }
+    ],
+    "example": {
+      "bot_id": "612324421335537259"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-combo/close.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fcombobot/create",
+    "title": "Create Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/create",
+    "name": "create_fcombobot",
+    "public": false,
+    "fields": [
+      {
+        "name": "leverage",
+        "python_name": "leverage",
+        "type": "string",
+        "required": true,
+        "description": "Position leverage multiplier (e.g. `\"5\"` means 5x). Must be >= 1"
+      },
+      {
+        "name": "init_margin",
+        "python_name": "init_margin",
+        "type": "string",
+        "required": true,
+        "description": "Initial investment in quote currency (decimal string, e.g. `\"1000\"` for 1000 USDT)"
+      },
+      {
+        "name": "adjust_position_mode",
+        "python_name": "adjust_position_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Rebalancing trigger mode: `1` Time, `2` Percentage, `3` Time or Percentage, `4` Manual, `5` On settings change, `6` On transfer"
+      },
+      {
+        "name": "symbol_settings",
+        "python_name": "symbol_settings",
+        "type": "array<object>",
+        "required": true,
+        "description": "Per-symbol portfolio configuration. At least one entry required. All `target_position_percent` must sum to 1"
+      },
+      {
+        "name": "adjust_position_percent",
+        "python_name": "adjust_position_percent",
+        "type": "string",
+        "required": false,
+        "description": "Rebalancing drift threshold as percentage, range: [0.01, 0.5] (e.g. `\"0.05\"` means rebalance when allocation drifts 5%). **Required** when mode includes percentage"
+      },
+      {
+        "name": "adjust_position_time_interval",
+        "python_name": "adjust_position_time_interval",
+        "type": "integer",
+        "required": false,
+        "description": "Rebalancing time interval **in seconds**. **Required** when mode includes time. `30M`, `1H`, `4H`, `8H`, `12H`, `1D`, `3D`, `7D`, `14D`, `28D` convert to seconds"
+      },
+      {
+        "name": "sl_percent",
+        "python_name": "sl_percent",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss as percentage of total margin (e.g. `\"0.2\"` means close when loss reaches 20%)"
+      },
+      {
+        "name": "tp_percent",
+        "python_name": "tp_percent",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit as percentage of total margin (e.g. `\"0.5\"` means close when profit reaches 50%)"
+      },
+      {
+        "name": "trailing_stop_percent",
+        "python_name": "trailing_stop_percent",
+        "type": "string",
+        "required": false,
+        "description": "Trailing stop callback as percentage (e.g. `\"0.05\"` means 5%)"
+      }
+    ],
+    "example": {
+      "leverage": "5",
+      "init_margin": "500",
+      "adjust_position_mode": 3,
+      "adjust_position_percent": "0.05",
+      "adjust_position_time_interval": 3600,
+      "symbol_settings": [
+        {
+          "symbol": "BTCUSDT",
+          "target_position_percent": "0.5",
+          "side": 1
+        },
+        {
+          "symbol": "ETHUSDT",
+          "target_position_percent": "0.5",
+          "side": 2
+        }
+      ],
+      "sl_percent": "0.2",
+      "tp_percent": "0.5"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-combo/create.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fcombobot/detail",
+    "title": "Get Bot Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/get-detail",
+    "name": "get_fcombobot_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "bot_id",
+        "python_name": "bot_id",
+        "type": "string",
+        "required": true,
+        "description": "Bot ID to query"
+      }
+    ],
+    "example": {
+      "bot_id": "612324421335537259"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-combo/get-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fcombobot/getlimit",
+    "title": "Get Bot Parameter Limit",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-combo/get-limit",
+    "name": "get_fcombobot_getlimit",
+    "public": false,
+    "fields": [
+      {
+        "name": "leverage",
+        "python_name": "leverage",
+        "type": "string",
+        "required": true,
+        "description": "Position leverage multiplier (e.g. `\"5\"` means 5x). Must be >= 1"
+      },
+      {
+        "name": "init_margin",
+        "python_name": "init_margin",
+        "type": "string",
+        "required": true,
+        "description": "Initial investment in quote currency (decimal string)"
+      },
+      {
+        "name": "adjust_position_mode",
+        "python_name": "adjust_position_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Rebalancing trigger mode: `1` Time, `2` Percentage, `3` Time or %, `4` Manual, `5` On settings change, `6` On transfer"
+      },
+      {
+        "name": "symbol_settings",
+        "python_name": "symbol_settings",
+        "type": "array<object>",
+        "required": true,
+        "description": "Per-symbol portfolio configuration"
+      },
+      {
+        "name": "adjust_position_percent",
+        "python_name": "adjust_position_percent",
+        "type": "string",
+        "required": false,
+        "description": "Rebalancing drift threshold as percentage"
+      },
+      {
+        "name": "adjust_position_time_interval",
+        "python_name": "adjust_position_time_interval",
+        "type": "integer",
+        "required": false,
+        "description": "Rebalancing time interval in seconds"
+      },
+      {
+        "name": "sl_percent",
+        "python_name": "sl_percent",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss as percentage (e.g. `\"0.2\"` means 20%)"
+      },
+      {
+        "name": "tp_percent",
+        "python_name": "tp_percent",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit as percentage (e.g. `\"0.5\"` means 50%)"
+      },
+      {
+        "name": "trailing_stop_percent",
+        "python_name": "trailing_stop_percent",
+        "type": "string",
+        "required": false,
+        "description": "Trailing stop callback as percentage (e.g. `\"0.05\"` means 5%)"
+      },
+      {
+        "name": "need_to_slippage",
+        "python_name": "need_to_slippage",
+        "type": "boolean",
+        "required": false,
+        "description": "Whether to include slippage calculation"
+      }
+    ],
+    "example": {
+      "leverage": "5",
+      "init_margin": "500",
+      "adjust_position_mode": 3,
+      "adjust_position_percent": "0.05",
+      "adjust_position_time_interval": 3600,
+      "symbol_settings": [
+        {
+          "symbol": "BTCUSDT",
+          "target_position_percent": "0.5",
+          "side": 1
+        },
+        {
+          "symbol": "ETHUSDT",
+          "target_position_percent": "0.5",
+          "side": 2
+        }
+      ],
+      "sl_percent": "0.2",
+      "tp_percent": "0.5",
+      "need_to_slippage": false
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-combo/get-limit.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fgridbot/close",
+    "title": "Close Grid Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/close",
+    "name": "close_fgridbot",
+    "public": false,
+    "fields": [
+      {
+        "name": "bot_id",
+        "python_name": "bot_id",
+        "type": "string",
+        "required": true,
+        "description": "Bot ID to close, obtained from Create Futures Grid Bot response"
+      }
+    ],
+    "example": {
+      "bot_id": "612330315406398322"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-grid/close.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fgridbot/create",
+    "title": "Create Grid Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/create",
+    "name": "create_fgridbot",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Trading pair symbol, uppercase only (e.g. `BTCUSDT`)"
+      },
+      {
+        "name": "grid_mode",
+        "python_name": "grid_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Strategy direction: `1` Neutral, `2` Long, `3` Short"
+      },
+      {
+        "name": "min_price",
+        "python_name": "min_price",
+        "type": "string",
+        "required": true,
+        "description": "Lower price bound of the grid range (decimal string)"
+      },
+      {
+        "name": "max_price",
+        "python_name": "max_price",
+        "type": "string",
+        "required": true,
+        "description": "Upper price bound of the grid range (decimal string)"
+      },
+      {
+        "name": "cell_number",
+        "python_name": "cell_number",
+        "type": "integer",
+        "required": true,
+        "description": "Number of grid levels, minimum 2"
+      },
+      {
+        "name": "leverage",
+        "python_name": "leverage",
+        "type": "string",
+        "required": true,
+        "description": "Position leverage multiplier (e.g. `\"5\"` means 5x). Must be >= 1"
+      },
+      {
+        "name": "grid_type",
+        "python_name": "grid_type",
+        "type": "integer",
+        "required": true,
+        "description": "Grid spacing type: `1` Arithmetic, `2` Geometric"
+      },
+      {
+        "name": "total_investment",
+        "python_name": "total_investment",
+        "type": "string",
+        "required": true,
+        "description": "Initial investment in quote currency (decimal string, e.g. `\"1000\"` for 1000 USDT)"
+      },
+      {
+        "name": "take_profit_per",
+        "python_name": "take_profit_per",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit as percentage (e.g. `\"0.2\"` means 20%). Used when `tp_sl_type` includes percentage-based TP"
+      },
+      {
+        "name": "stop_loss_per",
+        "python_name": "stop_loss_per",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss as percentage (e.g. `\"0.1\"` means 10%). Used when `tp_sl_type` includes percentage-based SL"
+      },
+      {
+        "name": "take_profit_price",
+        "python_name": "take_profit_price",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit trigger price (decimal string). Used when `tp_sl_type` includes price-based TP"
+      },
+      {
+        "name": "stop_loss_price",
+        "python_name": "stop_loss_price",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss trigger price (decimal string). Used when `tp_sl_type` includes price-based SL"
+      },
+      {
+        "name": "tp_sl_type",
+        "python_name": "tp_sl_type",
+        "type": "integer",
+        "required": false,
+        "description": "TP/SL trigger mode: `1` Both by %, `2` Both by price, `3` TP price+SL %, `4` TP %+SL price"
+      },
+      {
+        "name": "entry_price",
+        "python_name": "entry_price",
+        "type": "string",
+        "required": false,
+        "description": "Optional entry trigger price for delayed activation (decimal string)"
+      },
+      {
+        "name": "trailing_stop_per",
+        "python_name": "trailing_stop_per",
+        "type": "string",
+        "required": false,
+        "description": "Trailing stop exit as percentage (e.g. `\"0.05\"` means 5%)"
+      },
+      {
+        "name": "move_up_price",
+        "python_name": "move_up_price",
+        "type": "string",
+        "required": false,
+        "description": "Move-up price for grid shifting, not applicable when \"grid_type\"=`2"
+      },
+      {
+        "name": "move_down_price",
+        "python_name": "move_down_price",
+        "type": "string",
+        "required": false,
+        "description": "Move-down price for grid shifting, not applicable when \"grid_type\"=`2"
+      }
+    ],
+    "example": {
+      "symbol": "BTCUSDT",
+      "grid_mode": 2,
+      "min_price": "230000",
+      "max_price": "800000",
+      "cell_number": 88,
+      "leverage": "6",
+      "grid_type": 2,
+      "total_investment": "950",
+      "entry_price": "370000",
+      "trailing_stop_per": "0.18",
+      "tp_sl_type": 4,
+      "stop_loss_price": "200000",
+      "take_profit_per": "0.28"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-grid/create.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fgridbot/detail",
+    "title": "Get Grid Bot Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/get-detail",
+    "name": "get_fgridbot_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "bot_id",
+        "python_name": "bot_id",
+        "type": "string",
+        "required": true,
+        "description": "Bot ID to query"
+      }
+    ],
+    "example": {
+      "bot_id": "612330315406398322"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-grid/get-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fgridbot/validate",
+    "title": "Validate Grid Input",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-grid/validate-input",
+    "name": "request_fgridbot_validate",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Trading pair symbol, uppercase only (e.g. `BTCUSDT`)"
+      },
+      {
+        "name": "cell_number",
+        "python_name": "cell_number",
+        "type": "integer",
+        "required": true,
+        "description": "Number of grid levels, minimum 2"
+      },
+      {
+        "name": "min_price",
+        "python_name": "min_price",
+        "type": "string",
+        "required": true,
+        "description": "Lower price bound of the grid range (decimal string)"
+      },
+      {
+        "name": "max_price",
+        "python_name": "max_price",
+        "type": "string",
+        "required": true,
+        "description": "Upper price bound of the grid range (decimal string)"
+      },
+      {
+        "name": "leverage",
+        "python_name": "leverage",
+        "type": "string",
+        "required": true,
+        "description": "Position leverage, must be >= 1 (e.g. `\"5\"`)"
+      },
+      {
+        "name": "grid_type",
+        "python_name": "grid_type",
+        "type": "integer",
+        "required": true,
+        "description": "Grid spacing type: `1` Arithmetic, `2` Geometric"
+      },
+      {
+        "name": "grid_mode",
+        "python_name": "grid_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Strategy direction: `1` Neutral, `2` Long, `3` Short"
+      },
+      {
+        "name": "stop_loss_price",
+        "python_name": "stop_loss_price",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss trigger price (decimal string). Used when `tp_sl_type` includes price-based SL"
+      },
+      {
+        "name": "take_profit_price",
+        "python_name": "take_profit_price",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit trigger price (decimal string). Used when `tp_sl_type` includes price-based TP"
+      },
+      {
+        "name": "tp_sl_type",
+        "python_name": "tp_sl_type",
+        "type": "integer",
+        "required": false,
+        "description": "TP/SL trigger mode: `1` Both %, `2` Both price, `3` TP price+SL %, `4` TP %+SL price"
+      },
+      {
+        "name": "entry_price",
+        "python_name": "entry_price",
+        "type": "string",
+        "required": false,
+        "description": "Entry trigger price for delayed activation (decimal string)"
+      },
+      {
+        "name": "stop_loss_per",
+        "python_name": "stop_loss_per",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss as percentage (e.g. `\"10\"` means 10%). Used when `tp_sl_type` includes percentage-based SL"
+      },
+      {
+        "name": "take_profit_per",
+        "python_name": "take_profit_per",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit as percentage (e.g. `\"20\"` means 20%). Used when `tp_sl_type` includes percentage-based TP"
+      },
+      {
+        "name": "trailing_stop_per",
+        "python_name": "trailing_stop_per",
+        "type": "string",
+        "required": false,
+        "description": "Trailing stop callback as percentage (e.g. `\"5\"` means 5%)"
+      },
+      {
+        "name": "init_margin",
+        "python_name": "init_margin",
+        "type": "string",
+        "required": false,
+        "description": "Initial margin amount in quote currency (decimal string)"
+      },
+      {
+        "name": "move_up_price",
+        "python_name": "move_up_price",
+        "type": "string",
+        "required": false,
+        "description": "Move-up price for grid shifting"
+      },
+      {
+        "name": "move_down_price",
+        "python_name": "move_down_price",
+        "type": "string",
+        "required": false,
+        "description": "Move-down price for grid shifting"
+      }
+    ],
+    "example": {
+      "symbol": "BTCUSDT",
+      "grid_mode": 2,
+      "min_price": "230000",
+      "max_price": "800000",
+      "cell_number": 88,
+      "leverage": "6",
+      "grid_type": 2
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-grid/validate-input.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fmartingalebot/close",
+    "title": "Close Martingale Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/close",
+    "name": "close_fmartingalebot",
+    "public": false,
+    "fields": [
+      {
+        "name": "bot_id",
+        "python_name": "bot_id",
+        "type": "string",
+        "required": true,
+        "description": "Bot ID to close, obtained from Create Futures Martingale Bot response"
+      }
+    ],
+    "example": {
+      "bot_id": "612335280740902531"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-martingale/close.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fmartingalebot/create",
+    "title": "Create Martingale Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/create",
+    "name": "create_fmartingalebot",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Trading pair symbol, uppercase only (e.g. `BTCUSDT`)"
+      },
+      {
+        "name": "martingale_mode",
+        "python_name": "martingale_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Strategy direction: `1` Long (buy dips), `2` Short (sell rallies)"
+      },
+      {
+        "name": "leverage",
+        "python_name": "leverage",
+        "type": "string",
+        "required": true,
+        "description": "Position leverage multiplier (e.g. `\"5\"` means 5x). Must be >= 1"
+      },
+      {
+        "name": "price_float_percent",
+        "python_name": "price_float_percent",
+        "type": "string",
+        "required": true,
+        "description": "Price movement percentage to trigger a position add (e.g. `\"0.015\"` means add when price moves 1.5% against the position)"
+      },
+      {
+        "name": "add_position_percent",
+        "python_name": "add_position_percent",
+        "type": "string",
+        "required": true,
+        "description": "Position add scaling as percentage of base position size (e.g. `\"1.1\"` = 1.1x base; `\"2\"` = 2x base)"
+      },
+      {
+        "name": "add_position_num",
+        "python_name": "add_position_num",
+        "type": "integer",
+        "required": true,
+        "description": "Maximum number of position adds per round"
+      },
+      {
+        "name": "init_margin",
+        "python_name": "init_margin",
+        "type": "string",
+        "required": true,
+        "description": "Initial investment in quote currency (decimal string, e.g. `\"1000\"` for 1000 USDT)"
+      },
+      {
+        "name": "round_tp_percent",
+        "python_name": "round_tp_percent",
+        "type": "string",
+        "required": true,
+        "description": "Single round take-profit as percentage (e.g. `\"0.03\"` means close when profit reaches 3%)"
+      },
+      {
+        "name": "auto_cycle_toggle",
+        "python_name": "auto_cycle_toggle",
+        "type": "integer",
+        "required": false,
+        "description": "Auto-cycle mode: `1` Enable (restart after TP), `2` Disable (stop after single TP)"
+      },
+      {
+        "name": "sl_percent",
+        "python_name": "sl_percent",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss as percentage of total margin (e.g. `\"0.2\"` means close when loss reaches 20%). Leave empty if not set"
+      },
+      {
+        "name": "entry_price",
+        "python_name": "entry_price",
+        "type": "string",
+        "required": false,
+        "description": "Entry trigger price as absolute price (decimal string). Leave empty if not set"
+      }
+    ],
+    "example": {
+      "symbol": "MNTUSDT",
+      "martingale_mode": 1,
+      "leverage": "5",
+      "price_float_percent": "0.16",
+      "add_position_percent": "1.8",
+      "add_position_num": 5,
+      "round_tp_percent": "0.1",
+      "init_margin": "650",
+      "sl_percent": "0.5",
+      "entry_price": "0.56",
+      "auto_cycle_toggle": 2
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-martingale/create.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fmartingalebot/detail",
+    "title": "Get Martingale Bot Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/get-detail",
+    "name": "get_fmartingalebot_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "bot_id",
+        "python_name": "bot_id",
+        "type": "string",
+        "required": true,
+        "description": "Bot ID to query"
+      }
+    ],
+    "example": {
+      "bot_id": "612335724699611830"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-martingale/get-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/fmartingalebot/getlimit",
+    "title": "Get Bot Parameter Limit",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/futures-martingale/get-limit",
+    "name": "get_fmartingalebot_getlimit",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Trading pair symbol, uppercase only (e.g. `BTCUSDT`)"
+      },
+      {
+        "name": "martingale_mode",
+        "python_name": "martingale_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Strategy direction: `1` Long, `2` Short"
+      },
+      {
+        "name": "leverage",
+        "python_name": "leverage",
+        "type": "string",
+        "required": true,
+        "description": "Position leverage multiplier (e.g. `\"5\"` means 5x). Must be >= 1"
+      },
+      {
+        "name": "price_float_percent",
+        "python_name": "price_float_percent",
+        "type": "string",
+        "required": false,
+        "description": "Price movement trigger as percentage (e.g. `\"0.015\"` means 1.5%)"
+      },
+      {
+        "name": "add_position_percent",
+        "python_name": "add_position_percent",
+        "type": "string",
+        "required": false,
+        "description": "Position add scaling as percentage of base position (e.g. `\"1\"` = 1x)"
+      },
+      {
+        "name": "add_position_num",
+        "python_name": "add_position_num",
+        "type": "integer",
+        "required": false,
+        "description": "Maximum number of position adds per round"
+      },
+      {
+        "name": "init_margin",
+        "python_name": "init_margin",
+        "type": "string",
+        "required": false,
+        "description": "Initial investment in quote currency (decimal string)"
+      },
+      {
+        "name": "round_tp_percent",
+        "python_name": "round_tp_percent",
+        "type": "string",
+        "required": false,
+        "description": "Single round take-profit as percentage (e.g. `\"0.03\"` means 3%)"
+      },
+      {
+        "name": "sl_percent",
+        "python_name": "sl_percent",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss as percentage (e.g. `\"0.2\"` means 20%)"
+      },
+      {
+        "name": "entry_price",
+        "python_name": "entry_price",
+        "type": "string",
+        "required": false,
+        "description": "Entry trigger price (decimal string)"
+      },
+      {
+        "name": "need_to_slippage",
+        "python_name": "need_to_slippage",
+        "type": "boolean",
+        "required": false,
+        "description": "Whether to include slippage calculation"
+      },
+      {
+        "name": "auto_cycle_toggle",
+        "python_name": "auto_cycle_toggle",
+        "type": "integer",
+        "required": false,
+        "description": "Repeat cycles switch; official HTTP example uses integer 1."
+      }
+    ],
+    "example": {
+      "symbol": "MNTUSDT",
+      "martingale_mode": 1,
+      "leverage": "5",
+      "price_float_percent": "0.16",
+      "add_position_percent": "1.8",
+      "add_position_num": 5,
+      "round_tp_percent": "0.1",
+      "init_margin": "1000",
+      "sl_percent": "0.5",
+      "auto_cycle_toggle": 2
+    },
+    "has_example": true,
+    "source_file": "v5/bot/futures-martingale/get-limit.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/grid/close-grid",
+    "title": "Close Grid Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/close",
+    "name": "request_grid_close_grid",
+    "public": false,
+    "fields": [
+      {
+        "name": "grid_id",
+        "python_name": "grid_id",
+        "type": "string",
+        "required": true,
+        "description": "Grid bot ID to close, obtained from Create Spot Grid Bot response"
+      },
+      {
+        "name": "close_mode",
+        "python_name": "close_mode",
+        "type": "string",
+        "required": true,
+        "description": "Asset settlement mode: `2` Base token, `3` Quote token (e.g. USDT), `4` Base + Quote token"
+      }
+    ],
+    "example": {
+      "bot_id": "612340768081708828"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/spot-grid/close.mdx",
+    "verification_note": "Official spec incomplete; not verified live. Uses documented grid_id/close_mode; the published example instead uses bot_id.",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/grid/create-grid",
+    "title": "Create Grid Bot",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/create",
+    "name": "request_grid_create_grid",
+    "public": false,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Trading pair symbol, uppercase only (e.g. `BTCUSDT`)"
+      },
+      {
+        "name": "max_price",
+        "python_name": "max_price",
+        "type": "string",
+        "required": true,
+        "description": "Upper bound of the grid price range (decimal string)"
+      },
+      {
+        "name": "min_price",
+        "python_name": "min_price",
+        "type": "string",
+        "required": true,
+        "description": "Lower bound of the grid price range (decimal string)"
+      },
+      {
+        "name": "cell_number",
+        "python_name": "cell_number",
+        "type": "integer",
+        "required": true,
+        "description": "Number of grid intervals, minimum 2"
+      },
+      {
+        "name": "invest_mode",
+        "python_name": "invest_mode",
+        "type": "integer",
+        "required": false,
+        "description": "Investment mode. `0`: Quote only (default), `1`: Base only, `2`: Base + Quote"
+      },
+      {
+        "name": "base_investment",
+        "python_name": "base_investment",
+        "type": "string",
+        "required": false,
+        "description": "Investment in base token (decimal string). **Required** when `invest_mode` is `1` or `2"
+      },
+      {
+        "name": "quote_investment",
+        "python_name": "quote_investment",
+        "type": "string",
+        "required": false,
+        "description": "Investment in quote token (decimal string). **Required** when `invest_mode` is `0` or `2"
+      },
+      {
+        "name": "entry_price",
+        "python_name": "entry_price",
+        "type": "string",
+        "required": false,
+        "description": "Entry trigger price (decimal string). Bot activates when market price reaches this level"
+      },
+      {
+        "name": "stop_loss_price",
+        "python_name": "stop_loss_price",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss trigger price (decimal string)"
+      },
+      {
+        "name": "take_profit_price",
+        "python_name": "take_profit_price",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit trigger price (decimal string)"
+      },
+      {
+        "name": "ts_percent",
+        "python_name": "ts_percent",
+        "type": "string",
+        "required": false,
+        "description": "Trailing stop callback ratio, range `[0, 0.99]` (e.g. `\"0.05\"` means 5%)"
+      },
+      {
+        "name": "enable_trailing",
+        "python_name": "enable_trailing",
+        "type": "boolean",
+        "required": false,
+        "description": "Enable grid trailing (auto-shift). Requires `cell_number >= 5`. Default: `false"
+      },
+      {
+        "name": "limit_up_price",
+        "python_name": "limit_up_price",
+        "type": "string",
+        "required": false,
+        "description": "Upper limit price for grid trailing (decimal string), usd when \"enable_trailing\"=`true"
+      }
+    ],
+    "example": {
+      "symbol": "MNTUSDT",
+      "max_price": "1.0968",
+      "min_price": "0.3656",
+      "quote_investment": "200",
+      "base_investment": "",
+      "invest_mode": 0,
+      "cell_number": 50
+    },
+    "has_example": true,
+    "source_file": "v5/bot/spot-grid/create.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/grid/query-grid-detail",
+    "title": "Get Grid Bot Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/get-detail",
+    "name": "get_grid_query_grid_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "grid_id",
+        "python_name": "grid_id",
+        "type": "string",
+        "required": true,
+        "description": "Grid bot ID to query"
+      }
+    ],
+    "example": {
+      "grid_id": 1234567890
+    },
+    "has_example": true,
+    "source_file": "v5/bot/spot-grid/get-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/grid/validate-input",
+    "title": "Validate Grid Input",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/bot/spot-grid/validate-input",
+    "name": "request_grid_validate_input",
+    "public": true,
+    "fields": [
+      {
+        "name": "symbol",
+        "python_name": "symbol",
+        "type": "string",
+        "required": true,
+        "description": "Trading pair symbol, uppercase only (e.g. `BTCUSDT`)"
+      },
+      {
+        "name": "cell_number",
+        "python_name": "cell_number",
+        "type": "integer",
+        "required": true,
+        "description": "Number of grid intervals, minimum 2"
+      },
+      {
+        "name": "min_price",
+        "python_name": "min_price",
+        "type": "string",
+        "required": true,
+        "description": "Lower bound of the grid price range (decimal string)"
+      },
+      {
+        "name": "max_price",
+        "python_name": "max_price",
+        "type": "string",
+        "required": true,
+        "description": "Upper bound of the grid price range. Must be greater than `min_price` (decimal string)"
+      },
+      {
+        "name": "invest_mode",
+        "python_name": "invest_mode",
+        "type": "integer",
+        "required": false,
+        "description": "Investment mode: `0` Quote only (default), `1` Base only, `2` Base + Quote"
+      },
+      {
+        "name": "base_investment",
+        "python_name": "base_investment",
+        "type": "string",
+        "required": false,
+        "description": "Investment in base token (decimal string). **Required** when `invest_mode` is `1` or `2"
+      },
+      {
+        "name": "quote_investment",
+        "python_name": "quote_investment",
+        "type": "string",
+        "required": false,
+        "description": "Investment in quote token (decimal string). **Required** when `invest_mode` is `0` or `2"
+      },
+      {
+        "name": "stop_loss",
+        "python_name": "stop_loss",
+        "type": "string",
+        "required": false,
+        "description": "Stop-loss as absolute price (decimal string)"
+      },
+      {
+        "name": "take_profit",
+        "python_name": "take_profit",
+        "type": "string",
+        "required": false,
+        "description": "Take-profit as absolute price (decimal string)"
+      },
+      {
+        "name": "entry_price",
+        "python_name": "entry_price",
+        "type": "string",
+        "required": false,
+        "description": "Entry trigger as absolute price (decimal string)"
+      },
+      {
+        "name": "ts_percent",
+        "python_name": "ts_percent",
+        "type": "string",
+        "required": false,
+        "description": "Trailing stop callback ratio, range `[0, 0.99]` (e.g. `\"0.05\"` means 5%)"
+      },
+      {
+        "name": "enable_trailing",
+        "python_name": "enable_trailing",
+        "type": "boolean",
+        "required": false,
+        "description": "Whether to enable grid trailing. Requires `cell_number >= 5"
+      },
+      {
+        "name": "limit_up_price",
+        "python_name": "limit_up_price",
+        "type": "string",
+        "required": false,
+        "description": "Upper limit price for grid trailing (decimal string)"
+      }
+    ],
+    "example": {
+      "symbol": "MNTUSDT",
+      "max_price": "1.2",
+      "min_price": "0.3",
+      "quote_investment": "",
+      "base_investment": "300",
+      "invest_mode": 1,
+      "cell_number": 66,
+      "entry_price": "0.4"
+    },
+    "has_example": true,
+    "source_file": "v5/bot/spot-grid/validate-input.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

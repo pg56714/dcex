@@ -22,7 +22,43 @@ impl MexcClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = MexcParams::from_pairs(params);
-        if let Some(result) = self.additional_request(method_name, &params, true).await? {
+        if let Some(result) = self
+            .stream_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .wallet_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .market_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .account_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .convert_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self
+            .subaccount_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(result);
+        }
+        if let Some(result) = self.stp_schema_request(method_name, &params, true).await? {
             return Ok(result);
         }
         let (api, path, query) = match method_name {
@@ -259,5 +295,101 @@ impl MexcClient {
         };
         self.request(HttpMethod::Get, api, path, query, None, false)
             .await
+    }
+}
+
+mod market_requests {
+    use crate::exchange::ValidatedResponse;
+    use crate::exchanges::mexc::client::{MexcApi, MexcClient};
+    use crate::exchanges::mexc::params::{MexcParams, validate_u64_range};
+    use crate::http::HttpMethod;
+    use crate::{DcexError, Result};
+    impl MexcClient {
+        pub(in crate::exchanges::mexc) async fn market_schema_request(
+            &self,
+            name: &str,
+            p: &MexcParams,
+            public: bool,
+        ) -> Result<Option<ValidatedResponse>> {
+            let (path, api, verb, signed, allowed, required): (
+                &str,
+                MexcApi,
+                HttpMethod,
+                bool,
+                &[&str],
+                &[&str],
+            ) = match name {
+                "get_spot_offline_symbols" => (
+                    "/api/v3/symbol/offline",
+                    MexcApi::Spot,
+                    HttpMethod::Get,
+                    false,
+                    &[],
+                    &[],
+                ),
+                "get_announcements" => (
+                    "/api/v3/announcements",
+                    MexcApi::Spot,
+                    HttpMethod::Get,
+                    false,
+                    &["language", "page", "limit"],
+                    &[],
+                ),
+                "get_contract_supported_currencies" => (
+                    "/api/v1/contract/support_currencies",
+                    MexcApi::Contract,
+                    HttpMethod::Get,
+                    false,
+                    &[],
+                    &[],
+                ),
+                _ => return Ok(None),
+            };
+            if public == signed {
+                return Ok(None);
+            }
+            p.ensure_allowed(allowed)?;
+            validate_u64_range(p, "recvWindow", 1, 60_000)?;
+            let query = p.only(allowed);
+            let unique: std::collections::BTreeSet<_> = query.iter().map(|(k, _)| k).collect();
+            if unique.len() != query.len() {
+                return Err(DcexError::InvalidInput("duplicate MEXC parameter".into()));
+            }
+            for key in required {
+                if p.required(key)?.trim().is_empty() {
+                    return Err(DcexError::InvalidInput(format!("{key} cannot be empty")));
+                }
+            }
+            validate_u64_range(p, "page", 1, u64::MAX)?;
+            validate_u64_range(
+                p,
+                "limit",
+                1,
+                if name == "get_announcements" {
+                    100
+                } else {
+                    1000
+                },
+            )?;
+            validate_u64_range(p, "startTime", 0, u64::MAX)?;
+            validate_u64_range(p, "endTime", 0, u64::MAX)?;
+            if let (Some(start), Some(end)) = (p.get("startTime"), p.get("endTime"))
+                && start.parse::<u64>().unwrap() > end.parse::<u64>().unwrap()
+            {
+                return Err(DcexError::InvalidInput("startTime exceeds endTime".into()));
+            }
+            if name == "get_announcements"
+                && p.get("limit")
+                    .is_some_and(|n| n.parse::<u64>().is_ok_and(|n| n % 5 != 0))
+            {
+                return Err(DcexError::InvalidInput(
+                    "announcement limit must be a multiple of 5".into(),
+                ));
+            }
+            let path = path.to_string();
+            Ok(Some(
+                self.request(verb, api, path, query, None, signed).await?,
+            ))
+        }
     }
 }

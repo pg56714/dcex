@@ -1,0 +1,61 @@
+[
+  {
+    "name": "classic_common_notice_get_all_notices",
+    "method": "GET",
+    "path": "/api/v2/public/annoucements",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "annType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "language",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-notice/classic-common-notice#query-announcements",
+    "summary": "Query Announcements"
+  }
+]

@@ -1,0 +1,162 @@
+[
+  {
+    "name": "cancel_spot_withdrawal",
+    "method": "DELETE",
+    "path": "/api/v3/capital/withdraw",
+    "fields": [
+      {
+        "name": "id",
+        "python_name": "id",
+        "type": "string",
+        "required": true,
+        "description": "withdraw id"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Cancel withdraw",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw"
+  },
+  {
+    "name": "create_spot_withdrawal",
+    "method": "POST",
+    "path": "/api/v3/capital/withdraw",
+    "fields": [
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": true,
+        "description": "coin"
+      },
+      {
+        "name": "withdrawOrderId",
+        "python_name": "withdraw_order_id",
+        "type": "string",
+        "required": false,
+        "description": "withdrawOrderId"
+      },
+      {
+        "name": "netWork",
+        "python_name": "network",
+        "type": "string",
+        "required": false,
+        "description": "withdraw network"
+      },
+      {
+        "name": "contractAddress",
+        "python_name": "contract_address",
+        "type": "string",
+        "required": false,
+        "description": "coin contract address"
+      },
+      {
+        "name": "address",
+        "python_name": "address",
+        "type": "string",
+        "required": true,
+        "description": "withdraw address"
+      },
+      {
+        "name": "memo",
+        "python_name": "memo",
+        "type": "string",
+        "required": false,
+        "description": "memo(If memo is required in the address, it must be passed in)"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "withdraw amount"
+      },
+      {
+        "name": "remark",
+        "python_name": "remark",
+        "type": "string",
+        "required": false,
+        "description": "remark"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Withdraw(new)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew"
+  },
+  {
+    "name": "create_spot_withdrawal_legacy",
+    "method": "POST",
+    "path": "/api/v3/capital/withdraw/apply",
+    "fields": [
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": true,
+        "description": "coin"
+      },
+      {
+        "name": "withdrawOrderId",
+        "python_name": "withdraw_order_id",
+        "type": "string",
+        "required": false,
+        "description": "withdrawOrderId"
+      },
+      {
+        "name": "network",
+        "python_name": "network",
+        "type": "string",
+        "required": false,
+        "description": "withdraw network"
+      },
+      {
+        "name": "address",
+        "python_name": "address",
+        "type": "string",
+        "required": true,
+        "description": "withdraw address"
+      },
+      {
+        "name": "memo",
+        "python_name": "memo",
+        "type": "string",
+        "required": false,
+        "description": "memo(If memo is required in the address, it must be passed in)"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "withdraw amount"
+      },
+      {
+        "name": "remark",
+        "python_name": "remark",
+        "type": "string",
+        "required": false,
+        "description": "remark"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": "Signature validity window in milliseconds, up to 60000."
+      }
+    ],
+    "title": "Withdraw(previous,offline soon)",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon"
+  }
+]

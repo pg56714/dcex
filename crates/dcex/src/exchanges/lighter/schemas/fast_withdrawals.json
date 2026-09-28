@@ -1,0 +1,20 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/v1/fastwithdraw",
+    "official_source": "https://apidocs.lighter.xyz/reference/fastwithdraw",
+    "name": "submit_fast_withdrawal",
+    "fields": [
+      {
+        "type": "string",
+        "name": "tx_info",
+        "required": true
+      },
+      {
+        "type": "string",
+        "name": "to_address",
+        "required": true
+      }
+    ]
+  }
+]

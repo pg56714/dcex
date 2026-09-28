@@ -1,0 +1,1077 @@
+[
+  {
+    "name": "classic_p2p_get_p2_p_merchant_list",
+    "method": "GET",
+    "path": "/api/v2/p2p/merchantList",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "online",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-p2p-merchant-list",
+    "summary": "Get P2P Merchant List"
+  },
+  {
+    "name": "classic_p2p_get_merchant_information",
+    "method": "GET",
+    "path": "/api/v2/p2p/merchantInfo",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-information",
+    "summary": "Get Merchant Information"
+  },
+  {
+    "name": "classic_p2p_get_p2_p_adv_list",
+    "method": "GET",
+    "path": "/api/v2/p2p/advList",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "status",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "advNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "language",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "orderBy",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "payMethodId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "sourceType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-advertisement-list",
+    "summary": "Get Merchant Advertisement List"
+  },
+  {
+    "name": "classic_p2p_get_p2_p_order_list",
+    "method": "GET",
+    "path": "/api/v2/p2p/orderList",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "status",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "advNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "language",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "orderNo",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-p2p-p2p/classic-p2p#get-merchant-p2p-orders",
+    "summary": "Get Merchant P2P Orders"
+  },
+  {
+    "name": "classic_tax_get_p2_p_account_record",
+    "method": "GET",
+    "path": "/api/v2/tax/p2p-record",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "idLessThan",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-tax-tax-records/classic-tax#p2p-transaction-records",
+    "summary": "P2P Transaction Records"
+  },
+  {
+    "name": "p2p_ad_management_get_ad_list",
+    "method": "GET",
+    "path": "/api/v3/p2p/ad-list",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "token",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "amount",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "pageNum",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#get-ad-list",
+    "summary": "Get Ad List"
+  },
+  {
+    "name": "p2p_ad_management_get_exchange_rate",
+    "method": "GET",
+    "path": "/api/v3/p2p/exchange-rate",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "token",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#get-exchange-rate",
+    "summary": "Get Exchange Rate"
+  },
+  {
+    "name": "p2p_ad_management_fee_simulate",
+    "method": "POST",
+    "path": "/api/v3/p2p/fee-simulate",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "token",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "marketType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "amount",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#fee-simulate",
+    "summary": "Fee Simulate"
+  },
+  {
+    "name": "p2p_ad_management_get_ad_limit",
+    "method": "GET",
+    "path": "/api/v3/p2p/ad-limit",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "token",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#get-ad-limit",
+    "summary": "Get Ad Limit"
+  },
+  {
+    "name": "p2p_ad_management_create_ad",
+    "method": "POST",
+    "path": "/api/v3/p2p/ad-create",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "token",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "priceType",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "price",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "premium",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "minAmount",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxAmount",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "quantity",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "payMethodIds",
+        "required": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "payMethodId": {
+                "type": "string",
+                "description": "Payment method ID. Retrieve via Get Pay Methods. Merchant's accepted payment method"
+              },
+              "userPayMethodId": {
+                "type": "string",
+                "description": "User payment method ID\n\nRequired when `side=sell`. Merchant's collection method"
+              }
+            }
+          }
+        },
+        "location": "query"
+      },
+      {
+        "wire": "remark",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tradeTerms",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "payTimeLimit",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#create-ad",
+    "summary": "Create Ad"
+  },
+  {
+    "name": "p2p_ad_management_update_ad",
+    "method": "POST",
+    "path": "/api/v3/p2p/ad-update",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "advId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "priceType",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "price",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "premium",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "minAmount",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "maxAmount",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "quantity",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "payMethodIds",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "payMethodId": {
+                "type": "string",
+                "description": "Payment method ID. Retrieve via Get Pay Methods. Merchant's accepted payment method"
+              },
+              "userPayMethodId": {
+                "type": "string",
+                "description": "User payment method ID\n\nRequired when `side=sell`. Merchant's collection method"
+              }
+            }
+          }
+        },
+        "location": "query"
+      },
+      {
+        "wire": "payTimeLimit",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "remark",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "tradeTerms",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#update-ad",
+    "summary": "Update Ad"
+  },
+  {
+    "name": "p2p_ad_management_operate_ad",
+    "method": "POST",
+    "path": "/api/v3/p2p/ad-operate",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "advId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "operation",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#operate-ad",
+    "summary": "Operate Ad"
+  },
+  {
+    "name": "p2p_ad_management_get_ad_info",
+    "method": "GET",
+    "path": "/api/v3/p2p/ad-info",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "advId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#get-ad-info",
+    "summary": "Get Ad Info"
+  },
+  {
+    "name": "p2p_ad_management_get_my_ads",
+    "method": "GET",
+    "path": "/api/v3/p2p/my-ads",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "advId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "token",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "fiat",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "status",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/ad-management#get-my-ads",
+    "summary": "Get My Ads"
+  },
+  {
+    "name": "get_p2p_balance",
+    "method": "GET",
+    "path": "/api/v3/p2p/balance",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "token",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/common#get-balance",
+    "summary": "Get Balance"
+  },
+  {
+    "name": "p2p_order_management_get_pending_orders",
+    "method": "GET",
+    "path": "/api/v3/p2p/pending-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/order-management#get-pending-orders",
+    "summary": "Get Pending Orders"
+  },
+  {
+    "name": "p2p_order_management_get_all_orders",
+    "method": "GET",
+    "path": "/api/v3/p2p/all-orders",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "cursor",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "side",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "status",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/order-management#get-all-orders",
+    "summary": "Get All Orders"
+  },
+  {
+    "name": "p2p_order_management_get_order_info",
+    "method": "GET",
+    "path": "/api/v3/p2p/order-info",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/order-management#get-order-info",
+    "summary": "Get Order Info"
+  },
+  {
+    "name": "p2p_order_management_confirm_payment",
+    "method": "POST",
+    "path": "/api/v3/p2p/order-pay",
+    "public": false,
+    "confirm": true,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/order-management#confirm-payment",
+    "summary": "Confirm Payment"
+  },
+  {
+    "name": "p2p_order_management_release_asset",
+    "method": "POST",
+    "path": "/api/v3/p2p/order-release",
+    "public": false,
+    "confirm": true,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/p2p/order-management#release-asset",
+    "summary": "Release Asset"
+  },
+  {
+    "name": "p2p_user_info_get_user_info",
+    "method": "GET",
+    "path": "/api/v3/p2p/user-info",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-user-info",
+    "summary": "Get User Info"
+  },
+  {
+    "name": "p2p_user_info_get_currencies",
+    "method": "GET",
+    "path": "/api/v3/p2p/currencies",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-currencies",
+    "summary": "Get Currencies"
+  },
+  {
+    "name": "p2p_user_info_get_pay_methods",
+    "method": "GET",
+    "path": "/api/v3/p2p/pay-method",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/p2p/user-info#get-pay-methods",
+    "summary": "Get Pay Methods"
+  }
+]

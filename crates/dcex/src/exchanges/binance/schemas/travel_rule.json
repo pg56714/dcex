@@ -1,0 +1,246 @@
+[
+  {
+    "method": "POST",
+    "path": "/sapi/v1/localentity/broker/withdraw/apply",
+    "sdk_method": "broker_withdraw",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#broker-withdraw",
+    "parameters": [
+      {
+        "name": "address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "withdraw_order_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "withdrawOrderId",
+        "kind": "str"
+      },
+      {
+        "name": "questionnaire",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "questionnaire",
+        "kind": "json"
+      },
+      {
+        "name": "originator_pii",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "originatorPii",
+        "kind": "json"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "address_name",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressName",
+        "kind": "str"
+      },
+      {
+        "name": "transaction_fee_flag",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "transactionFeeFlag",
+        "kind": "bool"
+      },
+      {
+        "name": "wallet_type",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "walletType",
+        "kind": "int"
+      }
+    ],
+    "name": "create_broker_withdrawal"
+  },
+  {
+    "method": "PUT",
+    "path": "/sapi/v1/localentity/broker/deposit/provide-info",
+    "sdk_method": "submit_deposit_questionnaire",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#submit-deposit-questionnaire",
+    "parameters": [
+      {
+        "name": "sub_account_id",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "subAccountId",
+        "kind": "str"
+      },
+      {
+        "name": "deposit_id",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "depositId",
+        "kind": "int"
+      },
+      {
+        "name": "questionnaire",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "questionnaire",
+        "kind": "json"
+      },
+      {
+        "name": "beneficiary_pii",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "beneficiaryPii",
+        "kind": "json"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "coin",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Optional[float]",
+        "required": false,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "address",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      }
+    ],
+    "name": "submit_broker_deposit_questionnaire"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/localentity/withdraw/apply",
+    "sdk_method": "withdraw_travel_rule",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-travel-rule",
+    "parameters": [
+      {
+        "name": "coin",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "coin",
+        "kind": "str"
+      },
+      {
+        "name": "address",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "address",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[float, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "decimal"
+      },
+      {
+        "name": "questionnaire",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "questionnaire",
+        "kind": "json"
+      },
+      {
+        "name": "withdraw_order_id",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "withdrawOrderId",
+        "kind": "str"
+      },
+      {
+        "name": "network",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "network",
+        "kind": "str"
+      },
+      {
+        "name": "address_tag",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "addressTag",
+        "kind": "str"
+      },
+      {
+        "name": "transaction_fee_flag",
+        "type": "Optional[bool]",
+        "required": false,
+        "wire": "transactionFeeFlag",
+        "kind": "bool"
+      },
+      {
+        "name": "name",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "name",
+        "kind": "str"
+      },
+      {
+        "name": "wallet_type",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "walletType",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "create_travel_rule_withdrawal"
+  }
+]

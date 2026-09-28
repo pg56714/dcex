@@ -760,7 +760,7 @@ CASES: dict[str, tuple[dict[str, Any], str, str, bool]] = {
 
 
 COMPLETION_CASES = json.loads(
-    (ROOT / "tests/fixtures/mexc_completion.json").read_text(encoding="utf-8")
+    (ROOT / "tests/fixtures/mexc_request_cases.json").read_text(encoding="utf-8")
 )
 CASES.update(
     {

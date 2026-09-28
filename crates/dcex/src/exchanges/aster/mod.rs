@@ -1,8 +1,7 @@
 mod account;
-mod additional;
+
 mod client;
-mod completion;
-mod completion_wrappers;
+
 mod endpoints;
 mod market;
 mod params;
@@ -21,3 +20,13 @@ pub use params::{
 pub use signing::sign_message;
 
 mod prediction;
+
+mod asset;
+
+mod subaccount;
+
+mod agents;
+
+mod builder;
+
+mod withdrawals;

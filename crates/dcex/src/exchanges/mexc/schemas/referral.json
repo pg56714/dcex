@@ -1,0 +1,39 @@
+[
+  {
+    "name": "get_rebate_detail_kickback",
+    "method": "GET",
+    "path": "/api/v3/rebate/detail/kickback",
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "long",
+        "required": false,
+        "description": "Start time, Unix millisecond timestamp"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "long",
+        "required": false,
+        "description": "End time, Unix millisecond timestamp"
+      },
+      {
+        "name": "page",
+        "python_name": "page",
+        "type": "int",
+        "required": false,
+        "description": "default 1"
+      },
+      {
+        "name": "recvWindow",
+        "python_name": "recv_window",
+        "type": "long",
+        "required": false,
+        "description": ""
+      }
+    ],
+    "title": "Get Self Rebate Records Detail",
+    "official_source": "https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-self-rebate-records-detail"
+  }
+]

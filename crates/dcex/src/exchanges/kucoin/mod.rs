@@ -1,11 +1,11 @@
 mod account;
 mod classic_trading;
 mod client;
-mod completion_wrappers;
+
 mod earn;
 mod endpoints;
-mod inventory_completion;
-mod inventory_wrappers;
+
+mod generated;
 mod margin;
 mod market;
 mod params;
@@ -23,4 +23,4 @@ pub use websocket::{KucoinPrivateWebSocket, KucoinProWebSocket, KucoinPublicWebS
 #[cfg(test)]
 mod tests;
 
-mod risk;
+mod schema_requests;

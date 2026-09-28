@@ -1,0 +1,88 @@
+[
+  {
+    "name": "create_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/create",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": true,
+        "description": "Blacklist group id"
+      },
+      {
+        "name": "blacklist",
+        "python_name": "blacklist",
+        "type": "number[]",
+        "required": true,
+        "description": "List of sub-account UIDs. At least two UIDs must be provided"
+      }
+    ],
+    "title": "Create STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/create-stp-group"
+  },
+  {
+    "name": "delete_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/delete",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": true,
+        "description": "Blacklist group id"
+      }
+    ],
+    "title": "Delete STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/delete-stp-group"
+  },
+  {
+    "name": "get_current_contract_stp_group",
+    "method": "GET",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/search",
+    "fields": [],
+    "title": "Get Current User STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/get-current-user-stp-group"
+  },
+  {
+    "name": "get_contract_stp_groups",
+    "method": "GET",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": false,
+        "description": "Blacklist group id"
+      }
+    ],
+    "title": "Query STP Groups and Group Members Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/query-stp-groups-and-group-members"
+  },
+  {
+    "name": "update_contract_stp_group",
+    "method": "POST",
+    "path": "/api/v1/private/market_maker/self_trade/blacklist/update",
+    "fields": [
+      {
+        "name": "configName",
+        "python_name": "config_name",
+        "type": "string",
+        "required": true,
+        "description": "Blacklist group id"
+      },
+      {
+        "name": "blacklist",
+        "python_name": "blacklist",
+        "type": "number[]",
+        "required": true,
+        "description": "Sub-account UID list"
+      }
+    ],
+    "title": "Update STP Group Only supported for market maker accounts",
+    "official_source": "https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/update-stp-group"
+  }
+]

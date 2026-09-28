@@ -1,0 +1,1472 @@
+[
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/order-list",
+    "title": "Get LP Order List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/order-list",
+    "name": "get_alpha_lp_order_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "orderType",
+        "python_name": "order_type",
+        "type": "integer",
+        "required": false,
+        "description": "Filter by order type. `0`: All (default), `1`: Stake, `2`: Redeem"
+      },
+      {
+        "name": "tokenCode",
+        "python_name": "token_code",
+        "type": "string",
+        "required": false,
+        "description": "Filter by token code"
+      },
+      {
+        "name": "orderStatus",
+        "python_name": "order_status",
+        "type": "array",
+        "required": false,
+        "description": "Filter by order status (multiple values allowed). `1`: Processing, `2`: Success, `3`: Failed"
+      },
+      {
+        "name": "days",
+        "python_name": "days",
+        "type": "integer",
+        "required": false,
+        "description": "Query last N days. Default: `90`, Max: `365"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Results per page. Default: `20`, Max: `100"
+      },
+      {
+        "name": "pageIndex",
+        "python_name": "page_index",
+        "type": "integer",
+        "required": false,
+        "description": "Page number (1-based). Default: `1"
+      },
+      {
+        "name": "poolAddress",
+        "python_name": "pool_address",
+        "type": "string",
+        "required": false,
+        "description": "Filter by pool contract address"
+      }
+    ],
+    "example": {
+      "orderType": 0,
+      "days": 7,
+      "limit": 20,
+      "pageIndex": 1
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/lp/order-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/pay-token-list",
+    "title": "Get LP Pay Token List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pay-token-list",
+    "name": "get_alpha_lp_pay_token_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "chainCode",
+        "python_name": "chain_code",
+        "type": "string",
+        "required": false,
+        "description": "Filter by blockchain identifier"
+      },
+      {
+        "name": "tokenAddress",
+        "python_name": "token_address",
+        "type": "string",
+        "required": false,
+        "description": "Filter by token contract address"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/alpha/lp/pay-token-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/pay-token-price",
+    "title": "Get LP Pay Token Price",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pay-token-price",
+    "name": "get_alpha_lp_pay_token_price",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenCode",
+        "python_name": "token_code",
+        "type": "array",
+        "required": true,
+        "description": "Array of token codes to query, e.g. `[\"CEX_1\", \"CEX_2\"]`. Max 50 items"
+      },
+      {
+        "name": "chainCode",
+        "python_name": "chain_code",
+        "type": "string",
+        "required": false,
+        "description": "Filter by blockchain identifier"
+      }
+    ],
+    "example": {
+      "tokenCode": [
+        "CEX_1",
+        "CEX_2"
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/lp/pay-token-price.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/pool-info",
+    "title": "Get LP Pool Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pool-info",
+    "name": "get_alpha_lp_pool_info",
+    "public": false,
+    "fields": [
+      {
+        "name": "poolAddress",
+        "python_name": "pool_address",
+        "type": "string",
+        "required": true,
+        "description": "Pool contract address"
+      }
+    ],
+    "example": {
+      "poolAddress": "0x1234567890abcdef"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/lp/pool-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/pool-list",
+    "title": "Get LP Pool List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/pool-list",
+    "name": "get_alpha_lp_pool_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenSymbol",
+        "python_name": "token_symbol",
+        "type": "string",
+        "required": false,
+        "description": "Search pools containing this token symbol, e.g. `ETH`, `USDC"
+      }
+    ],
+    "example": {
+      "tokenSymbol": "ETH"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/lp/pool-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/position-list",
+    "title": "Get LP Position List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/position-list",
+    "name": "get_alpha_lp_position_list",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/alpha/lp/position-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/redeem",
+    "title": "Execute LP Redeem",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/redeem",
+    "name": "redeem_alpha_lp",
+    "public": false,
+    "fields": [
+      {
+        "name": "positionId",
+        "python_name": "position_id",
+        "type": "integer",
+        "required": true,
+        "description": "Position ID (from Get LP Position List)"
+      },
+      {
+        "name": "poolAddress",
+        "python_name": "pool_address",
+        "type": "string",
+        "required": true,
+        "description": "Pool contract address"
+      },
+      {
+        "name": "dercRatio",
+        "python_name": "derc_ratio",
+        "type": "string",
+        "required": true,
+        "description": "Reduction ratio (0–1). `\"0.25\"` = redeem 25%, `\"0.5\"` = redeem 50%, `\"1\"` = close entire position"
+      },
+      {
+        "name": "receiveTokenCode",
+        "python_name": "receive_token_code",
+        "type": "string",
+        "required": false,
+        "description": "Token code for receiving the redeemed amount"
+      }
+    ],
+    "example": {
+      "positionId": 12345,
+      "poolAddress": "0x1234567890abcdef",
+      "dercRatio": "0.5"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/lp/redeem.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/lp/stake",
+    "title": "Execute LP Stake",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/lp/stake",
+    "name": "stake_alpha_lp",
+    "public": false,
+    "fields": [
+      {
+        "name": "positionId",
+        "python_name": "position_id",
+        "type": "integer",
+        "required": true,
+        "description": "Position ID. Use `0` to create a new position, or provide an existing position ID to add liquidity"
+      },
+      {
+        "name": "poolAddress",
+        "python_name": "pool_address",
+        "type": "string",
+        "required": true,
+        "description": "Pool contract address"
+      },
+      {
+        "name": "payTokenAmount",
+        "python_name": "pay_token_amount",
+        "type": "string",
+        "required": true,
+        "description": "Payment token amount (positive decimal as string)"
+      },
+      {
+        "name": "payTokenCode",
+        "python_name": "pay_token_code",
+        "type": "string",
+        "required": true,
+        "description": "Payment token code, e.g. `CEX_1` for USDT"
+      },
+      {
+        "name": "rangeUpper",
+        "python_name": "range_upper",
+        "type": "string",
+        "required": false,
+        "description": "Range order upper limit. Use this OR `priceUpper`, not both"
+      },
+      {
+        "name": "rangeLower",
+        "python_name": "range_lower",
+        "type": "string",
+        "required": false,
+        "description": "Range order lower limit. Use this OR `priceLower`, not both"
+      },
+      {
+        "name": "priceUpper",
+        "python_name": "price_upper",
+        "type": "string",
+        "required": false,
+        "description": "Price order upper limit (price priority). Use this OR `rangeUpper`, not both"
+      },
+      {
+        "name": "priceLower",
+        "python_name": "price_lower",
+        "type": "string",
+        "required": false,
+        "description": "Price order lower limit (price priority). Use this OR `rangeLower`, not both"
+      }
+    ],
+    "example": {
+      "positionId": 0,
+      "poolAddress": "0x1234567890abcdef",
+      "payTokenAmount": "1000",
+      "payTokenCode": "CEX_1",
+      "rangeUpper": "2000",
+      "rangeLower": "1800"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/lp/stake.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/buy",
+    "title": "Execute Buy",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/buy",
+    "name": "buy_alpha_prediction",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenId",
+        "python_name": "token_id",
+        "type": "string",
+        "required": true,
+        "description": "Outcome token ID to buy (from Get Event Detail)"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "USDC amount to invest (positive decimal as string)"
+      },
+      {
+        "name": "payTokenCode",
+        "python_name": "pay_token_code",
+        "type": "string",
+        "required": true,
+        "description": "Payment token code. Phase 1 fixed to `USDC"
+      },
+      {
+        "name": "orderType",
+        "python_name": "order_type",
+        "type": "integer",
+        "required": true,
+        "description": "Order type. Refer to predictionOrderType. Phase 1: `1` (FOK) only"
+      },
+      {
+        "name": "slippage",
+        "python_name": "slippage",
+        "type": "string",
+        "required": true,
+        "description": "Maximum acceptable price slippage as decimal. `0.05` = 5% tolerance"
+      },
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": true,
+        "description": "Event ID associated with the token"
+      }
+    ],
+    "example": {
+      "tokenId": "token_yes_123",
+      "amount": "100",
+      "payTokenCode": "USDC",
+      "orderType": 1,
+      "slippage": "0.05",
+      "eventId": "event_123"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/buy.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/alpha/prediction/engine-status",
+    "title": "Get Engine Status",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/engine-status",
+    "name": "get_alpha_prediction_engine_status",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/engine-status.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/event-detail",
+    "title": "Get Event Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/event-detail",
+    "name": "get_alpha_prediction_event_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": false,
+        "description": "Event ID. Use `slug` when available"
+      },
+      {
+        "name": "slug",
+        "python_name": "slug",
+        "type": "string",
+        "required": false,
+        "description": "URL-friendly event slug. Takes priority over `eventId"
+      },
+      {
+        "name": "hasMoreMarkets",
+        "python_name": "has_more_markets",
+        "type": "boolean",
+        "required": false,
+        "description": "Whether to include markets from related sub-events. Default: `false"
+      }
+    ],
+    "example": {
+      "slug": "will-argentina-win-world-cup-2026"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/event-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/order-book",
+    "title": "Get Order Book",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-book",
+    "name": "request_alpha_prediction_order_book",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenIds",
+        "python_name": "token_ids",
+        "type": "array",
+        "required": true,
+        "description": "List of outcome token IDs. Maximum 20"
+      }
+    ],
+    "example": {
+      "tokenIds": [
+        "token_yes_123"
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/order-book.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/order-estimate",
+    "title": "Get Order Estimate",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-estimate",
+    "name": "request_alpha_prediction_order_estimate",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenId",
+        "python_name": "token_id",
+        "type": "string",
+        "required": true,
+        "description": "Outcome token ID (from Get Event Detail)"
+      },
+      {
+        "name": "side",
+        "python_name": "side",
+        "type": "integer",
+        "required": true,
+        "description": "Trade direction. Refer to predictionSide"
+      },
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": true,
+        "description": "Event ID associated with the token"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "BUY: USDC to invest. SELL: number of shares to sell (positive decimal as string)"
+      },
+      {
+        "name": "orderType",
+        "python_name": "order_type",
+        "type": "integer",
+        "required": true,
+        "description": "Order type. Refer to predictionOrderType. Phase 1: `1` (FOK) only"
+      },
+      {
+        "name": "payTokenCode",
+        "python_name": "pay_token_code",
+        "type": "string",
+        "required": false,
+        "description": "Payment token code. Required for BUY. Phase 1 fixed to `USDC"
+      }
+    ],
+    "example": {
+      "tokenId": "token_yes_123",
+      "side": 1,
+      "eventId": "event_123",
+      "amount": "100",
+      "orderType": 1,
+      "payTokenCode": "USDC"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/order-estimate.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/order-list",
+    "title": "Get Order List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/order-list",
+    "name": "get_alpha_prediction_order_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "integer",
+        "required": false,
+        "description": "Filter by order status. Refer to predictionOrderStatus"
+      },
+      {
+        "name": "tokenId",
+        "python_name": "token_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by outcome token ID"
+      },
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by event ID"
+      },
+      {
+        "name": "side",
+        "python_name": "side",
+        "type": "integer",
+        "required": false,
+        "description": "Filter by trade direction. Refer to predictionSide"
+      },
+      {
+        "name": "days",
+        "python_name": "days",
+        "type": "integer",
+        "required": false,
+        "description": "Look back N days. Max: `90"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of records per page"
+      },
+      {
+        "name": "pageIndex",
+        "python_name": "page_index",
+        "type": "integer",
+        "required": false,
+        "description": "Page number starting from `1"
+      }
+    ],
+    "example": {
+      "limit": 20,
+      "pageIndex": 1,
+      "days": 7
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/order-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/alpha/prediction/pay-token-list",
+    "title": "Get Payment Token List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/pay-token-list",
+    "name": "get_alpha_prediction_pay_token_list",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/pay-token-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/portfolio-summary",
+    "title": "Get Portfolio Summary",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/portfolio-summary",
+    "name": "get_alpha_prediction_portfolio_summary",
+    "public": false,
+    "fields": [
+      {
+        "name": "eventType",
+        "python_name": "event_type",
+        "type": "integer",
+        "required": false,
+        "description": "Filter by event type. Refer to predictionEventType"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/portfolio-summary.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/position-history",
+    "title": "Get Position History",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/position-history",
+    "name": "get_alpha_prediction_position_history",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenId",
+        "python_name": "token_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by outcome token ID"
+      },
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by event ID"
+      },
+      {
+        "name": "result",
+        "python_name": "result",
+        "type": "integer",
+        "required": false,
+        "description": "Filter by position outcome. Refer to predictionPositionResult"
+      },
+      {
+        "name": "days",
+        "python_name": "days",
+        "type": "integer",
+        "required": false,
+        "description": "Look back N days. Max: `90"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of records per page"
+      },
+      {
+        "name": "pageIndex",
+        "python_name": "page_index",
+        "type": "integer",
+        "required": false,
+        "description": "Page number starting from `1"
+      }
+    ],
+    "example": {
+      "limit": 20,
+      "pageIndex": 1,
+      "days": 30
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/position-history.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/position-list",
+    "title": "Get Position List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/position-list",
+    "name": "get_alpha_prediction_position_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenId",
+        "python_name": "token_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by outcome token ID"
+      },
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by event ID"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of records per page"
+      },
+      {
+        "name": "pageIndex",
+        "python_name": "page_index",
+        "type": "integer",
+        "required": false,
+        "description": "Page number starting from `1"
+      }
+    ],
+    "example": {
+      "limit": 20,
+      "pageIndex": 1
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/position-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/price-history",
+    "title": "Get Price History",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/price-history",
+    "name": "get_alpha_prediction_price_history",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenId",
+        "python_name": "token_id",
+        "type": "string",
+        "required": true,
+        "description": "Outcome token ID"
+      },
+      {
+        "name": "interval",
+        "python_name": "interval",
+        "type": "string",
+        "required": true,
+        "description": "Time interval. Refer to predictionPriceInterval"
+      }
+    ],
+    "example": {
+      "tokenId": "token_yes_123",
+      "interval": "1H"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/price-history.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/sell",
+    "title": "Execute Sell",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sell",
+    "name": "sell_alpha_prediction",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenId",
+        "python_name": "token_id",
+        "type": "string",
+        "required": true,
+        "description": "Outcome token ID to sell (from Get Position List)"
+      },
+      {
+        "name": "size",
+        "python_name": "size",
+        "type": "string",
+        "required": true,
+        "description": "Number of shares to sell (positive decimal as string)"
+      },
+      {
+        "name": "orderType",
+        "python_name": "order_type",
+        "type": "integer",
+        "required": true,
+        "description": "Order type. Refer to predictionOrderType. Phase 1: `1` (FOK) only"
+      },
+      {
+        "name": "slippage",
+        "python_name": "slippage",
+        "type": "string",
+        "required": true,
+        "description": "Maximum acceptable price slippage as decimal. `0.05` = 5% tolerance"
+      },
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": true,
+        "description": "Event ID associated with the token"
+      },
+      {
+        "name": "toTokenCode",
+        "python_name": "to_token_code",
+        "type": "string",
+        "required": false,
+        "description": "Destination token code. Phase 1 fixed to `USDC"
+      }
+    ],
+    "example": {
+      "tokenId": "token_yes_123",
+      "size": "50",
+      "orderType": 1,
+      "slippage": "0.05",
+      "eventId": "event_123",
+      "toTokenCode": "USDC"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/sell.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/side-market-list",
+    "title": "Get Side Market List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/side-market-list",
+    "name": "get_alpha_prediction_side_market_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "eventId",
+        "python_name": "event_id",
+        "type": "string",
+        "required": true,
+        "description": "Event ID to query markets for"
+      },
+      {
+        "name": "sortBy",
+        "python_name": "sort_by",
+        "type": "string",
+        "required": false,
+        "description": "Sort field. Refer to predictionSortBy"
+      },
+      {
+        "name": "marketType",
+        "python_name": "market_type",
+        "type": "integer",
+        "required": false,
+        "description": "Filter by market type. Refer to predictionMarketType"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of records per page"
+      },
+      {
+        "name": "pageIndex",
+        "python_name": "page_index",
+        "type": "integer",
+        "required": false,
+        "description": "Page number starting from `1"
+      }
+    ],
+    "example": {
+      "eventId": "event_123",
+      "sortBy": "volume",
+      "limit": 20,
+      "pageIndex": 1
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/side-market-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/sports/group-stage-detail",
+    "title": "Get Sports Group Stage Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-group-stage-detail",
+    "name": "get_alpha_prediction_sports_group_stage_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "eventType",
+        "python_name": "event_type",
+        "type": "integer",
+        "required": true,
+        "description": "Sports event type. Refer to predictionEventType. Phase 1: `1` (FIFA_2026)"
+      },
+      {
+        "name": "groupName",
+        "python_name": "group_name",
+        "type": "string",
+        "required": false,
+        "description": "Filter by group name (e.g., `A`, `B`, … `L` for FIFA 2026)"
+      }
+    ],
+    "example": {
+      "eventType": 1,
+      "groupName": "A"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/sports-group-stage-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/sports/match-list",
+    "title": "Get Sports Match List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-match-list",
+    "name": "get_alpha_prediction_sports_match_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "eventType",
+        "python_name": "event_type",
+        "type": "integer",
+        "required": true,
+        "description": "Sports event type. Refer to predictionEventType. Phase 1: `1` (FIFA_2026)"
+      },
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "integer",
+        "required": false,
+        "description": "Match status filter. Refer to predictionMatchStatus"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "Filter matches starting after this timestamp (UTC milliseconds)"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "Filter matches starting before this timestamp (UTC milliseconds)"
+      },
+      {
+        "name": "stageCode",
+        "python_name": "stage_code",
+        "type": "string",
+        "required": false,
+        "description": "Filter by tournament stage. Refer to predictionStageCode"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Number of records per page"
+      },
+      {
+        "name": "pageIndex",
+        "python_name": "page_index",
+        "type": "integer",
+        "required": false,
+        "description": "Page number starting from `1"
+      }
+    ],
+    "example": {
+      "eventType": 1,
+      "status": 2,
+      "limit": 20,
+      "pageIndex": 1
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/sports-match-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/alpha/prediction/sports/timeline-stages",
+    "title": "Get Sports Timeline Stages",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/sports-timeline-stages",
+    "name": "get_alpha_prediction_sports_timeline_stages",
+    "public": false,
+    "fields": [
+      {
+        "name": "eventType",
+        "python_name": "event_type",
+        "type": "integer",
+        "required": true,
+        "description": "Sports event type. Refer to predictionEventType. Phase 1: `1` (FIFA_2026)"
+      }
+    ],
+    "example": {
+      "eventType": "1"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/sports-timeline-stages.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/prediction/token-price",
+    "title": "Get Token Price",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/prediction/token-price",
+    "name": "get_alpha_prediction_token_price",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenIds",
+        "python_name": "token_ids",
+        "type": "array",
+        "required": true,
+        "description": "List of outcome token IDs to query. Maximum 20"
+      }
+    ],
+    "example": {
+      "tokenIds": [
+        "token_yes_123",
+        "token_no_123"
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/prediction/token-price.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/asset-detail",
+    "title": "Get Asset Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/asset-detail",
+    "name": "get_alpha_trade_asset_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "chainCode",
+        "python_name": "chain_code",
+        "type": "string",
+        "required": true,
+        "description": "Blockchain code, e.g. `ETH`, `SOL`, `BSC"
+      },
+      {
+        "name": "tokenAddress",
+        "python_name": "token_address",
+        "type": "string",
+        "required": true,
+        "description": "Token contract address on the specified chain"
+      }
+    ],
+    "example": {
+      "chainCode": "ETH",
+      "tokenAddress": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/asset-detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/asset-list",
+    "title": "Get Asset List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/asset-list",
+    "name": "get_alpha_trade_asset_list",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/alpha/trade/asset-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/biz-token-details",
+    "title": "Get Token Details",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-details",
+    "name": "request_alpha_trade_biz_token_details",
+    "public": false,
+    "fields": [
+      {
+        "name": "chainCode",
+        "python_name": "chain_code",
+        "type": "string",
+        "required": true,
+        "description": "Blockchain code, e.g. `ETH`, `SOL`, `BSC"
+      },
+      {
+        "name": "tokenAddress",
+        "python_name": "token_address",
+        "type": "string",
+        "required": true,
+        "description": "Token contract address on the specified chain"
+      }
+    ],
+    "example": {
+      "chainCode": "ETH",
+      "tokenAddress": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/biz-token-details.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/biz-token-list",
+    "title": "Get Biz Token List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-list",
+    "name": "get_alpha_trade_biz_token_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenTag",
+        "python_name": "token_tag",
+        "type": "integer",
+        "required": false,
+        "description": "Token tag filter. `0`: All (default), `1`: New token sniping, `2`: On-chain hot token"
+      }
+    ],
+    "example": {
+      "tokenTag": 2
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/biz-token-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/biz-token-price-list",
+    "title": "Get Token Price List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/biz-token-price-list",
+    "name": "get_alpha_trade_biz_token_price_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "tokenAddressInfo",
+        "python_name": "token_address_info",
+        "type": "array",
+        "required": true,
+        "description": "List of token identifiers to query. Maximum 20 items per request"
+      }
+    ],
+    "example": {
+      "tokenAddressInfo": [
+        {
+          "chainCode": "ETH",
+          "tokenAddress": "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+        },
+        {
+          "chainCode": "SOL",
+          "tokenAddress": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+        }
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/biz-token-price-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/order-list",
+    "title": "Get Order List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/order-list",
+    "name": "get_alpha_trade_order_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "tradeType",
+        "python_name": "trade_type",
+        "type": "integer",
+        "required": false,
+        "description": "Filter by trade type. `0`: All (default), `1`: Purchase, `2`: Redeem"
+      },
+      {
+        "name": "tokenCode",
+        "python_name": "token_code",
+        "type": "string",
+        "required": false,
+        "description": "Filter by token code"
+      },
+      {
+        "name": "orderStatus",
+        "python_name": "order_status",
+        "type": "array",
+        "required": false,
+        "description": "Filter by order status (multiple values allowed). `1`: Processing, `2`: Success, `3`: Failed"
+      },
+      {
+        "name": "days",
+        "python_name": "days",
+        "type": "integer",
+        "required": false,
+        "description": "Query last N days. Range: [0, 90]. `0` uses system default (90 days). Default: `0"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": true,
+        "description": "Results per page. Range: [1, 100]"
+      },
+      {
+        "name": "pageIndex",
+        "python_name": "page_index",
+        "type": "integer",
+        "required": true,
+        "description": "Page number (1-based)"
+      },
+      {
+        "name": "direction",
+        "python_name": "direction",
+        "type": "string",
+        "required": false,
+        "description": "Pagination direction. `prev`, `next"
+      }
+    ],
+    "example": {
+      "tradeType": 0,
+      "days": 7,
+      "limit": 20,
+      "pageIndex": 1
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/order-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/pay-token-list",
+    "title": "Get Payment Token List",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/pay-token-list",
+    "name": "get_alpha_trade_pay_token_list",
+    "public": false,
+    "fields": [
+      {
+        "name": "chainCode",
+        "python_name": "chain_code",
+        "type": "string",
+        "required": true,
+        "description": "Blockchain code, e.g. `SOL`, `MANTLE"
+      },
+      {
+        "name": "tokenAddress",
+        "python_name": "token_address",
+        "type": "string",
+        "required": true,
+        "description": "Token contract address on the specified chain"
+      }
+    ],
+    "example": {
+      "chainCode": "SOL",
+      "tokenAddress": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/pay-token-list.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/purchase",
+    "title": "Execute Purchase",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-purchase",
+    "name": "purchase_alpha_trade",
+    "public": false,
+    "fields": [
+      {
+        "name": "fromTokenCode",
+        "python_name": "from_token_code",
+        "type": "string",
+        "required": true,
+        "description": "Payment token code (`CEX_`), e.g. `CEX_1` for USDT. Must match the quote request"
+      },
+      {
+        "name": "fromTokenAmount",
+        "python_name": "from_token_amount",
+        "type": "string",
+        "required": true,
+        "description": "Payment amount (positive decimal as string). Must match the quote request"
+      },
+      {
+        "name": "toTokenCode",
+        "python_name": "to_token_code",
+        "type": "string",
+        "required": true,
+        "description": "Target on-chain token code (`DEX_`), e.g. `DEX_123`. Must match the quote request"
+      },
+      {
+        "name": "slippage",
+        "python_name": "slippage",
+        "type": "string",
+        "required": true,
+        "description": "Slippage tolerance as decimal. `0.005` = 0.5%, `0.01` = 1%, `0.05` = 5%"
+      },
+      {
+        "name": "quoteData",
+        "python_name": "quote_data",
+        "type": "string",
+        "required": true,
+        "description": "Base64-encoded quote data. Must pass as-is from the `/quote` response"
+      },
+      {
+        "name": "gas",
+        "python_name": "gas",
+        "type": "string",
+        "required": true,
+        "description": "Estimated gas fee. Must pass as-is from the `/quote` response"
+      },
+      {
+        "name": "quoteMode",
+        "python_name": "quote_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Quote mode. Must be consistent with the `/quote` request. `0`: Auto, `1`: Price Priority, `2`: Success Rate Priority"
+      },
+      {
+        "name": "correctingCode",
+        "python_name": "correcting_code",
+        "type": "string",
+        "required": true,
+        "description": "MD5 checksum for data integrity. Must pass as-is from the `/quote` response"
+      },
+      {
+        "name": "tenant",
+        "python_name": "tenant",
+        "type": "string",
+        "required": false,
+        "description": "Optional tenant identifier"
+      }
+    ],
+    "example": {
+      "fromTokenCode": "CEX_1",
+      "fromTokenAmount": "100",
+      "toTokenCode": "DEX_123",
+      "slippage": "0.01",
+      "quoteData": "eyJhbGciOiJIUzI1NiJ9...",
+      "gas": "0.0003",
+      "quoteMode": 0,
+      "correctingCode": "a1b2c3d4e5f6"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/trade-purchase.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/quote",
+    "title": "Get Trade Quote",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-quote",
+    "name": "request_alpha_trade_quote",
+    "public": false,
+    "fields": [
+      {
+        "name": "tradeType",
+        "python_name": "trade_type",
+        "type": "integer",
+        "required": true,
+        "description": "Trade type. `1`: Purchase (buy on-chain token with payment token), `2`: Redeem (sell on-chain token for payment token)"
+      },
+      {
+        "name": "fromTokenCode",
+        "python_name": "from_token_code",
+        "type": "string",
+        "required": true,
+        "description": "Source token code (`CEX_` or `DEX_`). Purchase: CEX token (e.g. `CEX_1` for USDT); Redeem: DEX token (e.g. `DEX_123`)"
+      },
+      {
+        "name": "fromTokenAmount",
+        "python_name": "from_token_amount",
+        "type": "string",
+        "required": true,
+        "description": "Amount to pay, string-formatted positive decimal. Must be greater than 0"
+      },
+      {
+        "name": "toTokenCode",
+        "python_name": "to_token_code",
+        "type": "string",
+        "required": true,
+        "description": "Target token code (`CEX_` or `DEX_`). Purchase: DEX token; Redeem: CEX token (e.g. `CEX_1` for USDT)"
+      },
+      {
+        "name": "quoteMode",
+        "python_name": "quote_mode",
+        "type": "integer",
+        "required": false,
+        "description": "Quote mode. `0`: Auto (default), `1`: Price Priority, `2`: Success Rate Priority"
+      }
+    ],
+    "example": {
+      "tradeType": 1,
+      "fromTokenCode": "CEX_1",
+      "fromTokenAmount": "100",
+      "toTokenCode": "DEX_123",
+      "quoteMode": 0
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/trade-quote.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/alpha/trade/redeem",
+    "title": "Execute Redeem",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/alpha/trade/trade-redeem",
+    "name": "redeem_alpha_trade",
+    "public": false,
+    "fields": [
+      {
+        "name": "fromTokenCode",
+        "python_name": "from_token_code",
+        "type": "string",
+        "required": true,
+        "description": "On-chain token to sell (`DEX_`). Must match the quote request, e.g. `DEX_123"
+      },
+      {
+        "name": "fromTokenAmount",
+        "python_name": "from_token_amount",
+        "type": "string",
+        "required": true,
+        "description": "Amount to sell (positive decimal as string). Must match the quote request"
+      },
+      {
+        "name": "toTokenCode",
+        "python_name": "to_token_code",
+        "type": "string",
+        "required": true,
+        "description": "Payment token to receive (`CEX_`), e.g. `CEX_1` for USDT. Must match the quote request"
+      },
+      {
+        "name": "slippage",
+        "python_name": "slippage",
+        "type": "string",
+        "required": true,
+        "description": "Slippage tolerance as decimal. `0.005` = 0.5%, `0.01` = 1%, `0.05` = 5%"
+      },
+      {
+        "name": "quoteData",
+        "python_name": "quote_data",
+        "type": "string",
+        "required": true,
+        "description": "Base64-encoded quote data. Must pass as-is from the `/quote` response"
+      },
+      {
+        "name": "gas",
+        "python_name": "gas",
+        "type": "string",
+        "required": true,
+        "description": "Estimated gas fee. Must pass as-is from the `/quote` response"
+      },
+      {
+        "name": "quoteMode",
+        "python_name": "quote_mode",
+        "type": "integer",
+        "required": true,
+        "description": "Quote mode. Must be consistent with the `/quote` request. `0`: Auto, `1`: Price Priority, `2`: Success Rate Priority"
+      },
+      {
+        "name": "correctingCode",
+        "python_name": "correcting_code",
+        "type": "string",
+        "required": true,
+        "description": "MD5 checksum for data integrity. Must pass as-is from the `/quote` response"
+      },
+      {
+        "name": "tenant",
+        "python_name": "tenant",
+        "type": "string",
+        "required": false,
+        "description": "Optional tenant identifier"
+      }
+    ],
+    "example": {
+      "fromTokenCode": "DEX_123",
+      "fromTokenAmount": "10000000",
+      "toTokenCode": "CEX_1",
+      "slippage": "0.01",
+      "quoteData": "eyJhbGciOiJIUzI1NiJ9...",
+      "gas": "0.0003",
+      "quoteMode": 0,
+      "correctingCode": "a1b2c3d4e5f6"
+    },
+    "has_example": true,
+    "source_file": "v5/alpha/trade/trade-redeem.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

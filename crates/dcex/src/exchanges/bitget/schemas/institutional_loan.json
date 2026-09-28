@@ -1,0 +1,444 @@
+[
+  {
+    "name": "classic_instloan_account_get_ltv",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/ltv-convert",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "riskUnitId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#get-ltv",
+    "summary": "Get LTV"
+  },
+  {
+    "name": "classic_instloan_account_bind_risk_unit",
+    "method": "POST",
+    "path": "/api/v2/spot/ins-loan/bind-uid",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "riskUnitId",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Risk Unit ID (Required for parent account calls, not required for risk unit account calls)"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "uid",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Sub UID（limit 50 UIDS for one Risk Unit）"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "operate",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "`bind` Bind \n\n `unbind` Unbind"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#bind-unbind-sub-account-uid-to-risk-unit",
+    "summary": "Bind/Unbind Sub-account UID to Risk Unit"
+  },
+  {
+    "name": "classic_instloan_account_get_risk_unit",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/risk-unit",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#get-risk-unit",
+    "summary": "Get Risk Unit"
+  },
+  {
+    "name": "classic_instloan_account_get_transferred_amount_from_spot_account",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/transfered",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "userId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#get-transferable-amount",
+    "summary": "Get transferable amount"
+  },
+  {
+    "name": "classic_instloan_orders_get_loan_orders",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/loan-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-orders/classic-instloan-orders#get-loan-orders",
+    "summary": "Get Loan Orders"
+  },
+  {
+    "name": "classic_instloan_orders_get_repayment_orders",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/repaid-history",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-orders/classic-instloan-orders#get-repayment-orders",
+    "summary": "Get Repayment Orders"
+  },
+  {
+    "name": "classic_instloan_public_get_product_info",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/product-infos",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-public/classic-instloan-public#get-product-info",
+    "summary": "Get Product Info"
+  },
+  {
+    "name": "classic_instloan_public_get_margin_coin_info",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/ensure-coins-convert",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-public/classic-instloan-public#get-margin-coin-info",
+    "summary": "Get Margin Coin Info"
+  },
+  {
+    "name": "classic_instloan_public_get_spot_symbols",
+    "method": "GET",
+    "path": "/api/v2/spot/ins-loan/symbols",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-instloan-public/classic-instloan-public#get-spot-symbols",
+    "summary": "Get Spot Symbols"
+  },
+  {
+    "name": "institutional_loan_bind_uid",
+    "method": "POST",
+    "path": "/api/v3/ins-loan/bind-uid",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "riskUnitId",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "description": "Risk Unit ID (Required for parent account calls, not required for risk unit account calls)"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "uid",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Sub UID (limit 50 UIDs for one Risk Unit)"
+        },
+        "location": "body"
+      },
+      {
+        "wire": "operate",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "`bind` Bind \n\n`unbind` Unbind"
+        },
+        "location": "body"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#bind-unbind-uid-to-risk-unit",
+    "summary": "Bind/Unbind UID to Risk Unit"
+  },
+  {
+    "name": "institutional_loan_get_margin_coin_info",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/ensure-coins-convert",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-margin-coin-info",
+    "summary": "Get Margin Coin Info"
+  },
+  {
+    "name": "institutional_loan_get_ltv",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/ltv-convert",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "riskUnitId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-ltv",
+    "summary": "Get LTV"
+  },
+  {
+    "name": "institutional_loan_get_loan_orders",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/loan-order",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "orderId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-loan-orders",
+    "summary": "Get Loan Orders"
+  },
+  {
+    "name": "institutional_loan_get_product_info",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/product-infos",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-product-info",
+    "summary": "Get Product Info"
+  },
+  {
+    "name": "institutional_loan_get_repayment_orders",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/repaid-history",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "startTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "endTime",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "limit",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-repayment-orders",
+    "summary": "Get Repayment Orders"
+  },
+  {
+    "name": "institutional_loan_get_risk_unit",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/risk-unit",
+    "public": false,
+    "confirm": false,
+    "fields": [],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-risk-unit",
+    "summary": "Get Risk Unit"
+  },
+  {
+    "name": "institutional_loan_get_trade_symbols",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/symbols",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "productId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-trade-symbols",
+    "summary": "Get Trade Symbols"
+  },
+  {
+    "name": "institutional_loan_get_transferred_quantity",
+    "method": "GET",
+    "path": "/api/v3/ins-loan/transfered",
+    "public": false,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "userId",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/institutional-loan/loan#get-transferred-quantity",
+    "summary": "Get Transferred Quantity"
+  }
+]

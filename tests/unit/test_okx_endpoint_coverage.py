@@ -2310,7 +2310,9 @@ WRAPPER_FILES = (
 )
 
 
-COMPLETION = json.loads((ROOT / "tests/fixtures/okx_completion.json").read_text(encoding="utf-8"))
+COMPLETION = json.loads(
+    (ROOT / "tests/fixtures/okx_request_cases.json").read_text(encoding="utf-8")
+)
 COMPLETION_NAMES = {e["name"] for e in COMPLETION}
 CASES += tuple(
     Case(

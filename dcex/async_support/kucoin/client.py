@@ -5,7 +5,7 @@ from typing import Any
 
 from ._account_http import AccountHTTP
 from ._earn_http import EarnHTTP
-from ._inventory_http import InventoryHTTP
+from ._generated import GeneratedHTTP
 from ._margin_http import MarginHTTP
 from ._market_http import MarketHTTP
 
@@ -15,7 +15,7 @@ class Client(
     AccountHTTP,
     EarnHTTP,
     MarginHTTP,
-    InventoryHTTP,
+    GeneratedHTTP,
 ):
     """KuCoin async client for trading operations."""
 

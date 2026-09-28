@@ -1,0 +1,30 @@
+[
+  {
+    "row": 4543,
+    "name": "get_user_to_multi_sig_signers",
+    "type": "userToMultiSigSigners",
+    "variant": "",
+    "public": true,
+    "user": true,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/info.py#L626",
+    "required_fields": [
+      "user"
+    ]
+  },
+  {
+    "row": 4544,
+    "name": "get_extra_agents",
+    "type": "extraAgents",
+    "variant": "",
+    "public": true,
+    "user": true,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/info.py#L763",
+    "required_fields": [
+      "user"
+    ]
+  }
+]

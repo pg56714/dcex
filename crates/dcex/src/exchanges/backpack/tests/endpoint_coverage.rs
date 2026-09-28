@@ -157,6 +157,28 @@ const PUBLIC_CASES: &[Case] = &[
 ];
 
 const PRIVATE_CASES: &[Case] = &[
+    // Cases retained from the independent Python endpoint wire suite.
+    private(
+        "submit_rfq_quote",
+        "quoteSubmit",
+        &[
+            ("rfqId", "rfq-1"),
+            ("bidPrice", "100.000000000000000001"),
+            ("askPrice", "101"),
+        ],
+        "POST /api/v1/rfq/quote",
+    ),
+    private(
+        "create_withdrawal",
+        "withdraw",
+        &[
+            ("address", "offline-address"),
+            ("blockchain", "Solana"),
+            ("symbol", "USDC"),
+            ("quantity", "1.000000000000000001"),
+        ],
+        "POST /wapi/v1/capital/withdrawals",
+    ),
     private(
         "execute_borrow_lend",
         "borrowLendExecute",

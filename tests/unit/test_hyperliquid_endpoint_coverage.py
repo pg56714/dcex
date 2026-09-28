@@ -806,7 +806,7 @@ def _public_methods(cls: type) -> set[str]:
 
 def test_every_hyperliquid_wrapper_has_a_coverage_case() -> None:
     """New sync or async wrappers must be added to this offline coverage table."""
-    from tests.unit.test_hyperliquid_inventory_completion import NAMES
+    from tests.unit.test_hyperliquid_admin_actions import NAMES
 
     covered = {case.method for case in WRAPPER_CASES} | NAMES
     assert _public_methods(Client) == covered
@@ -874,8 +874,10 @@ def test_wrapper_params_reach_official_wire_type(case: WrapperCase) -> None:
     if case.method == "borrow_lend_signed":
         assert payload == {
             "action": {"type": "borrowLend", "operation": "supply", "token": 0, "amount": "1"},
-            "nonce": 100, "signature": SIGNATURE,
-            "vaultAddress": USER, "expiresAfter": 1900000000000,
+            "nonce": 100,
+            "signature": SIGNATURE,
+            "vaultAddress": USER,
+            "expiresAfter": 1900000000000,
         }
     if case.kind == "public":
         assert last["path"] == "/info"

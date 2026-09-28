@@ -1,0 +1,162 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/user/aff-customer-info",
+    "title": "Get Affiliate User Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/affiliate/affiliate-info",
+    "name": "get_user_aff_customer_info",
+    "public": false,
+    "fields": [
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": true,
+        "description": "The master account UID of affiliate's client"
+      },
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": false,
+        "description": "Coin type for filtering, e.g., `USDT"
+      },
+      {
+        "name": "business",
+        "python_name": "business",
+        "type": "string",
+        "required": false,
+        "description": "Business line filter. `1`: Derivatives, `2`: Spot, `3`: ByFi, `4`: USDC, `5`: Options"
+      }
+    ],
+    "example": {
+      "uid": "1513500"
+    },
+    "has_example": true,
+    "source_file": "v5/affiliate/affiliate-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/account/demo-apply-money",
+    "title": "Demo Trading Service",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/demo",
+    "name": "request_demo_funds",
+    "public": false,
+    "fields": [
+      {
+        "name": "adjustType",
+        "python_name": "adjust_type",
+        "type": "integer",
+        "required": false,
+        "description": "0`(default): add demo funds; `1`: reduce demo funds"
+      },
+      {
+        "name": "utaDemoApplyMoney",
+        "python_name": "uta_demo_apply_money",
+        "type": "array",
+        "required": false,
+        "description": ""
+      }
+    ],
+    "example": {
+      "adjustType": 0,
+      "utaDemoApplyMoney": [
+        {
+          "coin": "USDT",
+          "amountStr": "109"
+        },
+        {
+          "coin": "ETH",
+          "amountStr": "1"
+        }
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/demo.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/user/create-demo-member",
+    "title": "Demo Trading Service",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/demo",
+    "name": "create_demo_member",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/demo.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins/ip/changelog",
+    "title": "Get Institution IP Change Log",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/institution/ip-changelog",
+    "name": "get_ins_ip_changelog",
+    "public": false,
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "string",
+        "required": false,
+        "description": "Filter start time, Unix timestamp in milliseconds"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "string",
+        "required": false,
+        "description": "Filter end time, Unix timestamp in milliseconds"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Records per page. Range: [1, 50]. Default: 20"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor. Use the `nextPageCursor` value from the previous response"
+      }
+    ],
+    "example": {
+      "limit": "3"
+    },
+    "has_example": true,
+    "source_file": "v5/institution/ip-changelog.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins/whitelist/ip",
+    "title": "Get Institution Whitelist IP",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/institution/whitelist-ip",
+    "name": "get_ins_whitelist_ip",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/institution/whitelist-ip.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/user/invitation/code",
+    "title": "Get Referral Code",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/user/referral-code",
+    "name": "get_user_invitation_code",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/user/referral-code.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

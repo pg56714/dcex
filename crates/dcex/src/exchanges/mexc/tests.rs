@@ -9,7 +9,7 @@ use crate::product_table::{MarketInfo, ProductTable};
 use super::endpoints::CONTRACT_DETAIL;
 use super::*;
 
-mod routes;
+mod route_coverage;
 
 fn client() -> MexcClient {
     MexcClient::new(

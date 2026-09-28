@@ -4,13 +4,13 @@
 from typing import Any
 
 from ._account_http import AccountHTTP
-from ._inventory_http import InventoryHTTP
+from ._generated import GeneratedHTTP
 from ._trade_http import TradeHTTP
 
 
 class Client(
     TradeHTTP,
-    InventoryHTTP,
+    GeneratedHTTP,
     AccountHTTP,
 ):
     """BingX async client for trading operations."""

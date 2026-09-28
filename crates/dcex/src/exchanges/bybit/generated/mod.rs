@@ -1,0 +1,20 @@
+//! Generated business-specific Client methods.
+mod account;
+mod affiliate;
+mod alpha;
+mod bots;
+mod broker;
+mod card;
+mod compliance;
+mod convert;
+mod event;
+mod fiat;
+mod file_upload;
+mod leveraged_tokens;
+mod loan;
+mod pwm;
+mod referral;
+mod stocks;
+mod subaccount;
+mod trading;
+mod withdrawals;

@@ -1,0 +1,108 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/account/mmp-state",
+    "title": "Get MMP State",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/account/get-mmp-state",
+    "name": "get_mmp_state",
+    "public": false,
+    "fields": [
+      {
+        "name": "baseCoin",
+        "python_name": "base_coin",
+        "type": "string",
+        "required": true,
+        "description": "Base coin, uppercase only"
+      }
+    ],
+    "example": {},
+    "has_example": false,
+    "source_file": "v5/account/get-mmp-state.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/account/mmp-reset",
+    "title": "Reset MMP",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/account/reset-mmp",
+    "name": "reset_mmp",
+    "public": false,
+    "fields": [
+      {
+        "name": "baseCoin",
+        "python_name": "base_coin",
+        "type": "string",
+        "required": true,
+        "description": "Base coin, uppercase only"
+      }
+    ],
+    "example": {
+      "baseCoin": "ETH"
+    },
+    "has_example": true,
+    "source_file": "v5/account/reset-mmp.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/account/mmp-modify",
+    "title": "Set MMP",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/account/set-mmp",
+    "name": "set_mmp_config",
+    "public": false,
+    "fields": [
+      {
+        "name": "baseCoin",
+        "python_name": "base_coin",
+        "type": "string",
+        "required": true,
+        "description": "Base coin, uppercase only"
+      },
+      {
+        "name": "window",
+        "python_name": "window",
+        "type": "string",
+        "required": true,
+        "description": "Time window (ms)"
+      },
+      {
+        "name": "frozenPeriod",
+        "python_name": "frozen_period",
+        "type": "string",
+        "required": true,
+        "description": "Frozen period (ms). \"0\" means the trade will remain frozen until manually reset"
+      },
+      {
+        "name": "qtyLimit",
+        "python_name": "qty_limit",
+        "type": "string",
+        "required": true,
+        "description": "Trade qty limit (positive and up to 2 decimal places)"
+      },
+      {
+        "name": "deltaLimit",
+        "python_name": "delta_limit",
+        "type": "string",
+        "required": true,
+        "description": "Delta limit (positive and up to 2 decimal places)"
+      },
+      {
+        "name": "vegaLimit",
+        "python_name": "vega_limit",
+        "type": "string",
+        "required": false,
+        "description": "Vega limit (positive and up to 2 decimal places). Default: `500000"
+      }
+    ],
+    "example": {
+      "baseCoin": "ETH",
+      "window": "5000",
+      "frozenPeriod": "100000",
+      "qtyLimit": "50",
+      "deltaLimit": "20"
+    },
+    "has_example": true,
+    "source_file": "v5/account/set-mmp.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

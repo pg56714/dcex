@@ -1,0 +1,34 @@
+[
+  {
+    "method": "POST",
+    "path": "/sapi/v1/account/disableFastWithdrawSwitch",
+    "sdk_method": "disable_fast_withdraw_switch",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#disable-fast-withdraw-switch",
+    "parameters": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "disable_fast_withdraw_switch"
+  },
+  {
+    "method": "POST",
+    "path": "/sapi/v1/account/enableFastWithdrawSwitch",
+    "sdk_method": "enable_fast_withdraw_switch",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#enable-fast-withdraw-switch",
+    "parameters": [
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "enable_fast_withdraw_switch"
+  }
+]

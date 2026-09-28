@@ -1,0 +1,80 @@
+//! Business-specific endpoint and field metadata.
+use super::super::*;
+pub(super) const ENDPOINTS: &[Endpoint] = &[
+    Endpoint {
+        name: "get_futures_subaccount_trading_status",
+        path: "/derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled",
+        method: HttpMethod::Get,
+        auth: KrakenAuth::Futures,
+        public: false,
+        allowed: &["subaccountUid"],
+        fields: &[Field {
+            key: "subaccountUid",
+            kind: "string",
+            required: true,
+            values: &[],
+            minimum: 0,
+        }],
+        symbol_key: None,
+    },
+    Endpoint {
+        name: "set_futures_subaccount_trading_status",
+        path: "/derivatives/api/v3/subaccount/{subaccountUid}/trading-enabled",
+        method: HttpMethod::Put,
+        auth: KrakenAuth::Futures,
+        public: false,
+        allowed: &["subaccountUid", "tradingEnabled"],
+        fields: &[
+            Field {
+                key: "subaccountUid",
+                kind: "string",
+                required: true,
+                values: &[],
+                minimum: 0,
+            },
+            Field {
+                key: "tradingEnabled",
+                kind: "boolean",
+                required: true,
+                values: &[],
+                minimum: 0,
+            },
+        ],
+        symbol_key: None,
+    },
+    Endpoint {
+        name: "create_spot_subaccount",
+        path: "/0/private/CreateSubaccount",
+        method: HttpMethod::Post,
+        auth: KrakenAuth::Spot,
+        public: false,
+        allowed: &["username", "email"],
+        fields: &[
+            Field {
+                key: "username",
+                kind: "string",
+                required: true,
+                values: &[],
+                minimum: 0,
+            },
+            Field {
+                key: "email",
+                kind: "string",
+                required: true,
+                values: &[],
+                minimum: 0,
+            },
+        ],
+        symbol_key: None,
+    },
+    Endpoint {
+        name: "get_futures_subaccounts",
+        path: "/derivatives/api/v3/subaccounts",
+        method: HttpMethod::Get,
+        auth: KrakenAuth::Futures,
+        public: false,
+        allowed: &[],
+        fields: &[],
+        symbol_key: None,
+    },
+];

@@ -1,0 +1,200 @@
+[
+  {
+    "method": "POST",
+    "path": "/v5/ins-loan/association-uid",
+    "title": "Bind Or Unbind UID",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/bind-uid",
+    "name": "request_ins_loan_association_uid",
+    "public": false,
+    "fields": [
+      {
+        "name": "uid",
+        "python_name": "uid",
+        "type": "string",
+        "required": true,
+        "description": "UID Binda) the key used must be from one of UIDs in the risk unit; b) input UID must not have an INS loanUnbinda) the key used must be from one of UIDs in the risk unit; b) input UID cannot be the same as the UID used to access the API"
+      },
+      {
+        "name": "operate",
+        "python_name": "operate",
+        "type": "string",
+        "required": true,
+        "description": "0`: bind, `1`: unbind"
+      }
+    ],
+    "example": {
+      "uid": "592324",
+      "operate": "0"
+    },
+    "has_example": true,
+    "source_file": "v5/otc/bind-uid.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins-loan/coin-delta-amount",
+    "title": "Get Coin Delta Amount",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/coin-delta-amount",
+    "name": "get_ins_loan_coin_delta_amount",
+    "public": false,
+    "fields": [
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": false,
+        "description": "Coin name, uppercase only. e.g. `BTC`. If not passed, returns all coins"
+      }
+    ],
+    "example": {
+      "coin": "BTC"
+    },
+    "has_example": true,
+    "source_file": "v5/otc/coin-delta-amount.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins-loan/delay-liq-status",
+    "title": "Get Delay Liquidation Status",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/delay-liq-status",
+    "name": "get_ins_loan_delay_liq_status",
+    "public": false,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/otc/delay-liq-status.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins-loan/loan-order",
+    "title": "Get Loan Orders",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/loan-info",
+    "name": "get_ins_loan_loan_order",
+    "public": false,
+    "fields": [
+      {
+        "name": "orderId",
+        "python_name": "order_id",
+        "type": "string",
+        "required": false,
+        "description": "Loan order ID. If not passed, returns all orders sorted by `loanTime` in descending order"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "The start timestamp (ms)"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "The end timestamp (ms)"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Limit for data size. [`1`, `100`], Default: `10"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/otc/loan-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins-loan/product-infos",
+    "title": "Get Product Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/margin-product-info",
+    "name": "get_ins_loan_product_infos",
+    "public": true,
+    "fields": [
+      {
+        "name": "productId",
+        "python_name": "product_id",
+        "type": "string",
+        "required": false,
+        "description": "Product ID. If not passed, returns all products"
+      }
+    ],
+    "example": {
+      "productId": "91"
+    },
+    "has_example": true,
+    "source_file": "v5/otc/margin-product-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/ins-loan/repaid-history",
+    "title": "Get Repayment Orders",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/repay-info",
+    "name": "get_ins_loan_repaid_history",
+    "public": false,
+    "fields": [
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "The start timestamp (ms)"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "The end timestamp (ms)"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Limit for data size. [`1`, `100`]. Default: `100"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/otc/repay-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/ins-loan/repay-loan",
+    "title": "Repay",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/otc/repay",
+    "name": "request_ins_loan_repay_loan",
+    "public": false,
+    "fields": [
+      {
+        "name": "token",
+        "python_name": "token",
+        "type": "string",
+        "required": true,
+        "description": "Coin name"
+      },
+      {
+        "name": "quantity",
+        "python_name": "quantity",
+        "type": "string",
+        "required": true,
+        "description": "The qty to be repaid"
+      }
+    ],
+    "example": {
+      "token": "USDT",
+      "quantity": "500000"
+    },
+    "has_example": true,
+    "source_file": "v5/otc/repay.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

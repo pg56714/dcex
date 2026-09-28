@@ -319,7 +319,7 @@ fn aster_market(market: &str) -> PyResult<AsterMarket> {
     }
 }
 
-mod functions;
+mod function_bindings;
 mod product_table;
 
 #[path = "clients/arcus.rs"]
@@ -419,6 +419,6 @@ fn _native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     binance_ws::register(m)?;
     okx_ws::register(m)?;
     product_table::register(m)?;
-    functions::register(m)?;
+    function_bindings::register(m)?;
     Ok(())
 }

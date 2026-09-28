@@ -1,0 +1,14 @@
+[
+  {
+    "row": 4131,
+    "name": "get_outcome_templates",
+    "type": "outcomeTemplates",
+    "variant": "",
+    "public": true,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/hip-4-deployer-actions#action-format",
+    "required_fields": []
+  }
+]

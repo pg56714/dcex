@@ -2,8 +2,7 @@ pub mod wrappers;
 
 mod account;
 mod client;
-mod completion;
-mod completion_wrappers;
+
 mod endpoints;
 mod market;
 mod params;
@@ -16,4 +15,10 @@ pub mod websocket;
 
 pub use client::{BackpackClient, SignaturePayload};
 
-mod additional;
+mod withdrawals;
+
+mod borrow_lend;
+
+mod prediction;
+
+mod vault;

@@ -13,4 +13,10 @@ pub use client::ExtendedClient;
 #[cfg(test)]
 mod tests;
 
-mod risk;
+mod portfolio;
+
+mod interest;
+
+mod vault;
+
+mod rewards;

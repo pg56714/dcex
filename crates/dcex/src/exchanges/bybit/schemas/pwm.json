@@ -1,0 +1,1039 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/asset-manager/all-funds",
+    "title": "Get All Funds",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/all-funds",
+    "name": "get_earn_pwm_asset_manager_all_funds",
+    "public": false,
+    "fields": [
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": false,
+        "description": "Filter by coin"
+      },
+      {
+        "name": "fundId",
+        "python_name": "fund_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by fund ID. Only funds created by the institution via Open API can be queried"
+      },
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "string",
+        "required": false,
+        "description": "Filter by status: `PendingSubscribe` / `Active` / `Closing` / `Closed"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Page size. Default: `20`, max: `50"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor (uses fund ID as cursor)"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/all-funds.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/asset-manager/all-order",
+    "title": "Get All Fund Orders",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/all-order",
+    "name": "get_earn_pwm_asset_manager_all_order",
+    "public": false,
+    "fields": [
+      {
+        "name": "fundId",
+        "python_name": "fund_id",
+        "type": "string",
+        "required": false,
+        "description": "Filter by fund ID. Returns orders for all managed funds if omitted"
+      },
+      {
+        "name": "orderType",
+        "python_name": "order_type",
+        "type": "string",
+        "required": false,
+        "description": "Order type filter: `Subscribe` / `Redeem`. Returns all if omitted"
+      },
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "string",
+        "required": false,
+        "description": "Order status filter: `Pending Review` / `Processing` / `Completed` / `Rejected` / `Failed`. Returns all if omitted"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "integer",
+        "required": false,
+        "description": "Start time in milliseconds. See time range rules below"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "integer",
+        "required": false,
+        "description": "End time in milliseconds. See time range rules below"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Page size. Default: `20`, max: `50"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor (uses order `orderId` as cursor)"
+      }
+    ],
+    "example": {
+      "fundId": "100001",
+      "limit": "20"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/all-order.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/asset-manager/create-fund",
+    "title": "Create Fund (Pending Subscription)",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-fund",
+    "name": "request_earn_pwm_asset_manager_create_fund",
+    "public": false,
+    "fields": [
+      {
+        "name": "fundName",
+        "python_name": "fund_name",
+        "type": "string",
+        "required": true,
+        "description": "Fund name, 1–50 characters"
+      },
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": true,
+        "description": "Base coin. Supported values: `BTC`, `ETH`, `USDT`, `USDC`, `SOL`, `MNT`, `XRP"
+      },
+      {
+        "name": "profitShareRate",
+        "python_name": "profit_share_rate",
+        "type": "string",
+        "required": true,
+        "description": "High-watermark profit sharing rate (%), range: 0–100"
+      },
+      {
+        "name": "managementFeeRate",
+        "python_name": "management_fee_rate",
+        "type": "string",
+        "required": true,
+        "description": "Management fee rate (annualized %), range: 0–100"
+      },
+      {
+        "name": "fundIntroduction",
+        "python_name": "fund_introduction",
+        "type": "string",
+        "required": false,
+        "description": "Fund introduction ID (must be in the institution's allowed list)"
+      },
+      {
+        "name": "reqLinkId",
+        "python_name": "req_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined request ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "fundName": "BTC Alpha Fund",
+      "coin": "BTC",
+      "profitShareRate": "20.00",
+      "managementFeeRate": "2.00",
+      "reqLinkId": "create-fund-001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/create-fund.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/asset-manager/create-investment-plan",
+    "title": "Create Investment Plan",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-investment-plan",
+    "name": "request_earn_pwm_asset_manager_create_investment_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "accountUid",
+        "python_name": "account_uid",
+        "type": "string",
+        "required": true,
+        "description": "Target user UID"
+      },
+      {
+        "name": "planName",
+        "python_name": "plan_name",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan name, max 50 characters"
+      },
+      {
+        "name": "planType",
+        "python_name": "plan_type",
+        "type": "string",
+        "required": true,
+        "description": "Plan type: `stable` / `advanced"
+      },
+      {
+        "name": "investmentDistribution",
+        "python_name": "investment_distribution",
+        "type": "array",
+        "required": true,
+        "description": "Fund configuration list. At least 1 fund required"
+      },
+      {
+        "name": "reqLinkId",
+        "python_name": "req_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined request ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "accountUid": "800001",
+      "planName": "Conservative Growth Plan",
+      "planType": "stable",
+      "investmentDistribution": [
+        {
+          "productId": "12345",
+          "amount": "100000.00"
+        }
+      ],
+      "reqLinkId": "create-plan-001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/create-investment-plan.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/asset-manager/create-sub-account",
+    "title": "Create Fund Sub-Account",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/create-sub-account",
+    "name": "request_earn_pwm_asset_manager_create_sub_account",
+    "public": false,
+    "fields": [
+      {
+        "name": "fundId",
+        "python_name": "fund_id",
+        "type": "string",
+        "required": true,
+        "description": "Fund ID"
+      },
+      {
+        "name": "reqLinkId",
+        "python_name": "req_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined request ID, used to prevent duplicate creation"
+      }
+    ],
+    "example": {
+      "fundId": "100001",
+      "reqLinkId": "create-sub-001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/create-sub-account.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/asset-manager/get-investment-plan",
+    "title": "Get Investment Plans",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/get-investment-plan",
+    "name": "get_earn_pwm_asset_manager_get_investment_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": false,
+        "description": "Investment plan ID. Returns all plans if omitted. Only plans created by the institution via Open API can be queried"
+      },
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "string",
+        "required": false,
+        "description": "Filter by status: `PendingSubscription` / `Active` / `Closed` / `Deleted`. Returns all if omitted"
+      },
+      {
+        "name": "subscriptionUid",
+        "python_name": "subscription_uid",
+        "type": "string",
+        "required": false,
+        "description": "UID of the user who subscribed to the investment plan"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "integer",
+        "required": false,
+        "description": "Page size. Default: `20`, max: `50"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/get-investment-plan.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/asset-manager/manage-investment-plan",
+    "title": "Manage Investment Plan",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/manage-investment-plan",
+    "name": "request_earn_pwm_asset_manager_manage_investment_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID"
+      },
+      {
+        "name": "updateStatus",
+        "python_name": "update_status",
+        "type": "string",
+        "required": false,
+        "description": "Update plan status. Options: `Closed` / `Deleted`. Status is unchanged if omitted"
+      },
+      {
+        "name": "updateFunds",
+        "python_name": "update_funds",
+        "type": "array",
+        "required": false,
+        "description": "Fund list to update. If a matching `fundId` exists, the amount is updated; otherwise a new fund is added. Max 10 entries. Returns an error if duplicate `fundId` entries are present"
+      },
+      {
+        "name": "reqLinkId",
+        "python_name": "req_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined request ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "planId": "10088",
+      "updateStatus": "Closed",
+      "updateFunds": [
+        {
+          "fundId": "430",
+          "amount": "100000"
+        },
+        {
+          "fundId": "2005",
+          "amount": "270000"
+        }
+      ],
+      "reqLinkId": "manage-plan-001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/manage-investment-plan.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/asset-manager/manage-order",
+    "title": "Manage Order",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/manage-order",
+    "name": "request_earn_pwm_asset_manager_manage_order",
+    "public": false,
+    "fields": [
+      {
+        "name": "orderId",
+        "python_name": "order_id",
+        "type": "string",
+        "required": true,
+        "description": "Order ID. Must be in `Pending Review` status"
+      },
+      {
+        "name": "action",
+        "python_name": "action",
+        "type": "string",
+        "required": true,
+        "description": "Action to perform: `approve` / `reject"
+      },
+      {
+        "name": "reqLinkId",
+        "python_name": "req_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined request ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "orderId": "500002",
+      "action": "approve",
+      "reqLinkId": "manage-order-001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/manage-order.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/asset-manager/settle-profit",
+    "title": "Settle Fund Profit",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/asset-manager/settle-profit",
+    "name": "request_earn_pwm_asset_manager_settle_profit",
+    "public": false,
+    "fields": [
+      {
+        "name": "fundId",
+        "python_name": "fund_id",
+        "type": "string",
+        "required": true,
+        "description": "Fund ID"
+      },
+      {
+        "name": "reqLinkId",
+        "python_name": "req_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined request ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "fundId": "12323",
+      "reqLinkId": "settle-001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/asset-manager/settle-profit.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/customize-plan/create",
+    "title": "Create Customize Investment Plan",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/customize-plan/create",
+    "name": "create_earn_pwm_customize_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "accountType",
+        "python_name": "account_type",
+        "type": "string",
+        "required": false,
+        "description": "Source account type. Default: `FUND"
+      },
+      {
+        "name": "products",
+        "python_name": "products",
+        "type": "array",
+        "required": true,
+        "description": "Product configuration list. At least 1 item required"
+      }
+    ],
+    "example": {
+      "accountType": "FUND",
+      "products": [
+        {
+          "category": "equityFund",
+          "productId": "2001",
+          "fundName": "Market Neutral Alpha",
+          "amount": "100000.00"
+        },
+        {
+          "category": "multiCoinEarning",
+          "productId": "430",
+          "fundName": "",
+          "amount": "50000.00"
+        }
+      ]
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/customize-plan/create.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/customize-plan/product",
+    "title": "Get Subscribable Product Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/customize-plan/product",
+    "name": "get_earn_pwm_customize_plan_product",
+    "public": true,
+    "fields": [],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/finance/pwm/customize-plan/product.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/fund-transfer",
+    "title": "Fund Transfer Between Sub-Accounts",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/fund-transfer",
+    "name": "request_earn_pwm_fund_transfer",
+    "public": false,
+    "fields": [
+      {
+        "name": "transferId",
+        "python_name": "transfer_id",
+        "type": "string",
+        "required": true,
+        "description": "Transfer request ID"
+      },
+      {
+        "name": "fromUserId",
+        "python_name": "from_user_id",
+        "type": "int64",
+        "required": true,
+        "description": "Source UID. Must be a custodian sub-account of the current fund"
+      },
+      {
+        "name": "toUserId",
+        "python_name": "to_user_id",
+        "type": "int64",
+        "required": true,
+        "description": "Destination UID. Must be a custodian sub-account of the current fund"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "Transfer amount"
+      },
+      {
+        "name": "coin",
+        "python_name": "coin",
+        "type": "string",
+        "required": true,
+        "description": "Coin name"
+      }
+    ],
+    "example": {
+      "transferId": "4fdf-re-4343-frewr",
+      "fromUserId": 800001,
+      "toUserId": 800002,
+      "amount": "1.00",
+      "coin": "BTC"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/fund-transfer.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/investment-plan/all",
+    "title": "Get All Investment Plans",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/all",
+    "name": "get_earn_pwm_investment_plan_all",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": false,
+        "description": "Investment plan ID. Returns all plans if omitted"
+      },
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "string",
+        "required": false,
+        "description": "Filter by status: `PendingSubscription` / `Active` / `Closed`. Returns all if omitted"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "int",
+        "required": false,
+        "description": "Page size. Default: `20`, max: `50"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor"
+      }
+    ],
+    "example": {},
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/all.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/investment-plan/asset-trend",
+    "title": "Get Asset Trend",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/asset-trend",
+    "name": "get_earn_pwm_investment_plan_asset_trend",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "int",
+        "required": false,
+        "description": "Start timestamp (ms). Default: current time minus 7 days"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "int",
+        "required": false,
+        "description": "End timestamp (ms). Default: current time"
+      }
+    ],
+    "example": {
+      "planId": "10001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/asset-trend.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/investment-plan/claim",
+    "title": "Claim Withdrawable Funds",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/claim",
+    "name": "claim_earn_pwm_investment_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID. Must be in `Active` status"
+      },
+      {
+        "name": "toAccountType",
+        "python_name": "to_account_type",
+        "type": "string",
+        "required": false,
+        "description": "Target account type. Default: `FUND"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined order ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "planId": "10001",
+      "toAccountType": "FUND",
+      "orderLinkId": "claim-order-001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/claim.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/investment-plan/detail",
+    "title": "Get Investment Plan Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/detail",
+    "name": "get_earn_pwm_investment_plan_detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID. Must be in `Active` or `Closed` status"
+      }
+    ],
+    "example": {
+      "planId": "10001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/detail.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/investment-plan/fund-nav",
+    "title": "Get Fund Historical NAV",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/fund-nav",
+    "name": "get_earn_pwm_investment_plan_fund_nav",
+    "public": false,
+    "fields": [
+      {
+        "name": "fundId",
+        "python_name": "fund_id",
+        "type": "string",
+        "required": true,
+        "description": "Fund ID"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "int",
+        "required": false,
+        "description": "Start timestamp (ms). Default: current time minus 7 days"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "int",
+        "required": false,
+        "description": "End timestamp (ms). Default: current time"
+      }
+    ],
+    "example": {
+      "fundId": "2001"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/fund-nav.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/investment-plan/invest-more",
+    "title": "Invest More",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/invest-more",
+    "name": "request_earn_pwm_investment_plan_invest_more",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID. Must be in `Active` status"
+      },
+      {
+        "name": "accountType",
+        "python_name": "account_type",
+        "type": "string",
+        "required": false,
+        "description": "Source account type. Default: `FUND"
+      },
+      {
+        "name": "category",
+        "python_name": "category",
+        "type": "string",
+        "required": true,
+        "description": "Product type"
+      },
+      {
+        "name": "productId",
+        "python_name": "product_id",
+        "type": "string",
+        "required": true,
+        "description": "Product ID"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": true,
+        "description": "Additional investment amount (base coin)"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined order ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "planId": "10001",
+      "accountType": "FUND",
+      "category": "equityFund",
+      "productId": "2001",
+      "amount": "20000.00",
+      "orderLinkId": "xxx"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/invest-more.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/investment-plan/new-plan",
+    "title": "Get Pending Investment Plan Detail",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/new-plan",
+    "name": "get_earn_pwm_investment_plan_new_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID. Must be in `PendingSubscription` status"
+      }
+    ],
+    "example": {
+      "planId": "10003"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/new-plan.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/investment-plan/order",
+    "title": "Get Investment Plan Orders",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/order",
+    "name": "get_earn_pwm_investment_plan_order",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": false,
+        "description": "Investment plan ID. Returns orders for all plans if omitted"
+      },
+      {
+        "name": "category",
+        "python_name": "category",
+        "type": "string",
+        "required": false,
+        "description": "Product type filter: `flexibleSavings` / `fundPool` / `fundPoolPremium` / `equityFund` / `onchainEarn`. Returns all if omitted"
+      },
+      {
+        "name": "type",
+        "python_name": "type_",
+        "type": "string",
+        "required": false,
+        "description": "Order type filter: `Subscribe` / `Redeem`. Returns all if omitted"
+      },
+      {
+        "name": "status",
+        "python_name": "status",
+        "type": "string",
+        "required": false,
+        "description": "Order status filter: `Completed` / `Pending` / `Failed`. Returns all if omitted"
+      },
+      {
+        "name": "startTime",
+        "python_name": "start_time",
+        "type": "string",
+        "required": false,
+        "description": "Start time in milliseconds. No lower limit if omitted"
+      },
+      {
+        "name": "endTime",
+        "python_name": "end_time",
+        "type": "string",
+        "required": false,
+        "description": "End time in milliseconds. Defaults to current time if omitted"
+      },
+      {
+        "name": "limit",
+        "python_name": "limit",
+        "type": "int",
+        "required": false,
+        "description": "Page size. Default: `20`, max: `50"
+      },
+      {
+        "name": "cursor",
+        "python_name": "cursor",
+        "type": "string",
+        "required": false,
+        "description": "Pagination cursor"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": false,
+        "description": "User-defined order ID, max 36 characters"
+      }
+    ],
+    "example": {
+      "planId": "10001",
+      "limit": "20"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/order.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/investment-plan/redeem",
+    "title": "Redeem",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/redeem",
+    "name": "redeem_earn_pwm_investment_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID"
+      },
+      {
+        "name": "category",
+        "python_name": "category",
+        "type": "string",
+        "required": true,
+        "description": "Product type"
+      },
+      {
+        "name": "productId",
+        "python_name": "product_id",
+        "type": "string",
+        "required": true,
+        "description": "Product ID. Pass `fundId` for fund products"
+      },
+      {
+        "name": "shares",
+        "python_name": "shares",
+        "type": "string",
+        "required": false,
+        "description": "Number of shares to redeem. Required for fund products"
+      },
+      {
+        "name": "amount",
+        "python_name": "amount",
+        "type": "string",
+        "required": false,
+        "description": "Redemption amount. Required for non-fund products"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined order ID, max 36 characters, used for idempotency"
+      },
+      {
+        "name": "positionId",
+        "python_name": "position_id",
+        "type": "string",
+        "required": false,
+        "description": "Position ID to redeem. Required for FundPool and On-chain Earn products"
+      }
+    ],
+    "example": {
+      "planId": "10001",
+      "category": "equityFund",
+      "productId": "2001",
+      "shares": "3000",
+      "orderLinkId": "xxx"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/redeem.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "POST",
+    "path": "/v5/earn/pwm/investment-plan/subscribe",
+    "title": "Subscribe Investment Plan",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/investment-plan/subscribe",
+    "name": "subscribe_earn_pwm_investment_plan",
+    "public": false,
+    "fields": [
+      {
+        "name": "planId",
+        "python_name": "plan_id",
+        "type": "string",
+        "required": true,
+        "description": "Investment plan ID. Must be in `PendingSubscription` status"
+      },
+      {
+        "name": "accountType",
+        "python_name": "account_type",
+        "type": "string",
+        "required": false,
+        "description": "Source account type. Default: `FUND"
+      },
+      {
+        "name": "orderLinkId",
+        "python_name": "order_link_id",
+        "type": "string",
+        "required": true,
+        "description": "User-defined order ID, max 36 characters, used for idempotency"
+      }
+    ],
+    "example": {
+      "planId": "10001",
+      "accountType": "FUND",
+      "orderLinkId": "xxx"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/investment-plan/subscribe.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  },
+  {
+    "method": "GET",
+    "path": "/v5/earn/pwm/query-fund-transfer-result",
+    "title": "Get Fund Transfer Records",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/finance/pwm/query-fund-transfer-result",
+    "name": "get_earn_pwm_query_fund_transfer_result",
+    "public": false,
+    "fields": [
+      {
+        "name": "transferId",
+        "python_name": "transfer_id",
+        "type": "string",
+        "required": false,
+        "description": "Transfer request ID. If omitted, returns up to the 20 most recent non-terminal transfer records within the past month. Records older than one month may have been archived"
+      },
+      {
+        "name": "fromUserId",
+        "python_name": "from_user_id",
+        "type": "int64",
+        "required": false,
+        "description": "Source UID"
+      }
+    ],
+    "example": {
+      "transferId": "4fdf-re-4343-frewr"
+    },
+    "has_example": true,
+    "source_file": "v5/finance/pwm/query-fund-transfer-result.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

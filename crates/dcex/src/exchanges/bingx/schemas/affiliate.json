@@ -1,0 +1,384 @@
+[
+  {
+    "name": "get_agent_v1_asset_partner_data",
+    "method": "GET",
+    "path": "/openApi/agent/v1/asset/partnerData",
+    "signed": true,
+    "fields": [
+      {
+        "name": "uid",
+        "type": "long",
+        "required": false,
+        "description": "Partner UID",
+        "kind": "int"
+      },
+      {
+        "name": "startTime",
+        "type": "int64",
+        "required": false,
+        "description": "Start time, unit: day, only supports querying the latest 3 months. ",
+        "kind": "int"
+      },
+      {
+        "name": "endTime",
+        "type": "int64",
+        "required": false,
+        "description": "End time, unit: day, only supports querying the latest 3 months. ",
+        "kind": "int"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": false,
+        "description": "如果未填寫，預設值為1",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": false,
+        "description": "the maximum value is 200",
+        "kind": "int"
+      },
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": false,
+        "description": "Request valid time window value, unit: milliseconds. If not filled, the default is 5 seconds",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20partner%20information",
+    "summary": "Query partner information",
+    "scoped": false
+  },
+  {
+    "name": "get_agent_v2_reward_commission_data_list",
+    "method": "GET",
+    "path": "/openApi/agent/v2/reward/commissionDataList",
+    "signed": true,
+    "fields": [
+      {
+        "name": "uid",
+        "type": "long",
+        "required": false,
+        "description": "Inquire about the daily commission of the user who invited the invitation by their UID.",
+        "kind": "int"
+      },
+      {
+        "name": "invitationCode",
+        "type": "string",
+        "required": false,
+        "description": "Invitation code: Check the daily commissions of users associated with that invitation code.",
+        "kind": "str"
+      },
+      {
+        "name": "businessType",
+        "type": "string",
+        "required": false,
+        "description": "perpetualFutures: Perpetual contracts; standardFutures: Standard contracts; spot: Spot trading; copyTradePro: External copy trading; tradFi: TradFi; if empty, it defaults to querying all. To query crypto perpetual futures data, subtract tradFi data from perpetualFutures data.",
+        "kind": "str"
+      },
+      {
+        "name": "distanceType",
+        "type": "int64",
+        "required": false,
+        "description": "Invitation relationship type: omit this parameter to query all; 1: direct invite; 2: indirect invite.",
+        "kind": "int"
+      },
+      {
+        "name": "startTime",
+        "type": "date",
+        "required": true,
+        "description": "Start timestamp, unit: days, maximum query window size is 7 days, window panning range is the most recent 366 days.",
+        "kind": "str"
+      },
+      {
+        "name": "endTime",
+        "type": "date",
+        "required": true,
+        "description": "End timestamp, unit: days; maximum query window size: 7 days; window scrolling range: the most recent 366 days.",
+        "kind": "str"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": true,
+        "description": "Page number for pagination, must be greater than 0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": true,
+        "description": "Page size for pagination, must be greater than 0 with a maximum value of 100.",
+        "kind": "int"
+      },
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": true,
+        "description": "Request the valid time window value, in milliseconds.",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Daily%20commission%20details",
+    "summary": "Daily commission details",
+    "scoped": false
+  },
+  {
+    "name": "get_agent_v1_reward_third_commission_data_list",
+    "method": "GET",
+    "path": "/openApi/agent/v1/reward/third/commissionDataList",
+    "signed": true,
+    "fields": [
+      {
+        "name": "uid",
+        "type": "long",
+        "required": false,
+        "description": "UID of the trading user (non-invitation relationship user)",
+        "kind": "int"
+      },
+      {
+        "name": "commissionBizType",
+        "type": "int64",
+        "required": true,
+        "description": "81: perpetual contract trading API commission 82: spot trading API commission",
+        "kind": "int"
+      },
+      {
+        "name": "startTime",
+        "type": "date",
+        "required": true,
+        "description": "Start timestamp (days), Only supports querying data after December 1, 2023.",
+        "kind": "str"
+      },
+      {
+        "name": "endTime",
+        "type": "date",
+        "required": true,
+        "description": "End timestamp (days). Only supports querying data after December 1, 2023.",
+        "kind": "str"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": true,
+        "description": "Page number for pagination, must be greater than 0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": true,
+        "description": "The number of pages must be greater than 0 and the maximum value is 100",
+        "kind": "int"
+      },
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": false,
+        "description": "Request valid time window value, unit: milliseconds. If not filled, the default is 5 seconds",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Query%20API%20transaction%20commission%20%EF%BC%88non-invitation%20relationship%EF%BC%89",
+    "summary": "Query API transaction commission （non-invitation relationship）",
+    "scoped": false
+  },
+  {
+    "name": "get_agent_v1_commission_data_list_referral_code",
+    "method": "GET",
+    "path": "/openApi/agent/v1/commissionDataList/referralCode",
+    "signed": true,
+    "fields": [
+      {
+        "name": "referralCode",
+        "type": "string",
+        "required": false,
+        "description": "Invitation code; if left blank, query all.",
+        "kind": "str"
+      },
+      {
+        "name": "directInvitation",
+        "type": "string",
+        "required": true,
+        "description": "Invitation relationship, true: direct invitation, false: indirect invitation",
+        "kind": "str"
+      },
+      {
+        "name": "startTime",
+        "type": "Long",
+        "required": false,
+        "description": "Start time only supports querying data for the most recent year. If neither startTime nor endTime is filled in, the default is to return data for the most recent 7 days. The maximum query time window is 92 days",
+        "kind": "int"
+      },
+      {
+        "name": "endTime",
+        "type": "Long",
+        "required": false,
+        "description": "End time only supports querying data for the most recent year. If neither startTime nor endTime is filled in, the default is to return data for the most recent 7 days. The maximum query time window is 92 days",
+        "kind": "int"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": false,
+        "description": "Number of pages, default is 1 if not specified",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": false,
+        "description": "Number of pages per page, default is 100 if not specified, maximum is 200",
+        "kind": "int"
+      },
+      {
+        "name": "recvWindow",
+        "type": "int64",
+        "required": false,
+        "description": "Request valid time window value, unit: milliseconds",
+        "kind": "int"
+      }
+    ],
+    "source": "https://bingx-api.github.io/docs-v3/#/en/Agent/Invitation%20code%20data",
+    "summary": "Invitation code data",
+    "scoped": false
+  },
+  {
+    "name": "get_agent_v1_account_invite_account_list",
+    "method": "GET",
+    "path": "/openApi/agent/v1/account/inviteAccountList",
+    "signed": true,
+    "fields": [
+      {
+        "name": "pageIndex",
+        "type": "int",
+        "required": true,
+        "description": "Page number, must be greater than 0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int",
+        "required": true,
+        "description": "Page size, must be greater than 0",
+        "kind": "int"
+      },
+      {
+        "name": "startTime",
+        "type": "long",
+        "required": false,
+        "description": "Start timestamp in **milliseconds**. Maximum query window is 30 days. Omit together with `endTime` to query all data",
+        "kind": "int"
+      },
+      {
+        "name": "endTime",
+        "type": "long",
+        "required": false,
+        "description": "End timestamp in **milliseconds**. Maximum query window is 30 days",
+        "kind": "int"
+      },
+      {
+        "name": "lastUid",
+        "type": "long",
+        "required": false,
+        "description": "Required when queried data exceeds 10,000 records. Pass the last UID of the current page on each subsequent request; omit on the first request",
+        "kind": "int"
+      }
+    ],
+    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L14",
+    "summary": "1. Query Invited Users",
+    "scoped": false
+  },
+  {
+    "name": "get_agent_v1_account_invite_relation_check",
+    "method": "GET",
+    "path": "/openApi/agent/v1/account/inviteRelationCheck",
+    "signed": true,
+    "fields": [
+      {
+        "name": "uid",
+        "type": "long",
+        "required": true,
+        "description": "Invited user UID to query",
+        "kind": "int"
+      }
+    ],
+    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L115",
+    "summary": "3. Query Agent User Information",
+    "scoped": false
+  },
+  {
+    "name": "get_agent_v1_asset_deposit_detail_list",
+    "method": "GET",
+    "path": "/openApi/agent/v1/asset/depositDetailList",
+    "signed": true,
+    "fields": [
+      {
+        "name": "uid",
+        "type": "long",
+        "required": true,
+        "description": "Inviting user UID (must be the parent user UID)",
+        "kind": "int"
+      },
+      {
+        "name": "bizType",
+        "type": "int",
+        "required": true,
+        "description": "Business type: `1` = Deposit",
+        "kind": "int"
+      },
+      {
+        "name": "startTime",
+        "type": "int64",
+        "required": true,
+        "description": "Start timestamp (days); only supports last 90 days",
+        "kind": "int"
+      },
+      {
+        "name": "endTime",
+        "type": "int64",
+        "required": true,
+        "description": "End timestamp (days); only supports last 90 days",
+        "kind": "int"
+      },
+      {
+        "name": "pageIndex",
+        "type": "int64",
+        "required": true,
+        "description": "Page number, must be > 0",
+        "kind": "int"
+      },
+      {
+        "name": "pageSize",
+        "type": "int64",
+        "required": true,
+        "description": "Page size, must be > 0, max 100",
+        "kind": "int"
+      }
+    ],
+    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L242",
+    "summary": "6. Query Deposit Details of Invited Users",
+    "scoped": false
+  },
+  {
+    "name": "get_agent_v1_account_superior_check",
+    "method": "GET",
+    "path": "/openApi/agent/v1/account/superiorCheck",
+    "signed": true,
+    "fields": [
+      {
+        "name": "uid",
+        "type": "long",
+        "required": true,
+        "description": "The account UID to check",
+        "kind": "int"
+      }
+    ],
+    "source": "https://github.com/BingX-API/api-ai-skills/blob/5fb44d121b7e10ef3493bb4de21fedf7e5c98ac6/skills/agent/api-reference.md#L333",
+    "summary": "8. Superior Verification",
+    "scoped": false
+  }
+]

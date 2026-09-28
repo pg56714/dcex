@@ -2,7 +2,7 @@
 
 ## Lighter cryptography
 
-`crates/dcex/src/lighter.rs` contains modified ports of cryptographic
+`crates/dcex/src/lighter_crypto.rs` contains modified ports of cryptographic
 algorithms and constants from:
 
 - [elliottech/lighter-go](https://github.com/elliottech/lighter-go)

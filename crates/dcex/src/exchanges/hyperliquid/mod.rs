@@ -1,10 +1,10 @@
 mod account;
 mod asset;
 mod client;
-mod completion;
+
 mod endpoints;
-mod inventory_completion;
-mod inventory_wrappers;
+
+mod generated;
 mod market;
 mod msgpack;
 mod params;
@@ -18,3 +18,12 @@ pub use signing::{HyperliquidSignature, hyperliquid_signature};
 
 #[cfg(test)]
 mod tests;
+
+mod transfers;
+
+mod builder;
+
+mod schema_requests;
+
+mod administration;
+mod deployment;

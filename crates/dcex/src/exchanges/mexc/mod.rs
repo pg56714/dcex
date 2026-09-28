@@ -1,7 +1,6 @@
 mod account;
 mod client;
-mod completion;
-mod completion_wrappers;
+
 mod endpoints;
 mod market;
 mod params;
@@ -17,4 +16,14 @@ pub use websocket::{MexcFuturesWebSocket, MexcPrivateWebSocket, MexcPublicWebSoc
 #[cfg(test)]
 mod tests;
 
-mod additional;
+mod stream;
+
+mod wallet;
+
+mod convert;
+
+mod subaccount;
+
+mod stp;
+
+mod schema_requests;

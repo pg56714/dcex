@@ -311,3 +311,29 @@ async def test_margin_listen_token_without_session_credentials() -> None:
     finally:
         await client.close()
         await runner.cleanup()
+
+
+import pytest
+
+CONDITIONAL_TYPES = [
+    "STOP",
+    "STOP_MARKET",
+    "TAKE_PROFIT",
+    "TAKE_PROFIT_MARKET",
+    "TRAILING_STOP_MARKET",
+]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("kind", CONDITIONAL_TYPES)
+async def test_coin_m_ws_conditionals_point_to_current_algo_endpoint(kind):
+    from dcex.ws.binance import CoinFuturesApiClient
+
+    client = CoinFuturesApiClient("key", "secret", base_url="ws://127.0.0.1:9")
+    try:
+        with pytest.raises(ValueError, match="/dapi/v1/algoOrder"):
+            await client.place_order(
+                {"symbol": "BTCUSD_PERP", "side": "SELL", "type": kind, "quantity": "1"}
+            )
+    finally:
+        await client.close()

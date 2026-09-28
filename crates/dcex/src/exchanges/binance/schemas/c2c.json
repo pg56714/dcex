@@ -1,0 +1,48 @@
+[
+  {
+    "name": "get_c2_c_trade_history",
+    "method": "GET",
+    "path": "/sapi/v1/c2c/orderMatch/listUserOrderHistory",
+    "public": false,
+    "fields": [
+      {
+        "name": "trade_type",
+        "type": "Optional[GetC2CTradeHistoryTradeTypeEnum]",
+        "required": false,
+        "wire": "tradeType",
+        "kind": "str"
+      },
+      {
+        "name": "start_timestamp",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTimestamp",
+        "kind": "int"
+      },
+      {
+        "name": "end_timestamp",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTimestamp",
+        "kind": "int"
+      },
+      {
+        "name": "page",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "page",
+        "kind": "int"
+      },
+      {
+        "name": "rows",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "rows",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-c2-c/api/rest-api/~#get-c2-ctrade-history",
+    "summary": "Get C2C Trade History (USER_DATA)"
+  }
+]

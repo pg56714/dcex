@@ -484,6 +484,47 @@ const PUBLIC_CASES: &[Case] = &[
 ];
 
 const PRIVATE_CASES: &[Case] = &[
+    // Cases retained from the independent Python endpoint wire suite.
+    private(
+        "create_withdrawal",
+        Host::Spot,
+        &[
+            ("currency", "USDT"),
+            ("amount", "1.000000000000000001"),
+            ("toAddress", "offline-address"),
+            ("withdrawType", "ADDRESS"),
+        ],
+        "POST /api/v3/withdrawals",
+    ),
+    private(
+        "create_uta_withdrawal",
+        Host::Spot,
+        &[
+            ("currency", "USDT"),
+            ("amount", "3"),
+            ("toAddress", "123456"),
+            ("withdrawType", "UID"),
+        ],
+        "POST /api/ua/v2/asset/withdrawal",
+    ),
+    private(
+        "cancel_withdrawal",
+        Host::Spot,
+        &[("withdrawalId", "test-withdrawal")],
+        "DELETE /api/v1/withdrawals/test-withdrawal",
+    ),
+    private(
+        "cancel_uta_withdrawal",
+        Host::Spot,
+        &[("withdrawId", "test-withdrawal")],
+        "POST /api/ua/v2/asset/withdraw/cancel",
+    ),
+    private(
+        "cancel_margin_stop_order_by_id_raw",
+        Host::Spot,
+        &[("orderId", "test-order"), ("callerFlag", "keep")],
+        "DELETE /api/v3/hf/margin/stop-order/cancel-by-id?orderId=test-order&callerFlag=keep",
+    ),
     private(
         "set_uta_account_mode",
         Host::Spot,

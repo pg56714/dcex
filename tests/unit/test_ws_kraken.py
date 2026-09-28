@@ -233,3 +233,19 @@ async def test_kraken_public_ws_rejects_unexpected_payload(
     ws = kraken.public()
     with pytest.raises(RuntimeError, match="Unexpected Kraken WebSocket event payload"):
         await ws.recv()
+
+
+import inspect
+
+import pytest
+
+from tests.unit.endpoint_wrapper_helpers import (
+    _client_class,
+)
+
+
+def test_kraken_websocket_token_has_no_undocumented_permissions_field() -> None:
+    sync_client = _client_class("sync", "kraken")
+    async_client = _client_class("async", "kraken")
+    assert set(inspect.signature(sync_client.get_spot_websocket_token).parameters) == {"self"}
+    assert set(inspect.signature(async_client.get_spot_websocket_token).parameters) == {"self"}

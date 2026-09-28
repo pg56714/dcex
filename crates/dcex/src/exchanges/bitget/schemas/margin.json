@@ -1,0 +1,37 @@
+[
+  {
+    "name": "classic_common_apidata_margin_ls_ratio",
+    "method": "GET",
+    "path": "/api/v2/margin/market/long-short-ratio",
+    "public": true,
+    "confirm": false,
+    "fields": [
+      {
+        "wire": "symbol",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "period",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      },
+      {
+        "wire": "coin",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "location": "query"
+      }
+    ],
+    "source": "https://www.bitget.com/docs/catalog/classic-common-apidata/classic-common-apidata#get-leveraged-long-short-ratio-data",
+    "summary": "Get Leveraged long-short ratio Data"
+  }
+]

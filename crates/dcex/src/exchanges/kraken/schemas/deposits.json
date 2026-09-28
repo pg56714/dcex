@@ -1,0 +1,416 @@
+[
+  {
+    "name": "claim_funding_deposit_address",
+    "method": "PUT",
+    "path": "/funding/v1/deposit/address",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "body",
+        "location": "body",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "method_id": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+            }
+          }
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/claim-funding-deposit-address"
+  },
+  {
+    "name": "get_funding_deposit_addresses",
+    "method": "GET",
+    "path": "/funding/v2/deposit/addresses",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "scope",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "method_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "method_id"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "network_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "network_id"
+            }
+          ]
+        }
+      },
+      {
+        "name": "cursor",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      {
+        "name": "limit",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "exclusiveMinimum": true,
+          "minimum": 0,
+          "maximum": 500
+        }
+      },
+      {
+        "name": "asset",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string",
+              "enum": [
+                "currency",
+                "tokenized_asset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16
+            }
+          },
+          "required": [
+            "class"
+          ]
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-claimed-addresses-v2"
+  },
+  {
+    "name": "get_funding_deposit_limits",
+    "method": "GET",
+    "path": "/funding/v1/limits/deposit/{asset_class}/{asset}",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "asset_class",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "currency",
+            "tokenized_asset"
+          ]
+        }
+      },
+      {
+        "name": "asset",
+        "location": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        }
+      },
+      {
+        "name": "preferred_asset",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string",
+              "enum": [
+                "currency",
+                "tokenized_asset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-deposit-limits"
+  },
+  {
+    "name": "get_funding_deposits",
+    "method": "GET",
+    "path": "/funding/v1/deposits",
+    "auth": "header",
+    "fields": [
+      {
+        "name": "asset",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "class": {
+              "type": "string",
+              "enum": [
+                "currency",
+                "tokenized_asset"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16
+            }
+          },
+          "required": [
+            "class"
+          ]
+        }
+      },
+      {
+        "name": "scope",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "method_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "method_id"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "network_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "network_id"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "network_group_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-fA-F]{8}-?(?:[0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}$"
+                }
+              },
+              "title": "network_group_id"
+            }
+          ]
+        }
+      },
+      {
+        "name": "status",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "initial",
+                      "pending",
+                      "settled",
+                      "success",
+                      "failure"
+                    ]
+                  }
+                }
+              },
+              "title": "list"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "range": {
+                  "type": "object",
+                  "properties": {
+                    "start": {
+                      "type": "string",
+                      "enum": [
+                        "initial",
+                        "pending",
+                        "settled",
+                        "success",
+                        "failure"
+                      ]
+                    },
+                    "end": {
+                      "type": "string",
+                      "enum": [
+                        "initial",
+                        "pending",
+                        "settled",
+                        "success",
+                        "failure"
+                      ]
+                    }
+                  }
+                }
+              },
+              "title": "range"
+            }
+          ]
+        }
+      },
+      {
+        "name": "cursor",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      {
+        "name": "limit",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "exclusiveMinimum": true,
+          "minimum": 0,
+          "maximum": 500
+        }
+      },
+      {
+        "name": "start_time",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "end_time",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "rebase_multiplier",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "rebased",
+            "base"
+          ]
+        }
+      },
+      {
+        "name": "account_id",
+        "location": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "otp",
+        "location": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    ],
+    "official_source": "https://docs.kraken.com/api-reference/funding-beta/list-funding-deposits"
+  }
+]

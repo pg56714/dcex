@@ -1,0 +1,25 @@
+[
+  {
+    "method": "GET",
+    "path": "/v5/spot-lever-token/info",
+    "title": "Get Leverage Token Info",
+    "official_source": "https://bybit-exchange.github.io/docs/v5/lt/leverage-token-info",
+    "name": "get_spot_lever_token_info",
+    "public": true,
+    "fields": [
+      {
+        "name": "ltCoin",
+        "python_name": "lt_coin",
+        "type": "string",
+        "required": false,
+        "description": "Abbreviation of the LT, such as `BTC3L"
+      }
+    ],
+    "example": {
+      "ltCoin": "BTC3L"
+    },
+    "has_example": true,
+    "source_file": "v5/lt/leverage-token-info.mdx",
+    "spec_commit": "d193e92e52bc48a60512ca95a79ab79f4bb16f75"
+  }
+]

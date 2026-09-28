@@ -1,0 +1,232 @@
+[
+  {
+    "name": "fiat_deposit",
+    "method": "POST",
+    "path": "/sapi/v1/fiat/deposit",
+    "public": false,
+    "fields": [
+      {
+        "name": "currency",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "currency",
+        "kind": "str"
+      },
+      {
+        "name": "api_payment_method",
+        "type": "Union[DepositApiPaymentMethodEnum, None]",
+        "required": true,
+        "wire": "apiPaymentMethod",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      },
+      {
+        "name": "ext",
+        "type": "Optional[object]",
+        "required": false,
+        "wire": "ext",
+        "kind": "object"
+      }
+    ],
+    "json_body": true,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#deposit",
+    "summary": "Deposit (TRADE)"
+  },
+  {
+    "name": "fiat_withdraw",
+    "method": "POST",
+    "path": "/sapi/v2/fiat/withdraw",
+    "public": false,
+    "fields": [
+      {
+        "name": "currency",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "currency",
+        "kind": "str"
+      },
+      {
+        "name": "api_payment_method",
+        "type": "Union[FiatWithdrawApiPaymentMethodEnum, None]",
+        "required": true,
+        "wire": "apiPaymentMethod",
+        "kind": "str"
+      },
+      {
+        "name": "amount",
+        "type": "Union[int, None]",
+        "required": true,
+        "wire": "amount",
+        "kind": "int"
+      },
+      {
+        "name": "account_info",
+        "type": "Union[FiatWithdrawRequestAccountInfo, None]",
+        "required": true,
+        "wire": "accountInfo",
+        "kind": "object"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      },
+      {
+        "name": "ext",
+        "type": "Optional[object]",
+        "required": false,
+        "wire": "ext",
+        "kind": "object"
+      }
+    ],
+    "json_body": true,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#fiat-withdraw",
+    "summary": "Fiat Withdraw (TRADE)"
+  },
+  {
+    "name": "get_fiat_deposit_withdraw_history",
+    "method": "GET",
+    "path": "/sapi/v1/fiat/orders",
+    "public": false,
+    "fields": [
+      {
+        "name": "transaction_type",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "transactionType",
+        "kind": "str"
+      },
+      {
+        "name": "begin_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "beginTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "page",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "page",
+        "kind": "int"
+      },
+      {
+        "name": "rows",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "rows",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#get-fiat-deposit-withdraw-history",
+    "summary": "Get Fiat Deposit/Withdraw History (USER_DATA)"
+  },
+  {
+    "name": "get_fiat_payments_history",
+    "method": "GET",
+    "path": "/sapi/v1/fiat/payments",
+    "public": false,
+    "fields": [
+      {
+        "name": "transaction_type",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "transactionType",
+        "kind": "str"
+      },
+      {
+        "name": "begin_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "beginTime",
+        "kind": "int"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "page",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "page",
+        "kind": "int"
+      },
+      {
+        "name": "rows",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "rows",
+        "kind": "int"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#get-fiat-payments-history",
+    "summary": "Get Fiat Payments History (USER_DATA)"
+  },
+  {
+    "name": "get_order_detail",
+    "method": "GET",
+    "path": "/sapi/v1/fiat/get-order-detail",
+    "public": false,
+    "fields": [
+      {
+        "name": "order_no",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "orderNo",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "json_body": false,
+    "source": "https://developers.binance.com/en/docs/catalog/investment-and-services-fiat/api/rest-api/~#get-order-detail",
+    "summary": "Get Order Detail (USER_DATA)"
+  }
+]

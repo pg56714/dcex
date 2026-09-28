@@ -1,0 +1,177 @@
+[
+  {
+    "row": 4093,
+    "name": "top_up_isolated_only_margin",
+    "type": "topUpIsolatedOnlyMargin",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#update-isolated-margin",
+    "required_fields": [
+      "asset",
+      "leverage"
+    ]
+  },
+  {
+    "row": 4094,
+    "name": "user_outcome",
+    "type": "userOutcome",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#split-outcome",
+    "required_fields": [
+      "splitOutcome"
+    ]
+  },
+  {
+    "row": 4095,
+    "name": "validator_l1_stream",
+    "type": "validatorL1Stream",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#validator-vote-on-risk-free-rate-for-aligned-quote-asset",
+    "required_fields": [
+      "riskFreeRate"
+    ]
+  },
+  {
+    "row": 4096,
+    "name": "authorize_aqav2_role",
+    "type": "authorizeAqav2Role",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#authorize-aqav2-role",
+    "required_fields": [
+      "token",
+      "role"
+    ]
+  },
+  {
+    "row": 4097,
+    "name": "claim_rewards",
+    "type": "claimRewards",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#claim-rewards",
+    "required_fields": []
+  },
+  {
+    "row": 4545,
+    "name": "set_referrer",
+    "type": "setReferrer",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L437",
+    "required_fields": [
+      "code"
+    ]
+  },
+  {
+    "row": 4546,
+    "name": "convert_to_multi_sig_user_signed",
+    "type": "convertToMultiSigUser",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": true,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L674",
+    "required_fields": [
+      "signers",
+      "nonce",
+      "signatureChainId",
+      "hyperliquidChain"
+    ]
+  },
+  {
+    "row": 4547,
+    "name": "c_signer_action",
+    "type": "CSignerAction",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L984",
+    "required_fields": [
+      "unjailSelf"
+    ]
+  },
+  {
+    "row": 4548,
+    "name": "c_validator_action",
+    "type": "CValidatorAction",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1014",
+    "required_fields": [
+      "unregister"
+    ]
+  },
+  {
+    "row": 4549,
+    "name": "multi_sig_signed",
+    "type": "multiSig",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": true,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1103",
+    "required_fields": [
+      "signatureChainId",
+      "signatures",
+      "payload"
+    ]
+  },
+  {
+    "row": 4550,
+    "name": "evm_user_modify",
+    "type": "evmUserModify",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1130",
+    "required_fields": [
+      "usingBigBlocks"
+    ]
+  },
+  {
+    "row": 4552,
+    "name": "gossip_priority_bid",
+    "type": "gossipPriorityBid",
+    "variant": "",
+    "public": false,
+    "user": false,
+    "signed": false,
+    "testnet_only": false,
+    "source": "https://github.com/hyperliquid-dex/hyperliquid-python-sdk/blob/2fdb18f9517675ea03695a0962bd19eece9c83f0/hyperliquid/exchange.py#L1225",
+    "required_fields": [
+      "slotId",
+      "ip",
+      "maxGas"
+    ]
+  }
+]

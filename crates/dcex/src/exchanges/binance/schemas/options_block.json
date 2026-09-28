@@ -1,0 +1,205 @@
+[
+  {
+    "method": "POST",
+    "path": "/eapi/v1/block/order/execute",
+    "sdk_method": "accept_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#accept-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "accept_options_block_order"
+  },
+  {
+    "method": "GET",
+    "path": "/eapi/v1/block/user-trades",
+    "sdk_method": "account_block_trade_list",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#account-block-trade-list",
+    "parameters": [
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "underlying",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "underlying",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "get_options_account_block_trades"
+  },
+  {
+    "method": "DELETE",
+    "path": "/eapi/v1/block/order/create",
+    "sdk_method": "cancel_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#cancel-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "cancel_options_block_order"
+  },
+  {
+    "method": "PUT",
+    "path": "/eapi/v1/block/order/create",
+    "sdk_method": "extend_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#extend-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "extend_options_block_order"
+  },
+  {
+    "method": "POST",
+    "path": "/eapi/v1/block/order/create",
+    "sdk_method": "new_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#new-block-trade-order",
+    "parameters": [
+      {
+        "name": "liquidity",
+        "type": "Union[NewBlockTradeOrderLiquidityEnum, None]",
+        "required": true,
+        "wire": "liquidity",
+        "kind": "str"
+      },
+      {
+        "name": "legs",
+        "type": "Union[List[NewBlockTradeOrderLegsParameterInner], None]",
+        "required": true,
+        "wire": "legs",
+        "kind": "json"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "create_options_block_order"
+  },
+  {
+    "method": "GET",
+    "path": "/eapi/v1/block/order/execute",
+    "sdk_method": "query_block_trade_details",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#query-block-trade-details",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Union[str, None]",
+        "required": true,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "get_options_block_order_details"
+  },
+  {
+    "method": "GET",
+    "path": "/eapi/v1/block/order/orders",
+    "sdk_method": "query_block_trade_order",
+    "official_source": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-options/api/rest-api/market-maker-block-trade#query-block-trade-order",
+    "parameters": [
+      {
+        "name": "block_order_matching_key",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "blockOrderMatchingKey",
+        "kind": "str"
+      },
+      {
+        "name": "end_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "endTime",
+        "kind": "int"
+      },
+      {
+        "name": "start_time",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "startTime",
+        "kind": "int"
+      },
+      {
+        "name": "underlying",
+        "type": "Optional[str]",
+        "required": false,
+        "wire": "underlying",
+        "kind": "str"
+      },
+      {
+        "name": "recv_window",
+        "type": "Optional[int]",
+        "required": false,
+        "wire": "recvWindow",
+        "kind": "int"
+      }
+    ],
+    "name": "get_options_block_orders"
+  }
+]

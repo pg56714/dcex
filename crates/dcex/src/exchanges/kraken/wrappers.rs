@@ -145,3 +145,48 @@ crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [g
 crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_market_price(tradeable => "tradeable")];private [];}
 
 crate::exchanges::impl_exchange_method_wrappers! {@extend;KrakenClient;public [get_futures_liquidity_pool_statistics(since => "since",interval => "interval")];private [];}
+
+mod business_methods {
+    use crate::exchanges::kraken::KrakenClient;
+    crate::exchanges::impl_exchange_method_wrappers! {
+        @extend; KrakenClient; public []; private [
+            get_affiliate_daily_activity(),
+            add_assignment_program(contract_type => "contractType", accept_long => "acceptLong", accept_short => "acceptShort", time_frame => "timeFrame", enabled => "enabled"),
+            delete_assignment_program(assignment_id => "id"),
+            get_assignment_program_history(),
+            get_assignment_program_current(),
+            calculate_funding_fees(method_id => "method_id", amount => "amount"),
+            claim_funding_deposit_address(body => "body"),
+            create_funding_address(body => "body"),
+            /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+            create_funding_withdrawal(body => "body"),
+            delete_funding_address(address_id => "id"),
+            get_funding_addresses(),
+            get_funding_assets(direction => "direction"),
+            get_funding_deposit_addresses(),
+            get_funding_deposit_limits(asset_class => "asset_class", asset => "asset"),
+            get_funding_deposits(),
+            get_funding_methods(direction => "direction"),
+            get_funding_networks(),
+            get_funding_withdrawal_limits(asset_class => "asset_class", asset => "asset"),
+            get_funding_withdrawals(),
+            update_funding_address(address_id => "id", body => "body"),
+            cancel_spot_withdrawal(asset => "asset", refid => "refid"),
+            /// API withdrawals and external transfers have no second confirmation; they execute on submit.
+            create_spot_withdrawal(asset => "asset", key => "key", amount => "amount"),
+            accept_rfq_offer(rfq_uid => "rfqUid"),
+            cancel_user_rfq(rfq_uid => "rfqUid"),
+            cancel_rfq_offer(rfq_uid => "rfqUid"),
+            create_user_rfq(request => "json"),
+            get_open_rfqs(),
+            get_closed_rfq_offers(),
+            get_open_rfq_offers(),
+            get_open_rfqs_for_account(),
+            place_rfq_offer(rfq_uid => "rfqUid"),
+            get_rfq(rfq_uid => "rfqUid"),
+            delete_rfq_assignment_max_leverage(),
+            get_rfq_assignment_max_leverage(),
+            update_rfq_assignment_max_leverage(max_leverage => "maxLeverage"),
+        ];
+    }
+}

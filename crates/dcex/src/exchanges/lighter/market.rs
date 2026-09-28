@@ -14,7 +14,31 @@ impl LighterClient {
         params: Vec<(String, String)>,
     ) -> Result<ValidatedResponse> {
         let params = LighterParams::from_pairs(params);
-        if let Some(response) = self.additional_request(method_name, &params, true).await? {
+        if let Some(response) = self.explorer_request(method_name, &params, true).await? {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .account_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .explorer_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .deposits_schema_request(method_name, &params, true)
+            .await?
+        {
+            return Ok(response);
+        }
+        if let Some(response) = self
+            .leases_schema_request(method_name, &params, true)
+            .await?
+        {
             return Ok(response);
         }
         self.validate_public_params(method_name, &params)?;
