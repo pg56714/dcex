@@ -349,7 +349,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: None,
                         order_type: Some("MARKET"),
-                        position_side: None,
                         time_in_force: None,
                     }),
                 )
@@ -362,7 +361,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: Some("BUY"),
                         order_type: Some("MARKET"),
-                        position_side: Some("LONG"),
                         time_in_force: None,
                     }),
                 )
@@ -375,7 +373,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: Some("SELL"),
                         order_type: Some("MARKET"),
-                        position_side: Some("SHORT"),
                         time_in_force: None,
                     }),
                 )
@@ -388,7 +385,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: None,
                         order_type: Some("LIMIT"),
-                        position_side: None,
                         time_in_force: Some("GTC"),
                     }),
                 )
@@ -401,7 +397,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: Some("BUY"),
                         order_type: Some("LIMIT"),
-                        position_side: Some("LONG"),
                         time_in_force: Some("GTC"),
                     }),
                 )
@@ -414,7 +409,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: Some("SELL"),
                         order_type: Some("LIMIT"),
-                        position_side: Some("SHORT"),
                         time_in_force: Some("GTC"),
                     }),
                 )
@@ -427,7 +421,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: None,
                         order_type: Some("LIMIT"),
-                        position_side: None,
                         time_in_force: Some("PostOnly"),
                     }),
                 )
@@ -440,7 +433,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: Some("BUY"),
                         order_type: Some("LIMIT"),
-                        position_side: Some("LONG"),
                         time_in_force: Some("PostOnly"),
                     }),
                 )
@@ -453,7 +445,6 @@ impl BingxClient {
                     Some(SwapOrderDefaults {
                         side: Some("SELL"),
                         order_type: Some("LIMIT"),
-                        position_side: Some("SHORT"),
                         time_in_force: Some("PostOnly"),
                     }),
                 )
@@ -710,6 +701,9 @@ impl BingxClient {
             "positionId",
         ])?;
         let defaults = defaults.unwrap_or_default();
+        if defaults.side.is_some() {
+            params.required("positionSide")?;
+        }
         let mut query = params.only(SWAP_ORDER_OPTIONAL_KEYS);
         self.push_required_symbol(&mut query, params)?;
         let order_type = match defaults.order_type {
@@ -723,11 +717,6 @@ impl BingxClient {
         validate_swap_order(params, order_type)?;
         query.push(("type".to_string(), order_type.to_string()));
         query.push(("side".to_string(), side));
-        if let Some(position_side) = defaults.position_side
-            && !query.iter().any(|(key, _)| key == "positionSide")
-        {
-            query.push(("positionSide".to_string(), position_side.to_string()));
-        }
         if let Some(time_in_force) = defaults.time_in_force
             && !query.iter().any(|(key, _)| key == "timeInForce")
         {
@@ -825,7 +814,6 @@ impl BingxClient {
 struct SwapOrderDefaults<'a> {
     side: Option<&'a str>,
     order_type: Option<&'a str>,
-    position_side: Option<&'a str>,
     time_in_force: Option<&'a str>,
 }
 

@@ -5,7 +5,7 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
-from ...arcus.client import _params
+from ...arcus._request_params import _params
 from ._http_manager import HTTPManager, SpotHTTPManager
 
 

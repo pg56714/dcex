@@ -50,9 +50,16 @@ API 提款沒有第二次確認，送出即執行。建議交易用 API 金鑰�
 ## 驗證與限制
 
 <!-- VERIFICATION -->
-`cargo test --workspace --all-features`：670 項通過；53 項 live/stateful 測試依既有設定忽略。以 `uv run --no-sync maturin develop --release -j2` 建置並安裝 release 原生擴充。
-
-完整單次 `pytest tests/unit`：16,079 項通過，沒有 skip 或 xfail。完整 pre-commit（含 Ruff、格式與 Pyright）、`cargo fmt --all --check`、文件 `--check` 及 `git diff --check` 通過。Clippy 成功，剩餘 14 個既有公開介面的 `too_many_arguments` 警告；本輪新增警告已修正。49 項清冊檢查涵蓋 Rust／同步／非同步方法、實際 wire 路由、動態路徑、官方清冊對應及數量。
+- Rust passed: `680`
+- Rust live ignored: `53`
+- Python passed: `16935`
+- Python deselected: `944`
+- Python skipped: `0`
+- Python xfailed: `0`
+- Outstanding test failures: `0`
+- Native extension rebuilt: `True`
+- Native build profile: `release`
+- Existing Clippy warnings: `14`
 <!-- /VERIFICATION -->
 
 離線測試驗證路由、HTTP 方法、參數、簽章、WebSocket 訊息與回應處理，不能證明真實帳戶權限或交易所線上可用性。沒有送出真實訂單、提款或帳戶管理操作。

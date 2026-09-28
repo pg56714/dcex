@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Self
 
 from ..._native_http import load_native, request_native_json_async
-from ...arcus.client import _params
+from ...arcus._request_params import _params
 from ...base.http_manager import BaseHTTPManager
 from ...utils.common import Common
 from ...utils.errors import FailedRequestError

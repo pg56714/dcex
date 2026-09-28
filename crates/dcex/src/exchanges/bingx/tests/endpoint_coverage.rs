@@ -232,7 +232,12 @@ const PUBLIC_ROUTES: &[Case] = &[
 const SPOT_LIMIT: &[(&str, &str)] = &[SPOT, ("side", "BUY"), ("quantity", "1"), ("price", "1")];
 const SPOT_SIDED_LIMIT: &[(&str, &str)] = &[SPOT, ("quantity", "1"), ("price", "1")];
 const SWAP_LIMIT: &[(&str, &str)] = &[SWAP, ("side", "BUY"), ("quantity", "1"), ("price", "1")];
-const SWAP_SIDED_LIMIT: &[(&str, &str)] = &[SWAP, ("quantity", "1"), ("price", "1")];
+const SWAP_SIDED_LIMIT: &[(&str, &str)] = &[
+    SWAP,
+    ("quantity", "1"),
+    ("price", "1"),
+    ("positionSide", "SHORT"),
+];
 
 /// (dispatch name, params, HTTP method, documented path)
 const PRIVATE_ROUTES: &[Case] = &[
@@ -567,13 +572,13 @@ const PRIVATE_ROUTES: &[Case] = &[
     ),
     (
         "place_swap_market_buy_order",
-        &[SWAP, ("quantity", "1")],
+        &[SWAP, ("quantity", "1"), ("positionSide", "SHORT")],
         "POST",
         "/openApi/swap/v2/trade/order",
     ),
     (
         "place_swap_market_sell_order",
-        &[SWAP, ("quantity", "1")],
+        &[SWAP, ("quantity", "1"), ("positionSide", "SHORT")],
         "POST",
         "/openApi/swap/v2/trade/order",
     ),
@@ -878,16 +883,16 @@ fn order_helpers_force_side_type_position_side_and_time_in_force() {
     let cases: &[(&str, &[(&str, &str)], &[(&str, &str)])] = &[
         (
             "place_swap_market_buy_order",
-            &[SWAP, ("quantity", "1")],
+            &[SWAP, ("quantity", "1"), ("positionSide", "SHORT")],
             &[
                 ("side", "BUY"),
                 ("type", "MARKET"),
-                ("positionSide", "LONG"),
+                ("positionSide", "SHORT"),
             ],
         ),
         (
             "place_swap_market_sell_order",
-            &[SWAP, ("quantity", "1")],
+            &[SWAP, ("quantity", "1"), ("positionSide", "SHORT")],
             &[("side", "SELL"), ("type", "MARKET")],
         ),
         (
@@ -2101,4 +2106,33 @@ fn batch_replacement_keeps_json_number_quantity_for_conditional_order() {
     assert_eq!(batch[0]["symbol"], "BTC-USDT");
     assert!(batch[0].get("closePosition").is_none());
     assert!(request.get("signature").is_some());
+}
+
+#[test]
+fn sided_swap_helpers_require_and_preserve_explicit_position_side() {
+    let (url, receiver) = recording_server();
+    let client = signed_client(url);
+    for kind in ["market", "limit", "post_only"] {
+        for side in ["buy", "sell"] {
+            let method = format!("place_swap_{kind}_{side}_order");
+            let mut params = vec![SWAP, ("quantity", "1")];
+            if kind != "market" {
+                params.push(("price", "1"));
+            }
+            let missing = params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect();
+            let call_client = client.clone();
+            let call_method = method.clone();
+            let result =
+                block_on(async move { call_client.private_request(&call_method, missing).await });
+            assert!(result.unwrap_err().to_string().contains("positionSide"));
+            assert!(receiver.try_recv().is_err());
+            let position = if side == "buy" { "SHORT" } else { "LONG" };
+            params.push(("positionSide", position));
+            private_call(&client, &method, &params);
+            assert_eq!(next(&receiver, &method).get("positionSide"), Some(position));
+        }
+    }
 }

@@ -50,9 +50,16 @@ Method counts include aliases and signing helpers, not endpoints. Additions are 
 ## Verification and limits
 
 <!-- VERIFICATION -->
-`cargo test --workspace --all-features`: 670 passed; 53 live/stateful tests ignored. The release native extension was built and installed using `uv run --no-sync maturin develop --release -j2`.
-
-One complete `pytest tests/unit` run: 16,079 passed, zero skips or xfails. Full pre-commit (including Ruff, formatting and Pyright), `cargo fmt --all --check`, the docs `--check` and `git diff --check` passed. Clippy succeeded with 14 existing `too_many_arguments` entry-point warnings; warnings introduced by this work were resolved. The 49 ledger checks cover Rust/sync/async methods, actual wire routes, dynamic paths, official inventory dispositions and counts.
+- Rust passed: `680`
+- Rust live ignored: `53`
+- Python passed: `16935`
+- Python deselected: `944`
+- Python skipped: `0`
+- Python xfailed: `0`
+- Outstanding test failures: `0`
+- Native extension rebuilt: `True`
+- Native build profile: `release`
+- Existing Clippy warnings: `14`
 <!-- /VERIFICATION -->
 
 Offline tests verify routes, HTTP methods, parameters, signatures, WebSocket messages and response handling. They do not establish live account eligibility or exchange availability. No live orders, withdrawals or account-administration requests were submitted.

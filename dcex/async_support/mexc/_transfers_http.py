@@ -176,7 +176,6 @@ class TradeHTTPTransfersHTTP(HTTPManager):
 
         Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer
 
-
         The recipient is a different user. API transfers have no second confirmation;
         they execute on submit. Verify the recipient UID, email, or phone first.
         """

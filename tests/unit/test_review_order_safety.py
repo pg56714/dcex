@@ -47,14 +47,21 @@ async def test_aster_guarded_future_nonce_preserves_automatic_clock(asynchronous
 
 
 @pytest.mark.parametrize("asynchronous", [False, True])
-@pytest.mark.parametrize("method", ["place_swap_market_sell_order", "place_swap_limit_sell_order"])
-def test_bingx_sell_requires_explicit_position_side(asynchronous, method):
+@pytest.mark.parametrize(
+    "method",
+    [
+        f"place_swap_{kind}_{side}_order"
+        for kind in ("market", "limit", "post_only")
+        for side in ("buy", "sell")
+    ],
+)
+def test_bingx_helpers_require_explicit_position_side(asynchronous, method):
     prefix = "dcex.async_support" if asynchronous else "dcex"
     cls = importlib.import_module(f"{prefix}.bingx.client").Client
     signature = inspect.signature(getattr(cls, method))
     assert signature.parameters["position_side"].default is inspect.Parameter.empty
     args = {"self": object(), "product_symbol": "BTC-USDT-SWAP", "quantity": "1"}
-    if "limit" in method:
+    if "market" not in method:
         args["price"] = "10"
     with pytest.raises(TypeError, match="position_side"):
         signature.bind(**args)

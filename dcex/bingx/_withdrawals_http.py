@@ -22,7 +22,9 @@ class TradeHTTPWithdrawalsHTTP(HTTPManager):
         tx_id: str | None = None,
         recv_window: int | None = None,
     ) -> list[dict[str, Any]]:
-        """GET /openApi/api/v3/capital/withdraw/history. Timestamps use milliseconds."""
+        """Get withdrawal history.
+
+        GET /openApi/api/v3/capital/withdraw/history. Timestamps use milliseconds."""
         return self._native_private(
             "get_withdrawal_history",
             self._native_params(
@@ -51,13 +53,13 @@ class TradeHTTPWithdrawalsHTTP(HTTPManager):
         transfer_client_id: str | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
+        """Transfer master internal.
+
         POST /openApi/wallets/v1/capital/innerTransfer/apply.
 
         The English and Chinese docs disagree on the spot walletType code (4/15).
         This wrapper preserves the caller-selected integer without choosing either.
         Source: https://bingx-api.github.io/docs-v3/
-
 
         The recipient is a different user. API transfers have no second confirmation;
         they execute on submit. Verify the recipient UID, email, or phone first.
@@ -90,7 +92,8 @@ class TradeHTTPWithdrawalsHTTP(HTTPManager):
         transfer_client_id: str | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
+        """Transfer sub account internal.
+
         POST /openApi/wallets/v1/capital/subAccountInnerTransfer/apply.
 
         Sub-account-only operation; uses a signed JSON body.
@@ -128,7 +131,8 @@ class TradeHTTPWithdrawalsHTTP(HTTPManager):
         date_ofbirth: str | None = None,
         recv_window: int | None = None,
     ) -> Any:  # noqa: ANN401
-        """
+        """Create withdrawal.
+
         POST /openApi/wallets/v1/capital/withdraw/apply.
 
         API withdrawals have no second confirmation; they execute on submit.

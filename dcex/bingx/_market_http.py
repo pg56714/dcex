@@ -285,7 +285,7 @@ class MarketHTTP(HTTPManager):
     def get_coin_swap_contracts(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap contracts.
 
         GET /openApi/cswap/v1/market/contracts.
 
@@ -301,7 +301,7 @@ class MarketHTTP(HTTPManager):
     def get_coin_swap_orderbook(
         self, *, product_symbol: str, limit: int | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap orderbook.
 
         GET /openApi/cswap/v1/market/depth.
 
@@ -324,7 +324,7 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get coin swap kline.
 
         GET /openApi/cswap/v1/market/klines.
 
@@ -347,7 +347,7 @@ class MarketHTTP(HTTPManager):
     def get_coin_swap_premium_index(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap premium index.
 
         GET /openApi/cswap/v1/market/premiumIndex.
 
@@ -363,7 +363,7 @@ class MarketHTTP(HTTPManager):
     def get_coin_swap_open_interest(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap open interest.
 
         GET /openApi/cswap/v1/market/openInterest.
 
@@ -379,7 +379,7 @@ class MarketHTTP(HTTPManager):
     def get_coin_swap_ticker(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap ticker.
 
         GET /openApi/cswap/v1/market/ticker.
 
@@ -402,7 +402,7 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get spot historical kline.
 
         GET /openApi/market/his/v1/kline.
 
@@ -443,7 +443,9 @@ class MarketHTTP(HTTPManager):
         from_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """GET /openApi/market/his/v1/trade. Timestamps use milliseconds."""
+        """Get spot historical trades.
+
+        GET /openApi/market/his/v1/trade. Timestamps use milliseconds."""
         return self._native_public(
             "get_spot_historical_trades",
             self._native_params(
@@ -459,7 +461,9 @@ class MarketHTTP(HTTPManager):
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """GET /openApi/swap/v1/market/historicalTrades. Timestamps use milliseconds."""
+        """Get swap historical trades.
+
+        GET /openApi/swap/v1/market/historicalTrades. Timestamps use milliseconds."""
         return self._native_public(
             "get_swap_historical_trades",
             self._native_params(
@@ -468,7 +472,5 @@ class MarketHTTP(HTTPManager):
         )
 
     def get_spot_server_time(self) -> Any:  # noqa: ANN401
-        """
-        Get the spot server time; the server returns its native timestamp unit.
-        """
+        """Get the spot server time; the server returns its native timestamp unit."""
         return self._native_public("get_spot_server_time", [])

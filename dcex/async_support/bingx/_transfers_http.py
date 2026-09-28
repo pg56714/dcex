@@ -18,6 +18,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
         to_account: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get transferable coins."""
         return await self._native_private(
             "get_transferable_coins",
             self._native_params(
@@ -38,6 +39,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
         amount: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Asset transfer."""
         return await self._native_private(
             "asset_transfer",
             self._native_params(
@@ -74,6 +76,7 @@ class AccountHTTPTransfersHTTP(HTTPManager):
         page_size: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get asset transfer records."""
         return await self._native_private(
             "get_asset_transfer_records",
             self._native_params(
@@ -204,7 +207,8 @@ class TradeHTTPTransfersHTTP(HTTPManager):
     async def set_sub_account_transfer_authorization(
         self, *, sub_uids: str, transferable: bool, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Set sub account transfer authorization.
+
         POST /openApi/account/v1/innerTransfer/authorizeSubAccount. Timestamps use milliseconds.
         """
         return await self._native_private(
@@ -226,7 +230,9 @@ class TradeHTTPTransfersHTTP(HTTPManager):
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """GET /openApi/wallets/v1/capital/innerTransfer/records. Timestamps use milliseconds."""
+        """Get internal transfer records.
+
+        GET /openApi/wallets/v1/capital/innerTransfer/records. Timestamps use milliseconds."""
         return await self._native_private(
             "get_internal_transfer_records",
             self._native_params(
@@ -252,7 +258,8 @@ class TradeHTTPTransfersHTTP(HTTPManager):
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get sub account internal transfer records.
+
         GET /openApi/wallets/v1/capital/subAccount/innerTransfer/records. Timestamps use
         milliseconds.
         """

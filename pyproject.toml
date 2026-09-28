@@ -98,6 +98,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"dcex/bingx/*.py" = ["D213"] # BingX API summaries start on the first docstring line.
+"dcex/async_support/bingx/*.py" = ["D213"]
 "tests/*" = [
   "S101", # Allow use of assert statements in tests
   "S105", # hardcoded-password-string

@@ -1,5 +1,6 @@
 """BingX trade HTTP client."""
 
+from decimal import Decimal
 from typing import Any
 
 from dcex._schema_codec import normalize_params
@@ -36,14 +37,15 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         side: str,
         type_: str,
         time_in_force: str | None = None,
-        quantity: float | str | None = None,
-        quote_order_qty: float | str | None = None,
-        price: float | str | None = None,
-        stop_price: float | str | None = None,
+        quantity: str | Decimal | None = None,
+        quote_order_qty: str | Decimal | None = None,
+        price: str | Decimal | None = None,
+        stop_price: str | Decimal | None = None,
         new_client_order_id: str | None = None,
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot order."""
         return await self._native_private(
             "place_spot_order",
             self._native_call_params(
@@ -72,11 +74,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_spot_market_buy_order(
         self,
         product_symbol: str,
-        quote_order_qty: float | str,
+        quote_order_qty: str | Decimal,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot market buy order."""
         return await self._native_private(
             "place_spot_market_buy_order",
             self._native_call_params(
@@ -102,11 +105,12 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_spot_market_sell_order(
         self,
         product_symbol: str,
-        quantity: float | str,
+        quantity: str | Decimal,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot market sell order."""
         return await self._native_private(
             "place_spot_market_sell_order",
             self._native_call_params(
@@ -133,13 +137,14 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         side: str,
-        quantity: float | str,
-        price: float | str,
+        quantity: str | Decimal,
+        price: str | Decimal,
         time_in_force: str | None = None,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot limit order."""
         return await self._native_private(
             "place_spot_limit_order",
             self._native_call_params(
@@ -166,13 +171,14 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_spot_limit_buy_order(
         self,
         product_symbol: str,
-        quantity: float | str,
-        price: float | str,
+        quantity: str | Decimal,
+        price: str | Decimal,
         time_in_force: str | None = None,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot limit buy order."""
         return await self._native_private(
             "place_spot_limit_buy_order",
             self._native_call_params(
@@ -199,13 +205,14 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_spot_limit_sell_order(
         self,
         product_symbol: str,
-        quantity: float | str,
-        price: float | str,
+        quantity: str | Decimal,
+        price: str | Decimal,
         time_in_force: str | None = None,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot limit sell order."""
         return await self._native_private(
             "place_spot_limit_sell_order",
             self._native_call_params(
@@ -232,12 +239,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         side: str,
-        quantity: float | str,
-        price: float | str,
+        quantity: str | Decimal,
+        price: str | Decimal,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot post only order."""
         return await self._native_private(
             "place_spot_post_only_order",
             self._native_call_params(
@@ -262,12 +270,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_spot_post_only_buy_order(
         self,
         product_symbol: str,
-        quantity: float | str,
-        price: float | str,
+        quantity: str | Decimal,
+        price: str | Decimal,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot post only buy order."""
         return await self._native_private(
             "place_spot_post_only_buy_order",
             self._native_call_params(
@@ -292,12 +301,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_spot_post_only_sell_order(
         self,
         product_symbol: str,
-        quantity: float | str,
-        price: float | str,
+        quantity: str | Decimal,
+        price: str | Decimal,
         client_order_id: str | None = None,
         new_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot post only sell order."""
         return await self._native_private(
             "place_spot_post_only_sell_order",
             self._native_call_params(
@@ -334,10 +344,10 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         cancel_order_id: int | str | None = None,  # noqa: N803
         cancel_client_order_id: str | None = None,  # noqa: N803
         cancel_restrictions: str | None = None,  # noqa: N803
-        quantity: float | str | None = None,
-        quote_order_qty: float | str | None = None,  # noqa: N803
-        price: float | str | None = None,
-        stop_price: float | str | None = None,  # noqa: N803
+        quantity: str | Decimal | None = None,
+        quote_order_qty: str | Decimal | None = None,  # noqa: N803
+        price: str | Decimal | None = None,
+        stop_price: str | Decimal | None = None,  # noqa: N803
         time_in_force: str | None = None,  # noqa: N803
         new_client_order_id: str | None = None,  # noqa: N803
         recv_window: int | None = None,  # noqa: N803
@@ -380,6 +390,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         cancel_restrictions: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Cancel spot order."""
         return await self._native_private(
             "cancel_spot_order",
             self._native_call_params(
@@ -401,6 +412,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Cancel spot open orders."""
         return await self._native_private(
             "cancel_spot_open_orders",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -436,6 +448,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get spot order."""
         return await self._native_private(
             "get_spot_order",
             self._native_call_params(
@@ -456,6 +469,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get spot open orders."""
         return await self._native_private(
             "get_spot_open_orders",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -483,6 +497,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         type_: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get spot order history."""
         return await self._native_private(
             "get_spot_order_history",
             self._native_call_params(
@@ -519,6 +534,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get spot my trades."""
         return await self._native_private(
             "get_spot_my_trades",
             self._native_call_params(
@@ -541,6 +557,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get spot commission rate."""
         return await self._native_private(
             "get_spot_commission_rate",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -572,11 +589,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         side: str,
         position_side: str | None = None,
         reduce_only: str | None = None,
-        price: float | None = None,
-        quantity: float | None = None,
-        quote_order_qty: float | None = None,
-        stop_price: float | None = None,
-        price_rate: float | None = None,
+        price: str | Decimal | None = None,
+        quantity: str | Decimal | None = None,
+        quote_order_qty: str | Decimal | None = None,
+        stop_price: str | Decimal | None = None,
+        price_rate: str | Decimal | None = None,
         stop_loss: str | None = None,
         take_profit: str | None = None,
         working_type: str | None = None,
@@ -584,10 +601,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         recv_window: int | None = None,
         time_in_force: str | None = None,
         close_position: str | None = None,
-        activation_price: float | None = None,
+        activation_price: str | Decimal | None = None,
         stop_guaranteed: str | None = None,
         position_id: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap order."""
         return await self._native_private(
             "place_swap_order",
             self._native_call_params(
@@ -640,11 +658,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         side: str,
         position_side: str | None = None,
         reduce_only: str | None = None,
-        price: float | None = None,
-        quantity: float | None = None,
-        quote_order_qty: float | None = None,
-        stop_price: float | None = None,
-        price_rate: float | None = None,
+        price: str | Decimal | None = None,
+        quantity: str | Decimal | None = None,
+        quote_order_qty: str | Decimal | None = None,
+        stop_price: str | Decimal | None = None,
+        price_rate: str | Decimal | None = None,
         stop_loss: str | None = None,
         take_profit: str | None = None,
         working_type: str | None = None,
@@ -652,10 +670,11 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         recv_window: int | None = None,
         time_in_force: str | None = None,
         close_position: str | None = None,
-        activation_price: float | None = None,
+        activation_price: str | Decimal | None = None,
         stop_guaranteed: str | None = None,
         position_id: int | None = None,
     ) -> dict[str, Any]:
+        """Test swap order."""
         return await self._native_private(
             "test_swap_order",
             self._native_call_params(
@@ -694,12 +713,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         side: str,
-        quantity: float,
+        quantity: str | Decimal,
         client_order_id: str | None = None,
         reduce_only: str | None = None,
         position_side: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap market order."""
         return await self._native_private(
             "place_swap_market_order",
             self._native_call_params(
@@ -726,12 +746,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_swap_market_buy_order(
         self,
         product_symbol: str,
-        quantity: float,
-        position_side: str = "LONG",
+        quantity: str | Decimal,
+        position_side: str,
         client_order_id: str | None = None,
         reduce_only: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap market buy order."""
         return await self._native_private(
             "place_swap_market_buy_order",
             self._native_call_params(
@@ -758,12 +779,13 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_swap_market_sell_order(
         self,
         product_symbol: str,
-        quantity: float,
+        quantity: str | Decimal,
         position_side: str,
         client_order_id: str | None = None,
         reduce_only: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap market sell order."""
         return await self._native_private(
             "place_swap_market_sell_order",
             self._native_call_params(
@@ -792,14 +814,15 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         side: str,
-        quantity: float,
-        price: float,
+        quantity: str | Decimal,
+        price: str | Decimal,
         client_order_id: str | None = None,
         time_in_force: str = "GTC",
         reduce_only: str | None = None,
         position_side: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap limit order."""
         return await self._native_private(
             "place_swap_limit_order",
             self._native_call_params(
@@ -828,14 +851,15 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_swap_limit_buy_order(
         self,
         product_symbol: str,
-        quantity: float,
-        price: float,
-        position_side: str = "LONG",
+        quantity: str | Decimal,
+        price: str | Decimal,
+        position_side: str,
         time_in_force: str = "GTC",
         client_order_id: str | None = None,
         reduce_only: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap limit buy order."""
         return await self._native_private(
             "place_swap_limit_buy_order",
             self._native_call_params(
@@ -864,14 +888,15 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_swap_limit_sell_order(
         self,
         product_symbol: str,
-        quantity: float,
-        price: float,
+        quantity: str | Decimal,
+        price: str | Decimal,
         position_side: str,
         time_in_force: str = "GTC",
         client_order_id: str | None = None,
         reduce_only: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap limit sell order."""
         return await self._native_private(
             "place_swap_limit_sell_order",
             self._native_call_params(
@@ -901,14 +926,15 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         self,
         product_symbol: str,
         side: str,
-        quantity: float,
-        price: float,
+        quantity: str | Decimal,
+        price: str | Decimal,
         client_order_id: str | None = None,
         time_in_force: str = "PostOnly",
         reduce_only: str | None = None,
         position_side: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap post only order."""
         return await self._native_private(
             "place_swap_post_only_order",
             self._native_call_params(
@@ -936,13 +962,14 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_swap_post_only_buy_order(
         self,
         product_symbol: str,
-        quantity: float,
-        price: float,
-        position_side: str = "LONG",
+        quantity: str | Decimal,
+        price: str | Decimal,
+        position_side: str,
         client_order_id: str | None = None,
         reduce_only: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap post only buy order."""
         return await self._native_private(
             "place_swap_post_only_buy_order",
             self._native_call_params(
@@ -969,13 +996,14 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def place_swap_post_only_sell_order(
         self,
         product_symbol: str,
-        quantity: float,
-        price: float,
+        quantity: str | Decimal,
+        price: str | Decimal,
         position_side: str,
         client_order_id: str | None = None,
         reduce_only: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap post only sell order."""
         return await self._native_private(
             "place_swap_post_only_sell_order",
             self._native_call_params(
@@ -1001,6 +1029,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Cancel swap order."""
         return await self._native_private(
             "cancel_swap_order",
             self._native_call_params(
@@ -1022,6 +1051,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         type_: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Cancel swap all orders."""
         return await self._native_private(
             "cancel_swap_all_orders",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -1063,22 +1093,23 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         cancel_order_id: str | None = None,
         cancel_restrictions: str | None = None,
         reduce_only: str | None = None,
-        price: float | None = None,
-        quantity: float | None = None,
-        quote_order_qty: float | None = None,
-        stop_price: float | None = None,
-        price_rate: float | None = None,
+        price: str | Decimal | None = None,
+        quantity: str | Decimal | None = None,
+        quote_order_qty: str | Decimal | None = None,
+        stop_price: str | Decimal | None = None,
+        price_rate: str | Decimal | None = None,
         working_type: str | None = None,
         stop_loss: str | None = None,
         take_profit: str | None = None,
         client_order_id: str | None = None,
         close_position: str | None = None,
-        activation_price: float | None = None,
+        activation_price: str | Decimal | None = None,
         stop_guaranteed: str | None = None,
         time_in_force: str | None = None,
         position_id: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Replace swap order."""
         return await self._native_private(
             "replace_swap_order",
             self._native_call_params(
@@ -1116,6 +1147,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         position_id: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Close swap position."""
         return await self._native_private(
             "close_swap_position",
             self._native_call_params(
@@ -1129,6 +1161,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Close swap all positions."""
         return await self._native_private(
             "close_swap_all_positions",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -1144,6 +1177,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get order detail."""
         return await self._native_private(
             "get_order_detail",
             self._native_call_params(
@@ -1165,6 +1199,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         type_: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get open orders."""
         return await self._native_private(
             "get_open_orders",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -1188,6 +1223,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get order history."""
         return await self._native_private(
             "get_order_history",
             self._native_call_params(
@@ -1210,6 +1246,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         margin_type: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Change margin type."""
         return await self._native_private(
             "change_margin_type",
             self._native_call_params(
@@ -1223,6 +1260,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get margin type."""
         return await self._native_private(
             "get_margin_type",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -1236,6 +1274,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         leverage: int,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Set leverage."""
         return await self._native_private(
             "set_leverage",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -1247,6 +1286,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         product_symbol: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get leverage."""
         return await self._native_private(
             "get_leverage",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -1258,6 +1298,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         dual_side_position: str,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Set position mode."""
         return await self._native_private(
             "set_position_mode",
             self._native_call_params(
@@ -1270,6 +1311,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
 
     @legacy_keywords({"recvWindow": "recv_window"})
     async def get_position_mode(self, recv_window: int | None = None) -> dict[str, Any]:
+        """Get position mode."""
         return await self._native_private(
             "get_position_mode",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -1569,8 +1611,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def set_swap_asset_mode(
         self, asset_mode: str, *, recv_window: int | None = None, confirm: bool = False
     ) -> dict[str, Any]:
-        """
-        Call ``POST /openApi/swap/v1/trade/assetMode``.
+        """Call ``POST /openApi/swap/v1/trade/assetMode``.
 
         Requires confirm=True. This changes collateral accounting for swaps.
         """
@@ -1812,7 +1853,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         stop_loss: dict[str, Any] | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Place coin swap order.
 
         POST /openApi/cswap/v1/trade/order.
 
@@ -1847,7 +1888,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Cancel coin swap order.
 
         DELETE /openApi/cswap/v1/trade/cancelOrder.
 
@@ -1872,7 +1913,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         recv_window: int | None = None,
         all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """
+        """Cancel coin swap all orders.
 
         POST /openApi/cswap/v1/trade/allOpenOrders.
 
@@ -1897,7 +1938,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         recv_window: int | None = None,
         all_symbols: bool = False,
     ) -> dict[str, Any]:
-        """
+        """Close coin swap all positions.
 
         POST /openApi/cswap/v1/trade/closeAllPositions.
 
@@ -1918,7 +1959,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_coin_swap_open_orders(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap open orders.
 
         GET /openApi/cswap/v1/trade/openOrders.
 
@@ -1939,7 +1980,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get coin swap order.
 
         GET /openApi/cswap/v1/trade/orderDetail.
 
@@ -1967,7 +2008,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         end_time: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get coin swap order history.
 
         GET /openApi/cswap/v1/trade/orderHistory.
 
@@ -1995,7 +2036,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         page_size: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get coin swap fills.
 
         GET /openApi/cswap/v1/trade/allFillOrders.
 
@@ -2020,7 +2061,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get coin swap force orders.
 
         GET /openApi/cswap/v1/trade/forceOrders.
 
@@ -2043,7 +2084,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_coin_swap_leverage(
         self, *, product_symbol: str, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap leverage.
 
         GET /openApi/cswap/v1/trade/leverage.
 
@@ -2059,7 +2100,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def set_coin_swap_leverage(
         self, *, product_symbol: str, side: str, leverage: str, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Set coin swap leverage.
 
         POST /openApi/cswap/v1/trade/leverage.
 
@@ -2077,7 +2118,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_coin_swap_margin_type(
         self, *, product_symbol: str, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap margin type.
 
         GET /openApi/cswap/v1/trade/marginType.
 
@@ -2093,7 +2134,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def set_coin_swap_margin_type(
         self, *, product_symbol: str, margin_type: str, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Set coin swap margin type.
 
         POST /openApi/cswap/v1/trade/marginType.
 
@@ -2117,7 +2158,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         type_: int,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Adjust coin swap position margin.
 
         POST /openApi/cswap/v1/trade/positionMargin.
 
@@ -2139,7 +2180,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_coin_swap_commission_rate(
         self, *, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap commission rate.
 
         GET /openApi/cswap/v1/user/commissionRate.
 
@@ -2154,7 +2195,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_coin_swap_balance(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap balance.
 
         GET /openApi/cswap/v1/user/balance.
 
@@ -2170,7 +2211,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_coin_swap_positions(
         self, *, product_symbol: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get coin swap positions.
 
         GET /openApi/cswap/v1/user/positions.
 
@@ -2197,7 +2238,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         below_client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Place spot OCO.
 
         POST /openApi/spot/v1/oco/order.
 
@@ -2228,7 +2269,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Cancel spot OCO.
 
         POST /openApi/spot/v1/oco/cancel.
 
@@ -2250,7 +2291,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         client_order_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get spot OCO.
 
         GET /openApi/spot/v1/oco/orderList.
 
@@ -2268,7 +2309,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_spot_open_oco(
         self, *, page_index: int, page_size: int, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
+        """Get spot open OCO.
 
         GET /openApi/spot/v1/oco/openOrderList.
 
@@ -2290,7 +2331,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         end_time: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get spot OCO history.
 
         GET /openApi/spot/v1/oco/historyOrderList.
 
@@ -2321,7 +2362,7 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         tx_id: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get deposit history.
 
         GET /openApi/api/v3/capital/deposit/hisrec.
 
@@ -2350,7 +2391,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         display_name: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """GET /openApi/wallets/v1/capital/config/getall. Timestamps use milliseconds."""
+        """Get coin network config.
+
+        GET /openApi/wallets/v1/capital/config/getall. Timestamps use milliseconds."""
         return await self._native_private(
             "get_coin_network_config",
             self._native_params(coin=coin, displayName=display_name, recvWindow=recv_window),
@@ -2364,14 +2407,18 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """GET /openApi/wallets/v1/capital/deposit/address. Timestamps use milliseconds."""
+        """Get deposit addresses.
+
+        GET /openApi/wallets/v1/capital/deposit/address. Timestamps use milliseconds."""
         return await self._native_private(
             "get_deposit_addresses",
             self._native_params(coin=coin, offset=offset, limit=limit, recvWindow=recv_window),
         )
 
     async def get_deposit_risk_records(self, *, recv_window: int | None = None) -> dict[str, Any]:
-        """GET /openApi/wallets/v1/capital/deposit/riskRecords. Timestamps use milliseconds."""
+        """Get deposit risk records.
+
+        GET /openApi/wallets/v1/capital/deposit/riskRecords. Timestamps use milliseconds."""
         return await self._native_private(
             "get_deposit_risk_records", self._native_params(recvWindow=recv_window)
         )
@@ -2386,7 +2433,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         recv_window: int | None = None,
         confirm: bool = False,
     ) -> dict[str, Any]:
-        """
+        """Reverse swap position.
+
         POST /openApi/swap/v1/trade/reverse. Timestamps use milliseconds.
 
         Requires confirm=True. This closes and reverses the selected position.
@@ -2411,7 +2459,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         amount: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """POST /openApi/swap/v2/trade/getVst. Timestamps use milliseconds."""
+        """Adjust simulated trading balance.
+
+        POST /openApi/swap/v2/trade/getVst. Timestamps use milliseconds."""
         return await self._native_private(
             "adjust_simulated_trading_balance",
             self._native_params(adjustType=adjust_type, amount=amount, recvWindow=recv_window),
@@ -2420,7 +2470,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_standard_futures_positions(
         self, *, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """GET /openApi/contract/v1/allPosition. Timestamps use milliseconds."""
+        """Get standard futures positions.
+
+        GET /openApi/contract/v1/allPosition. Timestamps use milliseconds."""
         return await self._native_private(
             "get_standard_futures_positions", self._native_params(recvWindow=recv_window)
         )
@@ -2435,7 +2487,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """GET /openApi/contract/v1/allOrders. Timestamps use milliseconds."""
+        """Get standard futures orders.
+
+        GET /openApi/contract/v1/allOrders. Timestamps use milliseconds."""
         return await self._native_private(
             "get_standard_futures_orders",
             self._native_params(
@@ -2451,13 +2505,17 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def get_standard_futures_balance(
         self, *, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """GET /openApi/contract/v1/balance. Timestamps use milliseconds."""
+        """Get standard futures balance.
+
+        GET /openApi/contract/v1/balance. Timestamps use milliseconds."""
         return await self._native_private(
             "get_standard_futures_balance", self._native_params(recvWindow=recv_window)
         )
 
     async def get_api_permissions(self, *, recv_window: int | None = None) -> dict[str, Any]:
-        """GET /openApi/v1/account/apiPermissions. Timestamps use milliseconds."""
+        """Get API permissions.
+
+        GET /openApi/v1/account/apiPermissions. Timestamps use milliseconds."""
         return await self._native_private(
             "get_api_permissions", self._native_params(recvWindow=recv_window)
         )
@@ -2465,7 +2523,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def create_sub_account(
         self, *, sub_account_string: str, note: str | None = None, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """POST /openApi/subAccount/v1/create. Timestamps use milliseconds."""
+        """Create sub account.
+
+        POST /openApi/subAccount/v1/create. Timestamps use milliseconds."""
         return await self._native_private(
             "create_sub_account",
             self._native_params(
@@ -2476,7 +2536,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def set_sub_account_frozen(
         self, *, sub_uid: int, freeze: bool, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """POST /openApi/subAccount/v1/updateStatus. Timestamps use milliseconds."""
+        """Set sub account frozen.
+
+        POST /openApi/subAccount/v1/updateStatus. Timestamps use milliseconds."""
         return await self._native_private(
             "set_sub_account_frozen",
             self._native_params(subUid=sub_uid, freeze=freeze, recvWindow=recv_window),
@@ -2491,7 +2553,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         ip_addresses: list[str] | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """POST /openApi/subAccount/v1/apiKey/create. Timestamps use milliseconds."""
+        """Create sub account API key.
+
+        POST /openApi/subAccount/v1/apiKey/create. Timestamps use milliseconds."""
         return await self._native_private(
             "create_sub_account_api_key",
             self._native_params(
@@ -2513,7 +2577,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         ip_addresses: list[str] | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """POST /openApi/subAccount/v1/apiKey/edit. Timestamps use milliseconds."""
+        """Modify sub account API key.
+
+        POST /openApi/subAccount/v1/apiKey/edit. Timestamps use milliseconds."""
         return await self._native_private(
             "modify_sub_account_api_key",
             self._native_params(
@@ -2529,7 +2595,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
     async def delete_sub_account_api_key(
         self, *, sub_uid: int, api_key: str, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """POST /openApi/subAccount/v1/apiKey/del. Timestamps use milliseconds."""
+        """Delete sub account API key.
+
+        POST /openApi/subAccount/v1/apiKey/del. Timestamps use milliseconds."""
         return await self._native_private(
             "delete_sub_account_api_key",
             self._native_params(subUid=sub_uid, apiKey=api_key, recvWindow=recv_window),
@@ -2544,7 +2612,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Get sub account deposit addresses.
+
         GET /openApi/wallets/v1/capital/subAccount/deposit/address. Timestamps use milliseconds.
         """
         return await self._native_private(
@@ -2567,7 +2636,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """GET /openApi/wallets/v1/capital/deposit/subHisrec. Timestamps use milliseconds."""
+        """Get sub account deposit history.
+
+        GET /openApi/wallets/v1/capital/deposit/subHisrec. Timestamps use milliseconds."""
         return await self._native_private(
             "get_sub_account_deposit_history",
             self._native_params(
@@ -2584,7 +2655,9 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         )
 
     async def get_api_restrictions(self, *, recv_window: int | None = None) -> dict[str, Any]:
-        """GET /openApi/v1/account/apiRestrictions. Timestamps use milliseconds."""
+        """Get API restrictions.
+
+        GET /openApi/v1/account/apiRestrictions. Timestamps use milliseconds."""
         return await self._native_private(
             "get_api_restrictions", self._native_params(recvWindow=recv_window)
         )
@@ -2598,7 +2671,8 @@ class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawals
         wallet_type: int,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
-        """
+        """Create sub account deposit address.
+
         POST /openApi/wallets/v1/capital/deposit/createSubAddress. Timestamps use milliseconds.
         """
         return await self._native_private(

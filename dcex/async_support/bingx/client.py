@@ -19,8 +19,7 @@ class Client(
         self,
         **args: Any,  # noqa: ANN401
     ) -> None:
-        """
-        Initialize the BingX client.
+        """Initialize the BingX client.
 
         Args:
             **args: Additional arguments passed to parent classes.

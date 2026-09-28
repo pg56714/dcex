@@ -49,8 +49,7 @@ class HTTPManager(BaseHTTPManager):
     _native_client: Any | None = field(default=None, init=False, repr=False)
 
     async def async_init(self) -> Self:
-        """
-        Initialize the HTTP manager.
+        """Initialize the HTTP manager.
 
         Returns:
             HTTPManager: Initialized HTTP manager instance
@@ -136,8 +135,7 @@ class HTTPManager(BaseHTTPManager):
         signed: bool = True,
         request_headers: dict[str, str] | None = None,
     ) -> dict:
-        """
-        Make an HTTP request to BingX API.
+        """Make an HTTP request to BingX API.
 
         Args:
             method: HTTP method (GET, POST, PUT, DELETE)

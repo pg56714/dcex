@@ -3,8 +3,29 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
+
+from scripts.build_endpoint_markdown import ROOT, build_markdown
 
 from scripts.build_endpoint_docs import LEDGER, OUTPUT, build_html
+
+
+def test_endpoint_markdown_matches_current_sources() -> None:
+    for path, content in build_markdown().items():
+        assert path.read_text(encoding="utf-8") == content, path
+
+
+def test_markdown_cli_help_and_no_mode_do_not_write() -> None:
+    paths = sorted((ROOT / "docs").glob("endpoint-*.md"))
+    before = {path: (path.read_bytes(), path.stat().st_mtime_ns) for path in paths}
+    for args, code in [(["--help"], 0), ([], 2)]:
+        result = subprocess.run(
+            [sys.executable, "-m", "scripts.build_endpoint_markdown", *args],
+            cwd=ROOT, capture_output=True,
+        )
+        assert result.returncode == code, result.stderr
+    assert before == {path: (path.read_bytes(), path.stat().st_mtime_ns) for path in paths}
 
 
 def test_endpoint_coverage_html_matches_ledger() -> None:

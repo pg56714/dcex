@@ -101,7 +101,9 @@ def test_arcus_spot_python_sync_public_methods() -> None:
         assert client.get_price(SELL, BUY, "1000000") == {"ok": True}
         assert client.get_quote(SELL, BUY, "1000000", TAKER, slippage_bps=50) == {"ok": True}
         client.close()
-        assert [urlsplit(received.get_nowait()["path"]).path for _ in range(4)] == [
+        requests = [received.get_nowait() for _ in range(4)]
+        assert [request["method"] for request in requests] == ["GET"] * 4
+        assert [urlsplit(request["path"]).path for request in requests] == [
             "/health",
             "/v1/tokens",
             "/v1/price",
@@ -190,7 +192,9 @@ def test_arcus_spot_python_async_public_methods() -> None:
             assert await client.get_price(SELL, BUY, "1000000") == {"ok": True}
             assert await client.get_quote(SELL, BUY, "1000000", TAKER) == {"ok": True}
             await client.close()
-            paths = [urlsplit(received.get_nowait()["path"]) for _ in range(4)]
+            requests = [received.get_nowait() for _ in range(4)]
+            assert [request["method"] for request in requests] == ["GET"] * 4
+            paths = [urlsplit(request["path"]) for request in requests]
             assert [path.path for path in paths] == [
                 "/health",
                 "/v1/tokens",

@@ -18,6 +18,7 @@ class TradeHTTPBatchHTTP(HTTPManager):
         sync: bool | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place spot batch order."""
         return await self._native_private(
             "place_spot_batch_order",
             self._native_call_params(wire_keywords(locals(), {"recvWindow": "recv_window"})),
@@ -38,6 +39,7 @@ class TradeHTTPBatchHTTP(HTTPManager):
         process: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Cancel spot batch orders."""
         return await self._native_private(
             "cancel_spot_batch_orders",
             self._native_call_params(
@@ -58,6 +60,7 @@ class TradeHTTPBatchHTTP(HTTPManager):
         batch_orders: list,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Place swap batch order."""
         return await self._native_private(
             "place_swap_batch_order",
             self._native_call_params(
@@ -81,6 +84,7 @@ class TradeHTTPBatchHTTP(HTTPManager):
         client_order_id_list: list | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Cancel swap batch order."""
         return await self._native_private(
             "cancel_swap_batch_order",
             self._native_call_params(
@@ -98,8 +102,7 @@ class TradeHTTPBatchHTTP(HTTPManager):
     async def replace_swap_batch_orders(
         self, orders: list[dict[str, Any]], *, recv_window: int | None = None
     ) -> dict[str, Any]:
-        """
-        Cancel and replace multiple swap orders; preserve per-order failure results.
+        """Cancel and replace multiple swap orders; preserve per-order failure results.
 
         Orders accept the native cancelReplace fields and product_symbol.
         """

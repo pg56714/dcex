@@ -13,6 +13,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
 
     @legacy_keywords({"recvWindow": "recv_window"})
     def get_account_balance(self, recv_window: int | None = None) -> dict[str, Any]:
+        """Get account balance."""
         return self._native_private(
             "get_account_balance",
             self._native_params(recvWindow=recv_window),
@@ -20,6 +21,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
 
     @legacy_keywords({"recvWindow": "recv_window"})
     def get_swap_account_balance(self, recv_window: int | None = None) -> dict[str, Any]:
+        """Get swap account balance."""
         return self._native_private(
             "get_swap_account_balance",
             self._native_params(recvWindow=recv_window),
@@ -37,6 +39,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         self,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get spot account balance."""
         return self._native_private(
             "get_spot_account_balance",
             self._native_params(recvWindow=recv_window),
@@ -48,6 +51,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         asset: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get fund account balance."""
         return self._native_private(
             "get_fund_account_balance",
             self._native_params(asset=asset, recvWindow=recv_window),
@@ -59,6 +63,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         account_type: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get all account balance."""
         return self._native_private(
             "get_all_account_balance",
             self._native_params(accountType=account_type, recvWindow=recv_window),
@@ -69,6 +74,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         self,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get account uid."""
         return self._native_private(
             "get_account_uid",
             self._native_params(recvWindow=recv_window),
@@ -81,6 +87,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         api_key: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get API key info."""
         return self._native_private(
             "get_api_key_info",
             self._native_params(uid=uid, apiKey=api_key, recvWindow=recv_window),
@@ -163,6 +170,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         product_symbol: str | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get open positions."""
         return self._native_private(
             "get_open_positions",
             self._native_params(product_symbol=product_symbol, recvWindow=recv_window),
@@ -178,6 +186,7 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         limit: int | None = None,
         recv_window: int | None = None,
     ) -> dict[str, Any]:
+        """Get fund flow."""
         return self._native_private(
             "get_fund_flow",
             self._native_params(
@@ -191,18 +200,21 @@ class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
         )
 
     def get_listen_key(self) -> str:
+        """Get listen key."""
         if not self.api_key:
             raise ValueError("API key is required")
         self._uses_native_transport()
         return self._native_private("get_listen_key", [])["listenKey"]
 
     def keep_alive_listen_key(self, listen_key: str) -> dict[str, Any]:
+        """Keep alive listen key."""
         return self._native_private(
             "keep_alive_listen_key",
             self._native_params(listen_key=listen_key),
         )
 
     def close_listen_key(self, listen_key: str) -> dict[str, Any]:
+        """Close listen key."""
         return self._native_private(
             "close_listen_key",
             self._native_params(listen_key=listen_key),
