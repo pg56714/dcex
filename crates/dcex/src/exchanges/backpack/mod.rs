@@ -6,6 +6,7 @@ mod client;
 mod endpoints;
 mod market;
 mod params;
+mod private;
 mod rfq;
 mod signing;
 mod strategy;

@@ -8,37 +8,75 @@ trait WrapperSource {
 }
 
 impl WrapperSource for BingxClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/bingx/wrappers.rs");
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/bingx/wrappers.rs"),
+        include_str!("../src/exchanges/bingx/withdrawals.rs"),
+        include_str!("../src/exchanges/bingx/transfers.rs"),
+        include_str!("../src/exchanges/bingx/batch.rs"),
+    );
 }
 
 impl WrapperSource for BybitClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/bybit/wrappers.rs");
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/bybit/wrappers.rs"),
+        include_str!("../src/exchanges/bybit/withdrawals.rs"),
+        include_str!("../src/exchanges/bybit/transfers.rs"),
+        include_str!("../src/exchanges/bybit/batch.rs"),
+    );
 }
 
 impl WrapperSource for OkxClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/okx/wrappers.rs");
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/okx/wrappers.rs"),
+        include_str!("../src/exchanges/okx/withdrawals.rs"),
+        include_str!("../src/exchanges/okx/transfers.rs"),
+        include_str!("../src/exchanges/okx/batch.rs"),
+    );
 }
 
 impl WrapperSource for BitgetClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/bitget/wrappers.rs");
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/bitget/wrappers.rs"),
+        include_str!("../src/exchanges/bitget/withdrawals.rs"),
+        include_str!("../src/exchanges/bitget/transfers.rs"),
+        include_str!("../src/exchanges/bitget/batch.rs"),
+    );
 }
 
 impl WrapperSource for KrakenClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/kraken/wrappers.rs");
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/kraken/wrappers.rs"),
+        include_str!("../src/exchanges/kraken/withdrawals.rs"),
+        include_str!("../src/exchanges/kraken/transfers.rs"),
+        include_str!("../src/exchanges/kraken/batch.rs"),
+    );
 }
 
 impl WrapperSource for MexcClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/mexc/wrappers.rs");
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/mexc/wrappers.rs"),
+        include_str!("../src/exchanges/mexc/withdrawals.rs"),
+        include_str!("../src/exchanges/mexc/transfers.rs"),
+        include_str!("../src/exchanges/mexc/batch.rs"),
+    );
 }
 
 impl WrapperSource for HyperliquidClient {
-    const SOURCE: &'static str = include_str!("../src/exchanges/hyperliquid/wrappers.rs");
+    const SOURCE: &'static str = concat!(
+        include_str!("../src/exchanges/hyperliquid/wrappers.rs"),
+        include_str!("../src/exchanges/hyperliquid/withdrawals.rs"),
+        include_str!("../src/exchanges/hyperliquid/transfers.rs"),
+        include_str!("../src/exchanges/hyperliquid/batch.rs"),
+    );
 }
 
 impl WrapperSource for LighterClient {
     const SOURCE: &'static str = concat!(
         include_str!("../src/exchanges/lighter/client.rs"),
-        include_str!("../src/exchanges/lighter/wrappers.rs")
+        include_str!("../src/exchanges/lighter/wrappers.rs"),
+        include_str!("../src/exchanges/lighter/withdrawals.rs"),
+        include_str!("../src/exchanges/lighter/transfers.rs"),
+        include_str!("../src/exchanges/lighter/batch.rs"),
     );
 }
 

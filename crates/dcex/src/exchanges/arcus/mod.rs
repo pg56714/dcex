@@ -7,6 +7,7 @@ mod endpoints;
 mod market;
 mod metadata;
 mod params;
+mod private;
 mod signing;
 mod trade;
 mod wallet;

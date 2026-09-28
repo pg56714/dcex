@@ -24,7 +24,14 @@ import pytest
 pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
-WRAPPER_FILES = ("_account_http.py", "_market_http.py", "_trade_http.py")
+WRAPPER_FILES = (
+    "_withdrawals_http.py",
+    "_transfers_http.py",
+    "_batch_http.py",
+    "_account_http.py",
+    "_market_http.py",
+    "_trade_http.py",
+)
 WRAPPER_FILES += tuple(str(p.relative_to(ROOT / "dcex/bingx")) for p in sorted((ROOT / "dcex/bingx/_generated").glob("*_http.py")))
 
 SPOT_ORDER = ("POST", "/openApi/spot/v1/trade/order")

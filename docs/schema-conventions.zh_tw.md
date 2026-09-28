@@ -29,6 +29,14 @@ Python 的 `dcex/_schema_codec.py` 在轉成 native 字串參數前檢查原始�
   `_account_http.py` 與商品 mixin 組成。Arcus 現貨及永續保留各自公開類別，
   採用相同的檔案職責。
 
+Rust 共同核心為 `mod.rs`、`client.rs`、`market.rs`、`trade.rs`、
+`params.rs`、`signing.rs`、`private.rs`、`tests.rs` 與
+`tests/endpoint_coverage.rs`。每個 Python 同步／非同步套件均有 `client.py`
+及上述四個 HTTP 模組。所有私有 dispatch 入口（含 Arcus 現貨）放在
+`private.rs`，商品處理邏輯保留在所屬模組。僅在有獨立實作時才需要
+account／商品檔案。`tests/unit/test_exchange_structure.py` 依原生註冊清單
+檢查每個交易所是否遵守此配置。
+
 ## 數字與 wire 格式
 
 價格、數量與金額使用一般十進位字串；在送出前拒絕 Python 浮點數、科學記號字串、

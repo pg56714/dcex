@@ -7,6 +7,7 @@ mod endpoints;
 mod explorer;
 mod market;
 mod params;
+mod private;
 mod signing;
 mod trade;
 pub mod websocket;

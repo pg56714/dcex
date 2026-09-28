@@ -8,35 +8,10 @@ pub(in crate::exchanges::arcus) use super::params::{
     compare_decimals, decimal_parts, decimal_product_below, exact_units, required,
 };
 pub(in crate::exchanges::arcus) use super::signing::{legacy_signing_message, timestamp_ns};
-pub(in crate::exchanges::arcus) use crate::exchange::ValidatedResponse;
 pub(in crate::exchanges::arcus) use crate::http::{HttpMethod, HttpRequest, RequestBody};
 pub(in crate::exchanges::arcus) use crate::{DcexError, Result};
 
 impl ArcusClient {
-    pub async fn private_request(
-        &self,
-        method_name: &str,
-        params: Vec<(String, String)>,
-    ) -> Result<ValidatedResponse> {
-        if super::schema_requests::field_schemas::handles(method_name, false) {
-            return self.field_schema_request(method_name, params).await;
-        }
-        if super::metadata::handles(method_name, false) {
-            return self.metadata_request(method_name, params).await;
-        }
-        if matches!(
-            method_name,
-            "create_api_key_signed" | "revoke_api_key_signed"
-        ) {
-            return self.api_keys_request(method_name, params).await;
-        }
-        if method_name == "submit_internal_transfer" {
-            return self.submit_internal_transfer_request(params).await;
-        }
-        let request = self.build_private_request(method_name, params).await?;
-        self.execute(request).await
-    }
-
     /// Builds a signed WebSocket trading frame using the same validation and signing as REST.
     /// May fetch market metadata, but never submits the trading request.
     pub async fn sign_websocket_request(

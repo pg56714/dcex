@@ -5,6 +5,7 @@ mod client;
 mod endpoints;
 mod market;
 mod params;
+mod private;
 mod signing;
 #[cfg(test)]
 mod tests;

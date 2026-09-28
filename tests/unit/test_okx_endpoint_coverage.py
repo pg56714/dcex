@@ -2300,6 +2300,9 @@ CASES: tuple[Case, ...] = (
 )
 
 WRAPPER_FILES = (
+    "_withdrawals_http.py",
+    "_transfers_http.py",
+    "_batch_http.py",
     "_account_http.py",
     "_asset_http.py",
     "_finance_http.py",

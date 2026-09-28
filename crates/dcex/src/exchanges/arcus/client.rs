@@ -110,7 +110,7 @@ impl ArcusClient {
     }
 }
 
-mod spot {
+pub(super) mod spot {
     //! Arcus spot RFQ router. Trade signing uses an EVM wallet, not the perps API key.
 
     use std::collections::BTreeMap;
@@ -430,25 +430,6 @@ mod spot {
             self.execute(request).await
         }
 
-        pub async fn private_request(
-            &self,
-            method_name: &str,
-            params: Vec<(String, String)>,
-        ) -> Result<ValidatedResponse> {
-            if method_name != "submit_signed_quote" {
-                return Err(DcexError::InvalidInput(format!(
-                    "unknown Arcus spot private method: {method_name}"
-                )));
-            }
-            let values: BTreeMap<_, _> = params.into_iter().collect();
-            ensure_allowed(&values, &["signed_quote_json"])?;
-            let signed_quote = serde_json::from_str(required(&values, "signed_quote_json")?)
-                .map_err(|error| {
-                    DcexError::InvalidInput(format!("invalid signed quote JSON: {error}"))
-                })?;
-            self.submit_signed_quote(signed_quote).await
-        }
-
         fn query(&self, mut values: BTreeMap<String, String>) -> Result<Vec<(String, String)>> {
             if let Some(chain_id) = values.get("chainId") {
                 if chain_id.parse::<u64>().ok() != Some(self.chain_id) {
@@ -491,7 +472,10 @@ mod spot {
         }
     }
 
-    fn ensure_allowed(values: &BTreeMap<String, String>, allowed: &[&str]) -> Result<()> {
+    pub(in crate::exchanges::arcus) fn ensure_allowed(
+        values: &BTreeMap<String, String>,
+        allowed: &[&str],
+    ) -> Result<()> {
         if let Some(key) = values.keys().find(|key| !allowed.contains(&key.as_str())) {
             return Err(DcexError::InvalidInput(format!(
                 "unknown Arcus spot parameter: {key}"
@@ -500,7 +484,10 @@ mod spot {
         Ok(())
     }
 
-    fn required<'a>(values: &'a BTreeMap<String, String>, key: &str) -> Result<&'a str> {
+    pub(in crate::exchanges::arcus) fn required<'a>(
+        values: &'a BTreeMap<String, String>,
+        key: &str,
+    ) -> Result<&'a str> {
         values
             .get(key)
             .map(String::as_str)

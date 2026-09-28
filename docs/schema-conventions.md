@@ -34,6 +34,15 @@ another generic JSON validator or decimal-to-float conversion.
   and `_account_http.py`, plus product mixins. Arcus spot and perpetual clients
   keep separate public classes while using these same file roles.
 
+The common Rust core is `mod.rs`, `client.rs`, `market.rs`, `trade.rs`,
+`params.rs`, `signing.rs`, `private.rs`, `tests.rs`, and
+`tests/endpoint_coverage.rs`. Every Python sync/async package has `client.py`
+and the four HTTP modules above. All private dispatch entry points, including
+Arcus spot, belong in `private.rs`; product handlers remain in their domain
+modules. Account/product files are needed only when that exchange has a separate
+implementation. `tests/unit/test_exchange_structure.py` checks this contract
+for every exchange registered in the native module.
+
 ## Numbers and wire format
 
 Prices, quantities and amounts use plain decimal strings. Reject Python floats,

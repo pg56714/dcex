@@ -49,8 +49,9 @@ def _rust_exchange_source(exchange: str) -> str:
     source_dir = ROOT / "crates" / "dcex" / "src" / "exchanges" / exchange
     return "\n".join(
         path.read_text(encoding="utf-8")
-        for path in source_dir.glob("*.rs")
+        for path in source_dir.rglob("*.rs")
         if path.name != "tests.rs"
+        and not {"tests", "websocket"}.intersection(path.relative_to(source_dir).parts)
     )
 
 

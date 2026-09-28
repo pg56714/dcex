@@ -24,6 +24,9 @@ pytest.importorskip("dcex._native")
 
 ROOT = Path(__file__).resolve().parents[2]
 WRAPPER_FILES = (
+    "_withdrawals_http.py",
+    "_transfers_http.py",
+    "_batch_http.py",
     "_account_http.py",
     "_earn_http.py",
     "_market_http.py",

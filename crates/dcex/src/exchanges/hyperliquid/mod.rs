@@ -8,6 +8,7 @@ mod generated;
 mod market;
 mod msgpack;
 mod params;
+mod private;
 mod signing;
 mod trade;
 pub mod websocket;
