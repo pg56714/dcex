@@ -1,0 +1,52 @@
+[
+  {
+    "name": "get_standard_futures_positions",
+    "path": "/openApi/contract/v1/allPosition",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_standard_futures_orders",
+    "path": "/openApi/contract/v1/allOrders",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "product_symbol",
+      "orderId",
+      "startTime",
+      "endTime",
+      "limit",
+      "recvWindow"
+    ],
+    "required": [
+      "product_symbol"
+    ],
+    "integers": [
+      "orderId",
+      "startTime",
+      "endTime",
+      "limit",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_standard_futures_balance",
+    "path": "/openApi/contract/v1/balance",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "recvWindow"
+    ]
+  }
+]

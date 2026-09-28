@@ -23,7 +23,7 @@ fn cached_schema(raw: &'static str) -> Result<Arc<Value>> {
     schemas.insert(raw, Arc::clone(&schema));
     Ok(schema)
 }
-#[path = "endpoint_schemas/mod.rs"]
+#[path = "generated/schema_tables.rs"]
 mod endpoints;
 struct RiskEndpoint {
     path: &'static str,
@@ -49,6 +49,7 @@ impl OkxClient {
         }
         let schema = e.schema.map(cached_schema).transpose()?;
         let pairs = p.without(&[]);
+        crate::exchanges::schema::validate_pairs(&pairs)?;
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
             if !e.keys.contains(&key.as_str())
@@ -137,57 +138,7 @@ impl OkxClient {
     }
 }
 fn validate_json_shape(value: &Value, schema: &Value) -> Result<()> {
-    match schema["type"].as_str() {
-        Some("object") => {
-            let object = value
-                .as_object()
-                .ok_or_else(|| invalid("expected a JSON object"))?;
-            let fields = schema["properties"]
-                .as_object()
-                .ok_or_else(|| invalid("invalid object schema"))?;
-            if let Some(required) = schema["required"].as_array() {
-                for key in required.iter().filter_map(Value::as_str) {
-                    if !object.contains_key(key) {
-                        return Err(invalid(&format!("missing nested field {key}")));
-                    }
-                }
-            }
-            for (key, value) in object {
-                let field = fields
-                    .get(key)
-                    .ok_or_else(|| invalid(&format!("unknown nested field {key}")))?;
-                validate_json_shape(value, field)?;
-            }
-        }
-        Some("array") => {
-            let items = value
-                .as_array()
-                .ok_or_else(|| invalid("expected a JSON array"))?;
-            if schema["minItems"]
-                .as_u64()
-                .is_some_and(|n| items.len() < n as usize)
-                || schema["maxItems"]
-                    .as_u64()
-                    .is_some_and(|n| items.len() > n as usize)
-            {
-                return Err(invalid("array length is outside the documented limits"));
-            }
-            for value in value
-                .as_array()
-                .ok_or_else(|| invalid("expected a JSON array"))?
-            {
-                validate_json_shape(value, &schema["items"])?;
-            }
-        }
-        Some("string")
-            if value
-                .as_str()
-                .is_some_and(|s| !s.trim().is_empty() || schema["x-allow-empty"] == true) => {}
-        Some("boolean") if value.is_boolean() => {}
-        Some("integer") if value.as_i64().is_some() => {}
-        _ => return Err(invalid("nested field has an invalid type or is empty")),
-    }
-    Ok(())
+    crate::exchanges::schema::validate_with(value, schema, "request", true, true)
 }
 
 fn validate_additional(name: &str, p: &OkxParams, schema: &Value) -> Result<()> {
@@ -255,8 +206,7 @@ fn validate_additional(name: &str, p: &OkxParams, schema: &Value) -> Result<()> 
                 if !matches!(leg["from"]["side"].as_str(), Some("buy" | "sell"))
                     || !leg["from"]["sz"]
                         .as_str()
-                        .and_then(|s| s.parse::<f64>().ok())
-                        .is_some_and(|n| n.is_finite() && n > 0.0)
+                        .is_some_and(crate::common::is_positive_plain_decimal)
                 {
                     return Err(invalid("invalid source position side or size"));
                 }
@@ -306,8 +256,7 @@ fn validate_additional(name: &str, p: &OkxParams, schema: &Value) -> Result<()> 
                 for leg in legs {
                     if !leg["sz"]
                         .as_str()
-                        .and_then(|v| v.parse::<f64>().ok())
-                        .is_some_and(|v| v.is_finite() && v > 0.0)
+                        .is_some_and(crate::common::is_positive_plain_decimal)
                     {
                         return Err(invalid("RFQ leg size must be positive"));
                     }
@@ -764,13 +713,12 @@ fn validate_completion(name: &str, p: &OkxParams) -> Result<()> {
     Ok(())
 }
 fn positive(p: &OkxParams, key: &str) -> Result<()> {
-    if p.get(key)
-        .is_some_and(|v| !v.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0))
-    {
-        return Err(invalid(&format!("{key} must be positive")));
+    if let Some(value) = p.get(key) {
+        crate::exchanges::schema::encode(key, value, "decimal")?;
     }
     Ok(())
 }
+
 fn any(p: &OkxParams, keys: &[&str]) -> Result<()> {
     if keys.iter().all(|k| p.get(k).is_none()) {
         return Err(invalid(&format!("one of {} is required", keys.join(", "))));

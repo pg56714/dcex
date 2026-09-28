@@ -1,0 +1,626 @@
+[
+  {
+    "name": "get_fixed_loan_supply_contract_info",
+    "path": "/v5/crypto-loan-fixed/supply-contract-info",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "supplyId",
+      "supplyCurrency",
+      "term",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": [
+      "limit"
+    ]
+  },
+  {
+    "name": "repay_liability",
+    "path": "/v5/account/quick-repayment",
+    "post": true,
+    "public": false,
+    "keys": [
+      "coin"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_repayment_info",
+    "path": "/v5/account/pay-info",
+    "post": false,
+    "public": false,
+    "keys": [
+      "coin"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_borrowable_collateralisable_number",
+    "path": "/v5/crypto-loan/borrowable-collateralisable-number",
+    "post": false,
+    "public": false,
+    "keys": [
+      "loanCurrency",
+      "collateralCurrency"
+    ],
+    "required": [
+      "loanCurrency",
+      "collateralCurrency"
+    ],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_adjust_ltv",
+    "path": "/v5/crypto-loan/adjust-ltv",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orderId",
+      "amount",
+      "direction"
+    ],
+    "required": [
+      "orderId",
+      "amount",
+      "direction"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_collateral_data",
+    "path": "/v5/crypto-loan/collateral-data",
+    "post": false,
+    "public": true,
+    "keys": [
+      "vipLevel",
+      "currency"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_borrow_history",
+    "path": "/v5/crypto-loan/borrow-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "loanCurrency",
+      "collateralCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_loanable_data",
+    "path": "/v5/crypto-loan/loanable-data",
+    "post": false,
+    "public": true,
+    "keys": [
+      "vipLevel",
+      "currency"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_adjustment_history",
+    "path": "/v5/crypto-loan/adjustment-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "adjustId",
+      "collateralCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_max_collateral_amount",
+    "path": "/v5/crypto-loan/max-collateral-amount",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId"
+    ],
+    "required": [
+      "orderId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_repayment_history",
+    "path": "/v5/crypto-loan/repayment-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "repayId",
+      "loanCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_repay",
+    "path": "/v5/crypto-loan/repay",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orderId",
+      "amount"
+    ],
+    "required": [
+      "orderId",
+      "amount"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_ongoing_orders",
+    "path": "/v5/crypto-loan/ongoing-orders",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "loanCurrency",
+      "collateralCurrency",
+      "loanTermType",
+      "loanTerm",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_common_adjust_ltv",
+    "path": "/v5/crypto-loan-common/adjust-ltv",
+    "post": true,
+    "public": false,
+    "keys": [
+      "currency",
+      "amount",
+      "direction"
+    ],
+    "required": [
+      "currency",
+      "amount",
+      "direction"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_common_collateral_data",
+    "path": "/v5/crypto-loan-common/collateral-data",
+    "post": false,
+    "public": true,
+    "keys": [
+      "currency"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_common_position",
+    "path": "/v5/crypto-loan-common/position",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_fixed_available_inventory",
+    "path": "/v5/crypto-loan-fixed/available-inventory",
+    "post": false,
+    "public": false,
+    "keys": [
+      "currency",
+      "term",
+      "annualRate"
+    ],
+    "required": [
+      "currency",
+      "term",
+      "annualRate"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_fixed_borrow_contract_info",
+    "path": "/v5/crypto-loan-fixed/borrow-contract-info",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "loanId",
+      "orderCurrency",
+      "term",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_fixed_borrow_order_quote",
+    "path": "/v5/crypto-loan-fixed/borrow-order-quote",
+    "post": false,
+    "public": true,
+    "keys": [
+      "orderCurrency",
+      "orderBy",
+      "term",
+      "sort",
+      "limit"
+    ],
+    "required": [
+      "orderCurrency",
+      "orderBy"
+    ],
+    "integers": [
+      "sort",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_crypto_loan_fixed_borrow_order_info",
+    "path": "/v5/crypto-loan-fixed/borrow-order-info",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "orderCurrency",
+      "state",
+      "term",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_fixed_borrow",
+    "path": "/v5/crypto-loan-fixed/borrow",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orderCurrency",
+      "orderAmount",
+      "annualRate",
+      "term",
+      "repayType",
+      "strategyType",
+      "collateralList"
+    ],
+    "required": [
+      "orderCurrency",
+      "orderAmount",
+      "annualRate",
+      "term"
+    ],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_fixed_borrow_order_cancel",
+    "path": "/v5/crypto-loan-fixed/borrow-order-cancel",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orderId"
+    ],
+    "required": [
+      "orderId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_fixed_supply_order_cancel",
+    "path": "/v5/crypto-loan-fixed/supply-order-cancel",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orderId",
+      "refundedAccount"
+    ],
+    "required": [
+      "orderId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_fixed_renew_info",
+    "path": "/v5/crypto-loan-fixed/renew-info",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "orderCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_fixed_renew",
+    "path": "/v5/crypto-loan-fixed/renew",
+    "post": true,
+    "public": false,
+    "keys": [
+      "loanId",
+      "collateralList"
+    ],
+    "required": [
+      "loanId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_fixed_repay_collateral",
+    "path": "/v5/crypto-loan-fixed/repay-collateral",
+    "post": true,
+    "public": false,
+    "keys": [
+      "loanId",
+      "loanCurrency",
+      "collateralCoin",
+      "amount"
+    ],
+    "required": [
+      "loanCurrency",
+      "collateralCoin",
+      "amount"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_fixed_repayment_history",
+    "path": "/v5/crypto-loan-fixed/repayment-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "repayId",
+      "loanCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_fixed_fully_repay",
+    "path": "/v5/crypto-loan-fixed/fully-repay",
+    "post": true,
+    "public": false,
+    "keys": [
+      "loanId",
+      "loanCurrency"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_fixed_supply_order_quote",
+    "path": "/v5/crypto-loan-fixed/supply-order-quote",
+    "post": false,
+    "public": true,
+    "keys": [
+      "orderCurrency",
+      "term",
+      "orderBy",
+      "sort",
+      "limit"
+    ],
+    "required": [
+      "orderCurrency",
+      "orderBy"
+    ],
+    "integers": [
+      "sort",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_crypto_loan_fixed_supply_order_info",
+    "path": "/v5/crypto-loan-fixed/supply-order-info",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "orderCurrency",
+      "state",
+      "term",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_fixed_supply",
+    "path": "/v5/crypto-loan-fixed/supply",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orderCurrency",
+      "orderAmount",
+      "annualRate",
+      "term",
+      "availableSource"
+    ],
+    "required": [
+      "orderCurrency",
+      "orderAmount",
+      "annualRate",
+      "term"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_flexible_available_inventory",
+    "path": "/v5/crypto-loan-flexible/available-inventory",
+    "post": false,
+    "public": false,
+    "keys": [
+      "currency"
+    ],
+    "required": [
+      "currency"
+    ],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_flexible_borrow",
+    "path": "/v5/crypto-loan-flexible/borrow",
+    "post": true,
+    "public": false,
+    "keys": [
+      "loanCurrency",
+      "loanAmount",
+      "collateralList"
+    ],
+    "required": [
+      "loanCurrency",
+      "loanAmount"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_flexible_borrow_history",
+    "path": "/v5/crypto-loan-flexible/borrow-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "orderId",
+      "loanCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_flexible_repay_collateral",
+    "path": "/v5/crypto-loan-flexible/repay-collateral",
+    "post": true,
+    "public": false,
+    "keys": [
+      "loanCurrency",
+      "collateralCoin",
+      "amount"
+    ],
+    "required": [
+      "loanCurrency",
+      "collateralCoin",
+      "amount"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_flexible_repayment_history",
+    "path": "/v5/crypto-loan-flexible/repayment-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "repayId",
+      "loanCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_flexible_repay",
+    "path": "/v5/crypto-loan-flexible/repay",
+    "post": true,
+    "public": false,
+    "keys": [
+      "loanCurrency",
+      "amount"
+    ],
+    "required": [
+      "loanCurrency",
+      "amount"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_flexible_ongoing_coin",
+    "path": "/v5/crypto-loan-flexible/ongoing-coin",
+    "post": false,
+    "public": false,
+    "keys": [
+      "loanCurrency"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_common_loanable_data",
+    "path": "/v5/crypto-loan-common/loanable-data",
+    "post": false,
+    "public": true,
+    "keys": [
+      "vipLevel",
+      "currency"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_common_adjustment_history",
+    "path": "/v5/crypto-loan-common/adjustment-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "adjustId",
+      "collateralCurrency",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "crypto_loan_common_max_loan",
+    "path": "/v5/crypto-loan-common/max-loan",
+    "post": true,
+    "public": false,
+    "keys": [
+      "currency",
+      "collateralList"
+    ],
+    "required": [
+      "currency"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_crypto_loan_common_max_collateral_amount",
+    "path": "/v5/crypto-loan-common/max-collateral-amount",
+    "post": false,
+    "public": false,
+    "keys": [
+      "currency"
+    ],
+    "required": [
+      "currency"
+    ],
+    "integers": []
+  }
+]

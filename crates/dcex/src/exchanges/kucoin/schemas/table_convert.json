@@ -1,0 +1,444 @@
+[
+  {
+    "name": "add_convert_limit_order",
+    "path": "/api/v1/convert/limit/order",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "clientOrderId",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "BOTH",
+          "FUNDING",
+          "TRADING"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "fromCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "fromCurrencySize",
+        "kind": "d",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toCurrencySize",
+        "kind": "d",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "add_convert_order",
+    "path": "/api/v1/convert/order",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "clientOrderId",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "quoteId",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "BOTH",
+          "FUNDING",
+          "TRADING"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "cancel_convert_limit_order",
+    "path": "/api/v1/convert/limit/order/cancel",
+    "method": "HttpMethod::Delete",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "clientOrderId",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "orderId",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_convert_currencies",
+    "path": "/api/v1/convert/currencies",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_convert_limit_order_detail",
+    "path": "/api/v1/convert/limit/order/detail",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "clientOrderId",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "orderId",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_convert_limit_order_detail_list",
+    "path": "/api/v1/convert/limit/orders",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "status",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "OPEN",
+          "SUCCESS",
+          "FAIL",
+          "CANCELLED"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_convert_limit_quote",
+    "path": "/api/v1/convert/limit/quote",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "fromCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "fromCurrencySize",
+        "kind": "d",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toCurrencySize",
+        "kind": "d",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_convert_order_detail",
+    "path": "/api/v1/convert/order/detail",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "clientOrderId",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "orderId",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_convert_order_history",
+    "path": "/api/v1/convert/order/history",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 20,
+        "maximum": 100
+      },
+      {
+        "key": "status",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "OPEN",
+          "SUCCESS",
+          "FAIL"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_convert_quote",
+    "path": "/api/v1/convert/quote",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "fromCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "fromCurrencySize",
+        "kind": "d",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toCurrencySize",
+        "kind": "d",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_convert_symbol",
+    "path": "/api/v1/convert/symbol",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "fromCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toCurrency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "orderType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "MARKET",
+          "LIMIT"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  }
+]

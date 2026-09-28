@@ -1,0 +1,83 @@
+[
+  {
+    "name": "set_auto_loan",
+    "path": "/api/v5/account/set-auto-loan",
+    "post": true,
+    "public": false,
+    "keys": [
+      "autoLoan"
+    ],
+    "required": [],
+    "bools": [
+      "autoLoan"
+    ],
+    "schema": null
+  },
+  {
+    "name": "get_repayment_currencies",
+    "path": "/api/v5/trade/one-click-repay-currency-list-v2",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "repay_debt",
+    "path": "/api/v5/trade/one-click-repay-v2",
+    "post": true,
+    "public": false,
+    "keys": [
+      "debtCcy",
+      "repayCcyList"
+    ],
+    "required": [
+      "debtCcy",
+      "repayCcyList"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_repayment_history",
+    "path": "/api/v5/trade/one-click-repay-history-v2",
+    "post": false,
+    "public": false,
+    "keys": [
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_loan_ratio",
+    "path": "/api/v5/rubik/stat/margin/loan-ratio",
+    "post": false,
+    "public": true,
+    "keys": [
+      "ccy",
+      "begin",
+      "end",
+      "period"
+    ],
+    "required": [
+      "ccy"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"begin\":{\"type\":\"string\"},\"end\":{\"type\":\"string\"},\"period\":{\"type\":\"string\"}},\"required\":[\"ccy\"]}"
+  },
+  {
+    "name": "get_public_interest_rate_loan_quota",
+    "path": "/api/v5/public/interest-rate-loan-quota",
+    "post": false,
+    "public": true,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{},\"required\":[]}"
+  }
+]

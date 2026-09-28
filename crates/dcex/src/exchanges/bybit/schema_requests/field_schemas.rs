@@ -5,16 +5,10 @@ use crate::http::HttpMethod;
 use crate::{DcexError, Result};
 use serde::Deserialize;
 use serde_json::{Map, Value};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::sync::OnceLock;
 
-#[derive(Deserialize)]
-struct Field {
-    name: String,
-    #[serde(rename = "type")]
-    kind: String,
-    required: bool,
-}
+use crate::exchanges::schema::{self, Field};
 
 #[derive(Deserialize)]
 struct Endpoint {
@@ -44,46 +38,7 @@ impl BybitClient {
             return Ok(None);
         };
         let pairs = params.without(&[]);
-        let mut seen = HashSet::new();
-        let mut body = Map::new();
-        for (key, raw) in &pairs {
-            let field = endpoint
-                .fields
-                .iter()
-                .find(|f| &f.name == key)
-                .ok_or_else(|| invalid(format!("unknown parameter: {key}")))?;
-            if !seen.insert(key) || (field.required && raw.trim().is_empty()) {
-                return Err(invalid(format!("duplicate or empty parameter: {key}")));
-            }
-            let value = match field.kind.as_str() {
-                "integer" | "int" | "int64" | "long" => Value::from(
-                    raw.parse::<i64>()
-                        .map_err(|_| invalid(format!("{key} requires an integer")))?,
-                ),
-                "boolean" => Value::Bool(
-                    raw.parse::<bool>()
-                        .map_err(|_| invalid(format!("{key} requires a boolean")))?,
-                ),
-                kind if kind.starts_with("array") || kind == "object" => {
-                    let value: Value = serde_json::from_str(raw)
-                        .map_err(|_| invalid(format!("{key} requires valid JSON")))?;
-                    if (kind.starts_with("array") && !value.is_array())
-                        || (kind == "object" && !value.is_object())
-                    {
-                        return Err(invalid(format!("{key} has the wrong JSON type")));
-                    }
-                    value
-                }
-                "string" => Value::String(raw.clone()),
-                _ => return Err(invalid("unsupported schema type")),
-            };
-            body.insert(key.clone(), value);
-        }
-        for field in &endpoint.fields {
-            if field.required && !body.contains_key(&field.name) {
-                return Err(invalid(format!("{} is required", field.name)));
-            }
-        }
+        let body = schema::request(&endpoint.fields, &pairs)?;
         validate_conditions(&endpoint.path, &body)?;
         let result = if endpoint.method == "GET" {
             self.request(HttpMethod::Get, &endpoint.path, pairs, None, !public)

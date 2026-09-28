@@ -10,10 +10,10 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
-from tests.unit.endpoint_wrapper_helpers import generated_method_members
 
 from scripts.build_bitget_wrappers import snake
 from scripts.wrapper_codegen import load_schemas
+from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -46,7 +46,7 @@ def sample(schema):
         return True
     if kind in {"integer", "number"}:
         return max(1, schema.get("minimum", 1))
-    return "1"
+    return "1" * max(1, schema.get("minLength", 1))
 
 
 def case(op):

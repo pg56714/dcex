@@ -1,0 +1,621 @@
+[
+  {
+    "name": "set_uta_account_mode",
+    "path": "/api/ua/v2/account/mode",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "CLASSIC",
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_futures_account_ledgers",
+    "path": "/api/v1/transaction-history",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "RealizedPNL",
+          "Deposit",
+          "Withdrawal",
+          "Transferin",
+          "TransferOut"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "forward",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "maxCount",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_spot_account_ledgers",
+    "path": "/api/v1/accounts/ledgers",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "direction",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "in",
+          "out"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "bizType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currentPage",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 10,
+        "maximum": 500
+      }
+    ]
+  },
+  {
+    "name": "get_spot_hf_account_ledgers",
+    "path": "/api/v1/hf/accounts/ledgers",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "direction",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "in",
+          "out"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "bizType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "TRADE_EXCHANGE",
+          "TRANSFER",
+          "SUB_TRANSFER",
+          "RETURNED_FEES",
+          "DEDUCTION_FEES",
+          "OTHER"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "lastId",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 200
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": 9999999999999
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": 9999999999999
+      }
+    ]
+  },
+  {
+    "name": "get_uta_account_ledgers",
+    "path": "/api/ua/v2/account/ledger",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "FUNDING",
+          "SPOT",
+          "FUTURES",
+          "CROSS",
+          "ISOLATED",
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "businessType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "TRADE_EXCHANGE",
+          "TRANSFER",
+          "SUB_TRANSFER",
+          "RETURNED_FEES",
+          "DEDUCTION_FEES",
+          "OTHER",
+          "SUB_TO_SUB_TRANSFER",
+          "SPOT_EXCHANGE",
+          "SPOT_EXCHANGE_REBATE",
+          "FUTURES_EXCHANGE_OPEN",
+          "FUTURES_EXCHANGE_CLOSE",
+          "FUTURES_EXCHANGE_REBATE",
+          "FUNDING_FEE",
+          "LIABILITY_INTEREST",
+          "KCS_DEDUCTION_FEES",
+          "KCS_RETURNED_FEES",
+          "AUTO_EXCHANGE_USER"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "direction",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "IN",
+          "OUT"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 50
+      },
+      {
+        "key": "lastId",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_classic_account_balances_v2",
+    "path": "/api/ua/v2/account/balance",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountSubtype",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "FUNDING",
+          "SPOT",
+          "FUTURES",
+          "CROSS",
+          "ISOLATED"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_account_mode",
+    "path": "/api/ua/v2/account/mode",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_uta_all_rate_limits",
+    "path": "/api/ua/v2/rate-limit/query-all",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_uta_rate_limits",
+    "path": "/api/ua/v2/rate-limit/query",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "uids",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_rate_limit_cap",
+    "path": "/api/ua/v2/rate-limit/query-cap",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_uta_interest_history",
+    "path": "/api/ua/v2/account/interest-history",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 1000
+      }
+    ]
+  },
+  {
+    "name": "get_basic_fee",
+    "path": "/api/v1/base-fee",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currencyType",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [
+          "0",
+          "1"
+        ],
+        "minimum": 0,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "set_uta_kcs_fee_deduction",
+    "path": "/api/ua/v2/account/fee/kcs-deduct",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "enabled",
+        "kind": "b",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "set_uta_rate_limit",
+    "path": "/api/ua/v2/rate-limit/set",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "list",
+        "kind": "a",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_account_info",
+    "path": "/api/v2/user-info",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_spot_account_type",
+    "path": "/api/v1/hf/accounts/opened",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_uta_oes_custody_quota",
+    "path": "/api/ua/v2/oes/custody-quota",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "custodian",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "BITGO_SG",
+          "BITGO_SD",
+          "CACTUS",
+          "CEFFU"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  }
+]

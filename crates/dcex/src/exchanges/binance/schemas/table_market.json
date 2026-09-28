@@ -1,0 +1,1274 @@
+[
+  {
+    "name": "get_futures_symbol_config",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/symbolConfig",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_continuous_klines",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/continuousKlines",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "pair",
+      "contractType",
+      "interval",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "fields": [
+      {
+        "key": "pair",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "contractType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "PERPETUAL",
+          "CURRENT_QUARTER",
+          "NEXT_QUARTER",
+          "TRADIFI_PERPETUAL"
+        ]
+      },
+      {
+        "key": "interval",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "1m",
+          "3m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "4h",
+          "6h",
+          "8h",
+          "12h",
+          "1d",
+          "3d",
+          "1w",
+          "1M"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_funding_info",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/fundingInfo",
+    "public": true,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "get_futures_index_price_klines",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/indexPriceKlines",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "pair",
+      "interval",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "fields": [
+      {
+        "key": "pair",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "interval",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "1m",
+          "3m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "4h",
+          "6h",
+          "8h",
+          "12h",
+          "1d",
+          "3d",
+          "1w",
+          "1M"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_mark_price_klines",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/markPriceKlines",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "interval",
+      "startTime",
+      "endTime",
+      "limit",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "interval",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "1m",
+          "3m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "4h",
+          "6h",
+          "8h",
+          "12h",
+          "1d",
+          "3d",
+          "1w",
+          "1M"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_premium_index_klines",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/premiumIndexKlines",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "interval",
+      "startTime",
+      "endTime",
+      "limit",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "interval",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "1m",
+          "3m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "4h",
+          "6h",
+          "8h",
+          "12h",
+          "1d",
+          "3d",
+          "1w",
+          "1M"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_price_ticker_v1",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/ticker/price",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_price_ticker",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v2/ticker/price",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_24h_ticker",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/ticker/24hr",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_spot_average_price",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/avgPrice",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_spot_24h_ticker",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/ticker/24hr",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "symbols",
+      "type",
+      "symbolStatus",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbols",
+        "kind": "a",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "FULL",
+          "MINI"
+        ]
+      },
+      {
+        "key": "symbolStatus",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRADING",
+          "HALT",
+          "BREAK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "get_spot_book_ticker",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/ticker/bookTicker",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "symbols",
+      "symbolStatus",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbols",
+        "kind": "a",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbolStatus",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRADING",
+          "HALT",
+          "BREAK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "get_spot_delist_schedule",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/spot/delist-schedule",
+    "public": true,
+    "api_key": true,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_system_status",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/system/status",
+    "public": true,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "futures_adl_risk",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/symbolAdlRisk",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_asset_index",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/assetIndex",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_composite_index_symbol_information",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/indexInfo",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_quarterly_contract_settlement_price",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/futures/data/delivery-price",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "pair"
+    ],
+    "fields": [
+      {
+        "key": "pair",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_futures_index_price_constituents",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/constituents",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_futures_insurance_fund_balance_snapshot",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/insuranceBalance",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_rpi_order_book",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/rpiDepth",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "limit"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_test_connectivity",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/ping",
+    "public": true,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "futures_trading_schedule",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/tradingSchedule",
+    "public": true,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "spot_execution_rules",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/executionRules",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "symbols",
+      "symbolStatus"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbols",
+        "kind": "a",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbolStatus",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRADING",
+          "HALT",
+          "BREAK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "spot_ping",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/ping",
+    "public": true,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "spot_reference_price",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/referencePrice",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "spot_reference_price_calculation",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/referencePrice/calculation",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "symbolStatus"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "symbolStatus",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRADING",
+          "HALT",
+          "BREAK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "spot_ticker",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/ticker",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "symbols",
+      "windowSize",
+      "type",
+      "symbolStatus"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbols",
+        "kind": "a",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "windowSize",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "1m",
+          "2m",
+          "3m",
+          "4m",
+          "5m",
+          "6m",
+          "7m",
+          "8m",
+          "9m",
+          "10m",
+          "11m",
+          "12m",
+          "13m",
+          "14m",
+          "15m",
+          "16m",
+          "17m",
+          "18m",
+          "19m",
+          "20m",
+          "21m",
+          "22m",
+          "23m",
+          "24m",
+          "25m",
+          "26m",
+          "27m",
+          "28m",
+          "29m",
+          "30m",
+          "31m",
+          "32m",
+          "33m",
+          "34m",
+          "35m",
+          "36m",
+          "37m",
+          "38m",
+          "39m",
+          "40m",
+          "41m",
+          "42m",
+          "43m",
+          "44m",
+          "45m",
+          "46m",
+          "47m",
+          "48m",
+          "49m",
+          "50m",
+          "51m",
+          "52m",
+          "53m",
+          "54m",
+          "55m",
+          "56m",
+          "57m",
+          "58m",
+          "59m",
+          "1h",
+          "2h",
+          "3h",
+          "4h",
+          "5h",
+          "6h",
+          "7h",
+          "8h",
+          "9h",
+          "10h",
+          "11h",
+          "12h",
+          "13h",
+          "14h",
+          "15h",
+          "16h",
+          "17h",
+          "18h",
+          "19h",
+          "20h",
+          "21h",
+          "22h",
+          "23h",
+          "1d",
+          "2d",
+          "3d",
+          "4d",
+          "5d",
+          "6d",
+          "7d"
+        ]
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "FULL",
+          "MINI"
+        ]
+      },
+      {
+        "key": "symbolStatus",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRADING",
+          "HALT",
+          "BREAK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "spot_ticker_trading_day",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/ticker/tradingDay",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "symbols",
+      "timeZone",
+      "type",
+      "symbolStatus"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbols",
+        "kind": "a",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "timeZone",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "FULL",
+          "MINI"
+        ]
+      },
+      {
+        "key": "symbolStatus",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRADING",
+          "HALT",
+          "BREAK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "spot_ui_klines",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/uiKlines",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "interval",
+      "startTime",
+      "endTime",
+      "timeZone",
+      "limit"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "interval",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "1s",
+          "1m",
+          "3m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "4h",
+          "6h",
+          "8h",
+          "12h",
+          "1d",
+          "3d",
+          "1w",
+          "1M"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "timeZone",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_dual_investment_product_list",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/dci/product/list",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "optionType",
+      "exercisedCoin",
+      "investCoin",
+      "pageSize",
+      "pageIndex",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "optionType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "CALL",
+          "PUT"
+        ]
+      },
+      {
+        "key": "exercisedCoin",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "investCoin",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pageIndex",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_bfusd_rate_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/bfusd/history/rateHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_flexible_rate_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/simple-earn/flexible/history/rateHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "productId",
+      "aprPeriod",
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "productId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "aprPeriod",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "DAY",
+          "YEAR"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_rwusd_rate_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/rwusd/history/rateHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "name": "get_asset_logos",
+    "path": "/fapi/v3/common/asset/all-asset-logo",
+    "method": "HttpMethod::Get",
+    "is_public": true,
+    "presigned": false,
+    "fields": [],
+    "required": []
+  },
+  {
+    "name": "get_direct_announcements",
+    "path": "/fapi/v3/announcement/direct",
+    "method": "HttpMethod::Get",
+    "is_public": false,
+    "presigned": false,
+    "fields": [
+      "page",
+      "size"
+    ],
+    "required": []
+  },
+  {
+    "name": "get_direct_announcement",
+    "path": "/fapi/v3/announcement/directById",
+    "method": "HttpMethod::Get",
+    "is_public": false,
+    "presigned": false,
+    "fields": [
+      "id"
+    ],
+    "required": [
+      "id"
+    ]
+  }
+]

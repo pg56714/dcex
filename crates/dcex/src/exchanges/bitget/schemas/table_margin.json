@@ -1,0 +1,583 @@
+[
+  {
+    "name": "set_futures_auto_margin",
+    "path": "/api/v2/mix/account/set-auto-margin",
+    "post": true,
+    "public": false,
+    "fields": [
+      "symbol",
+      "autoMargin",
+      "marginCoin",
+      "holdSide"
+    ],
+    "required": [
+      "symbol",
+      "autoMargin",
+      "marginCoin",
+      "holdSide"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_assets",
+    "path": "/api/v2/margin/crossed/account/assets",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_risk_rate",
+    "path": "/api/v2/margin/crossed/account/risk-rate",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_interest_rate_limits",
+    "path": "/api/v2/margin/crossed/interest-rate-and-limit",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin"
+    ],
+    "required": [
+      "coin"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_tiers",
+    "path": "/api/v2/margin/crossed/tier-data",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin"
+    ],
+    "required": [
+      "coin"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_interest_history",
+    "path": "/api/v2/margin/crossed/interest-history",
+    "post": false,
+    "public": false,
+    "fields": [
+      "startTime",
+      "coin",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_cross_margin_liquidation_history",
+    "path": "/api/v2/margin/crossed/liquidation-history",
+    "post": false,
+    "public": false,
+    "fields": [
+      "startTime",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_cross_margin_financial_records",
+    "path": "/api/v2/margin/crossed/financial-records",
+    "post": false,
+    "public": false,
+    "fields": [
+      "startTime",
+      "marginType",
+      "coin",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "place_cross_margin_order",
+    "path": "/api/v2/margin/crossed/place-order",
+    "post": true,
+    "public": false,
+    "fields": [
+      "symbol",
+      "orderType",
+      "loanType",
+      "force",
+      "side",
+      "price",
+      "baseSize",
+      "quoteSize",
+      "clientOid",
+      "stpMode"
+    ],
+    "required": [
+      "symbol",
+      "orderType",
+      "loanType",
+      "force",
+      "side"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "cancel_cross_margin_order",
+    "path": "/api/v2/margin/crossed/cancel-order",
+    "post": true,
+    "public": false,
+    "fields": [
+      "symbol",
+      "orderId",
+      "clientOid"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_open_orders",
+    "path": "/api/v2/margin/crossed/open-orders",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "orderId",
+      "clientOid",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_order_history",
+    "path": "/api/v2/margin/crossed/history-orders",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "orderId",
+      "enterPointSource",
+      "clientOid",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_cross_margin_fills",
+    "path": "/api/v2/margin/crossed/fills",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "orderId",
+      "idLessThan",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_isolated_margin_assets",
+    "path": "/api/v2/margin/isolated/account/assets",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_isolated_margin_risk_rate",
+    "path": "/api/v2/margin/isolated/account/risk-rate",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "pageNum",
+      "pageSize"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 500,
+    "days": null
+  },
+  {
+    "name": "get_isolated_margin_interest_rate_limits",
+    "path": "/api/v2/margin/isolated/interest-rate-and-limit",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_isolated_margin_tiers",
+    "path": "/api/v2/margin/isolated/tier-data",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_isolated_margin_interest_history",
+    "path": "/api/v2/margin/isolated/interest-history",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "coin",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_isolated_margin_liquidation_history",
+    "path": "/api/v2/margin/isolated/liquidation-history",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_isolated_margin_financial_records",
+    "path": "/api/v2/margin/isolated/financial-records",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "marginType",
+      "coin",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "place_isolated_margin_order",
+    "path": "/api/v2/margin/isolated/place-order",
+    "post": true,
+    "public": false,
+    "fields": [
+      "symbol",
+      "orderType",
+      "loanType",
+      "force",
+      "side",
+      "price",
+      "baseSize",
+      "quoteSize",
+      "clientOid",
+      "stpMode"
+    ],
+    "required": [
+      "symbol",
+      "orderType",
+      "loanType",
+      "force",
+      "side"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "cancel_isolated_margin_order",
+    "path": "/api/v2/margin/isolated/cancel-order",
+    "post": true,
+    "public": false,
+    "fields": [
+      "symbol",
+      "orderId",
+      "clientOid"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_isolated_margin_open_orders",
+    "path": "/api/v2/margin/isolated/open-orders",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "orderId",
+      "clientOid",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_isolated_margin_order_history",
+    "path": "/api/v2/margin/isolated/history-orders",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "orderId",
+      "enterPointSource",
+      "clientOid",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_isolated_margin_fills",
+    "path": "/api/v2/margin/isolated/fills",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "orderId",
+      "idLessThan",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol",
+      "startTime"
+    ],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_uta_eligible_margin_tiers",
+    "path": "/api/v3/account/eligible-margin-tier",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_margin_mode_switch_quota",
+    "path": "/api/v2/mix/account/switch-union-usdt",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_cross_margin_liquidation_orders",
+    "path": "/api/v2/margin/crossed/liquidation-order",
+    "post": false,
+    "public": false,
+    "fields": [
+      "type",
+      "symbol",
+      "fromCoin",
+      "toCoin",
+      "startTime",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_isolated_margin_liquidation_orders",
+    "path": "/api/v2/margin/isolated/liquidation-order",
+    "post": false,
+    "public": false,
+    "fields": [
+      "type",
+      "symbol",
+      "fromCoin",
+      "toCoin",
+      "startTime",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 500,
+    "days": 90
+  },
+  {
+    "name": "get_classic_interest_rate_record",
+    "path": "/api/v2/margin/interest-rate-record",
+    "post": false,
+    "public": true,
+    "fields": [
+      "coin"
+    ],
+    "required": [
+      "coin"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_margin_currencies",
+    "path": "/api/v2/margin/currencies",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_margin_long_short",
+    "path": "/api/v3/market/margin-long-short",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "period",
+      "coin"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  }
+]

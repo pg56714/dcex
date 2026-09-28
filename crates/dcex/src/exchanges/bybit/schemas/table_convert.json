@@ -1,0 +1,87 @@
+[
+  {
+    "name": "request_convert_quote",
+    "path": "/v5/asset/exchange/quote-apply",
+    "post": true,
+    "public": false,
+    "keys": [
+      "accountType",
+      "fromCoin",
+      "toCoin",
+      "requestCoin",
+      "requestAmount",
+      "fromCoinType",
+      "toCoinType",
+      "requestId"
+    ],
+    "required": [
+      "accountType",
+      "fromCoin",
+      "toCoin",
+      "requestCoin",
+      "requestAmount"
+    ],
+    "integers": []
+  },
+  {
+    "name": "execute_convert_quote",
+    "path": "/v5/asset/exchange/convert-execute",
+    "post": true,
+    "public": false,
+    "keys": [
+      "quoteTxId"
+    ],
+    "required": [
+      "quoteTxId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_convert_result",
+    "path": "/v5/asset/exchange/convert-result-query",
+    "post": false,
+    "public": false,
+    "keys": [
+      "quoteTxId",
+      "accountType"
+    ],
+    "required": [
+      "quoteTxId",
+      "accountType"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_convert_coins",
+    "path": "/v5/asset/exchange/query-coin-list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "accountType",
+      "coin",
+      "side"
+    ],
+    "required": [
+      "accountType"
+    ],
+    "integers": [
+      "side"
+    ]
+  },
+  {
+    "name": "get_convert_history",
+    "path": "/v5/asset/exchange/query-convert-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "accountType",
+      "index",
+      "limit"
+    ],
+    "required": [],
+    "integers": [
+      "index",
+      "limit"
+    ]
+  }
+]

@@ -6,7 +6,7 @@ use super::params::BitgetParams;
 use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
 
-#[path = "endpoint_schemas/mod.rs"]
+#[path = "generated/schema_tables.rs"]
 mod endpoints;
 
 pub(super) struct Endpoint {
@@ -34,6 +34,7 @@ impl BitgetClient {
             return Ok(None);
         }
         params.ensure_allowed(endpoint.fields, endpoint.fields.contains(&"symbol"))?;
+        crate::exchanges::schema::validate_pairs(&params.only(endpoint.fields))?;
         if params.get("symbol").is_some() && params.get("product_symbol").is_some() {
             return Err(invalid("symbol and product_symbol are mutually exclusive"));
         }
@@ -53,7 +54,7 @@ impl BitgetClient {
             for key in ["minPrice", "maxPrice", "size", "leverage", "reservedMargin"] {
                 if params
                     .get(key)
-                    .is_some_and(|s| !s.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0))
+                    .is_some_and(|s| !crate::common::is_positive_plain_decimal(s))
                 {
                     return Err(invalid("grid prices and amounts must be positive decimals"));
                 }
@@ -82,7 +83,7 @@ impl BitgetClient {
                 return Err(invalid("gridType is required for futures"));
             }
         }
-        validate(name, params, &endpoint)?;
+        validate(name, params, endpoint)?;
         if name == "batch_create_classic_sub_accounts" {
             let body: Value = serde_json::from_str(required(params, "accounts")?)
                 .map_err(|_| invalid("invalid accounts JSON"))?;
@@ -172,8 +173,7 @@ impl BitgetClient {
                         || !matches!(item["side"].as_str(), Some("buy" | "sell"))
                         || !item["qty"]
                             .as_str()
-                            .and_then(|v| v.parse::<f64>().ok())
-                            .is_some_and(|v| v.is_finite() && v > 0.0)
+                            .is_some_and(crate::common::is_positive_plain_decimal)
                     {
                         return Err(invalid(
                             "position requires native symbol, buy/sell side and positive decimal qty",
@@ -209,9 +209,9 @@ impl BitgetClient {
                     }
                     if key == "investmentAmount"
                         && (object.len() != 2
-                            || !item["amount"].as_str().is_some_and(|s| {
-                                s.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0)
-                            }))
+                            || !item["amount"]
+                                .as_str()
+                                .is_some_and(crate::common::is_positive_plain_decimal))
                     {
                         return Err(invalid(
                             "investment requires coin and positive decimal amount",
@@ -320,12 +320,7 @@ fn integer(params: &BitgetParams, key: &str) -> Result<Option<u64>> {
 }
 fn positive(params: &BitgetParams, key: &str) -> Result<()> {
     if let Some(value) = params.get(key) {
-        let number: f64 = value
-            .parse()
-            .map_err(|_| invalid(&format!("{key} must be a positive decimal")))?;
-        if !number.is_finite() || number <= 0.0 {
-            return Err(invalid(&format!("{key} must be a positive decimal")));
-        }
+        crate::exchanges::schema::encode(key, value, "decimal")?;
     }
     Ok(())
 }
@@ -665,7 +660,7 @@ pub(super) fn validate_margin_order_fields(params: &BitgetParams) -> Result<()> 
             required(params, key)?;
         }
     }
-    validate("place_cross_margin_order", params, &endpoint)
+    validate("place_cross_margin_order", params, endpoint)
 }
 
 mod request_tables;

@@ -1,0 +1,64 @@
+[
+  {
+    "name": "get_cloud_mining_payment_and_refund_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/asset/ledger-transfer/cloud-mining/queryByPage",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "tranId",
+      "clientTranId",
+      "asset",
+      "current",
+      "size"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "tranId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "clientTranId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

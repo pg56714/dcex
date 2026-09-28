@@ -1,0 +1,194 @@
+[
+  {
+    "name": "get_deposit_address",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/capital/deposit/address",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "coin",
+      "network",
+      "amount",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "network",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_deposit_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/capital/deposit/hisrec",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "includeSource",
+      "coin",
+      "status",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow",
+      "txId"
+    ],
+    "fields": [
+      {
+        "key": "includeSource",
+        "kind": "b",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "status",
+        "kind": "i",
+        "required": false,
+        "choices": [
+          "0",
+          "1",
+          "2",
+          "6",
+          "7",
+          "8"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "txId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "wallet_fetch_deposit_address_list_with_network",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/capital/deposit/address/list",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "coin",
+      "network"
+    ],
+    "fields": [
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "network",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "wallet_one_click_arrival_deposit_apply",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/capital/deposit/credit-apply",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "depositId",
+      "txId",
+      "subAccountId",
+      "subUserId"
+    ],
+    "fields": [
+      {
+        "key": "depositId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "txId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "subAccountId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "subUserId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

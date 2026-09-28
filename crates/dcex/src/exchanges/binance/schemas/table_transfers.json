@@ -1,0 +1,545 @@
+[
+  {
+    "name": "pm_bnb_transfer",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/papi/v1/bnb-transfer",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "amount",
+      "transferSide",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "transferSide",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "TO_UM",
+          "FROM_UM"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_margin_cross_margin_transfer_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/margin/transfer",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "type",
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "isolatedSymbol",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "ROLL_IN",
+          "ROLL_OUT"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "isolatedSymbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "wallet_dust_transfer",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/asset/dust",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "accountType",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "SPOT",
+          "MARGIN"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "pm_pro_bnb_transfer",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/portfolio/bnb-transfer",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "amount",
+      "transferSide",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "transferSide",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "TO_UM",
+          "FROM_UM"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_user_delegation_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/asset/custody/transfer-history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "email",
+      "startTime",
+      "endTime",
+      "type",
+      "asset",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "email",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "DELEGATE",
+          "UNDELEGATE"
+        ]
+      },
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_managed_sub_account_transfer_log_master_account_investor",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/managed-subaccount/queryTransLogForInvestor",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "email",
+      "startTime",
+      "endTime",
+      "page",
+      "limit",
+      "transfers",
+      "transferFunctionAccountType"
+    ],
+    "fields": [
+      {
+        "key": "email",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "transfers",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "transferFunctionAccountType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "SPOT",
+          "MARGIN",
+          "ISOLATED_MARGIN",
+          "USDT_FUTURE",
+          "COIN_FUTURE"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "query_managed_sub_account_transfer_log_master_account_trading",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/managed-subaccount/queryTransLogForTradeParent",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "email",
+      "startTime",
+      "endTime",
+      "page",
+      "limit",
+      "transfers",
+      "transferFunctionAccountType"
+    ],
+    "fields": [
+      {
+        "key": "email",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "transfers",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "transferFunctionAccountType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "SPOT",
+          "MARGIN",
+          "ISOLATED_MARGIN",
+          "USDT_FUTURE",
+          "COIN_FUTURE"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "query_managed_sub_account_transfer_log_sub_account_trading",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/managed-subaccount/query-trans-log",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "page",
+      "limit",
+      "transfers",
+      "transferFunctionAccountType",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "transfers",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "transferFunctionAccountType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "SPOT",
+          "MARGIN",
+          "ISOLATED_MARGIN",
+          "USDT_FUTURE",
+          "COIN_FUTURE"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_transferable_earn_asset_balance_for_portfolio_margin",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/earn-asset-balance",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "transferType",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "transferType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "EARN_TO_FUTURE",
+          "FUTURE_TO_EARN"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "transfer_ldusdt_rwusd_for_portfolio_margin",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/portfolio/earn-asset-transfer",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "transferType",
+      "amount",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "LDUSDT",
+          "RWUSD"
+        ]
+      },
+      {
+        "key": "transferType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "EARN_TO_FUTURE",
+          "FUTURE_TO_EARN"
+        ]
+      },
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,151 @@
+[
+  {
+    "name": "confirm_pending_mmr",
+    "path": "/v5/position/confirm-pending-mmr",
+    "post": true,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "product_symbol"
+    ],
+    "required": [
+      "category",
+      "symbol"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_trade_analysis",
+    "path": "/v5/account/trade-info-for-analysis",
+    "post": false,
+    "public": false,
+    "keys": [
+      "symbol",
+      "startTime",
+      "endTime",
+      "product_symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "startTime",
+      "endTime"
+    ]
+  },
+  {
+    "name": "get_trade_behavior_config",
+    "path": "/v5/account/user-setting-config",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_move_position_history",
+    "path": "/v5/position/move-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "startTime",
+      "endTime",
+      "status",
+      "blockTradeId",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  },
+  {
+    "name": "move_positions",
+    "path": "/v5/position/move-positions",
+    "post": true,
+    "public": false,
+    "keys": [
+      "fromUid",
+      "toUid",
+      "list"
+    ],
+    "required": [
+      "fromUid",
+      "toUid",
+      "list"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_exchange_order_records",
+    "path": "/v5/asset/exchange/order-record",
+    "post": false,
+    "public": false,
+    "keys": [
+      "fromCoin",
+      "toCoin",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": [
+      "limit"
+    ]
+  },
+  {
+    "name": "get_pre_upgrade_closed_pnl",
+    "path": "/v5/pre-upgrade/position/closed-pnl",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "category",
+      "symbol"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_pre_upgrade_order_history",
+    "path": "/v5/pre-upgrade/order/history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "baseCoin",
+      "orderId",
+      "orderLinkId",
+      "orderFilter",
+      "orderStatus",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "category"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  }
+]

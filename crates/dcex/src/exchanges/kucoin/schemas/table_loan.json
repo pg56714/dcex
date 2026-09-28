@@ -1,0 +1,112 @@
+[
+  {
+    "name": "get_uta_borrowable_currencies",
+    "path": "/api/ua/v2/market/borrowable-currency",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_uta_borrowing_rates_limits",
+    "path": "/api/ua/v2/account/interest-limits",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_loan_info",
+    "path": "/api/v1/otc-loan/loan",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_accounts",
+    "path": "/api/v1/otc-loan/accounts",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_discount_rate_configs",
+    "path": "/api/v1/otc-loan/discount-rate-configs",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": []
+  },
+  {
+    "name": "get_uta_accounts",
+    "path": "/api/ua/v2/otc-loan/account",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_discount_rate_configs",
+    "path": "/api/ua/v2/otc-loan/discount-rate",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_loan_info",
+    "path": "/api/ua/v2/otc-loan/loan",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  }
+]

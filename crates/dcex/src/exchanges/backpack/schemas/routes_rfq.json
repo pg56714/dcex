@@ -1,0 +1,19 @@
+[
+  {
+    "name": "submit_rfq_quote",
+    "path": "/api/v1/rfq/quote",
+    "instruction": "quoteSubmit",
+    "required": [
+      "rfqId",
+      "bidPrice",
+      "askPrice"
+    ],
+    "strings": [
+      "rfqId"
+    ],
+    "decimals": [
+      "bidPrice",
+      "askPrice"
+    ]
+  }
+]

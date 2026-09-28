@@ -1065,7 +1065,7 @@ mod market_requests {
     use crate::Result;
     use crate::exchange::ValidatedResponse;
     use crate::exchanges::aster::{AsterClient, AsterMarket, params::AsterParams};
-    use crate::http::HttpMethod;
+
     impl AsterClient {
         pub(in crate::exchanges::aster) async fn market_schema_request(
             &self,
@@ -1073,43 +1073,27 @@ mod market_requests {
             p: &AsterParams,
             public: bool,
         ) -> Result<Option<ValidatedResponse>> {
-            let (path, method, is_public, presigned, fields, required): (
-                &str,
-                HttpMethod,
-                bool,
-                bool,
-                &[&str],
-                &[&str],
-            ) = match name {
-                "get_asset_logos" => (
-                    "/fapi/v3/common/asset/all-asset-logo",
-                    HttpMethod::Get,
-                    true,
-                    false,
-                    &[],
-                    &[],
-                ),
-                "get_direct_announcements" => (
-                    "/fapi/v3/announcement/direct",
-                    HttpMethod::Get,
-                    false,
-                    false,
-                    &["page", "size"],
-                    &[],
-                ),
-                "get_direct_announcement" => (
-                    "/fapi/v3/announcement/directById",
-                    HttpMethod::Get,
-                    false,
-                    false,
-                    &["id"],
-                    &["id"],
-                ),
-                _ => return Ok(None),
+            static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+                std::sync::OnceLock::new();
+            let Some(route) = crate::exchanges::schema::route(
+                &ROUTES,
+                include_str!("schemas/routes_market.json"),
+                name,
+            ) else {
+                return Ok(None);
             };
+            let (path, method, is_public, presigned, fields, required) = (
+                route.path,
+                route.method,
+                route.is_public,
+                route.presigned,
+                route.fields,
+                route.required,
+            );
             if public != is_public {
                 return Ok(None);
             }
+            route.validate(|key| p.get(key))?;
             p.ensure_allowed(fields, &[])?;
             for key in required {
                 p.required(key)?;

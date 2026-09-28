@@ -1,0 +1,90 @@
+[
+  {
+    "name": "convert_contract_coin",
+    "path": "/api/v5/public/convert-contract-coin",
+    "post": false,
+    "public": true,
+    "keys": [
+      "type",
+      "instId",
+      "sz",
+      "px",
+      "unit",
+      "opType",
+      "product_symbol"
+    ],
+    "required": [
+      "instId",
+      "sz"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_convert_currency_pair",
+    "path": "/api/v5/asset/convert/currency-pair",
+    "post": false,
+    "public": false,
+    "keys": [
+      "fromCcy",
+      "toCcy",
+      "convertMode"
+    ],
+    "required": [
+      "fromCcy",
+      "toCcy"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "estimate_convert_quote",
+    "path": "/api/v5/asset/convert/estimate-quote",
+    "post": true,
+    "public": false,
+    "keys": [
+      "baseCcy",
+      "quoteCcy",
+      "side",
+      "rfqSz",
+      "rfqSzCcy",
+      "clQReqId",
+      "convertMode"
+    ],
+    "required": [
+      "baseCcy",
+      "quoteCcy",
+      "side",
+      "rfqSz",
+      "rfqSzCcy"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "execute_convert_trade",
+    "path": "/api/v5/asset/convert/trade",
+    "post": true,
+    "public": false,
+    "keys": [
+      "quoteId",
+      "baseCcy",
+      "quoteCcy",
+      "side",
+      "sz",
+      "szCcy",
+      "clTReqId",
+      "convertMode"
+    ],
+    "required": [
+      "quoteId",
+      "baseCcy",
+      "quoteCcy",
+      "side",
+      "sz",
+      "szCcy"
+    ],
+    "bools": [],
+    "schema": null
+  }
+]

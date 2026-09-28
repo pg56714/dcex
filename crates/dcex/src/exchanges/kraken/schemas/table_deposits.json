@@ -1,0 +1,181 @@
+[
+  {
+    "name": "get_spot_deposit_addresses",
+    "path": "/0/private/DepositAddresses",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "aclass",
+      "method",
+      "new",
+      "amount"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "aclass",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "currency",
+          "tokenized_asset"
+        ],
+        "minimum": 0
+      },
+      {
+        "key": "method",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "new",
+        "kind": "boolean",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "amount",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  },
+  {
+    "name": "get_spot_deposit_methods",
+    "path": "/0/private/DepositMethods",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "aclass",
+      "rebase_multiplier"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "aclass",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "currency",
+          "tokenized_asset"
+        ],
+        "minimum": 0
+      },
+      {
+        "key": "rebase_multiplier",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "rebased",
+          "base"
+        ],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  },
+  {
+    "name": "get_spot_deposit_status",
+    "path": "/0/private/DepositStatus",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "aclass",
+      "method",
+      "start",
+      "end",
+      "cursor",
+      "limit",
+      "rebase_multiplier"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "aclass",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "currency",
+          "tokenized_asset"
+        ],
+        "minimum": 0
+      },
+      {
+        "key": "method",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "start",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "end",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "cursor",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "limit",
+        "kind": "integer",
+        "required": false,
+        "values": [],
+        "minimum": 1
+      },
+      {
+        "key": "rebase_multiplier",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "rebased",
+          "base"
+        ],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  }
+]

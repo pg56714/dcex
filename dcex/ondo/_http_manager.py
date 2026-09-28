@@ -8,6 +8,8 @@ import os
 from dataclasses import dataclass, field
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._native_http import load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
@@ -17,6 +19,7 @@ from ..utils.helpers import generate_timestamp
 
 
 def _params(**kwargs: object) -> list[tuple[str, str]]:
+    kwargs = normalize_params(kwargs)
     result: list[tuple[str, str]] = []
     for key, value in kwargs.items():
         if value is None:

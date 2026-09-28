@@ -1,0 +1,447 @@
+[
+  {
+    "name": "get_server_time",
+    "path": "/api/v5/public/time",
+    "post": false,
+    "public": true,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_ticker",
+    "path": "/api/v5/market/ticker",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "product_symbol"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_full_orderbook",
+    "path": "/api/v5/market/books-full",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "sz",
+      "product_symbol"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_candles_history",
+    "path": "/api/v5/market/history-candles",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "after",
+      "before",
+      "bar",
+      "limit",
+      "adjust",
+      "product_symbol"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_trades_history",
+    "path": "/api/v5/market/history-trades",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "type",
+      "after",
+      "before",
+      "limit",
+      "product_symbol"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_estimated_delivery_price",
+    "path": "/api/v5/public/estimated-price",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "product_symbol"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_discount_rates",
+    "path": "/api/v5/public/discount-rate-interest-free-quota",
+    "post": false,
+    "public": true,
+    "keys": [
+      "ccy"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_index_tickers",
+    "path": "/api/v5/market/index-tickers",
+    "post": false,
+    "public": true,
+    "keys": [
+      "quoteCcy",
+      "instId",
+      "product_symbol"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_mark_price_candles",
+    "path": "/api/v5/market/mark-price-candles",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "after",
+      "before",
+      "bar",
+      "limit",
+      "product_symbol"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_system_status",
+    "path": "/api/v5/system/status",
+    "post": false,
+    "public": true,
+    "keys": [
+      "state"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "set_settlement_currency",
+    "path": "/api/v5/account/set-settle-currency",
+    "post": true,
+    "public": false,
+    "keys": [
+      "settleCcy"
+    ],
+    "required": [
+      "settleCcy"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_books_rpi",
+    "path": "/api/v5/market/books-rpi",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "sz"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_platform_24_volume",
+    "path": "/api/v5/market/platform-24-volume",
+    "post": false,
+    "public": true,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{},\"required\":[]}"
+  },
+  {
+    "name": "get_call_auction_details",
+    "path": "/api/v5/market/call-auction-details",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_block_tickers",
+    "path": "/api/v5/market/block-tickers",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instType",
+      "instFamily"
+    ],
+    "required": [
+      "instType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"instFamily\":{\"type\":\"string\"}},\"required\":[\"instType\"]}"
+  },
+  {
+    "name": "get_block_ticker",
+    "path": "/api/v5/market/block-ticker",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_estimated_settlement_info",
+    "path": "/api/v5/public/estimated-settlement-info",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_settlement_history",
+    "path": "/api/v5/public/settlement-history",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instFamily",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "instFamily"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"},\"after\":{\"type\":\"string\"},\"before\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[\"instFamily\"]}"
+  },
+  {
+    "name": "get_insurance_fund",
+    "path": "/api/v5/public/insurance-fund",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instType",
+      "type",
+      "instFamily",
+      "ccy",
+      "before",
+      "after",
+      "limit"
+    ],
+    "required": [
+      "instType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"type\":{\"type\":\"string\"},\"instFamily\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"},\"before\":{\"type\":\"string\"},\"after\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[\"instType\"]}"
+  },
+  {
+    "name": "get_premium_history",
+    "path": "/api/v5/public/premium-history",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"after\":{\"type\":\"string\"},\"before\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_index_candles",
+    "path": "/api/v5/market/index-candles",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "after",
+      "before",
+      "bar",
+      "limit"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"after\":{\"type\":\"string\"},\"before\":{\"type\":\"string\"},\"bar\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_history_index_candles",
+    "path": "/api/v5/market/history-index-candles",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "after",
+      "before",
+      "bar",
+      "limit"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"after\":{\"type\":\"string\"},\"before\":{\"type\":\"string\"},\"bar\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_history_mark_price_candles",
+    "path": "/api/v5/market/history-mark-price-candles",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "after",
+      "before",
+      "bar",
+      "limit"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"after\":{\"type\":\"string\"},\"before\":{\"type\":\"string\"},\"bar\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "get_exchange_rate",
+    "path": "/api/v5/market/exchange-rate",
+    "post": false,
+    "public": true,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{},\"required\":[]}"
+  },
+  {
+    "name": "get_index_components",
+    "path": "/api/v5/market/index-components",
+    "post": false,
+    "public": true,
+    "keys": [
+      "index"
+    ],
+    "required": [
+      "index"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"index\":{\"type\":\"string\"}},\"required\":[\"index\"]}"
+  },
+  {
+    "name": "get_economic_calendar",
+    "path": "/api/v5/public/economic-calendar",
+    "post": false,
+    "public": true,
+    "keys": [
+      "region",
+      "importance",
+      "before",
+      "after",
+      "limit"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"region\":{\"type\":\"string\"},\"importance\":{\"type\":\"string\"},\"before\":{\"type\":\"string\"},\"after\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_market_data_history",
+    "path": "/api/v5/public/market-data-history",
+    "post": false,
+    "public": true,
+    "keys": [
+      "module",
+      "instType",
+      "instIdList",
+      "instFamilyList",
+      "dateAggrType",
+      "begin",
+      "end"
+    ],
+    "required": [
+      "module",
+      "instType",
+      "dateAggrType",
+      "begin",
+      "end"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"module\":{\"type\":\"string\"},\"instType\":{\"type\":\"string\"},\"instIdList\":{\"type\":\"string\"},\"instFamilyList\":{\"type\":\"string\"},\"dateAggrType\":{\"type\":\"string\"},\"begin\":{\"type\":\"string\"},\"end\":{\"type\":\"string\"}},\"required\":[\"module\",\"instType\",\"dateAggrType\",\"begin\",\"end\"]}"
+  },
+  {
+    "name": "get_delta_hedge_currencies",
+    "path": "/api/v5/public/delta-hedge-currencies",
+    "post": false,
+    "public": true,
+    "keys": [
+      "ccy"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_mm_instrument_types",
+    "path": "/api/v5/public/mm-instrument-types",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instType",
+      "instId"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"instId\":{\"type\":\"string\"}},\"required\":[]}"
+  }
+]

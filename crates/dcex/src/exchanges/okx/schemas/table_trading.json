@@ -1,0 +1,173 @@
+[
+  {
+    "name": "get_pm_position_tiers",
+    "path": "/api/v5/account/position-tiers",
+    "post": false,
+    "public": false,
+    "keys": [
+      "instType",
+      "instFamily"
+    ],
+    "required": [
+      "instType",
+      "instFamily"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "amend_spread_order",
+    "path": "/api/v5/sprd/amend-order",
+    "post": true,
+    "public": false,
+    "keys": [
+      "ordId",
+      "clOrdId",
+      "reqId",
+      "newSz",
+      "newPx"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_spread_order_history_archive",
+    "path": "/api/v5/sprd/orders-history-archive",
+    "post": false,
+    "public": false,
+    "keys": [
+      "sprdId",
+      "ordType",
+      "state",
+      "instType",
+      "instFamily",
+      "beginId",
+      "endId",
+      "begin",
+      "end",
+      "limit"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "simulate_positions",
+    "path": "/api/v5/account/position-builder",
+    "post": true,
+    "public": false,
+    "keys": [
+      "acctLv",
+      "inclRealPosAndEq",
+      "lever",
+      "simPos",
+      "simAsset",
+      "greeksType",
+      "idxVol"
+    ],
+    "required": [],
+    "bools": [
+      "inclRealPosAndEq"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"acctLv\":{\"type\":\"string\"},\"inclRealPosAndEq\":{\"type\":\"boolean\"},\"lever\":{\"type\":\"string\"},\"simPos\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"},\"pos\":{\"type\":\"string\"},\"avgPx\":{\"type\":\"string\"},\"lever\":{\"type\":\"string\"}},\"required\":[\"instId\",\"pos\",\"avgPx\"]}},\"simAsset\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\"]}},\"greeksType\":{\"type\":\"string\"},\"idxVol\":{\"type\":\"string\"}},\"required\":[]}"
+  },
+  {
+    "name": "move_positions",
+    "path": "/api/v5/account/move-positions",
+    "post": true,
+    "public": false,
+    "keys": [
+      "fromAcct",
+      "toAcct",
+      "legs",
+      "clientId"
+    ],
+    "required": [
+      "fromAcct",
+      "toAcct",
+      "legs",
+      "clientId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"fromAcct\":{\"type\":\"string\"},\"toAcct\":{\"type\":\"string\"},\"legs\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"from\":{\"type\":\"object\",\"properties\":{\"posId\":{\"type\":\"string\"},\"sz\":{\"type\":\"string\"},\"side\":{\"type\":\"string\"}},\"required\":[\"posId\",\"sz\",\"side\"]},\"to\":{\"type\":\"object\",\"properties\":{\"tdMode\":{\"type\":\"string\"},\"posSide\":{\"type\":\"string\"},\"ccy\":{\"type\":\"string\"}},\"required\":[]}},\"required\":[\"from\",\"to\"]}},\"clientId\":{\"type\":\"string\"}},\"required\":[\"fromAcct\",\"toAcct\",\"legs\",\"clientId\"]}"
+  },
+  {
+    "name": "get_move_positions_history",
+    "path": "/api/v5/account/move-positions-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "blockTdId",
+      "clientId",
+      "beginTs",
+      "endTs",
+      "limit",
+      "state"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"blockTdId\":{\"type\":\"string\"},\"clientId\":{\"type\":\"string\"},\"beginTs\":{\"type\":\"string\"},\"endTs\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"},\"state\":{\"type\":\"string\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_block_trades",
+    "path": "/api/v5/public/block-trades",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId"
+    ],
+    "required": [
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\"}},\"required\":[\"instId\"]}"
+  },
+  {
+    "name": "reset_mmp",
+    "path": "/api/v5/account/mmp-reset",
+    "post": true,
+    "public": false,
+    "keys": [
+      "instType",
+      "instFamily"
+    ],
+    "required": [
+      "instFamily"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"instFamily\":{\"type\":\"string\"}},\"required\":[\"instFamily\"]}"
+  },
+  {
+    "name": "set_mmp_config",
+    "path": "/api/v5/account/mmp-config",
+    "post": true,
+    "public": false,
+    "keys": [
+      "instFamily",
+      "timeInterval",
+      "frozenInterval",
+      "qtyLimit"
+    ],
+    "required": [
+      "instFamily",
+      "timeInterval",
+      "frozenInterval",
+      "qtyLimit"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"},\"timeInterval\":{\"type\":\"string\"},\"frozenInterval\":{\"type\":\"string\"},\"qtyLimit\":{\"type\":\"string\"}},\"required\":[\"instFamily\",\"timeInterval\",\"frozenInterval\",\"qtyLimit\"]}"
+  },
+  {
+    "name": "get_mmp_config",
+    "path": "/api/v5/account/mmp-config",
+    "post": false,
+    "public": false,
+    "keys": [
+      "instFamily"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instFamily\":{\"type\":\"string\"}},\"required\":[]}"
+  }
+]

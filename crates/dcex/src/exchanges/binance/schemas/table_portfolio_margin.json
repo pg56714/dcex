@@ -1,0 +1,994 @@
+[
+  {
+    "name": "get_pm_coin_income_history",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::CoinFutures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/cm/income",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "incomeType",
+      "startTime",
+      "endTime",
+      "page",
+      "limit",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "incomeType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRANSFER",
+          "WELCOME_BONUS",
+          "FUNDING_FEE",
+          "REALIZED_PNL",
+          "COMMISSION",
+          "INSURANCE_CLEAR",
+          "DELIVERED_SETTELMENT"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_margin_interest_history",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/margin/marginInterestHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "archived",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "archived",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "true",
+          "false"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_futures_income_history",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/income",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "incomeType",
+      "startTime",
+      "endTime",
+      "page",
+      "limit",
+      "recvWindow",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "incomeType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRANSFER",
+          "WELCOME_BONUS",
+          "REALIZED_PNL",
+          "FUNDING_FEE",
+          "COMMISSION",
+          "INSURANCE_CLEAR",
+          "REFERRAL_KICKBACK",
+          "COMMISSION_REBATE",
+          "API_REBATE",
+          "CONTEST_REWARD",
+          "CROSS_COLLATERAL_TRANSFER",
+          "OPTIONS_PREMIUM_FEE",
+          "OPTIONS_SETTLE_PROFIT",
+          "INTERNAL_TRANSFER",
+          "AUTO_EXCHANGE",
+          "DELIVERED_SETTELMENT",
+          "COIN_SWAP_DEPOSIT",
+          "COIN_SWAP_WITHDRAW",
+          "POSITION_LIMIT_INCREASE_FEE"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "page",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_coin_commission_rate",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::CoinFutures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/cm/commissionRate",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_futures_commission_rate",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/commissionRate",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_order_rate_limits",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/rateLimit/order",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "pm_fund_auto_collection",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/papi/v1/auto-collection",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "pm_fund_collection_by_asset",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/papi/v1/asset-collection",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_download_id_for_um_futures_order_history",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/order/asyn",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_download_id_for_um_futures_trade_history",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/trade/asyn",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_download_id_for_um_futures_transaction_history",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/income/asyn",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_um_account_detail_v2",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v2/um/account",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_um_futures_order_download_link_by_id",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/order/asyn/id",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "downloadId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "downloadId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_um_futures_trade_download_link_by_id",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/trade/asyn/id",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "downloadId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "downloadId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_um_futures_transaction_download_link_by_id",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/income/asyn/id",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "downloadId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "downloadId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_pm_portfolio_margin_negative_balance_interest_history",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/portfolio/interest-history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "startTime",
+      "endTime",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_pm_user_negative_balance_auto_exchange_record",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/portfolio/negative-balance-exchange-record",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "pm_test_connectivity",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/ping",
+    "public": true,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "pm_futures_tradfi_perps_contract",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Post",
+    "path": "/papi/v1/um/stock/contract",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_um_futures_bnb_burn_status",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/feeBurn",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_pm_current_cm_open_order",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::CoinFutures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/cm/openOrder",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "orderId",
+      "origClientOrderId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "orderId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "origClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_pm_current_um_open_order",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/um/openOrder",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "orderId",
+      "origClientOrderId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "orderId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "origClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "toggle_pm_bnb_burn_on_um_futures_trade",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Post",
+    "path": "/papi/v1/um/feeBurn",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "feeBurn",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "feeBurn",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "true",
+          "false"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_classic_portfolio_margin_account_information",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/pmAccountInfo",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_pro_portfolio_margin_pro_account_balance",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/balance",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_pro_portfolio_margin_pro_account_info",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/account",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_pro_portfolio_margin_pro_span_account_info",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v2/portfolio/account",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_pm_pro_portfolio_margin_pro_negative_balance_interest_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/interest-history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "startTime",
+      "endTime",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_pro_portfolio_margin_asset_leverage",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/margin-asset-leverage",
+    "public": false,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "pm_pro_portfolio_margin_collateral_rate",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/collateralRate",
+    "public": true,
+    "api_key": true,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "pm_pro_portfolio_margin_pro_tiered_collateral_rate",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v2/portfolio/collateralRate",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_pm_pro_portfolio_margin_asset_index_price",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/asset-index-price",
+    "public": true,
+    "api_key": true,
+    "allowed": [
+      "asset"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

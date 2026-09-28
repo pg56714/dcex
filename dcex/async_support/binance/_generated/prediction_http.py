@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -26,7 +28,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"marketTopicId": market_topic_id}.items()
+                for key, value in normalize_params({"marketTopicId": market_topic_id}).items()
                 if value is not None
             ],
         )
@@ -47,7 +49,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {}.items()
+                for key, value in normalize_params({}).items()
                 if value is not None
             ],
         )
@@ -77,14 +79,16 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "l1Category": l1_category,
-                    "l2Category": l2_category,
-                    "sortBy": sort_by,
-                    "orderBy": order_by,
-                    "offset": offset,
-                    "limit": limit,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "l1Category": l1_category,
+                        "l2Category": l2_category,
+                        "sortBy": sort_by,
+                        "orderBy": order_by,
+                        "offset": offset,
+                        "limit": limit,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -105,7 +109,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"query": query, "topK": top_k}.items()
+                for key, value in normalize_params({"query": query, "topK": top_k}).items()
                 if value is not None
             ],
         )
@@ -126,7 +130,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"marketId": market_id}.items()
+                for key, value in normalize_params({"marketId": market_id}).items()
                 if value is not None
             ],
         )
@@ -149,11 +153,9 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "vendor": vendor,
-                    "marketId": market_id,
-                    "tokenId": token_id,
-                }.items()
+                for key, value in normalize_params(
+                    {"vendor": vendor, "marketId": market_id, "tokenId": token_id}
+                ).items()
                 if value is not None
             ],
         )
@@ -184,15 +186,17 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "marketId": market_id,
-                    "tokenId": token_id,
-                    "side": side,
-                    "makerAmount": maker_amount,
-                    "takerAmount": taker_amount,
-                    "pricePerShare": price_per_share,
-                    "expiration": expiration,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "marketId": market_id,
+                        "tokenId": token_id,
+                        "side": side,
+                        "makerAmount": maker_amount,
+                        "takerAmount": taker_amount,
+                        "pricePerShare": price_per_share,
+                        "expiration": expiration,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -213,7 +217,9 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"orderId": order_id, "secretToken": secret_token}.items()
+                for key, value in normalize_params(
+                    {"orderId": order_id, "secretToken": secret_token}
+                ).items()
                 if value is not None
             ],
         )
@@ -234,7 +240,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"orderId": order_id}.items()
+                for key, value in normalize_params({"orderId": order_id}).items()
                 if value is not None
             ],
         )
@@ -262,12 +268,14 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "first": first,
-                    "after": after,
-                    "eventTypes": event_types,
-                    "marketId": market_id,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "first": first,
+                        "after": after,
+                        "eventTypes": event_types,
+                        "marketId": market_id,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -288,7 +296,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"assets": assets}.items()
+                for key, value in normalize_params({"assets": assets}).items()
                 if value is not None
             ],
         )
@@ -311,7 +319,9 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"first": first, "after": after, "status": status}.items()
+                for key, value in normalize_params(
+                    {"first": first, "after": after, "status": status}
+                ).items()
                 if value is not None
             ],
         )
@@ -332,7 +342,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"secretToken": secret_token}.items()
+                for key, value in normalize_params({"secretToken": secret_token}).items()
                 if value is not None
             ],
         )
@@ -353,7 +363,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"orderIds": order_ids}.items()
+                for key, value in normalize_params({"orderIds": order_ids}).items()
                 if value is not None
             ],
         )
@@ -376,11 +386,13 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "tokenId": token_id,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "tokenId": token_id,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -410,14 +422,16 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "tokenId": token_id,
-                    "marketId": market_id,
-                    "marketTopicId": market_topic_id,
-                    "activeOnly": active_only,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "tokenId": token_id,
+                        "marketId": market_id,
+                        "marketTopicId": market_topic_id,
+                        "activeOnly": active_only,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -446,13 +460,15 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "tab": tab,
-                    "offset": offset,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "tab": tab,
+                        "offset": offset,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -479,11 +495,13 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "marketTopicId": market_topic_id,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "marketTopicId": market_topic_id,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -515,16 +533,18 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "l1Category": l1_category,
-                    "result": result,
-                    "startDate": start_date,
-                    "endDate": end_date,
-                    "offset": offset,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "l1Category": l1_category,
+                        "result": result,
+                        "startDate": start_date,
+                        "endDate": end_date,
+                        "offset": offset,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -552,12 +572,14 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "walletId": wallet_id,
-                    "tokenIds": token_ids,
-                    "chainId": chain_id,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "walletId": wallet_id,
+                        "tokenIds": token_ids,
+                        "chainId": chain_id,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -580,11 +602,9 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "txHash": tx_hash,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"walletAddress": wallet_address, "txHash": tx_hash, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -607,11 +627,13 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "walletId": wallet_id,
-                    "cancelInfoList": cancel_info_list,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "walletId": wallet_id,
+                        "cancelInfoList": cancel_info_list,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -646,19 +668,21 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "tokenId": token_id,
-                    "side": side,
-                    "amountIn": amount_in,
-                    "orderType": order_type,
-                    "slippageBps": slippage_bps,
-                    "priceLimit": price_limit,
-                    "chainId": chain_id,
-                    "feeRateBps": fee_rate_bps,
-                    "fundingSource": funding_source,
-                    "fundTransferAmount": fund_transfer_amount,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "tokenId": token_id,
+                        "side": side,
+                        "amountIn": amount_in,
+                        "orderType": order_type,
+                        "slippageBps": slippage_bps,
+                        "priceLimit": price_limit,
+                        "chainId": chain_id,
+                        "feeRateBps": fee_rate_bps,
+                        "fundingSource": funding_source,
+                        "fundTransferAmount": fund_transfer_amount,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -692,18 +716,20 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "walletId": wallet_id,
-                    "quoteId": quote_id,
-                    "timeInForce": time_in_force,
-                    "accountType": account_type,
-                    "orderType": order_type,
-                    "slippageBps": slippage_bps,
-                    "priceLimit": price_limit,
-                    "fundingSource": funding_source,
-                    "fundTransferAmount": fund_transfer_amount,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "walletId": wallet_id,
+                        "quoteId": quote_id,
+                        "timeInForce": time_in_force,
+                        "accountType": account_type,
+                        "orderType": order_type,
+                        "slippageBps": slippage_bps,
+                        "priceLimit": price_limit,
+                        "fundingSource": funding_source,
+                        "fundTransferAmount": fund_transfer_amount,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -734,15 +760,17 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "tradeSide": trade_side,
-                    "l1Category": l1_category,
-                    "marketId": market_id,
-                    "offset": offset,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "tradeSide": trade_side,
+                        "l1Category": l1_category,
+                        "marketId": market_id,
+                        "offset": offset,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -775,17 +803,19 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "l1Category": l1_category,
-                    "orderType": order_type,
-                    "status": status,
-                    "startDate": start_date,
-                    "endDate": end_date,
-                    "offset": offset,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "l1Category": l1_category,
+                        "orderType": order_type,
+                        "status": status,
+                        "startDate": start_date,
+                        "endDate": end_date,
+                        "offset": offset,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -814,13 +844,15 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "fromToken": from_token,
-                    "fromTokenAmount": from_token_amount,
-                    "toToken": to_token,
-                    "accountType": account_type,
-                    "chainId": chain_id,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "fromToken": from_token,
+                        "fromTokenAmount": from_token_amount,
+                        "toToken": to_token,
+                        "accountType": account_type,
+                        "chainId": chain_id,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -852,14 +884,16 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "coin": coin,
-                    "network": network,
-                    "amount": amount,
-                    "withdrawOrderId": withdraw_order_id,
-                    "walletType": wallet_type,
-                    "name": name,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "coin": coin,
+                        "network": network,
+                        "amount": amount,
+                        "withdrawOrderId": withdraw_order_id,
+                        "walletType": wallet_type,
+                        "name": name,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -890,15 +924,17 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletId": wallet_id,
-                    "walletAddress": wallet_address,
-                    "fromTokenAmount": from_token_amount,
-                    "accountType": account_type,
-                    "fromToken": from_token,
-                    "toToken": to_token,
-                    "chainId": chain_id,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletId": wallet_id,
+                        "walletAddress": wallet_address,
+                        "fromTokenAmount": from_token_amount,
+                        "accountType": account_type,
+                        "fromToken": from_token,
+                        "toToken": to_token,
+                        "chainId": chain_id,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -930,16 +966,18 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletId": wallet_id,
-                    "walletAddress": wallet_address,
-                    "fromTokenAmount": from_token_amount,
-                    "accountType": account_type,
-                    "sourceBiz": source_biz,
-                    "fromToken": from_token,
-                    "toToken": to_token,
-                    "chainId": chain_id,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletId": wallet_id,
+                        "walletAddress": wallet_address,
+                        "fromTokenAmount": from_token_amount,
+                        "accountType": account_type,
+                        "sourceBiz": source_biz,
+                        "fromToken": from_token,
+                        "toToken": to_token,
+                        "chainId": chain_id,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -971,16 +1009,18 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "startDate": start_date,
-                    "endDate": end_date,
-                    "tokenSymbol": token_symbol,
-                    "direction": direction,
-                    "offset": offset,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "startDate": start_date,
+                        "endDate": end_date,
+                        "tokenSymbol": token_symbol,
+                        "direction": direction,
+                        "offset": offset,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -1003,7 +1043,9 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"transferId": transfer_id, "recvWindow": recv_window}.items()
+                for key, value in normalize_params(
+                    {"transferId": transfer_id, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -1033,14 +1075,16 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "walletAddress": wallet_address,
-                    "tokenId": token_id,
-                    "marketId": market_id,
-                    "marketTopicId": market_topic_id,
-                    "activeOnly": active_only,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "walletAddress": wallet_address,
+                        "tokenId": token_id,
+                        "marketId": market_id,
+                        "marketTopicId": market_topic_id,
+                        "activeOnly": active_only,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -1061,7 +1105,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"recvWindow": recv_window}.items()
+                for key, value in normalize_params({"recvWindow": recv_window}).items()
                 if value is not None
             ],
         )
@@ -1082,7 +1126,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"recvWindow": recv_window}.items()
+                for key, value in normalize_params({"recvWindow": recv_window}).items()
                 if value is not None
             ],
         )
@@ -1105,7 +1149,7 @@ class GeneratedPredictionHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"recvWindow": recv_window}.items()
+                for key, value in normalize_params({"recvWindow": recv_window}).items()
                 if value is not None
             ],
         )

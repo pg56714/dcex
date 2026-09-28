@@ -1,0 +1,20 @@
+[
+  {
+    "name": "get_vault_performance",
+    "path": "/api/v1/vault/public/performance",
+    "is_public": true,
+    "fields": [
+      "interval"
+    ],
+    "required": [
+      "interval"
+    ]
+  },
+  {
+    "name": "get_vault_summary",
+    "path": "/api/v1/vault/public/summary",
+    "is_public": true,
+    "fields": [],
+    "required": []
+  }
+]

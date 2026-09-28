@@ -3,6 +3,8 @@
 import json
 from typing import Any
 
+from dcex._schema_codec import encode_json
+
 from .._native_http import load_native
 from ._base import AsyncWebSocketMixin
 
@@ -399,7 +401,7 @@ class V1Client(AsyncWebSocketMixin):
 
     async def send_message(self, message: dict[str, Any], *, all_symbols: bool = False) -> None:
         """Send a documented V1 event; cancelAll/countdown require all_symbols=True."""
-        await self._native_client.send_message(json.dumps(message), all_symbols)
+        await self._native_client.send_message(encode_json(message), all_symbols)
 
     async def recv(self) -> dict[str, Any] | list[Any]:
         """Receive a raw V1 status or market/account event."""

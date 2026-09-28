@@ -1,0 +1,69 @@
+[
+  {
+    "name": "get_spot_lever_token_reference",
+    "path": "/v5/spot-lever-token/reference",
+    "post": false,
+    "public": true,
+    "keys": [
+      "ltCoin"
+    ],
+    "required": [
+      "ltCoin"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_spot_lever_token_order_record",
+    "path": "/v5/spot-lever-token/order-record",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ltCoin",
+      "orderId",
+      "startTime",
+      "endTime",
+      "limit",
+      "ltOrderType",
+      "serialNo"
+    ],
+    "required": [],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit",
+      "ltOrderType"
+    ]
+  },
+  {
+    "name": "spot_lever_token_purchase",
+    "path": "/v5/spot-lever-token/purchase",
+    "post": true,
+    "public": false,
+    "keys": [
+      "ltCoin",
+      "ltAmount",
+      "serialNo"
+    ],
+    "required": [
+      "ltCoin",
+      "ltAmount"
+    ],
+    "integers": []
+  },
+  {
+    "name": "spot_lever_token_redeem",
+    "path": "/v5/spot-lever-token/redeem",
+    "post": true,
+    "public": false,
+    "keys": [
+      "ltCoin",
+      "quantity",
+      "serialNo"
+    ],
+    "required": [
+      "ltCoin",
+      "quantity"
+    ],
+    "integers": []
+  }
+]

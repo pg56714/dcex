@@ -1,0 +1,71 @@
+[
+  {
+    "name": "get_interest_rate_curves_history",
+    "path": "/api/v1/interest/info/rate-curves",
+    "is_public": true,
+    "fields": [
+      "interval"
+    ],
+    "required": [
+      "interval"
+    ]
+  },
+  {
+    "name": "get_latest_interest_rate_curve",
+    "path": "/api/v1/interest/info/latest-rate-curves",
+    "is_public": true,
+    "fields": [],
+    "required": []
+  },
+  {
+    "name": "get_interest_key_metrics",
+    "path": "/api/v1/interest/key-metrics",
+    "is_public": false,
+    "fields": [
+      "accountId"
+    ],
+    "required": [
+      "accountId"
+    ]
+  },
+  {
+    "name": "get_interest_daily_metrics",
+    "path": "/api/v1/interest/daily-metrics",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_interest_payment_chart",
+    "path": "/api/v1/interest/payment-chart",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "bucket"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_interest_payments_history",
+    "path": "/api/v1/interest/payments",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  }
+]

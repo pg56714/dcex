@@ -8,6 +8,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._native_http import load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..utils.common import Common
@@ -16,6 +18,7 @@ from ..utils.helpers import generate_timestamp
 
 
 def _params(**kwargs: object) -> list[tuple[str, str]]:
+    kwargs = normalize_params(kwargs)
     return [
         (name, str(value).lower() if isinstance(value, bool) else str(value))
         for name, value in kwargs.items()

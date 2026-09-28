@@ -1,0 +1,19 @@
+[
+  {
+    "name": "set_sub_account_transfer_out",
+    "path": "/api/v5/users/subaccount/set-transfer-out",
+    "post": true,
+    "public": false,
+    "keys": [
+      "subAcct",
+      "canTransOut"
+    ],
+    "required": [
+      "subAcct"
+    ],
+    "bools": [
+      "canTransOut"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"subAcct\":{\"type\":\"string\"},\"canTransOut\":{\"type\":\"boolean\"}},\"required\":[\"subAcct\"]}"
+  }
+]

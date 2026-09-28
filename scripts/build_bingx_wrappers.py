@@ -43,6 +43,18 @@ def main() -> None:
         fields = [
             {**f, "kind": field_kind(f)} for f in op["parameters"] if f["name"] != "timestamp"
         ]
+        if op["path"] == "/openApi/cswap/v2/trade/order":
+            for field in fields:
+                if field["name"] in {"takeProfit", "stopLoss"}:
+                    field["schema"] = {
+                        "type": "object",
+                        "properties": {
+                            "type": {"type": "string"},
+                            "stopPrice": {"type": "number"},
+                            "price": {"type": "number"},
+                            "workingType": {"type": "string"},
+                        },
+                    }
         if op["path"].startswith("/api/lindorm/"):
             fields += [
                 {"name": name, "kind": "str", "required": True}

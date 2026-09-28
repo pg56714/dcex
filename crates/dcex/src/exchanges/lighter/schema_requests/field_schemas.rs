@@ -54,6 +54,7 @@ impl LighterClient {
             if !f.choices.is_empty() && !f.choices.iter().any(|v| v == value) {
                 return Err(invalid(format!("invalid {}", f.name)));
             }
+            crate::exchanges::schema::encode(&f.name, value, &f.kind)?;
             match f.kind.as_str() {
                 "integer" => {
                     p.required_u64_range(

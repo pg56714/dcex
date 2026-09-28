@@ -1,0 +1,105 @@
+[
+  {
+    "name": "place_spot_oco",
+    "path": "/openApi/spot/v1/oco/order",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "product_symbol",
+      "side",
+      "quantity",
+      "limitPrice",
+      "triggerPrice",
+      "orderPrice",
+      "listClientOrderId",
+      "aboveClientOrderId",
+      "belowClientOrderId",
+      "recvWindow"
+    ],
+    "required": [
+      "product_symbol",
+      "side",
+      "quantity",
+      "limitPrice",
+      "triggerPrice",
+      "orderPrice"
+    ],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "cancel_spot_oco",
+    "path": "/openApi/spot/v1/oco/cancel",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "orderId",
+      "clientOrderId",
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_spot_oco",
+    "path": "/openApi/spot/v1/oco/orderList",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "orderListId",
+      "clientOrderId",
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_spot_open_oco",
+    "path": "/openApi/spot/v1/oco/openOrderList",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "pageIndex",
+      "pageSize",
+      "recvWindow"
+    ],
+    "required": [
+      "pageIndex",
+      "pageSize"
+    ],
+    "integers": [
+      "pageIndex",
+      "pageSize",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_spot_oco_history",
+    "path": "/openApi/spot/v1/oco/historyOrderList",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "pageIndex",
+      "pageSize",
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "required": [
+      "pageIndex",
+      "pageSize"
+    ],
+    "integers": [
+      "pageIndex",
+      "pageSize",
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ]
+  }
+]

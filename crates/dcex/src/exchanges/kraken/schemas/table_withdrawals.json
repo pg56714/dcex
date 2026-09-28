@@ -1,0 +1,225 @@
+[
+  {
+    "name": "get_withdrawal_addresses",
+    "path": "/0/private/WithdrawAddresses",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "aclass",
+      "method",
+      "key",
+      "verified"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "aclass",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "currency",
+          "tokenized_asset"
+        ],
+        "minimum": 0
+      },
+      {
+        "key": "method",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "key",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "verified",
+        "kind": "boolean",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  },
+  {
+    "name": "get_withdrawal_information",
+    "path": "/0/private/WithdrawInfo",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "key",
+      "amount"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "key",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "amount",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  },
+  {
+    "name": "get_withdrawal_methods",
+    "path": "/0/private/WithdrawMethods",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "aclass",
+      "network",
+      "rebase_multiplier"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "aclass",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "currency",
+          "tokenized_asset"
+        ],
+        "minimum": 0
+      },
+      {
+        "key": "network",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "rebase_multiplier",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "rebased",
+          "base"
+        ],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  },
+  {
+    "name": "get_withdrawal_status",
+    "path": "/0/private/WithdrawStatus",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "aclass",
+      "method",
+      "start",
+      "end",
+      "cursor",
+      "limit",
+      "rebase_multiplier"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "aclass",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "currency",
+          "tokenized_asset"
+        ],
+        "minimum": 0
+      },
+      {
+        "key": "method",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "start",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "end",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "cursor",
+        "kind": "string",
+        "required": false,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "limit",
+        "kind": "integer",
+        "required": false,
+        "values": [],
+        "minimum": 1
+      },
+      {
+        "key": "rebase_multiplier",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "rebased",
+          "base"
+        ],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  }
+]

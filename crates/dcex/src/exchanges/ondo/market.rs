@@ -14,21 +14,17 @@ impl OndoClient {
         let params = OndoParams::from_pairs(params);
         let response = match method_name {
             "get_login_challenge" | "complete_login_challenge" => {
-                let (path, allowed, required): (&str, &[&str], &[&str]) =
-                    if method_name == "get_login_challenge" {
-                        (
-                            "/v1/auth/erc-4361/login/get_challenge",
-                            &["walletAddress", "chainId"],
-                            &["walletAddress", "chainId"],
-                        )
-                    } else {
-                        (
-                            "/v1/auth/erc-4361/login/complete_challenge",
-                            &["id", "signature", "source"],
-                            &["id", "signature"],
-                        )
-                    };
-                let body = params.body(allowed, required, &[], &[], &[])?;
+                static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+                    std::sync::OnceLock::new();
+                let route = crate::exchanges::schema::route(
+                    &ROUTES,
+                    include_str!("schemas/routes_auth.json"),
+                    method_name,
+                )
+                .expect("matched auth route");
+                route.validate(|key| params.get(key))?;
+                let path = route.path;
+                let body = params.body(route.fields, route.required, &[], &[], &[])?;
                 if body.as_object().is_some_and(|o| {
                     o.values()
                         .any(|v| v.as_str().is_none_or(|s| s.trim().is_empty()))

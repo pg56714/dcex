@@ -1,0 +1,179 @@
+[
+  {
+    "name": "get_account_equity_history",
+    "path": "/api/v1/portfolio/charts/equities",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_account_pnl_history",
+    "path": "/api/v1/portfolio/charts/pnl",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "pnlType",
+      "instrumentType"
+    ],
+    "required": [
+      "accountId",
+      "interval",
+      "pnlType"
+    ]
+  },
+  {
+    "name": "get_account_pnl_percentage_history",
+    "path": "/api/v1/portfolio/charts/pnl/percentage",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "pnlType",
+      "priceMarket",
+      "instrumentType"
+    ],
+    "required": [
+      "accountId",
+      "interval",
+      "pnlType"
+    ]
+  },
+  {
+    "name": "get_cumulative_account_pnl_history",
+    "path": "/api/v1/portfolio/charts/pnl/cumulative",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "pnlType",
+      "instrumentType"
+    ],
+    "required": [
+      "accountId",
+      "interval",
+      "pnlType"
+    ]
+  },
+  {
+    "name": "get_cumulative_account_pnl_percentage_history",
+    "path": "/api/v1/portfolio/charts/pnl/cumulative/percentage",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "pnlType",
+      "priceMarket",
+      "instrumentType"
+    ],
+    "required": [
+      "accountId",
+      "interval",
+      "pnlType"
+    ]
+  },
+  {
+    "name": "get_account_vault_equity_history",
+    "path": "/api/v1/portfolio/charts/vault-equities",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_account_max_drawdown_history",
+    "path": "/api/v1/portfolio/charts/max-drawdown",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_account_funding_chart",
+    "path": "/api/v1/portfolio/charts/funding",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "market"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_account_portfolio_summary",
+    "path": "/api/v1/portfolio/accounts/summary",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "instrumentType"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_account_performance",
+    "path": "/api/v1/portfolio/accounts/performance",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "marketType"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_account_funding_stats",
+    "path": "/api/v1/portfolio/funding/stats",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "market"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  },
+  {
+    "name": "get_account_funding_history",
+    "path": "/api/v1/portfolio/funding/history",
+    "is_public": false,
+    "fields": [
+      "accountId",
+      "interval",
+      "market",
+      "cursor",
+      "limit"
+    ],
+    "required": [
+      "accountId",
+      "interval"
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "name": "get_login_challenge",
+    "path": "/v1/auth/erc-4361/login/get_challenge",
+    "method": "POST",
+    "is_public": true,
+    "fields": [
+      "walletAddress",
+      "chainId"
+    ],
+    "required": [
+      "walletAddress",
+      "chainId"
+    ]
+  },
+  {
+    "name": "complete_login_challenge",
+    "path": "/v1/auth/erc-4361/login/complete_challenge",
+    "method": "POST",
+    "is_public": true,
+    "fields": [
+      "id",
+      "signature",
+      "source"
+    ],
+    "required": [
+      "id",
+      "signature"
+    ]
+  }
+]

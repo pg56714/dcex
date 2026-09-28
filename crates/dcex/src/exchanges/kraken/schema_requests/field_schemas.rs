@@ -67,6 +67,8 @@ impl KrakenClient {
             } else {
                 raw.into()
             };
+            let original = value.clone();
+            let value = crate::exchanges::schema::encode_shape(value, &f.schema, &f.name)?;
             validate(&value, &f.schema, &f.name)?;
             match f.location.as_str() {
                 "path" => {
@@ -86,7 +88,14 @@ impl KrakenClient {
                     if e.auth == "header" {
                         nested_query(&f.name, &value, &mut query)?;
                     } else {
-                        query.push((f.name.clone(), raw.to_owned()));
+                        query.push((
+                            f.name.clone(),
+                            if json && value != original {
+                                value.to_string()
+                            } else {
+                                raw.to_owned()
+                            },
+                        ));
                     }
                 }
                 "header" => {}
@@ -265,125 +274,7 @@ fn validate_endpoint(name: &str, fields: &Map<String, Value>) -> Result<()> {
 }
 
 fn validate(value: &Value, schema: &Value, field: &str) -> Result<()> {
-    if let Some(branches) = schema["allOf"].as_array() {
-        for branch in branches {
-            validate(value, branch, field)?;
-        }
-    }
-    if let Some(branches) = schema["oneOf"].as_array() {
-        let selected: Vec<_> = branches
-            .iter()
-            .filter(|branch| {
-                branch["properties"]
-                    .as_object()
-                    .is_none_or(|props| props.keys().any(|k| value.get(k).is_some()))
-            })
-            .collect();
-        if selected.len() != 1 {
-            return Err(invalid(format!(
-                "{field} requires exactly one documented variant"
-            )));
-        }
-        validate(value, selected[0], field)?;
-    }
-    if let Some(choices) = schema["enum"].as_array()
-        && !choices.contains(value)
-    {
-        return Err(invalid(format!("invalid {field}")));
-    }
-    match schema["type"].as_str() {
-        Some("object") => {
-            let obj = value
-                .as_object()
-                .ok_or_else(|| invalid(format!("{field} requires an object")))?;
-            for key in schema["required"]
-                .as_array()
-                .into_iter()
-                .flatten()
-                .filter_map(Value::as_str)
-            {
-                if !obj.contains_key(key) {
-                    return Err(invalid(format!("{field}.{key} is required")));
-                }
-            }
-            if let Some(props) = schema["properties"].as_object() {
-                for (key, child) in props {
-                    if let Some(v) = obj.get(key) {
-                        validate(v, child, &format!("{field}.{key}"))?;
-                    }
-                }
-            }
-        }
-        Some("array") => {
-            let items = value
-                .as_array()
-                .ok_or_else(|| invalid(format!("{field} requires an array")))?;
-            if schema["minItems"]
-                .as_u64()
-                .is_some_and(|n| items.len() < n as usize)
-                || schema["maxItems"]
-                    .as_u64()
-                    .is_some_and(|n| items.len() > n as usize)
-            {
-                return Err(invalid(format!("invalid {field} length")));
-            }
-            for v in items {
-                validate(v, &schema["items"], field)?;
-            }
-        }
-        Some("string") => {
-            let raw = value
-                .as_str()
-                .ok_or_else(|| invalid(format!("{field} requires a string")))?;
-            if schema["minLength"]
-                .as_u64()
-                .is_some_and(|n| raw.chars().count() < n as usize)
-                || schema["maxLength"]
-                    .as_u64()
-                    .is_some_and(|n| raw.chars().count() > n as usize)
-            {
-                return Err(invalid(format!("invalid {field} length")));
-            }
-            if let Some(pattern) = schema["pattern"].as_str()
-                && !regex::Regex::new(pattern)
-                    .map_err(|_| invalid("invalid embedded pattern"))?
-                    .is_match(raw)
-            {
-                return Err(invalid(format!("invalid {field} format")));
-            }
-            if schema["format"] == "uuid"
-                && !(raw.len() == 36
-                    && raw.bytes().enumerate().all(|(i, b)| {
-                        if [8, 13, 18, 23].contains(&i) {
-                            b == b'-'
-                        } else {
-                            b.is_ascii_hexdigit()
-                        }
-                    }))
-            {
-                return Err(invalid(format!("{field} requires a UUID")));
-            }
-        }
-        Some("boolean") if !value.is_boolean() => {
-            return Err(invalid(format!("{field} requires boolean")));
-        }
-        Some("integer") if value.as_i64().is_none() => {
-            return Err(invalid(format!("{field} requires integer")));
-        }
-        Some("number") if !value.is_number() => {
-            return Err(invalid(format!("{field} requires number")));
-        }
-        _ => {}
-    }
-    if let Some(n) = value.as_f64()
-        && (schema["minimum"]
-            .as_f64()
-            .is_some_and(|min| n < min || n == min && schema["exclusiveMinimum"] == true)
-            || schema["maximum"].as_f64().is_some_and(|max| n > max))
-    {
-        return Err(invalid(format!("{field} is outside documented limits")));
-    }
-    Ok(())
+    crate::exchanges::schema::validate_with(value, schema, field, false, false)
 }
 
 fn load_schemas() -> Vec<Endpoint> {

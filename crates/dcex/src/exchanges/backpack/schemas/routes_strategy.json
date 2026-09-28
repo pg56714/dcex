@@ -1,0 +1,92 @@
+[
+  {
+    "name": "create_strategy",
+    "path": "/api/v1/strategy",
+    "instruction": "strategyCreate",
+    "verb": "POST",
+    "fields": [
+      "product_symbol",
+      "symbol",
+      "strategyType",
+      "side",
+      "quantity",
+      "price",
+      "clientStrategyId",
+      "duration",
+      "interval",
+      "randomizedIntervalQuantity",
+      "timeInForce",
+      "postOnly",
+      "reduceOnly",
+      "selfTradePrevention",
+      "slippageTolerance",
+      "slippageToleranceType",
+      "autoLend",
+      "autoLendRedeem",
+      "autoBorrow",
+      "autoBorrowRepay"
+    ]
+  },
+  {
+    "name": "get_open_strategy",
+    "path": "/api/v1/strategy",
+    "instruction": "strategyQuery",
+    "verb": "GET",
+    "fields": [
+      "product_symbol",
+      "symbol",
+      "strategyId",
+      "clientStrategyId"
+    ]
+  },
+  {
+    "name": "cancel_strategy",
+    "path": "/api/v1/strategy",
+    "instruction": "strategyCancel",
+    "verb": "DELETE",
+    "fields": [
+      "product_symbol",
+      "symbol",
+      "strategyId",
+      "clientStrategyId"
+    ]
+  },
+  {
+    "name": "get_open_strategies",
+    "path": "/api/v1/strategies",
+    "instruction": "strategyQueryAll",
+    "verb": "GET",
+    "fields": [
+      "product_symbol",
+      "symbol",
+      "marketType",
+      "strategyType"
+    ]
+  },
+  {
+    "name": "cancel_open_strategies",
+    "path": "/api/v1/strategies",
+    "instruction": "strategyCancelAll",
+    "verb": "DELETE",
+    "fields": [
+      "product_symbol",
+      "symbol",
+      "strategyType"
+    ]
+  },
+  {
+    "name": "get_strategy_history",
+    "path": "/wapi/v1/history/strategies",
+    "instruction": "strategyHistoryQueryAll",
+    "verb": "GET",
+    "fields": [
+      "product_symbol",
+      "symbol",
+      "strategyId",
+      "limit",
+      "offset",
+      "marketType",
+      "sortDirection"
+    ]
+  }
+]

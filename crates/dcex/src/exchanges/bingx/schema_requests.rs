@@ -6,7 +6,7 @@ use crate::{
 };
 use serde_json::Value;
 
-#[path = "endpoint_schemas/mod.rs"]
+#[path = "generated/schema_tables.rs"]
 mod endpoints;
 
 pub(super) struct Endpoint {
@@ -33,6 +33,7 @@ impl BingxClient {
         }
         params.ensure_allowed(e.fields)?;
         let supplied = params.only(e.fields);
+        crate::exchanges::schema::validate_pairs(&supplied)?;
         if supplied
             .iter()
             .map(|(k, _)| k)

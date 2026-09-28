@@ -1,0 +1,250 @@
+[
+  {
+    "name": "get_futures_sub_account_assets",
+    "path": "/api/v2/mix/account/sub-account-assets",
+    "post": false,
+    "public": false,
+    "fields": [
+      "productType"
+    ],
+    "required": [
+      "productType"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_spot_sub_account_assets",
+    "path": "/api/v2/spot/account/subaccount-assets",
+    "post": false,
+    "public": false,
+    "fields": [
+      "idLessThan",
+      "limit"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_sub_accounts",
+    "path": "/api/v3/user/sub-list",
+    "post": false,
+    "public": false,
+    "fields": [
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 100,
+    "days": 90
+  },
+  {
+    "name": "get_uta_sub_account_assets",
+    "path": "/api/v3/account/sub-unified-assets",
+    "post": false,
+    "public": false,
+    "fields": [
+      "subUid",
+      "cursor",
+      "limit"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 50,
+    "days": 90
+  },
+  {
+    "name": "get_sub_account_deposit_address",
+    "path": "/api/v2/spot/wallet/subaccount-deposit-address",
+    "post": false,
+    "public": false,
+    "fields": [
+      "subUid",
+      "coin",
+      "chain",
+      "size"
+    ],
+    "required": [
+      "subUid",
+      "coin"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_sub_account_deposit_records",
+    "path": "/api/v2/spot/wallet/subaccount-deposit-records",
+    "post": false,
+    "public": false,
+    "fields": [
+      "subUid",
+      "coin",
+      "startTime",
+      "endTime",
+      "idLessThan",
+      "limit"
+    ],
+    "required": [
+      "subUid"
+    ],
+    "arrays": [],
+    "limit": 100,
+    "days": null
+  },
+  {
+    "name": "create_uta_sub_account",
+    "path": "/api/v3/user/create-sub",
+    "post": true,
+    "public": false,
+    "fields": [
+      "username",
+      "accountMode",
+      "note"
+    ],
+    "required": [
+      "username"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "classic_create_virtual_subaccount",
+    "path": "/api/v2/user/create-virtual-subaccount",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subAccountList"
+    ],
+    "required": [
+      "subAccountList"
+    ],
+    "arrays": [
+      "subAccountList"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "classic_create_virtual_subaccount_apikey",
+    "path": "/api/v2/user/create-virtual-subaccount-apikey",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subAccountUid",
+      "passphrase",
+      "label",
+      "permList",
+      "ipList"
+    ],
+    "required": [
+      "subAccountUid",
+      "passphrase",
+      "label",
+      "permList"
+    ],
+    "arrays": [
+      "permList",
+      "ipList"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "classic_modify_virtual_subaccount",
+    "path": "/api/v2/user/modify-virtual-subaccount",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subAccountUid",
+      "permList",
+      "status"
+    ],
+    "required": [
+      "subAccountUid",
+      "permList",
+      "status"
+    ],
+    "arrays": [
+      "permList"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "classic_modify_virtual_subaccount_apikey",
+    "path": "/api/v2/user/modify-virtual-subaccount-apikey",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subAccountUid",
+      "passphrase",
+      "label",
+      "subAccountApiKey",
+      "ipList",
+      "permList"
+    ],
+    "required": [
+      "subAccountUid",
+      "passphrase",
+      "label",
+      "subAccountApiKey"
+    ],
+    "arrays": [
+      "ipList",
+      "permList"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_virtual_subaccount_list",
+    "path": "/api/v2/user/virtual-subaccount-list",
+    "post": false,
+    "public": false,
+    "fields": [
+      "limit",
+      "idLessThan",
+      "status"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 500,
+    "days": null
+  },
+  {
+    "name": "get_classic_virtual_subaccount_apikey_list",
+    "path": "/api/v2/user/virtual-subaccount-apikey-list",
+    "post": false,
+    "public": false,
+    "fields": [
+      "subAccountUid"
+    ],
+    "required": [
+      "subAccountUid"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "batch_create_classic_sub_accounts",
+    "path": "/api/v2/user/batch-create-subaccount-and-apikey",
+    "post": true,
+    "public": false,
+    "fields": [
+      "accounts"
+    ],
+    "required": [
+      "accounts"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  }
+]

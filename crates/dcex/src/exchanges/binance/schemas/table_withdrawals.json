@@ -1,0 +1,127 @@
+[
+  {
+    "name": "get_pm_margin_transferable_amount",
+    "market": "BinanceMarket::PortfolioMargin",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/papi/v1/margin/maxWithdraw",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "fetch_withdraw_address_list",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/capital/withdraw/address/list",
+    "public": false,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "fetch_withdraw_quota",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/capital/withdraw/quota",
+    "public": false,
+    "api_key": false,
+    "allowed": [],
+    "fields": []
+  },
+  {
+    "name": "get_withdrawal_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/capital/withdraw/history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "coin",
+      "withdrawOrderId",
+      "status",
+      "offset",
+      "limit",
+      "idList",
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "withdrawOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "status",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "idList",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

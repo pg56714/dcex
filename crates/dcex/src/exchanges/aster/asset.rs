@@ -2,7 +2,6 @@
 use crate::Result;
 use crate::exchange::ValidatedResponse;
 use crate::exchanges::aster::{AsterClient, AsterMarket, params::AsterParams};
-use crate::http::HttpMethod;
 impl AsterClient {
     pub(in crate::exchanges::aster) async fn asset_schema_request(
         &self,
@@ -10,35 +9,27 @@ impl AsterClient {
         p: &AsterParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let (path, method, is_public, presigned, fields, required): (
-            &str,
-            HttpMethod,
-            bool,
-            bool,
-            &[&str],
-            &[&str],
-        ) = match name {
-            "exchange_futures_assets" => (
-                "/fapi/v3/assetExchange",
-                HttpMethod::Post,
-                false,
-                false,
-                &[],
-                &[],
-            ),
-            "get_asset_migration_history" => (
-                "/fapi/v3/asset/migrateUser/history",
-                HttpMethod::Get,
-                false,
-                false,
-                &["batchId"],
-                &["batchId"],
-            ),
-            _ => return Ok(None),
+        static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+            std::sync::OnceLock::new();
+        let Some(route) = crate::exchanges::schema::route(
+            &ROUTES,
+            include_str!("schemas/routes_asset.json"),
+            name,
+        ) else {
+            return Ok(None);
         };
+        let (path, method, is_public, presigned, fields, required) = (
+            route.path,
+            route.method,
+            route.is_public,
+            route.presigned,
+            route.fields,
+            route.required,
+        );
         if public != is_public {
             return Ok(None);
         }
+        route.validate(|key| p.get(key))?;
         p.ensure_allowed(fields, &[])?;
         for key in required {
             p.required(key)?;

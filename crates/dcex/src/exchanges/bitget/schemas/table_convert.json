@@ -1,0 +1,156 @@
+[
+  {
+    "name": "convert_futures_union_asset",
+    "path": "/api/v2/mix/account/union-convert",
+    "post": true,
+    "public": false,
+    "fields": [
+      "coin",
+      "amount"
+    ],
+    "required": [
+      "coin",
+      "amount"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_convert_records",
+    "path": "/api/v3/account/convert-records",
+    "post": false,
+    "public": false,
+    "fields": [
+      "fromCoin",
+      "toCoin",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 100,
+    "days": 30
+  },
+  {
+    "name": "get_uta_small_assets_history",
+    "path": "/api/v3/convert/small-assets-history",
+    "post": false,
+    "public": false,
+    "fields": [
+      "orderId",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 100,
+    "days": null
+  },
+  {
+    "name": "get_uta_small_assets",
+    "path": "/api/v3/convert/small-assets",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_small_assets_trade",
+    "path": "/api/v3/convert/small-assets-trade",
+    "post": true,
+    "public": false,
+    "fields": [
+      "fromCoinList"
+    ],
+    "required": [
+      "fromCoinList"
+    ],
+    "arrays": [
+      "fromCoinList"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_convert_currencies",
+    "path": "/api/v2/convert/currencies",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_quoted_price",
+    "path": "/api/v2/convert/quoted-price",
+    "post": false,
+    "public": false,
+    "fields": [
+      "fromCoin",
+      "toCoin",
+      "fromCoinSize",
+      "toCoinSize"
+    ],
+    "required": [
+      "fromCoin",
+      "toCoin"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "classic_trade",
+    "path": "/api/v2/convert/trade",
+    "post": true,
+    "public": false,
+    "fields": [
+      "fromCoin",
+      "fromCoinSize",
+      "cnvtPrice",
+      "toCoin",
+      "toCoinSize",
+      "traceId"
+    ],
+    "required": [
+      "fromCoin",
+      "fromCoinSize",
+      "cnvtPrice",
+      "toCoin",
+      "toCoinSize",
+      "traceId"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_convert_record",
+    "path": "/api/v2/convert/convert-record",
+    "post": false,
+    "public": false,
+    "fields": [
+      "startTime",
+      "endTime",
+      "limit",
+      "idLessThan"
+    ],
+    "required": [
+      "startTime",
+      "endTime"
+    ],
+    "arrays": [],
+    "limit": 100,
+    "days": null
+  }
+]

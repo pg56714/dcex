@@ -1,0 +1,519 @@
+[
+  {
+    "name": "get_futures_estimated_open_count",
+    "path": "/api/v2/mix/account/open-count",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "productType",
+      "marginCoin",
+      "openAmount",
+      "openPrice",
+      "leverage"
+    ],
+    "required": [
+      "symbol",
+      "productType",
+      "marginCoin",
+      "openAmount",
+      "openPrice"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_liquidation_price",
+    "path": "/api/v2/mix/account/liq-price",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "productType",
+      "marginCoin",
+      "posSide",
+      "orderType",
+      "openAmount",
+      "openPrice"
+    ],
+    "required": [
+      "symbol",
+      "productType",
+      "marginCoin",
+      "posSide",
+      "orderType",
+      "openAmount"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_max_open_quantity",
+    "path": "/api/v2/mix/account/max-open",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "productType",
+      "marginCoin",
+      "posSide",
+      "orderType",
+      "openPrice"
+    ],
+    "required": [
+      "symbol",
+      "productType",
+      "marginCoin",
+      "posSide",
+      "orderType"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_interest_history",
+    "path": "/api/v2/mix/account/interest-history",
+    "post": false,
+    "public": false,
+    "fields": [
+      "productType",
+      "startTime",
+      "endTime",
+      "coin",
+      "idLessThan",
+      "limit"
+    ],
+    "required": [
+      "productType",
+      "startTime",
+      "endTime"
+    ],
+    "arrays": [],
+    "limit": 100,
+    "days": null
+  },
+  {
+    "name": "set_futures_asset_mode",
+    "path": "/api/v2/mix/account/set-asset-mode",
+    "post": true,
+    "public": false,
+    "fields": [
+      "productType",
+      "assetMode"
+    ],
+    "required": [
+      "productType",
+      "assetMode"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_union_config",
+    "path": "/api/v2/mix/account/union-config",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_funding_records",
+    "path": "/api/v3/account/funding-financial-records",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin",
+      "type",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": 100,
+    "days": 30
+  },
+  {
+    "name": "get_uta_fee_rate",
+    "path": "/api/v3/account/fee-rate",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "category"
+    ],
+    "required": [
+      "symbol",
+      "category"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "set_uta_collateral_type",
+    "path": "/api/v3/account/set-collateral-type",
+    "post": true,
+    "public": false,
+    "fields": [
+      "collateralType",
+      "collateralCoins",
+      "allowCashplus"
+    ],
+    "required": [
+      "collateralType"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_settings",
+    "path": "/api/v3/account/settings",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_delta_info",
+    "path": "/api/v3/account/delta-info",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_payment_coins",
+    "path": "/api/v3/account/payment-coins",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_max_open_available",
+    "path": "/api/v3/account/max-open-available",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "symbol",
+      "orderType",
+      "side",
+      "price",
+      "size",
+      "autoBorrow"
+    ],
+    "required": [
+      "category",
+      "symbol",
+      "orderType",
+      "side"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_eligible_discount_rates",
+    "path": "/api/v3/account/eligible-discount-rate",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "set_uta_account_mode",
+    "path": "/api/v3/account/adjust-account-mode",
+    "post": true,
+    "public": false,
+    "fields": [
+      "mode",
+      "deltaSwitch",
+      "targetUid"
+    ],
+    "required": [
+      "mode"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "set_uta_fee_deduction",
+    "path": "/api/v3/account/switch-deduct",
+    "post": true,
+    "public": false,
+    "fields": [
+      "deduct"
+    ],
+    "required": [
+      "deduct"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_fee_deduction",
+    "path": "/api/v3/account/deduct-info",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "upgrade_to_uta",
+    "path": "/api/v3/account/switch",
+    "post": true,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_upgrade_status",
+    "path": "/api/v3/account/switch-status",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_account_upgrade_status",
+    "path": "/api/v2/spot/account/upgrade-status",
+    "post": false,
+    "public": false,
+    "fields": [
+      "subUid"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "upgrade_classic_account",
+    "path": "/api/v2/spot/account/upgrade",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subUid"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_spot_fee_deduction",
+    "path": "/api/v2/spot/account/deduct-info",
+    "post": false,
+    "public": false,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "set_spot_fee_deduction",
+    "path": "/api/v2/spot/account/switch-deduct",
+    "post": true,
+    "public": false,
+    "fields": [
+      "deduct"
+    ],
+    "required": [
+      "deduct"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_rate_limit_quota",
+    "path": "/api/v3/user/rate-limit-quota",
+    "post": false,
+    "public": false,
+    "fields": [
+      "category",
+      "uid",
+      "cursor",
+      "limit"
+    ],
+    "required": [
+      "category"
+    ],
+    "arrays": [],
+    "limit": 100,
+    "days": null
+  },
+  {
+    "name": "uta_set_rate_limit_quota",
+    "path": "/api/v3/user/set-rate-limit-quota",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "uids",
+      "quota"
+    ],
+    "required": [
+      "category",
+      "uids",
+      "quota"
+    ],
+    "arrays": [
+      "uids"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_delete_sub",
+    "path": "/api/v3/user/delete-sub",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subUid"
+    ],
+    "required": [
+      "subUid"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_freeze_sub",
+    "path": "/api/v3/user/freeze-sub",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subUid",
+      "operation"
+    ],
+    "required": [
+      "subUid",
+      "operation"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_create_sub_api",
+    "path": "/api/v3/user/create-sub-api",
+    "post": true,
+    "public": false,
+    "fields": [
+      "subUid",
+      "note",
+      "type",
+      "passphrase",
+      "permissions",
+      "ips"
+    ],
+    "required": [
+      "subUid",
+      "note",
+      "type",
+      "passphrase",
+      "permissions",
+      "ips"
+    ],
+    "arrays": [
+      "permissions",
+      "ips"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_update_sub_api",
+    "path": "/api/v3/user/update-sub-api",
+    "post": true,
+    "public": false,
+    "fields": [
+      "apiKey",
+      "passphrase",
+      "type",
+      "permissions",
+      "ips"
+    ],
+    "required": [
+      "apiKey",
+      "passphrase"
+    ],
+    "arrays": [
+      "permissions",
+      "ips"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_delete_sub_api",
+    "path": "/api/v3/user/delete-sub-api",
+    "post": true,
+    "public": false,
+    "fields": [
+      "apiKey"
+    ],
+    "required": [
+      "apiKey"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_sub_api_list",
+    "path": "/api/v3/user/sub-api-list",
+    "post": false,
+    "public": false,
+    "fields": [
+      "subUid",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "subUid"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  }
+]

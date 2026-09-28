@@ -5,13 +5,7 @@ use serde::Deserialize;
 use serde_json::{Map, Value};
 use std::sync::OnceLock;
 
-#[derive(Deserialize)]
-struct Field {
-    wire: String,
-    required: bool,
-    schema: Value,
-    location: String,
-}
+use crate::exchanges::schema::Field;
 #[derive(Deserialize)]
 struct Endpoint {
     name: String,
@@ -24,54 +18,6 @@ struct Endpoint {
 
 fn invalid(message: impl std::fmt::Display) -> DcexError {
     DcexError::InvalidInput(format!("Bitget: {message}"))
-}
-
-fn validate(value: &Value, schema: &Value, key: &str) -> Result<()> {
-    let valid = match schema["type"].as_str() {
-        Some("string") => value.is_string(),
-        Some("integer") => value.is_i64() || value.is_u64(),
-        Some("number") => value.is_number(),
-        Some("boolean") => value.is_boolean(),
-        Some("array") => value.is_array(),
-        Some("object") => value.is_object(),
-        _ => true,
-    };
-    if !valid {
-        return Err(invalid(format!("invalid type for {key}")));
-    }
-    if let Some(choices) = schema["enum"].as_array()
-        && !choices.contains(value)
-    {
-        return Err(invalid(format!("invalid {key}")));
-    }
-    if let Some(number) = value.as_f64()
-        && (schema["minimum"]
-            .as_f64()
-            .is_some_and(|minimum| number < minimum)
-            || schema["maximum"]
-                .as_f64()
-                .is_some_and(|maximum| number > maximum))
-    {
-        return Err(invalid(format!("{key} is outside the documented range")));
-    }
-    if let Some(items) = value.as_array() {
-        for item in items {
-            validate(item, &schema["items"], key)?;
-        }
-    }
-    if let Some(object) = value.as_object() {
-        if let Some(required) = schema["required"].as_array() {
-            for field in required.iter().filter_map(Value::as_str) {
-                if !object.contains_key(field) {
-                    return Err(invalid(format!("missing {key}.{field}")));
-                }
-            }
-        }
-        for (field, item) in object {
-            validate(item, &schema["properties"][field], field)?;
-        }
-    }
-    Ok(())
 }
 
 impl BitgetClient {
@@ -89,7 +35,7 @@ impl BitgetClient {
         else {
             return Ok(None);
         };
-        let mut allowed: Vec<&str> = endpoint.fields.iter().map(|f| f.wire.as_str()).collect();
+        let mut allowed: Vec<&str> = endpoint.fields.iter().map(|f| f.name.as_str()).collect();
         if endpoint.confirm {
             allowed.push("confirm");
             if p.get("confirm") != Some("true") {
@@ -100,23 +46,17 @@ impl BitgetClient {
         let mut query = Vec::new();
         let mut body = Map::new();
         for field in &endpoint.fields {
-            let Some(raw) = p.get(&field.wire) else {
+            let Some(raw) = p.get(&field.name) else {
                 if field.required {
-                    return Err(invalid(format!("missing {}", field.wire)));
+                    return Err(invalid(format!("missing {}", field.name)));
                 }
                 continue;
             };
-            let value = if field.schema["type"].as_str().unwrap_or("string") == "string" {
-                Value::String(raw.into())
-            } else {
-                serde_json::from_str(raw)
-                    .map_err(|_| invalid(format!("invalid JSON for {}", field.wire)))?
-            };
-            validate(&value, &field.schema, &field.wire)?;
+            let value = field.encode(raw)?;
             if field.location == "query" {
-                query.push((field.wire.clone(), raw.into()));
+                query.push((field.name.clone(), raw.into()));
             } else {
-                body.insert(field.wire.clone(), value);
+                body.insert(field.name.clone(), value);
             }
         }
         let response = if endpoint.method == "GET" {

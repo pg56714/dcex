@@ -16,36 +16,8 @@ struct Endpoint {
     instruction: Option<&'static str>,
     fields: &'static [Field],
 }
-fn endpoint(name: &str) -> Option<Endpoint> {
-    Some(match name {
-        "execute_borrow_lend" => Endpoint {
-            path: "/api/v1/borrowLend",
-            method: HttpMethod::Post,
-            instruction: Some("borrowLendExecute"),
-            fields: &[
-                Field {
-                    key: "quantity",
-                    kind: "string",
-                    required: true,
-                    choices: &[],
-                },
-                Field {
-                    key: "side",
-                    kind: "string",
-                    required: true,
-                    choices: &["Borrow", "Lend"],
-                },
-                Field {
-                    key: "symbol",
-                    kind: "string",
-                    required: true,
-                    choices: &[],
-                },
-            ],
-        },
-        _ => return None,
-    })
-}
+#[path = "generated/borrow_lend_schema.rs"]
+mod endpoints;
 impl BackpackClient {
     pub(in crate::exchanges::backpack) async fn borrow_lend_schema_request(
         &self,
@@ -53,7 +25,7 @@ impl BackpackClient {
         p: &BackpackParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let Some(e) = endpoint(name) else {
+        let Some(e) = endpoints::endpoint(name) else {
             return Ok(None);
         };
         if public != e.instruction.is_none() {
@@ -73,6 +45,7 @@ impl BackpackClient {
             if v.is_empty() || (!f.choices.is_empty() && !f.choices.contains(&v)) {
                 return Err(DcexError::InvalidInput(format!("invalid {}", f.key)));
             }
+            crate::exchanges::schema::encode(f.key, v, f.kind)?;
             let value = match f.kind {
                 "integer" => Value::from(
                     v.parse::<u64>()

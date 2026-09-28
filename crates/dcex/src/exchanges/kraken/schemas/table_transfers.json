@@ -1,0 +1,117 @@
+[
+  {
+    "name": "transfer_spot_sub_account",
+    "path": "/0/private/AccountTransfer",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [
+      "asset",
+      "asset_class",
+      "amount",
+      "from",
+      "to"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "asset_class",
+        "kind": "string",
+        "required": false,
+        "values": [
+          "currency",
+          "tokenized_asset"
+        ],
+        "minimum": 0
+      },
+      {
+        "key": "amount",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "from",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 1
+      },
+      {
+        "key": "to",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 1
+      }
+    ],
+    "symbol_key": null
+  },
+  {
+    "name": "transfer_futures_sub_account",
+    "path": "/derivatives/api/v3/transfer/subaccount",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Futures",
+    "public": false,
+    "allowed": [
+      "fromUser",
+      "toUser",
+      "fromAccount",
+      "toAccount",
+      "unit",
+      "amount"
+    ],
+    "fields": [
+      {
+        "key": "fromUser",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "toUser",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "fromAccount",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "toAccount",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "unit",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      },
+      {
+        "key": "amount",
+        "kind": "string",
+        "required": true,
+        "values": [],
+        "minimum": 0
+      }
+    ],
+    "symbol_key": null
+  }
+]

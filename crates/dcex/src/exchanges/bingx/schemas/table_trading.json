@@ -1,0 +1,38 @@
+[
+  {
+    "name": "reverse_swap_position",
+    "path": "/openApi/swap/v1/trade/reverse",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "type_",
+      "product_symbol",
+      "triggerPrice",
+      "workingType",
+      "recvWindow"
+    ],
+    "required": [
+      "type_",
+      "product_symbol"
+    ],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "adjust_simulated_trading_balance",
+    "path": "/openApi/swap/v2/trade/getVst",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "adjustType",
+      "amount",
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "amount",
+      "recvWindow"
+    ]
+  }
+]

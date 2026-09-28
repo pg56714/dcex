@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -34,13 +36,15 @@ class GeneratedC2cHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "tradeType": trade_type,
-                    "startTimestamp": start_timestamp,
-                    "endTimestamp": end_timestamp,
-                    "page": page,
-                    "rows": rows,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "tradeType": trade_type,
+                        "startTimestamp": start_timestamp,
+                        "endTimestamp": end_timestamp,
+                        "page": page,
+                        "rows": rows,
+                    }
+                ).items()
                 if value is not None
             ],
         )

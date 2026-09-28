@@ -1,0 +1,554 @@
+[
+  {
+    "name": "add_sub_account_api",
+    "path": "/api/v1/sub/api-key",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "passphrase",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "remark",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "permission",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "ipWhitelist",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "expire",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "-1",
+          "30",
+          "90",
+          "180",
+          "360"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "delete_sub_account_api",
+    "path": "/api/v1/sub/api-key",
+    "method": "HttpMethod::Delete",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "apiKey",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "passphrase",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_sub_account_api_list",
+    "path": "/api/v1/sub/api-key",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "apiKey",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "modify_sub_account_api",
+    "path": "/api/v1/sub/api-key/update",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "passphrase",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "permission",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "ipWhitelist",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "expire",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "-1",
+          "30",
+          "90",
+          "180",
+          "360"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "apiKey",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "add_sub_account_futures_permission",
+    "path": "/api/v3/sub/user/futures/enable",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "uid",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "add_sub_account_margin_permission",
+    "path": "/api/v3/sub/user/margin/enable",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "uid",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "add_uta_sub_account",
+    "path": "/api/ua/v2/user/sub/create-sub-account",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "password",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "remarks",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "access",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "mode",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "CLASSIC",
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "add_uta_sub_account_api",
+    "path": "/api/ua/v2/user/create-sub-api-key",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "passphrase",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "remark",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "permission",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "ipWhitelist",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "expire",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "-1",
+          "30",
+          "90",
+          "180",
+          "360"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "delete_uta_sub_account_api",
+    "path": "/api/ua/v2/user/sub-api-key",
+    "method": "HttpMethod::Delete",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "apiKey",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "passphrase",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "modify_uta_sub_account_api",
+    "path": "/api/ua/v2/user/modify-sub-api-key",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "apiKey",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "passphrase",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "permission",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "ipWhitelist",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "expire",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "-1",
+          "30",
+          "90",
+          "180",
+          "360"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_sub_account_api_list",
+    "path": "/api/ua/v2/user/sub-api-key",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "apiKey",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "add_sub_account",
+    "path": "/api/v2/sub/user/created",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "password",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "remarks",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subName",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "access",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "mode",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "CLASSIC",
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  }
+]

@@ -3,6 +3,8 @@
 import json
 from typing import Any
 
+from dcex._schema_codec import encode_json
+
 from .._native_http import load_native
 from ._base import AsyncWebSocketMixin
 
@@ -216,7 +218,7 @@ class ProClient(AsyncWebSocketMixin):
         self, request_id: str, operation: str, args: dict[str, Any] | list[dict[str, Any]]
     ) -> None:
         """Send an operation supported by the selected version; check its recv response."""
-        await self._native_client.send_operation(request_id, operation, json.dumps(args))
+        await self._native_client.send_operation(request_id, operation, encode_json(args))
 
     async def ping(self, request_id: str = "ping") -> None:
         """Send one heartbeat; follow the server's advertised pingInterval."""

@@ -1,0 +1,29 @@
+[
+  {
+    "name": "get_glp_today_performance",
+    "path": "/api/v5/users/glp/todayperformance",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{},\"required\":[]}"
+  },
+  {
+    "name": "get_glp_historical_performance",
+    "path": "/api/v5/users/glp/historicalperformance",
+    "post": false,
+    "public": false,
+    "keys": [
+      "program",
+      "begin",
+      "end",
+      "limit"
+    ],
+    "required": [
+      "program"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"program\":{\"type\":\"string\"},\"begin\":{\"type\":\"string\"},\"end\":{\"type\":\"string\"},\"limit\":{\"type\":\"string\"}},\"required\":[\"program\"]}"
+  }
+]

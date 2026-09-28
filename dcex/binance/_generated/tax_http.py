@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -33,12 +35,14 @@ class GeneratedTaxHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "page": page,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "startTime": start_time,
+                        "endTime": end_time,
+                        "page": page,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )

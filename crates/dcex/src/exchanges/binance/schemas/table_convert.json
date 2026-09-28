@@ -1,0 +1,301 @@
+[
+  {
+    "name": "futures_accept_the_offered_quote",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Post",
+    "path": "/fapi/v1/convert/acceptQuote",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "quoteId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "quoteId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_list_all_convert_pairs",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/convert/exchangeInfo",
+    "public": true,
+    "api_key": false,
+    "allowed": [
+      "fromAsset",
+      "toAsset"
+    ],
+    "fields": [
+      {
+        "key": "fromAsset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "toAsset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_order_status",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/convert/orderStatus",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "orderId",
+      "quoteId"
+    ],
+    "fields": [
+      {
+        "key": "orderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "quoteId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_send_quote_request",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Post",
+    "path": "/fapi/v1/convert/getQuote",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "fromAsset",
+      "toAsset",
+      "fromAmount",
+      "toAmount",
+      "validTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "fromAsset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "toAsset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "fromAmount",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "toAmount",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "validTime",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "wallet_dust_convert",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/asset/dust-convert/convert",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "accountType",
+      "clientId",
+      "targetAsset",
+      "thirdPartyClientId",
+      "dustQuotaAssetToTargetAssetPrice"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "clientId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "targetAsset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "thirdPartyClientId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "dustQuotaAssetToTargetAssetPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "wallet_dust_convertible_assets",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/asset/dust-convert/query-convertible-assets",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "targetAsset",
+      "accountType",
+      "dustQuotaAssetToTargetAssetPrice"
+    ],
+    "fields": [
+      {
+        "key": "targetAsset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "dustQuotaAssetToTargetAssetPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "wallet_dustlog",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/asset/dribblet",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "accountType",
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "SPOT",
+          "MARGIN"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_wallet_assets_that_can_be_converted_into_bnb",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/asset/dust-btc",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "accountType",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "SPOT",
+          "MARGIN"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,202 @@
+[
+  {
+    "name": "get_api_key_permissions",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/account/apiRestrictions",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "create_margin_special_key",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/margin/apiKey",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "apiName",
+      "symbol",
+      "ip",
+      "publicKey",
+      "permissionMode",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "apiName",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "ip",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "publicKey",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "permissionMode",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRADE",
+          "READ"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "delete_margin_special_key",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Delete",
+    "path": "/sapi/v1/margin/apiKey",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "apiName",
+      "symbol",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "apiName",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "edit_margin_ip_for_special_key",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Put",
+    "path": "/sapi/v1/margin/apiKey/ip",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "ip",
+      "symbol",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "ip",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_margin_special_key",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/margin/apiKey",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "query_margin_special_key_list",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/margin/api-key-list",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

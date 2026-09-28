@@ -5,12 +5,7 @@ use serde::Deserialize;
 use serde_json::Value;
 use std::sync::OnceLock;
 
-#[derive(Deserialize)]
-struct Field {
-    name: String,
-    kind: String,
-    required: bool,
-}
+use crate::exchanges::schema::Field;
 #[derive(Deserialize)]
 struct Endpoint {
     name: String,
@@ -58,16 +53,7 @@ impl BingxClient {
             if value.trim().is_empty() {
                 return Err(invalid(format!("{} cannot be empty", f.name)));
             }
-            let valid = match f.kind.as_str() {
-                "int" => value.parse::<i64>().is_ok(),
-                "bool" => matches!(value, "true" | "false"),
-                "decimal" => crate::common::is_positive_plain_decimal(value),
-                "array" => serde_json::from_str::<Value>(value).is_ok_and(|v| v.is_array()),
-                _ => true,
-            };
-            if !valid {
-                return Err(invalid(format!("invalid {}", f.name)));
-            }
+            f.encode(value)?;
         }
         let method = match e.method.as_str() {
             "GET" => HttpMethod::Get,

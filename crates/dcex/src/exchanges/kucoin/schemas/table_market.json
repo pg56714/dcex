@@ -1,0 +1,1009 @@
+[
+  {
+    "name": "get_currencies_v3",
+    "path": "/api/v3/currencies",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_futures_all_tickers",
+    "path": "/api/v1/allTickers",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_futures_mark_price",
+    "path": "/api/v1/mark-price/{symbol}/current",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": true,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_futures_server_time",
+    "path": "/api/v1/timestamp",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_futures_service_status",
+    "path": "/api/v1/status",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_spot_full_orderbook",
+    "path": "/api/v3/market/orderbook/level2",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_spot_server_time",
+    "path": "/api/v1/timestamp",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_spot_service_status",
+    "path": "/api/v1/status",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_uta_collateral_ratios",
+    "path": "/api/ua/v2/market/collateral-discount-ratio",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_uta_current_funding_rates",
+    "path": "/api/ua/v2/market/funding-rate",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "productType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "COIN-FUTURES",
+          "USDC-FUTURES",
+          "USDT-FUTURES"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_funding_rate_history",
+    "path": "/api/ua/v2/market/funding-rate-history",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_index_prices",
+    "path": "/api/ua/v2/market/index-price",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "lastId",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_interest_rate_index",
+    "path": "/api/ua/v2/market/interest-rate-index",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "lastId",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_klines",
+    "path": "/api/ua/v2/market/kline",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "tradeType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "SPOT",
+          "FUTURES"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "klineType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "TRADE",
+          "MARK_PRICE",
+          "INDEX_PRICE",
+          "PREMIUM_INDEX"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "interval",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "1min",
+          "3min",
+          "5min",
+          "15min",
+          "30min",
+          "1hour",
+          "2hour",
+          "4hour",
+          "6hour",
+          "8hour",
+          "12hour",
+          "1day",
+          "3day",
+          "1week",
+          "1month"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_orderbook",
+    "path": "/api/ua/v2/market/orderbook",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "tradeType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "SPOT",
+          "FUTURES"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "limit",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "20",
+          "100",
+          "FULL"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "rpiFilter",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [
+          "0",
+          "1"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_service_status",
+    "path": "/api/ua/v2/server/status",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "tradeType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "SPOT",
+          "FUTURES"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_tickers",
+    "path": "/api/ua/v2/market/ticker",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "tradeType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "SPOT",
+          "FUTURES"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_trade_statistics",
+    "path": "/api/ua/v2/trade-statistics",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_uta_public_trades",
+    "path": "/api/ua/v2/market/trade",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "tradeType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "SPOT",
+          "FUTURES"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_instruments",
+    "path": "/api/ua/v2/market/instrument",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "tradeType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "SPOT",
+          "FUTURES"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_futures_interest_rate_index",
+    "path": "/api/v1/interest/query",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "reverse",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "forward",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "maxCount",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 100
+      }
+    ]
+  },
+  {
+    "name": "get_futures_premium_index",
+    "path": "/api/v1/premium/query",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "reverse",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "forward",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "maxCount",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 100
+      }
+    ]
+  },
+  {
+    "name": "get_call_auction_info",
+    "path": "/api/v1/market/callauctionData",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_call_auction_part_order_book",
+    "path": "/api/v1/market/orderbook/callauction/level2_{size}",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "size",
+        "kind": "i",
+        "required": true,
+        "path": true,
+        "choices": [
+          "20",
+          "100"
+        ],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_spot_currency_v3",
+    "path": "/api/v3/currencies/{currency}",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": true,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "chain",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_market_list",
+    "path": "/api/v1/markets",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_spot_symbol_v2",
+    "path": "/api/v2/symbols/{symbol}",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": true,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_currencies",
+    "path": "/api/ua/v2/asset/currencies",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "chain",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currencyList",
+        "kind": "a",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_currency",
+    "path": "/api/ua/v2/market/currency",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "chain",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_call_auction_info",
+    "path": "/api/ua/v2/market/call-auction-info",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_client_ip_address",
+    "path": "/api/ua/v2/user/my-ip",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_uta_kyc_regions",
+    "path": "/api/ua/v2/user/kyc-region",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_spot_24h_statistics",
+    "path": "/api/v1/market/stats",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_client_ip_address",
+    "path": "/api/v1/my-ip",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_kyc_regions",
+    "path": "/api/kyc/regions/v4",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_spot_index_price",
+    "path": "/api/v1/index/query",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "reverse",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "forward",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "maxCount",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 100
+      }
+    ]
+  },
+  {
+    "name": "get_futures_24h_statistics",
+    "path": "/api/v1/trade-statistics",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Futures",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_uta_oe_scurrency",
+    "path": "/api/ua/v2/oes/currency",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "custodian",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "BITGO_SG",
+          "BITGO_SD",
+          "CACTUS",
+          "CEFFU"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  }
+]

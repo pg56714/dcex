@@ -1,0 +1,489 @@
+[
+  {
+    "name": "check_questionnaire_requirements",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/localentity/questionnaire-requirements",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_travel_rule_deposit_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/localentity/deposit/history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "trId",
+      "txId",
+      "tranId",
+      "network",
+      "coin",
+      "travelRuleStatus",
+      "pendingQuestionnaire",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit"
+    ],
+    "fields": [
+      {
+        "key": "trId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "txId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "tranId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "network",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "travelRuleStatus",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingQuestionnaire",
+        "kind": "b",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_travel_rule_deposit_history_v2",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v2/localentity/deposit/history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "depositId",
+      "txId",
+      "network",
+      "coin",
+      "retrieveQuestionnaire",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit"
+    ],
+    "fields": [
+      {
+        "key": "depositId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "txId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "network",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "retrieveQuestionnaire",
+        "kind": "b",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_country_list",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/localentity/country/list",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_region_list",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/localentity/region/list",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "countryCode",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "countryCode",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "submit_deposit_questionnaire_travel_rule",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Put",
+    "path": "/sapi/v1/localentity/deposit/provide-info",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "tranId",
+      "questionnaire"
+    ],
+    "fields": [
+      {
+        "key": "tranId",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "questionnaire",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "submit_deposit_questionnaire_v2",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Put",
+    "path": "/sapi/v2/localentity/deposit/provide-info",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "depositId",
+      "questionnaire"
+    ],
+    "fields": [
+      {
+        "key": "depositId",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "questionnaire",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "vasp_list",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/localentity/vasp",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_travel_rule_withdrawal_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/localentity/withdraw/history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "trId",
+      "txId",
+      "withdrawOrderId",
+      "network",
+      "coin",
+      "travelRuleStatus",
+      "offset",
+      "limit",
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "trId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "txId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "withdrawOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "network",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "travelRuleStatus",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_travel_rule_withdrawal_history_v2",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v2/localentity/withdraw/history",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "trId",
+      "txId",
+      "withdrawOrderId",
+      "network",
+      "coin",
+      "travelRuleStatus",
+      "offset",
+      "limit",
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "trId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "txId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "withdrawOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "network",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "coin",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "travelRuleStatus",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "offset",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

@@ -116,6 +116,7 @@ impl BybitPrivateWebSocket {
     }
 
     pub async fn send_trade_order(&mut self, op: &str, args: Value) -> Result<String> {
+        crate::exchanges::schema::validate_numbers(&args, "args")?;
         if !self.trade_mode || !self.authenticated {
             return Err(DcexError::InvalidInput(
                 "Bybit trade WebSocket must be connected and authenticated.".to_string(),

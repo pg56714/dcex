@@ -5,7 +5,7 @@ use crate::http::HttpMethod;
 use crate::{DcexError, Result};
 use serde_json::{Map, Value};
 
-#[path = "endpoint_schemas/mod.rs"]
+#[path = "generated/schema_tables.rs"]
 mod endpoints;
 struct RiskEndpoint {
     path: &'static str,
@@ -30,6 +30,7 @@ impl BybitClient {
             return Ok(None);
         }
         let pairs = params.without(&[]);
+        crate::exchanges::schema::validate_pairs(&pairs)?;
         let mut seen = std::collections::HashSet::new();
         for (key, value) in &pairs {
             if !endpoint.keys.contains(&key.as_str())
@@ -97,7 +98,7 @@ impl BybitClient {
                 }
                 if !item["amount"]
                     .as_str()
-                    .is_some_and(|s| s.parse::<f64>().is_ok_and(|n| n.is_finite() && n > 0.0))
+                    .is_some_and(crate::common::is_positive_plain_decimal)
                 {
                     return Err(invalid(
                         "collateral amount must be a positive decimal string",
@@ -432,8 +433,7 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
                 if !obj
                     .get(key)
                     .and_then(Value::as_str)
-                    .and_then(|v| v.parse::<f64>().ok())
-                    .is_some_and(|v| v.is_finite() && v > 0.0)
+                    .is_some_and(crate::common::is_positive_plain_decimal)
                 {
                     return Err(invalid(
                         "move leg price and qty must be positive decimal strings",
@@ -500,11 +500,7 @@ fn validate(name: &str, p: &BybitParams) -> Result<()> {
                 "requestCoin must equal fromCoin, and toCoin must differ",
             ));
         }
-        if !p
-            .required("requestAmount")?
-            .parse::<f64>()
-            .is_ok_and(|n| n.is_finite() && n > 0.0)
-        {
+        if !crate::common::is_positive_plain_decimal(p.required("requestAmount")?) {
             return Err(invalid("requestAmount must be positive"));
         }
         for key in ["fromCoinType", "toCoinType"] {

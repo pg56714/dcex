@@ -1,0 +1,385 @@
+[
+  {
+    "name": "get_classic_account_bot_assets",
+    "path": "/api/v2/account/bot-assets",
+    "post": false,
+    "public": false,
+    "fields": [
+      "accountType"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_add_investment",
+    "path": "/api/v3/trade/grid/add-investment",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "botId",
+      "coin",
+      "size",
+      "fundsSource",
+      "adjustType",
+      "reinvestProfit"
+    ],
+    "required": [
+      "category",
+      "botId",
+      "coin",
+      "size",
+      "fundsSource"
+    ],
+    "arrays": [
+      "fundsSource"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_trade_grid_bot_detail",
+    "path": "/api/v3/trade/grid/bot-detail",
+    "post": false,
+    "public": false,
+    "fields": [
+      "botId"
+    ],
+    "required": [
+      "botId"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_close_bot",
+    "path": "/api/v3/trade/grid/close-bot",
+    "post": true,
+    "public": false,
+    "fields": [
+      "botId"
+    ],
+    "required": [
+      "botId"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_create_bot",
+    "path": "/api/v3/trade/grid/create-bot",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode",
+      "investmentAmount",
+      "fundsSource",
+      "slippage",
+      "autoTransferProfits",
+      "gridType",
+      "leverage",
+      "autoReserveMargin",
+      "reservedMargin",
+      "triggerCondition",
+      "triggerParams",
+      "triggerPrice",
+      "terminationCondition",
+      "terminationParams",
+      "terminationSell",
+      "stopLoss",
+      "takeProfit",
+      "trailingGrid",
+      "movingAverageGains",
+      "stopUpwardPrice",
+      "hodlMode",
+      "marketOpen",
+      "lossReserve"
+    ],
+    "required": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode",
+      "investmentAmount",
+      "fundsSource",
+      "slippage",
+      "autoTransferProfits"
+    ],
+    "arrays": [
+      "investmentAmount",
+      "fundsSource",
+      "triggerParams",
+      "terminationParams"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_create_neutral_bot",
+    "path": "/api/v3/trade/grid/create-neutral-bot",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode",
+      "fundsSource",
+      "leverage",
+      "investmentAmount",
+      "triggerPrice",
+      "stopLoss",
+      "takeProfit",
+      "autoTransferProfits"
+    ],
+    "required": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode",
+      "fundsSource"
+    ],
+    "arrays": [
+      "fundsSource",
+      "investmentAmount"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_trade_grid_list_details",
+    "path": "/api/v3/trade/grid/list-details",
+    "post": false,
+    "public": false,
+    "fields": [
+      "category",
+      "botId"
+    ],
+    "required": [
+      "category",
+      "botId"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_modify_bot",
+    "path": "/api/v3/trade/grid/modify-bot",
+    "post": true,
+    "public": false,
+    "fields": [
+      "botId",
+      "category",
+      "takeProfit",
+      "stopLoss",
+      "terminationCondition",
+      "terminationParams",
+      "hodlMode",
+      "autoTransferProfits"
+    ],
+    "required": [
+      "botId"
+    ],
+    "arrays": [
+      "terminationParams"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_modify_grid_interval",
+    "path": "/api/v3/trade/grid/modify-grid-interval",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "botId",
+      "maxPrice",
+      "minPrice",
+      "gridNum"
+    ],
+    "required": [
+      "category",
+      "botId",
+      "maxPrice",
+      "minPrice",
+      "gridNum"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_modify_neutral_bot",
+    "path": "/api/v3/trade/grid/modify-neutral-bot",
+    "post": true,
+    "public": false,
+    "fields": [
+      "botId",
+      "category",
+      "takeProfit",
+      "stopLoss",
+      "autoTransferProfits"
+    ],
+    "required": [
+      "botId",
+      "category"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_modify_neutral_grid_interval",
+    "path": "/api/v3/trade/grid/modify-neutral-grid-interval",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "botId",
+      "maxPrice",
+      "minPrice",
+      "gridNum"
+    ],
+    "required": [
+      "category",
+      "botId",
+      "maxPrice",
+      "minPrice",
+      "gridNum"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_trade_grid_neutral_bot_detail",
+    "path": "/api/v3/trade/grid/neutral-bot-detail",
+    "post": false,
+    "public": false,
+    "fields": [
+      "botId"
+    ],
+    "required": [
+      "botId"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_trade_grid_neutral_list_details",
+    "path": "/api/v3/trade/grid/neutral-list-details",
+    "post": false,
+    "public": false,
+    "fields": [
+      "category",
+      "botId"
+    ],
+    "required": [
+      "category",
+      "botId"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_validate_neutral",
+    "path": "/api/v3/trade/grid/validate-neutral",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode",
+      "leverage",
+      "investmentAmount",
+      "triggerPrice",
+      "stopLoss",
+      "takeProfit",
+      "autoTransferProfits"
+    ],
+    "required": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode"
+    ],
+    "arrays": [
+      "investmentAmount"
+    ],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "uta_trade_grid_validate",
+    "path": "/api/v3/trade/grid/validate",
+    "post": true,
+    "public": false,
+    "fields": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode",
+      "investmentAmount",
+      "autoTransferProfits",
+      "gridType",
+      "leverage",
+      "reservedMargin",
+      "triggerCondition",
+      "triggerParams",
+      "triggerPrice",
+      "terminationCondition",
+      "terminationParams",
+      "stopLoss",
+      "takeProfit",
+      "trailingGrid",
+      "movingAverageGains",
+      "stopUpwardPrice",
+      "hodlMode",
+      "marketOpen",
+      "lossReserve"
+    ],
+    "required": [
+      "category",
+      "symbol",
+      "maxPrice",
+      "minPrice",
+      "gridNum",
+      "gridOrderMode",
+      "investmentAmount",
+      "autoTransferProfits"
+    ],
+    "arrays": [
+      "investmentAmount",
+      "triggerParams",
+      "terminationParams"
+    ],
+    "limit": null,
+    "days": null
+  }
+]

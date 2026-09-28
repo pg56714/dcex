@@ -749,6 +749,10 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
         return {}
     if name in {"columns"}:
         return "symbol"
+    from dcex._schema_codec import _DECIMALS
+
+    if name.replace("_", "").lower() in _DECIMALS:
+        return "1"
     return "test"
 
 

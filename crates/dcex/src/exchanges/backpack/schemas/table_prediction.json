@@ -1,0 +1,79 @@
+[
+  {
+    "name": "get_prediction_events",
+    "path": "/api/v1/prediction",
+    "method": "HttpMethod::Get",
+    "instruction": null,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "string",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "tagSlug",
+        "kind": "string",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "eventSlug",
+        "kind": "string",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "seriesSlug",
+        "kind": "string",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "resolved",
+        "kind": "boolean",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "sortBy",
+        "kind": "string",
+        "required": false,
+        "choices": [
+          "volume",
+          "resolvedAt",
+          "startDate",
+          "endDate"
+        ]
+      },
+      {
+        "key": "sortDirection",
+        "kind": "string",
+        "required": false,
+        "choices": [
+          "Asc",
+          "Desc"
+        ]
+      },
+      {
+        "key": "limit",
+        "kind": "integer",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "offset",
+        "kind": "integer",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_prediction_tags",
+    "path": "/api/v1/prediction/tags",
+    "method": "HttpMethod::Get",
+    "instruction": null,
+    "fields": []
+  }
+]

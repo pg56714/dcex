@@ -1,0 +1,29 @@
+[
+  {
+    "name": "activate_options",
+    "path": "/api/v5/account/activate-option",
+    "post": true,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "mass_cancel_options_orders",
+    "path": "/api/v5/trade/mass-cancel",
+    "post": true,
+    "public": false,
+    "keys": [
+      "instType",
+      "instFamily",
+      "lockInterval"
+    ],
+    "required": [
+      "instType",
+      "instFamily"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instType\":{\"type\":\"string\"},\"instFamily\":{\"type\":\"string\"},\"lockInterval\":{\"type\":\"string\"}},\"required\":[\"instType\",\"instFamily\"]}"
+  }
+]

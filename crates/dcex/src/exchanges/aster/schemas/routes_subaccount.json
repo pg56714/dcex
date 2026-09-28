@@ -1,0 +1,82 @@
+[
+  {
+    "name": "get_sub_accounts",
+    "path": "/fapi/v3/getSubAccountList",
+    "method": "HttpMethod::Get",
+    "is_public": false,
+    "presigned": false,
+    "fields": [],
+    "required": []
+  },
+  {
+    "name": "create_sub_account_signed",
+    "path": "/fapi/v3/createSubAccount",
+    "method": "HttpMethod::Post",
+    "is_public": false,
+    "presigned": true,
+    "fields": [
+      "subAccountName",
+      "subSourceAddr",
+      "nonce",
+      "user",
+      "signer",
+      "childSignature",
+      "signature"
+    ],
+    "required": [
+      "subAccountName",
+      "subSourceAddr",
+      "nonce",
+      "user",
+      "signer",
+      "childSignature",
+      "signature"
+    ]
+  },
+  {
+    "name": "update_sub_account_signed",
+    "path": "/fapi/v3/updateSubAccount",
+    "method": "HttpMethod::Post",
+    "is_public": false,
+    "presigned": true,
+    "fields": [
+      "subSourceAddr",
+      "nonce",
+      "user",
+      "signer",
+      "subAccountName",
+      "status",
+      "signature"
+    ],
+    "required": [
+      "subSourceAddr",
+      "nonce",
+      "user",
+      "signer",
+      "signature"
+    ]
+  },
+  {
+    "name": "bind_sub_account_signed",
+    "path": "/fapi/v3/sub-accounts/bind",
+    "method": "HttpMethod::Post",
+    "is_public": false,
+    "presigned": true,
+    "fields": [
+      "childAddress",
+      "name",
+      "nonce",
+      "user",
+      "childSignature",
+      "signature"
+    ],
+    "required": [
+      "childAddress",
+      "name",
+      "nonce",
+      "user",
+      "childSignature",
+      "signature"
+    ]
+  }
+]

@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -35,14 +37,16 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "coin": coin,
-                    "recvWindow": recv_window,
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "current": current,
-                    "limit": limit,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "coin": coin,
+                        "recvWindow": recv_window,
+                        "startTime": start_time,
+                        "endTime": end_time,
+                        "current": current,
+                        "limit": limit,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -71,13 +75,15 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "loanCoin": loan_coin,
-                    "duration": duration,
-                    "current": current,
-                    "size": size,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "loanCoin": loan_coin,
+                        "duration": duration,
+                        "current": current,
+                        "size": size,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -109,16 +115,18 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "loanAccountId": loan_account_id,
-                    "loanCoin": loan_coin,
-                    "loanAmount": loan_amount,
-                    "collateralAccountId": collateral_account_id,
-                    "collateralCoin": collateral_coin,
-                    "isFlexibleRate": is_flexible_rate,
-                    "loanTerm": loan_term,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "loanAccountId": loan_account_id,
+                        "loanCoin": loan_coin,
+                        "loanAmount": loan_amount,
+                        "collateralAccountId": collateral_account_id,
+                        "collateralCoin": collateral_coin,
+                        "isFlexibleRate": is_flexible_rate,
+                        "loanTerm": loan_term,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -150,16 +158,18 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "supplyRequest": supply_request,
-                    "borrowCoin": borrow_coin,
-                    "loanTerm": loan_term,
-                    "borrowUid": borrow_uid,
-                    "collateralCoin": collateral_coin,
-                    "collateralAccountId": collateral_account_id,
-                    "autoRepay": auto_repay,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "supplyRequest": supply_request,
+                        "borrowCoin": borrow_coin,
+                        "loanTerm": loan_term,
+                        "borrowUid": borrow_uid,
+                        "collateralCoin": collateral_coin,
+                        "collateralAccountId": collateral_account_id,
+                        "autoRepay": auto_repay,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -182,11 +192,9 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "orderId": order_id,
-                    "loanTerm": loan_term,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"orderId": order_id, "loanTerm": loan_term, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -209,11 +217,9 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "orderId": order_id,
-                    "amount": amount,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"orderId": order_id, "amount": amount, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -240,11 +246,13 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "orderId": order_id,
-                    "collateralAccountId": collateral_account_id,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "orderId": order_id,
+                        "collateralAccountId": collateral_account_id,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -275,15 +283,17 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "orderId": order_id,
-                    "loanCoin": loan_coin,
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "current": current,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "orderId": order_id,
+                        "loanCoin": loan_coin,
+                        "startTime": start_time,
+                        "endTime": end_time,
+                        "current": current,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -314,15 +324,17 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "orderId": order_id,
-                    "collateralAccountId": collateral_account_id,
-                    "loanCoin": loan_coin,
-                    "collateralCoin": collateral_coin,
-                    "current": current,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "orderId": order_id,
+                        "collateralAccountId": collateral_account_id,
+                        "loanCoin": loan_coin,
+                        "collateralCoin": collateral_coin,
+                        "current": current,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -353,15 +365,17 @@ class GeneratedVipLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "orderId": order_id,
-                    "loanCoin": loan_coin,
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "current": current,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "orderId": order_id,
+                        "loanCoin": loan_coin,
+                        "startTime": start_time,
+                        "endTime": end_time,
+                        "current": current,
+                        "limit": limit,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )

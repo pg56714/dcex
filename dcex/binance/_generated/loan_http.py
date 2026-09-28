@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -26,7 +28,9 @@ class GeneratedLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"loanCoin": loan_coin, "recvWindow": recv_window}.items()
+                for key, value in normalize_params(
+                    {"loanCoin": loan_coin, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -49,10 +53,9 @@ class GeneratedLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "collateralCoin": collateral_coin,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"collateralCoin": collateral_coin, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -79,11 +82,9 @@ class GeneratedLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "loanCoin": loan_coin,
-                    "vipLevel": vip_level,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"loanCoin": loan_coin, "vipLevel": vip_level, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -110,11 +111,9 @@ class GeneratedLoanHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "current": current,
-                    "limit": limit,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"current": current, "limit": limit, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )

@@ -1,0 +1,25 @@
+[
+  {
+    "name": "get_announcements",
+    "path": "/api/v5/support/announcements",
+    "post": false,
+    "public": true,
+    "keys": [
+      "annType",
+      "page"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"annType\":{\"type\":\"string\"},\"page\":{\"type\":\"string\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_announcement_types",
+    "path": "/api/v5/support/announcement-types",
+    "post": false,
+    "public": true,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{},\"required\":[]}"
+  }
+]

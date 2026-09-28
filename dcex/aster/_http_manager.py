@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from typing import Any, cast
 from urllib.parse import urlsplit
 
+from dcex._schema_codec import normalize_params
+
 from .._native_http import NativeResponse, load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
@@ -155,6 +157,7 @@ class HTTPManager(BaseHTTPManager):
 
     @staticmethod
     def _native_params(**kwargs: object) -> list[tuple[str, str]]:
+        kwargs = normalize_params(kwargs)
         params: list[tuple[str, str]] = []
         for key, value in kwargs.items():
             if key == "self" or value is None:

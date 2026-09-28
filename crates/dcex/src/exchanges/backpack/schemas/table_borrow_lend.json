@@ -1,0 +1,31 @@
+[
+  {
+    "name": "execute_borrow_lend",
+    "path": "/api/v1/borrowLend",
+    "method": "HttpMethod::Post",
+    "instruction": "borrowLendExecute",
+    "fields": [
+      {
+        "key": "quantity",
+        "kind": "string",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "side",
+        "kind": "string",
+        "required": true,
+        "choices": [
+          "Borrow",
+          "Lend"
+        ]
+      },
+      {
+        "key": "symbol",
+        "kind": "string",
+        "required": true,
+        "choices": []
+      }
+    ]
+  }
+]

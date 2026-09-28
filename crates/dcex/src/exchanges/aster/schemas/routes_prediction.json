@@ -1,0 +1,520 @@
+[
+  {
+    "name": "get_prediction_ping",
+    "path": "/api/v3/ping",
+    "is_public": true,
+    "fields": [],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_time",
+    "path": "/api/v3/time",
+    "is_public": true,
+    "fields": [],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_exchange_info",
+    "path": "/api/v3/prediction/exchangeInfo",
+    "is_public": true,
+    "fields": [],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_depth",
+    "path": "/api/v3/depth",
+    "is_public": true,
+    "fields": [
+      "symbol",
+      "limit"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_trades",
+    "path": "/api/v3/trades",
+    "is_public": true,
+    "fields": [
+      "symbol",
+      "limit"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_historical_trades",
+    "path": "/api/v3/historicalTrades",
+    "is_public": true,
+    "fields": [
+      "symbol",
+      "limit",
+      "fromId"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "limit",
+      "fromId"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_agg_trades",
+    "path": "/api/v3/aggTrades",
+    "is_public": true,
+    "fields": [
+      "symbol",
+      "fromId",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "fromId",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_klines",
+    "path": "/api/v3/klines",
+    "is_public": true,
+    "fields": [
+      "symbol",
+      "interval",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol",
+      "interval"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_ticker_24hr",
+    "path": "/api/v3/ticker/24hr",
+    "is_public": true,
+    "fields": [
+      "symbol"
+    ],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_ticker_price",
+    "path": "/api/v3/ticker/price",
+    "is_public": true,
+    "fields": [
+      "symbol"
+    ],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_ticker_book_ticker",
+    "path": "/api/v3/ticker/bookTicker",
+    "is_public": true,
+    "fields": [
+      "symbol"
+    ],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_commission_rate",
+    "path": "/api/v3/commissionRate",
+    "is_public": false,
+    "fields": [
+      "symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "create_prediction_order",
+    "path": "/api/v3/order",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "side",
+      "type",
+      "timeInForce",
+      "quantity",
+      "quoteOrderQty",
+      "price",
+      "newClientOrderId",
+      "stopPrice"
+    ],
+    "required": [
+      "symbol",
+      "side",
+      "type"
+    ],
+    "integers": [],
+    "decimals": [
+      "quantity",
+      "quoteOrderQty",
+      "price",
+      "stopPrice"
+    ],
+    "method": "HttpMethod::Post"
+  },
+  {
+    "name": "cancel_prediction_order",
+    "path": "/api/v3/order",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "orderId",
+      "origClientOrderId"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "orderId"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Delete"
+  },
+  {
+    "name": "get_prediction_order",
+    "path": "/api/v3/order",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "orderId",
+      "origClientOrderId"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "orderId"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_open_order",
+    "path": "/api/v3/openOrder",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "orderId",
+      "origClientOrderId"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "orderId"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_open_orders",
+    "path": "/api/v3/openOrders",
+    "is_public": false,
+    "fields": [
+      "symbol"
+    ],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_all_orders",
+    "path": "/api/v3/allOrders",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "orderId",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "integers": [
+      "orderId",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "create_prediction_asset_wallet_transfer",
+    "path": "/api/v3/asset/wallet/transfer",
+    "is_public": false,
+    "fields": [
+      "amount",
+      "asset",
+      "clientTranId",
+      "kindType"
+    ],
+    "required": [
+      "amount",
+      "asset",
+      "clientTranId",
+      "kindType"
+    ],
+    "integers": [],
+    "decimals": [
+      "amount"
+    ],
+    "method": "HttpMethod::Post"
+  },
+  {
+    "name": "create_prediction_mint",
+    "path": "/api/v3/prediction/mint",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "quantity",
+      "newClientOrderId"
+    ],
+    "required": [
+      "symbol",
+      "quantity"
+    ],
+    "integers": [],
+    "decimals": [
+      "quantity"
+    ],
+    "method": "HttpMethod::Post"
+  },
+  {
+    "name": "create_prediction_burn",
+    "path": "/api/v3/prediction/burn",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "quantity",
+      "newClientOrderId"
+    ],
+    "required": [
+      "symbol",
+      "quantity"
+    ],
+    "integers": [],
+    "decimals": [
+      "quantity"
+    ],
+    "method": "HttpMethod::Post"
+  },
+  {
+    "name": "create_prediction_split",
+    "path": "/api/v3/prediction/split",
+    "is_public": false,
+    "fields": [
+      "event",
+      "symbol",
+      "quantity",
+      "newClientOrderId"
+    ],
+    "required": [
+      "event",
+      "symbol",
+      "quantity"
+    ],
+    "integers": [],
+    "decimals": [
+      "quantity"
+    ],
+    "method": "HttpMethod::Post"
+  },
+  {
+    "name": "create_prediction_merge",
+    "path": "/api/v3/prediction/merge",
+    "is_public": false,
+    "fields": [
+      "event",
+      "quantity",
+      "newClientOrderId"
+    ],
+    "required": [
+      "event",
+      "quantity"
+    ],
+    "integers": [],
+    "decimals": [
+      "quantity"
+    ],
+    "method": "HttpMethod::Post"
+  },
+  {
+    "name": "get_prediction_positions",
+    "path": "/api/v3/prediction/positions",
+    "is_public": false,
+    "fields": [
+      "symbol"
+    ],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_position_histories",
+    "path": "/api/v3/prediction/positionHistories",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_settlement_histories",
+    "path": "/api/v3/prediction/settlementHistories",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_account",
+    "path": "/api/v3/account",
+    "is_public": false,
+    "fields": [],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "get_prediction_user_trades",
+    "path": "/api/v3/userTrades",
+    "is_public": false,
+    "fields": [
+      "symbol",
+      "orderId",
+      "startTime",
+      "endTime",
+      "fromId",
+      "limit"
+    ],
+    "required": [],
+    "integers": [
+      "orderId",
+      "startTime",
+      "endTime",
+      "fromId",
+      "limit"
+    ],
+    "decimals": [],
+    "method": "HttpMethod::Get"
+  },
+  {
+    "name": "create_prediction_listen_key",
+    "path": "/api/v3/listenKey",
+    "is_public": false,
+    "fields": [],
+    "required": [],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Post"
+  },
+  {
+    "name": "update_prediction_listen_key",
+    "path": "/api/v3/listenKey",
+    "is_public": false,
+    "fields": [
+      "listenKey"
+    ],
+    "required": [
+      "listenKey"
+    ],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Put"
+  },
+  {
+    "name": "cancel_prediction_listen_key",
+    "path": "/api/v3/listenKey",
+    "is_public": false,
+    "fields": [
+      "listenKey"
+    ],
+    "required": [
+      "listenKey"
+    ],
+    "integers": [],
+    "decimals": [],
+    "method": "HttpMethod::Delete"
+  }
+]

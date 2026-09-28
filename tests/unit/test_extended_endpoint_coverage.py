@@ -41,7 +41,10 @@ VAULT = 4272448241247734333
 RUST_DIR = (
     Path(__file__).resolve().parents[2] / "crates" / "dcex" / "src" / "exchanges" / "extended"
 )
-RUST_SOURCE = "\n".join(path.read_text(encoding="utf-8") for path in RUST_DIR.glob("*.rs"))
+RUST_SOURCE = "\n".join(
+    path.read_text(encoding="utf-8")
+    for path in [*RUST_DIR.glob("*.rs"), *(RUST_DIR / "schemas").glob("*.json")]
+)
 
 # One payload that satisfies the market-config and fee lookups used while
 # auto-signing orders, and is a valid ``status: OK`` body for every other call.
@@ -558,7 +561,9 @@ def _assert_signed_order_flow(requests: list[dict[str, Any]], *, posted: bool) -
     if posted:
         expected.append("/api/v1/user/order")
     assert paths == expected
-    assert [request["method"] for request in requests] == (["GET", "GET", "POST"] if posted else ["GET", "GET"])
+    assert [request["method"] for request in requests] == (
+        ["GET", "GET", "POST"] if posted else ["GET", "GET"]
+    )
     if posted:
         order = json.loads(requests[-1]["body"])
         assert order["market"] == "BTC-USD"

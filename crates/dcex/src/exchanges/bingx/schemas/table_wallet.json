@@ -1,0 +1,17 @@
+[
+  {
+    "name": "get_coin_network_config",
+    "path": "/openApi/wallets/v1/capital/config/getall",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "coin",
+      "displayName",
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "recvWindow"
+    ]
+  }
+]

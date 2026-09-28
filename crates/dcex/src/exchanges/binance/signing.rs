@@ -1,7 +1,6 @@
 use std::sync::{Arc, Mutex};
 
 use serde_json::Value;
-use url::form_urlencoded;
 
 use crate::crypto::hmac_sha256_hex;
 use crate::exchange::{RequestSigner, ResponseValidator};
@@ -18,6 +17,7 @@ pub(super) struct BinanceSigner {
 impl RequestSigner for BinanceSigner {
     fn sign(&self, request: &mut HttpRequest, timestamp_ms: u64) -> Result<()> {
         let timestamp_ms = self.adjust_timestamp(timestamp_ms)?;
+        let literal_brackets = request.path == "/sapi/v1/w3w/wallet/prediction/trade/batch-cancel";
         let params = match &mut request.body {
             RequestBody::Empty => &mut request.query,
             RequestBody::Json(_)
@@ -41,9 +41,17 @@ impl RequestSigner for BinanceSigner {
         if !params.iter().any(|(key, _)| key == "recvWindow") {
             params.push(("recvWindow".to_string(), "5000".to_string()));
         }
-        let encoded = encode_params(params);
+        let encoded = crate::exchanges::schema::form(params, literal_brackets);
         let signature = hmac_sha256_hex(self.api_secret.as_bytes(), encoded.as_bytes())?;
         params.push(("signature".to_string(), signature));
+        if literal_brackets {
+            let body = crate::exchanges::schema::form(params, true).into_bytes();
+            request.body = RequestBody::Raw(body);
+            request.headers.insert(
+                "Content-Type".into(),
+                "application/x-www-form-urlencoded".into(),
+            );
+        }
         request
             .headers
             .insert("X-MBX-APIKEY".to_string(), self.api_key.clone());
@@ -102,16 +110,6 @@ impl ResponseValidator for BinanceResponseValidator {
         response.ensure_success()?;
         Ok(data)
     }
-}
-
-pub(super) fn encode_params(params: &[(String, String)]) -> String {
-    let mut serializer = form_urlencoded::Serializer::new(String::new());
-    serializer.extend_pairs(
-        params
-            .iter()
-            .map(|(key, value)| (key.as_str(), value.as_str())),
-    );
-    serializer.finish()
 }
 
 pub(super) fn json_value_string(value: &Value) -> String {

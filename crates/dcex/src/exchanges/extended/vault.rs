@@ -8,19 +8,21 @@ impl ExtendedClient {
         params: &ExtendedParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let (path, is_public, fields, required): (&str, bool, &[&str], &[&str]) = match name {
-            "get_vault_performance" => (
-                "/api/v1/vault/public/performance",
-                true,
-                &["interval"],
-                &["interval"],
-            ),
-            "get_vault_summary" => ("/api/v1/vault/public/summary", true, &[], &[]),
-            _ => return Ok(None),
+        static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+            std::sync::OnceLock::new();
+        let Some(route) = crate::exchanges::schema::route(
+            &ROUTES,
+            include_str!("schemas/routes_vault.json"),
+            name,
+        ) else {
+            return Ok(None);
         };
+        let (path, is_public, fields, required) =
+            (route.path, route.is_public, route.fields, route.required);
         if is_public != public {
             return Ok(None);
         }
+        route.validate(|key| params.get(key))?;
         params.ensure_allowed(fields, &["accountId", "market", "priceMarket"])?;
         for key in required {
             params.required(key)?;

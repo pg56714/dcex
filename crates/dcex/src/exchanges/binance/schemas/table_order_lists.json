@@ -1,0 +1,801 @@
+[
+  {
+    "name": "place_margin_oco",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/margin/order/oco",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "side",
+      "quantity",
+      "price",
+      "stopPrice",
+      "isIsolated",
+      "listClientOrderId",
+      "limitClientOrderId",
+      "limitIcebergQty",
+      "stopClientOrderId",
+      "stopLimitPrice",
+      "stopIcebergQty",
+      "stopLimitTimeInForce",
+      "newOrderRespType",
+      "sideEffectType",
+      "selfTradePreventionMode",
+      "autoRepayAtCancel",
+      "recvWindow",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "side",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "BUY",
+          "SELL"
+        ]
+      },
+      {
+        "key": "quantity",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "price",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "stopPrice",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "isIsolated",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRUE",
+          "FALSE"
+        ]
+      },
+      {
+        "key": "listClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limitClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "limitIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "stopClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "stopLimitPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "stopIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "stopLimitTimeInForce",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "GTC",
+          "FOK",
+          "IOC"
+        ]
+      },
+      {
+        "key": "newOrderRespType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "ACK",
+          "RESULT",
+          "FULL"
+        ]
+      },
+      {
+        "key": "sideEffectType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "NO_SIDE_EFFECT",
+          "MARGIN_BUY",
+          "AUTO_REPAY",
+          "AUTO_BORROW_REPAY"
+        ]
+      },
+      {
+        "key": "selfTradePreventionMode",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "EXPIRE_TAKER",
+          "EXPIRE_MAKER",
+          "EXPIRE_BOTH",
+          "NONE"
+        ]
+      },
+      {
+        "key": "autoRepayAtCancel",
+        "kind": "b",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "place_margin_otoco",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/margin/order/otoco",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "workingType",
+      "workingSide",
+      "workingPrice",
+      "workingQuantity",
+      "pendingSide",
+      "pendingQuantity",
+      "pendingAboveType",
+      "isIsolated",
+      "sideEffectType",
+      "autoRepayAtCancel",
+      "listClientOrderId",
+      "newOrderRespType",
+      "selfTradePreventionMode",
+      "workingClientOrderId",
+      "workingIcebergQty",
+      "workingTimeInForce",
+      "pendingAboveClientOrderId",
+      "pendingAbovePrice",
+      "pendingAboveStopPrice",
+      "pendingAboveTrailingDelta",
+      "pendingAboveIcebergQty",
+      "pendingAboveTimeInForce",
+      "pendingBelowType",
+      "pendingBelowClientOrderId",
+      "pendingBelowPrice",
+      "pendingBelowStopPrice",
+      "pendingBelowTrailingDelta",
+      "pendingBelowIcebergQty",
+      "pendingBelowTimeInForce",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "workingType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "LIMIT",
+          "LIMIT_MAKER"
+        ]
+      },
+      {
+        "key": "workingSide",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "BUY",
+          "SELL"
+        ]
+      },
+      {
+        "key": "workingPrice",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "workingQuantity",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "pendingSide",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "BUY",
+          "SELL"
+        ]
+      },
+      {
+        "key": "pendingQuantity",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "LIMIT_MAKER",
+          "STOP_LOSS",
+          "STOP_LOSS_LIMIT"
+        ]
+      },
+      {
+        "key": "isIsolated",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "TRUE",
+          "FALSE"
+        ]
+      },
+      {
+        "key": "sideEffectType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "NO_SIDE_EFFECT",
+          "MARGIN_BUY",
+          "AUTO_BORROW_REPAY"
+        ]
+      },
+      {
+        "key": "autoRepayAtCancel",
+        "kind": "b",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "listClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "newOrderRespType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "ACK",
+          "RESULT",
+          "FULL"
+        ]
+      },
+      {
+        "key": "selfTradePreventionMode",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "EXPIRE_TAKER",
+          "EXPIRE_MAKER",
+          "EXPIRE_BOTH",
+          "NONE"
+        ]
+      },
+      {
+        "key": "workingClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "workingIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "workingTimeInForce",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "GTC",
+          "IOC",
+          "FOK"
+        ]
+      },
+      {
+        "key": "pendingAboveClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAbovePrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveStopPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveTrailingDelta",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveTimeInForce",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "GTC",
+          "IOC",
+          "FOK"
+        ]
+      },
+      {
+        "key": "pendingBelowType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "LIMIT_MAKER",
+          "STOP_LOSS",
+          "STOP_LOSS_LIMIT"
+        ]
+      },
+      {
+        "key": "pendingBelowClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowStopPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowTrailingDelta",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowTimeInForce",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "GTC",
+          "IOC",
+          "FOK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "place_spot_opoco",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/api/v3/orderList/opoco",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "workingType",
+      "workingSide",
+      "workingPrice",
+      "workingQuantity",
+      "pendingSide",
+      "pendingAboveType",
+      "listClientOrderId",
+      "newOrderRespType",
+      "selfTradePreventionMode",
+      "workingClientOrderId",
+      "workingIcebergQty",
+      "workingTimeInForce",
+      "workingStrategyId",
+      "workingStrategyType",
+      "workingPegPriceType",
+      "workingPegOffsetType",
+      "workingPegOffsetValue",
+      "pendingAboveClientOrderId",
+      "pendingAbovePrice",
+      "pendingAboveStopPrice",
+      "pendingAboveTrailingDelta",
+      "pendingAboveIcebergQty",
+      "pendingAboveTimeInForce",
+      "pendingAboveStrategyId",
+      "pendingAboveStrategyType",
+      "pendingAbovePegPriceType",
+      "pendingAbovePegOffsetType",
+      "pendingAbovePegOffsetValue",
+      "pendingBelowType",
+      "pendingBelowClientOrderId",
+      "pendingBelowPrice",
+      "pendingBelowStopPrice",
+      "pendingBelowTrailingDelta",
+      "pendingBelowIcebergQty",
+      "pendingBelowTimeInForce",
+      "pendingBelowStrategyId",
+      "pendingBelowStrategyType",
+      "pendingBelowPegPriceType",
+      "pendingBelowPegOffsetType",
+      "pendingBelowPegOffsetValue",
+      "recvWindow",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "workingType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "LIMIT",
+          "LIMIT_MAKER"
+        ]
+      },
+      {
+        "key": "workingSide",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "BUY",
+          "SELL"
+        ]
+      },
+      {
+        "key": "workingPrice",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "workingQuantity",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "pendingSide",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "BUY",
+          "SELL"
+        ]
+      },
+      {
+        "key": "pendingAboveType",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "STOP_LOSS_LIMIT",
+          "STOP_LOSS",
+          "LIMIT_MAKER",
+          "TAKE_PROFIT",
+          "TAKE_PROFIT_LIMIT"
+        ]
+      },
+      {
+        "key": "listClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "newOrderRespType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "ACK",
+          "RESULT",
+          "FULL"
+        ]
+      },
+      {
+        "key": "selfTradePreventionMode",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "NONE",
+          "EXPIRE_TAKER",
+          "EXPIRE_MAKER",
+          "EXPIRE_BOTH",
+          "DECREMENT",
+          "TRANSFER"
+        ]
+      },
+      {
+        "key": "workingClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "workingIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "workingTimeInForce",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "GTC",
+          "IOC",
+          "FOK"
+        ]
+      },
+      {
+        "key": "workingStrategyId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "workingStrategyType",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "workingPegPriceType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "PRIMARY_PEG",
+          "MARKET_PEG"
+        ]
+      },
+      {
+        "key": "workingPegOffsetType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "PRICE_LEVEL"
+        ]
+      },
+      {
+        "key": "workingPegOffsetValue",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAbovePrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveStopPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveTrailingDelta",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveTimeInForce",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "GTC",
+          "IOC",
+          "FOK"
+        ]
+      },
+      {
+        "key": "pendingAboveStrategyId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAboveStrategyType",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingAbovePegPriceType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "PRIMARY_PEG",
+          "MARKET_PEG"
+        ]
+      },
+      {
+        "key": "pendingAbovePegOffsetType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "PRICE_LEVEL"
+        ]
+      },
+      {
+        "key": "pendingAbovePegOffsetValue",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "STOP_LOSS",
+          "STOP_LOSS_LIMIT",
+          "TAKE_PROFIT",
+          "TAKE_PROFIT_LIMIT"
+        ]
+      },
+      {
+        "key": "pendingBelowClientOrderId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowStopPrice",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowTrailingDelta",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowIcebergQty",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowTimeInForce",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "GTC",
+          "IOC",
+          "FOK"
+        ]
+      },
+      {
+        "key": "pendingBelowStrategyId",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowStrategyType",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "pendingBelowPegPriceType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "PRIMARY_PEG",
+          "MARKET_PEG"
+        ]
+      },
+      {
+        "key": "pendingBelowPegOffsetType",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "PRICE_LEVEL"
+        ]
+      },
+      {
+        "key": "pendingBelowPegOffsetValue",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "name": "get_asset_withdraw_vasp_list",
+    "path": "/v5/asset/withdraw/vasp/list",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_asset_withdraw_query_address",
+    "path": "/v5/asset/withdraw/query-address",
+    "post": false,
+    "public": false,
+    "keys": [
+      "coin",
+      "chain",
+      "addressType",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": [
+      "addressType",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_asset_withdraw_query_record",
+    "path": "/v5/asset/withdraw/query-record",
+    "post": false,
+    "public": false,
+    "keys": [
+      "withdrawID",
+      "txID",
+      "coin",
+      "withdrawType",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": [
+      "withdrawType",
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  }
+]

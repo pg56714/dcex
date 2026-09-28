@@ -3,6 +3,7 @@
 from typing import Any
 
 from dcex._keyword_aliases import legacy_keywords
+from dcex._schema_codec import normalize_params
 
 from .._native_http import request_native_json
 from ._http_manager import HTTPManager
@@ -31,6 +32,7 @@ class MarketHTTP(HTTPManager):
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
         """Convert optional Python arguments into native string pairs."""
+        kwargs = normalize_params(kwargs)
         params: list[tuple[str, str]] = []
         for key, value in kwargs.items():
             if value is None:

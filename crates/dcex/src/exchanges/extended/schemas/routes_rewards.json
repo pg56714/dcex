@@ -1,0 +1,16 @@
+[
+  {
+    "name": "get_earned_points",
+    "path": "/api/v1/user/rewards/earned",
+    "is_public": false,
+    "fields": [],
+    "required": []
+  },
+  {
+    "name": "get_points_leaderboard_stats",
+    "path": "/api/v1/user/rewards/leaderboard/stats",
+    "is_public": false,
+    "fields": [],
+    "required": []
+  }
+]

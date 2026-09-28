@@ -1,0 +1,29 @@
+[
+  {
+    "name": "get_withdrawal_history",
+    "path": "/openApi/api/v3/capital/withdraw/history",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "id",
+      "coin",
+      "withdrawOrderId",
+      "status",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "txId",
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "status",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow"
+    ]
+  }
+]

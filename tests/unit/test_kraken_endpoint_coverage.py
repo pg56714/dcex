@@ -17,6 +17,7 @@ import queue
 import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
+from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
@@ -102,7 +103,13 @@ CASES: dict[str, tuple[dict[str, Any], str, str, str]] = {
     "simulate_futures_portfolio": (
         {
             "portfolio": {
-                "positions": [{"instrument": "PF_XBTUSD", "size": -1.25, "entryPrice": 60000.25}]
+                "positions": [
+                    {
+                        "instrument": "PF_XBTUSD",
+                        "size": Decimal("-1.25"),
+                        "entryPrice": Decimal("60000.25"),
+                    }
+                ]
             }
         },
         "POST",

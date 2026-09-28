@@ -1,0 +1,71 @@
+[
+  {
+    "name": "set_sub_account_transfer_authorization",
+    "path": "/openApi/account/v1/innerTransfer/authorizeSubAccount",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "subUids",
+      "transferable",
+      "recvWindow"
+    ],
+    "required": [
+      "subUids",
+      "transferable"
+    ],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_internal_transfer_records",
+    "path": "/openApi/wallets/v1/capital/innerTransfer/records",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "coin",
+      "id",
+      "transferClientId",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow"
+    ],
+    "required": [
+      "coin"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_sub_account_internal_transfer_records",
+    "path": "/openApi/wallets/v1/capital/subAccount/innerTransfer/records",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "coin",
+      "transferClientId",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow"
+    ],
+    "required": [
+      "coin"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow"
+    ]
+  }
+]

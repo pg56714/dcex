@@ -1,0 +1,28 @@
+[
+  {
+    "name": "get_api_permissions",
+    "path": "/openApi/v1/account/apiPermissions",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_api_restrictions",
+    "path": "/openApi/v1/account/apiRestrictions",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "recvWindow"
+    ]
+  }
+]

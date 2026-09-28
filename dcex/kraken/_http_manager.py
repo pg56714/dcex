@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, cast
 from urllib.parse import urlencode
 
+from dcex._schema_codec import normalize_params
+
 from .._native_http import NativeResponse, load_native, native_body_text, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..product_table.manager import ProductTableManager
@@ -53,6 +55,7 @@ def _encoded_query(query: dict[str, Any]) -> str:
 
 
 def _native_params(query: dict[str, Any]) -> list[tuple[str, str]]:
+    query = normalize_params(query)
     params: list[tuple[str, str]] = []
     for key, value in query.items():
         if isinstance(value, (list, tuple)):
@@ -154,6 +157,7 @@ class HTTPManager(BaseHTTPManager):
     @staticmethod
     def _native_params(**kwargs: object) -> list[tuple[str, str]]:
         """Convert optional Python arguments into native string pairs."""
+        kwargs = normalize_params(kwargs)
         params: list[tuple[str, str]] = []
         for key, value in kwargs.items():
             if key == "self" or value is None:

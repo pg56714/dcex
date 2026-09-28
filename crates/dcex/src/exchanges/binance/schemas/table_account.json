@@ -1,0 +1,1216 @@
+[
+  {
+    "name": "get_futures_account_config",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/accountConfig",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_trading_status",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/apiTradingStatus",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_adl_quantiles",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/adlQuantile",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow",
+      "product_symbol"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_account_trading_status",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/account/apiTradingStatus",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_account_status",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/account/status",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_user_assets",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v3/asset/getUserAsset",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "needBtcValuation",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "needBtcValuation",
+        "kind": "b",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_coin_network_config",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/capital/config/getall",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_bnb_burn_status",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/feeBurn",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_download_id_for_futures_transaction_history",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/income/asyn",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_futures_futures_transaction_history_download_link_by_id",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Get",
+    "path": "/fapi/v1/income/asyn/id",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "downloadId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "downloadId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "futures_futures_tradfi_perps_contract",
+    "market": "BinanceMarket::Futures",
+    "symbol_market": "BinanceMarket::Futures",
+    "method": "HttpMethod::Post",
+    "path": "/fapi/v1/stock/contract",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "spot_my_filters",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/api/v3/myFilters",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "symbol",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "d",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "pm_pro_fund_auto_collection",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/portfolio/auto-collection",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "pm_pro_fund_collection_by_asset",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/portfolio/asset-collection",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_pm_pro_delta_mode_status",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/portfolio/delta-mode",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "pm_pro_switch_delta_mode",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/portfolio/delta-mode",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "deltaEnabled",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "deltaEnabled",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "true",
+          "false"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "fetch_address_verification_list",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/addressVerify/list",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "change_auto_compound_status",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/dci/product/auto_compound/edit-status",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "positionId",
+      "autoCompoundPlan",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "positionId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "autoCompoundPlan",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "NONE",
+          "STANDARD",
+          "ADVANCED"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "check_dual_investment_accounts",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/dci/product/accounts",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "subscribe_dual_investment_products",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/dci/product/subscribe",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "id",
+      "orderId",
+      "depositAmount",
+      "autoCompoundPlan",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "id",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "orderId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "depositAmount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "autoCompoundPlan",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "NONE",
+          "STANDARD",
+          "ADVANCED"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_bfusd_account",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/bfusd/account",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_bfusd_quota_details",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/bfusd/quota",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_bfusd_rewards_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/bfusd/history/rewardsHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_bfusd_subscription_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/bfusd/history/subscriptionHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "USDC",
+          "USDT"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "redeem_bfusd",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/bfusd/redeem",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "amount",
+      "type",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "FAST",
+          "STANDARD"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "subscribe_bfusd",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/bfusd/subscribe",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "amount",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_collateral_record",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/simple-earn/flexible/history/collateralRecord",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "productId",
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "productId",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_flexible_personal_left_quota",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/simple-earn/flexible/personalLeftQuota",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "productId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "productId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_flexible_subscription_preview",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/simple-earn/flexible/subscriptionPreview",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "productId",
+      "amount",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "productId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_locked_personal_left_quota",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/simple-earn/locked/personalLeftQuota",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "projectId",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "projectId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_locked_subscription_preview",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/simple-earn/locked/subscriptionPreview",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "projectId",
+      "amount",
+      "autoSubscribe",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "projectId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "autoSubscribe",
+        "kind": "b",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "set_flexible_auto_subscribe",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/simple-earn/flexible/setAutoSubscribe",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "productId",
+      "autoSubscribe",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "productId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "autoSubscribe",
+        "kind": "b",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "set_locked_auto_subscribe",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/simple-earn/locked/setAutoSubscribe",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "positionId",
+      "autoSubscribe",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "positionId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "autoSubscribe",
+        "kind": "b",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_rwusd_account",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/rwusd/account",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_rwusd_quota_details",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/rwusd/quota",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_rwusd_rewards_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/rwusd/history/rewardsHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_rwusd_subscription_history",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Get",
+    "path": "/sapi/v1/rwusd/history/subscriptionHistory",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "startTime",
+      "endTime",
+      "current",
+      "size",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": false,
+        "choices": [
+          "USDC",
+          "USDT"
+        ]
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "current",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "size",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "redeem_rwusd",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/rwusd/redeem",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "amount",
+      "type",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "FAST",
+          "STANDARD"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "subscribe_rwusd",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/rwusd/subscribe",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "asset",
+      "amount",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "asset",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "USDT",
+          "USDC"
+        ]
+      },
+      {
+        "key": "amount",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

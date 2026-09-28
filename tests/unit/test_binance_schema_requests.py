@@ -10,9 +10,9 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
 import pytest
-from tests.unit.endpoint_wrapper_helpers import generated_method_members
 
 from scripts.build_binance_wrappers import operation_name, wire_name
+from tests.unit.endpoint_wrapper_helpers import generated_method_members
 from tests.unit.native_http_helpers import _http_server
 from tests.unit.test_binance_batch_orders import batch_client, invoke
 
@@ -95,6 +95,10 @@ async def test_inventory_wire(asynchronous, op):
     raw = (
         urlsplit(request["path"]).query if json_body or op["method"] != "POST" else request["body"]
     )
+    if operation_name(op) == "prediction_batch_cancel_orders":
+        assert "cancelInfoList[0].orderId=11" in raw
+        assert "cancelInfoList[1].clientOrderId=other" in raw
+        assert "%5B" not in raw and "%5D" not in raw
     pairs = parse_qsl(raw, keep_blank_values=True)
     if public:
         assert request["api_key"] is None
@@ -151,3 +155,22 @@ def test_inventory_surface():
         } == NAMES
         for name in NAMES:
             assert inspect.signature(getattr(cls, name))
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("asynchronous", [False, True])
+@pytest.mark.parametrize("cancel_info_list", [None, []])
+async def test_prediction_batch_cancel_requires_nonempty_list(asynchronous, cancel_info_list):
+    from dcex.utils.errors import FailedRequestError
+
+    with _http_server() as (base, received):
+        async with batch_client(asynchronous, base) as client:
+            with pytest.raises((ValueError, FailedRequestError), match="cancelInfoList"):
+                await invoke(
+                    client,
+                    "prediction_batch_cancel_orders",
+                    wallet_address="wallet",
+                    wallet_id="1",
+                    cancel_info_list=cancel_info_list,
+                )
+        assert received.empty()

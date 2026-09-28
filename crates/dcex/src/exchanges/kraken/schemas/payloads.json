@@ -1,0 +1,41 @@
+[
+  {
+    "name": "simulate_futures_portfolio_payload",
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "positions"
+      ],
+      "properties": {
+        "positions": {
+          "type": "array",
+          "maxItems": 500,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "instrument",
+              "size",
+              "entryPrice"
+            ],
+            "properties": {
+              "instrument": {
+                "type": "string",
+                "minLength": 1
+              },
+              "size": {
+                "type": "number",
+                "x-signed": true
+              },
+              "entryPrice": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]

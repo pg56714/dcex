@@ -49,15 +49,11 @@ impl ArcusClient {
             let schema = props
                 .get(&key)
                 .ok_or_else(|| invalid(format!("unsupported parameter {key}")))?;
-            let value = match schema["type"].as_str() {
-                Some("integer") => raw
-                    .parse::<i64>()
-                    .map(Value::from)
-                    .map_err(|_| invalid(format!("{key} requires an integer")))?,
-                Some("object" | "array") => serde_json::from_str(&raw)
-                    .map_err(|_| invalid(format!("{key} requires JSON")))?,
-                _ => Value::String(raw),
-            };
+            let value = crate::exchanges::schema::encode(
+                &key,
+                &raw,
+                schema["type"].as_str().unwrap_or("string"),
+            )?;
             if body.insert(key.clone(), value).is_some() {
                 return Err(invalid(format!("duplicate parameter {key}")));
             }
@@ -209,76 +205,7 @@ impl ArcusClient {
 }
 
 fn validate(value: &Value, schema: &Value, field: &str) -> Result<()> {
-    if let Some(choices) = schema["enum"].as_array()
-        && !choices.contains(value)
-    {
-        return Err(invalid(format!("invalid {field}")));
-    }
-    match schema["type"].as_str() {
-        Some("object") => {
-            let object = value
-                .as_object()
-                .ok_or_else(|| invalid(format!("{field} must be an object")))?;
-            let props = schema["properties"]
-                .as_object()
-                .ok_or_else(|| invalid("invalid embedded schema"))?;
-            for required in schema["required"]
-                .as_array()
-                .into_iter()
-                .flatten()
-                .filter_map(Value::as_str)
-            {
-                if !object.contains_key(required) {
-                    return Err(invalid(format!("{field}.{required} is required")));
-                }
-            }
-            for (key, v) in object {
-                validate(
-                    v,
-                    props
-                        .get(key)
-                        .ok_or_else(|| invalid(format!("unknown {field}.{key}")))?,
-                    &format!("{field}.{key}"),
-                )?;
-            }
-        }
-        Some("string") => {
-            let text = value
-                .as_str()
-                .ok_or_else(|| invalid(format!("{field} requires a string")))?;
-            if schema["minLength"]
-                .as_u64()
-                .is_some_and(|n| text.chars().count() < (n as usize))
-                || schema["maxLength"]
-                    .as_u64()
-                    .is_some_and(|n| text.chars().count() > (n as usize))
-            {
-                return Err(invalid(format!("invalid {field} length")));
-            }
-            if let Some(pattern) = schema["pattern"].as_str() {
-                // Nonzero signature scalars are checked separately above; Rust
-                // regex intentionally does not support the OpenAPI lookahead.
-                let pattern = pattern.replace("(?=.*[1-9a-fA-F])", "");
-                let regex =
-                    regex::Regex::new(&pattern).map_err(|_| invalid("invalid embedded pattern"))?;
-                if !regex.is_match(text) {
-                    return Err(invalid(format!("invalid {field} format")));
-                }
-            }
-        }
-        Some("integer") => {
-            let n = value
-                .as_i64()
-                .ok_or_else(|| invalid(format!("{field} requires an integer")))?;
-            if schema["minimum"].as_i64().is_some_and(|min| n < min)
-                || schema["maximum"].as_i64().is_some_and(|max| n > max)
-            {
-                return Err(invalid(format!("{field} is outside documented limits")));
-            }
-        }
-        _ => return Err(invalid("unsupported embedded field type")),
-    }
-    Ok(())
+    crate::exchanges::schema::validate_with(value, schema, field, true, false)
 }
 
 fn load_schemas() -> Vec<Endpoint> {

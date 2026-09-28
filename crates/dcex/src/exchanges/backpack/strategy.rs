@@ -4,28 +4,6 @@ use crate::exchange::ValidatedResponse;
 use crate::{DcexError, Result};
 use serde_json::Value;
 
-const CREATE: &[&str] = &[
-    "product_symbol",
-    "symbol",
-    "strategyType",
-    "side",
-    "quantity",
-    "price",
-    "clientStrategyId",
-    "duration",
-    "interval",
-    "randomizedIntervalQuantity",
-    "timeInForce",
-    "postOnly",
-    "reduceOnly",
-    "selfTradePrevention",
-    "slippageTolerance",
-    "slippageToleranceType",
-    "autoLend",
-    "autoLendRedeem",
-    "autoBorrow",
-    "autoBorrowRepay",
-];
 const BOOLS: &[&str] = &[
     "randomizedIntervalQuantity",
     "postOnly",
@@ -44,48 +22,18 @@ impl BackpackClient {
         method: &str,
         params: &BackpackParams,
     ) -> Result<Option<ValidatedResponse>> {
-        let (path, instruction, verb, fields): (&str, &str, &str, &[&str]) = match method {
-            "create_strategy" => ("/api/v1/strategy", "strategyCreate", "POST", CREATE),
-            "get_open_strategy" => (
-                "/api/v1/strategy",
-                "strategyQuery",
-                "GET",
-                &["product_symbol", "symbol", "strategyId", "clientStrategyId"],
-            ),
-            "cancel_strategy" => (
-                "/api/v1/strategy",
-                "strategyCancel",
-                "DELETE",
-                &["product_symbol", "symbol", "strategyId", "clientStrategyId"],
-            ),
-            "get_open_strategies" => (
-                "/api/v1/strategies",
-                "strategyQueryAll",
-                "GET",
-                &["product_symbol", "symbol", "marketType", "strategyType"],
-            ),
-            "cancel_open_strategies" => (
-                "/api/v1/strategies",
-                "strategyCancelAll",
-                "DELETE",
-                &["product_symbol", "symbol", "strategyType"],
-            ),
-            "get_strategy_history" => (
-                "/wapi/v1/history/strategies",
-                "strategyHistoryQueryAll",
-                "GET",
-                &[
-                    "product_symbol",
-                    "symbol",
-                    "strategyId",
-                    "limit",
-                    "offset",
-                    "marketType",
-                    "sortDirection",
-                ],
-            ),
-            _ => return Ok(None),
+        static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+            std::sync::OnceLock::new();
+        let Some(route) = crate::exchanges::schema::route(
+            &ROUTES,
+            include_str!("schemas/routes_strategy.json"),
+            method,
+        ) else {
+            return Ok(None);
         };
+        route.validate(|key| params.get(key))?;
+        let (path, instruction, verb, fields) =
+            (route.path, route.instruction, route.verb, route.fields);
         params.ensure_allowed(
             fields,
             if method == "get_strategy_history" {

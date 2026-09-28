@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import encode_json, normalize_params
+
 from .._native_http import request_native_json
 from ..enums import OrderSide
 from ..utils.errors import FailedRequestError
@@ -25,7 +27,7 @@ class TradeHTTP(HTTPManager):
         fields are added by the client and must not be supplied here.
         """
         return self._native_private(
-            "place_coin_futures_algo_order", self._params(fields=dumps(fields))
+            "place_coin_futures_algo_order", self._params(fields=encode_json(fields))
         )
 
     def cancel_coin_futures_algo_order(self, fields: dict[str, Any]) -> Any:
@@ -38,7 +40,7 @@ class TradeHTTP(HTTPManager):
         fields are added by the client and must not be supplied here.
         """
         return self._native_private(
-            "cancel_coin_futures_algo_order", self._params(fields=dumps(fields))
+            "cancel_coin_futures_algo_order", self._params(fields=encode_json(fields))
         )
 
     def get_coin_futures_algo_order(self, fields: dict[str, Any]) -> Any:
@@ -51,7 +53,7 @@ class TradeHTTP(HTTPManager):
         fields are added by the client and must not be supplied here.
         """
         return self._native_private(
-            "get_coin_futures_algo_order", self._params(fields=dumps(fields))
+            "get_coin_futures_algo_order", self._params(fields=encode_json(fields))
         )
 
     def place_equity_order(
@@ -408,6 +410,7 @@ class TradeHTTP(HTTPManager):
 
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
+        kwargs = normalize_params(kwargs)
         params: list[tuple[str, str]] = []
         for key, value in kwargs.items():
             if value is None:

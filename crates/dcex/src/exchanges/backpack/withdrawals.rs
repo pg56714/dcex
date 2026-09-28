@@ -9,29 +9,23 @@ impl BackpackClient {
         name: &str,
         p: &BackpackParams,
     ) -> Result<Option<ValidatedResponse>> {
-        let (path, instruction, required, strings, decimals): (
-            &str,
-            &str,
-            &[&str],
-            &[&str],
-            &[&str],
-        ) = match name {
-            "create_withdrawal" => (
-                "/wapi/v1/capital/withdrawals",
-                "withdraw",
-                &["address", "blockchain", "quantity", "symbol"],
-                &[
-                    "address",
-                    "blockchain",
-                    "quantity",
-                    "symbol",
-                    "clientId",
-                    "twoFactorToken",
-                ],
-                &["quantity"],
-            ),
-            _ => return Ok(None),
+        static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+            std::sync::OnceLock::new();
+        let Some(route) = crate::exchanges::schema::route(
+            &ROUTES,
+            include_str!("schemas/routes_withdrawals.json"),
+            name,
+        ) else {
+            return Ok(None);
         };
+        route.validate(|key| p.get(key))?;
+        let (path, instruction, required, strings, decimals) = (
+            route.path,
+            route.instruction,
+            route.required,
+            route.strings,
+            route.decimals,
+        );
         let allowed: &[&str] = {
             &[
                 "address",

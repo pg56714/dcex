@@ -1,7 +1,7 @@
 //! Schema-driven request validation, encoding and dispatch.
 use super::client::{KrakenAuth, KrakenClient};
 use super::params::KrakenParams;
-#[path = "endpoint_schemas/mod.rs"]
+#[path = "generated/schema_tables.rs"]
 mod endpoints;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
@@ -42,6 +42,17 @@ impl KrakenClient {
             return Ok(None);
         };
         params.ensure_allowed(endpoint.allowed)?;
+        let checked: Vec<_> = params
+            .only(endpoint.allowed)
+            .into_iter()
+            .filter(|(key, value)| {
+                !(name == "simulate_futures_portfolio" && key == "json"
+                    || name == "edit_spot_order"
+                        && matches!(key.as_str(), "price" | "price2")
+                        && crate::exchanges::schema::relative_price(value))
+            })
+            .collect();
+        crate::exchanges::schema::validate_pairs(&checked)?;
         let mut query = Vec::new();
         let mut path = endpoint.path.to_string();
         for field in endpoint.fields {
@@ -66,6 +77,9 @@ impl KrakenClient {
             if !field.values.is_empty() && field.kind != "array" && !field.values.contains(&value) {
                 return Err(invalid(format!("invalid {}", field.key)));
             }
+            if field.kind == "positive" {
+                crate::exchanges::schema::encode(field.key, value, "decimal")?;
+            }
             match field.kind {
                 "signed_integer" => {
                     value
@@ -73,7 +87,7 @@ impl KrakenClient {
                         .map_err(|_| invalid("userref must be an int32"))?;
                 }
                 "positive" => {
-                    if !value.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0) {
+                    if !crate::common::is_positive_plain_decimal(value) {
                         return Err(invalid(format!("{} must be positive", field.key)));
                     }
                 }
@@ -147,9 +161,7 @@ impl KrakenClient {
             }
         }
         if let Some(amount) = params.get("amount")
-            && !amount
-                .parse::<f64>()
-                .is_ok_and(|v| v.is_finite() && v > 0.0)
+            && !crate::common::is_positive_plain_decimal(amount)
         {
             return Err(invalid("amount must be positive"));
         }
@@ -170,25 +182,21 @@ impl KrakenClient {
         if name == "simulate_futures_portfolio" {
             let body: serde_json::Value = serde_json::from_str(params.required("json")?)
                 .map_err(|_| invalid("portfolio must be valid JSON"))?;
-            if body.as_object().is_none_or(|o| o.len() != 1) {
-                return Err(invalid("portfolio must contain only positions"));
-            }
-            let positions = body["positions"]
-                .as_array()
-                .filter(|v| v.len() <= 500)
-                .ok_or_else(|| invalid("positions must be an array of at most 500 entries"))?;
-            for position in positions {
-                if position.as_object().is_none_or(|o| o.len() != 3)
-                    || position["instrument"].as_str().is_none_or(|v| v.is_empty())
-                    || !position["size"].as_f64().is_some_and(f64::is_finite)
-                    || !position["entryPrice"]
-                        .as_f64()
-                        .is_some_and(|v| v.is_finite() && v >= 0.0)
-                {
-                    return Err(invalid("invalid portfolio position"));
+            static SHAPES: std::sync::LazyLock<serde_json::Value> =
+                std::sync::LazyLock::new(|| {
+                    serde_json::from_str(include_str!("schemas/payloads.json"))
+                        .expect("checked payload schemas")
+                });
+            let shape = &SHAPES[0]["schema"];
+            let body = crate::exchanges::schema::encode_shape(body, shape, "json")?;
+            crate::exchanges::schema::validate(&body, shape, "json")?;
+            for (key, value) in &mut query {
+                if key == "json" {
+                    *value = body.to_string();
                 }
             }
         }
+
         if let (Some(start), Some(end)) = (params.get("starttm"), params.get("endtm"))
             && start.parse::<u64>().map_err(invalid)? > end.parse::<u64>().map_err(invalid)?
         {

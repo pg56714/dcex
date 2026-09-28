@@ -1,0 +1,256 @@
+[
+  {
+    "name": "get_options_cancel_countdown",
+    "market": "BinanceMarket::Options",
+    "symbol_market": "BinanceMarket::Options",
+    "method": "HttpMethod::Get",
+    "path": "/eapi/v1/countdownCancelAll",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "underlying",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "underlying",
+        "kind": "s",
+        "required": false,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "set_options_cancel_countdown",
+    "market": "BinanceMarket::Options",
+    "symbol_market": "BinanceMarket::Options",
+    "method": "HttpMethod::Post",
+    "path": "/eapi/v1/countdownCancelAll",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "underlying",
+      "countdownTime",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "underlying",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "countdownTime",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "send_options_cancel_heartbeat",
+    "market": "BinanceMarket::Options",
+    "symbol_market": "BinanceMarket::Options",
+    "method": "HttpMethod::Post",
+    "path": "/eapi/v1/countdownCancelAllHeartBeat",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "underlyings",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "underlyings",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "get_options_mmp_config",
+    "market": "BinanceMarket::Options",
+    "symbol_market": "BinanceMarket::Options",
+    "method": "HttpMethod::Get",
+    "path": "/eapi/v1/mmp",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "underlying",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "underlying",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "reset_options_mmp",
+    "market": "BinanceMarket::Options",
+    "symbol_market": "BinanceMarket::Options",
+    "method": "HttpMethod::Post",
+    "path": "/eapi/v1/mmpReset",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "underlying",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "underlying",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "set_options_mmp_config",
+    "market": "BinanceMarket::Options",
+    "symbol_market": "BinanceMarket::Options",
+    "method": "HttpMethod::Post",
+    "path": "/eapi/v1/mmpSet",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "underlying",
+      "windowTimeInMilliseconds",
+      "frozenTimeInMilliseconds",
+      "qtyLimit",
+      "deltaLimit",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "underlying",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "windowTimeInMilliseconds",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "frozenTimeInMilliseconds",
+        "kind": "i",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "qtyLimit",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "deltaLimit",
+        "kind": "d",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "tradfi_options_contract",
+    "market": "BinanceMarket::Options",
+    "symbol_market": "BinanceMarket::Options",
+    "method": "HttpMethod::Post",
+    "path": "/eapi/v1/stock/contract",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  },
+  {
+    "name": "set_locked_product_redeem_option",
+    "market": "BinanceMarket::Spot",
+    "symbol_market": "BinanceMarket::Spot",
+    "method": "HttpMethod::Post",
+    "path": "/sapi/v1/simple-earn/locked/setRedeemOption",
+    "public": false,
+    "api_key": false,
+    "allowed": [
+      "positionId",
+      "redeemTo",
+      "recvWindow"
+    ],
+    "fields": [
+      {
+        "key": "positionId",
+        "kind": "s",
+        "required": true,
+        "choices": []
+      },
+      {
+        "key": "redeemTo",
+        "kind": "s",
+        "required": true,
+        "choices": [
+          "SPOT",
+          "FLEXIBLE"
+        ]
+      },
+      {
+        "key": "recvWindow",
+        "kind": "i",
+        "required": false,
+        "choices": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,249 @@
+[
+  {
+    "name": "get_withdrawal_history_by_id",
+    "path": "/api/v1/withdrawals/{withdrawalId}",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "withdrawalId",
+        "kind": "s",
+        "required": true,
+        "path": true,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_withdrawal_history",
+    "path": "/api/v1/withdrawals",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "status",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "PROCESSING",
+          "REVIEW",
+          "WALLET_PROCESSING",
+          "SUCCESS",
+          "FAILURE"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "currentPage",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 10,
+        "maximum": 500
+      }
+    ]
+  },
+  {
+    "name": "get_withdrawal_quotas",
+    "path": "/api/v1/withdrawals/quotas",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "chain",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_withdrawal_history",
+    "path": "/api/ua/v2/asset/withdrawal/history",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "id",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "status",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "FAILURE",
+          "PRE_SUCCESS",
+          "PROCESSING",
+          "RISK_MGT_REJECTED",
+          "ROLLBACK",
+          "ROLLBACKING",
+          "SUCCESS",
+          "TRM_MGT_REJECTED",
+          "WAIT_RISK_MGT",
+          "WAIT_TRM_MGT"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "currentPage",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 50
+      }
+    ]
+  },
+  {
+    "name": "get_uta_withdrawal_quotas",
+    "path": "/api/ua/v2/withdrawals/quotas",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "chain",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "isInner",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "withdrawType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "ADDRESS",
+          "MAIL",
+          "PHONE",
+          "UID"
+        ],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  }
+]

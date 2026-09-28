@@ -1,0 +1,13 @@
+[
+  {
+    "name": "get_margin_currency_data",
+    "path": "/v5/spot-margin-trade/currency-data",
+    "post": false,
+    "public": false,
+    "keys": [
+      "currency"
+    ],
+    "required": [],
+    "integers": []
+  }
+]

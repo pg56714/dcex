@@ -1,0 +1,1259 @@
+[
+  {
+    "name": "trading_bot_grid_order_algo",
+    "path": "/api/v5/tradingBot/grid/order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "instId",
+      "algoOrdType",
+      "maxPx",
+      "minPx",
+      "gridNum",
+      "runType",
+      "tpTriggerPx",
+      "slTriggerPx",
+      "algoClOrdId",
+      "tag",
+      "profitSharingRatio",
+      "triggerParams",
+      "quoteSz",
+      "baseSz",
+      "tradeQuoteCcy",
+      "sz",
+      "direction",
+      "lever",
+      "basePos",
+      "tpRatio",
+      "slRatio"
+    ],
+    "required": [
+      "instId",
+      "algoOrdType",
+      "maxPx",
+      "minPx",
+      "gridNum"
+    ],
+    "bools": [
+      "basePos"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT-SWAP\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"maxPx\":{\"type\":\"string\",\"description\":\"Upper price of price range\"},\"minPx\":{\"type\":\"string\",\"description\":\"Lower price of price range\"},\"gridNum\":{\"type\":\"string\",\"description\":\"Grid quantity\"},\"runType\":{\"type\":\"string\",\"description\":\"Grid type 1 : Arithmetic, 2 : Geometric Default is Arithmetic\"},\"tpTriggerPx\":{\"type\":\"string\",\"description\":\"TP tigger price Applicable to Spot grid / Contract grid\"},\"slTriggerPx\":{\"type\":\"string\",\"description\":\"SL tigger price Applicable to Spot grid / Contract grid\"},\"algoClOrdId\":{\"type\":\"string\",\"description\":\"Client-supplied Algo ID A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters.\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag\"},\"profitSharingRatio\":{\"type\":\"string\",\"description\":\"Profit sharing ratio, it only supports these values 0 , 0.1 , 0.2 , 0.3 0.1 represents 10%\"},\"triggerParams\":{\"type\":\"array\",\"description\":\"Trigger Parameters Applicable to Spot grid / Contract grid\",\"items\":{\"type\":\"object\",\"properties\":{\"triggerAction\":{\"type\":\"string\",\"description\":\"Trigger action start stop\"},\"triggerStrategy\":{\"type\":\"string\",\"description\":\"Trigger strategy instant price rsi Default is instant\"},\"delaySeconds\":{\"type\":\"string\",\"description\":\"Delay seconds after action triggered\"},\"timeframe\":{\"type\":\"string\",\"description\":\"K-line type 3m , 5m , 15m , 30m ( m : minute) 1H , 4H ( H : hour) 1D ( D : day) This field is only valid when triggerStrategy is rsi\"},\"thold\":{\"type\":\"string\",\"description\":\"Threshold The value should be an integer between 1 to 100 This field is only valid when triggerStrategy is rsi\"},\"triggerCond\":{\"type\":\"string\",\"description\":\"Trigger condition cross_up cross_down above below cross This field is only valid when triggerStrategy is rsi\"},\"timePeriod\":{\"type\":\"string\",\"description\":\"Time Period 14 This field is only valid when triggerStrategy is rsi\"},\"triggerPx\":{\"type\":\"string\",\"description\":\"Trigger Price This field is only valid when triggerStrategy is price\"},\"stopType\":{\"type\":\"string\",\"description\":\"Stop type Spot grid 1 : Sell base currency 2 : Keep base currency Contract grid 1 : Market Close All positions 2 : Keep positions This field is only valid when triggerAction is stop\"}},\"required\":[\"triggerAction\",\"triggerStrategy\"]}},\"quoteSz\":{\"type\":\"string\",\"description\":\"Invest amount for quote currency Either quoteSz or baseSz is required\"},\"baseSz\":{\"type\":\"string\",\"description\":\"Invest amount for base currency Either quoteSz or baseSz is required\"},\"tradeQuoteCcy\":{\"type\":\"string\",\"description\":\"The quote currency for trading. Only applicable to SPOT. The default value is the quote currency of instId, e.g. USD for BTC-USD.\"},\"sz\":{\"type\":\"string\",\"description\":\"Used margin based on USDT\"},\"direction\":{\"type\":\"string\",\"description\":\"Contract grid type long , short , neutral\"},\"lever\":{\"type\":\"string\",\"description\":\"Leverage\"},\"basePos\":{\"type\":\"boolean\",\"description\":\"Whether or not open a position when the strategy activates Default is false Neutral contract grid should omit the parameter\"},\"tpRatio\":{\"type\":\"string\",\"description\":\"Take profit ratio, 0.1 represents 10%\"},\"slRatio\":{\"type\":\"string\",\"description\":\"Stop loss ratio, 0.1 represents 10%\"}},\"required\":[\"instId\",\"algoOrdType\",\"maxPx\",\"minPx\",\"gridNum\"]}"
+  },
+  {
+    "name": "trading_bot_grid_amend_algo_basic_param",
+    "path": "/api/v5/tradingBot/grid/amend-algo-basic-param",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "minPx",
+      "maxPx",
+      "gridNum",
+      "topupAmount"
+    ],
+    "required": [
+      "algoId",
+      "minPx",
+      "maxPx",
+      "gridNum"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"minPx\":{\"type\":\"string\",\"description\":\"Minimum price range\"},\"maxPx\":{\"type\":\"string\",\"description\":\"Maximum price range\"},\"gridNum\":{\"type\":\"string\",\"description\":\"Grid quantity\"},\"topupAmount\":{\"type\":\"string\",\"description\":\"Contract grid only. Optional client-supplied top up investment amount. If this is not supplied or explicitly supplied as \\\"0\\\", the required top up investment amount to edit grid parameters is topped up by default\"}},\"required\":[\"algoId\",\"minPx\",\"maxPx\",\"gridNum\"]}"
+  },
+  {
+    "name": "trading_bot_grid_amend_order_algo",
+    "path": "/api/v5/tradingBot/grid/amend-order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "instId",
+      "slTriggerPx",
+      "tpTriggerPx",
+      "tpRatio",
+      "slRatio",
+      "topUpAmt",
+      "triggerParams"
+    ],
+    "required": [
+      "algoId",
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT-SWAP\"},\"slTriggerPx\":{\"type\":\"string\",\"description\":\"New stop-loss trigger price if slTriggerPx is set \\\"\\\" means stop-loss trigger price is canceled. Either slTriggerPx or tpTriggerPx is required.\",\"x-allow-empty\":true},\"tpTriggerPx\":{\"type\":\"string\",\"description\":\"New take-profit trigger price if tpTriggerPx is set \\\"\\\" means take-profit trigger price is canceled.\",\"x-allow-empty\":true},\"tpRatio\":{\"type\":\"string\",\"description\":\"Take profit ratio, 0.1 represents 10%, only applicable to contract grid if it is set \\\"\\\" means take-profit ratio is canceled.\",\"x-allow-empty\":true},\"slRatio\":{\"type\":\"string\",\"description\":\"Stop loss ratio, 0.1 represents 10%, only applicable to contract grid` if it is set \\\"\\\" means stop-loss ratio is canceled.\",\"x-allow-empty\":true},\"topUpAmt\":{\"type\":\"string\",\"description\":\"Top up amount, only applicable to spot grid\"},\"triggerParams\":{\"type\":\"array\",\"description\":\"Trigger Parameters\",\"items\":{\"type\":\"object\",\"properties\":{\"triggerAction\":{\"type\":\"string\",\"description\":\"Trigger action start stop\"},\"triggerStrategy\":{\"type\":\"string\",\"description\":\"Trigger strategy instant price rsi\"},\"triggerPx\":{\"type\":\"string\",\"description\":\"Trigger Price This field is only valid when triggerStrategy is price\"},\"stopType\":{\"type\":\"string\",\"description\":\"Stop type Spot grid 1 : Sell base currency 2 : Keep base currency Contract grid 1 : Market Close All positions 2 : Keep positions This field is only valid when triggerAction is stop\"}},\"required\":[\"triggerAction\",\"triggerStrategy\"]}}},\"required\":[\"algoId\",\"instId\"]}"
+  },
+  {
+    "name": "trading_bot_grid_stop_order_algo",
+    "path": "/api/v5/tradingBot/grid/stop-order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orders"
+    ],
+    "required": [
+      "orders"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"orders\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"stopType\":{\"type\":\"string\",\"description\":\"Stop type Spot grid 1 : Sell base currency 2 : Keep base currency Contract grid 1 : Market Close All positions 2 : Keep positions\"}},\"required\":[\"algoId\",\"instId\",\"algoOrdType\",\"stopType\"]},\"minItems\":1,\"maxItems\":10}},\"required\":[\"orders\"],\"x-body-array\":true}"
+  },
+  {
+    "name": "trading_bot_grid_close_position",
+    "path": "/api/v5/tradingBot/grid/close-position",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "mktClose",
+      "sz",
+      "px"
+    ],
+    "required": [
+      "algoId",
+      "mktClose"
+    ],
+    "bools": [
+      "mktClose"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"mktClose\":{\"type\":\"boolean\",\"description\":\"Market close all the positions or not true : Market close all position, false : Close part of position\"},\"sz\":{\"type\":\"string\",\"description\":\"Close position amount, with unit of contract If mktClose is false , the parameter is required.\"},\"px\":{\"type\":\"string\",\"description\":\"Close position price If mktClose is false , the parameter is required.\"}},\"required\":[\"algoId\",\"mktClose\"]}"
+  },
+  {
+    "name": "trading_bot_grid_cancel_close_order",
+    "path": "/api/v5/tradingBot/grid/cancel-close-order",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "ordId"
+    ],
+    "required": [
+      "algoId",
+      "ordId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"ordId\":{\"type\":\"string\",\"description\":\"Close position order ID\"}},\"required\":[\"algoId\",\"ordId\"]}"
+  },
+  {
+    "name": "trading_bot_grid_order_instant_trigger",
+    "path": "/api/v5/tradingBot/grid/order-instant-trigger",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "topUpAmt"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"topUpAmt\":{\"type\":\"string\",\"description\":\"Top up amount, only applicable to spot grid\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "get_trading_bot_grid_orders_algo_pending",
+    "path": "/api/v5/tradingBot/grid/orders-algo-pending",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId",
+      "instId",
+      "instType",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT\"},\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SPOT MARGIN FUTURES SWAP\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested algoId .\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested algoId .\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[\"algoOrdType\"]}"
+  },
+  {
+    "name": "get_trading_bot_grid_orders_algo_history",
+    "path": "/api/v5/tradingBot/grid/orders-algo-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId",
+      "instId",
+      "instType",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT\"},\"instType\":{\"type\":\"string\",\"description\":\"Instrument type SPOT MARGIN FUTURES SWAP\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested algoId .\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested algoId .\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100.\"}},\"required\":[\"algoOrdType\"]}"
+  },
+  {
+    "name": "get_trading_bot_grid_orders_algo_details",
+    "path": "/api/v5/tradingBot/grid/orders-algo-details",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "required": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoOrdType\",\"algoId\"]}"
+  },
+  {
+    "name": "get_trading_bot_grid_sub_orders",
+    "path": "/api/v5/tradingBot/grid/sub-orders",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId",
+      "type",
+      "groupId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoOrdType",
+      "algoId",
+      "type"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"type\":{\"type\":\"string\",\"description\":\"Sub order state live filled\"},\"groupId\":{\"type\":\"string\",\"description\":\"Group ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested ordId .\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested ordId .\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[\"algoOrdType\",\"algoId\",\"type\"]}"
+  },
+  {
+    "name": "get_trading_bot_grid_positions",
+    "path": "/api/v5/tradingBot/grid/positions",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "required": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_grid : Contract grid\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoOrdType\",\"algoId\"]}"
+  },
+  {
+    "name": "trading_bot_grid_withdraw_income",
+    "path": "/api/v5/tradingBot/grid/withdraw-income",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "trading_bot_grid_compute_margin_balance",
+    "path": "/api/v5/tradingBot/grid/compute-margin-balance",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "type",
+      "amt"
+    ],
+    "required": [
+      "algoId",
+      "type"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"type\":{\"type\":\"string\",\"description\":\"Adjust margin balance type add reduce\"},\"amt\":{\"type\":\"string\",\"description\":\"Adjust margin balance amount Default is zero.\"}},\"required\":[\"algoId\",\"type\"]}"
+  },
+  {
+    "name": "trading_bot_grid_margin_balance",
+    "path": "/api/v5/tradingBot/grid/margin-balance",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "type",
+      "amt",
+      "percent"
+    ],
+    "required": [
+      "algoId",
+      "type"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"type\":{\"type\":\"string\",\"description\":\"Adjust margin balance type add reduce\"},\"amt\":{\"type\":\"string\",\"description\":\"Adjust margin balance amount Either amt or percent is required.\"},\"percent\":{\"type\":\"string\",\"description\":\"Adjust margin balance percentage\"}},\"required\":[\"algoId\",\"type\"]}"
+  },
+  {
+    "name": "trading_bot_grid_adjust_investment",
+    "path": "/api/v5/tradingBot/grid/adjust-investment",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "amt",
+      "allowReinvestProfit"
+    ],
+    "required": [
+      "algoId",
+      "amt"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"amt\":{\"type\":\"string\",\"description\":\"The amount is going to be added\"},\"allowReinvestProfit\":{\"type\":\"string\",\"description\":\"Whether reinvesting profits, only applicable to spot grid. true or false . The default is true.\"}},\"required\":[\"algoId\",\"amt\"]}"
+  },
+  {
+    "name": "get_trading_bot_grid_ai_param",
+    "path": "/api/v5/tradingBot/grid/ai-param",
+    "post": false,
+    "public": true,
+    "keys": [
+      "algoOrdType",
+      "instId",
+      "direction",
+      "duration"
+    ],
+    "required": [
+      "algoOrdType",
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT\"},\"direction\":{\"type\":\"string\",\"description\":\"Contract grid type long , short , neutral Required in the case of contract_grid\"},\"duration\":{\"type\":\"string\",\"description\":\"Back testing duration in number of days Spot grid default is 7D with available durations of 7D , 30D and 180D Contract grid default is 14D with available durations of 7D , 14D and 30D\"}},\"required\":[\"algoOrdType\",\"instId\"]}"
+  },
+  {
+    "name": "trading_bot_grid_min_investment",
+    "path": "/api/v5/tradingBot/grid/min-investment",
+    "post": true,
+    "public": true,
+    "keys": [
+      "instId",
+      "algoOrdType",
+      "maxPx",
+      "minPx",
+      "gridNum",
+      "runType",
+      "direction",
+      "lever",
+      "basePos",
+      "investmentType",
+      "triggerStrategy",
+      "topUpAmt",
+      "investmentData"
+    ],
+    "required": [
+      "instId",
+      "algoOrdType",
+      "maxPx",
+      "minPx",
+      "gridNum",
+      "runType"
+    ],
+    "bools": [
+      "basePos"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT-SWAP\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"maxPx\":{\"type\":\"string\",\"description\":\"Upper price of price range\"},\"minPx\":{\"type\":\"string\",\"description\":\"Lower price of price range\"},\"gridNum\":{\"type\":\"string\",\"description\":\"Grid quantity\"},\"runType\":{\"type\":\"string\",\"description\":\"Grid type 1 : Arithmetic, 2 : Geometric\"},\"direction\":{\"type\":\"string\",\"description\":\"Contract grid type long , short , neutral Only applicable to contract grid\"},\"lever\":{\"type\":\"string\",\"description\":\"Leverage Only applicable to contract grid\"},\"basePos\":{\"type\":\"boolean\",\"description\":\"Whether or not open a position when the strategy activates Default is false Neutral contract grid should omit the parameter Only applicable to contract grid\"},\"investmentType\":{\"type\":\"string\",\"description\":\"Investment type, only applicable to grid quote base dual\"},\"triggerStrategy\":{\"type\":\"string\",\"description\":\"Trigger stragety, instant price rsi\"},\"topUpAmt\":{\"type\":\"string\",\"description\":\"Top up amount, only applicable to spot grid\"},\"investmentData\":{\"type\":\"array\",\"description\":\"Invest Data\",\"items\":{\"type\":\"object\",\"properties\":{\"amt\":{\"type\":\"string\",\"description\":\"Invest amount\"},\"ccy\":{\"type\":\"string\",\"description\":\"Invest currency\"}},\"required\":[\"amt\",\"ccy\"]}}},\"required\":[\"instId\",\"algoOrdType\",\"maxPx\",\"minPx\",\"gridNum\",\"runType\"]}"
+  },
+  {
+    "name": "get_trading_bot_public_rsi_back_testing",
+    "path": "/api/v5/tradingBot/public/rsi-back-testing",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "timeframe",
+      "thold",
+      "timePeriod",
+      "triggerCond",
+      "duration"
+    ],
+    "required": [
+      "instId",
+      "timeframe",
+      "thold",
+      "timePeriod"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT Only applicable to SPOT\"},\"timeframe\":{\"type\":\"string\",\"description\":\"K-line type 3m , 5m , 15m , 30m ( m : minute) 1H , 4H ( H : hour) 1D ( D : day)\"},\"thold\":{\"type\":\"string\",\"description\":\"Threshold The value should be an integer between 1 to 100\"},\"timePeriod\":{\"type\":\"string\",\"description\":\"Time Period 14\"},\"triggerCond\":{\"type\":\"string\",\"description\":\"Trigger condition cross_up cross_down above below cross Default is cross_down\"},\"duration\":{\"type\":\"string\",\"description\":\"Back testing duration 1M ( M : month) Default is 1M\"}},\"required\":[\"instId\",\"timeframe\",\"thold\",\"timePeriod\"]}"
+  },
+  {
+    "name": "get_trading_bot_grid_grid_quantity",
+    "path": "/api/v5/tradingBot/grid/grid-quantity",
+    "post": false,
+    "public": true,
+    "keys": [
+      "instId",
+      "runType",
+      "algoOrdType",
+      "maxPx",
+      "minPx",
+      "lever"
+    ],
+    "required": [
+      "instId",
+      "runType",
+      "algoOrdType",
+      "maxPx",
+      "minPx"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT\"},\"runType\":{\"type\":\"string\",\"description\":\"Grid type 1 : Arithmetic 2 : Geometric\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"maxPx\":{\"type\":\"string\",\"description\":\"Upper price of price range\"},\"minPx\":{\"type\":\"string\",\"description\":\"Lower price of price range\"},\"lever\":{\"type\":\"string\",\"description\":\"Leverage, it is required for contract grid\"}},\"required\":[\"instId\",\"runType\",\"algoOrdType\",\"maxPx\",\"minPx\"]}"
+  },
+  {
+    "name": "trading_bot_grid_copy_order_algo",
+    "path": "/api/v5/tradingBot/grid/copy-order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "instId",
+      "algoOrdType",
+      "sourceAlgoId",
+      "quoteSz",
+      "lever",
+      "autoReserve",
+      "sz",
+      "actualMarginSz",
+      "extraMarginSz",
+      "algoClOrdId",
+      "tag"
+    ],
+    "required": [
+      "instId",
+      "algoOrdType",
+      "sourceAlgoId"
+    ],
+    "bools": [
+      "autoReserve"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type grid : Spot grid contract_grid : Contract grid\"},\"sourceAlgoId\":{\"type\":\"string\",\"description\":\"Lead algo order ID to follow and copy from\"},\"quoteSz\":{\"type\":\"string\",\"description\":\"Quote currency investment amount Only applicable to grid\"},\"lever\":{\"type\":\"string\",\"description\":\"Leverage Only applicable to contract_grid\"},\"autoReserve\":{\"type\":\"boolean\",\"description\":\"Whether to auto-reserve margin. Only applicable to contract_grid true : Actual margin and extra margin are automatically calculated based on sz false : Manually specify actualMarginSz and extraMarginSz\"},\"sz\":{\"type\":\"string\",\"description\":\"Total investment amount in USDT. Required when autoReserve is true Only applicable to contract_grid\"},\"actualMarginSz\":{\"type\":\"string\",\"description\":\"Actual margin. Required when autoReserve is false Only applicable to contract_grid\"},\"extraMarginSz\":{\"type\":\"string\",\"description\":\"Extra margin reserved. Defaults to 0 when unspecified Only applicable to contract_grid\"},\"algoClOrdId\":{\"type\":\"string\",\"description\":\"Client-supplied Algo ID\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag\"}},\"required\":[\"instId\",\"algoOrdType\",\"sourceAlgoId\"]}"
+  },
+  {
+    "name": "trading_bot_dca_create",
+    "path": "/api/v5/tradingBot/dca/create",
+    "post": true,
+    "public": false,
+    "keys": [
+      "instId",
+      "algoOrdType",
+      "initOrdAmt",
+      "allowReinvest",
+      "safetyOrdAmt",
+      "maxSafetyOrds",
+      "pxSteps",
+      "pxStepsMult",
+      "volMult",
+      "tpPct",
+      "slPct",
+      "slMode",
+      "direction",
+      "lever",
+      "triggerParams",
+      "profitSharingRatio",
+      "trackingMode",
+      "tag",
+      "algoClOrdId",
+      "tradeQuoteCcy"
+    ],
+    "required": [
+      "instId",
+      "algoOrdType",
+      "initOrdAmt",
+      "maxSafetyOrds",
+      "tpPct",
+      "lever",
+      "triggerParams"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"},\"initOrdAmt\":{\"type\":\"string\",\"description\":\"Initial order amount\"},\"allowReinvest\":{\"type\":\"string\",\"description\":\"Whether to reinvest profit. Only applicable to Contract DCA true or false , default is true\"},\"safetyOrdAmt\":{\"type\":\"string\",\"description\":\"Safety order amount When maxSafetyOrds >= 1, safetyOrdAmt is required\"},\"maxSafetyOrds\":{\"type\":\"string\",\"description\":\"Max number of safety orders\"},\"pxSteps\":{\"type\":\"string\",\"description\":\"Safety order price step When maxSafetyOrds >= 1, pxSteps is required\"},\"pxStepsMult\":{\"type\":\"string\",\"description\":\"Price step multiplier When maxSafetyOrds >= 1, pxStepsMult is required\"},\"volMult\":{\"type\":\"string\",\"description\":\"Safety order amount multiplier When maxSafetyOrds >= 1, volMult is required\"},\"tpPct\":{\"type\":\"string\",\"description\":\"Take-profit target per cycle 0.05 represents 5%\"},\"slPct\":{\"type\":\"string\",\"description\":\"Stop-loss target 0.05 represents 5%\"},\"slMode\":{\"type\":\"string\",\"description\":\"Stop-loss mode limit : Limit order market : Market order\"},\"direction\":{\"type\":\"string\",\"description\":\"Contract DCA type. Only applicable to contract_dca long : Long position, short : Short position\"},\"lever\":{\"type\":\"string\",\"description\":\"Leverage Only applicable to contract_dca\"},\"triggerParams\":{\"type\":\"array\",\"description\":\"Trigger parameters\",\"items\":{\"type\":\"object\",\"properties\":{\"triggerAction\":{\"type\":\"string\",\"description\":\"Trigger action Contract DCA: start : Start bot Spot DCA: start : Start bot\"},\"triggerStrategy\":{\"type\":\"string\",\"description\":\"Trigger strategy Contract DCA: instant : Instant trigger, price : Price trigger, rsi : RSI indicator trigger, default is instant Spot DCA: instant : Instant trigger, rsi : RSI indicator trigger, default is instant\"},\"timeframe\":{\"type\":\"string\",\"description\":\"K-line type 3m , 5m , 15m , 30m (m: minute) 1H , 4H (H: hour) 1D (D: day) This field is only valid when triggerStrategy is rsi\"},\"thold\":{\"type\":\"string\",\"description\":\"Threshold Integer between [1, 100] This field is only valid when triggerStrategy is rsi\"},\"triggerCond\":{\"type\":\"string\",\"description\":\"Trigger condition cross_up : Cross up cross_down : Cross down above : Above below : Below cross : Cross This field is only valid when triggerStrategy is rsi\"},\"timePeriod\":{\"type\":\"string\",\"description\":\"Time period 14 This field is only valid when triggerStrategy is rsi\"},\"triggerPx\":{\"type\":\"string\",\"description\":\"Trigger price This field is only valid when triggerStrategy is price Only applicable to contract_dca\"}},\"required\":[\"triggerAction\",\"triggerStrategy\"]}},\"profitSharingRatio\":{\"type\":\"string\",\"description\":\"Lead trader profit sharing ratio. Only fixed profit sharing is supported. Only applicable to contract_dca 0 , 0.1 , 0.2 , 0.3\"},\"trackingMode\":{\"type\":\"string\",\"description\":\"Tracking mode. Only applicable to contract_dca sync : Synchronous, async : Asynchronous\"},\"tag\":{\"type\":\"string\",\"description\":\"Order tag\"},\"algoClOrdId\":{\"type\":\"string\",\"description\":\"Client-supplied Algo ID\"},\"tradeQuoteCcy\":{\"type\":\"string\",\"description\":\"Quote currency for trading. Only applicable to spot_dca\"}},\"required\":[\"instId\",\"algoOrdType\",\"initOrdAmt\",\"maxSafetyOrds\",\"tpPct\",\"lever\",\"triggerParams\"]}"
+  },
+  {
+    "name": "trading_bot_dca_amend_order_algo",
+    "path": "/api/v5/tradingBot/dca/amend-order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "pxSteps",
+      "pxStepsMult",
+      "volMult",
+      "tpPct",
+      "slPct",
+      "initOrdAmt",
+      "safetyOrdAmt",
+      "maxSafetyOrds",
+      "reserveFunds",
+      "triggerParams"
+    ],
+    "required": [
+      "algoId",
+      "pxSteps",
+      "pxStepsMult",
+      "volMult",
+      "tpPct",
+      "slPct",
+      "initOrdAmt",
+      "safetyOrdAmt",
+      "maxSafetyOrds",
+      "reserveFunds",
+      "triggerParams"
+    ],
+    "bools": [
+      "reserveFunds"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"pxSteps\":{\"type\":\"string\",\"description\":\"Price step ratio (price gap to trigger the first safety order)\"},\"pxStepsMult\":{\"type\":\"string\",\"description\":\"Price step multiplier\"},\"volMult\":{\"type\":\"string\",\"description\":\"Amount multiplier\"},\"tpPct\":{\"type\":\"string\",\"description\":\"Take-profit target, e.g. 0.05 represents 5%\"},\"slPct\":{\"type\":\"string\",\"description\":\"Stop-loss target, e.g. 0.05 represents 5%\"},\"initOrdAmt\":{\"type\":\"string\",\"description\":\"Initial order amount (in quote currency)\"},\"safetyOrdAmt\":{\"type\":\"string\",\"description\":\"Safety order amount (in quote currency)\"},\"maxSafetyOrds\":{\"type\":\"string\",\"description\":\"Maximum number of safety orders\"},\"reserveFunds\":{\"type\":\"boolean\",\"description\":\"Whether to reserve all funds true : reserve funds false : do not reserve funds\"},\"triggerParams\":{\"type\":\"array\",\"description\":\"Signal trigger parameters\",\"items\":{\"type\":\"object\",\"properties\":{\"triggerAction\":{\"type\":\"string\",\"description\":\"Trigger action start : start the DCA bot\"},\"triggerStrategy\":{\"type\":\"string\",\"description\":\"Trigger strategy instant : trigger immediately rsi : RSI indicator trigger\"},\"timeframe\":{\"type\":\"string\",\"description\":\"Candlestick type 3m , 5m , 15m , 30m ( m = minutes) 1H , 4H ( H = hours) 1D ( D = days) Only valid when triggerStrategy is rsi\"},\"thold\":{\"type\":\"string\",\"description\":\"Threshold, integer in range [1, 100] Only valid when triggerStrategy is rsi\"},\"triggerCond\":{\"type\":\"string\",\"description\":\"Trigger condition cross_up : cross upward cross_down : cross downward above : above below : below cross : cross Only valid when triggerStrategy is rsi\"},\"timePeriod\":{\"type\":\"string\",\"description\":\"Period, e.g. 14 Only valid when triggerStrategy is rsi\"}},\"required\":[]}}},\"required\":[\"algoId\",\"pxSteps\",\"pxStepsMult\",\"volMult\",\"tpPct\",\"slPct\",\"initOrdAmt\",\"safetyOrdAmt\",\"maxSafetyOrds\",\"reserveFunds\",\"triggerParams\"]}"
+  },
+  {
+    "name": "trading_bot_dca_stop",
+    "path": "/api/v5/tradingBot/dca/stop",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType",
+      "stopType"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType",
+      "stopType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"},\"stopType\":{\"type\":\"string\",\"description\":\"Stop type contract_dca : 1 : Market close all positions, 2 : Keep positions spot_dca : 1 : Sell base currency, 2 : Keep base currency\"}},\"required\":[\"algoId\",\"algoOrdType\",\"stopType\"]}"
+  },
+  {
+    "name": "get_trading_bot_dca_ongoing_list",
+    "path": "/api/v5/tradingBot/dca/ongoing-list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested algoId\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested algoId\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[\"algoOrdType\"]}"
+  },
+  {
+    "name": "get_trading_bot_dca_history_list",
+    "path": "/api/v5/tradingBot/dca/history-list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested algoId\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested algoId\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[\"algoOrdType\"]}"
+  },
+  {
+    "name": "get_trading_bot_dca_orders",
+    "path": "/api/v5/tradingBot/dca/orders",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType",
+      "cycleId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"},\"cycleId\":{\"type\":\"string\",\"description\":\"Cycle ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested ordId\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested ordId\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[\"algoId\",\"algoOrdType\"]}"
+  },
+  {
+    "name": "trading_bot_dca_orders_manual_buy",
+    "path": "/api/v5/tradingBot/dca/orders/manual-buy",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType",
+      "price",
+      "amt",
+      "ordType",
+      "tradeQuoteCcy"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType",
+      "price",
+      "amt"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"},\"price\":{\"type\":\"string\",\"description\":\"Manual added order limit price\"},\"amt\":{\"type\":\"string\",\"description\":\"Amount\"},\"ordType\":{\"type\":\"string\",\"description\":\"Order type limit : Limit order market : Market order Only applicable to spot_dca\"},\"tradeQuoteCcy\":{\"type\":\"string\",\"description\":\"Quote currency for trading Only applicable to spot_dca\"}},\"required\":[\"algoId\",\"algoOrdType\",\"price\",\"amt\"]}"
+  },
+  {
+    "name": "trading_bot_dca_settings_reinvestment",
+    "path": "/api/v5/tradingBot/dca/settings/reinvestment",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType",
+      "allowReinvest"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType",
+      "allowReinvest"
+    ],
+    "bools": [
+      "allowReinvest"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order\"},\"allowReinvest\":{\"type\":\"boolean\",\"description\":\"Whether to reinvest profit true or false\"}},\"required\":[\"algoId\",\"algoOrdType\",\"allowReinvest\"]}"
+  },
+  {
+    "name": "trading_bot_dca_settings_take_profit",
+    "path": "/api/v5/tradingBot/dca/settings/take-profit",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType",
+      "tpPrice"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType",
+      "tpPrice"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order\"},\"tpPrice\":{\"type\":\"string\",\"description\":\"Take-profit price\"}},\"required\":[\"algoId\",\"algoOrdType\",\"tpPrice\"]}"
+  },
+  {
+    "name": "get_trading_bot_dca_position_details",
+    "path": "/api/v5/tradingBot/dca/position-details",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"}},\"required\":[\"algoId\",\"algoOrdType\"]}"
+  },
+  {
+    "name": "get_trading_bot_dca_cycle_list",
+    "path": "/api/v5/tradingBot/dca/cycle-list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType",
+      "instId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract_dca : Contract DCA order spot_dca : Spot DCA order\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested cycleId\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested cycleId\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[\"algoId\",\"algoOrdType\"]}"
+  },
+  {
+    "name": "trading_bot_dca_margin_add",
+    "path": "/api/v5/tradingBot/dca/margin/add",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "amt"
+    ],
+    "required": [
+      "algoId",
+      "amt"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"amt\":{\"type\":\"string\",\"description\":\"Margin add amount\"}},\"required\":[\"algoId\",\"amt\"]}"
+  },
+  {
+    "name": "trading_bot_dca_margin_reduce",
+    "path": "/api/v5/tradingBot/dca/margin/reduce",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "amt"
+    ],
+    "required": [
+      "algoId",
+      "amt"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"amt\":{\"type\":\"string\",\"description\":\"Margin reduction amount\"}},\"required\":[\"algoId\",\"amt\"]}"
+  },
+  {
+    "name": "trading_bot_signal_create_signal",
+    "path": "/api/v5/tradingBot/signal/create-signal",
+    "post": true,
+    "public": false,
+    "keys": [
+      "signalChanName",
+      "signalChanDesc"
+    ],
+    "required": [
+      "signalChanName"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"signalChanName\":{\"type\":\"string\",\"description\":\"Signal channel name\"},\"signalChanDesc\":{\"type\":\"string\",\"description\":\"Signal channel description\"}},\"required\":[\"signalChanName\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_signals",
+    "path": "/api/v5/tradingBot/signal/signals",
+    "post": false,
+    "public": false,
+    "keys": [
+      "signalSourceType",
+      "signalChanId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "signalSourceType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"signalSourceType\":{\"type\":\"string\",\"description\":\"Signal source type 1 : Created by yourself 2 : Subscribe 3 : Free signal\"},\"signalChanId\":{\"type\":\"string\",\"description\":\"Signal channel id\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records signalChanId earlier than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records signalChanId newer than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100.\"}},\"required\":[\"signalSourceType\"]}"
+  },
+  {
+    "name": "trading_bot_signal_order_algo",
+    "path": "/api/v5/tradingBot/signal/order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "signalChanId",
+      "lever",
+      "investAmt",
+      "subOrdType",
+      "includeAll",
+      "instIds",
+      "ratio",
+      "entrySettingParam",
+      "exitSettingParam"
+    ],
+    "required": [
+      "signalChanId",
+      "lever",
+      "investAmt",
+      "subOrdType"
+    ],
+    "bools": [
+      "includeAll"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"signalChanId\":{\"type\":\"string\",\"description\":\"Signal channel Id\"},\"lever\":{\"type\":\"string\",\"description\":\"Leverage Only applicable to contract signal\"},\"investAmt\":{\"type\":\"string\",\"description\":\"Investment amount\"},\"subOrdType\":{\"type\":\"string\",\"description\":\"Sub order type 1 \\uff1alimit order 2 \\uff1amarket order 9 \\uff1atradingView signal\"},\"includeAll\":{\"type\":\"boolean\",\"description\":\"Whether to include all USDT-margined contract.The default value is false . true : include false : exclude\"},\"instIds\":{\"type\":\"string\",\"description\":\"Instrument IDs. Single currency or multiple currencies separated with comma. When includeAll is true , it is ignored\"},\"ratio\":{\"type\":\"string\",\"description\":\"Price offset ratio, calculate the limit price as a percentage offset from the best bid/ask price. Only applicable to subOrdType is limit order\"},\"entrySettingParam\":{\"type\":\"object\",\"description\":\"Entry setting\",\"properties\":{\"allowMultipleEntry\":{\"type\":\"boolean\",\"description\":\"Whether or not allow multiple entries in the same direction for the same trading pairs.The default value is true \\u3002 true \\uff1aAllow false \\uff1aProhibit\"},\"entryType\":{\"type\":\"string\",\"description\":\"Entry type 1 : TradingView signal 2 : Fixed margin 3 : Contracts 4 : Percentage of free margin 5 : Percentage of the initial invested margin\"},\"amt\":{\"type\":\"string\",\"description\":\"Amount per order Only applicable to entryType in 2 / 3\"},\"ratio\":{\"type\":\"string\",\"description\":\"Amount ratio per order Only applicable to entryType in 4 / 5\"}},\"required\":[]},\"exitSettingParam\":{\"type\":\"object\",\"description\":\"Exit setting\",\"properties\":{\"tpSlType\":{\"type\":\"string\",\"description\":\"Type of set the take-profit and stop-loss trigger price pnl : Based on the estimated profit and loss percentage from the entry point price : Based on price increase or decrease from the crypto\\u2019s entry price\"},\"tpPct\":{\"type\":\"string\",\"description\":\"Take-profit percentage\"},\"slPct\":{\"type\":\"string\",\"description\":\"Stop-loss percentage\"}},\"required\":[]}},\"required\":[\"signalChanId\",\"lever\",\"investAmt\",\"subOrdType\"]}"
+  },
+  {
+    "name": "trading_bot_signal_stop_order_algo",
+    "path": "/api/v5/tradingBot/signal/stop-order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orders"
+    ],
+    "required": [
+      "orders"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"orders\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoId\"]},\"minItems\":1,\"maxItems\":10}},\"required\":[\"orders\"],\"x-body-array\":true}"
+  },
+  {
+    "name": "trading_bot_signal_margin_balance",
+    "path": "/api/v5/tradingBot/signal/margin-balance",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "type",
+      "amt",
+      "allowReinvest"
+    ],
+    "required": [
+      "algoId",
+      "type",
+      "amt"
+    ],
+    "bools": [
+      "allowReinvest"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"type\":{\"type\":\"string\",\"description\":\"Adjust margin balance type add reduce\"},\"amt\":{\"type\":\"string\",\"description\":\"Adjust margin balance amount Either amt or percent is required.\"},\"allowReinvest\":{\"type\":\"boolean\",\"description\":\"Whether to reinvest with newly added margin. The default value is false . false :it will be used as passive margin to prevent liquidation and will not be used as active investment true :the margin added here will furthermore be accounted for in calculations of your total investment amount, and furthermore your order size\\u3002 Only applicable to your signal comes in with an \\u201cinvestmentType\\u201d of \\u201cpercentage_investment\\u201d\"}},\"required\":[\"algoId\",\"type\",\"amt\"]}"
+  },
+  {
+    "name": "trading_bot_signal_amend_tpsl",
+    "path": "/api/v5/tradingBot/signal/amendTPSL",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "exitSettingParam"
+    ],
+    "required": [
+      "algoId",
+      "exitSettingParam"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"exitSettingParam\":{\"type\":\"object\",\"description\":\"Exit setting\",\"properties\":{\"tpSlType\":{\"type\":\"string\",\"description\":\"Type of set the take-profit and stop-loss trigger price pnl : Based on the estimated profit and loss percentage from the entry point price : Based on price increase or decrease from the crypto\\u2019s entry price\"},\"tpPct\":{\"type\":\"string\",\"description\":\"Take-profit percentage\"},\"slPct\":{\"type\":\"string\",\"description\":\"Stop-loss percentage\"}},\"required\":[\"tpSlType\"]}},\"required\":[\"algoId\",\"exitSettingParam\"]}"
+  },
+  {
+    "name": "trading_bot_signal_set_instruments",
+    "path": "/api/v5/tradingBot/signal/set-instruments",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "instIds",
+      "includeAll"
+    ],
+    "required": [
+      "algoId",
+      "instIds",
+      "includeAll"
+    ],
+    "bools": [
+      "includeAll"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instIds\":{\"type\":\"array\",\"description\":\"Instrument IDs. When includeAll is true , it is ignored\",\"items\":{\"type\":\"string\"}},\"includeAll\":{\"type\":\"boolean\",\"description\":\"Whether to include all USDT-margined contract.The default value is false . true : include false : exclude\"}},\"required\":[\"algoId\",\"instIds\",\"includeAll\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_orders_algo_details",
+    "path": "/api/v5/tradingBot/signal/orders-algo-details",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "required": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract : Contract signal\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoOrdType\",\"algoId\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_orders_algo_pending",
+    "path": "/api/v5/tradingBot/signal/orders-algo-pending",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoOrdType",
+      "after"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract : Contract signal\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records algoId earlier than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records algoId newer than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100.\"}},\"required\":[\"algoOrdType\",\"after\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_orders_algo_history",
+    "path": "/api/v5/tradingBot/signal/orders-algo-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoOrdType",
+      "algoId",
+      "after"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract : Contract signal\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records algoId earlier than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records algoId newer than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100.\"}},\"required\":[\"algoOrdType\",\"algoId\",\"after\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_positions",
+    "path": "/api/v5/tradingBot/signal/positions",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "required": [
+      "algoOrdType",
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract : Contract signal\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoOrdType\",\"algoId\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_positions_history",
+    "path": "/api/v5/tradingBot/signal/positions-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "instId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g.\\uff1a BTC-USD-SWAP\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested uTime , Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested uTime , Unix timestamp format in milliseconds, e.g 1597026383085\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100.\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "trading_bot_signal_close_position",
+    "path": "/api/v5/tradingBot/signal/close-position",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "instId"
+    ],
+    "required": [
+      "algoId",
+      "instId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID\"}},\"required\":[\"algoId\",\"instId\"]}"
+  },
+  {
+    "name": "trading_bot_signal_sub_order",
+    "path": "/api/v5/tradingBot/signal/sub-order",
+    "post": true,
+    "public": false,
+    "keys": [
+      "instId",
+      "algoId",
+      "side",
+      "ordType",
+      "sz",
+      "px",
+      "reduceOnly"
+    ],
+    "required": [
+      "instId",
+      "algoId",
+      "side",
+      "ordType",
+      "sz"
+    ],
+    "bools": [
+      "reduceOnly"
+    ],
+    "schema": "{\"type\":\"object\",\"properties\":{\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT-SWAP\"},\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"side\":{\"type\":\"string\",\"description\":\"Order side, buy sell\"},\"ordType\":{\"type\":\"string\",\"description\":\"Order type market : Market order limit : Limit order\"},\"sz\":{\"type\":\"string\",\"description\":\"Quantity to buy or sell\"},\"px\":{\"type\":\"string\",\"description\":\"Order price. Only applicable to limit order.\"},\"reduceOnly\":{\"type\":\"boolean\",\"description\":\"Whether orders can only reduce in position size. Valid options: true or false . The default value is false . Only applicable to Futures mode / Multi-currency margin\"}},\"required\":[\"instId\",\"algoId\",\"side\",\"ordType\",\"sz\"]}"
+  },
+  {
+    "name": "trading_bot_signal_cancel_sub_order",
+    "path": "/api/v5/tradingBot/signal/cancel-sub-order",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "instId",
+      "signalOrdId"
+    ],
+    "required": [
+      "algoId",
+      "instId",
+      "signalOrdId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"instId\":{\"type\":\"string\",\"description\":\"Instrument ID, e.g. BTC-USDT-SWAP\"},\"signalOrdId\":{\"type\":\"string\",\"description\":\"Order ID\"}},\"required\":[\"algoId\",\"instId\",\"signalOrdId\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_sub_orders",
+    "path": "/api/v5/tradingBot/signal/sub-orders",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "algoOrdType",
+      "state",
+      "signalOrdId",
+      "after",
+      "before",
+      "begin",
+      "end",
+      "limit",
+      "type",
+      "clOrdId"
+    ],
+    "required": [
+      "algoId",
+      "algoOrdType"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"algoOrdType\":{\"type\":\"string\",\"description\":\"Algo order type contract : Contract signal\"},\"state\":{\"type\":\"string\",\"description\":\"Sub order state live partially_filled filled cancelled Either state or signalOrdId is required, if both are passed in, only state is valid.\"},\"signalOrdId\":{\"type\":\"string\",\"description\":\"Sub order ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested ordId\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested ordId .\"},\"begin\":{\"type\":\"string\",\"description\":\"Return records of ctime after than the requested timestamp (include), Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"end\":{\"type\":\"string\",\"description\":\"Return records of ctime before than the requested timestamp (include), Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100.\"},\"type\":{\"type\":\"string\",\"description\":\"Sub order type live filled Either type or clOrdId is required, if both are passed in, only clOrdId is valid.\"},\"clOrdId\":{\"type\":\"string\",\"description\":\"Sub order client-supplied ID. It will be deprecated soon\"}},\"required\":[\"algoId\",\"algoOrdType\"]}"
+  },
+  {
+    "name": "get_trading_bot_signal_event_history",
+    "path": "/api/v5/tradingBot/signal/event-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records eventCtime earlier than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records eventCtime newer than the requested timestamp, Unix timestamp format in milliseconds, e.g. 1597026383085\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100.\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_order_algo",
+    "path": "/api/v5/tradingBot/recurring/order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "stgyName",
+      "recurringList",
+      "period",
+      "recurringDay",
+      "recurringHour",
+      "recurringTime",
+      "timeZone",
+      "amt",
+      "investmentCcy",
+      "tdMode",
+      "algoClOrdId",
+      "tag",
+      "tradeQuoteCcy",
+      "source",
+      "recurringTimeType"
+    ],
+    "required": [
+      "stgyName",
+      "recurringList",
+      "period",
+      "recurringTime",
+      "timeZone",
+      "amt",
+      "investmentCcy",
+      "tdMode"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"stgyName\":{\"type\":\"string\",\"description\":\"Custom name for trading bot, no more than 40 characters\"},\"recurringList\":{\"type\":\"array\",\"description\":\"Recurring buy info\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\",\"description\":\"Recurring currency, e.g. BTC\"},\"ratio\":{\"type\":\"string\",\"description\":\"Proportion of recurring currency assets, e.g. \\\"0.2\\\" representing 20%\"},\"minPx\":{\"type\":\"string\",\"description\":\"Minimum price of recurring currency. \\\"\\\" means no limit\",\"x-allow-empty\":true},\"maxPx\":{\"type\":\"string\",\"description\":\"Maximum price of recurring currency. \\\"\\\" means no limit\",\"x-allow-empty\":true}},\"required\":[\"ccy\",\"ratio\"]}},\"period\":{\"type\":\"string\",\"description\":\"Period monthly weekly daily hourly\"},\"recurringDay\":{\"type\":\"string\",\"description\":\"Recurring buy date When the period is monthly , the value range is an integer of [1,28] When the period is weekly , the value range is an integer of [1,7] When the period is daily / hourly , the parameter is not required.\"},\"recurringHour\":{\"type\":\"string\",\"description\":\"Recurring buy by hourly 1 / 4 / 8 / 12 , e.g. 4 represents \\\"recurring buy every 4 hour\\\" When the period is hourly , the parameter is required.\"},\"recurringTime\":{\"type\":\"string\",\"description\":\"Recurring buy time, the value range is an integer of [0,23] When the period is hourly , the parameter is the time of the first investment occurs.\"},\"timeZone\":{\"type\":\"string\",\"description\":\"UTC time zone, the value range is an integer of [-12,14] e.g. \\\"8\\\" representing UTC+8 (East 8 District), Beijing Time\"},\"amt\":{\"type\":\"string\",\"description\":\"Quantity invested per cycle\"},\"investmentCcy\":{\"type\":\"string\",\"description\":\"The invested quantity unit, can only be USDT / USDC\"},\"tdMode\":{\"type\":\"string\",\"description\":\"Trading mode Margin mode: cross Non-Margin mode: cash\"},\"algoClOrdId\":{\"type\":\"string\",\"description\":\"Client-supplied Algo ID There will be a value when algo order attaching algoClOrdId is triggered, or it will be \\\"\\\". A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 32 characters.\",\"x-allow-empty\":true},\"tag\":{\"type\":\"string\",\"description\":\"Order tag A combination of case-sensitive alphanumerics, all numbers, or all letters of up to 16 characters.\"},\"tradeQuoteCcy\":{\"type\":\"string\",\"description\":\"The quote currency for trading.\"},\"source\":{\"type\":\"array\",\"description\":\"Funding source 1 : Trading account 2 : Funding account 3 : Simple earn account Default is 1\",\"items\":{\"type\":\"string\"}},\"recurringTimeType\":{\"type\":\"string\",\"description\":\"Recurring buy time type 1 : Custom time 2 : Immediate trigger Default is 1\"}},\"required\":[\"stgyName\",\"recurringList\",\"period\",\"recurringTime\",\"timeZone\",\"amt\",\"investmentCcy\",\"tdMode\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_amend_order_algo",
+    "path": "/api/v5/tradingBot/recurring/amend-order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "stgyName"
+    ],
+    "required": [
+      "algoId",
+      "stgyName"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"stgyName\":{\"type\":\"string\",\"description\":\"New custom name for trading bot after adjustment, no more than 40 characters\"}},\"required\":[\"algoId\",\"stgyName\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_stop_order_algo",
+    "path": "/api/v5/tradingBot/recurring/stop-order-algo",
+    "post": true,
+    "public": false,
+    "keys": [
+      "orders"
+    ],
+    "required": [
+      "orders"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"orders\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoId\"]},\"minItems\":1,\"maxItems\":10}},\"required\":[\"orders\"],\"x-body-array\":true}"
+  },
+  {
+    "name": "get_trading_bot_recurring_orders_algo_pending",
+    "path": "/api/v5/tradingBot/recurring/orders-algo-pending",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested algoId .\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested algoId .\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_trading_bot_recurring_orders_algo_history",
+    "path": "/api/v5/tradingBot/recurring/orders-algo-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested algoId .\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested algoId .\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_trading_bot_recurring_orders_algo_details",
+    "path": "/api/v5/tradingBot/recurring/orders-algo-details",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "get_trading_bot_recurring_sub_orders",
+    "path": "/api/v5/tradingBot/recurring/sub-orders",
+    "post": false,
+    "public": false,
+    "keys": [
+      "algoId",
+      "ordId",
+      "after",
+      "before",
+      "limit"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"ordId\":{\"type\":\"string\",\"description\":\"Sub order ID\"},\"after\":{\"type\":\"string\",\"description\":\"Pagination of data to return records earlier than the requested algoId .\"},\"before\":{\"type\":\"string\",\"description\":\"Pagination of data to return records newer than the requested algoId .\"},\"limit\":{\"type\":\"string\",\"description\":\"Number of results per request. The maximum is 100. The default is 100\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_amend_recurring_time",
+    "path": "/api/v5/tradingBot/recurring/amend-recurring-time",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "recurringTimeType",
+      "timeZone",
+      "period",
+      "recurringHour",
+      "recurringDay",
+      "recurringTime"
+    ],
+    "required": [
+      "algoId",
+      "recurringTimeType",
+      "timeZone",
+      "period"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo ID\"},\"recurringTimeType\":{\"type\":\"string\",\"description\":\"Recurring buy time type 1 : Custom time 2 : Immediate trigger\"},\"timeZone\":{\"type\":\"string\",\"description\":\"UTC time zone, the value range is an integer of [-12,14] e.g. 8 representing UTC+8 (East 8 District), Beijing Time\"},\"period\":{\"type\":\"string\",\"description\":\"Period monthly weekly daily hourly\"},\"recurringHour\":{\"type\":\"string\",\"description\":\"Recurring buy by hourly 1 / 4 / 8 / 12 , e.g. 1 represents \\\"recurring buy every 1 hour\\\" Required when period is hourly\"},\"recurringDay\":{\"type\":\"string\",\"description\":\"Recurring buy date When the period is monthly , the value range is an integer of [1,28] When the period is weekly , the value range is an integer of [1,7] When the period is daily / hourly , the parameter is not required Only required when recurringTimeType is 1\"},\"recurringTime\":{\"type\":\"string\",\"description\":\"Recurring buy time, the value range is an integer of [0,23] Only required when recurringTimeType is 1\"}},\"required\":[\"algoId\",\"recurringTimeType\",\"timeZone\",\"period\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_amend_recurring_amount",
+    "path": "/api/v5/tradingBot/recurring/amend-recurring-amount",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "amount"
+    ],
+    "required": [
+      "algoId",
+      "amount"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"amount\":{\"type\":\"string\",\"description\":\"Amended recurring buy amount. Only the investment currency used when the strategy was created is supported\"}},\"required\":[\"algoId\",\"amount\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_add_investment",
+    "path": "/api/v5/tradingBot/recurring/add-investment",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "amount"
+    ],
+    "required": [
+      "algoId",
+      "amount"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"amount\":{\"type\":\"string\",\"description\":\"Additional investment amount. Only the investment currency used when the strategy was created is supported\"}},\"required\":[\"algoId\",\"amount\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_pause",
+    "path": "/api/v5/tradingBot/recurring/pause",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_restart",
+    "path": "/api/v5/tradingBot/recurring/restart",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId"
+    ],
+    "required": [
+      "algoId"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"}},\"required\":[\"algoId\"]}"
+  },
+  {
+    "name": "trading_bot_recurring_amend_price_range",
+    "path": "/api/v5/tradingBot/recurring/amend-price-range",
+    "post": true,
+    "public": false,
+    "keys": [
+      "algoId",
+      "recurringList"
+    ],
+    "required": [
+      "algoId",
+      "recurringList"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"algoId\":{\"type\":\"string\",\"description\":\"Algo order ID\"},\"recurringList\":{\"type\":\"array\",\"description\":\"Price range settings. The currency must be within the scope of the recurring buy currencies\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\",\"description\":\"Recurring buy currency\"},\"minPx\":{\"type\":\"string\",\"description\":\"Minimum price of price range. \\\"\\\" means no limit\",\"x-allow-empty\":true},\"maxPx\":{\"type\":\"string\",\"description\":\"Maximum price of price range. \\\"\\\" means no limit\",\"x-allow-empty\":true}},\"required\":[\"ccy\",\"minPx\",\"maxPx\"]}}},\"required\":[\"algoId\",\"recurringList\"]}"
+  }
+]

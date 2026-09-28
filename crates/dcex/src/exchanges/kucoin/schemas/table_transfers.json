@@ -1,0 +1,190 @@
+[
+  {
+    "name": "transfer_uta_accounts",
+    "path": "/api/ua/v2/account/transfer",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "clientOid",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "transferType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "INTERNAL",
+          "PARENT_TO_SUB",
+          "SUB_TO_PARENT",
+          "SUB_TO_SUB"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "amount",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "fromUid",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "fromAccountType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "FUNDING",
+          "UNIFIED",
+          "FUTURES",
+          "ISOLATED",
+          "CROSS",
+          "SPOT"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "fromAccountTag",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toUid",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toAccountType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "FUNDING",
+          "UNIFIED",
+          "FUTURES",
+          "ISOLATED",
+          "CROSS",
+          "SPOT"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "toAccountTag",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_transfer_quota",
+    "path": "/api/ua/v2/account/transfer-quota",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "accountType",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [
+          "FUNDING",
+          "SPOT",
+          "FUTURES",
+          "CROSS",
+          "ISOLATED",
+          "UNIFIED"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "set_uta_sub_account_transfer_permission",
+    "path": "/api/ua/v2/sub-account/canTransferOut",
+    "method": "HttpMethod::Post",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "subUids",
+        "kind": "s",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "subToSub",
+        "kind": "b",
+        "required": true,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  }
+]

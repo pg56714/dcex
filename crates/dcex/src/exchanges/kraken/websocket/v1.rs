@@ -98,6 +98,10 @@ impl KrakenV1WebSocket {
                     }
                 }
                 "addOrder" => {
+                    crate::exchanges::schema::validate_numbers(
+                        &Value::Object(obj.clone()),
+                        "order",
+                    )?;
                     for key in ["ordertype", "type", "pair", "volume"] {
                         if obj
                             .get(key)

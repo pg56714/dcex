@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import json
 from contextlib import asynccontextmanager
+from decimal import Decimal
 
 import pytest
 from aiohttp import WSMsgType, web
@@ -14,8 +15,24 @@ from dcex.ws.kucoin import PrivateClient, ProClient, PublicClient
 from tests.unit.ws_official_examples import json_examples, load_operations
 
 OPERATIONS = load_operations("kucoin")
+
+
+def exact_order_prices(message):
+    """Use plain strings for financial floats in upstream example fixtures."""
+    if isinstance(message, dict):
+        return {
+            key: format(Decimal(str(value)), "f")
+            if key == "newPrice" and isinstance(value, float)
+            else exact_order_prices(value)
+            for key, value in message.items()
+        }
+    if isinstance(message, list):
+        return [exact_order_prices(value) for value in message]
+    return message
+
+
 CASES = [
-    {"row": op["row"], "message": msg}
+    {"row": op["row"], "message": exact_order_prices(msg)}
     for op in OPERATIONS
     for msg in json_examples(op["text"])
     if isinstance(msg, dict)

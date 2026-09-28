@@ -1,0 +1,13 @@
+[
+  {
+    "name": "get_portfolio_margin_info",
+    "path": "/v5/asset/portfolio-margin",
+    "post": false,
+    "public": false,
+    "keys": [
+      "baseCoin"
+    ],
+    "required": [],
+    "integers": []
+  }
+]

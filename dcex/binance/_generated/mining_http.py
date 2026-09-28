@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -26,11 +28,9 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "algo": algo,
-                    "userName": user_name,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"algo": algo, "userName": user_name, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -51,7 +51,7 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {}.items()
+                for key, value in normalize_params({}).items()
                 if value is not None
             ],
         )
@@ -72,7 +72,7 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {}.items()
+                for key, value in normalize_params({}).items()
                 if value is not None
             ],
         )
@@ -95,11 +95,9 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "configId": config_id,
-                    "userName": user_name,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"configId": config_id, "userName": user_name, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -131,16 +129,18 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "algo": algo,
-                    "userName": user_name,
-                    "coin": coin,
-                    "startDate": start_date,
-                    "endDate": end_date,
-                    "pageIndex": page_index,
-                    "pageSize": page_size,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "algo": algo,
+                        "userName": user_name,
+                        "coin": coin,
+                        "startDate": start_date,
+                        "endDate": end_date,
+                        "pageIndex": page_index,
+                        "pageSize": page_size,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -172,16 +172,18 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "algo": algo,
-                    "userName": user_name,
-                    "coin": coin,
-                    "startDate": start_date,
-                    "endDate": end_date,
-                    "pageIndex": page_index,
-                    "pageSize": page_size,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "algo": algo,
+                        "userName": user_name,
+                        "coin": coin,
+                        "startDate": start_date,
+                        "endDate": end_date,
+                        "pageIndex": page_index,
+                        "pageSize": page_size,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -209,12 +211,14 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "configId": config_id,
-                    "pageIndex": page_index,
-                    "pageSize": page_size,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "configId": config_id,
+                        "pageIndex": page_index,
+                        "pageSize": page_size,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -241,11 +245,9 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "pageIndex": page_index,
-                    "pageSize": page_size,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"pageIndex": page_index, "pageSize": page_size, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -276,15 +278,17 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "userName": user_name,
-                    "algo": algo,
-                    "endDate": end_date,
-                    "startDate": start_date,
-                    "toPoolUser": to_pool_user,
-                    "hashRate": hash_rate,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "userName": user_name,
+                        "algo": algo,
+                        "endDate": end_date,
+                        "startDate": start_date,
+                        "toPoolUser": to_pool_user,
+                        "hashRate": hash_rate,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -314,14 +318,16 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "algo": algo,
-                    "startDate": start_date,
-                    "endDate": end_date,
-                    "pageIndex": page_index,
-                    "pageSize": page_size,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "algo": algo,
+                        "startDate": start_date,
+                        "endDate": end_date,
+                        "pageIndex": page_index,
+                        "pageSize": page_size,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -344,12 +350,14 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "algo": algo,
-                    "userName": user_name,
-                    "workerName": worker_name,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "algo": algo,
+                        "userName": user_name,
+                        "workerName": worker_name,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -380,15 +388,17 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "algo": algo,
-                    "userName": user_name,
-                    "pageIndex": page_index,
-                    "sort": sort,
-                    "sortColumn": sort_column,
-                    "workerStatus": worker_status,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "algo": algo,
+                        "userName": user_name,
+                        "pageIndex": page_index,
+                        "sort": sort,
+                        "sortColumn": sort_column,
+                        "workerStatus": worker_status,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -409,11 +419,9 @@ class GeneratedMiningHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "algo": algo,
-                    "userName": user_name,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"algo": algo, "userName": user_name, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )

@@ -1,0 +1,77 @@
+[
+  {
+    "name": "get_uta_account_max_withdrawal",
+    "path": "/api/v3/account/max-withdrawal",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin"
+    ],
+    "required": [
+      "coin"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_spot_wallet_withdrawal_records",
+    "path": "/api/v2/spot/wallet/withdrawal-records",
+    "post": false,
+    "public": false,
+    "fields": [
+      "startTime",
+      "endTime",
+      "coin",
+      "clientOid",
+      "idLessThan",
+      "orderId",
+      "limit"
+    ],
+    "required": [
+      "startTime",
+      "endTime"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_account_withdrawal_records",
+    "path": "/api/v3/account/withdrawal-records",
+    "post": false,
+    "public": false,
+    "fields": [
+      "startTime",
+      "endTime",
+      "coin",
+      "orderId",
+      "clientOid",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "startTime",
+      "endTime"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_account_withdraw_address",
+    "path": "/api/v3/account/withdraw-address",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin",
+      "type",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  }
+]

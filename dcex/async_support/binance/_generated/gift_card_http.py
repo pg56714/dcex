@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -33,12 +35,14 @@ class GeneratedGiftCardHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "baseToken": base_token,
-                    "faceToken": face_token,
-                    "baseTokenAmount": base_token_amount,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "baseToken": base_token,
+                        "faceToken": face_token,
+                        "baseTokenAmount": base_token_amount,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -61,11 +65,9 @@ class GeneratedGiftCardHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "token": token,
-                    "amount": amount,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"token": token, "amount": amount, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -86,7 +88,7 @@ class GeneratedGiftCardHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"recvWindow": recv_window}.items()
+                for key, value in normalize_params({"recvWindow": recv_window}).items()
                 if value is not None
             ],
         )
@@ -107,7 +109,9 @@ class GeneratedGiftCardHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"baseToken": base_token, "recvWindow": recv_window}.items()
+                for key, value in normalize_params(
+                    {"baseToken": base_token, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -130,11 +134,9 @@ class GeneratedGiftCardHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "code": code,
-                    "externalUid": external_uid,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {"code": code, "externalUid": external_uid, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )
@@ -157,7 +159,9 @@ class GeneratedGiftCardHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"referenceNo": reference_no, "recvWindow": recv_window}.items()
+                for key, value in normalize_params(
+                    {"referenceNo": reference_no, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )

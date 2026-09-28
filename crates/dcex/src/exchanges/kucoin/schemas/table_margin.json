@@ -1,0 +1,147 @@
+[
+  {
+    "name": "get_margin_hf_account_ledgers",
+    "path": "/api/v3/hf/margin/account/ledgers",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "direction",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "in",
+          "out"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "bizType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "lastId",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "limit",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": 200
+      },
+      {
+        "key": "startAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "endAt",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_margin_mark_price",
+    "path": "/api/v1/mark-price/{symbol}/current",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": true,
+        "path": true,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_margin_mark_prices",
+    "path": "/api/v3/mark-price/all-symbols",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  },
+  {
+    "name": "get_margin_currency_risk_limits",
+    "path": "/api/v3/margin/currencies",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": false,
+    "fields": [
+      {
+        "key": "isIsolated",
+        "kind": "b",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "currency",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "symbol",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": null,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_margin_config",
+    "path": "/api/v1/margin/config",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": []
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "name": "exchange_futures_assets",
+    "path": "/fapi/v3/assetExchange",
+    "method": "HttpMethod::Post",
+    "is_public": false,
+    "presigned": false,
+    "fields": [],
+    "required": []
+  },
+  {
+    "name": "get_asset_migration_history",
+    "path": "/fapi/v3/asset/migrateUser/history",
+    "method": "HttpMethod::Get",
+    "is_public": false,
+    "presigned": false,
+    "fields": [
+      "batchId"
+    ],
+    "required": [
+      "batchId"
+    ]
+  }
+]

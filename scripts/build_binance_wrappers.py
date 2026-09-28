@@ -110,6 +110,7 @@ def main() -> None:
             '"""Additional Binance endpoints from the official SDK request tables."""',
             "from typing import Any",
             "from json import dumps",
+            "from dcex._schema_codec import normalize_params",
             "from ._market_http import MarketHTTP",
             "from ._trade_http import TradeHTTP",
             "",
@@ -158,7 +159,7 @@ def main() -> None:
                 + f"self._native_{('public' if op['public'] else 'private')}({op['name']!r}, "
                 + '[(key, dumps(value, separators=(",", ":")) '
                 + "if isinstance(value, (dict, list, bool)) else str(value)) "
-                + f"for key, value in {{{values}}}.items() if value is not None])"
+                + f"for key, value in normalize_params({{{values}}}).items() if value is not None])"
             )
         write_python_wrappers("binance", asynchronous, "\n".join(lines) + "\n")
     print(f"Generated {len(specs)} operations.")

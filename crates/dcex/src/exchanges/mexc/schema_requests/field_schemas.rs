@@ -8,13 +8,7 @@ use serde::Deserialize;
 use serde_json::{Map, Value};
 use std::{collections::HashMap, sync::OnceLock};
 
-#[derive(Deserialize)]
-struct Field {
-    name: String,
-    #[serde(rename = "type")]
-    kind: String,
-    required: bool,
-}
+use crate::exchanges::schema::Field;
 #[derive(Deserialize)]
 struct Endpoint {
     name: String,
@@ -106,6 +100,7 @@ impl MexcClient {
                 return Err(invalid(format!("{} is required", f.name)));
             }
             if let Some(raw) = p.get(&f.name) {
+                f.encode(raw)?;
                 let value = if f.kind == "number[]" {
                     let values: Vec<u64> = serde_json::from_str(raw)
                         .map_err(|_| invalid("blacklist requires integer UIDs"))?;

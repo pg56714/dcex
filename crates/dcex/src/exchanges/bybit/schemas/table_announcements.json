@@ -1,0 +1,22 @@
+[
+  {
+    "name": "get_announcements",
+    "path": "/v5/announcements/index",
+    "post": false,
+    "public": true,
+    "keys": [
+      "locale",
+      "type",
+      "tag",
+      "page",
+      "limit"
+    ],
+    "required": [
+      "locale"
+    ],
+    "integers": [
+      "page",
+      "limit"
+    ]
+  }
+]

@@ -111,7 +111,8 @@
                   },
                   "size": {
                     "type": "number",
-                    "format": "double"
+                    "format": "double",
+                    "x-signed": true
                   }
                 }
               }

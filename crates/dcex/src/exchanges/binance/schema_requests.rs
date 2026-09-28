@@ -1,7 +1,7 @@
 //! Schema-driven request validation, encoding and dispatch.
 use super::client::{BinanceClient, BinanceMarket};
 use super::params::PublicParams;
-#[path = "endpoint_schemas/mod.rs"]
+#[path = "generated/schema_tables.rs"]
 mod endpoints;
 use crate::exchange::ValidatedResponse;
 use crate::http::HttpMethod;
@@ -50,6 +50,7 @@ impl BinanceClient {
             return Ok(None);
         };
         params.ensure_allowed(endpoint.allowed)?;
+        crate::exchanges::schema::validate_pairs(&params.0)?;
         let singleton_keys: Vec<_> = params
             .0
             .iter()
@@ -90,6 +91,9 @@ impl BinanceClient {
             if !field.choices.is_empty() && !field.choices.contains(&value) {
                 return Err(invalid(format!("invalid {}", field.key)));
             }
+            if field.kind == 'd' {
+                crate::exchanges::schema::encode(field.key, value, "decimal")?;
+            }
             match field.kind {
                 'i' => {
                     value.parse::<u64>().map_err(|_| {
@@ -97,7 +101,7 @@ impl BinanceClient {
                     })?;
                 }
                 'd' => {
-                    if !value.parse::<f64>().is_ok_and(|n| n.is_finite() && n > 0.0) {
+                    if !crate::common::is_positive_plain_decimal(value) {
                         return Err(invalid(format!("{} must be positive", field.key)));
                     }
                 }
@@ -134,7 +138,7 @@ impl BinanceClient {
                             .ok_or_else(|| invalid("invalid position symbol"))?;
                         let quantity = item["quantity"]
                             .as_str()
-                            .filter(|s| s.parse::<f64>().is_ok_and(|v| v.is_finite() && v > 0.0))
+                            .filter(|s| crate::common::is_positive_plain_decimal(s))
                             .ok_or_else(|| invalid("quantity must be a positive decimal string"))?;
                         let side = item["positionSide"]
                             .as_str()

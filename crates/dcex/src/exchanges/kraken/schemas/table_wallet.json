@@ -1,0 +1,12 @@
+[
+  {
+    "name": "get_spot_wallet_accounts",
+    "path": "/0/private/ListWalletAccounts",
+    "method": "HttpMethod::Post",
+    "auth": "KrakenAuth::Spot",
+    "public": false,
+    "allowed": [],
+    "fields": [],
+    "symbol_key": null
+  }
+]

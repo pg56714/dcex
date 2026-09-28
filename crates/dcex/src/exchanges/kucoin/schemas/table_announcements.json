@@ -1,0 +1,196 @@
+[
+  {
+    "name": "get_announcements",
+    "path": "/api/v3/announcements",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "currentPage",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "annType",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "latest-announcements",
+          "futures-announcements",
+          "activities",
+          "product-updates",
+          "vip",
+          "maintenance-updates",
+          "delistings",
+          "others",
+          "api-campaigns",
+          "new-listings"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "lang",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "zh_HK",
+          "ja_JP",
+          "ko_KR",
+          "en_US",
+          "pl_PL",
+          "es_ES",
+          "fr_FR",
+          "ar_AE",
+          "it_IT",
+          "id_ID",
+          "nl_NL",
+          "pt_PT",
+          "vi_VN",
+          "de_DE",
+          "tr_TR",
+          "ms_MY",
+          "ru_RU",
+          "th_TH",
+          "hi_IN",
+          "bn_BD",
+          "fil_PH",
+          "ur_PK"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      }
+    ]
+  },
+  {
+    "name": "get_uta_announcements",
+    "path": "/api/ua/v2/market/announcement",
+    "method": "HttpMethod::Get",
+    "market": "KucoinMarket::Spot",
+    "public": true,
+    "fields": [
+      {
+        "key": "language",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "zh_HK",
+          "ja_JP",
+          "ko_KR",
+          "en_US",
+          "pl_PL",
+          "es_ES",
+          "fr_FR",
+          "ar_AE",
+          "it_IT",
+          "id_ID",
+          "nl_NL",
+          "pt_PT",
+          "vi_VN",
+          "de_DE",
+          "tr_TR",
+          "ms_MY",
+          "ru_RU",
+          "th_TH",
+          "hi_IN",
+          "bn_BD",
+          "fil_PH",
+          "ur_PK"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "type",
+        "kind": "s",
+        "required": false,
+        "path": false,
+        "choices": [
+          "latest-announcements",
+          "activities",
+          "product-updates",
+          "vip",
+          "maintenance-updates",
+          "delistings",
+          "others",
+          "api-campaigns",
+          "new-listings",
+          "futures-announcements"
+        ],
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "key": "pageNumber",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "pageSize",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 1,
+        "maximum": null
+      },
+      {
+        "key": "startTime",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      },
+      {
+        "key": "endTime",
+        "kind": "i",
+        "required": false,
+        "path": false,
+        "choices": [],
+        "minimum": 0,
+        "maximum": null
+      }
+    ]
+  }
+]

@@ -1,5 +1,7 @@
 from typing import Any, cast
 
+from dcex._schema_codec import normalize_params
+
 from ..._native_http import request_native_json_async
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
@@ -40,6 +42,7 @@ class AccountHTTP(HTTPManager):
     @staticmethod
     def _params(**kwargs: object) -> list[tuple[str, str]]:
         """Convert optional Python arguments into native string pairs."""
+        kwargs = normalize_params(kwargs)
         params: list[tuple[str, str]] = []
         for key, value in kwargs.items():
             if key == "self" or value is None:

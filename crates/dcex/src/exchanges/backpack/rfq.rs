@@ -404,22 +404,23 @@ mod rfq_requests {
             name: &str,
             p: &BackpackParams,
         ) -> Result<Option<ValidatedResponse>> {
-            let (path, instruction, required, strings, decimals): (
-                &str,
-                &str,
-                &[&str],
-                &[&str],
-                &[&str],
-            ) = match name {
-                "submit_rfq_quote" => (
-                    "/api/v1/rfq/quote",
-                    "quoteSubmit",
-                    &["rfqId", "bidPrice", "askPrice"],
-                    &["rfqId"],
-                    &["bidPrice", "askPrice"],
-                ),
-                _ => return Ok(None),
+            static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+                std::sync::OnceLock::new();
+            let Some(route) = crate::exchanges::schema::route(
+                &ROUTES,
+                include_str!("schemas/routes_rfq.json"),
+                name,
+            ) else {
+                return Ok(None);
             };
+            route.validate(|key| p.get(key))?;
+            let (path, instruction, required, strings, decimals) = (
+                route.path,
+                route.instruction,
+                route.required,
+                route.strings,
+                route.decimals,
+            );
             let allowed: &[&str] = {
                 &[
                     "rfqId",

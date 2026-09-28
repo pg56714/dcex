@@ -47,6 +47,7 @@ pub struct ExchangeMethodRequest<'a, C: ExchangeMethodRequestClient> {
     method_name: &'static str,
     params: Vec<(String, String)>,
     signed: bool,
+    invalid_input: Option<crate::DcexError>,
 }
 
 impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
@@ -60,6 +61,7 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
             method_name,
             params,
             signed: false,
+            invalid_input: None,
         }
     }
 
@@ -73,12 +75,19 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
             method_name,
             params,
             signed: true,
+            invalid_input: None,
         }
     }
 
     pub fn param(mut self, key: impl Into<String>, value: impl ToString) -> Self {
         let key = key.into();
-        let value = value.to_string();
+        let value = match schema::input(&key, &value) {
+            Ok(value) => value,
+            Err(error) => {
+                self.invalid_input = Some(error);
+                return self;
+            }
+        };
         if let Some((_, existing_value)) = self
             .params
             .iter_mut()
@@ -92,7 +101,11 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
     }
 
     pub fn push_param(mut self, key: impl Into<String>, value: impl ToString) -> Self {
-        self.params.push((key.into(), value.to_string()));
+        let key = key.into();
+        match schema::input(&key, &value) {
+            Ok(value) => self.params.push((key, value)),
+            Err(error) => self.invalid_input = Some(error),
+        }
         self
     }
 
@@ -1579,6 +1592,9 @@ impl<'a, C: ExchangeMethodRequestClient> ExchangeMethodRequest<'a, C> {
     }
 
     pub async fn send(self) -> Result<ValidatedResponse> {
+        if let Some(error) = self.invalid_input {
+            return Err(error);
+        }
         if self.signed {
             self.client
                 .private_request_boxed(self.method_name, self.params)
@@ -1641,12 +1657,11 @@ macro_rules! impl_exchange_method_wrappers {
                     &self
                     $(, $public_param: impl ToString)*
                 ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-                    let params = vec![$(($public_key.to_string(), $public_param.to_string())),*];
                     crate::exchanges::ExchangeMethodRequest::public(
                         self,
                         stringify!($public_method),
-                        params,
-                    )
+                        Vec::new(),
+                    )$(.param($public_key, $public_param))*
                 }
             )*
 
@@ -1657,12 +1672,11 @@ macro_rules! impl_exchange_method_wrappers {
                     &self
                     $(, $private_param: impl ToString)*
                 ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-                    let params = vec![$(($private_key.to_string(), $private_param.to_string())),*];
                     crate::exchanges::ExchangeMethodRequest::private(
                         self,
                         stringify!($private_method),
-                        params,
-                    )
+                        Vec::new(),
+                    )$(.param($private_key, $private_param))*
                 }
             )*
         }
@@ -1676,6 +1690,32 @@ mod tests {
     use super::*;
 
     struct DummyClient;
+
+    impl_exchange_method_wrappers! {
+        @extend; DummyClient;
+        public [schema_amount(amount => "amount")];
+        private [];
+    }
+
+    #[tokio::test]
+    async fn financial_floats_are_rejected_before_builder_dispatch() {
+        let client = DummyClient;
+        assert!(client.schema_amount(0.1_f64).send().await.is_err());
+        assert!(
+            ExchangeMethodRequest::public(&client, "example", Vec::new())
+                .param("price", 0.1_f32)
+                .send()
+                .await
+                .is_err()
+        );
+        assert!(
+            ExchangeMethodRequest::public(&client, "example", Vec::new())
+                .push_param("quantity", 1.0_f64)
+                .send()
+                .await
+                .is_err()
+        );
+    }
 
     impl ExchangeMethodRequestClient for DummyClient {
         fn public_request_boxed<'a>(
@@ -1837,3 +1877,4 @@ pub mod okx;
 pub mod ondo;
 
 mod operation_guards;
+pub(crate) mod schema;

@@ -1,0 +1,745 @@
+[
+  {
+    "name": "get_futures_trade_history",
+    "path": "/api/v2/mix/market/fills-history",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "productType",
+      "limit",
+      "idLessThan",
+      "startTime",
+      "endTime"
+    ],
+    "required": [
+      "symbol",
+      "productType"
+    ],
+    "arrays": [],
+    "limit": 1000,
+    "days": 7
+  },
+  {
+    "name": "get_futures_index_candle_history",
+    "path": "/api/v2/mix/market/history-index-candles",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "productType",
+      "granularity",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol",
+      "productType",
+      "granularity"
+    ],
+    "arrays": [],
+    "limit": 200,
+    "days": 90
+  },
+  {
+    "name": "get_futures_mark_candle_history",
+    "path": "/api/v2/mix/market/history-mark-candles",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "productType",
+      "granularity",
+      "startTime",
+      "endTime",
+      "limit"
+    ],
+    "required": [
+      "symbol",
+      "productType",
+      "granularity"
+    ],
+    "arrays": [],
+    "limit": 200,
+    "days": 90
+  },
+  {
+    "name": "get_futures_next_funding_time",
+    "path": "/api/v2/mix/market/funding-time",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "productType"
+    ],
+    "required": [
+      "symbol",
+      "productType"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_open_interest_limit",
+    "path": "/api/v2/mix/market/oi-limit",
+    "post": false,
+    "public": true,
+    "fields": [
+      "productType",
+      "symbol"
+    ],
+    "required": [
+      "productType"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_position_tiers",
+    "path": "/api/v2/mix/market/query-position-lever",
+    "post": false,
+    "public": true,
+    "fields": [
+      "productType",
+      "symbol"
+    ],
+    "required": [
+      "productType",
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_discount_rates",
+    "path": "/api/v2/mix/market/discount-rate",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_interest_exchange_rates",
+    "path": "/api/v2/mix/market/exchange-rate",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_interest_rate_history",
+    "path": "/api/v2/mix/market/union-interest-rate-history",
+    "post": false,
+    "public": true,
+    "fields": [
+      "coin"
+    ],
+    "required": [
+      "coin"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_vip_fee_rates",
+    "path": "/api/v2/mix/market/vip-fee-rate",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_futures_isolated_symbols",
+    "path": "/api/v2/mix/account/isolated-symbols",
+    "post": false,
+    "public": false,
+    "fields": [
+      "productType"
+    ],
+    "required": [
+      "productType"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_funding_rate_history",
+    "path": "/api/v3/market/history-fund-rate",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category",
+      "symbol",
+      "cursor",
+      "limit"
+    ],
+    "required": [
+      "category",
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": 100,
+    "days": 90
+  },
+  {
+    "name": "get_uta_index_components",
+    "path": "/api/v3/market/index-components",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_position_tiers",
+    "path": "/api/v3/market/position-tier",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category",
+      "symbol",
+      "coin"
+    ],
+    "required": [
+      "category"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_open_interest_limit",
+    "path": "/api/v3/market/oi-limit",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "category"
+    ],
+    "required": [
+      "category"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_discount_rates",
+    "path": "/api/v3/market/discount-rate",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_rpi_orderbook",
+    "path": "/api/v3/market/rpi-orderbook",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category",
+      "symbol",
+      "limit"
+    ],
+    "required": [
+      "category",
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": 1000,
+    "days": null
+  },
+  {
+    "name": "get_uta_rpi_symbols",
+    "path": "/api/v3/market/rpi-symbols",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_account_open_interest_limit",
+    "path": "/api/v3/account/open-interest-limit",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol",
+      "category"
+    ],
+    "required": [
+      "symbol",
+      "category"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_eligible_symbols",
+    "path": "/api/v3/account/eligible-symbols",
+    "post": false,
+    "public": false,
+    "fields": [
+      "symbol"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_server_time",
+    "path": "/api/v2/public/time",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": 100,
+    "days": null
+  },
+  {
+    "name": "get_uta_cash_dividend_records",
+    "path": "/api/v3/market/cash-dividend-records",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "type",
+      "cursor",
+      "limit"
+    ],
+    "required": [
+      "symbol",
+      "type"
+    ],
+    "arrays": [],
+    "limit": 100,
+    "days": null
+  },
+  {
+    "name": "get_uta_risk_reserve",
+    "path": "/api/v3/market/risk-reserve",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category",
+      "symbol",
+      "marginCoin"
+    ],
+    "required": [
+      "category",
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_all_risk_reserves",
+    "path": "/api/v3/market/risk-reserve-all",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category"
+    ],
+    "required": [
+      "category"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_hourly_risk_reserve",
+    "path": "/api/v3/market/risk-reserve-hour",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category",
+      "symbol",
+      "marginCoin"
+    ],
+    "required": [
+      "category",
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_split_records",
+    "path": "/api/v3/market/split-records",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_futures_long_short_ratio",
+    "path": "/api/v3/market/futures-account-long-short",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "period"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_spot_whale_flow",
+    "path": "/api/v3/market/spot-whale-flow",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_merge_depth",
+    "path": "/api/v2/spot/market/merge-depth",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "precision",
+      "limit"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_auction",
+    "path": "/api/v2/spot/market/auction",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_classic_vip_fee_rate",
+    "path": "/api/v2/spot/market/vip-fee-rate",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_proof_of_reserves",
+    "path": "/api/v3/market/proof-of-reserves",
+    "post": false,
+    "public": true,
+    "fields": [],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_score_weights",
+    "path": "/api/v3/market/score-weights",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_fee_group",
+    "path": "/api/v3/market/fee-group",
+    "post": false,
+    "public": true,
+    "fields": [
+      "category",
+      "group"
+    ],
+    "required": [
+      "category"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_spot_fund_flow",
+    "path": "/api/v3/market/spot-fund-flow",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "period"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_spot_net_flow",
+    "path": "/api/v3/market/spot-net-flow",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_futures_active_buy_sell",
+    "path": "/api/v3/market/futures-active-buy-sell",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "period"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_futures_long_short",
+    "path": "/api/v3/market/futures-long-short",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "period"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_uta_futures_position_long_short",
+    "path": "/api/v3/market/futures-position-long-short",
+    "post": false,
+    "public": true,
+    "fields": [
+      "symbol",
+      "period"
+    ],
+    "required": [
+      "symbol"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_company_overview",
+    "path": "/api/v3/reality/market/company-overview",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_valuation_indicators",
+    "path": "/api/v3/reality/market/valuation-indicators",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_earnings_forecast",
+    "path": "/api/v3/reality/market/earnings-forecast",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_suspension_resumption_info",
+    "path": "/api/v3/reality/market/suspension-resumption-info",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_dividends",
+    "path": "/api/v3/reality/market/dividends",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_share_capital_change",
+    "path": "/api/v3/reality/market/share-capital-change",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_inner_trades",
+    "path": "/api/v3/reality/market/inner-trades",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_executive_shareholdings",
+    "path": "/api/v3/reality/market/executive-shareholdings",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  },
+  {
+    "name": "get_reality_sharehold_detail",
+    "path": "/api/v3/reality/market/sharehold-detail",
+    "post": false,
+    "public": true,
+    "fields": [
+      "code",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "code"
+    ],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  }
+]

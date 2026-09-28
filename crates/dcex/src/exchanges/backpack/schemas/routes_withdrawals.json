@@ -1,0 +1,24 @@
+[
+  {
+    "name": "create_withdrawal",
+    "path": "/wapi/v1/capital/withdrawals",
+    "instruction": "withdraw",
+    "required": [
+      "address",
+      "blockchain",
+      "quantity",
+      "symbol"
+    ],
+    "strings": [
+      "address",
+      "blockchain",
+      "quantity",
+      "symbol",
+      "clientId",
+      "twoFactorToken"
+    ],
+    "decimals": [
+      "quantity"
+    ]
+  }
+]

@@ -36,7 +36,10 @@ PRIVATE_KEY = "0x" + "11" * 32
 SPOT = "BTC-USDT-SPOT"
 SWAP = "BTC-USDT-SWAP"
 RUST_DIR = Path(__file__).resolve().parents[2] / "crates" / "dcex" / "src" / "exchanges" / "aster"
-RUST_SOURCE = "\n".join(path.read_text(encoding="utf-8") for path in RUST_DIR.glob("*.rs"))
+RUST_SOURCE = "\n".join(
+    path.read_text(encoding="utf-8")
+    for path in [*RUST_DIR.glob("*.rs"), *(RUST_DIR / "schemas").glob("*.json")]
+)
 
 
 @dataclass(frozen=True)

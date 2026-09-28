@@ -1,0 +1,276 @@
+[
+  {
+    "name": "set_isolated_mode",
+    "path": "/api/v5/account/set-isolated-mode",
+    "post": true,
+    "public": false,
+    "keys": [
+      "isoMode",
+      "type"
+    ],
+    "required": [
+      "isoMode",
+      "type"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_account_risk_state",
+    "path": "/api/v5/account/risk-state",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_greeks",
+    "path": "/api/v5/account/greeks",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ccy"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "set_account_level",
+    "path": "/api/v5/account/set-account-level",
+    "post": true,
+    "public": false,
+    "keys": [
+      "acctLv"
+    ],
+    "required": [
+      "acctLv"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_collateral_assets",
+    "path": "/api/v5/account/collateral-assets",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ccy",
+      "collateralEnabled"
+    ],
+    "required": [],
+    "bools": [
+      "collateralEnabled"
+    ],
+    "schema": null
+  },
+  {
+    "name": "get_asset_bill_history",
+    "path": "/api/v5/asset/bills-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ccy",
+      "type",
+      "thirdPartyType",
+      "clientId",
+      "after",
+      "before",
+      "limit",
+      "pagingType"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "set_fee_type",
+    "path": "/api/v5/account/set-fee-type",
+    "post": true,
+    "public": false,
+    "keys": [
+      "feeType"
+    ],
+    "required": [
+      "feeType"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "set_risk_offset_amount",
+    "path": "/api/v5/account/set-riskOffset-amt",
+    "post": true,
+    "public": false,
+    "keys": [
+      "ccy",
+      "clSpotInUseAmt"
+    ],
+    "required": [
+      "ccy",
+      "clSpotInUseAmt"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "preset_account_level_switch",
+    "path": "/api/v5/account/account-level-switch-preset",
+    "post": true,
+    "public": false,
+    "keys": [
+      "acctLv",
+      "lever"
+    ],
+    "required": [
+      "acctLv"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "precheck_account_level_switch",
+    "path": "/api/v5/account/set-account-switch-precheck",
+    "post": false,
+    "public": false,
+    "keys": [
+      "acctLv"
+    ],
+    "required": [
+      "acctLv"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "set_collateral_assets",
+    "path": "/api/v5/account/set-collateral-assets",
+    "post": true,
+    "public": false,
+    "keys": [
+      "type",
+      "collateralEnabled",
+      "ccyList"
+    ],
+    "required": [
+      "type",
+      "collateralEnabled"
+    ],
+    "bools": [
+      "collateralEnabled"
+    ],
+    "schema": null
+  },
+  {
+    "name": "set_trading_config",
+    "path": "/api/v5/account/set-trading-config",
+    "post": true,
+    "public": false,
+    "keys": [
+      "type",
+      "stgyType"
+    ],
+    "required": [
+      "type"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "precheck_delta_neutral",
+    "path": "/api/v5/account/precheck-set-delta-neutral",
+    "post": false,
+    "public": false,
+    "keys": [
+      "stgyType"
+    ],
+    "required": [
+      "stgyType"
+    ],
+    "bools": [],
+    "schema": null
+  },
+  {
+    "name": "get_bill_types",
+    "path": "/api/v5/account/subtypes",
+    "post": false,
+    "public": false,
+    "keys": [
+      "type"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\"}},\"required\":[]}"
+  },
+  {
+    "name": "adjust_demo_balance",
+    "path": "/api/v5/account/demo-adjust-balance",
+    "post": true,
+    "public": false,
+    "keys": [
+      "type",
+      "adjustments"
+    ],
+    "required": [
+      "type",
+      "adjustments"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"type\":{\"type\":\"string\"},\"adjustments\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"},\"amt\":{\"type\":\"string\"}},\"required\":[\"ccy\",\"amt\"]}}},\"required\":[\"type\",\"adjustments\"]}"
+  },
+  {
+    "name": "get_non_tradable_assets",
+    "path": "/api/v5/asset/non-tradable-assets",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ccy"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_finance_stable_rewards_product_info",
+    "path": "/api/v5/finance/stable-rewards/product-info",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ccy"
+    ],
+    "required": [
+      "ccy"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\",\"description\":\"Stablecoin, e.g. USDG\"}},\"required\":[\"ccy\"]}"
+  },
+  {
+    "name": "get_finance_stable_rewards_balance",
+    "path": "/api/v5/finance/stable-rewards/balance",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ccy"
+    ],
+    "required": [],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\",\"description\":\"Stablecoin, e.g. USDG Returns all supported stablecoins if not specified\"}},\"required\":[]}"
+  },
+  {
+    "name": "get_finance_stable_rewards_apy_history",
+    "path": "/api/v5/finance/stable-rewards/apy-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "ccy",
+      "days"
+    ],
+    "required": [
+      "ccy"
+    ],
+    "bools": [],
+    "schema": "{\"type\":\"object\",\"properties\":{\"ccy\":{\"type\":\"string\",\"description\":\"Stablecoin, e.g. USDG\"},\"days\":{\"type\":\"string\",\"description\":\"Number of historical days to return. The default is 100 . The maximum is 100\"}},\"required\":[\"ccy\"]}"
+  }
+]

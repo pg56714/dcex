@@ -10,12 +10,7 @@ use crate::{
     http::HttpMethod,
 };
 
-#[derive(Deserialize)]
-struct Field {
-    wire: String,
-    kind: String,
-    required: bool,
-}
+use crate::exchanges::schema::Field;
 #[derive(Deserialize)]
 struct Endpoint {
     name: String,
@@ -131,7 +126,7 @@ impl BinanceClient {
         let allowed: Vec<_> = endpoint
             .parameters
             .iter()
-            .map(|f| f.wire.as_str())
+            .map(|f| f.name.as_str())
             .collect();
         p.ensure_allowed(&allowed)?;
         let mut seen = std::collections::BTreeSet::new();
@@ -139,20 +134,21 @@ impl BinanceClient {
             return Err(invalid("duplicate parameter"));
         }
         for f in &endpoint.parameters {
-            let Some(value) = p.get(&f.wire) else {
+            let Some(value) = p.get(&f.name) else {
                 if f.required {
-                    return Err(invalid(format!("{} is required", f.wire)));
+                    return Err(invalid(format!("{} is required", f.name)));
                 }
                 continue;
             };
             if value.trim().is_empty() {
-                return Err(invalid(format!("{} cannot be empty", f.wire)));
+                return Err(invalid(format!("{} cannot be empty", f.name)));
             }
+            f.encode(value)?;
             match f.kind.as_str() {
                 "int" => {
                     value
                         .parse::<u64>()
-                        .map_err(|_| invalid(format!("{} must be an unsigned integer", f.wire)))?;
+                        .map_err(|_| invalid(format!("{} must be an unsigned integer", f.name)))?;
                 }
                 "decimal" if !is_positive_plain_decimal(value) => {
                     return Err(invalid("amount must be a positive plain decimal string"));
@@ -162,8 +158,8 @@ impl BinanceClient {
                 }
                 "json" => {
                     let parsed: Value = serde_json::from_str(value)
-                        .map_err(|_| invalid(format!("invalid JSON for {}", f.wire)))?;
-                    match f.wire.as_str() {
+                        .map_err(|_| invalid(format!("invalid JSON for {}", f.name)))?;
+                    match f.name.as_str() {
                         "legs" => validate_legs(&parsed)?,
                         "originatorPii" | "beneficiaryPii" => validate_pii(&parsed)?,
                         _ if !parsed.is_object() => {

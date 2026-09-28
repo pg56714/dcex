@@ -1,15 +1,10 @@
 //! Additional documented SDK operations; Alpha has its own host and Fiat uses JSON.
 use crate::exchanges::binance::{BinanceClient, params::PublicParams};
+use crate::exchanges::schema::{self, Field};
 use crate::{DcexError, Result, exchange::ValidatedResponse, http::HttpMethod};
 use serde::Deserialize;
-use serde_json::{Map, Value};
+use serde_json::Value;
 use std::sync::OnceLock;
-#[derive(Deserialize)]
-struct Field {
-    wire: String,
-    kind: String,
-    required: bool,
-}
 #[derive(Deserialize)]
 struct Endpoint {
     name: String,
@@ -37,44 +32,16 @@ impl BinanceClient {
         else {
             return Ok(None);
         };
-        let allowed: Vec<&str> = e.fields.iter().map(|f| f.wire.as_str()).collect();
+        let allowed: Vec<&str> = e.fields.iter().map(|f| f.name.as_str()).collect();
         p.ensure_allowed(&allowed)?;
-        let mut fields = Map::new();
-        for f in &e.fields {
-            let Some(raw) = p.get(&f.wire) else {
-                if f.required {
-                    return Err(invalid(format!("{} is required", f.wire)));
-                }
-                continue;
-            };
-            let value = match f.kind.as_str() {
-                "int" => Value::from(
-                    raw.parse::<i64>()
-                        .map_err(|_| invalid(format!("invalid integer {}", f.wire)))?,
-                ),
-                "bool" => Value::from(
-                    raw.parse::<bool>()
-                        .map_err(|_| invalid("invalid boolean"))?,
-                ),
-                "array" | "object" => {
-                    let v: Value = serde_json::from_str(raw)
-                        .map_err(|_| invalid("invalid structured parameter"))?;
-                    if (f.kind == "array" && !v.is_array())
-                        || (f.kind == "object" && !v.is_object())
-                    {
-                        return Err(invalid("invalid JSON type"));
-                    }
-                    v
-                }
-                "decimal" => {
-                    if !crate::common::is_positive_plain_decimal(raw) {
-                        return Err(invalid("decimal must be a positive plain string"));
-                    }
-                    Value::String(raw.into())
-                }
-                _ => Value::String(raw.into()),
-            };
-            fields.insert(f.wire.clone(), value);
+        let mut fields = schema::request_in_schema_order(&e.fields, &p.0)?;
+        if name == "prediction_batch_cancel_orders"
+            && fields
+                .get("cancelInfoList")
+                .and_then(Value::as_array)
+                .is_none_or(Vec::is_empty)
+        {
+            return Err(invalid("cancelInfoList must be a nonempty array"));
         }
         let method = match e.method.as_str() {
             "GET" => HttpMethod::Get,

@@ -8,96 +8,21 @@ impl ExtendedClient {
         params: &ExtendedParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let (path, is_public, fields, required): (&str, bool, &[&str], &[&str]) = match name {
-            "get_account_equity_history" => (
-                "/api/v1/portfolio/charts/equities",
-                false,
-                &["accountId", "interval"],
-                &["accountId", "interval"],
-            ),
-            "get_account_pnl_history" => (
-                "/api/v1/portfolio/charts/pnl",
-                false,
-                &["accountId", "interval", "pnlType", "instrumentType"],
-                &["accountId", "interval", "pnlType"],
-            ),
-            "get_account_pnl_percentage_history" => (
-                "/api/v1/portfolio/charts/pnl/percentage",
-                false,
-                &[
-                    "accountId",
-                    "interval",
-                    "pnlType",
-                    "priceMarket",
-                    "instrumentType",
-                ],
-                &["accountId", "interval", "pnlType"],
-            ),
-            "get_cumulative_account_pnl_history" => (
-                "/api/v1/portfolio/charts/pnl/cumulative",
-                false,
-                &["accountId", "interval", "pnlType", "instrumentType"],
-                &["accountId", "interval", "pnlType"],
-            ),
-            "get_cumulative_account_pnl_percentage_history" => (
-                "/api/v1/portfolio/charts/pnl/cumulative/percentage",
-                false,
-                &[
-                    "accountId",
-                    "interval",
-                    "pnlType",
-                    "priceMarket",
-                    "instrumentType",
-                ],
-                &["accountId", "interval", "pnlType"],
-            ),
-            "get_account_vault_equity_history" => (
-                "/api/v1/portfolio/charts/vault-equities",
-                false,
-                &["accountId", "interval"],
-                &["accountId", "interval"],
-            ),
-            "get_account_max_drawdown_history" => (
-                "/api/v1/portfolio/charts/max-drawdown",
-                false,
-                &["accountId", "interval"],
-                &["accountId", "interval"],
-            ),
-            "get_account_funding_chart" => (
-                "/api/v1/portfolio/charts/funding",
-                false,
-                &["accountId", "interval", "market"],
-                &["accountId", "interval"],
-            ),
-            "get_account_portfolio_summary" => (
-                "/api/v1/portfolio/accounts/summary",
-                false,
-                &["accountId", "interval", "instrumentType"],
-                &["accountId", "interval"],
-            ),
-            "get_account_performance" => (
-                "/api/v1/portfolio/accounts/performance",
-                false,
-                &["accountId", "interval", "marketType"],
-                &["accountId", "interval"],
-            ),
-            "get_account_funding_stats" => (
-                "/api/v1/portfolio/funding/stats",
-                false,
-                &["accountId", "interval", "market"],
-                &["accountId", "interval"],
-            ),
-            "get_account_funding_history" => (
-                "/api/v1/portfolio/funding/history",
-                false,
-                &["accountId", "interval", "market", "cursor", "limit"],
-                &["accountId", "interval"],
-            ),
-            _ => return Ok(None),
+        static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+            std::sync::OnceLock::new();
+        let Some(route) = crate::exchanges::schema::route(
+            &ROUTES,
+            include_str!("schemas/routes_portfolio.json"),
+            name,
+        ) else {
+            return Ok(None);
         };
+        let (path, is_public, fields, required) =
+            (route.path, route.is_public, route.fields, route.required);
         if is_public != public {
             return Ok(None);
         }
+        route.validate(|key| params.get(key))?;
         params.ensure_allowed(fields, &["accountId", "market", "priceMarket"])?;
         for key in required {
             params.required(key)?;

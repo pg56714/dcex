@@ -1,0 +1,177 @@
+[
+  {
+    "name": "create_sub_account",
+    "path": "/openApi/subAccount/v1/create",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "subAccountString",
+      "note",
+      "recvWindow"
+    ],
+    "required": [
+      "subAccountString"
+    ],
+    "integers": [
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "set_sub_account_frozen",
+    "path": "/openApi/subAccount/v1/updateStatus",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "subUid",
+      "freeze",
+      "recvWindow"
+    ],
+    "required": [
+      "subUid",
+      "freeze"
+    ],
+    "integers": [
+      "subUid",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "create_sub_account_api_key",
+    "path": "/openApi/subAccount/v1/apiKey/create",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "subUid",
+      "note",
+      "permissions",
+      "ipAddresses",
+      "recvWindow"
+    ],
+    "required": [
+      "subUid",
+      "note",
+      "permissions"
+    ],
+    "integers": [
+      "subUid",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "modify_sub_account_api_key",
+    "path": "/openApi/subAccount/v1/apiKey/edit",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "subUid",
+      "apiKey",
+      "note",
+      "permissions",
+      "ipAddresses",
+      "recvWindow"
+    ],
+    "required": [
+      "subUid",
+      "apiKey",
+      "note",
+      "permissions"
+    ],
+    "integers": [
+      "subUid",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "delete_sub_account_api_key",
+    "path": "/openApi/subAccount/v1/apiKey/del",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "subUid",
+      "apiKey",
+      "recvWindow"
+    ],
+    "required": [
+      "subUid",
+      "apiKey"
+    ],
+    "integers": [
+      "subUid",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_sub_account_deposit_addresses",
+    "path": "/openApi/wallets/v1/capital/subAccount/deposit/address",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "coin",
+      "subUid",
+      "offset",
+      "limit",
+      "recvWindow"
+    ],
+    "required": [
+      "coin",
+      "subUid"
+    ],
+    "integers": [
+      "subUid",
+      "offset",
+      "limit",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "get_sub_account_deposit_history",
+    "path": "/openApi/wallets/v1/capital/deposit/subHisrec",
+    "verb": "GET",
+    "public": false,
+    "fields": [
+      "coin",
+      "subUid",
+      "txId",
+      "status",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow"
+    ],
+    "required": [],
+    "integers": [
+      "subUid",
+      "status",
+      "startTime",
+      "endTime",
+      "offset",
+      "limit",
+      "recvWindow"
+    ]
+  },
+  {
+    "name": "create_sub_account_deposit_address",
+    "path": "/openApi/wallets/v1/capital/deposit/createSubAddress",
+    "verb": "POST",
+    "public": false,
+    "fields": [
+      "coin",
+      "subUid",
+      "network",
+      "walletType",
+      "recvWindow"
+    ],
+    "required": [
+      "coin",
+      "subUid",
+      "network",
+      "walletType"
+    ],
+    "integers": [
+      "subUid",
+      "walletType",
+      "recvWindow"
+    ]
+  }
+]

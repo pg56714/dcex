@@ -1,0 +1,15 @@
+[
+  {
+    "name": "get_uta_funding_assets",
+    "path": "/api/v3/account/funding-assets",
+    "post": false,
+    "public": false,
+    "fields": [
+      "coin"
+    ],
+    "required": [],
+    "arrays": [],
+    "limit": null,
+    "days": null
+  }
+]

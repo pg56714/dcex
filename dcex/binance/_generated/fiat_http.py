@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -34,13 +36,15 @@ class GeneratedFiatHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "currency": currency,
-                    "apiPaymentMethod": api_payment_method,
-                    "amount": amount,
-                    "recvWindow": recv_window,
-                    "ext": ext,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "currency": currency,
+                        "apiPaymentMethod": api_payment_method,
+                        "amount": amount,
+                        "recvWindow": recv_window,
+                        "ext": ext,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -72,14 +76,16 @@ class GeneratedFiatHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "currency": currency,
-                    "apiPaymentMethod": api_payment_method,
-                    "amount": amount,
-                    "accountInfo": account_info,
-                    "recvWindow": recv_window,
-                    "ext": ext,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "currency": currency,
+                        "apiPaymentMethod": api_payment_method,
+                        "amount": amount,
+                        "accountInfo": account_info,
+                        "recvWindow": recv_window,
+                        "ext": ext,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -109,14 +115,16 @@ class GeneratedFiatHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "transactionType": transaction_type,
-                    "beginTime": begin_time,
-                    "endTime": end_time,
-                    "page": page,
-                    "rows": rows,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "transactionType": transaction_type,
+                        "beginTime": begin_time,
+                        "endTime": end_time,
+                        "page": page,
+                        "rows": rows,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -146,14 +154,16 @@ class GeneratedFiatHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "transactionType": transaction_type,
-                    "beginTime": begin_time,
-                    "endTime": end_time,
-                    "page": page,
-                    "rows": rows,
-                    "recvWindow": recv_window,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "transactionType": transaction_type,
+                        "beginTime": begin_time,
+                        "endTime": end_time,
+                        "page": page,
+                        "rows": rows,
+                        "recvWindow": recv_window,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -174,7 +184,9 @@ class GeneratedFiatHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"orderNo": order_no, "recvWindow": recv_window}.items()
+                for key, value in normalize_params(
+                    {"orderNo": order_no, "recvWindow": recv_window}
+                ).items()
                 if value is not None
             ],
         )

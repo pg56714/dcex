@@ -90,7 +90,7 @@ async def test_full_official_request_and_signature(case, asynchronous):
             },
             "chain is required",
         ),
-        ("submit_event_quote", {"symbol": "ETH", "amount": "1"}, "orderLinkId is required"),
+        ("submit_event_quote", {"symbol": "ETH", "amount": "1"}, "orderLinkId.*required"),
         (
             "set_mmp_config",
             {

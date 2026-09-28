@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use serde_json::{Map, Number, Value};
+use serde_json::{Map, Value};
 
 use crate::{DcexError, Result};
 
@@ -188,27 +188,23 @@ impl OndoParams {
                     )));
                 }
             }
+            crate::exchanges::schema::validate_numbers(&value, "body")?;
             return Ok(value);
         }
         self.ensure_allowed(allowed)?;
         self.ensure_required(required)?;
         let mut body = Map::new();
         for (key, value) in &self.0 {
-            let value = if bools.contains(&key.as_str()) {
-                Value::Bool(value.parse::<bool>().map_err(|error| {
-                    DcexError::InvalidInput(format!("invalid Ondo boolean {key}: {error}"))
-                })?)
+            let kind = if bools.contains(&key.as_str()) {
+                "boolean"
             } else if integers.contains(&key.as_str()) {
-                Value::Number(Number::from(value.parse::<u64>().map_err(|error| {
-                    DcexError::InvalidInput(format!("invalid Ondo integer {key}: {error}"))
-                })?))
+                "uint"
             } else if json.contains(&key.as_str()) {
-                serde_json::from_str(value).map_err(|error| {
-                    DcexError::InvalidInput(format!("invalid Ondo JSON field {key}: {error}"))
-                })?
+                "json"
             } else {
-                Value::String(value.clone())
+                "string"
             };
+            let value = crate::exchanges::schema::encode(key, value, kind)?;
             body.insert(key.clone(), value);
         }
         Ok(Value::Object(body))

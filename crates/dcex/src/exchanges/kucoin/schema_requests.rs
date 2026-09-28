@@ -6,7 +6,7 @@ use crate::http::HttpMethod;
 use crate::{DcexError, Result};
 use serde_json::Value;
 
-#[path = "endpoint_schemas/mod.rs"]
+#[path = "generated/schema_tables.rs"]
 mod endpoints;
 
 pub(super) struct Field {
@@ -45,6 +45,7 @@ impl KucoinClient {
         }
         params.ensure_allowed(&allowed)?;
         let supplied = params.only(&allowed);
+        crate::exchanges::schema::validate_pairs(&supplied)?;
         if supplied
             .iter()
             .map(|(k, _)| k)
@@ -86,6 +87,9 @@ impl KucoinClient {
             }
             if !field.choices.is_empty() && !field.choices.contains(&input) {
                 return Err(invalid(&format!("unsupported {}", field.key)));
+            }
+            if field.kind == 'd' {
+                crate::exchanges::schema::encode(field.key, input, "decimal")?;
             }
             let mut text = input.to_string();
             let value = match field.kind {

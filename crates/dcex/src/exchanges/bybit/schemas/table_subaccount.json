@@ -1,0 +1,158 @@
+[
+  {
+    "name": "get_sub_account_deposit_address",
+    "path": "/v5/asset/deposit/query-sub-member-address",
+    "post": false,
+    "public": false,
+    "keys": [
+      "coin",
+      "chainType",
+      "subMemberId"
+    ],
+    "required": [
+      "coin",
+      "chainType",
+      "subMemberId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "create_sub_account_api_key",
+    "path": "/v5/user/create-sub-api",
+    "post": true,
+    "public": false,
+    "keys": [
+      "subuid",
+      "note",
+      "readOnly",
+      "ips",
+      "permissions"
+    ],
+    "required": [
+      "subuid",
+      "readOnly",
+      "permissions"
+    ],
+    "integers": [
+      "subuid",
+      "readOnly"
+    ]
+  },
+  {
+    "name": "create_sub_account",
+    "path": "/v5/user/create-sub-member",
+    "post": true,
+    "public": false,
+    "keys": [
+      "username",
+      "password",
+      "memberType",
+      "switch",
+      "note"
+    ],
+    "required": [
+      "username",
+      "memberType"
+    ],
+    "integers": [
+      "memberType",
+      "switch"
+    ]
+  },
+  {
+    "name": "set_sub_account_frozen",
+    "path": "/v5/user/frozen-sub-member",
+    "post": true,
+    "public": false,
+    "keys": [
+      "subuid",
+      "frozen"
+    ],
+    "required": [
+      "subuid",
+      "frozen"
+    ],
+    "integers": [
+      "subuid",
+      "frozen"
+    ]
+  },
+  {
+    "name": "get_sub_account_api_keys",
+    "path": "/v5/user/sub-apikeys",
+    "post": false,
+    "public": false,
+    "keys": [
+      "subMemberId",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "subMemberId"
+    ],
+    "integers": [
+      "limit"
+    ]
+  },
+  {
+    "name": "modify_sub_account_api_key",
+    "path": "/v5/user/update-sub-api",
+    "post": true,
+    "public": false,
+    "keys": [
+      "apikey",
+      "readOnly",
+      "ips",
+      "permissions"
+    ],
+    "required": [],
+    "integers": [
+      "readOnly"
+    ]
+  },
+  {
+    "name": "get_sub_accounts_paginated",
+    "path": "/v5/user/submembers",
+    "post": false,
+    "public": false,
+    "keys": [
+      "pageSize",
+      "nextCursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "delete_sub_account_api_key",
+    "path": "/v5/user/delete-sub-api",
+    "post": true,
+    "public": false,
+    "keys": [
+      "apikey"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "delete_sub_account",
+    "path": "/v5/user/del-submember",
+    "post": true,
+    "public": false,
+    "keys": [
+      "subMemberId"
+    ],
+    "required": [
+      "subMemberId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_sub_accounts",
+    "path": "/v5/user/query-sub-members",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "integers": []
+  }
+]

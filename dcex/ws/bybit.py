@@ -3,6 +3,8 @@
 import json
 from typing import Any
 
+from dcex._schema_codec import encode_json
+
 from .._native_http import load_native
 from ._base import AsyncWebSocketMixin
 
@@ -130,7 +132,7 @@ class PrivateClient(AsyncWebSocketMixin):
 
     async def send_trade_order(self, op: str, args: dict[str, Any]) -> str:
         """Submit one order.create, order.amend, or order.cancel request on /v5/trade."""
-        return str(await self._native_client.send_trade_order(op, json.dumps(args)))
+        return str(await self._native_client.send_trade_order(op, encode_json(args)))
 
     def is_authenticated(self) -> bool:
         """Return whether auth has been acknowledged."""

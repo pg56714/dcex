@@ -3,6 +3,8 @@
 from json import dumps
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from .._market_http import MarketHTTP
 from .._trade_http import TradeHTTP
 
@@ -34,13 +36,15 @@ class GeneratedAlphaHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "symbol": symbol,
-                    "fromId": from_id,
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "limit": limit,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "symbol": symbol,
+                        "fromId": from_id,
+                        "startTime": start_time,
+                        "endTime": end_time,
+                        "limit": limit,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -61,7 +65,7 @@ class GeneratedAlphaHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"symbol": symbol, "limit": limit}.items()
+                for key, value in normalize_params({"symbol": symbol, "limit": limit}).items()
                 if value is not None
             ],
         )
@@ -82,7 +86,7 @@ class GeneratedAlphaHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {}.items()
+                for key, value in normalize_params({}).items()
                 if value is not None
             ],
         )
@@ -111,13 +115,15 @@ class GeneratedAlphaHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {
-                    "symbol": symbol,
-                    "interval": interval,
-                    "limit": limit,
-                    "startTime": start_time,
-                    "endTime": end_time,
-                }.items()
+                for key, value in normalize_params(
+                    {
+                        "symbol": symbol,
+                        "interval": interval,
+                        "limit": limit,
+                        "startTime": start_time,
+                        "endTime": end_time,
+                    }
+                ).items()
                 if value is not None
             ],
         )
@@ -138,7 +144,7 @@ class GeneratedAlphaHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {"symbol": symbol}.items()
+                for key, value in normalize_params({"symbol": symbol}).items()
                 if value is not None
             ],
         )
@@ -159,7 +165,7 @@ class GeneratedAlphaHTTP(MarketHTTP, TradeHTTP):
                     if isinstance(value, (dict, list, bool))
                     else str(value),
                 )
-                for key, value in {}.items()
+                for key, value in normalize_params({}).items()
                 if value is not None
             ],
         )

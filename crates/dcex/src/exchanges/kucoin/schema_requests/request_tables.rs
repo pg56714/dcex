@@ -5,13 +5,7 @@ use serde::Deserialize;
 use serde_json::{Map, Value};
 use std::sync::OnceLock;
 
-#[derive(Deserialize)]
-struct Field {
-    name: String,
-    required: bool,
-    location: String,
-    schema: Value,
-}
+use crate::exchanges::schema::Field;
 #[derive(Deserialize)]
 struct Endpoint {
     name: String,
@@ -25,46 +19,6 @@ struct Endpoint {
 
 fn invalid(message: impl std::fmt::Display) -> DcexError {
     DcexError::InvalidInput(format!("KuCoin: {message}"))
-}
-
-fn value(field: &Field, raw: &str) -> Result<Value> {
-    let value = match field.schema["type"].as_str() {
-        Some("integer") => Value::from(
-            raw.parse::<i64>()
-                .map_err(|_| invalid(format!("{} must be an integer", field.name)))?,
-        ),
-        Some("number") => {
-            if !raw.parse::<f64>().is_ok_and(f64::is_finite) || raw.contains(['e', 'E']) {
-                return Err(invalid("use a plain decimal string"));
-            }
-            Value::String(raw.into())
-        }
-        Some("boolean") => Value::from(
-            raw.parse::<bool>()
-                .map_err(|_| invalid("invalid boolean"))?,
-        ),
-        Some(kind @ ("array" | "object")) => {
-            let v: Value =
-                serde_json::from_str(raw).map_err(|_| invalid("invalid structured JSON"))?;
-            if (kind == "array" && !v.is_array()) || (kind == "object" && !v.is_object()) {
-                return Err(invalid("invalid structured field type"));
-            }
-            v
-        }
-        _ => Value::String(raw.into()),
-    };
-    if let Some(n) = value.as_i64()
-        && (field.schema["minimum"].as_i64().is_some_and(|min| n < min)
-            || field.schema["maximum"].as_i64().is_some_and(|max| n > max))
-    {
-        return Err(invalid(format!("{} outside documented range", field.name)));
-    }
-    if let Some(choices) = field.schema["enum"].as_array()
-        && !choices.contains(&value)
-    {
-        return Err(invalid(format!("invalid {}", field.name)));
-    }
-    Ok(value)
 }
 
 impl KucoinClient {
@@ -96,7 +50,12 @@ impl KucoinClient {
                 }
                 continue;
             };
-            let v = value(f, raw)?;
+            let v = f.encode(raw)?;
+            let v = if f.schema["type"] == "number" {
+                Value::String(raw.into())
+            } else {
+                v
+            };
             match f.location.as_str() {
                 "path" => {
                     if raw.is_empty()

@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from dcex._schema_codec import normalize_params
+
 from ..._keyword_aliases import legacy_keywords, wire_keywords
 from ..._operation_guards import require_confirmation, require_scope
 from ._http_manager import HTTPManager
@@ -11,6 +13,7 @@ class TradeHTTP(HTTPManager):
     """Async HTTP client for BingX trade-related API endpoints backed by Rust."""
 
     def _native_call_params(self, values: dict[str, Any]) -> list[tuple[str, str]]:
+        values = normalize_params(values)
         values.pop("self", None)
         return self._native_params(**values)
 

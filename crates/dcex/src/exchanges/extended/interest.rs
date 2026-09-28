@@ -8,45 +8,21 @@ impl ExtendedClient {
         params: &ExtendedParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let (path, is_public, fields, required): (&str, bool, &[&str], &[&str]) = match name {
-            "get_interest_rate_curves_history" => (
-                "/api/v1/interest/info/rate-curves",
-                true,
-                &["interval"],
-                &["interval"],
-            ),
-            "get_latest_interest_rate_curve" => {
-                ("/api/v1/interest/info/latest-rate-curves", true, &[], &[])
-            }
-            "get_interest_key_metrics" => (
-                "/api/v1/interest/key-metrics",
-                false,
-                &["accountId"],
-                &["accountId"],
-            ),
-            "get_interest_daily_metrics" => (
-                "/api/v1/interest/daily-metrics",
-                false,
-                &["accountId", "interval"],
-                &["accountId", "interval"],
-            ),
-            "get_interest_payment_chart" => (
-                "/api/v1/interest/payment-chart",
-                false,
-                &["accountId", "interval", "bucket"],
-                &["accountId", "interval"],
-            ),
-            "get_interest_payments_history" => (
-                "/api/v1/interest/payments",
-                false,
-                &["accountId", "interval"],
-                &["accountId", "interval"],
-            ),
-            _ => return Ok(None),
+        static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+            std::sync::OnceLock::new();
+        let Some(route) = crate::exchanges::schema::route(
+            &ROUTES,
+            include_str!("schemas/routes_interest.json"),
+            name,
+        ) else {
+            return Ok(None);
         };
+        let (path, is_public, fields, required) =
+            (route.path, route.is_public, route.fields, route.required);
         if is_public != public {
             return Ok(None);
         }
+        route.validate(|key| params.get(key))?;
         params.ensure_allowed(fields, &["accountId", "market", "priceMarket"])?;
         for key in required {
             params.required(key)?;

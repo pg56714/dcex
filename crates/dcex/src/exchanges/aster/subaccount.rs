@@ -1,7 +1,6 @@
 //! Subaccount operations.
 use crate::exchange::ValidatedResponse;
 use crate::exchanges::aster::{AsterClient, AsterMarket, params::AsterParams};
-use crate::http::HttpMethod;
 use crate::{DcexError, Result};
 impl AsterClient {
     pub(in crate::exchanges::aster) async fn subaccount_schema_request(
@@ -10,89 +9,27 @@ impl AsterClient {
         p: &AsterParams,
         public: bool,
     ) -> Result<Option<ValidatedResponse>> {
-        let (path, method, is_public, presigned, fields, required): (
-            &str,
-            HttpMethod,
-            bool,
-            bool,
-            &[&str],
-            &[&str],
-        ) = match name {
-            "get_sub_accounts" => (
-                "/fapi/v3/getSubAccountList",
-                HttpMethod::Get,
-                false,
-                false,
-                &[],
-                &[],
-            ),
-            "create_sub_account_signed" => (
-                "/fapi/v3/createSubAccount",
-                HttpMethod::Post,
-                false,
-                true,
-                &[
-                    "subAccountName",
-                    "subSourceAddr",
-                    "nonce",
-                    "user",
-                    "signer",
-                    "childSignature",
-                    "signature",
-                ],
-                &[
-                    "subAccountName",
-                    "subSourceAddr",
-                    "nonce",
-                    "user",
-                    "signer",
-                    "childSignature",
-                    "signature",
-                ],
-            ),
-            "update_sub_account_signed" => (
-                "/fapi/v3/updateSubAccount",
-                HttpMethod::Post,
-                false,
-                true,
-                &[
-                    "subSourceAddr",
-                    "nonce",
-                    "user",
-                    "signer",
-                    "subAccountName",
-                    "status",
-                    "signature",
-                ],
-                &["subSourceAddr", "nonce", "user", "signer", "signature"],
-            ),
-            "bind_sub_account_signed" => (
-                "/fapi/v3/sub-accounts/bind",
-                HttpMethod::Post,
-                false,
-                true,
-                &[
-                    "childAddress",
-                    "name",
-                    "nonce",
-                    "user",
-                    "childSignature",
-                    "signature",
-                ],
-                &[
-                    "childAddress",
-                    "name",
-                    "nonce",
-                    "user",
-                    "childSignature",
-                    "signature",
-                ],
-            ),
-            _ => return Ok(None),
+        static ROUTES: std::sync::OnceLock<Vec<crate::exchanges::schema::Route>> =
+            std::sync::OnceLock::new();
+        let Some(route) = crate::exchanges::schema::route(
+            &ROUTES,
+            include_str!("schemas/routes_subaccount.json"),
+            name,
+        ) else {
+            return Ok(None);
         };
+        let (path, method, is_public, presigned, fields, required) = (
+            route.path,
+            route.method,
+            route.is_public,
+            route.presigned,
+            route.fields,
+            route.required,
+        );
         if public != is_public {
             return Ok(None);
         }
+        route.validate(|key| p.get(key))?;
         p.ensure_allowed(fields, &[])?;
         for key in required {
             p.required(key)?;

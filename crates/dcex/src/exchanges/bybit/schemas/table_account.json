@@ -1,0 +1,448 @@
+[
+  {
+    "name": "get_dcp_info",
+    "path": "/v5/account/query-dcp-info",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_coin_greeks",
+    "path": "/v5/asset/coin-greeks",
+    "post": false,
+    "public": false,
+    "keys": [
+      "baseCoin"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "set_collateral_coin",
+    "path": "/v5/account/set-collateral-switch",
+    "post": true,
+    "public": false,
+    "keys": [
+      "coin",
+      "collateralSwitch"
+    ],
+    "required": [
+      "coin",
+      "collateralSwitch"
+    ],
+    "integers": []
+  },
+  {
+    "name": "batch_set_collateral_coins",
+    "path": "/v5/account/set-collateral-switch-batch",
+    "post": true,
+    "public": false,
+    "keys": [
+      "request"
+    ],
+    "required": [
+      "request"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_asset_overview",
+    "path": "/v5/asset/asset-overview",
+    "post": false,
+    "public": false,
+    "keys": [
+      "memberId",
+      "valuationCurrency",
+      "accountType"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_delivery_records",
+    "path": "/v5/asset/delivery-record",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "startTime",
+      "endTime",
+      "expDate",
+      "limit",
+      "cursor",
+      "product_symbol"
+    ],
+    "required": [
+      "category"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_settlement_records",
+    "path": "/v5/asset/settlement-record",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor",
+      "product_symbol"
+    ],
+    "required": [
+      "category"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_funding_account_history",
+    "path": "/v5/asset/fundinghistory",
+    "post": false,
+    "public": false,
+    "keys": [
+      "createTimeFrom",
+      "createTimeTo",
+      "limit",
+      "cursor"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_total_members_assets",
+    "path": "/v5/asset/total-members-assets",
+    "post": false,
+    "public": false,
+    "keys": [
+      "coin"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_smp_group",
+    "path": "/v5/account/smp-group",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "set_delta_mode",
+    "path": "/v5/account/set-delta-mode",
+    "post": true,
+    "public": false,
+    "keys": [
+      "deltaEnable"
+    ],
+    "required": [
+      "deltaEnable"
+    ],
+    "integers": []
+  },
+  {
+    "name": "set_spot_hedging",
+    "path": "/v5/account/set-hedging-mode",
+    "post": true,
+    "public": false,
+    "keys": [
+      "setHedgingMode"
+    ],
+    "required": [
+      "setHedgingMode"
+    ],
+    "integers": []
+  },
+  {
+    "name": "set_price_limit_behavior",
+    "path": "/v5/account/set-limit-px-action",
+    "post": true,
+    "public": false,
+    "keys": [
+      "category",
+      "modifyEnable"
+    ],
+    "required": [
+      "category",
+      "modifyEnable"
+    ],
+    "integers": []
+  },
+  {
+    "name": "execute_small_balance_quote",
+    "path": "/v5/asset/covert/small-balance-execute",
+    "post": true,
+    "public": false,
+    "keys": [
+      "quoteId"
+    ],
+    "required": [
+      "quoteId"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_small_balance_history",
+    "path": "/v5/asset/covert/small-balance-history",
+    "post": false,
+    "public": false,
+    "keys": [
+      "accountType",
+      "quoteId",
+      "startTime",
+      "endTime",
+      "cursor",
+      "size"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "request_small_balance_quote",
+    "path": "/v5/asset/covert/get-quote",
+    "post": true,
+    "public": false,
+    "keys": [
+      "accountType",
+      "fromCoinList",
+      "toCoin"
+    ],
+    "required": [
+      "accountType",
+      "fromCoinList",
+      "toCoin"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_small_balance_coins",
+    "path": "/v5/asset/covert/small-balance-list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "accountType",
+      "fromCoin"
+    ],
+    "required": [
+      "accountType"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_pre_upgrade_delivery_records",
+    "path": "/v5/pre-upgrade/asset/delivery-record",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "expDate",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "category"
+    ],
+    "integers": [
+      "limit"
+    ]
+  },
+  {
+    "name": "get_pre_upgrade_executions",
+    "path": "/v5/pre-upgrade/execution/list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "orderId",
+      "orderLinkId",
+      "baseCoin",
+      "startTime",
+      "endTime",
+      "execType",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "category"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_pre_upgrade_settlement_records",
+    "path": "/v5/pre-upgrade/asset/settlement-record",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "symbol",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "category"
+    ],
+    "integers": [
+      "limit"
+    ]
+  },
+  {
+    "name": "get_pre_upgrade_transaction_log",
+    "path": "/v5/pre-upgrade/account/transaction-log",
+    "post": false,
+    "public": false,
+    "keys": [
+      "category",
+      "baseCoin",
+      "type",
+      "startTime",
+      "endTime",
+      "limit",
+      "cursor"
+    ],
+    "required": [
+      "category"
+    ],
+    "integers": [
+      "startTime",
+      "endTime",
+      "limit"
+    ]
+  },
+  {
+    "name": "sign_trading_agreement",
+    "path": "/v5/user/agreement",
+    "post": true,
+    "public": false,
+    "keys": [
+      "categoryV2",
+      "agree"
+    ],
+    "required": [
+      "categoryV2",
+      "agree"
+    ],
+    "integers": [
+      "categoryV2"
+    ]
+  },
+  {
+    "name": "get_all_api_rate_limits",
+    "path": "/v5/apilimit/query-all",
+    "post": false,
+    "public": false,
+    "keys": [
+      "limit",
+      "cursor",
+      "uids"
+    ],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_api_rate_limit_cap",
+    "path": "/v5/apilimit/query-cap",
+    "post": false,
+    "public": false,
+    "keys": [],
+    "required": [],
+    "integers": []
+  },
+  {
+    "name": "get_api_rate_limits",
+    "path": "/v5/apilimit/query",
+    "post": false,
+    "public": false,
+    "keys": [
+      "uids"
+    ],
+    "required": [
+      "uids"
+    ],
+    "integers": []
+  },
+  {
+    "name": "set_api_rate_limits",
+    "path": "/v5/apilimit/set",
+    "post": true,
+    "public": false,
+    "keys": [
+      "list"
+    ],
+    "required": [
+      "list"
+    ],
+    "integers": []
+  },
+  {
+    "name": "get_spot_x_puzzle_project_list",
+    "path": "/v5/spot-x/puzzle/project/list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "status",
+      "projectId",
+      "activityCoin",
+      "cursor",
+      "limit"
+    ],
+    "required": [
+      "status"
+    ],
+    "integers": [
+      "status",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_spot_x_token_splash_project_list",
+    "path": "/v5/spot-x/token-splash/project/list",
+    "post": false,
+    "public": false,
+    "keys": [
+      "status",
+      "projectId",
+      "activityCoin",
+      "cursor",
+      "limit"
+    ],
+    "required": [
+      "status"
+    ],
+    "integers": [
+      "status",
+      "limit"
+    ]
+  },
+  {
+    "name": "get_spot_x_token_splash_user_activity_params",
+    "path": "/v5/spot-x/token-splash/user/activity-params",
+    "post": false,
+    "public": false,
+    "keys": [
+      "projectId",
+      "activityCoin"
+    ],
+    "required": [],
+    "integers": []
+  }
+]

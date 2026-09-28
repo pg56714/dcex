@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from typing import Any, Literal, Self, cast
 from urllib.parse import urlencode
 
+from dcex._schema_codec import normalize_params
+
 from ..._native_http import NativeResponse, load_native, native_body_text, request_native_json_async
 from ...base.http_manager import BaseHTTPManager
 from ...lighter.credentials import LighterCredentials
@@ -128,6 +130,7 @@ class HTTPManager(BaseHTTPManager):
     @staticmethod
     def _native_params(**kwargs: object) -> list[tuple[str, str]]:
         """Convert optional Python arguments into native string pairs."""
+        kwargs = normalize_params(kwargs)
         params: list[tuple[str, str]] = []
         for key, value in kwargs.items():
             if key == "self" or value is None:
