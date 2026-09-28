@@ -6,6 +6,7 @@ from __future__ import annotations
 import ast
 import base64
 import inspect
+import json
 from dataclasses import dataclass
 from importlib import import_module
 from pathlib import Path
@@ -47,10 +48,12 @@ class EndpointCase:
     mode: str
     exchange: str
     method_name: str
+    client_kind: str = "client"
 
     @property
     def id(self) -> str:
-        return f"{self.mode}-{self.exchange}-{self.method_name}"
+        variant = "spot-" if self.client_kind == "spot" else ""
+        return f"{self.mode}-{self.exchange}-{variant}{self.method_name}"
 
 
 class FakePTM:
@@ -99,7 +102,20 @@ class FakeSyncResponse:
         return {"listenKey": "test-listen-key"}
 
 
-class FakeSyncNativePublicClient:
+class FakeArcusSigning:
+    def sign_websocket_request(self, request_id, method_name, params):
+        self.calls.append({"method": "NATIVE_SIGN_WS", "path": method_name, "params": params})
+        return json.dumps({"id": request_id, "request": {"method": method_name}})
+
+    async def sign_websocket_request_async(self, request_id, method_name, params):
+        return self.sign_websocket_request(request_id, method_name, params)
+
+    def build_signed_quote_json(self, quote, taker, signature, permits, route_tag, builder_fee_bps):
+        self.calls.append({"method": "NATIVE_BUILD_QUOTE", "quote": json.loads(quote)})
+        return {"quote": json.loads(quote), "taker": taker, "signature": signature}
+
+
+class FakeSyncNativePublicClient(FakeArcusSigning):
     def export_swap_income(self, params: list[tuple[str, str]]) -> bytes:
         self.calls.append(
             {"method": "NATIVE_BYTES", "path": "export_swap_income", "params": params}
@@ -168,7 +184,7 @@ class FakeSyncNativePublicClient:
         return 1, "{}", "test-tx-hash", None
 
 
-class FakeAsyncNativePublicClient:
+class FakeAsyncNativePublicClient(FakeArcusSigning):
     async def export_swap_income_async(self, params: list[tuple[str, str]]) -> bytes:
         self.calls.append(
             {"method": "NATIVE_BYTES", "path": "export_swap_income", "params": params}
@@ -262,7 +278,7 @@ class FakeAsyncHyperliquidMarket:
         return None
 
 
-def _endpoint_method_names(mode: str, exchange: str) -> list[str]:
+def _endpoint_method_names(mode: str, exchange: str, client_kind: str = "client") -> list[str]:
     base = ROOT / "dcex"
     if mode == "async":
         base /= "async_support"
@@ -274,6 +290,8 @@ def _endpoint_method_names(mode: str, exchange: str) -> list[str]:
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for cls in [node for node in tree.body if isinstance(node, ast.ClassDef)]:
+            if exchange == "arcus" and cls.name.startswith("Spot") != (client_kind == "spot"):
+                continue
             for node in cls.body:
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     if not node.name.startswith("_") and node.name not in {"async_init", "close"}:
@@ -335,9 +353,10 @@ def _endpoint_parameter_signatures(
 
 def _cases(mode: str, exchanges: tuple[str, ...]) -> list[EndpointCase]:
     return [
-        EndpointCase(mode=mode, exchange=exchange, method_name=name)
+        EndpointCase(mode=mode, exchange=exchange, method_name=name, client_kind=kind)
         for exchange in exchanges
-        for name in _endpoint_method_names(mode, exchange)
+        for kind in (("client", "spot") if exchange == "arcus" else ("client",))
+        for name in _endpoint_method_names(mode, exchange, kind)
     ]
 
 
@@ -353,15 +372,17 @@ def test_sync_async_endpoint_parameter_signatures_match(exchange: str) -> None:
     ) == _endpoint_parameter_signatures("async", exchange)
 
 
-def _client_class(mode: str, exchange: str) -> type:
-    module_name = f"dcex.{exchange}.client"
+def _client_class(mode: str, exchange: str, client_kind: str = "client") -> type:
+    module_name = f"dcex.{exchange}.{client_kind}"
     if mode == "async":
-        module_name = f"dcex.async_support.{exchange}.client"
-    return import_module(module_name).Client
+        module_name = f"dcex.async_support.{exchange}.{client_kind}"
+    return getattr(import_module(module_name), "SpotClient" if client_kind == "spot" else "Client")
 
 
-def _client_kwargs(exchange: str) -> dict[str, Any]:
+def _client_kwargs(exchange: str, client_kind: str = "client") -> dict[str, Any]:
     if exchange == "arcus":
+        if client_kind == "spot":
+            return {"wallet_address": "0x" + "1" * 40}
         return {"address": "0x" + "1" * 40, "account_index": 0}
     kwargs: dict[str, Any] = {"preload_product_table": False}
     if exchange == "aster":
@@ -524,6 +545,8 @@ def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
 
     if case.exchange == "arcus" and name == "signed_transfer":
         return {"amount": "1", "sourceSubaccount": "1", "targetSubaccount": "2"}
+    if case.exchange == "arcus" and name in {"quote", "signed_quote", "preferences", "body"}:
+        return {"id": "fixture", "amount": "1"}
     if case.exchange == "arcus" and name == "cancels":
         return [{"product_symbol": "BTC-USD-SWAP", "order_id": "1"}]
 

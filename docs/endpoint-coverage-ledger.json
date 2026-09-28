@@ -75153,14 +75153,14 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3686, 3687, 3688, 3689.",
       "evidence": [
-        "dcex/arcus/client.py::get_market_metadata",
-        "dcex/arcus/client.py::get_market_overview",
-        "dcex/arcus/client.py::get_spot_market_overview",
-        "dcex/arcus/client.py::get_metadata_candles",
-        "dcex/async_support/arcus/client.py::get_market_metadata",
-        "dcex/async_support/arcus/client.py::get_market_overview",
-        "dcex/async_support/arcus/client.py::get_spot_market_overview",
-        "dcex/async_support/arcus/client.py::get_metadata_candles"
+        "dcex/arcus/_market_http.py::get_market_metadata",
+        "dcex/arcus/_market_http.py::get_market_overview",
+        "dcex/arcus/_market_http.py::get_spot_market_overview",
+        "dcex/arcus/_market_http.py::get_metadata_candles",
+        "dcex/async_support/arcus/_market_http.py::get_market_metadata",
+        "dcex/async_support/arcus/_market_http.py::get_market_overview",
+        "dcex/async_support/arcus/_market_http.py::get_spot_market_overview",
+        "dcex/async_support/arcus/_market_http.py::get_metadata_candles"
       ],
       "official_source": "https://docs.arcus.xyz/api-reference/marketmetadata/get-market-metadata",
       "official_sources": [
@@ -75185,12 +75185,12 @@
       "methods": [],
       "note": "Grouped row split into explicit verb/path/operation rows. See rows 3690, 3691, 3692.",
       "evidence": [
-        "dcex/arcus/client.py::get_user_preferences",
-        "dcex/arcus/client.py::upsert_user_preferences",
-        "dcex/arcus/client.py::delete_user_preference_signed",
-        "dcex/async_support/arcus/client.py::get_user_preferences",
-        "dcex/async_support/arcus/client.py::upsert_user_preferences",
-        "dcex/async_support/arcus/client.py::delete_user_preference_signed"
+        "dcex/arcus/_account_http.py::get_user_preferences",
+        "dcex/arcus/_account_http.py::upsert_user_preferences",
+        "dcex/arcus/_account_http.py::delete_user_preference_signed",
+        "dcex/async_support/arcus/_account_http.py::get_user_preferences",
+        "dcex/async_support/arcus/_account_http.py::upsert_user_preferences",
+        "dcex/async_support/arcus/_account_http.py::delete_user_preference_signed"
       ],
       "official_source": "https://docs.arcus.xyz/api-reference/userpreferences/delete-a-user-preference",
       "official_sources": [

@@ -245,8 +245,8 @@ def test_arcus_spot_wallet_python_wrappers_forward_to_native(
             return self.public_request_json(method_name, params)
 
     native = SimpleNamespace(ArcusSpotHttpClient=NativeWalletStub)
-    sync_module = importlib.import_module("dcex.arcus.spot")
-    async_module = importlib.import_module("dcex.async_support.arcus.spot")
+    sync_module = importlib.import_module("dcex.arcus._http_manager")
+    async_module = importlib.import_module("dcex.async_support.arcus._http_manager")
     monkeypatch.setattr(sync_module, "load_native", lambda: native)
     monkeypatch.setattr(async_module, "load_native", lambda: native)
     monkeypatch.setenv("ARCUS_ADDRESS", TAKER)

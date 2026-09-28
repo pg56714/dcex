@@ -2,9 +2,8 @@
 """
 Offline wire coverage for every Arcus Perps sync and async wrapper.
 
-``dcex/arcus/client.py`` does not match the shared ``ENDPOINT_FILE_SUFFIXES``
-list, so the generic endpoint suite never exercises Arcus.  These tests drive
-each Perps wrapper through the real Rust client against a local HTTP server and
+The shared endpoint suite discovers the standard Arcus HTTP mixins. These
+additional tests drive each Perps wrapper through the real Rust client against a local HTTP server and
 assert the documented Arcus route (https://docs.arcus.xyz/api-reference) and
 key fields arrive on the wire, and that trading calls carry the Ed25519
 ``X-API-Key`` / ``X-Timestamp`` / ``X-Signature`` headers.

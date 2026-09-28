@@ -15,9 +15,9 @@ def test_arcus_perps_uses_one_env_credential_set_for_either_network(
 ) -> None:
     """Network selection changes the endpoint, not the environment key names."""
     native = SimpleNamespace(ArcusHttpClient=lambda **kwargs: kwargs)
-    monkeypatch.setattr(importlib.import_module("dcex.arcus.client"), "load_native", lambda: native)
+    monkeypatch.setattr(importlib.import_module("dcex.arcus._http_manager"), "load_native", lambda: native)
     monkeypatch.setattr(
-        importlib.import_module("dcex.async_support.arcus.client"), "load_native", lambda: native
+        importlib.import_module("dcex.async_support.arcus._http_manager"), "load_native", lambda: native
     )
     monkeypatch.setenv("ARCUS_API_KEY", "configured-key")
     monkeypatch.setenv("ARCUS_API_SIGNING_KEY", "configured-seed")

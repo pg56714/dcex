@@ -9,7 +9,9 @@ async def test_async_endpoint_wrapper_is_reachable(
     case: EndpointCase, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     _patch_hyperliquid_market(monkeypatch)
-    client = _client_class(case.mode, case.exchange)(**_client_kwargs(case.exchange))
+    client = _client_class(case.mode, case.exchange, case.client_kind)(
+        **_client_kwargs(case.exchange, case.client_kind)
+    )
     _patch_lighter_native_client(client)
     calls = _wire_async(client)
     _patch_async_case(client, case)
