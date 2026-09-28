@@ -1242,7 +1242,7 @@ def test_sync_helpers_pin_side_type_and_time_in_force(
     _drain(received)
     client = Client(**_client_kwargs(base_url))
     client.place_swap_post_only_sell_order(
-        product_symbol="ETH-USDT-SWAP", quantity="1", price="100"
+        product_symbol="ETH-USDT-SWAP", quantity="1", price="100", position_side="SHORT"
     )
     query = received.get(timeout=5)["query"]
     assert query["symbol"] == "ETH-USDT"
