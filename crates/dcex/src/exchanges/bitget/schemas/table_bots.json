@@ -258,12 +258,28 @@
       "type": "object",
       "properties": {
         "investmentAmount": {
-          "type": "string",
-          "format": "decimal"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
         },
         "investment_amount": {
-          "type": "string",
-          "format": "decimal"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
         },
         "maxPrice": {
           "type": "string",
@@ -567,12 +583,28 @@
       "type": "object",
       "properties": {
         "investmentAmount": {
-          "type": "string",
-          "format": "decimal"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
         },
         "investment_amount": {
-          "type": "string",
-          "format": "decimal"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "string",
+                "format": "decimal"
+              }
+            }
+          }
         },
         "maxPrice": {
           "type": "string",

@@ -456,6 +456,133 @@
             "format": "decimal"
           }
         }
+      },
+      "place_spot_batch_orders_raw": {
+        "type": "object",
+        "properties": {
+          "batchOrders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteOrderQty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_order_qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_futures_batch_orders": {
+        "type": "object",
+        "properties": {
+          "batchOrders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "activationPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "activation_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callbackRate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callback_rate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "modify_futures_batch_orders": {
+        "type": "object",
+        "properties": {
+          "batchOrders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "activationPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "activation_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callbackRate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "callback_rate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "backpack": {
@@ -3863,6 +3990,453 @@
             }
           }
         }
+      },
+      "create_oco_order": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopLimitPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "limitIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "abovePrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAbovePrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "create_oto_order": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopLimitPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "limitIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "abovePrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAbovePrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
+      },
+      "create_otoco_order": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "price": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopLimitPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "limitIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "stopIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "abovePrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "aboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "belowTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "workingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAbovePrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingAboveTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowQuantity": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowStopPrice": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowIcebergQty": {
+            "type": "string",
+            "format": "decimal"
+          },
+          "pendingBelowTrailingDelta": {
+            "type": "string",
+            "format": "decimal"
+          }
+        }
       }
     },
     "bingx": {
@@ -4282,28 +4856,72 @@
             "format": "decimal"
           },
           "stopLoss": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "stopPrice": {
             "type": "string",
             "format": "decimal"
           },
           "stop_loss": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "stop_price": {
             "type": "string",
             "format": "decimal"
           },
           "takeProfit": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "take_profit": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           }
         }
       },
@@ -4576,28 +5194,72 @@
             "format": "decimal"
           },
           "stopLoss": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "stopPrice": {
             "type": "string",
             "format": "decimal"
           },
           "stop_loss": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "stop_price": {
             "type": "string",
             "format": "decimal"
           },
           "takeProfit": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "take_profit": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           }
         }
       },
@@ -4659,28 +5321,72 @@
             "format": "decimal"
           },
           "stopLoss": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "stopPrice": {
             "type": "string",
             "format": "decimal"
           },
           "stop_loss": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "stop_price": {
             "type": "string",
             "format": "decimal"
           },
           "takeProfit": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           },
           "take_profit": {
-            "type": "string",
-            "format": "decimal"
+            "type": "object",
+            "properties": {
+              "price": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              },
+              "stopPrice": {
+                "type": "number",
+                "format": "decimal",
+                "x-positive": true
+              }
+            }
           }
         }
       },
@@ -4756,28 +5462,72 @@
                   "format": "decimal"
                 },
                 "stopLoss": {
-                  "type": "string",
-                  "format": "decimal"
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
                 },
                 "stopPrice": {
                   "type": "string",
                   "format": "decimal"
                 },
                 "stop_loss": {
-                  "type": "string",
-                  "format": "decimal"
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
                 },
                 "stop_price": {
                   "type": "string",
                   "format": "decimal"
                 },
                 "takeProfit": {
-                  "type": "string",
-                  "format": "decimal"
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
                 },
                 "take_profit": {
-                  "type": "string",
-                  "format": "decimal"
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
                 }
               }
             }
@@ -4820,6 +5570,99 @@
                   "format": "decimal"
                 },
                 "stopLoss": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "stop_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "takeProfit": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "take_profit": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_spot_batch_order": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteOrderQty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_order_qty": {
                   "type": "string",
                   "format": "decimal"
                 },
@@ -4827,21 +5670,230 @@
                   "type": "string",
                   "format": "decimal"
                 },
-                "stop_loss": {
+                "stop_price": {
                   "type": "string",
                   "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_swap_batch_order": {
+        "type": "object",
+        "properties": {
+          "batchOrders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "activationPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "activation_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "priceRate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price_rate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteOrderQty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_order_qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopLoss": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
                 },
                 "stop_price": {
                   "type": "string",
                   "format": "decimal"
                 },
                 "takeProfit": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "take_profit": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "batch_orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "activationPrice": {
                   "type": "string",
                   "format": "decimal"
                 },
-                "take_profit": {
+                "activation_price": {
                   "type": "string",
                   "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "priceRate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price_rate": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteOrderQty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_order_qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopLoss": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "stopPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "stop_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "takeProfit": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
+                },
+                "take_profit": {
+                  "type": "object",
+                  "properties": {
+                    "price": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "stopPrice": {
+                      "type": "number",
+                      "format": "decimal",
+                      "x-positive": true
+                    }
+                  }
                 }
               }
             }
@@ -6969,12 +8021,28 @@
         "type": "object",
         "properties": {
           "investmentAmount": {
-            "type": "string",
-            "format": "decimal"
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           },
           "investment_amount": {
-            "type": "string",
-            "format": "decimal"
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           },
           "maxPrice": {
             "type": "string",
@@ -7191,12 +8259,28 @@
         "type": "object",
         "properties": {
           "investmentAmount": {
-            "type": "string",
-            "format": "decimal"
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           },
           "investment_amount": {
-            "type": "string",
-            "format": "decimal"
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
           },
           "maxPrice": {
             "type": "string",
@@ -7295,6 +8379,18 @@
                 "trigger_price": {
                   "type": "string",
                   "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
                 }
               }
             }
@@ -7351,6 +8447,18 @@
                 "trigger_price": {
                   "type": "string",
                   "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
                 }
               }
             }
@@ -7402,6 +8510,595 @@
                   "format": "decimal"
                 },
                 "tp_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_spot_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "executeStopLossPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "executeTakeProfitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "execute_stop_loss_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "execute_take_profit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopLossPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetTakeProfitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_loss_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_take_profit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "trigger_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "order_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "executeStopLossPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "executeTakeProfitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "execute_stop_loss_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "execute_take_profit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopLossPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetTakeProfitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_loss_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_take_profit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "trigger_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_futures_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "presetStopLossExecutePrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopLossPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopSurplusExecutePrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopSurplusPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_loss_execute_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_loss_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_surplus_execute_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_surplus_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "order_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "presetStopLossExecutePrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopLossPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopSurplusExecutePrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "presetStopSurplusPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_loss_execute_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_loss_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_surplus_execute_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "preset_stop_surplus_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_uta_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "slLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "sl_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopLoss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "takeProfit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "take_profit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tpLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tp_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "order_list": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "slLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "sl_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopLoss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "takeProfit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "take_profit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tpLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tp_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_cross_margin_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "baseSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "base_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "baseSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "base_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_isolated_margin_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orderList": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "baseSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "base_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "baseSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "base_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteSize": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "size": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "newSize": {
                   "type": "string",
                   "format": "decimal"
                 }
@@ -8841,6 +10538,128 @@
             }
           }
         }
+      },
+      "place_batch_order": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "slLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "sl_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopLoss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "takeProfit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "take_profit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tpLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tp_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "trigger_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "amend_batch_order": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "qty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "slLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "sl_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopLoss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "takeProfit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "take_profit": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tpLimitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "tp_limit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "triggerPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "trigger_price": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "extended": {
@@ -9208,6 +11027,49 @@
           "amount": {
             "type": "string",
             "format": "decimal"
+          }
+        }
+      },
+      "modify_batch_orders": {
+        "type": "object",
+        "properties": {
+          "modifies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "type": "object",
+                  "properties": {
+                    "p": {
+                      "type": "string",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "s": {
+                      "type": "string",
+                      "format": "decimal",
+                      "x-positive": true
+                    },
+                    "t": {
+                      "type": "object",
+                      "properties": {
+                        "trigger": {
+                          "type": "object",
+                          "properties": {
+                            "triggerPx": {
+                              "type": "string",
+                              "format": "decimal",
+                              "x-positive": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -12494,6 +14356,72 @@
             "format": "decimal"
           }
         }
+      },
+      "place_spot_batch_orders": {
+        "type": "object",
+        "properties": {
+          "batchOrders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quantity": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quoteOrderQty": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "quote_order_qty": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      },
+      "place_contract_batch_orders": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stopLossPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "stop_loss_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "takeProfitPrice": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "take_profit_price": {
+                  "type": "string",
+                  "format": "decimal"
+                },
+                "vol": {
+                  "type": "string",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "okx": {
@@ -12537,7 +14465,10 @@
         "properties": {
           "newOrdPx": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-decimal-sentinels": [
+              "-1"
+            ]
           },
           "newSlOrdPx": {
             "type": "string",
@@ -12571,7 +14502,10 @@
           },
           "new_ord_px": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-decimal-sentinels": [
+              "-1"
+            ]
           },
           "new_sl_ord_px": {
             "type": "string",
@@ -13096,11 +15030,17 @@
           },
           "orderPx": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-decimal-sentinels": [
+              "-1"
+            ]
           },
           "order_px": {
             "type": "string",
-            "format": "decimal"
+            "format": "decimal",
+            "x-decimal-sentinels": [
+              "-1"
+            ]
           },
           "pxLimit": {
             "type": "string",
