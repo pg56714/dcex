@@ -1,13 +1,13 @@
-use serde_json::Value;
+pub(in crate::exchanges::bitget) use serde_json::Value;
 
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::bitget) use crate::Result;
+pub(in crate::exchanges::bitget) use crate::exchange::ValidatedResponse;
 
-use super::client::BitgetClient;
-use super::endpoints::*;
-use super::params::{BitgetParams, insert_optional_value, require_one_identifier};
+pub(in crate::exchanges::bitget) use super::client::BitgetClient;
+pub(in crate::exchanges::bitget) use super::endpoints::*;
+pub(in crate::exchanges::bitget) use super::params::{BitgetParams, require_one_identifier};
 
-const SPOT_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::bitget) const SPOT_ORDER_KEYS: &[&str] = &[
     "side",
     "orderType",
     "size",
@@ -25,7 +25,7 @@ const SPOT_ORDER_KEYS: &[&str] = &[
     "executeStopLossPrice",
 ];
 
-const UTA_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::bitget) const UTA_ORDER_KEYS: &[&str] = &[
     "category",
     "side",
     "orderType",
@@ -47,7 +47,7 @@ const UTA_ORDER_KEYS: &[&str] = &[
     "slLimitPrice",
 ];
 
-const FUTURES_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::bitget) const FUTURES_ORDER_KEYS: &[&str] = &[
     "productType",
     "marginMode",
     "marginCoin",
@@ -115,9 +115,15 @@ impl BitgetClient {
                 )
                 .await
             }
-            "place_spot_batch_orders" => self.place_spot_batch_orders_from_params(params).await,
+            "place_spot_batch_orders" => {
+                self.moved_trade_place_spot_batch_orders(method_name, params)
+                    .await
+            }
             "cancel_spot_order" => self.cancel_spot_order_from_params(params).await,
-            "cancel_spot_batch_orders" => self.cancel_spot_batch_orders_from_params(params).await,
+            "cancel_spot_batch_orders" => {
+                self.moved_trade_cancel_spot_batch_orders(method_name, params)
+                    .await
+            }
             "get_spot_order" => {
                 require_one_identifier(params, &["orderId", "clientOid"])?;
                 self.get_private(
@@ -163,13 +169,13 @@ impl BitgetClient {
             "place_uta_order" => self.place_uta_order_from_params(params).await,
             "place_reality_order" => self.place_reality_order_from_params(params).await,
             "place_uta_batch_orders" => {
-                self.post_private(UTA_BATCH_PLACE_ORDER, params.json_required("orderList")?)
+                self.moved_trade_place_uta_batch_orders(method_name, params)
                     .await
             }
             "cancel_uta_order" => self.cancel_uta_order_from_params(params).await,
             "cancel_reality_order" => self.cancel_reality_order_from_params(params).await,
             "cancel_uta_batch_orders" => {
-                self.post_private(UTA_BATCH_CANCEL_ORDERS, params.json_required("orderList")?)
+                self.moved_trade_cancel_uta_batch_orders(method_name, params)
                     .await
             }
             "get_uta_order" => {
@@ -343,11 +349,13 @@ impl BitgetClient {
                 .await
             }
             "place_futures_batch_orders" => {
-                self.place_futures_batch_orders_from_params(params).await
+                self.moved_trade_place_futures_batch_orders(method_name, params)
+                    .await
             }
             "cancel_futures_order" => self.cancel_futures_order_from_params(params).await,
             "cancel_futures_batch_orders" => {
-                self.cancel_futures_batch_orders_from_params(params).await
+                self.moved_trade_cancel_futures_batch_orders(method_name, params)
+                    .await
             }
             "get_futures_order" => {
                 params.required("productType")?;
@@ -404,7 +412,7 @@ impl BitgetClient {
         Ok(Some(result?))
     }
 
-    async fn place_spot_order_from_params(
+    pub(in crate::exchanges::bitget) async fn place_spot_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -412,7 +420,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn place_spot_order_request(
+    pub(in crate::exchanges::bitget) async fn place_spot_order_request(
         &self,
         params: &BitgetParams,
         side: Option<&str>,
@@ -458,22 +466,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn place_spot_batch_orders_from_params(
-        &self,
-        params: &BitgetParams,
-    ) -> Result<ValidatedResponse> {
-        let mut body = params.body(&["batchMode"]);
-        self.insert_product_symbol(&mut body, params)?;
-        insert_optional_value(
-            &mut body,
-            "orderList",
-            Some(params.json_required("orderList")?),
-        );
-        self.post_private(SPOT_BATCH_PLACE_ORDER, Value::Object(body))
-            .await
-    }
-
-    async fn cancel_spot_order_from_params(
+    pub(in crate::exchanges::bitget) async fn cancel_spot_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -484,22 +477,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn cancel_spot_batch_orders_from_params(
-        &self,
-        params: &BitgetParams,
-    ) -> Result<ValidatedResponse> {
-        let mut body = params.body(&["batchMode"]);
-        self.insert_product_symbol(&mut body, params)?;
-        insert_optional_value(
-            &mut body,
-            "orderList",
-            Some(params.json_required("orderList")?),
-        );
-        self.post_private(SPOT_BATCH_CANCEL_ORDER, Value::Object(body))
-            .await
-    }
-
-    async fn place_uta_order_from_params(
+    pub(in crate::exchanges::bitget) async fn place_uta_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -513,7 +491,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn cancel_uta_order_from_params(
+    pub(in crate::exchanges::bitget) async fn cancel_uta_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -525,7 +503,7 @@ impl BitgetClient {
         .await
     }
 
-    async fn place_futures_order_from_params(
+    pub(in crate::exchanges::bitget) async fn place_futures_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -533,7 +511,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn place_reality_order_from_params(
+    pub(in crate::exchanges::bitget) async fn place_reality_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -547,7 +525,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn cancel_reality_order_from_params(
+    pub(in crate::exchanges::bitget) async fn cancel_reality_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -559,7 +537,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn place_futures_order_request(
+    pub(in crate::exchanges::bitget) async fn place_futures_order_request(
         &self,
         params: &BitgetParams,
         side: Option<&str>,
@@ -595,25 +573,7 @@ impl BitgetClient {
             .await
     }
 
-    async fn place_futures_batch_orders_from_params(
-        &self,
-        params: &BitgetParams,
-    ) -> Result<ValidatedResponse> {
-        let mut body = params.body(&["productType", "marginMode", "marginCoin"]);
-        for key in ["productType", "marginMode", "marginCoin"] {
-            params.required(key)?;
-        }
-        self.insert_required_product_symbol(&mut body, params)?;
-        insert_optional_value(
-            &mut body,
-            "orderList",
-            Some(params.json_required("orderList")?),
-        );
-        self.post_private(FUTURES_BATCH_PLACE_ORDER, Value::Object(body))
-            .await
-    }
-
-    async fn cancel_futures_order_from_params(
+    pub(in crate::exchanges::bitget) async fn cancel_futures_order_from_params(
         &self,
         params: &BitgetParams,
     ) -> Result<ValidatedResponse> {
@@ -624,25 +584,9 @@ impl BitgetClient {
         self.post_private(FUTURES_CANCEL_ORDER, Value::Object(body))
             .await
     }
-
-    async fn cancel_futures_batch_orders_from_params(
-        &self,
-        params: &BitgetParams,
-    ) -> Result<ValidatedResponse> {
-        let mut body = params.body(&["productType", "marginCoin"]);
-        params.required("productType")?;
-        self.insert_product_symbol(&mut body, params)?;
-        insert_optional_value(
-            &mut body,
-            "orderIdList",
-            params.json_optional("orderIdList")?,
-        );
-        self.post_private(FUTURES_BATCH_CANCEL_ORDERS, Value::Object(body))
-            .await
-    }
 }
 
-fn require_uta_symbol(params: &BitgetParams) -> Result<()> {
+pub(in crate::exchanges::bitget) fn require_uta_symbol(params: &BitgetParams) -> Result<()> {
     require_one_identifier(params, &["product_symbol", "symbol"])
 }
 
@@ -651,7 +595,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn preserves_uta_protection_fields() {
+    pub(in crate::exchanges::bitget) fn preserves_uta_protection_fields() {
         let params = BitgetParams::from_pairs(vec![
             ("takeProfit".to_string(), "110".to_string()),
             ("stopLoss".to_string(), "90".to_string()),
@@ -666,7 +610,7 @@ mod tests {
     }
 
     #[test]
-    fn preserves_classic_futures_protection_fields() {
+    pub(in crate::exchanges::bitget) fn preserves_classic_futures_protection_fields() {
         let params = BitgetParams::from_pairs(vec![
             ("presetStopSurplusPrice".to_string(), "110".to_string()),
             ("presetStopLossExecutePrice".to_string(), "89".to_string()),

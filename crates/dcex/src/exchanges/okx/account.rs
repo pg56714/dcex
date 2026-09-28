@@ -1,11 +1,11 @@
-use serde_json::Value;
+pub(in crate::exchanges::okx) use serde_json::Value;
 
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::okx) use crate::Result;
+pub(in crate::exchanges::okx) use crate::exchange::ValidatedResponse;
 
-use super::client::OkxClient;
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::okx) use super::client::OkxClient;
+pub(in crate::exchanges::okx) use super::endpoints::*;
+pub(in crate::exchanges::okx) use super::params::{
     OkxParams, insert_optional_bool, insert_optional_string, push_optional, push_optional_owned,
 };
 
@@ -177,9 +177,8 @@ impl OkxClient {
                 .await
             }
             "get_max_withdrawal" => {
-                let mut query = Vec::new();
-                push_optional_owned(&mut query, "ccy", params.csv("ccy")?);
-                self.get_request(ACCOUNT_MAX_WITHDRAWAL, query).await
+                self.moved_account_get_max_withdrawal(method_name, params)
+                    .await
             }
             "get_interest_limits" => {
                 self.get_request(ACCOUNT_INTEREST_LIMITS, params.only(&["type", "ccy"]))

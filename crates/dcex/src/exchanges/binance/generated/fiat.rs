@@ -6,9 +6,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         fiat_deposit(currency => "currency", api_payment_method => "apiPaymentMethod", amount => "amount"),
-        /// API withdrawals have no second confirmation; they execute on submit.
-        fiat_withdraw(currency => "currency", api_payment_method => "apiPaymentMethod", amount => "amount", account_info => "accountInfo"),
-        get_fiat_deposit_withdraw_history(transaction_type => "transactionType"),
         get_fiat_payments_history(transaction_type => "transactionType"),
         get_order_detail(order_no => "orderNo"),
     ];

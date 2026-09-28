@@ -6,8 +6,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         cfd_account_get_fund_detail(),
-        cfd_account_transfer(coin => "coin", amount => "amount", account_type => "accountType", direction => "direction"),
-        cfd_account_get_transfer_records(),
         cfd_account_get_financial_records(),
         cfd_account_get_instruments(),
         cfd_market_get_tickers(),

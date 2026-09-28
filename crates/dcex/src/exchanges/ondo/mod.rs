@@ -12,3 +12,7 @@ pub use client::OndoClient;
 
 #[cfg(test)]
 mod tests;
+
+mod withdrawals;
+
+mod batch;

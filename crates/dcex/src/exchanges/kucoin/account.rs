@@ -1,13 +1,12 @@
-use serde_json::{Map, Value};
+pub(in crate::exchanges::kucoin) use serde_json::{Map, Value};
 
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::kucoin) use crate::Result;
+pub(in crate::exchanges::kucoin) use crate::exchange::ValidatedResponse;
 
-use super::client::{KucoinClient, KucoinMarket};
-use super::endpoints::*;
-use super::params::{
-    KucoinParams, generate_client_oid, insert_optional_string, insert_required_string,
-    validate_enum, validate_positive_number, validate_text_length,
+pub(in crate::exchanges::kucoin) use super::client::{KucoinClient, KucoinMarket};
+pub(in crate::exchanges::kucoin) use super::endpoints::*;
+pub(in crate::exchanges::kucoin) use super::params::{
+    KucoinParams, insert_required_string, validate_enum, validate_positive_number,
 };
 
 impl KucoinClient {
@@ -62,85 +61,10 @@ impl KucoinClient {
                 .await
             }
             "get_transfer_quotas" => {
-                params.ensure_allowed(&["currency", "account_type", "type", "tag"])?;
-                let account_type = params.required_any(&["account_type", "type"])?;
-                if !matches!(
-                    account_type,
-                    "MAIN" | "TRADE" | "MARGIN" | "ISOLATED" | "MARGIN_V2" | "ISOLATED_V2"
-                ) {
-                    return Err(crate::DcexError::InvalidInput(format!(
-                        "unsupported KuCoin account type: {account_type}"
-                    )));
-                }
-                let mut query = Vec::new();
-                query.push((
-                    "currency".to_string(),
-                    params.required("currency")?.to_string(),
-                ));
-                query.push(("type".to_string(), account_type.to_string()));
-                if let Some(tag) = params.get("tag") {
-                    query.push(("tag".to_string(), tag.to_string()));
-                }
-                self.private_get(KucoinMarket::Spot, SPOT_TRANSFER_QUOTAS, query)
+                self.moved_account_get_transfer_quotas(method_name, params)
                     .await
             }
-            "flex_transfer" => {
-                params.ensure_allowed(&[
-                    "clientOid",
-                    "currency",
-                    "amount",
-                    "fromUserId",
-                    "fromAccountType",
-                    "fromAccountTag",
-                    "transfer_type",
-                    "type",
-                    "toUserId",
-                    "toAccountType",
-                    "toAccountTag",
-                ])?;
-                validate_positive_number(params, "amount")?;
-                validate_text_length(params, "clientOid", 128, true)?;
-                let transfer_type = params
-                    .get_any(&["transfer_type", "type"])
-                    .unwrap_or("INTERNAL");
-                if !matches!(
-                    transfer_type,
-                    "INTERNAL" | "PARENT_TO_SUB" | "SUB_TO_PARENT" | "SUB_TO_SUB"
-                ) {
-                    return Err(crate::DcexError::InvalidInput(format!(
-                        "unsupported KuCoin transfer type: {transfer_type}"
-                    )));
-                }
-                validate_transfer_parties(params, transfer_type)?;
-                validate_transfer_account_versions(params, transfer_type)?;
-                validate_account_tag(params, "fromAccountType", "fromAccountTag")?;
-                validate_account_tag(params, "toAccountType", "toAccountTag")?;
-                let mut body = Map::new();
-                let client_oid = params
-                    .get("clientOid")
-                    .map(str::to_string)
-                    .unwrap_or_else(generate_client_oid);
-                insert_required_string(&mut body, "clientOid", &client_oid);
-                insert_required_string(&mut body, "type", transfer_type);
-                insert_required_string(&mut body, "currency", params.required("currency")?);
-                insert_required_string(&mut body, "amount", params.required("amount")?);
-                insert_required_string(
-                    &mut body,
-                    "fromAccountType",
-                    params.required("fromAccountType")?,
-                );
-                insert_required_string(
-                    &mut body,
-                    "toAccountType",
-                    params.required("toAccountType")?,
-                );
-                insert_optional_string(&mut body, "fromUserId", params.get("fromUserId"));
-                insert_optional_string(&mut body, "fromAccountTag", params.get("fromAccountTag"));
-                insert_optional_string(&mut body, "toUserId", params.get("toUserId"));
-                insert_optional_string(&mut body, "toAccountTag", params.get("toAccountTag"));
-                self.private_post(KucoinMarket::Spot, SPOT_FLEX_TRANSFER, Value::Object(body))
-                    .await
-            }
+            "flex_transfer" => self.moved_account_flex_transfer(method_name, params).await,
             "get_subaccounts" | "get_spot_subaccount_balances" | "get_uta_subaccounts" => {
                 params.ensure_allowed(&["currentPage", "pageSize"])?;
                 let path = match method_name {
@@ -251,7 +175,11 @@ impl KucoinClient {
     }
 }
 
-fn validate_comma_list(value: &str, label: &str, maximum: usize) -> Result<()> {
+pub(in crate::exchanges::kucoin) fn validate_comma_list(
+    value: &str,
+    label: &str,
+    maximum: usize,
+) -> Result<()> {
     let values = value.split(',').map(str::trim).collect::<Vec<_>>();
     if (1..=maximum).contains(&values.len()) && values.iter().all(|entry| !entry.is_empty()) {
         return Ok(());
@@ -261,7 +189,10 @@ fn validate_comma_list(value: &str, label: &str, maximum: usize) -> Result<()> {
     )))
 }
 
-fn validate_transfer_parties(params: &KucoinParams, transfer_type: &str) -> Result<()> {
+pub(in crate::exchanges::kucoin) fn validate_transfer_parties(
+    params: &KucoinParams,
+    transfer_type: &str,
+) -> Result<()> {
     match transfer_type {
         "PARENT_TO_SUB" => {
             params.required("toUserId")?;
@@ -284,7 +215,10 @@ fn validate_transfer_parties(params: &KucoinParams, transfer_type: &str) -> Resu
     Ok(())
 }
 
-fn validate_transfer_account_versions(params: &KucoinParams, transfer_type: &str) -> Result<()> {
+pub(in crate::exchanges::kucoin) fn validate_transfer_account_versions(
+    params: &KucoinParams,
+    transfer_type: &str,
+) -> Result<()> {
     if transfer_type == "INTERNAL" {
         return Ok(());
     }
@@ -298,7 +232,11 @@ fn validate_transfer_account_versions(params: &KucoinParams, transfer_type: &str
     Ok(())
 }
 
-fn reject_parameter(params: &KucoinParams, key: &str, transfer_type: &str) -> Result<()> {
+pub(in crate::exchanges::kucoin) fn reject_parameter(
+    params: &KucoinParams,
+    key: &str,
+    transfer_type: &str,
+) -> Result<()> {
     if params.get(key).is_some() {
         return Err(crate::DcexError::InvalidInput(format!(
             "KuCoin parameter {key} is not supported for {transfer_type} transfers"
@@ -307,7 +245,11 @@ fn reject_parameter(params: &KucoinParams, key: &str, transfer_type: &str) -> Re
     Ok(())
 }
 
-fn validate_account_tag(params: &KucoinParams, account_key: &str, tag_key: &str) -> Result<()> {
+pub(in crate::exchanges::kucoin) fn validate_account_tag(
+    params: &KucoinParams,
+    account_key: &str,
+    tag_key: &str,
+) -> Result<()> {
     let account_type = params.required(account_key)?;
     if !matches!(
         account_type,

@@ -20,9 +20,12 @@ mod tests;
 
 pub use client::BitgetClient;
 
-mod batch_controls;
 mod schema_requests;
 
 mod withdrawals;
 
 mod subaccount;
+
+mod batch;
+
+mod transfers;

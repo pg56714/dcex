@@ -3,10 +3,13 @@
 from typing import Any
 
 from .._operation_guards import require_scope
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfersHTTP, HTTPManager):
     """HTTP client for MEXC private trading APIs."""
 
     def test_spot_order(
@@ -263,17 +266,6 @@ class TradeHTTP(HTTPManager):
                 stpMode=stpMode,
                 recvWindow=recvWindow,
             ),
-        )
-
-    def place_spot_batch_orders(
-        self,
-        batchOrders: list[dict[str, Any]],
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Place MEXC Spot batch orders."""
-        return self._native_private(
-            "place_spot_batch_orders",
-            self._native_params(batchOrders=batchOrders, recvWindow=recvWindow),
         )
 
     def cancel_spot_order(
@@ -1226,30 +1218,6 @@ class TradeHTTP(HTTPManager):
             "get_contract_open_stop_orders", self._native_params(product_symbol=product_symbol)
         )
 
-    def cancel_contract_batch_orders_by_external_id(
-        self, *, orders: list[dict[str, Any]]
-    ) -> dict[str, Any]:
-        """
-        POST /api/v1/private/order/batch_cancel_with_external.
-
-        Inspect every returned item for individual failures.
-        """
-        return self._native_private(
-            "cancel_contract_batch_orders_by_external_id", self._native_params(orders=orders)
-        )
-
-    def get_contract_batch_orders_by_external_id(
-        self, *, orders: list[dict[str, Any]]
-    ) -> dict[str, Any]:
-        """
-        POST /api/v1/private/order/batch_query_with_external.
-
-        Inspect every returned item for individual failures.
-        """
-        return self._native_private(
-            "get_contract_batch_orders_by_external_id", self._native_params(orders=orders)
-        )
-
     def get_contract_closed_orders(
         self,
         *,
@@ -1397,16 +1365,6 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "remove_stp_strategy_group_members",
             self._native_params(uid=uid, tradeGroupId=trade_group_id),
-        )
-
-    def get_withdrawal_addresses(
-        self, *, coin: str | None = None, page: int | None = None, limit: int | None = None
-    ) -> dict[str, Any] | list[Any]:
-        """
-        GET /api/v3/capital/withdraw/address.
-        """
-        return self._native_private(
-            "get_withdrawal_addresses", self._native_params(coin=coin, page=page, limit=limit)
         )
 
     def delete_stp_strategy_group(self, *, trade_group_id: str) -> dict[str, Any] | list[Any]:
@@ -1718,33 +1676,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def get_rebate_affiliate_withdraw(
-        self,
-        *,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        page: int | None = None,
-        page_size: int | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /api/v3/rebate/affiliate/withdraw.
-
-        Source: https://www.mexc.com/api-docs/spot-v3/rebate-endpoints/get-affiliate-withdraw-record-affiliate-only
-        """
-        return self._native_private(
-            "get_rebate_affiliate_withdraw",
-            self._native_params(
-                **{
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "page": page,
-                    "pageSize": page_size,
-                    "recvWindow": recv_window,
-                }
-            ),
-        )
-
     def get_rebate_affiliate_list(
         self,
         *,
@@ -1889,142 +1820,4 @@ class TradeHTTP(HTTPManager):
                     "recvWindow": recv_window,
                 }
             ),
-        )
-
-    def cancel_spot_withdrawal(
-        self,
-        *,
-        id: str,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        DELETE /api/v3/capital/withdraw.
-
-        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/cancel-withdraw
-        """
-        return self._native_private(
-            "cancel_spot_withdrawal",
-            self._native_params(
-                **{
-                    "id": id,
-                    "recvWindow": recv_window,
-                }
-            ),
-        )
-
-    def transfer_spot_internal(
-        self,
-        *,
-        to_account_type: str,
-        to_account: str,
-        area_code: str | None = None,
-        asset: str,
-        amount: str,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v3/capital/transfer/internal.
-
-        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/internal-transfer
-
-
-        The recipient is a different user. API transfers have no second confirmation;
-        they execute on submit. Verify the recipient UID, email, or phone first.
-        """
-        return self._native_private(
-            "transfer_spot_internal",
-            self._native_params(
-                **{
-                    "toAccountType": to_account_type,
-                    "toAccount": to_account,
-                    "areaCode": area_code,
-                    "asset": asset,
-                    "amount": amount,
-                    "recvWindow": recv_window,
-                }
-            ),
-        )
-
-    def create_spot_withdrawal(
-        self,
-        *,
-        coin: str,
-        withdraw_order_id: str | None = None,
-        network: str | None = None,
-        contract_address: str | None = None,
-        address: str,
-        memo: str | None = None,
-        amount: str,
-        remark: str | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v3/capital/withdraw.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawnew
-        """
-        return self._native_private(
-            "create_spot_withdrawal",
-            self._native_params(
-                **{
-                    "coin": coin,
-                    "withdrawOrderId": withdraw_order_id,
-                    "netWork": network,
-                    "contractAddress": contract_address,
-                    "address": address,
-                    "memo": memo,
-                    "amount": amount,
-                    "remark": remark,
-                    "recvWindow": recv_window,
-                }
-            ),
-        )
-
-    def create_spot_withdrawal_legacy(
-        self,
-        *,
-        coin: str,
-        withdraw_order_id: str | None = None,
-        network: str | None = None,
-        address: str,
-        memo: str | None = None,
-        amount: str,
-        remark: str | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v3/capital/withdraw/apply.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Legacy endpoint; the exchange documents that it will be taken offline.
-        Source: https://www.mexc.com/api-docs/spot-v3/wallet-endpoints/withdrawpreviousoffline-soon
-        """
-        return self._native_private(
-            "create_spot_withdrawal_legacy",
-            self._native_params(
-                **{
-                    "coin": coin,
-                    "withdrawOrderId": withdraw_order_id,
-                    "network": network,
-                    "address": address,
-                    "memo": memo,
-                    "amount": amount,
-                    "remark": remark,
-                    "recvWindow": recv_window,
-                }
-            ),
-        )
-
-    def place_contract_batch_orders(self, orders: list[dict[str, Any]]) -> Any:  # noqa: ANN401
-        """
-        Submit up to 50 native-symbol futures orders.
-
-        Previously documented as under maintenance; the current official page restricts
-        this endpoint to market maker accounts. Inspect each item errorCode in the response.
-        Decimal prices and quantities must be plain strings.
-        Source: https://www.mexc.com/api-docs/futures/account-and-trading-endpoints/batch-place-order
-        """
-        return self._native_private(
-            "place_contract_batch_orders", self._native_params(orders=orders)
         )

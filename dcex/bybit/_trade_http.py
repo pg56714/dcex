@@ -5,10 +5,11 @@ from json import dumps
 from typing import Any
 
 from ..enums import OrderSide
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, HTTPManager):
     """HTTP client for Bybit trading operations."""
 
     def place_order(
@@ -379,17 +380,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def cancel_batch_orders(
-        self,
-        request: list[dict[str, Any]],
-        category: str = "linear",
-    ) -> dict[str, Any]:
-        """Cancel multiple orders in batch."""
-        return self._native_private(
-            "cancel_batch_orders",
-            self._native_params(request=request, category=category),
-        )
-
     def cancel_all_orders(
         self,
         category: str = "linear",
@@ -476,28 +466,6 @@ class TradeHTTP(HTTPManager):
                 limit=limit,
                 cursor=cursor,
             ),
-        )
-
-    def place_batch_order(
-        self,
-        request: list[dict[str, Any]],
-        category: str = "linear",
-    ) -> dict[str, Any]:
-        """Place multiple orders in batch."""
-        return self._native_private(
-            "place_batch_order",
-            self._native_params(request=request, category=category),
-        )
-
-    def amend_batch_order(
-        self,
-        request: list[dict[str, Any]],
-        category: str = "linear",
-    ) -> dict[str, Any]:
-        """Amend multiple orders in batch."""
-        return self._native_private(
-            "amend_batch_order",
-            self._native_params(request=request, category=category),
         )
 
     def get_borrow_quota(

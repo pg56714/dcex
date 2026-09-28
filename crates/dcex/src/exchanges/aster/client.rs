@@ -1,17 +1,21 @@
-use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+pub(in crate::exchanges::aster) use std::sync::Arc;
+pub(in crate::exchanges::aster) use std::sync::atomic::{AtomicU64, Ordering};
+pub(in crate::exchanges::aster) use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use serde_json::Value;
+pub(in crate::exchanges::aster) use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
-use crate::http::{AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody, block_on};
-use crate::product_table::ProductTable;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::aster) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::aster) use crate::http::{
+    AsyncHttpClient, HttpMethod, HttpRequest, HttpResponse, RequestBody, block_on,
+};
+pub(in crate::exchanges::aster) use crate::product_table::ProductTable;
+pub(in crate::exchanges::aster) use crate::{DcexError, Result};
 
-use super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL};
-use super::params::json_value_string;
-use super::signing::{encode_params, http_method_name, parse_private_key, sign_message};
+pub(in crate::exchanges::aster) use super::endpoints::{FUTURES_BASE_URL, SPOT_BASE_URL};
+pub(in crate::exchanges::aster) use super::params::json_value_string;
+pub(in crate::exchanges::aster) use super::signing::{
+    encode_params, http_method_name, parse_private_key, sign_message,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AsterMarket {
@@ -42,8 +46,8 @@ pub struct AsterClient {
     chain_base_url: String,
     announcement_base_url: String,
     user_address: Option<String>,
-    signer_address: Option<String>,
-    private_key: Option<[u8; 32]>,
+    pub(super) signer_address: Option<String>,
+    pub(super) private_key: Option<[u8; 32]>,
     last_nonce: Arc<AtomicU64>,
     product_table: Option<Arc<ProductTable>>,
 }
@@ -451,42 +455,6 @@ impl AsterClient {
         })
     }
 
-    /// Transfers within one master/sub-account family using the approved agent.
-    /// Not verified live: the official V3 parameter table specifies `signer`, but
-    /// its generic signing template also includes `user`. This implementation
-    /// follows the endpoint table pending an authoritative signed example.
-    /// https://github.com/asterdex/api-docs/blob/master/V3(Recommended)/EN/aster-finance-futures-api-v3.md
-    pub(super) async fn sub_account_transfer(
-        &self,
-        params: &super::params::AsterParams,
-    ) -> Result<ValidatedResponse> {
-        let signer = self.signer_address.as_deref().ok_or_else(|| {
-            DcexError::InvalidInput(
-                "Aster sub-account transfers require an approved signer.".into(),
-            )
-        })?;
-        let key = self.private_key.as_ref().ok_or_else(|| {
-            DcexError::InvalidInput(
-                "Aster sub-account transfers require the signer private key.".into(),
-            )
-        })?;
-        let mut pairs = params.only(&["toAccountAddress", "asset", "amount", "kindType"]);
-        pairs.push(("nonce".into(), self.next_nonce()?.to_string()));
-        pairs.push(("signer".into(), signer.into()));
-        pairs.extend(params.only(&["fromAccountAddress"]));
-        let signature = sign_message(&encode_params(&pairs), key)?;
-        pairs.push(("signature".into(), signature));
-        // Already signed in this endpoint's specified field order.
-        self.request(
-            HttpMethod::Post,
-            AsterMarket::Futures,
-            "/fapi/v3/subAccountTransfer",
-            pairs,
-            false,
-        )
-        .await
-    }
-
     /// Reserve a unique microsecond nonce; pass it to the order and its guarded cancel.
     pub fn reserve_nonce(&self) -> Result<u64> {
         let nonce = self.next_nonce()?;
@@ -494,7 +462,7 @@ impl AsterClient {
         Ok(nonce)
     }
 
-    fn next_nonce(&self) -> Result<u64> {
+    pub(in crate::exchanges::aster) fn next_nonce(&self) -> Result<u64> {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_err(|error| DcexError::Runtime(error.to_string()))?
@@ -538,7 +506,7 @@ pub(super) fn validate_wallet_address(label: &str, value: &str) -> Result<()> {
     Ok(())
 }
 
-fn exchange_symbol_fallback(product_symbol: &str) -> String {
+pub(in crate::exchanges::aster) fn exchange_symbol_fallback(product_symbol: &str) -> String {
     let mut parts = product_symbol.split('-');
     match (parts.next(), parts.next(), parts.next()) {
         (Some(base), Some(quote), Some(_kind)) => format!("{base}{quote}"),
@@ -579,7 +547,7 @@ pub(super) fn validate_response(response: &HttpResponse) -> Result<Value> {
     Ok(data)
 }
 
-fn validate_nonce_window(nonce: u64) -> Result<()> {
+pub(in crate::exchanges::aster) fn validate_nonce_window(nonce: u64) -> Result<()> {
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|error| DcexError::Runtime(error.to_string()))?
@@ -596,7 +564,7 @@ fn validate_nonce_window(nonce: u64) -> Result<()> {
 mod review_nonce_tests {
     use super::*;
 
-    fn signed_client() -> AsterClient {
+    pub(in crate::exchanges::aster) fn signed_client() -> AsterClient {
         AsterClient::with_base_urls(
             Some(format!("0x{}", "22".repeat(20))),
             Some(format!("0x{}", "33".repeat(20))),
@@ -609,7 +577,8 @@ mod review_nonce_tests {
     }
 
     #[test]
-    fn explicit_nonce_advances_shared_counter_and_rejects_outside_window() {
+    pub(in crate::exchanges::aster) fn explicit_nonce_advances_shared_counter_and_rejects_outside_window()
+     {
         let client = signed_client();
         let future = client.reserve_nonce().unwrap() + 30_000_000;
         client
@@ -639,7 +608,7 @@ mod review_nonce_tests {
     }
 
     #[test]
-    fn concurrent_reservations_do_not_collide() {
+    pub(in crate::exchanges::aster) fn concurrent_reservations_do_not_collide() {
         let client = signed_client();
         let values: Vec<_> = std::thread::scope(|scope| {
             let tasks: Vec<_> = (0..16)
@@ -661,7 +630,7 @@ mod review_nonce_tests {
     }
 
     #[test]
-    fn automatic_nonce_rejects_counter_outside_time_window() {
+    pub(in crate::exchanges::aster) fn automatic_nonce_rejects_counter_outside_time_window() {
         let client = signed_client();
         client.last_nonce.store(u64::MAX - 1, Ordering::Relaxed);
         assert!(

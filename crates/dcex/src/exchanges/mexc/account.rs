@@ -1,12 +1,12 @@
-use serde_json::Value;
+pub(in crate::exchanges::mexc) use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
-use crate::http::HttpMethod;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::mexc) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::mexc) use crate::http::HttpMethod;
+pub(in crate::exchanges::mexc) use crate::{DcexError, Result};
 
-use super::client::MexcClient;
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::mexc) use super::client::MexcClient;
+pub(in crate::exchanges::mexc) use super::endpoints::*;
+pub(in crate::exchanges::mexc) use super::params::{
     MexcParams, add_pagination_defaults, insert_number, validate_enum, validate_u64_range,
 };
 
@@ -102,29 +102,8 @@ impl MexcClient {
                 .await
             }
             "get_withdraw_history" => {
-                params.ensure_allowed(&[
-                    "coin",
-                    "status",
-                    "startTime",
-                    "endTime",
-                    "limit",
-                    "recvWindow",
-                ])?;
-                validate_u64_range(params, "status", 1, 10)?;
-                validate_u64_range(params, "limit", 1, 1_000)?;
-                self.spot_private(
-                    HttpMethod::Get,
-                    SPOT_WITHDRAW_HISTORY,
-                    params.only(&[
-                        "coin",
-                        "status",
-                        "startTime",
-                        "endTime",
-                        "limit",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_get_withdraw_history(method_name, params)
+                    .await
             }
             "get_deposit_address" => {
                 params.ensure_allowed(&["coin", "network", "recvWindow"])?;
@@ -167,161 +146,28 @@ impl MexcClient {
                 .await
             }
             "transfer_subaccount_assets" => {
-                params.ensure_allowed(&[
-                    "fromAccount",
-                    "toAccount",
-                    "fromAccountType",
-                    "toAccountType",
-                    "asset",
-                    "amount",
-                    "recvWindow",
-                ])?;
-                for key in ["fromAccountType", "toAccountType", "asset", "amount"] {
-                    params.required(key)?;
-                }
-                validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
-                validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
-                self.spot_private(
-                    HttpMethod::Post,
-                    SPOT_SUBACCOUNT_UNIVERSAL_TRANSFER,
-                    params.only(&[
-                        "fromAccount",
-                        "toAccount",
-                        "fromAccountType",
-                        "toAccountType",
-                        "asset",
-                        "amount",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_transfer_subaccount_assets(method_name, params)
+                    .await
             }
             "get_subaccount_transfer_history" => {
-                params.ensure_allowed(&[
-                    "fromAccount",
-                    "toAccount",
-                    "fromAccountType",
-                    "toAccountType",
-                    "startTime",
-                    "endTime",
-                    "page",
-                    "limit",
-                    "recvWindow",
-                ])?;
-                params.required("fromAccountType")?;
-                params.required("toAccountType")?;
-                validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
-                validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
-                validate_u64_range(params, "page", 1, u64::MAX)?;
-                validate_u64_range(params, "limit", 1, 500)?;
-                self.spot_private(
-                    HttpMethod::Get,
-                    SPOT_SUBACCOUNT_UNIVERSAL_TRANSFER,
-                    params.only(&[
-                        "fromAccount",
-                        "toAccount",
-                        "fromAccountType",
-                        "toAccountType",
-                        "startTime",
-                        "endTime",
-                        "page",
-                        "limit",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_get_subaccount_transfer_history(method_name, params)
+                    .await
             }
             "user_universal_transfer" => {
-                params.ensure_allowed(&[
-                    "fromAccountType",
-                    "toAccountType",
-                    "asset",
-                    "amount",
-                    "recvWindow",
-                ])?;
-                for key in ["fromAccountType", "toAccountType", "asset", "amount"] {
-                    params.required(key)?;
-                }
-                validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
-                validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
-                self.spot_private(
-                    HttpMethod::Post,
-                    SPOT_USER_UNIVERSAL_TRANSFER,
-                    params.only(&[
-                        "fromAccountType",
-                        "toAccountType",
-                        "asset",
-                        "amount",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_user_universal_transfer(method_name, params)
+                    .await
             }
             "get_user_universal_transfer_history" => {
-                params.ensure_allowed(&[
-                    "fromAccountType",
-                    "toAccountType",
-                    "startTime",
-                    "endTime",
-                    "page",
-                    "size",
-                    "recvWindow",
-                ])?;
-                params.required("fromAccountType")?;
-                params.required("toAccountType")?;
-                validate_enum(params, "fromAccountType", &["SPOT", "FUTURES"])?;
-                validate_enum(params, "toAccountType", &["SPOT", "FUTURES"])?;
-                validate_u64_range(params, "page", 1, u64::MAX)?;
-                validate_u64_range(params, "size", 1, 100)?;
-                self.spot_private(
-                    HttpMethod::Get,
-                    SPOT_USER_UNIVERSAL_TRANSFER,
-                    params.only(&[
-                        "fromAccountType",
-                        "toAccountType",
-                        "startTime",
-                        "endTime",
-                        "page",
-                        "size",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_get_user_universal_transfer_history(method_name, params)
+                    .await
             }
             "get_user_universal_transfer_by_id" => {
-                params.ensure_allowed(&["tranId", "recvWindow"])?;
-                params.required("tranId")?;
-                self.spot_private(
-                    HttpMethod::Get,
-                    SPOT_USER_UNIVERSAL_TRANSFER_BY_ID,
-                    params.only(&["tranId", "recvWindow"]),
-                )
-                .await
+                self.moved_account_get_user_universal_transfer_by_id(method_name, params)
+                    .await
             }
             "get_internal_transfer_history" => {
-                params.ensure_allowed(&[
-                    "tranId",
-                    "startTime",
-                    "endTime",
-                    "page",
-                    "limit",
-                    "recvWindow",
-                ])?;
-                validate_u64_range(params, "page", 1, u64::MAX)?;
-                validate_u64_range(params, "limit", 1, u64::MAX)?;
-                self.spot_private(
-                    HttpMethod::Get,
-                    SPOT_INTERNAL_TRANSFER_HISTORY,
-                    params.only(&[
-                        "tranId",
-                        "startTime",
-                        "endTime",
-                        "page",
-                        "limit",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_get_internal_transfer_history(method_name, params)
+                    .await
             }
             "get_contract_assets" => {
                 params.ensure_allowed(&[])?;
@@ -341,15 +187,8 @@ impl MexcClient {
                 self.contract_get(&path, Vec::new()).await
             }
             "get_contract_transfer_records" => {
-                params.ensure_allowed(&["currency", "state", "type", "page_num", "page_size"])?;
-                validate_enum(params, "state", &["WAIT", "SUCCESS", "FAILED"])?;
-                validate_enum(params, "type", &["IN", "OUT"])?;
-                validate_u64_range(params, "page_num", 1, u64::MAX)?;
-                validate_u64_range(params, "page_size", 1, 100)?;
-                let mut query =
-                    params.only(&["currency", "state", "type", "page_num", "page_size"]);
-                add_pagination_defaults(&mut query);
-                self.contract_get(CONTRACT_TRANSFER_RECORDS, query).await
+                self.moved_account_get_contract_transfer_records(method_name, params)
+                    .await
             }
             "get_contract_history_positions" => {
                 params.ensure_allowed(&[

@@ -99,3 +99,16 @@ impl KucoinClient {
 fn invalid(message: impl Into<String>) -> DcexError {
     DcexError::InvalidInput(format!("KuCoin: {}", message.into()))
 }
+
+mod wrappers_from_wrappers {
+    use crate::exchanges::kucoin::KucoinClient;
+    crate::exchanges::impl_exchange_method_wrappers! {
+     @extend; KucoinClient;
+     public [
+
+     ];
+     private [
+    get_futures_max_withdraw_margin(product_symbol => "product_symbol")
+     ];
+    }
+}

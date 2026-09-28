@@ -1,18 +1,17 @@
-use serde_json::{Map, Value};
+pub(in crate::exchanges::kucoin) use serde_json::{Map, Value};
 
-use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::kucoin) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::kucoin) use crate::{DcexError, Result};
 
-use super::client::{KucoinClient, KucoinMarket};
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::kucoin) use super::client::{KucoinClient, KucoinMarket};
+pub(in crate::exchanges::kucoin) use super::endpoints::*;
+pub(in crate::exchanges::kucoin) use super::params::{
     KucoinParams, bool_value, generate_client_oid, insert_required_string, insert_truthy_bool,
-    json_value_string, require_exactly_one, validate_client_oid, validate_enum,
-    validate_positive_number, validate_positive_u64, validate_text_length, validate_time_range,
-    validate_u64_range,
+    require_exactly_one, validate_client_oid, validate_enum, validate_positive_number,
+    validate_positive_u64, validate_text_length, validate_time_range, validate_u64_range,
 };
 
-const SPOT_ORDER_STRING_KEYS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const SPOT_ORDER_STRING_KEYS: &[&str] = &[
     "size",
     "funds",
     "price",
@@ -23,12 +22,14 @@ const SPOT_ORDER_STRING_KEYS: &[&str] = &[
     "timeInForce",
     "visibleSize",
 ];
-const SPOT_ORDER_INTEGER_KEYS: &[&str] = &["cancelAfter", "allowMaxTimeWindow", "clientTimestamp"];
-const SPOT_ORDER_BOOL_KEYS: &[&str] = &["postOnly", "hidden", "iceberg"];
-const SPOT_TRADE_HISTORY_KEYS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const SPOT_ORDER_INTEGER_KEYS: &[&str] =
+    &["cancelAfter", "allowMaxTimeWindow", "clientTimestamp"];
+pub(in crate::exchanges::kucoin) const SPOT_ORDER_BOOL_KEYS: &[&str] =
+    &["postOnly", "hidden", "iceberg"];
+pub(in crate::exchanges::kucoin) const SPOT_TRADE_HISTORY_KEYS: &[&str] = &[
     "orderId", "side", "type", "lastId", "startAt", "endAt", "limit",
 ];
-const FUTURES_ORDER_STRING_KEYS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const FUTURES_ORDER_STRING_KEYS: &[&str] = &[
     "price",
     "qty",
     "valueQty",
@@ -43,8 +44,8 @@ const FUTURES_ORDER_STRING_KEYS: &[&str] = &[
     "remark",
     "visibleSize",
 ];
-const FUTURES_ORDER_INTEGER_KEYS: &[&str] = &["leverage"];
-const FUTURES_ORDER_BOOL_KEYS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const FUTURES_ORDER_INTEGER_KEYS: &[&str] = &["leverage"];
+pub(in crate::exchanges::kucoin) const FUTURES_ORDER_BOOL_KEYS: &[&str] = &[
     "postOnly",
     "reduceOnly",
     "closeOrder",
@@ -52,7 +53,7 @@ const FUTURES_ORDER_BOOL_KEYS: &[&str] = &[
     "hidden",
     "iceberg",
 ];
-const FUTURES_ORDER_LIST_KEYS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const FUTURES_ORDER_LIST_KEYS: &[&str] = &[
     "status",
     "side",
     "type",
@@ -61,7 +62,7 @@ const FUTURES_ORDER_LIST_KEYS: &[&str] = &[
     "currentPage",
     "pageSize",
 ];
-const FUTURES_TRADE_HISTORY_KEYS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const FUTURES_TRADE_HISTORY_KEYS: &[&str] = &[
     "orderId",
     "side",
     "type",
@@ -106,7 +107,7 @@ impl KucoinClient {
                     .await
             }
             "place_spot_batch_orders_sync" => {
-                self.spot_batch_orders_to_path(params, None, "/api/v1/hf/orders/multi/sync")
+                self.moved_trade_place_spot_batch_orders_sync(method_name, params)
                     .await
             }
             "cancel_spot_order_sync" | "cancel_spot_order_by_client_oid_sync" => {
@@ -192,13 +193,16 @@ impl KucoinClient {
                 self.spot_order_from_params(params, Some("sell"), Some("limit"), true)
                     .await
             }
-            "place_spot_batch_orders" => self.spot_batch_orders_from_params(params, None).await,
+            "place_spot_batch_orders" => {
+                self.moved_trade_place_spot_batch_orders(method_name, params)
+                    .await
+            }
             "place_spot_batch_limit_orders" => {
-                self.spot_batch_orders_from_params(params, Some("limit"))
+                self.moved_trade_place_spot_batch_limit_orders(method_name, params)
                     .await
             }
             "place_spot_batch_market_orders" => {
-                self.spot_batch_orders_from_params(params, Some("market"))
+                self.moved_trade_place_spot_batch_market_orders(method_name, params)
                     .await
             }
             "cancel_spot_order" => {
@@ -430,7 +434,7 @@ impl KucoinClient {
         Ok(Some(result?))
     }
 
-    async fn spot_order_from_params(
+    pub(in crate::exchanges::kucoin) async fn spot_order_from_params(
         &self,
         params: &KucoinParams,
         side_override: Option<&str>,
@@ -447,7 +451,7 @@ impl KucoinClient {
         .await
     }
 
-    async fn spot_order_to_path(
+    pub(in crate::exchanges::kucoin) async fn spot_order_to_path(
         &self,
         params: &KucoinParams,
         side_override: Option<&str>,
@@ -477,90 +481,7 @@ impl KucoinClient {
             .await
     }
 
-    async fn spot_batch_orders_from_params(
-        &self,
-        params: &KucoinParams,
-        type_override: Option<&str>,
-    ) -> Result<ValidatedResponse> {
-        self.spot_batch_orders_to_path(params, type_override, SPOT_BATCH_ORDERS)
-            .await
-    }
-
-    async fn spot_batch_orders_to_path(
-        &self,
-        params: &KucoinParams,
-        type_override: Option<&str>,
-        path: &str,
-    ) -> Result<ValidatedResponse> {
-        params.ensure_allowed(&["orders"])?;
-        let orders = params.json_required("orders")?;
-        let orders = orders.as_array().ok_or_else(|| {
-            DcexError::InvalidInput("KuCoin orders must be a JSON array.".to_string())
-        })?;
-        if orders.is_empty() || orders.len() > 20 {
-            return Err(DcexError::InvalidInput(
-                "KuCoin batch orders must contain between 1 and 20 orders.".to_string(),
-            ));
-        }
-        let mut order_list = Vec::with_capacity(orders.len());
-        for order in orders {
-            let mut order = order.as_object().cloned().ok_or_else(|| {
-                DcexError::InvalidInput("KuCoin batch order must be a JSON object.".to_string())
-            })?;
-            if let Some(order_type) = type_override {
-                order.insert("type".to_string(), Value::String(order_type.to_string()));
-            }
-            let order_params = KucoinParams::from_pairs(
-                order
-                    .iter()
-                    .map(|(key, value)| (key.clone(), json_value_string(value)))
-                    .collect(),
-            );
-            validate_spot_order(&order_params, None, None, false)?;
-            let symbol = order
-                .remove("symbol")
-                .or_else(|| order.get("product_symbol").cloned());
-            order.remove("product_symbol");
-            if let Some(symbol) = symbol.map(|value| json_value_string(&value)) {
-                order.insert(
-                    "symbol".to_string(),
-                    Value::String(self.exchange_symbol(&symbol, false)?),
-                );
-            }
-            for key in SPOT_ORDER_STRING_KEYS {
-                if let Some(value) = order.get_mut(*key) {
-                    *value = Value::String(json_value_string(value));
-                }
-            }
-            for key in SPOT_ORDER_INTEGER_KEYS {
-                if let Some(value) = order.get_mut(*key) {
-                    let parsed = json_value_string(value).parse::<i64>().map_err(|_| {
-                        DcexError::InvalidInput(format!(
-                            "KuCoin batch order field {key} must be an integer"
-                        ))
-                    })?;
-                    *value = Value::Number(parsed.into());
-                }
-            }
-            for key in SPOT_ORDER_BOOL_KEYS {
-                if let Some(value) = order.get_mut(*key) {
-                    let parsed = bool_value(&json_value_string(value)).ok_or_else(|| {
-                        DcexError::InvalidInput(format!(
-                            "KuCoin batch order field {key} must be true or false"
-                        ))
-                    })?;
-                    *value = Value::Bool(parsed);
-                }
-            }
-            order_list.push(Value::Object(order));
-        }
-        let mut body = Map::new();
-        body.insert("orderList".to_string(), Value::Array(order_list));
-        self.private_post(KucoinMarket::Spot, path, Value::Object(body))
-            .await
-    }
-
-    async fn futures_order_from_params(
+    pub(in crate::exchanges::kucoin) async fn futures_order_from_params(
         &self,
         params: &KucoinParams,
         side_override: Option<&str>,
@@ -577,7 +498,7 @@ impl KucoinClient {
         .await
     }
 
-    async fn futures_order_to_path(
+    pub(in crate::exchanges::kucoin) async fn futures_order_to_path(
         &self,
         params: &KucoinParams,
         side_override: Option<&str>,
@@ -635,7 +556,7 @@ impl KucoinClient {
         Ok(body)
     }
 
-    fn insert_required_body_symbol(
+    pub(in crate::exchanges::kucoin) fn insert_required_body_symbol(
         &self,
         body: &mut Map<String, Value>,
         params: &KucoinParams,
@@ -651,7 +572,7 @@ impl KucoinClient {
     }
 }
 
-fn validate_spot_order(
+pub(in crate::exchanges::kucoin) fn validate_spot_order(
     params: &KucoinParams,
     side_override: Option<&str>,
     type_override: Option<&str>,
@@ -775,7 +696,7 @@ fn validate_spot_order(
     Ok(())
 }
 
-fn validate_futures_order(
+pub(in crate::exchanges::kucoin) fn validate_futures_order(
     params: &KucoinParams,
     side_override: Option<&str>,
     type_override: Option<&str>,
@@ -915,7 +836,10 @@ fn validate_futures_order(
     Ok(())
 }
 
-fn bool_param(params: &KucoinParams, key: &str) -> Result<Option<bool>> {
+pub(in crate::exchanges::kucoin) fn bool_param(
+    params: &KucoinParams,
+    key: &str,
+) -> Result<Option<bool>> {
     params
         .get(key)
         .map(|value| {
@@ -928,7 +852,7 @@ fn bool_param(params: &KucoinParams, key: &str) -> Result<Option<bool>> {
 
 /// KuCoin's spot DCP takes a comma-separated `symbols` string (at most 50
 /// pairs); an empty value means all pairs. Accepts that string or a JSON array.
-fn dcp_symbols(raw: &str) -> Result<String> {
+pub(in crate::exchanges::kucoin) fn dcp_symbols(raw: &str) -> Result<String> {
     let symbols: Vec<String> = if raw.trim_start().starts_with('[') {
         serde_json::from_str(raw).map_err(|_| {
             DcexError::InvalidInput("KuCoin DCP symbols must be a string array".into())

@@ -3,9 +3,10 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
     """HTTP client for Aster V3 private account operations."""
 
     async def get_spot_account(self) -> dict[str, Any] | list[Any]:
@@ -29,26 +30,6 @@ class AccountHTTP(HTTPManager):
                 startTime=startTime,
                 endTime=endTime,
                 limit=limit,
-            ),
-        )
-
-    async def transfer_spot_futures(
-        self,
-        amount: str,
-        asset: str,
-        clientTranId: str,
-        kindType: str,
-        market: str = "spot",
-    ) -> dict[str, Any] | list[Any]:
-        """Transfer assets between the Aster spot and futures wallets."""
-        return await self._native_private(
-            "transfer_spot_futures",
-            self._native_params(
-                amount=amount,
-                asset=asset,
-                clientTranId=clientTranId,
-                kindType=kindType,
-                market=market,
             ),
         )
 

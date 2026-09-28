@@ -19,6 +19,7 @@ from .referral_http import GeneratedReferralHTTP
 from .stocks_http import GeneratedStocksHTTP
 from .subaccount_http import GeneratedSubaccountHTTP
 from .trading_http import GeneratedTradingHTTP
+from .transfers_http import GeneratedTransfersHTTP
 from .withdrawals_http import GeneratedWithdrawalsHTTP
 
 
@@ -41,6 +42,7 @@ class GeneratedHTTP(
     GeneratedStocksHTTP,
     GeneratedSubaccountHTTP,
     GeneratedTradingHTTP,
+    GeneratedTransfersHTTP,
     GeneratedWithdrawalsHTTP,
     MarketHTTP,
 ):

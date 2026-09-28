@@ -18,8 +18,6 @@ mod tests;
 
 mod stream;
 
-mod wallet;
-
 mod convert;
 
 mod subaccount;
@@ -27,3 +25,9 @@ mod subaccount;
 mod stp;
 
 mod schema_requests;
+
+mod batch;
+
+mod withdrawals;
+
+mod transfers;

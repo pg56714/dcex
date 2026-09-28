@@ -185,19 +185,6 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
             self._native_params(symbol=symbol, price=price, leverage=leverage),
         )
 
-    async def get_v1_copy_trade_futures_position_margin_max_withdraw_margin(
-        self, *, symbol: str, position_side: str | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        Get Max Withdraw Margin.
-
-        Source: https://www.kucoin.com/docs-new/rest/copy-trading/get-max-withdraw-margin
-        """
-        return await self._native_private(
-            "get_v1_copy_trade_futures_position_margin_max_withdraw_margin",
-            self._native_params(symbol=symbol, positionSide=position_side),
-        )
-
     async def post_v1_copy_trade_futures_position_margin_deposit_margin(
         self, *, symbol: str, margin: str, biz_no: str, position_side: str | None = None
     ) -> Any:  # noqa: ANN401
@@ -210,21 +197,6 @@ class GeneratedCopyTradingHTTP(TradeHTTP):
             "post_v1_copy_trade_futures_position_margin_deposit_margin",
             self._native_params(
                 symbol=symbol, margin=margin, bizNo=biz_no, positionSide=position_side
-            ),
-        )
-
-    async def post_v1_copy_trade_futures_position_margin_withdraw_margin(
-        self, *, symbol: str, withdraw_amount: str, position_side: str | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        Remove Isolated Margin.
-
-        Source: https://www.kucoin.com/docs-new/rest/copy-trading/remove-isolated-margin
-        """
-        return await self._native_private(
-            "post_v1_copy_trade_futures_position_margin_withdraw_margin",
-            self._native_params(
-                symbol=symbol, withdrawAmount=withdraw_amount, positionSide=position_side
             ),
         )
 

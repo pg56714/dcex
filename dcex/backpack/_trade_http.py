@@ -4,10 +4,12 @@ from typing import Any
 
 from .._operation_guards import require_scope
 from ..utils.common import Common
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Backpack private trading operations."""
 
     def get_rfqs(
@@ -329,17 +331,6 @@ class TradeHTTP(HTTPManager):
                 orderId=orderId,
                 clientId=clientId,
             ),
-        )
-
-    def place_batch_orders(
-        self,
-        orders: list[dict[str, Any]],
-        brokerId: int | None = None,
-    ) -> dict[str, Any] | list[Any] | str:
-        """Place Backpack batch orders."""
-        return self._native_private(
-            "place_batch_orders",
-            self._native_params(orders=orders, brokerId=brokerId),
         )
 
     def get_open_orders(
@@ -673,44 +664,6 @@ class TradeHTTP(HTTPManager):
                     "autoLendRedeem": auto_lend_redeem,
                     "autoBorrow": auto_borrow,
                     "autoBorrowRepay": auto_borrow_repay,
-                }
-            ),
-        )
-
-    def create_withdrawal(
-        self,
-        *,
-        address: str,
-        blockchain: str,
-        quantity: str,
-        symbol: str,
-        client_id: str | None = None,
-        two_factor_token: str | None = None,
-        auto_borrow: bool | None = None,
-        auto_lend_redeem: bool | None = None,
-        recipient_information: dict[str, Any] | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """
-        Submit a withdrawal with the documented withdraw signing instruction.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        two_factor_token is required unless the exchange exempts the destination.
-        recipient_information is sent in the body but excluded from the signature.
-        Source: https://docs.backpack.exchange/#tag/Capital/operation/request_withdrawal
-        """
-        return self._native_private(
-            "create_withdrawal",
-            self._native_params(
-                **{
-                    "address": address,
-                    "blockchain": blockchain,
-                    "quantity": quantity,
-                    "symbol": symbol,
-                    "clientId": client_id,
-                    "twoFactorToken": two_factor_token,
-                    "autoBorrow": auto_borrow,
-                    "autoLendRedeem": auto_lend_redeem,
-                    "recipientInformation": recipient_information,
                 }
             ),
         )

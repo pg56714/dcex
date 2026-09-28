@@ -3,10 +3,12 @@
 import json
 from typing import Any
 
+from ._batch_http import MarketHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._withdrawals_http import MarketHTTPWithdrawalsHTTP
 
 
-class MarketHTTP(HTTPManager):
+class MarketHTTP(MarketHTTPWithdrawalsHTTP, MarketHTTPBatchHTTP, HTTPManager):
     """Async HTTP client for Lighter public REST APIs."""
 
     async def get_info(self) -> dict[str, Any] | list[Any]:
@@ -156,10 +158,6 @@ class MarketHTTP(HTTPManager):
     async def get_lease_options(self) -> dict[str, Any] | list[Any]:
         """Retrieve Lighter account lease options."""
         return await self._native_public("get_lease_options", self._native_params(**locals()))
-
-    async def get_withdrawal_delay(self) -> dict[str, Any] | list[Any]:
-        """Retrieve Lighter withdrawal delay information."""
-        return await self._native_public("get_withdrawal_delay", self._native_params(**locals()))
 
     async def get_account(
         self,
@@ -353,16 +351,6 @@ class MarketHTTP(HTTPManager):
         """Query the official Lighter explorer API."""
         return await self._native_public(
             "get_explorer_account_assets", self._native_params(**{"param": param})
-        )
-
-    async def get_explorer_batches(self) -> dict[str, Any] | list[Any]:
-        """Query the official Lighter explorer API."""
-        return await self._native_public("get_explorer_batches", self._native_params(**{}))
-
-    async def get_explorer_batch(self, *, batch_id: int) -> dict[str, Any] | list[Any]:
-        """Query the official Lighter explorer API."""
-        return await self._native_public(
-            "get_explorer_batch", self._native_params(**{"batchId": batch_id})
         )
 
     async def get_explorer_blocks(self) -> dict[str, Any] | list[Any]:

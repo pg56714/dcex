@@ -1,17 +1,17 @@
-use std::collections::BTreeMap;
+pub(in crate::exchanges::backpack) use std::collections::BTreeMap;
 
-use serde_json::{Map, Value};
+pub(in crate::exchanges::backpack) use serde_json::{Map, Value};
 
-use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::backpack) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::backpack) use crate::{DcexError, Result};
 
-use super::client::BackpackClient;
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::backpack) use super::client::BackpackClient;
+pub(in crate::exchanges::backpack) use super::endpoints::*;
+pub(in crate::exchanges::backpack) use super::params::{
     BackpackParams, insert_optional_integer, insert_optional_string, insert_required_string,
 };
 
-const ORDER_STRING_KEYS: &[&str] = &[
+pub(in crate::exchanges::backpack) const ORDER_STRING_KEYS: &[&str] = &[
     "side",
     "orderType",
     "quantity",
@@ -31,8 +31,8 @@ const ORDER_STRING_KEYS: &[&str] = &[
     "slippageTolerance",
     "slippageToleranceType",
 ];
-const ORDER_INTEGER_KEYS: &[&str] = &["clientId"];
-const ORDER_BOOL_KEYS: &[&str] = &[
+pub(in crate::exchanges::backpack) const ORDER_INTEGER_KEYS: &[&str] = &["clientId"];
+pub(in crate::exchanges::backpack) const ORDER_BOOL_KEYS: &[&str] = &[
     "postOnly",
     "reduceOnly",
     "autoBorrow",
@@ -238,7 +238,11 @@ impl BackpackClient {
         Ok(Some(response))
     }
 
-    fn validate_trade_params(&self, method_name: &str, params: &BackpackParams) -> Result<()> {
+    pub(in crate::exchanges::backpack) fn validate_trade_params(
+        &self,
+        method_name: &str,
+        params: &BackpackParams,
+    ) -> Result<()> {
         const MARKET_TYPES: &[&str] = &["SPOT", "PERP", "IPERP", "DATED", "PREDICTION", "RFQ"];
         match method_name {
             "get_open_order" | "cancel_order" => {
@@ -381,7 +385,7 @@ impl BackpackClient {
         }
     }
 
-    fn validate_order_params(
+    pub(in crate::exchanges::backpack) fn validate_order_params(
         &self,
         params: &BackpackParams,
         order_type_override: Option<&str>,
@@ -448,7 +452,7 @@ impl BackpackClient {
         Ok(())
     }
 
-    fn order_body(
+    pub(in crate::exchanges::backpack) fn order_body(
         &self,
         params: &BackpackParams,
         order_type_override: Option<&str>,
@@ -461,37 +465,14 @@ impl BackpackClient {
         Ok(body)
     }
 
-    pub(super) fn batch_orders_body(&self, params: &BackpackParams) -> Result<Value> {
-        let mut orders = params.json_required("orders")?;
-        let Value::Array(items) = &mut orders else {
-            return Err(DcexError::InvalidInput(
-                "Backpack batch orders must be a JSON array.".to_string(),
-            ));
-        };
-        for item in items {
-            let Value::Object(order) = item else {
-                return Err(DcexError::InvalidInput(
-                    "Backpack batch order must be a JSON object.".to_string(),
-                ));
-            };
-            if let Some(product_symbol) = order
-                .remove("product_symbol")
-                .and_then(|value| value.as_str().map(str::to_string))
-            {
-                order.insert(
-                    "symbol".to_string(),
-                    Value::String(self.exchange_symbol(&product_symbol)?),
-                );
-            }
-        }
-        Ok(orders)
-    }
-
-    fn ensure_order_lookup(&self, params: &BackpackParams) -> Result<()> {
+    pub(in crate::exchanges::backpack) fn ensure_order_lookup(
+        &self,
+        params: &BackpackParams,
+    ) -> Result<()> {
         params.ensure_exactly_one(&["orderId", "clientId"])
     }
 
-    fn insert_required_symbol(
+    pub(in crate::exchanges::backpack) fn insert_required_symbol(
         &self,
         body: &mut Map<String, Value>,
         params: &BackpackParams,
@@ -505,13 +486,18 @@ impl BackpackClient {
     }
 }
 
-fn validate_history_params(params: &BackpackParams) -> Result<()> {
+pub(in crate::exchanges::backpack) fn validate_history_params(
+    params: &BackpackParams,
+) -> Result<()> {
     params.optional_u64_range("limit", 1, 1_000)?;
     params.optional_u64_range("offset", 0, u64::MAX)?;
     params.optional_one_of("sortDirection", &["Asc", "Desc"])
 }
 
-fn order_headers(params: &BackpackParams, include_key: bool) -> BTreeMap<String, String> {
+pub(in crate::exchanges::backpack) fn order_headers(
+    params: &BackpackParams,
+    include_key: bool,
+) -> BTreeMap<String, String> {
     let mut headers = BTreeMap::new();
     if let Some(broker_id) = params.get("brokerId") {
         headers.insert("X-Broker-ID".to_string(), broker_id.to_string());
@@ -527,7 +513,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn preserves_trigger_protection_and_slippage_fields() {
+    pub(in crate::exchanges::backpack) fn preserves_trigger_protection_and_slippage_fields() {
         let params = BackpackParams::from_pairs(vec![
             ("stopLossTriggerPrice".to_string(), "90".to_string()),
             ("takeProfitLimitPrice".to_string(), "110".to_string()),
@@ -542,7 +528,7 @@ mod tests {
     }
 
     #[test]
-    fn validates_current_order_combinations_before_transport() {
+    pub(in crate::exchanges::backpack) fn validates_current_order_combinations_before_transport() {
         let client =
             BackpackClient::public(5_000, std::time::Duration::from_secs(1)).expect("client");
         let market = BackpackParams::from_pairs(vec![

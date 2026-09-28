@@ -120,3 +120,17 @@ impl BackpackClient {
 fn invalid(message: impl Into<String>) -> DcexError {
     DcexError::InvalidInput(format!("Backpack: {}", message.into()))
 }
+
+mod wrappers_from_wrappers {
+    use crate::exchanges::backpack::BackpackClient;
+    crate::exchanges::impl_exchange_method_wrappers! {
+     @extend; BackpackClient;
+     public [
+
+     ];
+     private [
+    get_max_withdrawal_quantity(symbol => "symbol"),
+    get_withdrawals()
+     ];
+    }
+}

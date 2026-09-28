@@ -36,7 +36,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_token_list(),
         get_tokens(account_index => "account_index"),
         get_trades(sort_by => "sort_by", limit => "limit"),
-        get_withdrawal_delay()
+
     ];
     private [
         create_sub_account(), change_api_key_signed(new_pubkey => "new_pubkey", l1_signature => "l1_signature", nonce => "nonce"),
@@ -56,7 +56,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_account_limits(),
         get_deposit_history(l1_address => "l1_address"),
         get_export(type_ => "type_"),
-        get_fastwithdraw_info(),
+
         get_l1_metadata(l1_address => "l1_address"),
         get_leases(),
         get_liquidations(limit => "limit"),
@@ -66,13 +66,13 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_position_funding(limit => "limit"),
         get_referral_points(),
         get_referral_user_referrals(l1_address => "l1_address"),
-        get_transfer_fee_info(),
-        get_transfer_history(),
-        get_withdraw_history(),
+
+
+
         modify_order(market_index => "market_index", order_index => "order_index", base_amount => "base_amount", price => "price"),
         place_order(market_index => "market_index", client_order_index => "client_order_index", base_amount => "base_amount", price => "price", is_ask => "is_ask", order_type => "order_type", time_in_force => "time_in_force"),
         send_tx(tx_type => "tx_type", tx_info => "tx_info"),
-        send_tx_batch(tx_types => "tx_types", tx_infos => "tx_infos"),
+
         update_leverage(market_index => "market_index", fraction => "fraction", margin_mode => "margin_mode"),
         update_margin(market_index => "market_index", usdc_amount => "usdc_amount", direction => "direction")
     ];

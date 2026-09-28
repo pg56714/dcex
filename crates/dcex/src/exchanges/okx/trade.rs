@@ -1,12 +1,12 @@
-use serde_json::{Map, Value};
+pub(in crate::exchanges::okx) use serde_json::{Map, Value};
 
-use crate::common::OrderSide;
-use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::okx) use crate::common::OrderSide;
+pub(in crate::exchanges::okx) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::okx) use crate::{DcexError, Result};
 
-use super::client::OkxClient;
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::okx) use super::client::OkxClient;
+pub(in crate::exchanges::okx) use super::endpoints::*;
+pub(in crate::exchanges::okx) use super::params::{
     OkxParams, insert_optional_bool, insert_optional_string, push_optional, require_one,
 };
 
@@ -94,9 +94,8 @@ impl OkxClient {
                     .await
             }
             "place_batch_orders" => {
-                let orders = params.json_required("orders")?;
-                validate_batch_order_slippage(&orders)?;
-                self.post_request(TRADE_BATCH_ORDERS, orders).await
+                self.moved_trade_place_batch_orders(method_name, params)
+                    .await
             }
             "place_market_order" => {
                 let mut pairs = params.without(&["ordType"]);
@@ -160,7 +159,7 @@ impl OkxClient {
             }
             "cancel_order" => self.cancel_order_from_params(params).await,
             "cancel_batch_orders" => {
-                self.post_request(TRADE_CANCEL_BATCH_ORDERS, params.json_required("orders")?)
+                self.moved_trade_cancel_batch_orders(method_name, params)
                     .await
             }
             "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
@@ -205,17 +204,23 @@ impl OkxClient {
 }
 
 impl OkxClient {
-    async fn place_order_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::okx) async fn place_order_from_params(
+        &self,
+        params: &OkxParams,
+    ) -> Result<ValidatedResponse> {
         self.order_validation_request(params, TRADE_ORDER, false)
             .await
     }
 
-    async fn pre_check_order_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::okx) async fn pre_check_order_from_params(
+        &self,
+        params: &OkxParams,
+    ) -> Result<ValidatedResponse> {
         self.order_validation_request(params, TRADE_ORDER_PRECHECK, true)
             .await
     }
 
-    async fn order_validation_request(
+    pub(in crate::exchanges::okx) async fn order_validation_request(
         &self,
         params: &OkxParams,
         endpoint: &str,
@@ -225,7 +230,7 @@ impl OkxClient {
         self.post_request(endpoint, Value::Object(body)).await
     }
 
-    fn order_body_from_params(
+    pub(in crate::exchanges::okx) fn order_body_from_params(
         &self,
         params: &OkxParams,
         pre_check: bool,
@@ -280,7 +285,10 @@ impl OkxClient {
         Ok(body)
     }
 
-    async fn cancel_order_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::okx) async fn cancel_order_from_params(
+        &self,
+        params: &OkxParams,
+    ) -> Result<ValidatedResponse> {
         require_one(params, &["ordId", "clOrdId"])?;
         let mut body = Map::new();
         self.insert_required_inst_id(&mut body, params)?;
@@ -290,7 +298,10 @@ impl OkxClient {
             .await
     }
 
-    async fn cancel_all_orders_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::okx) async fn cancel_all_orders_from_params(
+        &self,
+        params: &OkxParams,
+    ) -> Result<ValidatedResponse> {
         const PAGE_SIZE: usize = 100;
         const CANCEL_BATCH_SIZE: usize = 20;
 
@@ -372,7 +383,10 @@ impl OkxClient {
         Ok(response)
     }
 
-    async fn amend_order_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::okx) async fn amend_order_from_params(
+        &self,
+        params: &OkxParams,
+    ) -> Result<ValidatedResponse> {
         require_one(params, &["ordId", "clOrdId"])?;
         require_one(
             params,
@@ -412,7 +426,11 @@ impl OkxClient {
             .await
     }
 
-    async fn get_order_lookup(&self, path: &str, params: &OkxParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::okx) async fn get_order_lookup(
+        &self,
+        path: &str,
+        params: &OkxParams,
+    ) -> Result<ValidatedResponse> {
         require_one(params, &["ordId", "clOrdId"])?;
         let mut query = Vec::new();
         self.push_required_inst_id(&mut query, params)?;
@@ -421,7 +439,10 @@ impl OkxClient {
         self.get_request(path, query).await
     }
 
-    async fn get_order_list_from_params(&self, params: &OkxParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::okx) async fn get_order_list_from_params(
+        &self,
+        params: &OkxParams,
+    ) -> Result<ValidatedResponse> {
         let mut query = params.only(&[
             "instType",
             "instFamily",
@@ -435,7 +456,7 @@ impl OkxClient {
         self.get_request(TRADE_ORDERS_PENDING, query).await
     }
 
-    async fn get_order_history_request(
+    pub(in crate::exchanges::okx) async fn get_order_history_request(
         &self,
         path: &str,
         params: &OkxParams,
@@ -463,7 +484,7 @@ impl OkxClient {
         self.get_request(path, query).await
     }
 
-    async fn get_fills_request(
+    pub(in crate::exchanges::okx) async fn get_fills_request(
         &self,
         path: &str,
         params: &OkxParams,
@@ -494,7 +515,7 @@ impl OkxClient {
     }
 }
 
-fn validate_batch_order_slippage(orders: &Value) -> Result<()> {
+pub(in crate::exchanges::okx) fn validate_batch_order_slippage(orders: &Value) -> Result<()> {
     let orders = orders
         .as_array()
         .ok_or_else(|| DcexError::InvalidInput("OKX orders must be a JSON array".to_string()))?;
@@ -507,7 +528,7 @@ fn validate_batch_order_slippage(orders: &Value) -> Result<()> {
     Ok(())
 }
 
-fn validate_slippage_pct(order: &Map<String, Value>) -> Result<()> {
+pub(in crate::exchanges::okx) fn validate_slippage_pct(order: &Map<String, Value>) -> Result<()> {
     let Some(value) = order.get("slippagePct") else {
         return Ok(());
     };
@@ -577,12 +598,12 @@ mod tests {
 
     use super::*;
 
-    fn client() -> OkxClient {
+    pub(in crate::exchanges::okx) fn client() -> OkxClient {
         OkxClient::public(Duration::from_secs(1)).expect("client")
     }
 
     #[test]
-    fn place_order_body_preserves_boolean_and_array_json_types() {
+    pub(in crate::exchanges::okx) fn place_order_body_preserves_boolean_and_array_json_types() {
         let params = OkxParams::from_pairs(vec![
             ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
             ("tdMode".to_string(), "cross".to_string()),
@@ -617,7 +638,8 @@ mod tests {
     }
 
     #[test]
-    fn easy_convert_rejects_more_than_five_currencies_before_network() {
+    pub(in crate::exchanges::okx) fn easy_convert_rejects_more_than_five_currencies_before_network()
+    {
         let params = OkxParams::from_pairs(vec![
             ("fromCcy".into(), r#"["A","B","C","D","E","F"]"#.into()),
             ("toCcy".into(), "USDT".into()),
@@ -632,7 +654,7 @@ mod tests {
     }
 
     #[test]
-    fn precheck_body_drops_place_only_fields() {
+    pub(in crate::exchanges::okx) fn precheck_body_drops_place_only_fields() {
         let params = OkxParams::from_pairs(vec![
             ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
             ("tdMode".to_string(), "cross".to_string()),

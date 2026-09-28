@@ -20,3 +20,9 @@ mod wrappers;
 mod tests;
 
 pub use client::OkxClient;
+
+mod withdrawals;
+
+mod transfers;
+
+mod batch;

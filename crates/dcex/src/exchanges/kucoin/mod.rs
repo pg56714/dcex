@@ -24,3 +24,7 @@ pub use websocket::{KucoinPrivateWebSocket, KucoinProWebSocket, KucoinPublicWebS
 mod tests;
 
 mod schema_requests;
+
+mod batch;
+
+mod transfers;

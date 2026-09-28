@@ -3,9 +3,11 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AssetHTTPTransfersHTTP
+from ._withdrawals_http import AssetHTTPWithdrawalsHTTP
 
 
-class AssetHTTP(HTTPManager):
+class AssetHTTP(AssetHTTPWithdrawalsHTTP, AssetHTTPTransfersHTTP, HTTPManager):
     """Async HTTP client for Bybit asset operations."""
 
     async def get_coin_info(self, coin: str | None = None) -> dict[str, Any]:
@@ -67,120 +69,6 @@ class AssetHTTP(HTTPManager):
                 withBonus=withBonus,
                 withTransferSafeAmount=withTransferSafeAmount,
                 withLtvTransferSafeAmount=withLtvTransferSafeAmount,
-            ),
-        )
-
-    async def get_withdrawable_amount(self, coin: str) -> dict[str, Any]:
-        """Get withdrawable amount for a coin."""
-        return await self._native_private(
-            "get_withdrawable_amount",
-            self._native_params(coin=coin),
-        )
-
-    async def get_internal_transfer_records(
-        self,
-        transferId: str | None = None,
-        coin: str | None = None,
-        status: str | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        limit: int = 20,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """Get internal transfer records."""
-        return await self._native_private(
-            "get_internal_transfer_records",
-            self._native_params(
-                transferId=transferId,
-                coin=coin,
-                status=status,
-                startTime=startTime,
-                endTime=endTime,
-                limit=limit,
-                cursor=cursor,
-            ),
-        )
-
-    async def get_transferable_coin(
-        self,
-        fromAccountType: str,
-        toAccountType: str,
-    ) -> dict[str, Any]:
-        """Get transferable coins between account types."""
-        return await self._native_private(
-            "get_transferable_coin",
-            self._native_params(fromAccountType=fromAccountType, toAccountType=toAccountType),
-        )
-
-    async def create_internal_transfer(
-        self,
-        coin: str,
-        amount: str,
-        fromAccountType: str,
-        toAccountType: str,
-        transferId: str | None = None,
-    ) -> dict[str, Any]:
-        """Create internal transfer between account types."""
-        return await self._native_private(
-            "create_internal_transfer",
-            self._native_params(
-                coin=coin,
-                amount=amount,
-                fromAccountType=fromAccountType,
-                toAccountType=toAccountType,
-                transferId=transferId,
-            ),
-        )
-
-    async def create_universal_transfer(
-        self,
-        coin: str,
-        amount: str,
-        fromMemberId: str,
-        toMemberId: str,
-        fromAccountType: str,
-        toAccountType: str,
-        transferId: str | None = None,
-    ) -> dict[str, Any]:
-        """Transfer assets among Bybit master and sub-account UIDs."""
-        return await self._native_private(
-            "create_universal_transfer",
-            self._native_params(
-                coin=coin,
-                amount=amount,
-                fromMemberId=fromMemberId,
-                toMemberId=toMemberId,
-                fromAccountType=fromAccountType,
-                toAccountType=toAccountType,
-                transferId=transferId,
-            ),
-        )
-
-    async def get_universal_transfer_records(
-        self,
-        transferId: str | None = None,
-        coin: str | None = None,
-        status: str | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        fromMemberId: str | None = None,
-        toMemberId: str | None = None,
-        limit: int = 20,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """Get universal transfer records."""
-        return await self._native_private(
-            "get_universal_transfer_records",
-            self._native_params(
-                transferId=transferId,
-                coin=coin,
-                status=status,
-                startTime=startTime,
-                endTime=endTime,
-                fromMemberId=fromMemberId,
-                toMemberId=toMemberId,
-                limit=limit,
-                cursor=cursor,
             ),
         )
 

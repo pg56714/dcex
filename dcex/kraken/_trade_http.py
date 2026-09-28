@@ -5,10 +5,13 @@ from typing import Any
 
 from dcex._schema_codec import encode_json
 
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Kraken private trading operations."""
 
     def place_spot_order(
@@ -686,39 +689,6 @@ class TradeHTTP(HTTPManager):
             "cancel_futures_all_orders_after", self._native_params(timeout=timeout)
         )
 
-    def place_spot_batch_orders(
-        self,
-        product_symbol: str,
-        orders: list[dict[str, Any]],
-        *,
-        validate: bool | None = None,
-        deadline: str | None = None,
-        asset_class: str | None = None,
-    ) -> dict[str, Any]:
-        """Submit 2..15 orders for one pair as a signed JSON batch."""
-        return self._native_private(
-            "place_spot_batch_orders",
-            self._native_params(
-                product_symbol=product_symbol,
-                orders=dumps(orders),
-                validate=validate,
-                deadline=deadline,
-                asset_class=asset_class,
-            ),
-        )
-
-    def cancel_spot_batch_orders(
-        self, *, orders: list[str | int] | None = None, cl_ord_ids: list[str] | None = None
-    ) -> dict[str, Any]:
-        """Cancel up to 50 txids/userrefs or client order identifiers."""
-        return self._native_private(
-            "cancel_spot_batch_orders",
-            self._native_params(
-                orders=dumps(orders) if orders is not None else None,
-                cl_ord_ids=dumps(cl_ord_ids) if cl_ord_ids is not None else None,
-            ),
-        )
-
     def get_spot_extended_balance(self, *, rebase_multiplier: str | None = None) -> dict[str, Any]:
         """Get balances including credits, used credit and funds held for trading."""
         return self._native_private(
@@ -742,15 +712,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 product_symbol=product_symbol, margin_mode=margin_mode, maxLeverage=max_leverage
             ),
-        )
-
-    def manage_futures_batch_orders(
-        self, orders: list[dict[str, Any]], *, process_before: str | None = None
-    ) -> dict[str, Any]:
-        """Send, edit or cancel 1 to 500 instructions; price and size fields are JSON numbers."""
-        return self._native_private(
-            "manage_futures_batch_orders",
-            self._native_params(orders=dumps(orders), processBefore=process_before),
         )
 
     def get_spot_trades_info(
@@ -994,61 +955,6 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "get_spot_deposit_methods",
             self._native_params(asset=asset, aclass=aclass, rebase_multiplier=rebase_multiplier),
-        )
-
-    def transfer_spot_sub_account(
-        self,
-        *,
-        asset: str,
-        amount: str,
-        from_account: str,
-        to_account: str,
-        asset_class: str | None = None,
-    ) -> dict[str, Any]:
-        """
-
-        POST /0/private/AccountTransfer. Master account API key and Kraken subaccount
-        eligibility are required.
-
-        Source: https://docs.kraken.com/api-reference/subaccounts/account-transfer
-
-        """
-        return self._native_private(
-            "transfer_spot_sub_account",
-            self._native_params(
-                asset=asset,
-                amount=amount,
-                to=to_account,
-                asset_class=asset_class,
-                **{"from": from_account},
-            ),
-        )
-
-    def transfer_futures_sub_account(
-        self,
-        *,
-        from_user: str,
-        to_user: str,
-        from_account: str,
-        to_account: str,
-        unit: str,
-        amount: str,
-    ) -> dict[str, Any]:
-        """
-        POST /derivatives/api/v3/transfer/subaccount.
-
-        Source: https://docs.kraken.com/api-reference/transfers/initiate-sub-account-transfer
-        """
-        return self._native_private(
-            "transfer_futures_sub_account",
-            self._native_params(
-                fromUser=from_user,
-                toUser=to_user,
-                fromAccount=from_account,
-                toAccount=to_account,
-                unit=unit,
-                amount=amount,
-            ),
         )
 
     def get_spot_deposit_status(
@@ -1352,88 +1258,6 @@ class TradeHTTP(HTTPManager):
             raise RuntimeError("Kraken native client is required.")
         return self._native_client.retrieve_spot_export(id)
 
-    def get_withdrawal_addresses(
-        self,
-        *,
-        asset: str | None = None,
-        aclass: str | None = None,
-        method: str | None = None,
-        key: str | None = None,
-        verified: bool | None = None,
-    ) -> dict[str, Any]:
-        """
-        Read-only POST /0/private/WithdrawAddresses.
-
-        Source: https://docs.kraken.com/api-reference/funding/get-withdrawal-addresses.md
-        """
-        return self._native_private(
-            "get_withdrawal_addresses",
-            self._native_params(
-                asset=asset, aclass=aclass, method=method, key=key, verified=verified
-            ),
-        )
-
-    def get_withdrawal_information(self, *, asset: str, key: str, amount: str) -> dict[str, Any]:
-        """
-        Read-only POST /0/private/WithdrawInfo.
-
-        Source: https://docs.kraken.com/api-reference/funding/get-withdrawal-information.md
-        """
-        return self._native_private(
-            "get_withdrawal_information", self._native_params(asset=asset, key=key, amount=amount)
-        )
-
-    def get_withdrawal_methods(
-        self,
-        *,
-        asset: str | None = None,
-        aclass: str | None = None,
-        network: str | None = None,
-        rebase_multiplier: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Read-only POST /0/private/WithdrawMethods.
-
-        Source: https://docs.kraken.com/api-reference/funding/get-withdrawal-methods.md
-        """
-        return self._native_private(
-            "get_withdrawal_methods",
-            self._native_params(
-                asset=asset, aclass=aclass, network=network, rebase_multiplier=rebase_multiplier
-            ),
-        )
-
-    def get_withdrawal_status(
-        self,
-        *,
-        asset: str | None = None,
-        aclass: str | None = None,
-        method: str | None = None,
-        start: str | None = None,
-        end: str | None = None,
-        cursor: str | bool | None = None,
-        limit: int | None = None,
-        rebase_multiplier: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Read-only POST /0/private/WithdrawStatus.
-
-        Source: https://docs.kraken.com/api-reference/funding/get-status-of-recent-withdrawals.md
-        """
-        return self._native_private(
-            "get_withdrawal_status",
-            self._native_params(
-                asset=asset,
-                aclass=aclass,
-                method=method,
-                start=start,
-                end=end,
-                cursor=cursor,
-                limit=limit,
-                rebase_multiplier=rebase_multiplier,
-            ),
-        )
-
     def edit_spot_order(
         self,
         *,
@@ -1638,25 +1462,6 @@ class TradeHTTP(HTTPManager):
         """
         return self._native_private(
             "create_funding_address",
-            self._native_params(
-                account_id=account_id,
-                body=dumps(body, separators=(",", ":"), allow_nan=False),
-                otp=otp,
-            ),
-        )
-
-    def create_funding_withdrawal(
-        self, *, body: dict[str, Any], account_id: str | None = None, otp: str | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /funding/v1/withdrawals.
-
-        API withdrawals have no second confirmation; they execute on submit. Uses the documented
-        API-Nonce header and signs the complete path including its query.
-        Source: https://docs.kraken.com/api-reference/funding-beta/create-funding-withdrawal
-        """
-        return self._native_private(
-            "create_funding_withdrawal",
             self._native_params(
                 account_id=account_id,
                 body=dumps(body, separators=(",", ":"), allow_nan=False),
@@ -1881,76 +1686,6 @@ class TradeHTTP(HTTPManager):
             "get_funding_networks", self._native_params(account_id=account_id, otp=otp)
         )
 
-    def get_funding_withdrawal_limits(
-        self,
-        *,
-        asset_class: str,
-        asset: str,
-        preferred_asset: dict[str, Any] | None = None,
-        account_id: str | None = None,
-        otp: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /funding/v1/limits/withdrawal/{asset_class}/{asset}.
-
-        Requires the corresponding account permission. Uses the documented API-Nonce header and
-        signs the complete path including its query.
-        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawal-limits
-        """
-        return self._native_private(
-            "get_funding_withdrawal_limits",
-            self._native_params(
-                asset_class=asset_class,
-                asset=asset,
-                preferred_asset=dumps(preferred_asset, separators=(",", ":"), allow_nan=False)
-                if preferred_asset is not None
-                else None,
-                account_id=account_id,
-                otp=otp,
-            ),
-        )
-
-    def get_funding_withdrawals(
-        self,
-        *,
-        asset: dict[str, Any] | None = None,
-        scope: dict[str, Any] | None = None,
-        status: str | None = None,
-        cursor: str | None = None,
-        limit: int | None = None,
-        start_time: str | None = None,
-        end_time: str | None = None,
-        rebase_multiplier: str | None = None,
-        account_id: str | None = None,
-        otp: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /funding/v1/withdrawals.
-
-        Requires the corresponding account permission. Uses the documented API-Nonce header and
-        signs the complete path including its query.
-        Source: https://docs.kraken.com/api-reference/funding-beta/list-funding-withdrawals
-        """
-        return self._native_private(
-            "get_funding_withdrawals",
-            self._native_params(
-                asset=dumps(asset, separators=(",", ":"), allow_nan=False)
-                if asset is not None
-                else None,
-                scope=dumps(scope, separators=(",", ":"), allow_nan=False)
-                if scope is not None
-                else None,
-                status=status,
-                cursor=cursor,
-                limit=limit,
-                start_time=start_time,
-                end_time=end_time,
-                rebase_multiplier=rebase_multiplier,
-                account_id=account_id,
-                otp=otp,
-            ),
-        )
-
     def update_funding_address(
         self,
         *,
@@ -1973,47 +1708,6 @@ class TradeHTTP(HTTPManager):
                 account_id=account_id,
                 body=dumps(body, separators=(",", ":"), allow_nan=False),
                 otp=otp,
-            ),
-        )
-
-    def cancel_spot_withdrawal(self, *, asset: str, refid: str) -> Any:  # noqa: ANN401
-        """
-        POST /0/private/WithdrawCancel.
-
-        Requires the corresponding account permission.
-        Source: https://docs.kraken.com/api-reference/funding/request-withdrawal-cancellation
-        """
-        return self._native_private(
-            "cancel_spot_withdrawal", self._native_params(asset=asset, refid=refid)
-        )
-
-    def create_spot_withdrawal(
-        self,
-        *,
-        asset: str,
-        key: str,
-        amount: str,
-        aclass: str | None = None,
-        address: str | None = None,
-        max_fee: str | None = None,
-        rebase_multiplier: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /0/private/Withdraw.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Source: https://docs.kraken.com/api-reference/funding/withdraw-funds
-        """
-        return self._native_private(
-            "create_spot_withdrawal",
-            self._native_params(
-                asset=asset,
-                aclass=aclass,
-                key=key,
-                address=address,
-                amount=amount,
-                max_fee=max_fee,
-                rebase_multiplier=rebase_multiplier,
             ),
         )
 

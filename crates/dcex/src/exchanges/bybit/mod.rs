@@ -28,3 +28,9 @@ pub mod websocket;
 mod wrappers;
 
 pub use client::BybitClient;
+
+mod batch;
+
+mod transfers;
+
+mod withdrawals;

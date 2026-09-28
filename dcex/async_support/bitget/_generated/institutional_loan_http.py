@@ -46,20 +46,6 @@ class GeneratedInstitutionalLoanHTTP(MarketHTTP):
             "classic_instloan_account_get_risk_unit", self._native_params(**{})
         )
 
-    async def classic_instloan_account_get_transferred_amount_from_spot_account(
-        self, *, coin: str, user_id: str | None = None
-    ) -> dict[str, Any]:
-        """
-        Get transferable amount.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/classic-instloan-account/classic-instloan-account#get-transferable-amount
-        """
-        return await self._native_private(
-            "classic_instloan_account_get_transferred_amount_from_spot_account",
-            self._native_params(**{"coin": coin, "userId": user_id}),
-        )
-
     async def classic_instloan_orders_get_loan_orders(
         self,
         *,
@@ -244,18 +230,4 @@ class GeneratedInstitutionalLoanHTTP(MarketHTTP):
         """
         return await self._native_private(
             "institutional_loan_get_trade_symbols", self._native_params(**{"productId": product_id})
-        )
-
-    async def institutional_loan_get_transferred_quantity(
-        self, *, coin: str, user_id: str | None = None
-    ) -> dict[str, Any]:
-        """
-        Get Transferred Quantity.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/institutional-loan/loan#get-transferred-quantity
-        """
-        return await self._native_private(
-            "institutional_loan_get_transferred_quantity",
-            self._native_params(**{"coin": coin, "userId": user_id}),
         )

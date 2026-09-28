@@ -1,16 +1,15 @@
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::bingx) use crate::Result;
+pub(in crate::exchanges::bingx) use crate::exchange::ValidatedResponse;
 
-use super::client::BingxClient;
-use super::endpoints::*;
-use super::params::{
-    BingxParams, batch_orders_query, bool_or_string, comma_list, normalize_side, push_optional,
-    python_list_string, require_one_identifier, validate_bool, validate_client_id, validate_enum,
-    validate_json_object, validate_page_window, validate_positive_number, validate_time_range,
-    validate_u64_range,
+pub(in crate::exchanges::bingx) use super::client::BingxClient;
+pub(in crate::exchanges::bingx) use super::endpoints::*;
+pub(in crate::exchanges::bingx) use super::params::{
+    BingxParams, bool_or_string, normalize_side, push_optional, require_one_identifier,
+    validate_bool, validate_client_id, validate_enum, validate_json_object, validate_page_window,
+    validate_positive_number, validate_time_range, validate_u64_range,
 };
 
-const SPOT_ORDER_TYPES: &[&str] = &[
+pub(in crate::exchanges::bingx) const SPOT_ORDER_TYPES: &[&str] = &[
     "MARKET",
     "LIMIT",
     "TAKE_STOP_LIMIT",
@@ -18,7 +17,7 @@ const SPOT_ORDER_TYPES: &[&str] = &[
     "TRIGGER_LIMIT",
     "TRIGGER_MARKET",
 ];
-const SWAP_ORDER_TYPES: &[&str] = &[
+pub(in crate::exchanges::bingx) const SWAP_ORDER_TYPES: &[&str] = &[
     "MARKET",
     "LIMIT",
     "STOP_MARKET",
@@ -30,9 +29,10 @@ const SWAP_ORDER_TYPES: &[&str] = &[
     "TRIGGER_LIMIT",
     "TRIGGER_MARKET",
 ];
-const TIME_IN_FORCE_VALUES: &[&str] = &["GTC", "IOC", "FOK", "PostOnly"];
+pub(in crate::exchanges::bingx) const TIME_IN_FORCE_VALUES: &[&str] =
+    &["GTC", "IOC", "FOK", "PostOnly"];
 
-const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
+pub(in crate::exchanges::bingx) const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "timeInForce",
     "quantity",
     "quoteOrderQty",
@@ -42,7 +42,7 @@ const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "recvWindow",
 ];
 
-const SWAP_ORDER_OPTIONAL_KEYS: &[&str] = &[
+pub(in crate::exchanges::bingx) const SWAP_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "positionSide",
     "reduceOnly",
     "price",
@@ -62,7 +62,7 @@ const SWAP_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "positionId",
 ];
 
-const SWAP_REPLACE_OPTIONAL_KEYS: &[&str] = &[
+pub(in crate::exchanges::bingx) const SWAP_REPLACE_OPTIONAL_KEYS: &[&str] = &[
     "reduceOnly",
     "price",
     "quantity",
@@ -123,16 +123,8 @@ impl BingxClient {
                     .await
             }
             "place_spot_batch_order" => {
-                params.ensure_allowed(&["data", "sync", "recvWindow"])?;
-                validate_bool(params, "sync")?;
-                validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let mut query = vec![(
-                    "data".to_string(),
-                    batch_orders_query(params.required("data")?)?,
-                )];
-                push_optional(&mut query, "sync", params.get("sync"));
-                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
-                self.private_post(SPOT_PLACE_BATCH_ORDER, query).await
+                self.moved_trade_place_spot_batch_order(method_name, params)
+                    .await
             }
             "replace_spot_order" => {
                 params.ensure_allowed(&[
@@ -214,29 +206,8 @@ impl BingxClient {
                 self.private_post(SPOT_CANCEL_ORDER, query).await
             }
             "cancel_spot_batch_orders" => {
-                params.ensure_allowed(&[
-                    "product_symbol",
-                    "symbol",
-                    "orderIds",
-                    "clientOrderIDs",
-                    "process",
-                    "recvWindow",
-                ])?;
-                params.required("orderIds")?;
-                validate_enum(params, "process", &["0", "1"])?;
-                validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let mut query = Vec::new();
-                self.push_required_symbol(&mut query, params)?;
-                query.push((
-                    "orderIds".to_string(),
-                    comma_list(params.required("orderIds")?),
-                ));
-                push_optional(&mut query, "process", params.get("process"));
-                if let Some(value) = params.get("clientOrderIDs") {
-                    query.push(("clientOrderIDs".to_string(), comma_list(value)));
-                }
-                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
-                self.private_post(SPOT_CANCEL_BATCH_ORDERS, query).await
+                self.moved_trade_cancel_spot_batch_orders(method_name, params)
+                    .await
             }
             "cancel_spot_open_orders" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "recvWindow"])?;
@@ -489,14 +460,8 @@ impl BingxClient {
                 .await
             }
             "place_swap_batch_order" => {
-                params.ensure_allowed(&["batchOrders", "recvWindow"])?;
-                validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let mut query = vec![(
-                    "batchOrders".to_string(),
-                    batch_orders_query(params.required("batchOrders")?)?,
-                )];
-                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
-                self.private_post(SWAP_PLACE_BATCH_ORDER, query).await
+                self.moved_trade_place_swap_batch_order(method_name, params)
+                    .await
             }
             "cancel_swap_order" => {
                 params.ensure_allowed(&[
@@ -514,27 +479,8 @@ impl BingxClient {
                 self.private_delete(SWAP_PLACE_ORDER, query).await
             }
             "cancel_swap_batch_order" => {
-                params.ensure_allowed(&[
-                    "product_symbol",
-                    "symbol",
-                    "orderIdList",
-                    "clientOrderIdList",
-                    "recvWindow",
-                ])?;
-                require_one_identifier(params, &["orderIdList", "clientOrderIdList"])?;
-                validate_list_size(params, "orderIdList", 10)?;
-                validate_list_size(params, "clientOrderIdList", 10)?;
-                validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let mut query = Vec::new();
-                self.push_required_symbol(&mut query, params)?;
-                if let Some(value) = params.get("orderIdList") {
-                    query.push(("orderIdList".to_string(), python_list_string(value)));
-                }
-                if let Some(value) = params.get("clientOrderIdList") {
-                    query.push(("clientOrderIdList".to_string(), python_list_string(value)));
-                }
-                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
-                self.private_delete(SWAP_CANCEL_BATCH_ORDER, query).await
+                self.moved_trade_cancel_swap_batch_order(method_name, params)
+                    .await
             }
             "cancel_swap_all_orders" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "type_", "recvWindow"])?;
@@ -547,74 +493,7 @@ impl BingxClient {
             }
             "replace_swap_order" => self.replace_swap_order_from_params(params).await,
             "replace_swap_batch_orders" => {
-                params.ensure_allowed(&["batchOrders", "recvWindow"])?;
-                validate_u64_range(params, "recvWindow", 1, 5000)?;
-                let orders: serde_json::Value =
-                    serde_json::from_str(params.required("batchOrders")?).map_err(|_| {
-                        crate::DcexError::InvalidInput("invalid batchOrders JSON".into())
-                    })?;
-                let orders = orders.as_array().filter(|v| !v.is_empty()).ok_or_else(|| {
-                    crate::DcexError::InvalidInput("batchOrders requires a nonempty array".into())
-                })?;
-                let mut normalized = Vec::new();
-                for order in orders {
-                    let object = order.as_object().ok_or_else(|| {
-                        crate::DcexError::InvalidInput("batch order must be an object".into())
-                    })?;
-                    if object.contains_key("recvWindow") || object.contains_key("timestamp") {
-                        return Err(crate::DcexError::InvalidInput(
-                            "batch timing belongs on the outer request".into(),
-                        ));
-                    }
-                    let pairs = object
-                        .iter()
-                        .map(|(k, v)| {
-                            (
-                                if k == "type" {
-                                    "type_".into()
-                                } else {
-                                    k.clone()
-                                },
-                                v.as_str()
-                                    .map(str::to_string)
-                                    .unwrap_or_else(|| v.to_string()),
-                            )
-                        })
-                        .collect();
-                    let query = self.swap_replacement_query(&BingxParams::from_pairs(pairs))?;
-                    let mut output = serde_json::Map::new();
-                    for (k, v) in query {
-                        let value = if [
-                            "quantity",
-                            "quoteOrderQty",
-                            "price",
-                            "stopPrice",
-                            "priceRate",
-                            "activationPrice",
-                        ]
-                        .contains(&k.as_str())
-                        {
-                            serde_json::from_str::<serde_json::Number>(&v)
-                                .map(serde_json::Value::Number)
-                                .map_err(|_| {
-                                    crate::DcexError::InvalidInput(
-                                        "batch prices and quantities must be JSON numbers".into(),
-                                    )
-                                })?
-                        } else {
-                            serde_json::Value::String(v)
-                        };
-                        output.insert(k, value);
-                    }
-                    normalized.push(serde_json::Value::Object(output));
-                }
-                let mut query = vec![(
-                    "batchOrders".into(),
-                    serde_json::to_string(&normalized)
-                        .map_err(|e| crate::DcexError::Decode(e.to_string()))?,
-                )];
-                push_optional(&mut query, "recvWindow", params.get("recvWindow"));
-                self.private_post("/openApi/swap/v1/trade/batchCancelReplace", query)
+                self.moved_trade_replace_swap_batch_orders(method_name, params)
                     .await
             }
             "close_swap_position" => {
@@ -758,7 +637,7 @@ impl BingxClient {
         Ok(Some(result?))
     }
 
-    async fn spot_order_from_params(
+    pub(in crate::exchanges::bingx) async fn spot_order_from_params(
         &self,
         params: &BingxParams,
         side_override: Option<&str>,
@@ -858,7 +737,7 @@ impl BingxClient {
         self.private_post(endpoint, query).await
     }
 
-    async fn replace_swap_order_from_params(
+    pub(in crate::exchanges::bingx) async fn replace_swap_order_from_params(
         &self,
         params: &BingxParams,
     ) -> Result<ValidatedResponse> {
@@ -866,7 +745,10 @@ impl BingxClient {
             .await
     }
 
-    fn swap_replacement_query(&self, params: &BingxParams) -> Result<Vec<(String, String)>> {
+    pub(in crate::exchanges::bingx) fn swap_replacement_query(
+        &self,
+        params: &BingxParams,
+    ) -> Result<Vec<(String, String)>> {
         params.ensure_allowed(&[
             "product_symbol",
             "symbol",
@@ -947,7 +829,7 @@ struct SwapOrderDefaults<'a> {
     time_in_force: Option<&'a str>,
 }
 
-fn normalize_bool_fields(query: &mut [(String, String)]) {
+pub(in crate::exchanges::bingx) fn normalize_bool_fields(query: &mut [(String, String)]) {
     for (key, value) in query {
         if matches!(
             key.as_str(),
@@ -958,7 +840,10 @@ fn normalize_bool_fields(query: &mut [(String, String)]) {
     }
 }
 
-fn validate_spot_order(params: &BingxParams, order_type: &str) -> Result<()> {
+pub(in crate::exchanges::bingx) fn validate_spot_order(
+    params: &BingxParams,
+    order_type: &str,
+) -> Result<()> {
     if !SPOT_ORDER_TYPES.contains(&order_type) {
         return Err(crate::DcexError::InvalidInput(format!(
             "unsupported BingX type: {order_type}"
@@ -988,7 +873,10 @@ fn validate_spot_order(params: &BingxParams, order_type: &str) -> Result<()> {
     Ok(())
 }
 
-fn validate_swap_order(params: &BingxParams, order_type: &str) -> Result<()> {
+pub(in crate::exchanges::bingx) fn validate_swap_order(
+    params: &BingxParams,
+    order_type: &str,
+) -> Result<()> {
     if !SWAP_ORDER_TYPES.contains(&order_type) {
         return Err(crate::DcexError::InvalidInput(format!(
             "unsupported BingX type: {order_type}"
@@ -1079,7 +967,11 @@ fn validate_swap_order(params: &BingxParams, order_type: &str) -> Result<()> {
     Ok(())
 }
 
-fn validate_list_size(params: &BingxParams, key: &str, maximum: usize) -> Result<()> {
+pub(in crate::exchanges::bingx) fn validate_list_size(
+    params: &BingxParams,
+    key: &str,
+    maximum: usize,
+) -> Result<()> {
     let Some(value) = params.get(key) else {
         return Ok(());
     };
@@ -1099,7 +991,7 @@ fn validate_list_size(params: &BingxParams, key: &str, maximum: usize) -> Result
     )))
 }
 
-fn push_parameter_alias(
+pub(in crate::exchanges::bingx) fn push_parameter_alias(
     query: &mut Vec<(String, String)>,
     params: &BingxParams,
     official_key: &str,
@@ -1116,7 +1008,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn preserves_spot_trigger_and_official_client_id() {
+    pub(in crate::exchanges::bingx) fn preserves_spot_trigger_and_official_client_id() {
         let params = BingxParams::from_pairs(vec![
             ("stopPrice".to_string(), "90".to_string()),
             ("newClientOrderId".to_string(), "new-id".to_string()),
@@ -1127,7 +1019,7 @@ mod tests {
     }
 
     #[test]
-    fn maps_legacy_client_id_to_official_key() {
+    pub(in crate::exchanges::bingx) fn maps_legacy_client_id_to_official_key() {
         let params =
             BingxParams::from_pairs(vec![("clientOrderId".to_string(), "legacy-id".to_string())]);
         let mut query = Vec::new();
@@ -1139,7 +1031,7 @@ mod tests {
     }
 
     #[test]
-    fn maps_python_order_type_alias_to_official_key() {
+    pub(in crate::exchanges::bingx) fn maps_python_order_type_alias_to_official_key() {
         let params = BingxParams::from_pairs(vec![("type_".to_string(), "LIMIT".to_string())]);
         let mut query = Vec::new();
         push_parameter_alias(&mut query, &params, "type", "type_");

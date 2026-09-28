@@ -63,9 +63,9 @@ transfer_spot_sub_account(asset => "asset",amount => "amount",from_account => "f
 transfer_futures_sub_account(from_user => "fromUser",to_user => "toUser",from_account => "fromAccount",to_account => "toAccount",unit => "unit",amount => "amount"),
 get_spot_deposit_status(),
 get_spot_level3_orderbook(product_symbol => "product_symbol"),
-        manage_futures_batch_orders(orders => "orders"),
-        place_spot_batch_orders(product_symbol => "product_symbol", orders => "orders"),
-        cancel_spot_batch_orders(),
+
+
+
         get_spot_extended_balance(),
         get_futures_leverage_preferences(),
         set_futures_leverage_preference(product_symbol => "product_symbol", margin_mode => "margin_mode"),
@@ -77,7 +77,7 @@ get_spot_level3_orderbook(product_symbol => "product_symbol"),
         cancel_spot_all_orders_after(timeout => "timeout"),
         cancel_spot_order(),
         amend_spot_order(txid => "txid"),
-        futures_wallet_transfer(amount => "amount", from_account => "fromAccount", to_account => "toAccount", unit => "unit"),
+
         get_futures_accounts(),
         get_futures_fills(),
         get_futures_open_orders(),
@@ -119,9 +119,7 @@ get_spot_level3_orderbook(product_symbol => "product_symbol"),
         place_spot_post_only_limit_buy_order(product_symbol => "product_symbol", volume => "volume", price => "price"),
         place_spot_post_only_limit_order(product_symbol => "product_symbol", side => "side", volume => "volume", price => "price"),
         place_spot_post_only_limit_sell_order(product_symbol => "product_symbol", volume => "volume", price => "price"),
-        wallet_transfer_to_futures(asset => "asset", amount => "amount"),
-        /// API withdrawals and external transfers have no second confirmation; they execute on submit.
-        withdraw_futures_to_spot_wallet(amount => "amount", currency => "currency"),
+
     ];
 }
 

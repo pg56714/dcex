@@ -14,6 +14,8 @@ from .market_http import GeneratedMarketHTTP
 from .p2p_http import GeneratedP2pHTTP
 from .stocks_http import GeneratedStocksHTTP
 from .tax_http import GeneratedTaxHTTP
+from .transfers_http import GeneratedTransfersHTTP
+from .withdrawals_http import GeneratedWithdrawalsHTTP
 
 
 class GeneratedHTTP(
@@ -30,6 +32,8 @@ class GeneratedHTTP(
     GeneratedP2pHTTP,
     GeneratedStocksHTTP,
     GeneratedTaxHTTP,
+    GeneratedTransfersHTTP,
+    GeneratedWithdrawalsHTTP,
     MarketHTTP,
 ):
     """Business-specific generated methods with compatible base precedence."""

@@ -8,21 +8,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
         noop_spot(nonce => "nonce"),
         noop_futures(nonce => "nonce"),
         guarded_cancel_futures_order(product_symbol => "product_symbol", nonce => "nonce"),
-        guarded_cancel_futures_batch_orders(product_symbol => "product_symbol", nonce => "nonce"),
-        transfer_sub_account(
-            to_account_address => "toAccountAddress",
-            asset => "asset",
-            amount => "amount",
-            kind_type => "kindType"
-        ),
+
+
         get_spot_account(),
         get_spot_transaction_history(),
-        transfer_spot_futures(
-            amount => "amount",
-            asset => "asset",
-            client_tran_id => "clientTranId",
-            kind_type => "kindType"
-        ),
+
         get_futures_position_mode(),
         set_futures_position_mode(dual_side_position => "dualSidePosition"),
         get_futures_stp_mode(),
@@ -79,12 +69,12 @@ crate::exchanges::impl_exchange_method_wrappers! {
             quantity_unit => "quantityUnit",
             quantity => "quantity"
         ),
-        place_futures_batch_orders(batch_orders => "batchOrders"),
-        modify_futures_batch_orders(batch_orders => "batchOrders"),
+
+
         get_futures_order(product_symbol => "product_symbol"),
         cancel_futures_order(product_symbol => "product_symbol"),
         cancel_all_futures_open_orders(product_symbol => "product_symbol"),
-        cancel_futures_batch_orders(product_symbol => "product_symbol"),
+
         set_futures_countdown_cancel_all(
             product_symbol => "product_symbol",
             countdown_time => "countdownTime"
@@ -183,12 +173,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_prediction_open_order(symbol => "symbol"),
         get_prediction_open_orders(),
         get_prediction_all_orders(symbol => "symbol"),
-        create_prediction_asset_wallet_transfer(
-            amount => "amount",
-            asset => "asset",
-            client_tran_id => "clientTranId",
-            kind_type => "kindType"
-        ),
+
         create_prediction_mint(symbol => "symbol", quantity => "quantity"),
         create_prediction_burn(symbol => "symbol", quantity => "quantity"),
         create_prediction_split(event => "event", symbol => "symbol", quantity => "quantity"),

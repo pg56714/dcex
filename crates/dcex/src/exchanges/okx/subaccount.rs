@@ -1,11 +1,9 @@
-use serde_json::Value;
+pub(in crate::exchanges::okx) use crate::Result;
+pub(in crate::exchanges::okx) use crate::exchange::ValidatedResponse;
 
-use crate::Result;
-use crate::exchange::ValidatedResponse;
-
-use super::client::OkxClient;
-use super::endpoints::*;
-use super::params::{OkxParams, insert_optional_bool, okx_account_id, push_optional_owned};
+pub(in crate::exchanges::okx) use super::client::OkxClient;
+pub(in crate::exchanges::okx) use super::endpoints::*;
+pub(in crate::exchanges::okx) use super::params::{OkxParams, push_optional_owned};
 
 impl OkxClient {
     pub(super) async fn subaccount_private_request(
@@ -42,19 +40,7 @@ impl OkxClient {
                 .await
             }
             "transfer_between_subaccounts" => {
-                let mut body =
-                    params.required_body(&["ccy", "amt", "fromSubAccount", "toSubAccount"])?;
-                body.insert(
-                    "from".to_string(),
-                    Value::String(okx_account_id(params.required("from_account")?).to_string()),
-                );
-                body.insert(
-                    "to".to_string(),
-                    Value::String(okx_account_id(params.required("to_account")?).to_string()),
-                );
-                insert_optional_bool(&mut body, "loanTrans", params.get("loanTrans"))?;
-                insert_optional_bool(&mut body, "omitPosRisk", params.get("omitPosRisk"))?;
-                self.post_request(SUBACCOUNT_TRANSFER, Value::Object(body))
+                self.moved_subaccount_transfer_between_subaccounts(method_name, params)
                     .await
             }
             "get_entrusted_subaccount_list" => {

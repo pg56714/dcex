@@ -1,21 +1,23 @@
 mod account_config;
 mod grouped_orders;
 mod pools;
-mod transfer;
-mod withdraw;
 
-use serde_json::json;
+pub(in crate::exchanges::lighter) use serde_json::json;
 
-use crate::exchange::ValidatedResponse;
-use crate::http::{HttpMethod, block_on};
-use crate::{DcexError, Result};
+pub(in crate::exchanges::lighter) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::lighter) use crate::http::{HttpMethod, block_on};
+pub(in crate::exchanges::lighter) use crate::{DcexError, Result};
 
-use super::client::LighterClient;
-use super::client::LighterContentType;
-use super::endpoints::{RFQ_CREATE, RFQ_GET, RFQ_LIST, RFQ_UPDATE, SEND_TX, SEND_TX_BATCH};
-use super::market::auth_header_required;
-use super::params::LighterParams;
-use super::signing::{attributes, expiry_ms, order_expiry_ms, sign_payload};
+pub(in crate::exchanges::lighter) use super::client::LighterClient;
+pub(in crate::exchanges::lighter) use super::client::LighterContentType;
+pub(in crate::exchanges::lighter) use super::endpoints::{
+    RFQ_CREATE, RFQ_GET, RFQ_LIST, RFQ_UPDATE, SEND_TX, SEND_TX_BATCH,
+};
+pub(in crate::exchanges::lighter) use super::market::auth_header_required;
+pub(in crate::exchanges::lighter) use super::params::LighterParams;
+pub(in crate::exchanges::lighter) use super::signing::{
+    attributes, expiry_ms, order_expiry_ms, sign_payload,
+};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LighterSignedTransaction {
@@ -717,7 +719,7 @@ impl LighterClient {
         self.sign_tx(29, values, payload, attrs, api_key_index)
     }
 
-    fn sign_tx(
+    pub(in crate::exchanges::lighter) fn sign_tx(
         &self,
         tx_type: u64,
         values: Vec<i128>,
@@ -763,7 +765,10 @@ impl LighterClient {
         Ok(())
     }
 
-    fn signing_api_key_index(&self, params: &LighterParams) -> Result<u64> {
+    pub(in crate::exchanges::lighter) fn signing_api_key_index(
+        &self,
+        params: &LighterParams,
+    ) -> Result<u64> {
         let api_key_index = self.private_api_key_index(params.optional_u64("api_key_index")?)?;
         if api_key_index > 254 {
             return Err(DcexError::InvalidInput(
@@ -781,7 +786,7 @@ impl LighterClient {
     }
 }
 
-fn validate_nonce(params: &LighterParams) -> Result<Option<i64>> {
+pub(in crate::exchanges::lighter) fn validate_nonce(params: &LighterParams) -> Result<Option<i64>> {
     let nonce = params.optional_i64("nonce")?;
     if matches!(nonce, Some(value) if value < 0) {
         return Err(DcexError::InvalidInput(

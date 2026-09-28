@@ -1,9 +1,11 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AssetHTTPTransfersHTTP
+from ._withdrawals_http import AssetHTTPWithdrawalsHTTP
 
 
-class AssetHTTP(HTTPManager):
+class AssetHTTP(AssetHTTPTransfersHTTP, AssetHTTPWithdrawalsHTTP, HTTPManager):
     def get_currencies(
         self,
         ccy: list[str] | None = None,
@@ -56,70 +58,6 @@ class AssetHTTP(HTTPManager):
         return self._native_private(
             "get_asset_valuation",
             self._native_params(ccy=ccy),
-        )
-
-    def funds_transfer(
-        self,
-        ccy: str,
-        amt: str,
-        from_account: str,
-        to_account: str,
-        type: str | None = None,
-        subAcct: str | None = None,
-        loanTrans: bool | str | None = None,
-        omitPosRisk: bool | str | None = None,
-        clientId: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Transfer funds between accounts.
-
-        Args:
-            ccy: Currency code
-            amt: Transfer amount
-            from_account: Source account ("FUND" or "TRADING")
-            to_account: Destination account ("FUND" or "TRADING")
-            type: Transfer type
-            subAcct: Sub-account name
-            loanTrans: Loan transfer flag
-
-        Returns:
-            Dictionary containing transfer result.
-        """
-        return self._native_private(
-            "funds_transfer",
-            self._native_params(
-                ccy=ccy,
-                amt=amt,
-                from_account=from_account,
-                to_account=to_account,
-                type=type,
-                subAcct=subAcct,
-                loanTrans=loanTrans,
-                omitPosRisk=omitPosRisk,
-                clientId=clientId,
-            ),
-        )
-
-    def get_transfer_state(
-        self,
-        transId: str | None = None,
-        clientId: str | None = None,
-        type: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Get transfer state information.
-
-        Args:
-            transId: Transfer ID
-            clientId: Client ID
-            type: Transfer type
-
-        Returns:
-            Dictionary containing transfer state information.
-        """
-        return self._native_private(
-            "get_transfer_state",
-            self._native_params(transId=transId, clientId=clientId, type=type),
         )
 
     def get_bills(
@@ -218,44 +156,6 @@ class AssetHTTP(HTTPManager):
                 before=before,
                 limit=limit,
             ),
-        )
-
-    def get_deposit_withdraw_status(
-        self,
-        wdId: str | None = None,
-        txId: str | None = None,
-        ccy: str | None = None,
-        to: str | None = None,
-        chain: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Get deposit and withdrawal status.
-
-        Args:
-            wdId: Withdrawal ID
-            txId: Transaction ID
-            ccy: Currency code
-            to: Destination address
-            chain: Blockchain network
-
-        Returns:
-            Dictionary containing deposit and withdrawal status.
-        """
-        if (wdId is None) == (txId is None):
-            raise ValueError("Exactly one of wdId or txId is required.")
-        if txId is not None:
-            missing = [
-                name
-                for name, value in (("ccy", ccy), ("to", to), ("chain", chain))
-                if value is None
-            ]
-            if missing:
-                raise ValueError(
-                    f"{', '.join(missing)} required when querying deposit status by txId."
-                )
-        return self._native_private(
-            "get_deposit_withdraw_status",
-            self._native_params(wdId=wdId, txId=txId, ccy=ccy, to=to, chain=chain),
         )
 
     def get_exchange_list(self) -> dict[str, Any]:

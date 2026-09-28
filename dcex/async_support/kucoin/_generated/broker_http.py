@@ -8,19 +8,6 @@ from .._trade_http import TradeHTTP
 class GeneratedBrokerHTTP(TradeHTTP):
     """Broker API methods."""
 
-    async def post_v2_broker_withdrawal(self, *, body: dict[str, Any]) -> Any:  # noqa: ANN401
-        """
-        Apply for Fast Withdrawal.
-
-        Source: https://www.kucoin.com/docs-new/rest/broker/exchange-broker/apply-for-fast-withdrawal
-        API withdrawals have no second confirmation; they execute on submit.
-        This Fast API may return validation factors; submit them only if required
-        by the exchange. The incomplete official schema is forwarded as a body object.
-        """
-        return await self._native_private(
-            "post_v2_broker_withdrawal", self._native_params(body=body)
-        )
-
     async def get_v2_broker_api_rebate_download(
         self, *, begin: str, end: str, trade_type: str
     ) -> Any:  # noqa: ANN401
@@ -332,47 +319,6 @@ class GeneratedBrokerHTTP(TradeHTTP):
             self._native_params(uid=uid, apiKey=api_key, confirm=confirm),
         )
 
-    async def post_v1_broker_nd_transfer(
-        self,
-        *,
-        currency: str,
-        amount: str,
-        direction: str,
-        account_type: str,
-        special_uid: str,
-        special_account_type: str,
-        client_oid: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        Transfer.
-
-        Source: https://www.kucoin.com/docs-new/rest/broker/exchange-broker/transfer
-        Uses the Broker host and the configured ND management API key.
-        """
-        return await self._native_private(
-            "post_v1_broker_nd_transfer",
-            self._native_params(
-                currency=currency,
-                amount=amount,
-                direction=direction,
-                accountType=account_type,
-                specialUid=special_uid,
-                specialAccountType=special_account_type,
-                clientOid=client_oid,
-            ),
-        )
-
-    async def get_v3_broker_nd_transfer_detail(self, *, order_id: str) -> Any:  # noqa: ANN401
-        """
-        Get Transfer History.
-
-        Source: https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-transfer-history
-        Uses the Broker host and the configured ND management API key.
-        """
-        return await self._native_private(
-            "get_v3_broker_nd_transfer_detail", self._native_params(orderId=order_id)
-        )
-
     async def get_v1_asset_ndbroker_deposit_list(
         self,
         *,
@@ -410,17 +356,6 @@ class GeneratedBrokerHTTP(TradeHTTP):
         """
         return await self._native_private(
             "get_v3_broker_nd_deposit_detail", self._native_params(currency=currency, hash=hash)
-        )
-
-    async def get_v3_broker_nd_withdraw_detail(self, *, withdrawal_id: str) -> Any:  # noqa: ANN401
-        """
-        Get Withdraw Detail.
-
-        Source: https://www.kucoin.com/docs-new/rest/broker/exchange-broker/get-withdraw-detail
-        Uses the Broker host and the configured ND management API key.
-        """
-        return await self._native_private(
-            "get_v3_broker_nd_withdraw_detail", self._native_params(withdrawalId=withdrawal_id)
         )
 
     async def post_v1_broker_nd_mark_up(

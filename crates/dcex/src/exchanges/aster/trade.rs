@@ -1,14 +1,14 @@
-use serde_json::Value;
+pub(in crate::exchanges::aster) use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
-use crate::http::HttpMethod;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::aster) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::aster) use crate::http::HttpMethod;
+pub(in crate::exchanges::aster) use crate::{DcexError, Result};
 
-use super::client::{AsterClient, AsterMarket};
-use super::endpoints::*;
-use super::params::AsterParams;
+pub(in crate::exchanges::aster) use super::client::{AsterClient, AsterMarket};
+pub(in crate::exchanges::aster) use super::endpoints::*;
+pub(in crate::exchanges::aster) use super::params::AsterParams;
 
-const FUTURES_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::aster) const FUTURES_ORDER_KEYS: &[&str] = &[
     "positionSide",
     "type",
     "timeInForce",
@@ -28,7 +28,7 @@ const FUTURES_ORDER_KEYS: &[&str] = &[
     "stpMode",
 ];
 
-const BATCH_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::aster) const BATCH_ORDER_KEYS: &[&str] = &[
     "symbol",
     "product_symbol",
     "side",
@@ -47,7 +47,7 @@ const BATCH_ORDER_KEYS: &[&str] = &[
     "newOrderRespType",
 ];
 
-const STRATEGY_SUB_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::aster) const STRATEGY_SUB_ORDER_KEYS: &[&str] = &[
     "strategySubId",
     "securityType",
     "symbol",
@@ -494,7 +494,7 @@ impl AsterClient {
         Ok(Some(response))
     }
 
-    fn push_required_side(
+    pub(in crate::exchanges::aster) fn push_required_side(
         &self,
         query: &mut Vec<(String, String)>,
         params: &AsterParams,
@@ -506,71 +506,10 @@ impl AsterClient {
         Ok(())
     }
 
-    pub(super) fn resolve_batch_orders(&self, params: &AsterParams) -> Result<String> {
-        let mut value = params.json_required("batchOrders")?;
-        let Value::Array(orders) = &mut value else {
-            return Err(DcexError::InvalidInput(
-                "Aster batchOrders must be a JSON array.".to_string(),
-            ));
-        };
-        if orders.is_empty() || orders.len() > 5 {
-            return Err(DcexError::InvalidInput(
-                "Aster batchOrders must contain between 1 and 5 orders.".to_string(),
-            ));
-        }
-        for order in orders {
-            self.resolve_order_object(order)?;
-            let Value::Object(order) = order else {
-                unreachable!("resolve_order_object validated object")
-            };
-            let order = AsterParams::from_json_object(order)?;
-            order.ensure_allowed(BATCH_ORDER_KEYS, &[])?;
-            validate_symbol_alias(&order, true)?;
-            validate_futures_order(&order, true)?;
-        }
-        Ok(value.to_string())
-    }
-
-    pub(super) fn resolve_batch_amendments(&self, params: &AsterParams) -> Result<String> {
-        let mut value = params.json_required("batchOrders")?;
-        let Value::Array(orders) = &mut value else {
-            return Err(DcexError::InvalidInput(
-                "Aster batchOrders must be a JSON array".into(),
-            ));
-        };
-        if orders.is_empty() || orders.len() > 5 {
-            return Err(DcexError::InvalidInput(
-                "Aster batch amendments must contain between 1 and 5 orders".into(),
-            ));
-        }
-        for order in orders {
-            self.resolve_order_object(order)?;
-            let Value::Object(order) = order else {
-                unreachable!("resolve_order_object validated object")
-            };
-            let order = AsterParams::from_json_object(order)?;
-            order.ensure_allowed(
-                &[
-                    "symbol",
-                    "orderId",
-                    "origClientOrderId",
-                    "side",
-                    "quantity",
-                    "price",
-                ],
-                &[],
-            )?;
-            order.required("symbol")?;
-            ensure_order_lookup(&order)?;
-            order.u64("orderId")?;
-            order.optional_one_of("side", &["BUY", "SELL"])?;
-            order.required_positive_decimal("quantity")?;
-            order.required_positive_decimal("price")?;
-        }
-        Ok(value.to_string())
-    }
-
-    fn resolve_order_object(&self, value: &mut Value) -> Result<()> {
+    pub(in crate::exchanges::aster) fn resolve_order_object(
+        &self,
+        value: &mut Value,
+    ) -> Result<()> {
         let Value::Object(order) = value else {
             return Err(DcexError::InvalidInput(
                 "Aster order payload must be a JSON object.".to_string(),
@@ -605,7 +544,7 @@ impl AsterClient {
         Ok(())
     }
 
-    async fn strategy_order(
+    pub(in crate::exchanges::aster) async fn strategy_order(
         &self,
         method: HttpMethod,
         path: &str,
@@ -624,7 +563,11 @@ impl AsterClient {
         self.signed(method, AsterMarket::Futures, path, query).await
     }
 
-    fn resolve_strategy_orders(&self, params: &AsterParams, update: bool) -> Result<String> {
+    pub(in crate::exchanges::aster) fn resolve_strategy_orders(
+        &self,
+        params: &AsterParams,
+        update: bool,
+    ) -> Result<String> {
         let mut value = params.json_required("subOrderList")?;
         let Value::Array(orders) = &mut value else {
             return Err(DcexError::InvalidInput(
@@ -660,7 +603,7 @@ impl AsterClient {
     }
 }
 
-fn ensure_order_lookup(params: &AsterParams) -> Result<()> {
+pub(in crate::exchanges::aster) fn ensure_order_lookup(params: &AsterParams) -> Result<()> {
     if params.get("orderId").is_none() && params.get("origClientOrderId").is_none() {
         return Err(DcexError::InvalidInput(
             "Specify orderId or origClientOrderId.".to_string(),
@@ -669,7 +612,10 @@ fn ensure_order_lookup(params: &AsterParams) -> Result<()> {
     Ok(())
 }
 
-fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()> {
+pub(in crate::exchanges::aster) fn validate_private_params(
+    method_name: &str,
+    params: &AsterParams,
+) -> Result<()> {
     match method_name {
         "noop_spot" | "noop_futures" => {
             params.ensure_allowed(&["nonce"], &[])?;
@@ -1147,7 +1093,7 @@ fn validate_private_params(method_name: &str, params: &AsterParams) -> Result<()
 
 /// Uppercases `side` for single-order placements before validation, matching
 /// the batch and strategy paths, which normalize each order object first.
-fn normalize_order_side(
+pub(in crate::exchanges::aster) fn normalize_order_side(
     method_name: &str,
     mut params: Vec<(String, String)>,
 ) -> Vec<(String, String)> {
@@ -1164,7 +1110,10 @@ fn normalize_order_side(
     params
 }
 
-fn validate_symbol_alias(params: &AsterParams, required: bool) -> Result<()> {
+pub(in crate::exchanges::aster) fn validate_symbol_alias(
+    params: &AsterParams,
+    required: bool,
+) -> Result<()> {
     params.ensure_at_most_one(&["product_symbol", "symbol"])?;
     if required {
         params.required_any(&["product_symbol", "symbol"])?;
@@ -1172,14 +1121,14 @@ fn validate_symbol_alias(params: &AsterParams, required: bool) -> Result<()> {
     Ok(())
 }
 
-fn validate_trade_history(params: &AsterParams) -> Result<()> {
+pub(in crate::exchanges::aster) fn validate_trade_history(params: &AsterParams) -> Result<()> {
     params.u64("fromId")?;
     params.optional_u64_range("limit", 1, 1000)?;
     params.ensure_absent_with("fromId", &["startTime", "endTime"])?;
     params.ensure_max_time_span("startTime", "endTime", 7 * 24 * 60 * 60 * 1000)
 }
 
-fn validate_spot_order(params: &AsterParams) -> Result<()> {
+pub(in crate::exchanges::aster) fn validate_spot_order(params: &AsterParams) -> Result<()> {
     params.required_one_of("side", &["BUY", "SELL"])?;
     let order_type = params.required("type")?;
     params.required_one_of(
@@ -1226,7 +1175,10 @@ fn validate_spot_order(params: &AsterParams) -> Result<()> {
     Ok(())
 }
 
-fn validate_futures_order(params: &AsterParams, batch: bool) -> Result<()> {
+pub(in crate::exchanges::aster) fn validate_futures_order(
+    params: &AsterParams,
+    batch: bool,
+) -> Result<()> {
     params.required_one_of("side", &["BUY", "SELL"])?;
     params.optional_one_of("positionSide", &["BOTH", "LONG", "SHORT"])?;
     let order_type = params.required("type")?;
@@ -1305,7 +1257,7 @@ fn validate_futures_order(params: &AsterParams, batch: bool) -> Result<()> {
     Ok(())
 }
 
-fn validate_strategy_sub_order(
+pub(in crate::exchanges::aster) fn validate_strategy_sub_order(
     params: &AsterParams,
     update: bool,
     expected_index: usize,
@@ -1403,7 +1355,11 @@ fn validate_strategy_sub_order(
     Ok(())
 }
 
-fn validate_client_id(params: &AsterParams, key: &str, max_length: usize) -> Result<()> {
+pub(in crate::exchanges::aster) fn validate_client_id(
+    params: &AsterParams,
+    key: &str,
+    max_length: usize,
+) -> Result<()> {
     let Some(value) = params.get(key) else {
         return Ok(());
     };
@@ -1419,7 +1375,7 @@ fn validate_client_id(params: &AsterParams, key: &str, max_length: usize) -> Res
     Ok(())
 }
 
-fn validate_optional_id_list(
+pub(in crate::exchanges::aster) fn validate_optional_id_list(
     params: &AsterParams,
     key: &str,
     strings: bool,
@@ -1462,7 +1418,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn preserves_bbo_peg_fields() {
+    pub(in crate::exchanges::aster) fn preserves_bbo_peg_fields() {
         let params = AsterParams::from_pairs(vec![
             ("pegPriceType".to_string(), "QUEUE_1".to_string()),
             ("pegOffset".to_string(), "-0.5".to_string()),
@@ -1473,7 +1429,7 @@ mod tests {
     }
 
     #[test]
-    fn validates_current_chase_order_fields() {
+    pub(in crate::exchanges::aster) fn validates_current_chase_order_fields() {
         let valid = AsterParams::from_pairs(vec![
             ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),
             ("side".to_string(), "BUY".to_string()),
@@ -1493,13 +1449,13 @@ mod tests {
     }
 
     #[test]
-    fn current_mmp_query_accepts_an_omitted_symbol() {
+    pub(in crate::exchanges::aster) fn current_mmp_query_accepts_an_omitted_symbol() {
         let params = AsterParams::from_pairs(Vec::new());
         validate_private_params("get_futures_mmp", &params).expect("optional symbol");
     }
 
     #[test]
-    fn strategy_lookup_requires_exactly_one_identifier() {
+    pub(in crate::exchanges::aster) fn strategy_lookup_requires_exactly_one_identifier() {
         let both = AsterParams::from_pairs(vec![
             ("strategyId".to_string(), "1".to_string()),
             ("clientStrategyId".to_string(), "client-1".to_string()),

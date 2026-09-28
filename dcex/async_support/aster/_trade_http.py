@@ -4,10 +4,13 @@ from typing import Any
 
 from ..._operation_guards import require_confirmation
 from ...enums import OrderSide
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Aster V3 private trading operations."""
 
     async def place_spot_order(
@@ -268,17 +271,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def place_futures_batch_orders(
-        self,
-        batchOrders: list[dict[str, Any]],
-        nonce: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Place multiple Aster futures orders."""
-        return await self._native_private(
-            "place_futures_batch_orders",
-            self._native_params(batchOrders=batchOrders, nonce=nonce),
-        )
-
     async def get_futures_order(
         self,
         product_symbol: str,
@@ -323,31 +315,6 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "cancel_all_futures_open_orders",
             self._native_params(product_symbol=product_symbol),
-        )
-
-    async def modify_futures_batch_orders(
-        self,
-        batchOrders: list[dict[str, Any]],  # noqa: N803
-    ) -> dict[str, Any] | list[Any]:
-        """Amend up to five futures orders independently."""
-        return await self._native_private(
-            "modify_futures_batch_orders", self._native_params(batchOrders=batchOrders)
-        )
-
-    async def cancel_futures_batch_orders(
-        self,
-        product_symbol: str,
-        orderIdList: list[int] | None = None,
-        origClientOrderIdList: list[str] | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Cancel multiple Aster futures orders."""
-        return await self._native_private(
-            "cancel_futures_batch_orders",
-            self._native_params(
-                product_symbol=product_symbol,
-                orderIdList=orderIdList,
-                origClientOrderIdList=origClientOrderIdList,
-            ),
         )
 
     async def set_futures_countdown_cancel_all(
@@ -537,53 +504,6 @@ class TradeHTTP(HTTPManager):
                 nonce=nonce,
                 orderId=orderId,
                 origClientOrderId=origClientOrderId,
-            ),
-        )
-
-    async def guarded_cancel_futures_batch_orders(
-        self,
-        product_symbol: str,
-        nonce: int,
-        *,
-        orderIdList: list[int] | None = None,
-        origClientOrderIdList: list[str] | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Cancel using the nonce of the original batch placement."""
-        return await self._native_private(
-            "guarded_cancel_futures_batch_orders",
-            self._native_params(
-                product_symbol=product_symbol,
-                nonce=nonce,
-                orderIdList=orderIdList,
-                origClientOrderIdList=origClientOrderIdList,
-            ),
-        )
-
-    async def transfer_sub_account(
-        self,
-        to_account_address: str,
-        asset: str,
-        amount: str,
-        kind_type: str,
-        *,
-        from_account_address: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """
-        Transfer within one master/sub-account family using the approved agent.
-
-        Aster enforces account-family membership; external transfers are not supported.
-
-        Not verified live: the official signature template includes both user and signer,
-        while its parameter notes require only one. This method sends signer only.
-        """
-        return await self._native_private(
-            "transfer_sub_account",
-            self._native_params(
-                toAccountAddress=to_account_address,
-                asset=asset,
-                amount=amount,
-                kindType=kind_type,
-                fromAccountAddress=from_account_address,
             ),
         )
 
@@ -829,20 +749,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def create_prediction_asset_wallet_transfer(
-        self, *, amount: str, asset: str, client_tran_id: str, kind_type: str
-    ) -> dict[str, Any] | list[Any]:
-        """
-        POST /api/v3/asset/wallet/transfer on the prediction host. Use native prediction
-        symbols.
-        """
-        return await self._native_private(
-            "create_prediction_asset_wallet_transfer",
-            self._native_params(
-                amount=amount, asset=asset, clientTranId=client_tran_id, kindType=kind_type
-            ),
-        )
-
     async def create_prediction_mint(
         self, *, symbol: str, quantity: str, new_client_order_id: str | None = None
     ) -> dict[str, Any] | list[Any]:
@@ -978,27 +884,6 @@ class TradeHTTP(HTTPManager):
         """Query a migration batch with the authenticated destination account."""
         return await self._native_private(
             "get_asset_migration_history", self._native_params(batchId=batch_id)
-        )
-
-    async def place_spot_batch_orders_raw(self, **params: object) -> Any:  # noqa: ANN401
-        """
-        Submit caller-supplied batch order parameters.
-
-        Official spec incomplete; not verified live. Inspect every item in the response;
-        an HTTP success does not imply every order succeeded.
-        """
-        return await self._native_private(
-            "place_spot_batch_orders_raw", self._native_params(**params)
-        )
-
-    async def cancel_spot_batch_orders_raw(self, **params: object) -> Any:  # noqa: ANN401
-        """
-        Cancel a batch using caller-supplied wire parameters.
-
-        Official spec incomplete; not verified live. Inspect every item in the response.
-        """
-        return await self._native_private(
-            "cancel_spot_batch_orders_raw", self._native_params(**params)
         )
 
     async def noop_prediction(self, nonce: int) -> Any:  # noqa: ANN401
@@ -1202,141 +1087,5 @@ class TradeHTTP(HTTPManager):
                 endTime=end_time,
                 page=page,
                 limit=limit,
-            ),
-        )
-
-    async def withdraw_spot_signed(
-        self,
-        *,
-        chain_id: int,
-        asset: str,
-        amount: str,
-        fee: str,
-        receiver: str,
-        user_nonce: str,
-        user_signature: str,
-        signature_type: str | None = None,
-        signature_chain_id: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit a wallet-authorized spot withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        user_nonce and user_signature belong to the wallet authorization and are preserved
-        verbatim; the client adds a separate V3 agent nonce/signature.
-        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
-        """
-        return await self._native_private(
-            "withdraw_spot_signed",
-            self._native_params(
-                chainId=chain_id,
-                asset=asset,
-                amount=amount,
-                fee=fee,
-                receiver=receiver,
-                userNonce=user_nonce,
-                userSignature=user_signature,
-                signatureType=signature_type,
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
-    async def withdraw_spot_solana_signed(
-        self,
-        *,
-        chain_id: int,
-        asset: str,
-        amount: str,
-        fee: str,
-        receiver: str,
-        user_nonce: str | None = None,
-        user_signature: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit a wallet-authorized spot withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        user_nonce and user_signature belong to the wallet authorization and are preserved
-        verbatim; the client adds a separate V3 agent nonce/signature.
-        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
-        """
-        return await self._native_private(
-            "withdraw_spot_solana_signed",
-            self._native_params(
-                chainId=chain_id,
-                asset=asset,
-                amount=amount,
-                fee=fee,
-                receiver=receiver,
-                userNonce=user_nonce,
-                userSignature=user_signature,
-            ),
-        )
-
-    async def withdraw_futures_signed(
-        self,
-        *,
-        chain_id: int,
-        asset: str,
-        amount: str,
-        fee: str,
-        receiver: str,
-        user_nonce: str,
-        user_signature: str,
-        signature_type: str | None = None,
-        signature_chain_id: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit a wallet-authorized futures withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        user_nonce and user_signature belong to the wallet authorization and are preserved
-        verbatim; the client adds a separate V3 agent nonce/signature.
-        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
-        """
-        return await self._native_private(
-            "withdraw_futures_signed",
-            self._native_params(
-                chainId=chain_id,
-                asset=asset,
-                amount=amount,
-                fee=fee,
-                receiver=receiver,
-                userNonce=user_nonce,
-                userSignature=user_signature,
-                signatureType=signature_type,
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
-    async def withdraw_futures_solana_signed(
-        self,
-        *,
-        chain_id: int,
-        asset: str,
-        amount: str,
-        fee: str,
-        receiver: str,
-        user_nonce: str | None = None,
-        user_signature: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit a wallet-authorized futures withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        user_nonce and user_signature belong to the wallet authorization and are preserved
-        verbatim; the client adds a separate V3 agent nonce/signature.
-        Source: https://github.com/asterdex/api-docs/blob/master/demo/aster-deposit-withdrawal.md
-        """
-        return await self._native_private(
-            "withdraw_futures_solana_signed",
-            self._native_params(
-                chainId=chain_id,
-                asset=asset,
-                amount=amount,
-                fee=fee,
-                receiver=receiver,
-                userNonce=user_nonce,
-                userSignature=user_signature,
             ),
         )

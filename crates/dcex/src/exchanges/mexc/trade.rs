@@ -1,17 +1,17 @@
-use serde_json::{Map, Number, Value};
+pub(in crate::exchanges::mexc) use serde_json::{Map, Number, Value};
 
-use crate::exchange::ValidatedResponse;
-use crate::http::HttpMethod;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::mexc) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::mexc) use crate::http::HttpMethod;
+pub(in crate::exchanges::mexc) use crate::{DcexError, Result};
 
-use super::client::MexcClient;
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::mexc) use super::client::MexcClient;
+pub(in crate::exchanges::mexc) use super::endpoints::*;
+pub(in crate::exchanges::mexc) use super::params::{
     MexcParams, add_pagination_defaults, require_one_identifier, validate_enum, validate_u64_range,
 };
-use super::signing::json_value_string;
+pub(in crate::exchanges::mexc) use super::signing::json_value_string;
 
-const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
+pub(in crate::exchanges::mexc) const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "quantity",
     "quoteOrderQty",
     "price",
@@ -20,7 +20,7 @@ const SPOT_ORDER_OPTIONAL_KEYS: &[&str] = &[
     "recvWindow",
 ];
 
-const CONTRACT_ORDER_KEYS: &[&str] = &[
+pub(in crate::exchanges::mexc) const CONTRACT_ORDER_KEYS: &[&str] = &[
     "side",
     "type",
     "openType",
@@ -42,7 +42,7 @@ const CONTRACT_ORDER_KEYS: &[&str] = &[
     "stpMode",
 ];
 
-const CONTRACT_ORDER_NUMBER_KEYS: &[&str] = &[
+pub(in crate::exchanges::mexc) const CONTRACT_ORDER_NUMBER_KEYS: &[&str] = &[
     "side",
     "type",
     "openType",
@@ -57,7 +57,7 @@ const CONTRACT_ORDER_NUMBER_KEYS: &[&str] = &[
     "stpMode",
 ];
 
-fn required_batch_string<'a>(
+pub(in crate::exchanges::mexc) fn required_batch_string<'a>(
     order: &'a Map<String, Value>,
     index: usize,
     key: &str,
@@ -82,61 +82,8 @@ impl MexcClient {
         let result = match method_name {
             "cancel_contract_batch_orders_by_external_id"
             | "get_contract_batch_orders_by_external_id" => {
-                params.ensure_allowed(&["orders"])?;
-                let mut orders = params.json_required("orders")?;
-                let items = orders
-                    .as_array_mut()
-                    .filter(|v| !v.is_empty())
-                    .ok_or_else(|| {
-                        DcexError::InvalidInput("orders requires a nonempty JSON array".into())
-                    })?;
-                let mut seen = std::collections::HashSet::new();
-                for item in items {
-                    let object = item
-                        .as_object_mut()
-                        .ok_or_else(|| DcexError::InvalidInput("order must be an object".into()))?;
-                    if object.keys().any(|key| {
-                        !["product_symbol", "symbol", "externalOid"].contains(&key.as_str())
-                    }) || object.contains_key("symbol") && object.contains_key("product_symbol")
-                    {
-                        return Err(DcexError::InvalidInput(
-                            "invalid external order fields".into(),
-                        ));
-                    }
-                    let raw = object
-                        .remove("product_symbol")
-                        .or_else(|| object.remove("symbol"))
-                        .ok_or_else(|| DcexError::InvalidInput("symbol is required".into()))?;
-                    let symbol =
-                        raw.as_str()
-                            .filter(|s| !s.trim().is_empty())
-                            .ok_or_else(|| {
-                                DcexError::InvalidInput("symbol must be a nonempty string".into())
-                            })?;
-                    let symbol = self.exchange_symbol(symbol, "_")?;
-                    let id = object
-                        .get("externalOid")
-                        .and_then(Value::as_str)
-                        .filter(|s| !s.trim().is_empty())
-                        .ok_or_else(|| {
-                            DcexError::InvalidInput("externalOid must be a nonempty string".into())
-                        })?;
-                    if !seen.insert((symbol.clone(), id.to_string())) {
-                        return Err(DcexError::InvalidInput(
-                            "duplicate external order identifier".into(),
-                        ));
-                    }
-                    object.insert("symbol".into(), symbol.into());
-                }
-                self.contract_post_json(
-                    if method_name.starts_with("cancel_") {
-                        "/api/v1/private/order/batch_cancel_with_external"
-                    } else {
-                        "/api/v1/private/order/batch_query_with_external"
-                    },
-                    orders,
-                )
-                .await
+                self.moved_trade_cancel_contract_batch_orders_by_external_id(method_name, params)
+                    .await
             }
             "get_contract_closed_orders" | "get_contract_fee_details" => {
                 let fees = method_name == "get_contract_fee_details";
@@ -309,7 +256,10 @@ impl MexcClient {
                 self.spot_order_from_params(SPOT_ORDER, params, Some("SELL"), Some("MARKET"), None)
                     .await
             }
-            "place_spot_batch_orders" => self.place_spot_batch_orders_from_params(params).await,
+            "place_spot_batch_orders" => {
+                self.moved_trade_place_spot_batch_orders(method_name, params)
+                    .await
+            }
             "cancel_spot_order" => {
                 params.ensure_allowed(&[
                     "product_symbol",
@@ -1060,7 +1010,7 @@ impl MexcClient {
         Ok(Some(result?))
     }
 
-    async fn spot_order_from_params(
+    pub(in crate::exchanges::mexc) async fn spot_order_from_params(
         &self,
         endpoint: &str,
         params: &MexcParams,
@@ -1128,123 +1078,7 @@ impl MexcClient {
         self.spot_private(HttpMethod::Post, endpoint, query).await
     }
 
-    async fn place_spot_batch_orders_from_params(
-        &self,
-        params: &MexcParams,
-    ) -> Result<ValidatedResponse> {
-        params.ensure_allowed(&["batchOrders", "recvWindow"])?;
-        validate_u64_range(params, "recvWindow", 1, 60_000)?;
-        let orders = params.json_required("batchOrders")?;
-        let Value::Array(mut orders) = orders else {
-            return Err(DcexError::InvalidInput(
-                "batchOrders must be a JSON array.".to_string(),
-            ));
-        };
-        if orders.is_empty() || orders.len() > 20 {
-            return Err(DcexError::InvalidInput(
-                "MEXC Spot batch orders require 1 to 20 orders".to_string(),
-            ));
-        }
-        let mut batch_symbol: Option<String> = None;
-        for (index, order) in orders.iter_mut().enumerate() {
-            let Value::Object(order) = order else {
-                return Err(DcexError::InvalidInput(format!(
-                    "MEXC Spot batch order at index {index} must be a JSON object"
-                )));
-            };
-            const ALLOWED_KEYS: &[&str] = &[
-                "product_symbol",
-                "symbol",
-                "side",
-                "type",
-                "quantity",
-                "quoteOrderQty",
-                "price",
-                "newClientOrderId",
-                "stpMode",
-            ];
-            if let Some(key) = order
-                .keys()
-                .find(|key| !ALLOWED_KEYS.contains(&key.as_str()))
-            {
-                return Err(DcexError::InvalidInput(format!(
-                    "unsupported MEXC Spot batch order parameter: {key}"
-                )));
-            }
-            if order.contains_key("product_symbol") && order.contains_key("symbol") {
-                return Err(DcexError::InvalidInput(format!(
-                    "MEXC Spot batch order at index {index} cannot include both product_symbol and symbol"
-                )));
-            }
-            if let Some(product_symbol) = order.remove("product_symbol") {
-                let symbol = self.exchange_symbol(&json_value_string(&product_symbol), "")?;
-                order.insert("symbol".to_string(), Value::String(symbol));
-            }
-            let symbol = required_batch_string(order, index, "symbol")?;
-            if batch_symbol
-                .as_ref()
-                .is_some_and(|expected| expected != symbol)
-            {
-                return Err(DcexError::InvalidInput(
-                    "MEXC Spot batch orders must use the same symbol".to_string(),
-                ));
-            }
-            batch_symbol.get_or_insert_with(|| symbol.to_string());
-
-            let side = required_batch_string(order, index, "side")?;
-            if !matches!(side, "BUY" | "SELL") {
-                return Err(DcexError::InvalidInput(format!(
-                    "unsupported MEXC Spot batch order side: {side}"
-                )));
-            }
-            let order_type = required_batch_string(order, index, "type")?;
-            if !matches!(
-                order_type,
-                "LIMIT" | "MARKET" | "LIMIT_MAKER" | "IMMEDIATE_OR_CANCEL" | "FILL_OR_KILL"
-            ) {
-                return Err(DcexError::InvalidInput(format!(
-                    "unsupported MEXC Spot batch order type: {order_type}"
-                )));
-            }
-            match order_type {
-                "MARKET" => {
-                    if !order.contains_key("quantity") && !order.contains_key("quoteOrderQty") {
-                        return Err(DcexError::InvalidInput(format!(
-                            "MEXC Spot MARKET batch order at index {index} requires quantity or quoteOrderQty"
-                        )));
-                    }
-                }
-                _ => {
-                    for key in ["quantity", "price"] {
-                        if !order.contains_key(key) {
-                            return Err(DcexError::InvalidInput(format!(
-                                "MEXC Spot batch order at index {index} requires {key}"
-                            )));
-                        }
-                    }
-                }
-            }
-            if let Some(stp_mode) = order.get("stpMode").map(json_value_string)
-                && !matches!(
-                    stp_mode.as_str(),
-                    "CANCEL_MAKER" | "CANCEL_TAKER" | "CANCEL_BOTH"
-                )
-            {
-                return Err(DcexError::InvalidInput(format!(
-                    "unsupported MEXC Spot batch order stpMode: {stp_mode}"
-                )));
-            }
-        }
-        let mut query = vec![(
-            "batchOrders".to_string(),
-            serde_json::to_string(&orders).map_err(|error| DcexError::Decode(error.to_string()))?,
-        )];
-        query.extend(params.only(&["recvWindow"]));
-        self.spot_private(HttpMethod::Post, SPOT_BATCH_ORDERS, query)
-            .await
-    }
-
-    async fn contract_order_from_params(
+    pub(in crate::exchanges::mexc) async fn contract_order_from_params(
         &self,
         params: &MexcParams,
         side_override: Option<i64>,
@@ -1334,7 +1168,7 @@ impl MexcClient {
             .await
     }
 
-    async fn cancel_contract_orders_from_params(
+    pub(in crate::exchanges::mexc) async fn cancel_contract_orders_from_params(
         &self,
         params: &MexcParams,
     ) -> Result<ValidatedResponse> {
@@ -1374,7 +1208,10 @@ impl MexcClient {
             .await
     }
 
-    fn required_contract_symbol(&self, params: &MexcParams) -> Result<String> {
+    pub(in crate::exchanges::mexc) fn required_contract_symbol(
+        &self,
+        params: &MexcParams,
+    ) -> Result<String> {
         if let Some(symbol) = params.get("symbol") {
             return self.exchange_symbol(symbol, "_");
         }
@@ -1384,7 +1221,7 @@ impl MexcClient {
 
 /// Joins a JSON array (as produced by the Python layer) into MEXC's comma-separated
 /// query format; other values pass through unchanged.
-fn comma_separated(value: &str) -> String {
+pub(in crate::exchanges::mexc) fn comma_separated(value: &str) -> String {
     if let Ok(Value::Array(values)) = serde_json::from_str::<Value>(value) {
         return values
             .iter()
@@ -1400,7 +1237,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn preserves_current_contract_order_fields() {
+    pub(in crate::exchanges::mexc) fn preserves_current_contract_order_fields() {
         let params = MexcParams::from_pairs(vec![
             ("positionId".to_string(), "7".to_string()),
             ("lossTrend".to_string(), "2".to_string()),
@@ -1421,7 +1258,7 @@ mod tests {
     }
 
     #[test]
-    fn uses_current_futures_order_paths() {
+    pub(in crate::exchanges::mexc) fn uses_current_futures_order_paths() {
         assert_eq!(
             CONTRACT_OPEN_ORDERS,
             "/api/v1/private/order/list/open_orders"
@@ -1433,7 +1270,7 @@ mod tests {
     }
 
     #[test]
-    fn supplies_required_pagination_defaults() {
+    pub(in crate::exchanges::mexc) fn supplies_required_pagination_defaults() {
         let mut query = Vec::new();
         add_pagination_defaults(&mut query);
         assert_eq!(

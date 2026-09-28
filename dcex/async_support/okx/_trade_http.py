@@ -2,10 +2,13 @@ from json import dumps
 from typing import Any
 
 from ...enums import OrderSide
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     async def place_spread_order(
         self,
         sprd_id: str,
@@ -188,25 +191,6 @@ class TradeHTTP(HTTPManager):
                 attachAlgoOrds=attachAlgoOrds,
                 tag=tag,
             ),
-        )
-
-    async def place_batch_orders(
-        self,
-        orders: list[dict],
-    ) -> dict[str, Any]:
-        """
-        Place multiple orders in batch.
-
-        Args:
-            orders: List of order dictionaries
-
-        Returns:
-            Dict containing batch order placement results
-        """
-
-        return await self._native_private(
-            "place_batch_orders",
-            self._native_params(orders=orders),
         )
 
     async def place_market_order(
@@ -571,24 +555,6 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "cancel_order",
             self._native_params(product_symbol=product_symbol, ordId=ordId, clOrdId=clOrdId),
-        )
-
-    async def cancel_batch_orders(
-        self,
-        orders: list[dict[str, Any]],
-    ) -> dict[str, Any]:
-        """
-        Cancel multiple orders in batch.
-
-        Args:
-            orders: List of order dictionaries to cancel
-
-        Returns:
-            Dict containing batch cancellation results
-        """
-        return await self._native_private(
-            "cancel_batch_orders",
-            self._native_params(orders=orders),
         )
 
     async def cancel_all_orders(
@@ -1717,18 +1683,6 @@ class TradeHTTP(HTTPManager):
             "rfq_cancel_rfq", self._native_params(rfqId=rfq_id, clRfqId=cl_rfq_id)
         )
 
-    async def rfq_cancel_batch_rfqs(
-        self, *, rfq_ids: list[str] | None = None, cl_rfq_ids: list[str] | None = None
-    ) -> dict[str, Any]:
-        """
-        POST /api/v5/rfq/cancel-batch-rfqs. Use native instrument IDs.
-
-        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-rfqs
-        """
-        return await self._native_private(
-            "rfq_cancel_batch_rfqs", self._native_params(rfqIds=rfq_ids, clRfqIds=cl_rfq_ids)
-        )
-
     async def rfq_cancel_all_rfqs(self) -> dict[str, Any]:
         """
         POST /api/v5/rfq/cancel-all-rfqs. Use native instrument IDs.
@@ -1937,19 +1891,6 @@ class TradeHTTP(HTTPManager):
         """
         return await self._native_private(
             "delete_sub_account_api_key", self._native_params(subAcct=sub_acct, apiKey=api_key)
-        )
-
-    async def set_sub_account_transfer_out(
-        self, *, sub_acct: str, can_trans_out: bool | None = None
-    ) -> dict[str, Any]:
-        """
-        POST /api/v5/users/subaccount/set-transfer-out. Use native instrument IDs.
-
-        Source: https://www.okx.com/docs-v5/en/#sub-account-rest-api-set-permission-of-transfer-out
-        """
-        return await self._native_private(
-            "set_sub_account_transfer_out",
-            self._native_params(subAcct=sub_acct, canTransOut=can_trans_out),
         )
 
     async def trading_bot_grid_order_algo(
@@ -2228,16 +2169,6 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "get_trading_bot_grid_positions",
             self._native_params(algoOrdType=algo_ord_type, algoId=algo_id),
-        )
-
-    async def trading_bot_grid_withdraw_income(self, *, algo_id: str) -> dict[str, Any]:
-        """
-        POST /api/v5/tradingBot/grid/withdraw-income. Native instrument IDs and decimal strings.
-
-        Source: https://www.okx.com/docs-v5/en/#order-book-trading-grid-trading-post-spot-grid-withdraw-income
-        """
-        return await self._native_private(
-            "trading_bot_grid_withdraw_income", self._native_params(algoId=algo_id)
         )
 
     async def trading_bot_grid_compute_margin_balance(
@@ -3489,39 +3420,6 @@ class TradeHTTP(HTTPManager):
             "get_copytrading_current_lead_traders", self._native_params(instType=inst_type)
         )
 
-    async def get_asset_withdrawal_history(
-        self,
-        *,
-        ccy: str | None = None,
-        wd_id: str | None = None,
-        client_id: str | None = None,
-        tx_id: str | None = None,
-        type_: str | None = None,
-        state: str | None = None,
-        after: str | None = None,
-        before: str | None = None,
-        limit: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/v5/asset/withdrawal-history. Native instrument IDs and decimal strings.
-
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-history
-        """
-        return await self._native_private(
-            "get_asset_withdrawal_history",
-            self._native_params(
-                ccy=ccy,
-                wdId=wd_id,
-                clientId=client_id,
-                txId=tx_id,
-                type=type_,
-                state=state,
-                after=after,
-                before=before,
-                limit=limit,
-            ),
-        )
-
     async def get_fiat_deposit_payment_methods(self, *, ccy: str) -> dict[str, Any]:
         """
         GET /api/v5/fiat/deposit-payment-methods. Native instrument IDs and decimal strings.
@@ -3531,51 +3429,6 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "get_fiat_deposit_payment_methods", self._native_params(ccy=ccy)
         )
-
-    async def get_fiat_withdrawal_payment_methods(self, *, ccy: str) -> dict[str, Any]:
-        """
-        GET /api/v5/fiat/withdrawal-payment-methods. Native instrument IDs and decimal strings.
-
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-payment-methods
-        """
-        return await self._native_private(
-            "get_fiat_withdrawal_payment_methods", self._native_params(ccy=ccy)
-        )
-
-    async def get_fiat_withdrawal_order_history(
-        self,
-        *,
-        ccy: str | None = None,
-        payment_method: str | None = None,
-        state: str | None = None,
-        after: str | None = None,
-        before: str | None = None,
-        limit: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/v5/fiat/withdrawal-order-history. Native instrument IDs and decimal strings.
-
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-order-history
-        """
-        return await self._native_private(
-            "get_fiat_withdrawal_order_history",
-            self._native_params(
-                ccy=ccy,
-                paymentMethod=payment_method,
-                state=state,
-                after=after,
-                before=before,
-                limit=limit,
-            ),
-        )
-
-    async def get_fiat_withdrawal(self, *, ord_id: str) -> dict[str, Any]:
-        """
-        GET /api/v5/fiat/withdrawal. Native instrument IDs and decimal strings.
-
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-get-withdrawal-order-detail
-        """
-        return await self._native_private("get_fiat_withdrawal", self._native_params(ordId=ord_id))
 
     async def get_fiat_deposit_order_history(
         self,
@@ -3698,18 +3551,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 ordId=ord_id, clOrdId=cl_ord_id, state=state, begin=begin, end=end, limit=limit
             ),
-        )
-
-    async def get_account_subaccount_max_withdrawal(
-        self, *, sub_acct: str, ccy: str | None = None
-    ) -> dict[str, Any]:
-        """
-        GET /api/v5/account/subaccount/max-withdrawal. Native instrument IDs and decimal strings.
-
-        Source: https://www.okx.com/docs-v5/en/#sub-account-rest-api-get-sub-account-maximum-withdrawals
-        """
-        return await self._native_private(
-            "get_account_subaccount_max_withdrawal", self._native_params(subAcct=sub_acct, ccy=ccy)
         )
 
     async def get_asset_subaccount_managed_subaccount_bills(
@@ -4008,22 +3849,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(**{}),
         )
 
-    async def cancel_rfq_batch_quotes(
-        self,
-        *,
-        quote_ids: list[Any] | None = None,
-        cl_quote_ids: list[Any] | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v5/rfq/cancel-batch-quotes.
-
-        Source: https://www.okx.com/docs-v5/en/#block-trading-rest-api-cancel-multiple-quotes
-        """
-        return await self._native_private(
-            "cancel_rfq_batch_quotes",
-            self._native_params(**{"quoteIds": quote_ids, "clQuoteIds": cl_quote_ids}),
-        )
-
     async def cancel_all_rfq_quotes(
         self,
     ) -> Any:  # noqa: ANN401
@@ -4051,100 +3876,6 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "set_rfq_cancel_all_after",
             self._native_params(**{"timeOut": time_out}),
-        )
-
-    async def create_withdrawal(
-        self,
-        *,
-        ccy: str,
-        amt: str,
-        dest: str,
-        to_addr: str,
-        to_addr_type: str | None = None,
-        chain: str | None = None,
-        area_code: str | None = None,
-        rcvr_info: dict[str, Any] | None = None,
-        client_id: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v5/asset/withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-withdrawal
-        """
-        return await self._native_private(
-            "create_withdrawal",
-            self._native_params(
-                **{
-                    "ccy": ccy,
-                    "amt": amt,
-                    "dest": dest,
-                    "toAddr": to_addr,
-                    "toAddrType": to_addr_type,
-                    "chain": chain,
-                    "areaCode": area_code,
-                    "rcvrInfo": rcvr_info,
-                    "clientId": client_id,
-                }
-            ),
-        )
-
-    async def cancel_withdrawal(
-        self,
-        *,
-        wd_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v5/asset/cancel-withdrawal.
-
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal
-        """
-        return await self._native_private(
-            "cancel_withdrawal",
-            self._native_params(**{"wdId": wd_id}),
-        )
-
-    async def create_fiat_withdrawal(
-        self,
-        *,
-        payment_acct_id: str,
-        ccy: str,
-        amt: str,
-        payment_method: str,
-        client_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v5/fiat/create-withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-create-withdrawal-order
-        """
-        return await self._native_private(
-            "create_fiat_withdrawal",
-            self._native_params(
-                **{
-                    "paymentAcctId": payment_acct_id,
-                    "ccy": ccy,
-                    "amt": amt,
-                    "paymentMethod": payment_method,
-                    "clientId": client_id,
-                }
-            ),
-        )
-
-    async def cancel_fiat_withdrawal(
-        self,
-        *,
-        ord_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /api/v5/fiat/cancel-withdrawal.
-
-        Source: https://www.okx.com/docs-v5/en/#funding-account-rest-api-cancel-withdrawal-order
-        """
-        return await self._native_private(
-            "cancel_fiat_withdrawal",
-            self._native_params(**{"ordId": ord_id}),
         )
 
     async def get_affiliate_performance_summary(

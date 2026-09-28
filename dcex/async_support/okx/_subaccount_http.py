@@ -1,9 +1,10 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import SubaccountHTTPTransfersHTTP
 
 
-class SubaccountHTTP(HTTPManager):
+class SubaccountHTTP(SubaccountHTTPTransfersHTTP, HTTPManager):
     """Asynchronous OKX sub-account monitoring and transfer operations."""
 
     async def get_subaccount_list(
@@ -58,32 +59,6 @@ class SubaccountHTTP(HTTPManager):
                 after=after,
                 before=before,
                 limit=limit,
-            ),
-        )
-
-    async def transfer_between_subaccounts(
-        self,
-        ccy: str,
-        amt: str,
-        from_account: str,
-        to_account: str,
-        fromSubAccount: str,
-        toSubAccount: str,
-        *,
-        loanTrans: bool | str | None = None,
-        omitPosRisk: bool | str | None = None,
-    ) -> dict[str, Any]:
-        return await self._native_private(
-            "transfer_between_subaccounts",
-            self._native_params(
-                ccy=ccy,
-                amt=amt,
-                from_account=from_account,
-                to_account=to_account,
-                fromSubAccount=fromSubAccount,
-                toSubAccount=toSubAccount,
-                loanTrans=loanTrans,
-                omitPosRisk=omitPosRisk,
             ),
         )
 

@@ -5,8 +5,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
     ];
     private [
-        stock_plus_assets_transfer(),
-        stock_plus_assets_get_transfer_records(),
         stock_plus_assets_get_account(),
         stock_plus_assets_get_cash_flow(start_time => "startTime", end_time => "endTime"),
         stock_plus_assets_get_stock_position(),

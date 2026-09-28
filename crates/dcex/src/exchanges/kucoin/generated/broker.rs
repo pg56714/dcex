@@ -5,8 +5,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
     ];
     private [
-        /// API withdrawals have no second confirmation; they execute on submit.
-        post_v2_broker_withdrawal(body => "body"),
         get_v2_broker_api_rebate_download(begin => "begin", end => "end", trade_type => "tradeType"),
         get_v2_broker_query_my_commission(),
         get_v2_broker_query_user(),
@@ -23,11 +21,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_v1_broker_nd_account_apikey(uid => "uid"),
         post_v1_broker_nd_account_update_apikey(uid => "uid", label => "label", api_key => "apiKey"),
         delete_v1_broker_nd_account_apikey(uid => "uid", api_key => "apiKey"),
-        post_v1_broker_nd_transfer(currency => "currency", amount => "amount", direction => "direction", account_type => "accountType", special_uid => "specialUid", special_account_type => "specialAccountType", client_oid => "clientOid"),
-        get_v3_broker_nd_transfer_detail(order_id => "orderId"),
         get_v1_asset_ndbroker_deposit_list(),
         get_v3_broker_nd_deposit_detail(currency => "currency", hash => "hash"),
-        get_v3_broker_nd_withdraw_detail(withdrawal_id => "withdrawalId"),
         post_v1_broker_nd_mark_up(trade_type => "tradeType", maker_mark_up => "makerMarkUp", taker_mark_up => "takerMarkUp", effective_type => "effectiveType"),
         get_v1_broker_nd_mark_up(),
     ];

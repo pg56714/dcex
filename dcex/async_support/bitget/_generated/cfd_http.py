@@ -19,59 +19,6 @@ class GeneratedCfdHTTP(MarketHTTP):
         """
         return await self._native_private("cfd_account_get_fund_detail", self._native_params(**{}))
 
-    async def cfd_account_transfer(
-        self, *, coin: str, amount: str, account_type: str, direction: str
-    ) -> dict[str, Any]:
-        """
-        Transfer.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/cfd-account/cfd-account#cfd-transfer
-        """
-        return await self._native_private(
-            "cfd_account_transfer",
-            self._native_params(
-                **{
-                    "coin": coin,
-                    "amount": amount,
-                    "accountType": account_type,
-                    "direction": direction,
-                }
-            ),
-        )
-
-    async def cfd_account_get_transfer_records(
-        self,
-        *,
-        transfer_id: str | None = None,
-        sub_uid: str | None = None,
-        start_time: str | None = None,
-        end_time: str | None = None,
-        direction: str | None = None,
-        limit: str | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Get Transfer Records.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/cfd-account/cfd-account#get-cfd-transfer-records
-        """
-        return await self._native_private(
-            "cfd_account_get_transfer_records",
-            self._native_params(
-                **{
-                    "transferId": transfer_id,
-                    "subUid": sub_uid,
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "direction": direction,
-                    "limit": limit,
-                    "cursor": cursor,
-                }
-            ),
-        )
-
     async def cfd_account_get_financial_records(
         self,
         *,

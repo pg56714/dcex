@@ -1,12 +1,13 @@
 """Extended account HTTP client backed by Rust."""
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Extended account endpoints."""
 
     def get_account_details(self) -> Any:  # noqa: ANN401
@@ -42,12 +43,6 @@ class AccountHTTP(HTTPManager):
                 cursor=cursor,
                 limit=limit,
             ),
-        )
-
-    def submit_internal_transfer(self, body: Mapping[str, Any]) -> Any:  # noqa: ANN401
-        """Submit a pre-signed transfer between subaccounts of the same wallet."""
-        return self._native_private(
-            "submit_internal_transfer", self._native_params(body=dict(body))
         )
 
     def get_account_health(
@@ -465,19 +460,6 @@ class AccountHTTP(HTTPManager):
     def get_points_leaderboard_stats(self) -> Any:  # noqa: ANN401
         """GET /api/v1/user/rewards/leaderboard/stats."""
         return self._native_private("get_points_leaderboard_stats", self._native_params())
-
-    def create_withdrawal_signed(self, *, body: dict[str, Any]) -> dict[str, Any] | list[Any]:
-        """
-        Submit a caller-signed withdrawal settlement.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        The caller supplies the official Stark settlement signature and scaled amount.
-        EVM withdrawals require quoteId; STRK withdrawals use a Starknet wallet.
-        Source: https://api.docs.extended.exchange/#withdrawals
-        """
-        return self._native_private(
-            "create_withdrawal_signed", self._native_params(**{"body": body})
-        )
 
     def get_affiliate_data(self) -> dict[str, Any] | list[Any]:
         """

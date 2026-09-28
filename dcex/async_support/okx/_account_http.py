@@ -1,9 +1,10 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
     async def get_account_instruments(
         self,
         instType: str,
@@ -640,24 +641,6 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "set_greeks",
             self._native_params(greeksType=greeksType),
-        )
-
-    async def get_max_withdrawal(
-        self,
-        ccy: list[str] | None = None,
-    ) -> dict[str, Any]:
-        """
-        Get maximum withdrawal amount.
-
-        Args:
-            ccy: List of currencies to query
-
-        Returns:
-            Dict containing maximum withdrawal information
-        """
-        return await self._native_private(
-            "get_max_withdrawal",
-            self._native_params(ccy=ccy),
         )
 
     async def get_interest_limits(

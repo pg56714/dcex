@@ -1,14 +1,13 @@
-use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::bingx) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::bingx) use crate::{DcexError, Result};
 
-use super::client::BingxClient;
-use super::endpoints::*;
-use super::params::{
-    BingxParams, push_optional, require_pair_or_identifier, validate_enum,
-    validate_positive_number, validate_time_range, validate_u64_range,
+pub(in crate::exchanges::bingx) use super::client::BingxClient;
+pub(in crate::exchanges::bingx) use super::endpoints::*;
+pub(in crate::exchanges::bingx) use super::params::{
+    BingxParams, push_optional, validate_enum, validate_time_range, validate_u64_range,
 };
 
-const ACCOUNT_TYPES: &[&str] = &[
+pub(in crate::exchanges::bingx) const ACCOUNT_TYPES: &[&str] = &[
     "sopt",
     "stdFutures",
     "coinMPerp",
@@ -19,7 +18,7 @@ const ACCOUNT_TYPES: &[&str] = &[
     "c2c",
 ];
 
-const INCOME_TYPES: &[&str] = &[
+pub(in crate::exchanges::bingx) const INCOME_TYPES: &[&str] = &[
     "TRANSFER",
     "REALIZED_PNL",
     "FUNDING_FEE",
@@ -90,71 +89,13 @@ impl BingxClient {
                 .await
             }
             "get_transferable_coins" => {
-                params.ensure_allowed(&["fromAccount", "toAccount", "recvWindow"])?;
-                params.required("fromAccount")?;
-                params.required("toAccount")?;
-                validate_recv_window(params)?;
-                self.private_get(
-                    TRANSFERABLE_COINS,
-                    params.only(&["fromAccount", "toAccount", "recvWindow"]),
-                )
-                .await
+                self.moved_account_get_transferable_coins(method_name, params)
+                    .await
             }
-            "asset_transfer" => {
-                params.ensure_allowed(&[
-                    "fromAccount",
-                    "toAccount",
-                    "asset",
-                    "amount",
-                    "recvWindow",
-                ])?;
-                params.required("fromAccount")?;
-                params.required("toAccount")?;
-                params.required("asset")?;
-                params.required("amount")?;
-                validate_positive_number(params, "amount")?;
-                validate_recv_window(params)?;
-                self.private_post(
-                    ASSET_TRANSFER,
-                    params.only(&["fromAccount", "toAccount", "asset", "amount", "recvWindow"]),
-                )
-                .await
-            }
+            "asset_transfer" => self.moved_account_asset_transfer(method_name, params).await,
             "get_asset_transfer_records" => {
-                params.ensure_allowed(&[
-                    "fromAccount",
-                    "toAccount",
-                    "transferId",
-                    "tranId",
-                    "startTime",
-                    "endTime",
-                    "pageIndex",
-                    "pageSize",
-                    "recvWindow",
-                ])?;
-                if params.get("transferId").is_none() && params.get("tranId").is_none() {
-                    require_pair_or_identifier(params, "fromAccount", "toAccount", "transferId")?;
-                }
-                validate_u64_range(params, "pageIndex", 1, u64::MAX)?;
-                validate_u64_range(params, "pageSize", 1, 100)?;
-                validate_u64_range(params, "transferId", 1, u64::MAX)?;
-                validate_u64_range(params, "tranId", 1, u64::MAX)?;
-                validate_time_range(params, "startTime", "endTime", None)?;
-                validate_recv_window(params)?;
-                let mut query = params.only(&[
-                    "fromAccount",
-                    "toAccount",
-                    "transferId",
-                    "startTime",
-                    "endTime",
-                    "pageIndex",
-                    "pageSize",
-                    "recvWindow",
-                ]);
-                if !query.iter().any(|(key, _)| key == "transferId") {
-                    push_optional(&mut query, "transferId", params.get("tranId"));
-                }
-                self.private_get(TRANSFER_RECORDS, query).await
+                self.moved_account_get_asset_transfer_records(method_name, params)
+                    .await
             }
             "get_subaccounts" => {
                 params.ensure_allowed(&[
@@ -220,115 +161,16 @@ impl BingxClient {
                 .await
             }
             "get_subaccount_transfer_history" => {
-                params.ensure_allowed(&[
-                    "uid",
-                    "type",
-                    "tranId",
-                    "startTime",
-                    "endTime",
-                    "pageId",
-                    "pagingSize",
-                    "recvWindow",
-                ])?;
-                params.required("uid")?;
-                validate_u64_range(params, "uid", 1, u64::MAX)?;
-                validate_u64_range(params, "pageId", 1, u64::MAX)?;
-                validate_u64_range(params, "pagingSize", 1, 100)?;
-                validate_time_range(params, "startTime", "endTime", None)?;
-                validate_recv_window(params)?;
-                self.private_get(
-                    SUBACCOUNT_TRANSFER_HISTORY,
-                    params.only(&[
-                        "uid",
-                        "type",
-                        "tranId",
-                        "startTime",
-                        "endTime",
-                        "pageId",
-                        "pagingSize",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_get_subaccount_transfer_history(method_name, params)
+                    .await
             }
             "get_subaccount_transferable_amounts" => {
-                params.ensure_allowed(&[
-                    "fromUid",
-                    "fromAccountType",
-                    "toUid",
-                    "toAccountType",
-                    "recvWindow",
-                ])?;
-                for key in ["fromUid", "fromAccountType", "toUid", "toAccountType"] {
-                    params.required(key)?;
-                }
-                validate_u64_range(params, "fromUid", 1, u64::MAX)?;
-                validate_u64_range(params, "toUid", 1, u64::MAX)?;
-                validate_u64_range(params, "fromAccountType", 1, 3)?;
-                validate_u64_range(params, "toAccountType", 1, 3)?;
-                validate_recv_window(params)?;
-                self.private_post(
-                    SUBACCOUNT_TRANSFERABLE_AMOUNTS,
-                    params.only(&[
-                        "fromUid",
-                        "fromAccountType",
-                        "toUid",
-                        "toAccountType",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_get_subaccount_transferable_amounts(method_name, params)
+                    .await
             }
             "transfer_subaccount_assets" => {
-                params.ensure_allowed(&[
-                    "assetName",
-                    "transferAmount",
-                    "fromUid",
-                    "fromType",
-                    "fromAccountType",
-                    "toUid",
-                    "toType",
-                    "toAccountType",
-                    "remark",
-                    "recvWindow",
-                ])?;
-                for key in [
-                    "assetName",
-                    "transferAmount",
-                    "fromUid",
-                    "fromType",
-                    "fromAccountType",
-                    "toUid",
-                    "toType",
-                    "toAccountType",
-                    "remark",
-                ] {
-                    params.required(key)?;
-                }
-                validate_positive_number(params, "transferAmount")?;
-                validate_u64_range(params, "fromUid", 1, u64::MAX)?;
-                validate_u64_range(params, "toUid", 1, u64::MAX)?;
-                validate_u64_range(params, "fromType", 1, 2)?;
-                validate_u64_range(params, "toType", 1, 2)?;
-                validate_u64_range(params, "fromAccountType", 1, 3)?;
-                validate_u64_range(params, "toAccountType", 1, 3)?;
-                validate_recv_window(params)?;
-                self.private_post(
-                    SUBACCOUNT_ASSET_TRANSFER,
-                    params.only(&[
-                        "assetName",
-                        "transferAmount",
-                        "fromUid",
-                        "fromType",
-                        "fromAccountType",
-                        "toUid",
-                        "toType",
-                        "toAccountType",
-                        "remark",
-                        "recvWindow",
-                    ]),
-                )
-                .await
+                self.moved_account_transfer_subaccount_assets(method_name, params)
+                    .await
             }
             "get_open_positions" => {
                 params.ensure_allowed(&["product_symbol", "symbol", "recvWindow"])?;
@@ -394,7 +236,7 @@ impl BingxClient {
     }
 }
 
-fn validate_recv_window(params: &BingxParams) -> Result<()> {
+pub(in crate::exchanges::bingx) fn validate_recv_window(params: &BingxParams) -> Result<()> {
     validate_u64_range(params, "recvWindow", 1, 5000)
 }
 

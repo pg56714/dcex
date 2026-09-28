@@ -17,4 +17,5 @@ mod referral;
 mod stocks;
 mod subaccount;
 mod trading;
+mod transfers;
 mod withdrawals;

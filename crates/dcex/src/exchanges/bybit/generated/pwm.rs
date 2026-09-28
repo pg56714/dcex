@@ -16,7 +16,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         request_earn_pwm_asset_manager_manage_order(order_id => "orderId", action => "action", req_link_id => "reqLinkId"),
         request_earn_pwm_asset_manager_settle_profit(fund_id => "fundId", req_link_id => "reqLinkId"),
         create_earn_pwm_customize_plan(products => "products"),
-        request_earn_pwm_fund_transfer(transfer_id => "transferId", from_user_id => "fromUserId", to_user_id => "toUserId", amount => "amount", coin => "coin"),
         get_earn_pwm_investment_plan_all(),
         get_earn_pwm_investment_plan_asset_trend(plan_id => "planId"),
         claim_earn_pwm_investment_plan(plan_id => "planId", order_link_id => "orderLinkId"),
@@ -27,6 +26,5 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_earn_pwm_investment_plan_order(),
         redeem_earn_pwm_investment_plan(plan_id => "planId", category => "category", product_id => "productId", order_link_id => "orderLinkId"),
         subscribe_earn_pwm_investment_plan(plan_id => "planId", order_link_id => "orderLinkId"),
-        get_earn_pwm_query_fund_transfer_result(),
     ];
 }

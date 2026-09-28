@@ -4,30 +4,23 @@
 
 import json
 import os
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
-
-from dcex._schema_codec import normalize_params
 
 from .._native_http import load_native, request_native_json
 from ..base.http_manager import BaseHTTPManager
 from ..utils.common import Common
 from ..utils.errors import FailedRequestError
 from ..utils.helpers import generate_timestamp
-
-
-def _params(**kwargs: object) -> list[tuple[str, str]]:
-    kwargs = normalize_params(kwargs)
-    return [
-        (name, str(value).lower() if isinstance(value, bool) else str(value))
-        for name, value in kwargs.items()
-        if value is not None
-    ]
+from ._batch_http import ClientBatchHTTP
+from ._request_params import _params
+from ._transfers_http import ClientTransfersHTTP
+from ._withdrawals_http import ClientWithdrawalsHTTP
 
 
 @dataclass
-class Client(BaseHTTPManager):
+class Client(ClientTransfersHTTP, ClientWithdrawalsHTTP, ClientBatchHTTP, BaseHTTPManager):
     """Arcus perps; pass testnet=True to select the testnet endpoint."""
 
     EXCHANGE = Common.ARCUS
@@ -150,12 +143,6 @@ class Client(BaseHTTPManager):
             "get_fills", address=address or self.address, accountIndex=self.account_index
         )
 
-    def get_transfer_updates(self, address: str | None = None) -> Any:  # noqa: ANN401
-        """Get deposits and internal-transfer updates for an address."""
-        return self.public_request(
-            "get_transfer_updates", address=address or self.address, accountIndex=self.account_index
-        )
-
     def get_leverages(self, address: str | None = None) -> Any:  # noqa: ANN401
         """Get effective leverage and margin mode across markets."""
         return self.public_request(
@@ -190,13 +177,6 @@ class Client(BaseHTTPManager):
         """Request a leverage or margin-mode change for one market."""
         return self.private_request(
             "set_leverage", product_symbol=product_symbol, leverage=leverage, isolated=isolated
-        )
-
-    def submit_internal_transfer(self, signed_transfer: Mapping[str, Any]) -> Any:  # noqa: ANN401
-        """Submit a same-wallet EIP-712-signed collateral transfer, not a withdrawal."""
-        return self.private_request(
-            "submit_internal_transfer",
-            signed_transfer_json=json.dumps(dict(signed_transfer), separators=(",", ":")),
         )
 
     def place_order(
@@ -257,33 +237,6 @@ class Client(BaseHTTPManager):
         """Submit an order cancellation."""
         return self.private_request(
             "cancel_order", product_symbol=product_symbol, order_id=order_id
-        )
-
-    def batch_place_orders(
-        self, orders: list[dict[str, Any]], *, grouping: str | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        Place orders, optionally grouped as partialTpsl, positionTpsl, or entryTpsl.
-
-        TPSL legs use tpsl_type, stop_price, and reduce_only=True.
-        positionTpsl legs require quantity="0"; entryTpsl starts with the entry.
-        """
-        return self.private_request(
-            "batch_place_orders",
-            orders=json.dumps(orders, separators=(",", ":")),
-            grouping=grouping,
-        )
-
-    def batch_cancel_orders(self, cancels: list[dict[str, Any]]) -> Any:  # noqa: ANN401
-        """Cancel up to 100 individually signed orders in one request."""
-        return self.private_request(
-            "batch_cancel_orders", cancels=json.dumps(cancels, separators=(",", ":"))
-        )
-
-    def batch_modify_orders(self, modifies: list[dict[str, Any]]) -> Any:  # noqa: ANN401
-        """Modify up to 100 individually signed orders in one request."""
-        return self.private_request(
-            "batch_modify_orders", modifies=json.dumps(modifies, separators=(",", ":"))
         )
 
     def close(self) -> None:
@@ -697,55 +650,6 @@ class Client(BaseHTTPManager):
                     "limit": limit,
                 }.items()
                 if v is not None
-            },
-        )
-
-    def create_withdrawal_signed(
-        self,
-        *,
-        ethereum_address: str,
-        amount: str,
-        nonce: str,
-        signature: dict[str, str],
-        account_index: int | None = None,
-        spot_asset_id: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /v1/withdraw.
-
-        API withdrawals have no second confirmation; they execute on submit. Amount is an integer
-        quantum string. Supply a wallet EIP-712 signature; no API key headers are sent.
-        Source: https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal
-        """
-        return self.private_request(
-            "create_withdrawal_signed",
-            **{
-                "ethereumAddress": ethereum_address,
-                "accountIndex": account_index,
-                "spotAssetId": spot_asset_id,
-                "amount": amount,
-                "nonce": nonce,
-                "signature": json.dumps(signature, separators=(",", ":"), allow_nan=False),
-            },
-        )
-
-    def create_withdrawal(
-        self, *, ethereum_address: str, amount: str, nonce: str, account_index: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /v1/withdraw.
-
-        API withdrawals have no second confirmation; they execute on submit. Amount is an integer
-        quantum string. USDG only; the API key must carry operator-provisioned withdraw permission.
-        Source: https://docs.arcus.xyz/api-reference/exchange/submit-withdrawal
-        """
-        return self.private_request(
-            "create_withdrawal",
-            **{
-                "ethereumAddress": ethereum_address,
-                "accountIndex": account_index,
-                "amount": amount,
-                "nonce": nonce,
             },
         )
 

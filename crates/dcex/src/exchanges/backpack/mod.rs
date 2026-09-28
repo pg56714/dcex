@@ -22,3 +22,5 @@ mod borrow_lend;
 mod prediction;
 
 mod vault;
+
+mod batch;

@@ -1,9 +1,9 @@
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::kraken) use crate::Result;
+pub(in crate::exchanges::kraken) use crate::exchange::ValidatedResponse;
 
-use super::client::{KrakenAuth, KrakenClient};
-use super::endpoints::*;
-use super::params::{KrakenParams, push_optional};
+pub(in crate::exchanges::kraken) use super::client::{KrakenAuth, KrakenClient};
+pub(in crate::exchanges::kraken) use super::endpoints::*;
+pub(in crate::exchanges::kraken) use super::params::{KrakenParams, push_optional};
 
 impl KrakenClient {
     pub(super) async fn account_private_request(
@@ -65,21 +65,7 @@ impl KrakenClient {
                     .await
             }
             "wallet_transfer_to_futures" => {
-                params.required("asset")?;
-                params.required("amount")?;
-                params.required("to")?;
-                if params.get("from").or_else(|| params.get("from_")).is_none() {
-                    return Err(crate::DcexError::InvalidInput(
-                        "missing required parameter: from".to_string(),
-                    ));
-                }
-                let mut query = params.only(&["asset", "to", "amount"]);
-                push_optional(
-                    &mut query,
-                    "from",
-                    params.get("from").or_else(|| params.get("from_")),
-                );
-                self.private_post(KrakenAuth::Spot, SPOT_WALLET_TRANSFER, query)
+                self.moved_account_wallet_transfer_to_futures(method_name, params)
                     .await
             }
             "get_futures_accounts" => {
@@ -99,20 +85,11 @@ impl KrakenClient {
                 .await
             }
             "futures_wallet_transfer" => {
-                for key in ["amount", "fromAccount", "toAccount", "unit"] {
-                    params.required(key)?;
-                }
-                let mut query = params.only(&["amount", "fromAccount", "toAccount"]);
-                push_lowercase(&mut query, "unit", params.get("unit"));
-                self.private_post(KrakenAuth::Futures, FUTURES_TRANSFER, query)
+                self.moved_account_futures_wallet_transfer(method_name, params)
                     .await
             }
             "withdraw_futures_to_spot_wallet" => {
-                params.required("amount")?;
-                params.required("currency")?;
-                let mut query = params.only(&["amount", "sourceWallet"]);
-                push_lowercase(&mut query, "currency", params.get("currency"));
-                self.private_post(KrakenAuth::Futures, FUTURES_WITHDRAWAL, query)
+                self.moved_account_withdraw_futures_to_spot_wallet(method_name, params)
                     .await
             }
             _ => return Ok(None),
@@ -122,7 +99,11 @@ impl KrakenClient {
     }
 }
 
-fn push_lowercase(query: &mut Vec<(String, String)>, key: &str, value: Option<&str>) {
+pub(in crate::exchanges::kraken) fn push_lowercase(
+    query: &mut Vec<(String, String)>,
+    key: &str,
+    value: Option<&str>,
+) {
     if let Some(value) = value {
         query.push((key.to_string(), value.to_lowercase()));
     }

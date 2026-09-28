@@ -3,9 +3,11 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
+from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPWithdrawalsHTTP, AccountHTTPTransfersHTTP, HTTPManager):
     """HTTP client for Lighter private account APIs."""
 
     def create_auth_token(
@@ -88,14 +90,6 @@ class AccountHTTP(HTTPManager):
         """Export Lighter trade or funding records."""
         return self._native_private("get_export", self._native_params(**locals()))
 
-    def get_fastwithdraw_info(
-        self,
-        account_index: int | None = None,
-        authorization: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve Lighter fast-withdraw information."""
-        return self._native_private("get_fastwithdraw_info", self._native_params(**locals()))
-
     def get_l1_metadata(
         self,
         l1_address: str,
@@ -138,35 +132,6 @@ class AccountHTTP(HTTPManager):
             "get_referral_user_referrals",
             self._native_params(**locals()),
         )
-
-    def get_transfer_history(
-        self,
-        account_index: int | None = None,
-        cursor: str | None = None,
-        type_: str | list[str] | tuple[str, ...] | None = None,
-        authorization: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve Lighter transfer history."""
-        return self._native_private("get_transfer_history", self._native_params(**locals()))
-
-    def get_transfer_fee_info(
-        self,
-        account_index: int | None = None,
-        to_account_index: int | None = None,
-        authorization: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve Lighter transfer fee information."""
-        return self._native_private("get_transfer_fee_info", self._native_params(**locals()))
-
-    def get_withdraw_history(
-        self,
-        account_index: int | None = None,
-        cursor: str | None = None,
-        filter: str | None = None,
-        authorization: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve Lighter withdrawal history."""
-        return self._native_private("get_withdraw_history", self._native_params(**locals()))
 
     def get_position_funding(
         self,

@@ -3,9 +3,11 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
+from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPWithdrawalsHTTP, AccountHTTPTransfersHTTP, HTTPManager):
     """HTTP client for MEXC private account APIs."""
 
     def get_kyc_status(self, recvWindow: int | None = None) -> dict[str, Any] | list[Any]:
@@ -84,28 +86,6 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
-    def get_withdraw_history(
-        self,
-        coin: str | None = None,
-        status: int | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        limit: int | None = None,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve MEXC withdraw history."""
-        return self._native_private(
-            "get_withdraw_history",
-            self._native_params(
-                coin=coin,
-                status=status,
-                startTime=startTime,
-                endTime=endTime,
-                limit=limit,
-                recvWindow=recvWindow,
-            ),
-        )
-
     def get_deposit_address(
         self,
         coin: str,
@@ -116,26 +96,6 @@ class AccountHTTP(HTTPManager):
         return self._native_private(
             "get_deposit_address",
             self._native_params(coin=coin, network=network, recvWindow=recvWindow),
-        )
-
-    def user_universal_transfer(
-        self,
-        fromAccountType: str,
-        toAccountType: str,
-        asset: str,
-        amount: str,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Transfer assets between MEXC Spot and Futures accounts."""
-        return self._native_private(
-            "user_universal_transfer",
-            self._native_params(
-                fromAccountType=fromAccountType,
-                toAccountType=toAccountType,
-                asset=asset,
-                amount=amount,
-                recvWindow=recvWindow,
-            ),
         )
 
     def get_subaccounts(
@@ -174,115 +134,6 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
-    def transfer_subaccount_assets(
-        self,
-        fromAccountType: str,
-        toAccountType: str,
-        asset: str,
-        amount: str,
-        fromAccount: str | None = None,
-        toAccount: str | None = None,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Transfer assets among a MEXC master account and its sub-accounts."""
-        return self._native_private(
-            "transfer_subaccount_assets",
-            self._native_params(
-                fromAccount=fromAccount,
-                toAccount=toAccount,
-                fromAccountType=fromAccountType,
-                toAccountType=toAccountType,
-                asset=asset,
-                amount=amount,
-                recvWindow=recvWindow,
-            ),
-        )
-
-    def get_subaccount_transfer_history(
-        self,
-        fromAccountType: str,
-        toAccountType: str,
-        fromAccount: str | None = None,
-        toAccount: str | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        page: int | None = None,
-        limit: int | None = None,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve MEXC master/sub-account universal-transfer history."""
-        return self._native_private(
-            "get_subaccount_transfer_history",
-            self._native_params(
-                fromAccount=fromAccount,
-                toAccount=toAccount,
-                fromAccountType=fromAccountType,
-                toAccountType=toAccountType,
-                startTime=startTime,
-                endTime=endTime,
-                page=page,
-                limit=limit,
-                recvWindow=recvWindow,
-            ),
-        )
-
-    def get_user_universal_transfer_history(
-        self,
-        fromAccountType: str,
-        toAccountType: str,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        page: int | None = None,
-        size: int | None = None,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve MEXC universal transfer history."""
-        return self._native_private(
-            "get_user_universal_transfer_history",
-            self._native_params(
-                fromAccountType=fromAccountType,
-                toAccountType=toAccountType,
-                startTime=startTime,
-                endTime=endTime,
-                page=page,
-                size=size,
-                recvWindow=recvWindow,
-            ),
-        )
-
-    def get_user_universal_transfer_by_id(
-        self,
-        tranId: str,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve a MEXC universal transfer record by tranId."""
-        return self._native_private(
-            "get_user_universal_transfer_by_id",
-            self._native_params(tranId=tranId, recvWindow=recvWindow),
-        )
-
-    def get_internal_transfer_history(
-        self,
-        tranId: str | None = None,
-        startTime: int | None = None,
-        endTime: int | None = None,
-        page: int | None = None,
-        limit: int | None = None,
-        recvWindow: int | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve MEXC internal transfer history."""
-        return self._native_private(
-            "get_internal_transfer_history",
-            self._native_params(
-                tranId=tranId,
-                startTime=startTime,
-                endTime=endTime,
-                page=page,
-                limit=limit,
-                recvWindow=recvWindow,
-            ),
-        )
-
     def get_contract_assets(self) -> dict[str, Any] | list[Any]:
         """Retrieve all MEXC Contract account assets."""
         return self._native_private("get_contract_assets", [])
@@ -292,26 +143,6 @@ class AccountHTTP(HTTPManager):
         return self._native_private(
             "get_contract_asset",
             self._native_params(currency=currency),
-        )
-
-    def get_contract_transfer_records(
-        self,
-        currency: str | None = None,
-        state: str | None = None,
-        type_: str | None = None,
-        page_num: int = 1,
-        page_size: int = 20,
-    ) -> dict[str, Any] | list[Any]:
-        """Retrieve MEXC Contract asset transfer records."""
-        return self._native_private(
-            "get_contract_transfer_records",
-            self._native_params(
-                currency=currency,
-                state=state,
-                type_=type_,
-                page_num=page_num,
-                page_size=page_size,
-            ),
         )
 
     def get_contract_history_positions(

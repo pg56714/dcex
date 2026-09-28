@@ -3,9 +3,11 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
+from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPTransfersHTTP, AccountHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Kraken private account operations."""
 
     def get_earn_strategies(
@@ -161,19 +163,6 @@ class AccountHTTP(HTTPManager):
             ),
         )
 
-    def wallet_transfer_to_futures(
-        self,
-        asset: str,
-        amount: str,
-        from_: str = "Spot Wallet",
-        to: str = "Futures Wallet",
-    ) -> dict[str, Any]:
-        """Transfer funds from Kraken spot wallet to Futures wallet."""
-        return self._native_private(
-            "wallet_transfer_to_futures",
-            self._native_params(asset=asset, amount=amount, from_=from_, to=to),
-        )
-
     def get_futures_accounts(self) -> dict[str, Any]:
         """Retrieve Kraken Futures wallets/accounts."""
         return self._native_private("get_futures_accounts", [])
@@ -190,38 +179,4 @@ class AccountHTTP(HTTPManager):
         return self._native_private(
             "get_futures_fills",
             self._native_params(lastFillTime=lastFillTime),
-        )
-
-    def futures_wallet_transfer(
-        self,
-        amount: str,
-        fromAccount: str,
-        toAccount: str,
-        unit: str,
-    ) -> dict[str, Any]:
-        """Transfer funds between Kraken Futures cash and margin accounts."""
-        return self._native_private(
-            "futures_wallet_transfer",
-            self._native_params(
-                amount=amount,
-                fromAccount=fromAccount,
-                toAccount=toAccount,
-                unit=unit,
-            ),
-        )
-
-    def withdraw_futures_to_spot_wallet(
-        self,
-        amount: str,
-        currency: str,
-        sourceWallet: str | None = None,
-    ) -> dict[str, Any]:
-        """Withdraw funds from Kraken Futures to the Spot wallet."""
-        return self._native_private(
-            "withdraw_futures_to_spot_wallet",
-            self._native_params(
-                amount=amount,
-                currency=currency,
-                sourceWallet=sourceWallet,
-            ),
         )

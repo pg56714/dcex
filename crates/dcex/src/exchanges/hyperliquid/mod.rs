@@ -27,3 +27,7 @@ mod schema_requests;
 
 mod administration;
 mod deployment;
+
+mod batch;
+
+mod withdrawals;

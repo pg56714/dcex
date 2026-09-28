@@ -6,15 +6,17 @@ from typing import Any
 from dcex._schema_codec import encode_json, normalize_params
 
 from ..._native_http import request_native_json_async
-from ...binance._batch import encode_batch_orders
 from ...enums import OrderSide
 from ...utils.errors import FailedRequestError
 from ...utils.helpers import generate_timestamp
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 from .enums import BinanceProductType
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Binance trading API endpoints."""
 
     async def place_coin_futures_algo_order(self, fields: dict[str, Any]) -> Any:
@@ -217,30 +219,6 @@ class TradeHTTP(HTTPManager):
                 newOrderRespType=newOrderRespType,
                 clientOrderId=clientOrderId,
                 selfTradePreventionMode=selfTradePreventionMode,
-            ),
-        )
-
-    async def place_options_batch_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """Place options orders; inspect both the ok and errors result arrays."""
-        return await self._native_private(
-            "place_options_batch_orders",
-            self._params(orders=encode_batch_orders(orders)),
-        )
-
-    async def cancel_options_batch_orders(
-        self,
-        product_symbol: str,
-        *,
-        orderIds: list[int] | None = None,
-        clientOrderIds: list[str] | None = None,
-    ) -> dict[str, Any]:
-        """Cancel options orders; inspect both the ok and errors result arrays."""
-        return await self._native_private(
-            "cancel_options_batch_orders",
-            self._params(
-                product_symbol=product_symbol,
-                orderIds=dumps(orderIds) if orderIds is not None else None,
-                clientOrderIds=dumps(clientOrderIds) if clientOrderIds is not None else None,
             ),
         )
 
@@ -2403,125 +2381,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def place_futures_batch_orders(
-        self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> dict[str, list[dict[str, Any]]]:
-        """
-        Place a futures batch and return separate ``ok`` and ``errors`` lists.
-
-        Each entry has its zero-based request ``index`` and full ``response``.
-        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
-        Quantity and price fields require decimal strings or ``Decimal`` values.
-        Conditional orders must use the market's REST algo endpoint.
-        """
-        return await self._native_private(
-            "place_futures_batch_orders",
-            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
-        )
-
-    async def amend_futures_batch_orders(
-        self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> dict[str, list[dict[str, Any]]]:
-        """
-        Amend a futures batch and return separate ``ok`` and ``errors`` lists.
-
-        Each entry has its zero-based request ``index`` and full ``response``.
-        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
-        Quantity and price fields require decimal strings or ``Decimal`` values.
-        Conditional orders must use the market's REST algo endpoint.
-        """
-        return await self._native_private(
-            "amend_futures_batch_orders",
-            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
-        )
-
-    async def cancel_futures_batch_orders(
-        self,
-        product_symbol: str,
-        *,
-        order_ids: list[int] | None = None,
-        client_order_ids: list[str] | None = None,
-        recv_window: int | None = None,
-    ) -> dict[str, list[dict[str, Any]]]:
-        """
-        Cancel a futures batch and return separate ``ok`` and ``errors`` lists.
-
-        Each entry has its zero-based request ``index`` and full ``response``.
-        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
-        Conditional orders must use the market's REST algo endpoint.
-        """
-        return await self._native_private(
-            "cancel_futures_batch_orders",
-            self._params(
-                product_symbol=product_symbol,
-                orderIdList=dumps(order_ids) if order_ids is not None else None,
-                origClientOrderIdList=dumps(client_order_ids)
-                if client_order_ids is not None
-                else None,
-                recvWindow=recv_window,
-            ),
-        )
-
-    async def place_coin_futures_batch_orders(
-        self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> dict[str, list[dict[str, Any]]]:
-        """
-        Place a coin_futures batch and return separate ``ok`` and ``errors`` lists.
-
-        Each entry has its zero-based request ``index`` and full ``response``.
-        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
-        Quantity and price fields require decimal strings or ``Decimal`` values.
-        Conditional orders must use the market's REST algo endpoint.
-        """
-        return await self._native_private(
-            "place_coin_futures_batch_orders",
-            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
-        )
-
-    async def amend_coin_futures_batch_orders(
-        self, orders: list[dict[str, Any]], *, recv_window: int | None = None
-    ) -> dict[str, list[dict[str, Any]]]:
-        """
-        Amend a coin_futures batch and return separate ``ok`` and ``errors`` lists.
-
-        Each entry has its zero-based request ``index`` and full ``response``.
-        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
-        Quantity and price fields require decimal strings or ``Decimal`` values.
-        Conditional orders must use the market's REST algo endpoint.
-        """
-        return await self._native_private(
-            "amend_coin_futures_batch_orders",
-            self._params(batchOrders=encode_batch_orders(orders), recvWindow=recv_window),
-        )
-
-    async def cancel_coin_futures_batch_orders(
-        self,
-        product_symbol: str | None = None,
-        *,
-        symbol: str | None = None,
-        order_ids: list[int] | None = None,
-        client_order_ids: list[str] | None = None,
-        recv_window: int | None = None,
-    ) -> dict[str, list[dict[str, Any]]]:
-        """
-        Cancel a coin_futures batch and return separate ``ok`` and ``errors`` lists.
-
-        Each entry has its zero-based request ``index`` and full ``response``.
-        Always inspect ``errors``: HTTP 200 does not mean every item succeeded.
-        Conditional orders must use the market's REST algo endpoint.
-        """
-        return await self._native_private(
-            "cancel_coin_futures_batch_orders",
-            self._params(
-                product_symbol=self._required_alias(product_symbol, symbol, "product_symbol"),
-                orderIdList=dumps(order_ids) if order_ids is not None else None,
-                origClientOrderIdList=dumps(client_order_ids)
-                if client_order_ids is not None
-                else None,
-                recvWindow=recv_window,
-            ),
-        )
-
     async def create_futures_listen_key(self) -> dict[str, Any]:
         """Create a USD-M Futures user-data stream listen key."""
         return await self._native_private("create_futures_listen_key", [])
@@ -2898,21 +2757,6 @@ class TradeHTTP(HTTPManager):
                 archived=archived,
                 recvWindow=recv_window,
             ),
-        )
-
-    async def get_pm_margin_transferable_amount(
-        self, *, asset: str, recv_window: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /papi/v1/margin/maxWithdraw.
-
-        Decimal amounts are strings; timestamps are milliseconds.
-        Source:
-        https://developers.binance.com/en/docs/catalog/advanced-trading-derivatives-trading-portfolio-margin/api/rest-api/account#query-margin-max-withdraw
-
-        """
-        return await self._native_private(
-            "get_pm_margin_transferable_amount", self._params(asset=asset, recvWindow=recv_window)
         )
 
     async def get_pm_margin_repayment_records(
@@ -4077,22 +3921,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def pm_bnb_transfer(
-        self, *, amount: str, transfer_side: str, recv_window: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        BNB transfer (TRADE).
-
-        POST /papi/v1/bnb-transfer. Native exchange symbols; decimal amounts are strings.
-        Timestamps are milliseconds. Source:
-        https://developers.binance.com/en/docs/catalog/advanced-trading-derivatives-trading-portfolio-margin/api/rest-api/account#bnb-transfer
-
-        """
-        return await self._native_private(
-            "pm_bnb_transfer",
-            self._params(amount=amount, transferSide=transfer_side, recvWindow=recv_window),
-        )
-
     async def change_pm_auto_repay_futures_status(
         self, *, auto_repay: str, recv_window: int | None = None
     ) -> Any:  # noqa: ANN401
@@ -5137,40 +4965,6 @@ class TradeHTTP(HTTPManager):
             self._params(assetNames=asset_names, recvWindow=recv_window),
         )
 
-    async def get_margin_cross_margin_transfer_history(
-        self,
-        *,
-        asset: str | None = None,
-        kind_type: str | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        current: int | None = None,
-        size: int | None = None,
-        isolated_symbol: str | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Get Cross Margin Transfer History (USER_DATA).
-
-        GET /sapi/v1/margin/transfer. Native exchange symbols; decimal amounts are strings.
-        Timestamps are milliseconds. Source:
-        https://developers.binance.com/en/docs/catalog/core-trading-margin-trading/api/rest-api/transfer#get-cross-margin-transfer-history
-
-        """
-        return await self._native_private(
-            "get_margin_cross_margin_transfer_history",
-            self._params(
-                asset=asset,
-                type=kind_type,
-                startTime=start_time,
-                endTime=end_time,
-                current=current,
-                size=size,
-                isolatedSymbol=isolated_symbol,
-                recvWindow=recv_window,
-            ),
-        )
-
     async def spot_my_filters(self, *, symbol: str, recv_window: str | None = None) -> Any:  # noqa: ANN401
         """
         Query relevant filters (USER_DATA).
@@ -5446,26 +5240,6 @@ class TradeHTTP(HTTPManager):
                 accountType=account_type,
                 dustQuotaAssetToTargetAssetPrice=dust_quota_asset_to_target_asset_price,
             ),
-        )
-
-    async def wallet_dust_transfer(
-        self,
-        *,
-        asset: str | list[str],
-        account_type: str | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Dust Transfer (USER_DATA).
-
-        POST /sapi/v1/asset/dust. Native exchange symbols; decimal amounts are strings.
-        Timestamps are milliseconds. Source:
-        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/asset#dust-transfer
-
-        """
-        return await self._native_private(
-            "wallet_dust_transfer",
-            self._params(asset=asset, accountType=account_type, recvWindow=recv_window),
         )
 
     async def wallet_dustlog(
@@ -5857,23 +5631,6 @@ class TradeHTTP(HTTPManager):
                 clientAlgoId=client_algo_id,
                 limitPrice=limit_price,
             ),
-        )
-
-    async def pm_pro_bnb_transfer(
-        self, *, amount: str, transfer_side: str, recv_window: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        BNB transfer (USER_DATA).
-
-        POST /sapi/v1/portfolio/bnb-transfer. Native exchange symbols; decimal amounts are
-        strings.
-        Timestamps are milliseconds. Source:
-        https://developers.binance.com/en/docs/catalog/advanced-trading-derivatives-trading-portfolio-margin-pro/api/rest-api/account#bnb-transfer
-
-        """
-        return await self._native_private(
-            "pm_pro_bnb_transfer",
-            self._params(amount=amount, transferSide=transfer_side, recvWindow=recv_window),
         )
 
     async def change_pm_pro_auto_repay_futures_status(
@@ -6270,58 +6027,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def fetch_withdraw_address_list(self) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/capital/withdraw/address/list.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#fetch-withdraw-address-list
-        """
-        return await self._native_private("fetch_withdraw_address_list", self._params())
-
-    async def fetch_withdraw_quota(self) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/capital/withdraw/quota.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#fetch-withdraw-quota
-        """
-        return await self._native_private("fetch_withdraw_quota", self._params())
-
-    async def get_withdrawal_history(
-        self,
-        *,
-        coin: str | None = None,
-        withdraw_order_id: str | None = None,
-        status: int | None = None,
-        offset: int | None = None,
-        limit: int | None = None,
-        id_list: str | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/capital/withdraw/history.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#withdraw-history
-        """
-        return await self._native_private(
-            "get_withdrawal_history",
-            self._params(
-                coin=coin,
-                withdrawOrderId=withdraw_order_id,
-                status=status,
-                offset=offset,
-                limit=limit,
-                idList=id_list,
-                startTime=start_time,
-                endTime=end_time,
-                recvWindow=recv_window,
-            ),
-        )
-
     async def check_questionnaire_requirements(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
         GET /sapi/v1/localentity/questionnaire-requirements.
@@ -6470,82 +6175,6 @@ class TradeHTTP(HTTPManager):
         Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#vasp-list
         """
         return await self._native_private("vasp_list", self._params(recvWindow=recv_window))
-
-    async def get_travel_rule_withdrawal_history(
-        self,
-        *,
-        tr_id: str | None = None,
-        tx_id: str | None = None,
-        withdraw_order_id: str | None = None,
-        network: str | None = None,
-        coin: str | None = None,
-        travel_rule_status: int | None = None,
-        offset: int | None = None,
-        limit: int | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/localentity/withdraw/history.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-history-v1
-        """
-        return await self._native_private(
-            "get_travel_rule_withdrawal_history",
-            self._params(
-                trId=tr_id,
-                txId=tx_id,
-                withdrawOrderId=withdraw_order_id,
-                network=network,
-                coin=coin,
-                travelRuleStatus=travel_rule_status,
-                offset=offset,
-                limit=limit,
-                startTime=start_time,
-                endTime=end_time,
-                recvWindow=recv_window,
-            ),
-        )
-
-    async def get_travel_rule_withdrawal_history_v2(
-        self,
-        *,
-        tr_id: str | None = None,
-        tx_id: str | None = None,
-        withdraw_order_id: str | None = None,
-        network: str | None = None,
-        coin: str | None = None,
-        travel_rule_status: int | None = None,
-        offset: int | None = None,
-        limit: int | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v2/localentity/withdraw/history.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-history-v2
-        """
-        return await self._native_private(
-            "get_travel_rule_withdrawal_history_v2",
-            self._params(
-                trId=tr_id,
-                txId=tx_id,
-                withdrawOrderId=withdraw_order_id,
-                network=network,
-                coin=coin,
-                travelRuleStatus=travel_rule_status,
-                offset=offset,
-                limit=limit,
-                startTime=start_time,
-                endTime=end_time,
-                recvWindow=recv_window,
-            ),
-        )
 
     async def get_futures_lead_trader_status(self, *, recv_window: int | None = None) -> Any:  # noqa: ANN401
         """
@@ -7585,126 +7214,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def query_managed_sub_account_transfer_log_master_account_investor(
-        self,
-        *,
-        email: str,
-        start_time: int,
-        end_time: int,
-        page: int,
-        limit: int,
-        transfers: str | None = None,
-        transfer_function_account_type: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/managed-subaccount/queryTransLogForInvestor.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-transfer-log-master-account-investor
-        """
-        return await self._native_private(
-            "query_managed_sub_account_transfer_log_master_account_investor",
-            self._params(
-                email=email,
-                startTime=start_time,
-                endTime=end_time,
-                page=page,
-                limit=limit,
-                transfers=transfers,
-                transferFunctionAccountType=transfer_function_account_type,
-            ),
-        )
-
-    async def query_managed_sub_account_transfer_log_master_account_trading(
-        self,
-        *,
-        email: str,
-        start_time: int,
-        end_time: int,
-        page: int,
-        limit: int,
-        transfers: str | None = None,
-        transfer_function_account_type: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/managed-subaccount/queryTransLogForTradeParent.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-transfer-log-master-account-trading
-        """
-        return await self._native_private(
-            "query_managed_sub_account_transfer_log_master_account_trading",
-            self._params(
-                email=email,
-                startTime=start_time,
-                endTime=end_time,
-                page=page,
-                limit=limit,
-                transfers=transfers,
-                transferFunctionAccountType=transfer_function_account_type,
-            ),
-        )
-
-    async def query_managed_sub_account_transfer_log_sub_account_trading(
-        self,
-        *,
-        start_time: int,
-        end_time: int,
-        page: int,
-        limit: int,
-        transfers: str | None = None,
-        transfer_function_account_type: str | None = None,
-        recv_window: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/managed-subaccount/query-trans-log.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#query-managed-sub-account-transfer-log-sub-account-trading
-        """
-        return await self._native_private(
-            "query_managed_sub_account_transfer_log_sub_account_trading",
-            self._params(
-                startTime=start_time,
-                endTime=end_time,
-                page=page,
-                limit=limit,
-                transfers=transfers,
-                transferFunctionAccountType=transfer_function_account_type,
-                recvWindow=recv_window,
-            ),
-        )
-
-    async def get_transferable_earn_asset_balance_for_portfolio_margin(
-        self, *, asset: str, transfer_type: str, recv_window: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        GET /sapi/v1/portfolio/earn-asset-balance.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/advanced-trading-derivatives-trading-portfolio-margin-pro/api/rest-api/account#get-transferable-earn-asset-balance-for-portfolio-margin
-        """
-        return await self._native_private(
-            "get_transferable_earn_asset_balance_for_portfolio_margin",
-            self._params(asset=asset, transferType=transfer_type, recvWindow=recv_window),
-        )
-
-    async def transfer_ldusdt_rwusd_for_portfolio_margin(
-        self, *, asset: str, transfer_type: str, amount: str, recv_window: int | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        POST /sapi/v1/portfolio/earn-asset-transfer.
-
-        Native symbols; decimal amounts are strings. Exchange eligibility applies.
-        Source: https://developers.binance.com/en/docs/catalog/advanced-trading-derivatives-trading-portfolio-margin-pro/api/rest-api/account#transfer-ldusdt-rwusd-for-portfolio-margin
-        """
-        return await self._native_private(
-            "transfer_ldusdt_rwusd_for_portfolio_margin",
-            self._params(
-                asset=asset, transferType=transfer_type, amount=amount, recvWindow=recv_window
-            ),
-        )
-
     async def enable_isolated_margin_account(
         self, *, symbol: str, recv_window: int | None = None
     ) -> dict[str, Any]:
@@ -7956,145 +7465,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def withdraw_managed_sub_account(
-        self,
-        *,
-        from_email: str,
-        asset: str,
-        amount: str,
-        transfer_date: int | None = None,
-        recv_window: int | None = None,
-    ) -> dict:
-        """
-        POST /sapi/v1/managed-subaccount/withdraw.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        transfer_date schedules execution at the specified UTC date.
-
-        https://developers.binance.com/en/docs/catalog/vip-and-institutional-sub-account/api/rest-api/managed-sub-account#withdrawl-assets-from-the-managed-sub-account
-        """
-        return await self._native_private(
-            "withdraw_managed_sub_account",
-            self._params(
-                fromEmail=from_email,
-                asset=asset,
-                amount=amount,
-                transferDate=transfer_date,
-                recvWindow=recv_window,
-            ),
-        )
-
-    async def disable_fast_withdraw_switch(
-        self,
-        *,
-        recv_window: int | None = None,
-    ) -> dict:
-        """
-        POST /sapi/v1/account/disableFastWithdrawSwitch.
-
-        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#disable-fast-withdraw-switch
-        """
-        return await self._native_private(
-            "disable_fast_withdraw_switch",
-            self._params(
-                recvWindow=recv_window,
-            ),
-        )
-
-    async def enable_fast_withdraw_switch(
-        self,
-        *,
-        recv_window: int | None = None,
-    ) -> dict:
-        """
-        POST /sapi/v1/account/enableFastWithdrawSwitch.
-
-        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/account#enable-fast-withdraw-switch
-        """
-        return await self._native_private(
-            "enable_fast_withdraw_switch",
-            self._params(
-                recvWindow=recv_window,
-            ),
-        )
-
-    async def create_withdrawal(
-        self,
-        *,
-        coin: str,
-        address: str,
-        amount: str,
-        withdraw_order_id: str | None = None,
-        network: str | None = None,
-        address_tag: str | None = None,
-        transaction_fee_flag: bool | None = None,
-        name: str | None = None,
-        wallet_type: int | None = None,
-        recv_window: int | None = None,
-    ) -> dict:
-        """
-        POST /sapi/v1/capital/withdraw/apply.
-
-        API withdrawals have no second confirmation; they execute on submit.
-
-        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/capital#withdraw
-        """
-        return await self._native_private(
-            "create_withdrawal",
-            self._params(
-                coin=coin,
-                address=address,
-                amount=amount,
-                withdrawOrderId=withdraw_order_id,
-                network=network,
-                addressTag=address_tag,
-                transactionFeeFlag=transaction_fee_flag,
-                name=name,
-                walletType=wallet_type,
-                recvWindow=recv_window,
-            ),
-        )
-
-    async def create_broker_withdrawal(
-        self,
-        *,
-        address: str,
-        coin: str,
-        amount: str,
-        withdraw_order_id: str,
-        questionnaire: dict[str, Any],
-        originator_pii: dict[str, Any],
-        address_tag: str | None = None,
-        network: str | None = None,
-        address_name: str | None = None,
-        transaction_fee_flag: bool | None = None,
-        wallet_type: int | None = None,
-    ) -> dict:
-        """
-        POST /sapi/v1/localentity/broker/withdraw/apply.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Pass JSON objects; URL encoding is applied exactly once by the transport.
-
-        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#broker-withdraw
-        """
-        return await self._native_private(
-            "create_broker_withdrawal",
-            self._params(
-                address=address,
-                coin=coin,
-                amount=amount,
-                withdrawOrderId=withdraw_order_id,
-                questionnaire=dumps(questionnaire, separators=(",", ":"), allow_nan=False),
-                originatorPii=dumps(originator_pii, separators=(",", ":"), allow_nan=False),
-                addressTag=address_tag,
-                network=network,
-                addressName=address_name,
-                transactionFeeFlag=transaction_fee_flag,
-                walletType=wallet_type,
-            ),
-        )
-
     async def submit_broker_deposit_questionnaire(
         self,
         *,
@@ -8126,45 +7496,5 @@ class TradeHTTP(HTTPManager):
                 amount=amount,
                 address=address,
                 addressTag=address_tag,
-            ),
-        )
-
-    async def create_travel_rule_withdrawal(
-        self,
-        *,
-        coin: str,
-        address: str,
-        amount: str,
-        questionnaire: dict[str, Any],
-        withdraw_order_id: str | None = None,
-        network: str | None = None,
-        address_tag: str | None = None,
-        transaction_fee_flag: bool | None = None,
-        name: str | None = None,
-        wallet_type: int | None = None,
-        recv_window: int | None = None,
-    ) -> dict:
-        """
-        POST /sapi/v1/localentity/withdraw/apply.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Pass JSON objects; URL encoding is applied exactly once by the transport.
-
-        https://developers.binance.com/en/docs/catalog/core-trading-wallet/api/rest-api/travel-rule#withdraw-travel-rule
-        """
-        return await self._native_private(
-            "create_travel_rule_withdrawal",
-            self._params(
-                coin=coin,
-                address=address,
-                amount=amount,
-                questionnaire=dumps(questionnaire, separators=(",", ":"), allow_nan=False),
-                withdrawOrderId=withdraw_order_id,
-                network=network,
-                addressTag=address_tag,
-                transactionFeeFlag=transaction_fee_flag,
-                name=name,
-                walletType=wallet_type,
-                recvWindow=recv_window,
             ),
         )

@@ -1,14 +1,11 @@
-use serde_json::Value;
+pub(in crate::exchanges::okx) use serde_json::Value;
 
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::okx) use crate::Result;
+pub(in crate::exchanges::okx) use crate::exchange::ValidatedResponse;
 
-use super::client::OkxClient;
-use super::endpoints::*;
-use super::params::{
-    OkxParams, insert_optional_bool, insert_optional_string, okx_account_id, push_optional_owned,
-    validate_deposit_withdraw_status,
-};
+pub(in crate::exchanges::okx) use super::client::OkxClient;
+pub(in crate::exchanges::okx) use super::endpoints::*;
+pub(in crate::exchanges::okx) use super::params::{OkxParams, push_optional_owned};
 
 impl OkxClient {
     pub(super) async fn asset_private_request(
@@ -32,29 +29,10 @@ impl OkxClient {
                 push_optional_owned(&mut query, "ccy", params.csv("ccy")?);
                 self.get_request(ASSET_VALUATION, query).await
             }
-            "funds_transfer" => {
-                let mut body = params.required_body(&["ccy", "amt"])?;
-                body.insert(
-                    "from".to_string(),
-                    Value::String(okx_account_id(params.required("from_account")?).to_string()),
-                );
-                body.insert(
-                    "to".to_string(),
-                    Value::String(okx_account_id(params.required("to_account")?).to_string()),
-                );
-                for key in ["type", "subAcct", "clientId"] {
-                    insert_optional_string(&mut body, key, params.get(key));
-                }
-                insert_optional_bool(&mut body, "loanTrans", params.get("loanTrans"))?;
-                insert_optional_bool(&mut body, "omitPosRisk", params.get("omitPosRisk"))?;
-                self.post_request(ASSET_TRANSFER, Value::Object(body)).await
-            }
+            "funds_transfer" => self.moved_asset_funds_transfer(method_name, params).await,
             "get_transfer_state" => {
-                self.get_request(
-                    ASSET_TRANSFER_STATE,
-                    params.only(&["transId", "clientId", "type"]),
-                )
-                .await
+                self.moved_asset_get_transfer_state(method_name, params)
+                    .await
             }
             "get_bills" => {
                 self.get_request(
@@ -86,12 +64,8 @@ impl OkxClient {
                 .await
             }
             "get_deposit_withdraw_status" => {
-                validate_deposit_withdraw_status(params)?;
-                self.get_request(
-                    ASSET_DEPOSIT_WITHDRAW_STATUS,
-                    params.only(&["wdId", "txId", "ccy", "to", "chain"]),
-                )
-                .await
+                self.moved_asset_get_deposit_withdraw_status(method_name, params)
+                    .await
             }
             "get_exchange_list" => self.get_request(ASSET_EXCHANGE_LIST, Vec::new()).await,
             "post_monthly_statement" => {

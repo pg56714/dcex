@@ -1,142 +1,208 @@
-//! Transfers operations.
-use serde_json::{Value, json};
+//! Transfers between owned accounts.
 
-use crate::exchange::ValidatedResponse;
-use crate::exchanges::hyperliquid::client::HyperliquidClient;
-use crate::exchanges::hyperliquid::params::HyperliquidParams;
-use crate::exchanges::hyperliquid::trade::user_signed_fields;
-use crate::http::HttpMethod;
-use crate::{DcexError, Result};
+mod from_trade_hyperliquidclient {
+    use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
+    use crate::exchanges::hyperliquid::client::HyperliquidClient;
+    use crate::exchanges::hyperliquid::endpoints::EXCHANGE;
+    use crate::exchanges::hyperliquid::msgpack::encode_msgpack;
+    use crate::exchanges::hyperliquid::params::HyperliquidParams;
+    use crate::exchanges::hyperliquid::trade::*;
+    use crate::http::HttpMethod;
+    use crate::{DcexError, Result};
 
-impl HyperliquidClient {
-    pub(in crate::exchanges::hyperliquid) async fn transfers_schema_request(
-        &self,
-        method: &str,
-        params: &HyperliquidParams,
-    ) -> Result<Option<ValidatedResponse>> {
-        let (kind, fields): (&str, &[&str]) = match method {
-            "send_asset_signed" => (
-                "sendAsset",
-                &[
-                    "destination",
-                    "sourceDex",
-                    "destinationDex",
-                    "token",
-                    "amount",
-                    "fromSubAccount",
-                ],
-            ),
-            "send_usd_signed" => ("usdSend", &["destination", "amount"]),
-            "send_spot_signed" => ("spotSend", &["destination", "token", "amount"]),
-            "withdraw_from_bridge_signed" => ("withdraw3", &["destination", "amount"]),
-            "send_to_evm_with_data_signed" => ("sendToEvmWithData", &["action"]),
-            _ => return Ok(None),
-        };
-        let mut allowed = fields.to_vec();
-        allowed.extend(["nonce", "signature", "signatureChainId"]);
-        params.ensure_allowed(&allowed)?;
-        let (nonce, chain, signature) = user_signed_fields(params)?;
-        let network = if self.is_testnet() {
-            "Testnet"
-        } else {
-            "Mainnet"
-        };
-        let mut action = json!({"type":kind, "hyperliquidChain":network, "signatureChainId":chain});
-        if kind == "sendToEvmWithData" {
-            action = serde_json::from_str(params.required("action")?)
-                .map_err(|_| DcexError::InvalidInput("action must be a JSON object".into()))?;
-            let object = action
-                .as_object()
-                .ok_or_else(|| DcexError::InvalidInput("action must be a JSON object".into()))?;
-            let expected = [
-                "type",
-                "hyperliquidChain",
-                "signatureChainId",
-                "token",
-                "amount",
-                "sourceDex",
-                "destinationRecipient",
-                "addressEncoding",
-                "destinationChainId",
-                "gasLimit",
-                "data",
-                "nonce",
-            ];
-            if object.len() != expected.len()
-                || expected.iter().any(|k| !object.contains_key(*k))
-                || action["type"] != kind
-                || action["hyperliquidChain"] != network
-                || action["signatureChainId"] != chain
-                || action["nonce"].as_u64() != Some(nonce)
-            {
-                return Err(DcexError::InvalidInput("sendToEvmWithData requires the documented action fields and matching network, chain ID and nonce".into()));
-            }
-            for key in [
-                "token",
-                "amount",
-                "sourceDex",
-                "destinationRecipient",
-                "addressEncoding",
-            ] {
-                if action[key]
-                    .as_str()
-                    .is_none_or(|s| s.is_empty() && key != "sourceDex")
-                {
-                    return Err(DcexError::InvalidInput(format!("{key} must be a string")));
-                }
-            }
-            if !matches!(action["addressEncoding"].as_str(), Some("hex" | "base58"))
-                || action["destinationChainId"]
-                    .as_u64()
-                    .is_none_or(|n| n > u32::MAX as u64)
-                || action["gasLimit"].as_u64().is_none()
-            {
+    impl HyperliquidClient {
+        pub(in crate::exchanges::hyperliquid) async fn transfer_between_dexes_from_params(
+            &self,
+            params: &HyperliquidParams,
+        ) -> Result<ValidatedResponse> {
+            let source_dex = params.get("sourceDex").unwrap_or("");
+            let destination_dex = params.get("destinationDex").unwrap_or("");
+            if source_dex == destination_dex {
                 return Err(DcexError::InvalidInput(
-                    "invalid addressEncoding, destinationChainId or gasLimit".into(),
+                    "Hyperliquid internal transfer requires distinct source and destination DEXes"
+                        .to_string(),
                 ));
             }
-            // Preserve caller-signed data; the API table describes bytes but does
-            // not specify a JSON encoding or publish an SDK signer for this action.
-        } else {
-            for key in fields {
-                let raw = params.get(key).ok_or_else(|| {
-                    DcexError::InvalidInput(format!("missing required parameter: {key}"))
-                })?;
-                if raw.is_empty()
-                    && !["sourceDex", "destinationDex", "fromSubAccount"].contains(key)
-                {
-                    return Err(DcexError::InvalidInput(format!("{key} must not be empty")));
-                }
-                if ["destination", "builder", "fromSubAccount"].contains(key) && !raw.is_empty() {
-                    params.address(key)?;
-                }
-                // EIP-712 uses strings for some addresses: never lowercase or
-                // otherwise rewrite a caller-signed value.
-                action[*key] = raw.into();
-            }
-            let timestamp_key = if matches!(kind, "usdSend" | "spotSend" | "withdraw3") {
-                "time"
+            let destination = self.wallet_address.as_deref().ok_or_else(|| {
+                DcexError::InvalidInput(
+                    "Hyperliquid internal transfer requires wallet address".to_string(),
+                )
+            })?;
+            let token = params.required("token")?;
+            let amount = params.positive_decimal("amount")?;
+            let nonce = unix_timestamp_ms()?;
+            let action = object(vec![
+                ("type", string("agentSendAsset")),
+                ("destination", string(destination)),
+                ("sourceDex", string(source_dex)),
+                ("destinationDex", string(destination_dex)),
+                ("token", string(token)),
+                ("amount", string(amount)),
+                ("fromSubAccount", string("")),
+                ("nonce", uint(nonce)),
+            ]);
+            let payload = serde_json::json!({"action": action.to_json()});
+            self.exchange_payload_at_nonce(payload, encode_msgpack(&action), nonce)
+                .await
+        }
+
+        pub(in crate::exchanges::hyperliquid) async fn transfer_usdc_spot_perp_from_params(
+            &self,
+            params: &HyperliquidParams,
+        ) -> Result<ValidatedResponse> {
+            let amount = params.positive_decimal("amount")?;
+            let to_perp = params.required_bool("toPerp")?;
+            let (nonce, signature_chain_id, signature) = user_signed_fields(params)?;
+            let chain = if self.is_testnet() {
+                "Testnet"
             } else {
-                "nonce"
+                "Mainnet"
             };
-            action[timestamp_key] = nonce.into();
+            let payload = serde_json::json!({
+                "action": {
+                    "type": "usdClassTransfer",
+                    "hyperliquidChain": chain,
+                    "signatureChainId": signature_chain_id,
+                    "amount": amount,
+                    "toPerp": to_perp,
+                    "nonce": nonce,
+                },
+                "nonce": nonce,
+                "signature": signature,
+            });
+            let body = serde_json::to_vec(&payload)
+                .map_err(|error| DcexError::Decode(error.to_string()))?;
+            self.request(HttpMethod::Post, EXCHANGE, body, None, false)
+                .await
         }
-        if let Some(amount) = action.get("amount").and_then(Value::as_str)
-            && !crate::common::is_positive_plain_decimal(amount)
-        {
-            return Err(DcexError::InvalidInput(
-                "amount must be a positive plain decimal string".into(),
-            ));
+    }
+}
+
+mod from_direct_dispatch {
+    use crate::exchanges::hyperliquid::trade::*;
+    impl HyperliquidClient {
+        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_sub_account_usd(
+            &self,
+            params: &HyperliquidParams,
+        ) -> Result<ValidatedResponse> {
+            {
+                if params.required_u64("usd")? == 0 {
+                    return Err(DcexError::InvalidInput("usd must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("subAccountTransfer")),
+                        ("subAccountUser", string(&params.address("subAccountUser")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                        ("usd", uint(params.required_u64("usd")?)),
+                    ]),
+                    params,
+                )
+                .await
+            }
         }
-        let payload = json!({"action":action,"nonce":nonce,"signature":signature});
-        self.request(
-            HttpMethod::Post,
-            crate::exchanges::hyperliquid::endpoints::EXCHANGE,
-            serde_json::to_vec(&payload).map_err(|e| DcexError::Decode(e.to_string()))?,
-            None,
-            false,
-        )
-        .await
-        .map(Some)
+        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_sub_account_spot(
+            &self,
+            params: &HyperliquidParams,
+        ) -> Result<ValidatedResponse> {
+            {
+                if !params
+                    .required("amount")?
+                    .parse::<f64>()
+                    .is_ok_and(|v| v.is_finite() && v > 0.0)
+                {
+                    return Err(DcexError::InvalidInput("amount must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("subAccountSpotTransfer")),
+                        ("subAccountUser", string(&params.address("subAccountUser")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                        ("token", string(params.required("token")?)),
+                        ("amount", string(params.required("amount")?)),
+                    ]),
+                    params,
+                )
+                .await
+            }
+        }
+        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_vault_usd(
+            &self,
+            params: &HyperliquidParams,
+        ) -> Result<ValidatedResponse> {
+            {
+                if params.required_u64("usd")? == 0 {
+                    return Err(DcexError::InvalidInput("amount must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("vaultTransfer")),
+                        ("vaultAddress", string(&params.address("targetVault")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                        ("usd", uint(params.required_u64("usd")?)),
+                    ]),
+                    params,
+                )
+                .await
+            }
+        }
+        pub(in crate::exchanges::hyperliquid) async fn moved_transfer_hip3_liquidator(
+            &self,
+            params: &HyperliquidParams,
+        ) -> Result<ValidatedResponse> {
+            {
+                if params.required_u64("ntl")? == 0 {
+                    return Err(DcexError::InvalidInput("amount must be positive".into()));
+                }
+                self.submit_action(
+                    object(vec![
+                        ("type", string("hip3LiquidatorTransfer")),
+                        ("dex", string(params.required("dex")?)),
+                        ("ntl", uint(params.required_u64("ntl")?)),
+                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
+                    ]),
+                    params,
+                )
+                .await
+            }
+        }
+    }
+}
+
+mod wrappers_from_wrappers {
+    use crate::exchanges::hyperliquid::HyperliquidClient;
+    crate::exchanges::impl_exchange_method_wrappers! {
+     @extend; HyperliquidClient;
+     public [
+
+     ];
+     private [
+    transfer_between_dexes(
+                source_dex => "sourceDex",
+                destination_dex => "destinationDex",
+                token => "token",
+                amount => "amount"
+            ),
+    transfer_usdc_spot_perp(
+                amount => "amount",
+                to_perp => "toPerp",
+                nonce => "nonce",
+                signature => "signature",
+                signature_chain_id => "signatureChainId"
+            ),
+    transfer_vault_usd(target_vault => "targetVault", is_deposit => "isDeposit", usd => "usd"),
+    transfer_hip3_liquidator(dex => "dex", ntl => "ntl", is_deposit => "isDeposit"),
+    transfer_sub_account_usd(
+                sub_account_user => "subAccountUser",
+                is_deposit => "isDeposit",
+                usd => "usd"
+            ),
+    transfer_sub_account_spot(
+                sub_account_user => "subAccountUser",
+                is_deposit => "isDeposit",
+                token => "token",
+                amount => "amount"
+            )
+     ];
     }
 }

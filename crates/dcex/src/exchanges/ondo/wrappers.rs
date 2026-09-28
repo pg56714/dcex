@@ -14,13 +14,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_mark_prices(), get_open_interest(), get_volume(), get_contracts()
     ];
     private [
-        /// API withdrawals and external transfers have no second confirmation; they execute on submit.
-        create_withdrawal(customer_withdrawal_id => "customer_withdrawal_id", symbol => "symbol", network => "network", amount => "amount", address => "address"),
-        sandbox_withdrawal(customer_withdrawal_id => "customer_withdrawal_id", symbol => "symbol", amount => "amount", from_account => "from"),
+
         invalidate_jwt(),
         get_account(), get_open_order_counts(), get_deposits(),
         get_deposit(deposit_id => "depositID"), get_withdrawals(),
-        get_withdrawal_limits(), get_withdrawal(withdrawal_id => "withdrawalID"),
+get_withdrawal(withdrawal_id => "withdrawalID"),
         get_deposit_addresses(coins => "coins"),
         export_deposits_csv(), export_withdrawals_csv(),
         get_address_book(), list_api_keys(), get_positions(), get_balance(),
@@ -28,7 +26,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         complete_address_book_challenge(id => "id", signature => "signature"),
         sandbox_deposit(amount => "amount", symbol => "symbol", deposit_destination => "deposit_destination", chain_id => "chain_id"),
         provision_deposit_address(network => "network", symbol => "symbol", deposit_destination => "deposit_destination"),
-        get_withdrawal_status(),
+
         edit_address_book_entry(withdrawal_address => "withdrawalAddress"),
         remove_address_book_entry(withdrawal_address => "withdrawalAddress"),
         create_api_key(name => "name", scopes => "scopes"),
@@ -43,7 +41,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_portfolio_summary(), get_portfolio_summary_graph(),
         get_orders(), get_open_orders(), place_order(market => "market", side => "side"),
         cancel_all_orders(), cancel_open_orders(),
-        place_batch_orders(orders => "orders"), batch_cancel_orders(order_ids => "orderIDs"),
+batch_cancel_orders(order_ids => "orderIDs"),
         place_twap_order(market => "market", side => "side", size => "size", running_time => "runningTime", frequency => "frequency"),
         get_twap_order(order_id => "orderID"), cancel_twap_order(order_id => "orderID"),
         get_twap_order_fills(order_id => "orderID"), get_running_twap_orders(),

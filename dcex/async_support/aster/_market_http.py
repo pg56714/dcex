@@ -7,9 +7,10 @@ from dcex._schema_codec import normalize_params
 from ..._native_http import request_native_json_async
 from ...utils.common import Common
 from ._http_manager import HTTPManager
+from ._withdrawals_http import MarketHTTPWithdrawalsHTTP
 
 
-class MarketHTTP(HTTPManager):
+class MarketHTTP(MarketHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Aster V3 public market APIs."""
 
     async def _native_public(
@@ -360,17 +361,6 @@ class MarketHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol),
         )
 
-    async def get_spot_withdraw_fee(
-        self,
-        chainId: str,
-        asset: str,
-    ) -> dict[str, Any] | list[Any]:
-        """Estimate the public Aster withdrawal fee without creating a withdrawal."""
-        return await self._native_public(
-            "get_spot_withdraw_fee",
-            self._params(chainId=chainId, asset=asset),
-        )
-
     async def get_futures_premium_index(
         self,
         product_symbol: str | None = None,
@@ -554,12 +544,6 @@ class MarketHTTP(HTTPManager):
     async def get_chain_locked_aster(self) -> Any:  # noqa: ANN401
         """Query the total ASTER locked in 208-week staking positions."""
         return await self._native_public("get_chain_locked_aster", self._params())
-
-    async def get_chain_withdraw_fee(self, *, chain_id: int, asset: str) -> Any:  # noqa: ANN401
-        """Estimate the Aster Chain withdrawal fee for an asset and chain."""
-        return await self._native_public(
-            "get_chain_withdraw_fee", self._params(chainId=chain_id, asset=asset)
-        )
 
     async def get_announcement(self, *, id: int) -> Any:  # noqa: ANN401
         """Get a public Aster announcement by its numeric ID."""

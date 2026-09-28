@@ -8,7 +8,6 @@ crate::exchanges::impl_exchange_method_wrappers! {
         classic_instloan_account_get_ltv(),
         classic_instloan_account_bind_risk_unit(uid => "uid", operate => "operate"),
         classic_instloan_account_get_risk_unit(),
-        classic_instloan_account_get_transferred_amount_from_spot_account(coin => "coin"),
         classic_instloan_orders_get_loan_orders(),
         classic_instloan_orders_get_repayment_orders(),
         classic_instloan_public_get_product_info(product_id => "productId"),
@@ -22,6 +21,5 @@ crate::exchanges::impl_exchange_method_wrappers! {
         institutional_loan_get_repayment_orders(),
         institutional_loan_get_risk_unit(),
         institutional_loan_get_trade_symbols(product_id => "productId"),
-        institutional_loan_get_transferred_quantity(coin => "coin"),
     ];
 }

@@ -4,10 +4,12 @@ import json
 from json import dumps
 from typing import Any
 
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """Async HTTP client for Lighter signed trading APIs."""
 
     async def create_rfq(
@@ -47,14 +49,6 @@ class TradeHTTP(HTTPManager):
     ) -> dict[str, Any] | list[Any]:
         """Submit a signed Lighter transaction."""
         return await self._native_private("send_tx", self._native_params(**locals()))
-
-    async def send_tx_batch(
-        self,
-        tx_types: str,
-        tx_infos: str,
-    ) -> dict[str, Any] | list[Any]:
-        """Submit a batch of signed Lighter transactions."""
-        return await self._native_private("send_tx_batch", self._native_params(**locals()))
 
     async def sign_create_order(
         self,
@@ -680,53 +674,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def transfer_l2_account(
-        self,
-        *,
-        to_account_index: int,
-        asset_index: int,
-        from_route_type: int,
-        to_route_type: int,
-        amount: int,
-        usdc_fee: int = 0,
-        memo_hex: str | None = None,
-        skip_nonce: int = 0,
-        nonce: int | None = None,
-        api_key_index: int | None = None,
-        price_protection: bool | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """
-        Transfer between L2 account indices using raw integer amount and fee units.
-
-        The recipient may be another user. Transfers have no second confirmation;
-        they execute on submit. Account-family membership is not verified locally.
-        The exchange enforces eligibility.
-        """
-        return await self._native_private("transfer_l2_account", self._native_params(**locals()))
-
-    async def sign_transfer_l2_account(
-        self,
-        *,
-        to_account_index: int,
-        asset_index: int,
-        from_route_type: int,
-        to_route_type: int,
-        amount: int,
-        usdc_fee: int = 0,
-        memo_hex: str | None = None,
-        skip_nonce: int = 0,
-        nonce: int | None = None,
-        api_key_index: int | None = None,
-    ) -> tuple[Any, Any, Any, Any]:
-        """
-        Transfer between L2 account indices using raw integer amount and fee units.
-
-        The recipient may be another user. Transfers have no second confirmation;
-        they execute on submit. Account-family membership is not verified locally.
-        The exchange enforces eligibility.
-        """
-        return await self._native_sign("sign_transfer_l2_account", self._native_params(**locals()))
-
     async def set_maker_only_api_keys(
         self, *, account_index: int, api_key_indexes: list[int], authorization: str | None = None
     ) -> dict[str, Any] | list[Any]:
@@ -739,26 +686,6 @@ class TradeHTTP(HTTPManager):
                 authorization=authorization,
             ),
         )
-
-    transfer_same_master_account = transfer_l2_account
-    sign_transfer_same_master_account = sign_transfer_l2_account
-
-    async def submit_fast_withdrawal(
-        self,
-        *,
-        tx_info: str,
-        to_address: str,
-        authorization: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """
-        POST /api/v1/fastwithdraw.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        tx_info must be an already signed L2 transfer to the fast-withdraw service.
-
-        https://apidocs.lighter.xyz/reference/fastwithdraw
-        """
-        return await self._native_private("submit_fast_withdrawal", self._native_params(**locals()))
 
     async def create_referral_code(
         self,
@@ -866,42 +793,6 @@ class TradeHTTP(HTTPManager):
         https://apidocs.lighter.xyz/reference/rfq_respond
         """
         return await self._native_private("respond_to_rfq", self._native_params(**locals()))
-
-    async def withdraw_l2(
-        self,
-        *,
-        asset_index: int,
-        route_type: int,
-        amount: int,
-        nonce: int | None = None,
-        api_key_index: int | None = None,
-        skip_nonce: int = 0,
-    ) -> dict[str, Any] | list[Any]:
-        """
-        Submit L2 withdrawal transaction 13; amount uses raw integer asset units.
-
-        API withdrawals have no second confirmation; they execute on submit.
-
-        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/withdraw.go
-        """
-        return await self._native_private("withdraw_l2", self._native_params(**locals()))
-
-    async def sign_withdraw_l2(
-        self,
-        *,
-        asset_index: int,
-        route_type: int,
-        amount: int,
-        nonce: int | None = None,
-        api_key_index: int | None = None,
-        skip_nonce: int = 0,
-    ) -> tuple[Any, Any, Any, Any]:
-        """
-        Sign L2 withdrawal transaction 13; amount uses raw integer asset units.
-
-        https://github.com/elliottech/lighter-go/blob/main/types/txtypes/withdraw.go
-        """
-        return await self._native_sign("sign_withdraw_l2", self._native_params(**locals()))
 
     async def approve_integrator(
         self,

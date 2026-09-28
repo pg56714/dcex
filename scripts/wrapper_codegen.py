@@ -41,6 +41,14 @@ def generated_endpoints(exchange: str) -> set[str]:
     )
 
 
+def wrapper_domains(exchange: str) -> dict[str, str]:
+    """Apply source-module ownership independently of request schema catalogs."""
+    domains = endpoint_domains(exchange)
+    overrides = json.loads((ROOT / "scripts/fund_module_domains.json").read_text(encoding="utf-8"))
+    domains.update(overrides.get(exchange, {}))
+    return domains
+
+
 def load_schemas(exchange: str) -> list[dict[str, Any]]:
     """Read the generated surface from its committed business schema files."""
     names = generated_endpoints(exchange)
@@ -69,7 +77,7 @@ def write_schemas(exchange: str, endpoints: list[dict[str, Any]]) -> None:
 
 def write_rust_wrappers(exchange: str, source: str) -> None:
     """Partition explicit method declarations without changing their parameters."""
-    domains = endpoint_domains(exchange)
+    domains = wrapper_domains(exchange)
     groups: dict[str, dict[str, list[str]]] = defaultdict(lambda: {"public": [], "private": []})
     client = re.search(r"@extend;\s*(\w+);", source)
     if client is None:
@@ -116,7 +124,7 @@ def write_rust_wrappers(exchange: str, source: str) -> None:
 
 def write_python_wrappers(exchange: str, asynchronous: bool, source: str) -> None:
     """Generate domain mixins and preserve the original handwritten base order."""
-    domains = endpoint_domains(exchange)
+    domains = wrapper_domains(exchange)
     tree = ast.parse(source)
     cls = next(node for node in tree.body if isinstance(node, ast.ClassDef))
     bases = [ast.unparse(base) for base in cls.bases]

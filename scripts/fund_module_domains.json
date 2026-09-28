@@ -1,0 +1,63 @@
+{
+  "arcus": {},
+  "binance": {
+    "disable_fast_withdraw_switch": "withdrawals",
+    "enable_fast_withdraw_switch": "withdrawals",
+    "create_broker_withdrawal": "withdrawals",
+    "create_travel_rule_withdrawal": "withdrawals",
+    "fiat_withdraw": "withdrawals",
+    "get_fiat_deposit_withdraw_history": "withdrawals",
+    "prediction_batch_redeem": "batch",
+    "prediction_batch_cancel_orders": "batch",
+    "prediction_apply_mm_withdraw": "withdrawals",
+    "prediction_create_inbound_transfer": "transfers",
+    "prediction_create_outbound_transfer": "transfers",
+    "prediction_query_transfer_list": "transfers",
+    "prediction_query_transfer_status": "transfers"
+  },
+  "bingx": {},
+  "bitget": {
+    "broker_get_all_subaccount_deposit_withdrawal": "withdrawals",
+    "broker_subaccount_withdrawal": "withdrawals",
+    "cfd_account_transfer": "transfers",
+    "cfd_account_get_transfer_records": "transfers",
+    "classic_broker_subaccount_subaccount_withdraw": "withdrawals",
+    "classic_broker_subaccount_subaccount_deposit_auto_transfer": "transfers",
+    "classic_broker_subaccount_subaccount_withdrawal_records": "withdrawals",
+    "classic_broker_subaccount_get_subaccount_all_deposit_withdrawal_records": "withdrawals",
+    "classic_instloan_account_get_transferred_amount_from_spot_account": "transfers",
+    "copy_trading_follower_copy_transfer": "transfers",
+    "copy_trading_follower_get_copy_transfer_record": "transfers",
+    "copy_trading_public_private_get_max_transferable": "transfers",
+    "copy_trading_public_private_transfer": "transfers",
+    "copy_trading_public_private_get_transfer_record": "transfers",
+    "institutional_loan_get_transferred_quantity": "transfers",
+    "stock_plus_assets_transfer": "transfers",
+    "stock_plus_assets_get_transfer_records": "transfers"
+  },
+  "bybit": {
+    "request_earn_pwm_fund_transfer": "transfers",
+    "get_earn_pwm_query_fund_transfer_result": "transfers"
+  },
+  "hyperliquid": {},
+  "kraken": {},
+  "kucoin": {
+    "post_v2_broker_withdrawal": "withdrawals",
+    "post_v1_broker_nd_transfer": "transfers",
+    "get_v3_broker_nd_transfer_detail": "transfers",
+    "get_v3_broker_nd_withdraw_detail": "withdrawals",
+    "get_v1_copy_trade_futures_position_margin_max_withdraw_margin": "withdrawals",
+    "post_v1_copy_trade_futures_position_margin_withdraw_margin": "withdrawals"
+  },
+  "lighter": {
+    "submit_fast_withdrawal": "withdrawals"
+  },
+  "mexc": {
+    "get_rebate_affiliate_withdraw": "withdrawals"
+  },
+  "okx": {
+    "cancel_rfq_batch_quotes": "batch",
+    "create_fiat_withdrawal": "withdrawals",
+    "cancel_fiat_withdrawal": "withdrawals"
+  }
+}

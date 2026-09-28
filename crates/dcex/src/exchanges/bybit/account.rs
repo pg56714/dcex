@@ -1,10 +1,12 @@
-use serde_json::{Map, Value};
+pub(in crate::exchanges::bybit) use serde_json::{Map, Value};
 
-use super::client::BybitClient;
-use super::endpoints::*;
-use super::params::{BybitParams, insert_optional_string, push_optional};
-use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::bybit) use super::client::BybitClient;
+pub(in crate::exchanges::bybit) use super::endpoints::*;
+pub(in crate::exchanges::bybit) use super::params::{
+    BybitParams, insert_optional_string, push_optional,
+};
+pub(in crate::exchanges::bybit) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::bybit) use crate::{DcexError, Result};
 
 impl BybitClient {
     pub(super) async fn account_private_request(
@@ -48,23 +50,8 @@ impl BybitClient {
                 self.get_request(GET_WALLET_BALANCE, query).await
             }
             "get_transferable_amount" => {
-                let coins = params.required("coins")?;
-                if coins.is_empty() {
-                    return Err(DcexError::InvalidInput(
-                        "coins must contain at least one coin.".to_string(),
-                    ));
-                }
-                let count = coins.split(',').filter(|coin| !coin.is_empty()).count();
-                if count > 20 {
-                    return Err(DcexError::InvalidInput(
-                        "coins must contain no more than 20 coins.".to_string(),
-                    ));
-                }
-                self.get_request(
-                    GET_TRANSFERABLE_AMOUNT,
-                    vec![("coinName".to_string(), coins.to_string())],
-                )
-                .await
+                self.moved_account_get_transferable_amount(method_name, params)
+                    .await
             }
             "upgrade_to_unified_trading_account" => {
                 self.post_request(UPGRADE_TO_UNIFIED_ACCOUNT, Map::new())

@@ -23,12 +23,12 @@ crate::exchanges::impl_exchange_method_wrappers! {
         keep_alive_pm_listen_key(),
         close_pm_listen_key(),
         cancel_replace_spot_order(product_symbol => "product_symbol", side => "side", order_type => "type", cancel_replace_mode => "cancelReplaceMode"),
-        place_futures_batch_orders(orders => "batchOrders"),
-        amend_futures_batch_orders(orders => "batchOrders"),
-        cancel_futures_batch_orders(product_symbol => "product_symbol"),
-        place_coin_futures_batch_orders(orders => "batchOrders"),
-        amend_coin_futures_batch_orders(orders => "batchOrders"),
-        cancel_coin_futures_batch_orders(product_symbol => "product_symbol"),
+
+
+
+
+
+
         get_spot_order_list(),
         get_spot_all_order_lists(),
         get_spot_open_order_lists(),

@@ -1,9 +1,9 @@
-use super::client::{BinanceClient, BinanceMarket};
-use super::endpoints::*;
-use super::params::PublicParams;
-use crate::Result;
-use crate::exchange::ValidatedResponse;
-use crate::http::HttpMethod;
+pub(in crate::exchanges::binance) use super::client::{BinanceClient, BinanceMarket};
+pub(in crate::exchanges::binance) use super::endpoints::*;
+pub(in crate::exchanges::binance) use super::params::PublicParams;
+pub(in crate::exchanges::binance) use crate::Result;
+pub(in crate::exchanges::binance) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::binance) use crate::http::HttpMethod;
 
 macro_rules! subaccount_query_methods {
     ($($name:ident),+ $(,)?) => {
@@ -16,7 +16,7 @@ macro_rules! subaccount_query_methods {
 }
 
 impl BinanceClient {
-    fn subaccount_request(
+    pub(in crate::exchanges::binance) fn subaccount_request(
         &self,
         method_name: &'static str,
         params: Vec<(String, String)>,
@@ -40,110 +40,6 @@ impl BinanceClient {
         get_subaccount_universal_transfer_history,
         get_subaccount_transfer_history,
     );
-
-    pub fn transfer_subaccount_futures(
-        &self,
-        email: &str,
-        asset: &str,
-        amount: &str,
-        transfer_type: u8,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.subaccount_request(
-            "transfer_subaccount_futures",
-            vec![
-                ("email".to_string(), email.to_string()),
-                ("asset".to_string(), asset.to_string()),
-                ("amount".to_string(), amount.to_string()),
-                ("type".to_string(), transfer_type.to_string()),
-            ],
-        )
-    }
-
-    pub fn transfer_subaccount_margin(
-        &self,
-        email: &str,
-        asset: &str,
-        amount: &str,
-        transfer_type: u8,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.subaccount_request(
-            "transfer_subaccount_margin",
-            vec![
-                ("email".to_string(), email.to_string()),
-                ("asset".to_string(), asset.to_string()),
-                ("amount".to_string(), amount.to_string()),
-                ("type".to_string(), transfer_type.to_string()),
-            ],
-        )
-    }
-
-    pub fn transfer_between_subaccount_futures(
-        &self,
-        from_email: &str,
-        to_email: &str,
-        futures_type: u8,
-        asset: &str,
-        amount: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.subaccount_request(
-            "transfer_between_subaccount_futures",
-            vec![
-                ("fromEmail".to_string(), from_email.to_string()),
-                ("toEmail".to_string(), to_email.to_string()),
-                ("futuresType".to_string(), futures_type.to_string()),
-                ("asset".to_string(), asset.to_string()),
-                ("amount".to_string(), amount.to_string()),
-            ],
-        )
-    }
-
-    pub fn transfer_subaccount_to_master(
-        &self,
-        asset: &str,
-        amount: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.subaccount_request(
-            "transfer_subaccount_to_master",
-            vec![
-                ("asset".to_string(), asset.to_string()),
-                ("amount".to_string(), amount.to_string()),
-            ],
-        )
-    }
-
-    pub fn transfer_subaccount_to_subaccount(
-        &self,
-        to_email: &str,
-        asset: &str,
-        amount: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.subaccount_request(
-            "transfer_subaccount_to_subaccount",
-            vec![
-                ("toEmail".to_string(), to_email.to_string()),
-                ("asset".to_string(), asset.to_string()),
-                ("amount".to_string(), amount.to_string()),
-            ],
-        )
-    }
-
-    pub fn transfer_between_subaccounts(
-        &self,
-        from_account_type: &str,
-        to_account_type: &str,
-        asset: &str,
-        amount: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        self.subaccount_request(
-            "transfer_between_subaccounts",
-            vec![
-                ("fromAccountType".to_string(), from_account_type.to_string()),
-                ("toAccountType".to_string(), to_account_type.to_string()),
-                ("asset".to_string(), asset.to_string()),
-                ("amount".to_string(), amount.to_string()),
-            ],
-        )
-    }
 
     pub(super) async fn subaccount_private_request(
         &self,

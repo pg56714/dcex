@@ -1,9 +1,9 @@
-use super::client::{BinanceClient, BinanceMarket};
-use super::endpoints::*;
-use super::params::{PublicParams, normalize_order_side};
-use crate::exchange::ValidatedResponse;
-use crate::http::HttpMethod;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::binance) use super::client::{BinanceClient, BinanceMarket};
+pub(in crate::exchanges::binance) use super::endpoints::*;
+pub(in crate::exchanges::binance) use super::params::{PublicParams, normalize_order_side};
+pub(in crate::exchanges::binance) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::binance) use crate::http::HttpMethod;
+pub(in crate::exchanges::binance) use crate::{DcexError, Result};
 
 impl BinanceClient {
     pub fn get_options_exchange_info(&self) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
@@ -176,28 +176,6 @@ impl BinanceClient {
         crate::exchanges::ExchangeMethodRequest::private(
             self,
             "cancel_all_options_orders",
-            vec![("product_symbol".to_string(), product_symbol.to_string())],
-        )
-    }
-
-    pub fn place_options_batch_orders(
-        &self,
-        orders: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "place_options_batch_orders",
-            vec![("orders".to_string(), orders.to_string())],
-        )
-    }
-
-    pub fn cancel_options_batch_orders(
-        &self,
-        product_symbol: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "cancel_options_batch_orders",
             vec![("product_symbol".to_string(), product_symbol.to_string())],
         )
     }
@@ -608,7 +586,7 @@ impl BinanceClient {
         Ok(Some(response))
     }
 
-    async fn options_signed_request(
+    pub(in crate::exchanges::binance) async fn options_signed_request(
         &self,
         method: HttpMethod,
         path: &str,
@@ -634,7 +612,10 @@ impl BinanceClient {
     }
 }
 
-fn options_symbol_query(params: &PublicParams, excluded: &[&str]) -> Vec<(String, String)> {
+pub(in crate::exchanges::binance) fn options_symbol_query(
+    params: &PublicParams,
+    excluded: &[&str],
+) -> Vec<(String, String)> {
     let mut all_excluded = excluded.to_vec();
     if !all_excluded.contains(&"product_symbol") {
         all_excluded.push("product_symbol");
@@ -646,7 +627,7 @@ fn options_symbol_query(params: &PublicParams, excluded: &[&str]) -> Vec<(String
     query
 }
 
-fn validate_options_order(params: &PublicParams) -> Result<()> {
+pub(in crate::exchanges::binance) fn validate_options_order(params: &PublicParams) -> Result<()> {
     params.ensure_allowed(&[
         "product_symbol",
         "side",
@@ -679,13 +660,18 @@ fn validate_options_order(params: &PublicParams) -> Result<()> {
     Ok(())
 }
 
-fn validate_options_order_lookup(params: &PublicParams) -> Result<()> {
+pub(in crate::exchanges::binance) fn validate_options_order_lookup(
+    params: &PublicParams,
+) -> Result<()> {
     params.ensure_allowed(&["product_symbol", "orderId", "clientOrderId", "recvWindow"])?;
     params.required("product_symbol")?;
     require_any(params, &["orderId", "clientOrderId"])
 }
 
-fn require_any(params: &PublicParams, keys: &[&str]) -> Result<()> {
+pub(in crate::exchanges::binance) fn require_any(
+    params: &PublicParams,
+    keys: &[&str],
+) -> Result<()> {
     if keys.iter().any(|key| params.get(key).is_some()) {
         Ok(())
     } else {
@@ -696,7 +682,10 @@ fn require_any(params: &PublicParams, keys: &[&str]) -> Result<()> {
     }
 }
 
-fn positive_decimal(params: &PublicParams, key: &str) -> Result<()> {
+pub(in crate::exchanges::binance) fn positive_decimal(
+    params: &PublicParams,
+    key: &str,
+) -> Result<()> {
     let value = params.required(key)?;
     let number = value.parse::<f64>().map_err(|error| {
         DcexError::InvalidInput(format!("invalid Binance decimal parameter {key}: {error}"))

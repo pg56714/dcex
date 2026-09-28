@@ -40,7 +40,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         update_account(),
         get_max_borrow_quantity(symbol => "symbol"),
         get_max_order_quantity(symbol => "symbol", side => "side"),
-        get_max_withdrawal_quantity(symbol => "symbol"),
+
         get_borrow_lend_positions(),
         get_borrow_history(),
         get_interest_history(),
@@ -50,7 +50,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_private_collateral(),
         get_deposits(),
         get_deposit_address(blockchain => "blockchain"),
-        get_withdrawals(),
+
         get_dust_conversion_history(),
         get_settlement_history(),
         get_open_order(product_symbol => "product_symbol"),
@@ -58,7 +58,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_market_order(product_symbol => "product_symbol", side => "side"),
         place_limit_order(product_symbol => "product_symbol", side => "side", quantity => "quantity", price => "price"),
         cancel_order(product_symbol => "product_symbol"),
-        place_batch_orders(orders => "orders"),
+
         get_open_orders(),
         cancel_open_orders(),
         get_fill_history(),

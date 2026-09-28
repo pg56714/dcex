@@ -87,11 +87,11 @@ get_contract_30_day_fee_statistics(),
         get_contract_risk_limits(),
         get_contract_stop_orders(),
         get_contract_trading_fee_rate(),
-        get_contract_transfer_records(),
+
         get_currency_info(),
         get_deposit_address(coin => "coin"),
         get_deposit_history(),
-        get_internal_transfer_history(),
+
         get_kyc_status(),
         get_spot_account(),
         get_spot_all_orders(product_symbol => "product_symbol"),
@@ -102,11 +102,11 @@ get_contract_30_day_fee_statistics(),
         get_spot_self_symbols(),
         get_spot_symbol_commission(product_symbol => "product_symbol"),
         get_subaccount_asset(sub_account => "subAccount", account_type => "accountType"),
-        get_subaccount_transfer_history(from_account_type => "fromAccountType", to_account_type => "toAccountType"),
+
         get_subaccounts(),
-        get_user_universal_transfer_by_id(tran_id => "tranId"),
-        get_user_universal_transfer_history(from_account_type => "fromAccountType", to_account_type => "toAccountType"),
-        get_withdraw_history(),
+
+
+
         place_contract_limit_buy_order(product_symbol => "product_symbol", price => "price", vol => "vol", open_type => "openType"),
         place_contract_limit_order(product_symbol => "product_symbol", side => "side", price => "price", vol => "vol", open_type => "openType"),
         place_contract_limit_sell_order(product_symbol => "product_symbol", price => "price", vol => "vol", open_type => "openType"),
@@ -117,7 +117,7 @@ get_contract_30_day_fee_statistics(),
         place_contract_post_only_buy_order(product_symbol => "product_symbol", price => "price", vol => "vol", open_type => "openType"),
         place_contract_post_only_order(product_symbol => "product_symbol", side => "side", price => "price", vol => "vol", open_type => "openType"),
         place_contract_post_only_sell_order(product_symbol => "product_symbol", price => "price", vol => "vol", open_type => "openType"),
-        place_spot_batch_orders(batch_orders => "batchOrders"),
+
         place_spot_limit_buy_order(product_symbol => "product_symbol", quantity => "quantity", price => "price"),
         place_spot_limit_order(product_symbol => "product_symbol", side => "side", quantity => "quantity", price => "price"),
         place_spot_limit_sell_order(product_symbol => "product_symbol", quantity => "quantity", price => "price"),
@@ -130,8 +130,8 @@ get_contract_30_day_fee_statistics(),
         place_spot_post_only_limit_sell_order(product_symbol => "product_symbol", quantity => "quantity", price => "price"),
         set_spot_mx_deduct(mx_deduct_enable => "mxDeductEnable"),
         test_spot_order(product_symbol => "product_symbol", side => "side", type_ => "type"),
-        transfer_subaccount_assets(from_account_type => "fromAccountType", to_account_type => "toAccountType", asset => "asset", amount => "amount"),
-        user_universal_transfer(from_account_type => "fromAccountType", to_account_type => "toAccountType", asset => "asset", amount => "amount"),
+
+
     ];
 }
 

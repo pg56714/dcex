@@ -5,9 +5,10 @@ from typing import Any
 from dcex._keyword_aliases import legacy_keywords
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
     """Async HTTP client for Bitget private account operations."""
 
     async def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
@@ -82,77 +83,6 @@ class AccountHTTP(HTTPManager):
                 limit=limit,
                 idLessThan=id_less_than,
             ),
-        )
-
-    @legacy_keywords({"fromType": "from_type", "toType": "to_type", "clientOid": "client_oid"})
-    async def transfer(
-        self,
-        coin: str,
-        amount: str,
-        from_type: str,
-        to_type: str,
-        symbol: str | None = None,
-        client_oid: str | None = None,
-    ) -> dict[str, Any]:
-        """Transfer assets between Bitget account types."""
-        return await self._native_private(
-            "transfer",
-            self._native_params(
-                coin=coin,
-                amount=amount,
-                fromType=from_type,
-                toType=to_type,
-                symbol=symbol,
-                clientOid=client_oid,
-            ),
-        )
-
-    @legacy_keywords(
-        {
-            "fromType": "from_type",
-            "startTime": "start_time",
-            "endTime": "end_time",
-            "clientOid": "client_oid",
-            "pageNum": "page_num",
-            "idLessThan": "id_less_than",
-        }
-    )
-    async def get_transfer_records(
-        self,
-        coin: str,
-        from_type: str | None = None,
-        start_time: int | str | None = None,
-        end_time: int | str | None = None,
-        client_oid: str | None = None,
-        page_num: int | str | None = None,
-        limit: int | None = None,
-        id_less_than: str | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve Bitget account transfer records."""
-        return await self._native_private(
-            "get_transfer_records",
-            self._native_params(
-                coin=coin,
-                fromType=from_type,
-                startTime=start_time,
-                endTime=end_time,
-                clientOid=client_oid,
-                pageNum=page_num,
-                limit=limit,
-                idLessThan=id_less_than,
-            ),
-        )
-
-    @legacy_keywords({"fromType": "from_type", "toType": "to_type"})
-    async def get_transferable_coins(
-        self,
-        from_type: str,
-        to_type: str,
-    ) -> dict[str, Any]:
-        """Retrieve coins transferable between Bitget account types."""
-        return await self._native_private(
-            "get_transferable_coins",
-            self._native_params(fromType=from_type, toType=to_type),
         )
 
     @legacy_keywords(

@@ -57,7 +57,7 @@ move_positions(from_uid => "fromUid",to_uid => "toUid",legs => "list"),
         get_coin_greeks(),
         repay_liability(),
         set_collateral_coin(coin => "coin", collateral_switch => "collateralSwitch"),
-        batch_set_collateral_coins(request => "request"),
+
         get_asset_overview(),
         get_delivery_records(category => "category"),
         get_settlement_records(category => "category"),
@@ -88,13 +88,13 @@ move_positions(from_uid => "fromUid",to_uid => "toUid",legs => "list"),
         get_spread_trade_history(),
         get_spread_max_qty(symbol => "symbol", side => "side", order_price => "orderPrice"),
 
-        amend_batch_order(request => "request"),
+
         amend_order(product_symbol => "product_symbol"),
         cancel_all_orders(),
-        cancel_batch_orders(request => "request"),
+
         cancel_order(product_symbol => "product_symbol"),
-        create_internal_transfer(coin => "coin", amount => "amount", from_account_type => "fromAccountType", to_account_type => "toAccountType"),
-        create_universal_transfer(coin => "coin", amount => "amount", from_member_id => "fromMemberId", to_member_id => "toMemberId", from_account_type => "fromAccountType", to_account_type => "toAccountType"),
+
+
         get_account_info(),
         get_advanced_earn_orders(category => "category"),
         get_advanced_earn_positions(category => "category"),
@@ -167,7 +167,7 @@ move_positions(from_uid => "fromUid",to_uid => "toUid",legs => "list"),
         get_flexible_borrow_inventory(currency => "currency"),
         get_fixed_borrow_inventory(currency => "currency", term => "term", annual_rate => "annualRate"),
         get_internal_deposit_records(),
-        get_internal_transfer_records(),
+
         get_master_deposit_address(coin => "coin"),
         get_open_orders(),
         get_order_history(),
@@ -193,13 +193,13 @@ move_positions(from_uid => "fromUid",to_uid => "toUid",legs => "list"),
         get_sub_deposit_records(sub_member_id => "subMemberId"),
         get_sub_uid(),
         get_transaction_log(),
-        get_transferable_amount(coins => "coins"),
-        get_transferable_coin(from_account_type => "fromAccountType", to_account_type => "toAccountType"),
-        get_universal_transfer_records(),
+
+
+
         get_vip_margin_data(),
         get_wallet_balance(),
-        get_withdrawable_amount(coin => "coin"),
-        place_batch_order(request => "request"),
+
+
         place_limit_buy_order(product_symbol => "product_symbol", qty => "qty", price => "price"),
         place_limit_order(product_symbol => "product_symbol", side => "side", qty => "qty", price => "price"),
         place_limit_sell_order(product_symbol => "product_symbol", qty => "qty", price => "price"),

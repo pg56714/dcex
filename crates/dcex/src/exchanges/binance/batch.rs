@@ -485,3 +485,50 @@ mod tests {
         }
     }
 }
+
+mod from_options_binanceclient {
+
+    use crate::exchanges::binance::client::BinanceClient;
+
+    impl BinanceClient {
+        pub fn place_options_batch_orders(
+            &self,
+            orders: &str,
+        ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+            crate::exchanges::ExchangeMethodRequest::private(
+                self,
+                "place_options_batch_orders",
+                vec![("orders".to_string(), orders.to_string())],
+            )
+        }
+
+        pub fn cancel_options_batch_orders(
+            &self,
+            product_symbol: &str,
+        ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
+            crate::exchanges::ExchangeMethodRequest::private(
+                self,
+                "cancel_options_batch_orders",
+                vec![("product_symbol".to_string(), product_symbol.to_string())],
+            )
+        }
+    }
+}
+
+mod wrappers_from_trading_controls {
+    use crate::exchanges::binance::BinanceClient;
+    crate::exchanges::impl_exchange_method_wrappers! {
+     @extend; BinanceClient;
+     public [
+
+     ];
+     private [
+    place_futures_batch_orders(orders => "batchOrders"),
+    amend_futures_batch_orders(orders => "batchOrders"),
+    cancel_futures_batch_orders(product_symbol => "product_symbol"),
+    place_coin_futures_batch_orders(orders => "batchOrders"),
+    amend_coin_futures_batch_orders(orders => "batchOrders"),
+    cancel_coin_futures_batch_orders(product_symbol => "product_symbol")
+     ];
+    }
+}

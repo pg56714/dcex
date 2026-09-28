@@ -1,11 +1,11 @@
-use serde_json::Value;
+pub(in crate::exchanges::bitget) use serde_json::Value;
 
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::bitget) use crate::Result;
+pub(in crate::exchanges::bitget) use crate::exchange::ValidatedResponse;
 
-use super::client::BitgetClient;
-use super::endpoints::*;
-use super::params::{BitgetParams, require_one_identifier};
+pub(in crate::exchanges::bitget) use super::client::BitgetClient;
+pub(in crate::exchanges::bitget) use super::endpoints::*;
+pub(in crate::exchanges::bitget) use super::params::{BitgetParams, require_one_identifier};
 
 impl BitgetClient {
     pub(super) async fn account_private_request(
@@ -53,53 +53,14 @@ impl BitgetClient {
                 )
                 .await
             }
-            "transfer" => {
-                for key in ["coin", "amount", "fromType", "toType"] {
-                    params.required(key)?;
-                }
-                if matches!(params.get("fromType"), Some("isolated_margin"))
-                    || matches!(params.get("toType"), Some("isolated_margin"))
-                {
-                    params.required("symbol")?;
-                }
-                self.post_private(
-                    SPOT_ACCOUNT_TRANSFER,
-                    Value::Object(params.body(&[
-                        "coin",
-                        "amount",
-                        "fromType",
-                        "toType",
-                        "symbol",
-                        "clientOid",
-                    ])),
-                )
-                .await
-            }
+            "transfer" => self.moved_account_transfer(method_name, params).await,
             "get_transfer_records" => {
-                params.required("coin")?;
-                self.get_private(
-                    SPOT_ACCOUNT_TRANSFER_RECORDS,
-                    params.only(&[
-                        "coin",
-                        "fromType",
-                        "startTime",
-                        "endTime",
-                        "clientOid",
-                        "pageNum",
-                        "limit",
-                        "idLessThan",
-                    ]),
-                )
-                .await
+                self.moved_account_get_transfer_records(method_name, params)
+                    .await
             }
             "get_transferable_coins" => {
-                params.required("fromType")?;
-                params.required("toType")?;
-                self.get_private(
-                    SPOT_ACCOUNT_TRANSFER_COIN_INFO,
-                    params.only(&["fromType", "toType"]),
-                )
-                .await
+                self.moved_account_get_transferable_coins(method_name, params)
+                    .await
             }
             "get_deposit_records" => {
                 params.required("startTime")?;

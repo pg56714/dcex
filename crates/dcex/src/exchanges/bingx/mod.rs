@@ -11,7 +11,7 @@ mod private;
 mod signing;
 mod trade;
 mod trading_controls;
-mod wallet;
+
 mod websocket;
 mod wrappers;
 
@@ -20,3 +20,9 @@ pub use websocket::{BingxPrivateWebSocket, BingxPublicWebSocket};
 
 #[cfg(test)]
 mod tests;
+
+mod transfers;
+
+mod batch;
+
+mod withdrawals;

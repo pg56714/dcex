@@ -1,15 +1,15 @@
-use serde_json::Value;
+pub(in crate::exchanges::kucoin) use serde_json::Value;
 
-use crate::exchange::ValidatedResponse;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::kucoin) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::kucoin) use crate::{DcexError, Result};
 
-use super::client::{KucoinClient, KucoinMarket};
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::kucoin) use super::client::{KucoinClient, KucoinMarket};
+pub(in crate::exchanges::kucoin) use super::endpoints::*;
+pub(in crate::exchanges::kucoin) use super::params::{
     KucoinParams, generate_client_oid, require_exactly_one, validate_enum, validate_positive_number,
 };
 
-const UTA_ORDER_FIELDS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const UTA_ORDER_FIELDS: &[&str] = &[
     "tradeType",
     "side",
     "orderType",
@@ -31,9 +31,10 @@ const UTA_ORDER_FIELDS: &[&str] = &[
     "slTriggerPriceType",
     "stp",
 ];
-const UTA_ORDER_INTEGER_FIELDS: &[&str] = &["cancelAfter"];
-const UTA_ORDER_BOOL_FIELDS: &[&str] = &["postOnly", "reduceOnly", "closeOrder"];
-const UTA_AMEND_FIELDS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const UTA_ORDER_INTEGER_FIELDS: &[&str] = &["cancelAfter"];
+pub(in crate::exchanges::kucoin) const UTA_ORDER_BOOL_FIELDS: &[&str] =
+    &["postOnly", "reduceOnly", "closeOrder"];
+pub(in crate::exchanges::kucoin) const UTA_AMEND_FIELDS: &[&str] = &[
     "orderId",
     "clientOid",
     "newPrice",
@@ -44,9 +45,9 @@ const UTA_AMEND_FIELDS: &[&str] = &[
     "slTriggerPrice",
     "slTriggerPriceType",
 ];
-const UTA_AMEND_CHANGE_FIELDS: &[&str] =
+pub(in crate::exchanges::kucoin) const UTA_AMEND_CHANGE_FIELDS: &[&str] =
     &["newPrice", "newSize", "tpTriggerPrice", "slTriggerPrice"];
-const UTA_LIST_FIELDS: &[&str] = &[
+pub(in crate::exchanges::kucoin) const UTA_LIST_FIELDS: &[&str] = &[
     "tradeType",
     "side",
     "orderFilter",
@@ -67,64 +68,7 @@ impl KucoinClient {
     ) -> Result<Option<ValidatedResponse>> {
         let result = match method_name {
             "batch_cancel_uta_orders" => {
-                params.ensure_allowed(&["tradeType", "cancelOrderList"])?;
-                validate_trade_type(params)?;
-                let mut orders = params.json_required("cancelOrderList")?;
-                let items = orders
-                    .as_array_mut()
-                    .filter(|items| !items.is_empty() && items.len() <= 20)
-                    .ok_or_else(|| {
-                        DcexError::InvalidInput(
-                            "KuCoin UTA batch cancel requires 1 to 20 orders".into(),
-                        )
-                    })?;
-                for item in items {
-                    let object = item.as_object_mut().ok_or_else(|| {
-                        DcexError::InvalidInput("KuCoin cancel order must be an object".into())
-                    })?;
-                    if object
-                        .keys()
-                        .any(|key| !["symbol", "orderId", "clientOid"].contains(&key.as_str()))
-                    {
-                        return Err(DcexError::InvalidInput(
-                            "unsupported KuCoin batch cancel order field".into(),
-                        ));
-                    }
-                    if !["orderId", "clientOid"].iter().any(|key| {
-                        object
-                            .get(*key)
-                            .and_then(Value::as_str)
-                            .is_some_and(|v| !v.trim().is_empty())
-                    }) {
-                        return Err(DcexError::InvalidInput(
-                            "KuCoin batch cancel requires orderId or clientOid".into(),
-                        ));
-                    }
-                    for key in ["orderId", "clientOid"] {
-                        if object.get(key).is_some_and(|v| !v.is_string()) {
-                            return Err(DcexError::InvalidInput(format!(
-                                "KuCoin {key} must be a string"
-                            )));
-                        }
-                    }
-                    let symbol = object
-                        .get("symbol")
-                        .and_then(Value::as_str)
-                        .filter(|s| !s.trim().is_empty())
-                        .ok_or_else(|| {
-                            DcexError::InvalidInput("KuCoin batch cancel requires symbol".into())
-                        })?;
-                    if is_spot_symbol(symbol) == uta_is_futures(params) {
-                        return Err(DcexError::InvalidInput(
-                            "symbol does not match tradeType".into(),
-                        ));
-                    }
-                    let symbol = self.exchange_symbol(symbol, uta_is_futures(params))?;
-                    object.insert("symbol".into(), Value::String(symbol));
-                }
-                let mut body = params.body(&["tradeType"], &[], &[])?;
-                body.insert("cancelOrderList".into(), orders);
-                self.private_post(KucoinMarket::Spot, UTA_V2_CANCEL_BATCH, Value::Object(body))
+                self.moved_uta_batch_cancel_uta_orders(method_name, params)
                     .await
             }
             "cancel_uta_orders_by_symbol" => {
@@ -414,7 +358,7 @@ impl KucoinClient {
         result.map(Some)
     }
 
-    fn uta_insert_symbol(
+    pub(in crate::exchanges::kucoin) fn uta_insert_symbol(
         &self,
         body: &mut serde_json::Map<String, Value>,
         params: &KucoinParams,
@@ -422,7 +366,7 @@ impl KucoinClient {
         self.uta_insert_symbol_with_mode(body, params, uta_is_futures(params))
     }
 
-    fn uta_insert_symbol_with_mode(
+    pub(in crate::exchanges::kucoin) fn uta_insert_symbol_with_mode(
         &self,
         body: &mut serde_json::Map<String, Value>,
         params: &KucoinParams,
@@ -437,7 +381,7 @@ impl KucoinClient {
     }
 }
 
-fn validate_trade_type(params: &KucoinParams) -> Result<()> {
+pub(in crate::exchanges::kucoin) fn validate_trade_type(params: &KucoinParams) -> Result<()> {
     params.required("tradeType")?;
     validate_enum(params, "tradeType", &["SPOT", "MARGIN", "FUTURES"])?;
     if let Some(symbol) = params
@@ -454,11 +398,11 @@ fn validate_trade_type(params: &KucoinParams) -> Result<()> {
 
 /// Canonical spot product symbols end in `-SPOT`; raw KuCoin spot pairs are
 /// `BASE-QUOTE`, while raw futures contracts (e.g. `XBTUSDTM`) have no dash.
-fn is_spot_symbol(symbol: &str) -> bool {
+pub(in crate::exchanges::kucoin) fn is_spot_symbol(symbol: &str) -> bool {
     let parts: Vec<&str> = symbol.split('-').collect();
     parts.len() == 2 || parts.get(2) == Some(&"SPOT")
 }
 
-fn uta_is_futures(params: &KucoinParams) -> bool {
+pub(in crate::exchanges::kucoin) fn uta_is_futures(params: &KucoinParams) -> bool {
     params.get("tradeType") == Some("FUTURES")
 }

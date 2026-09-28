@@ -3,9 +3,10 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Backpack private account operations."""
 
     def get_account(self) -> dict[str, Any] | list[Any] | str:
@@ -45,18 +46,6 @@ class AccountHTTP(HTTPManager):
         """Retrieve Backpack max order quantity."""
         return self._native_private(
             "get_max_order_quantity",
-            self._native_params(**locals()),
-        )
-
-    def get_max_withdrawal_quantity(
-        self,
-        symbol: str,
-        autoBorrow: bool | None = None,
-        autoLendRedeem: bool | None = None,
-    ) -> dict[str, Any] | list[Any] | str:
-        """Retrieve Backpack max withdrawal quantity."""
-        return self._native_private(
-            "get_max_withdrawal_quantity",
             self._native_params(**locals()),
         )
 
@@ -142,21 +131,6 @@ class AccountHTTP(HTTPManager):
         return self._native_private(
             "get_deposit_address",
             self._native_params(blockchain=blockchain),
-        )
-
-    def get_withdrawals(
-        self,
-        id: int | None = None,
-        clientId: str | None = None,
-        from_: int | None = None,
-        to: int | None = None,
-        limit: int | None = None,
-        offset: int | None = None,
-    ) -> dict[str, Any] | list[Any] | str:
-        """Retrieve Backpack withdrawal history."""
-        return self._native_private(
-            "get_withdrawals",
-            self._native_params(**locals()),
         )
 
     def get_dust_conversion_history(

@@ -5,10 +5,13 @@ from typing import Any
 
 from .._keyword_aliases import legacy_keywords
 from .._operation_guards import require_confirmation, require_scope
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPTransfersHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for Bitget private trading operations."""
 
     @legacy_keywords(
@@ -233,23 +236,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"orderList": "order_list", "batchMode": "batch_mode"})
-    def place_spot_batch_orders(
-        self,
-        order_list: list[dict[str, Any]],
-        product_symbol: str | None = None,
-        batch_mode: str | None = None,
-    ) -> dict[str, Any]:
-        """Place Bitget spot orders in batch."""
-        return self._native_private(
-            "place_spot_batch_orders",
-            self._native_params(
-                product_symbol=product_symbol,
-                batchMode=batch_mode,
-                orderList=order_list,
-            ),
-        )
-
     @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid", "tpslType": "tpsl_type"})
     def cancel_spot_order(
         self,
@@ -266,23 +252,6 @@ class TradeHTTP(HTTPManager):
                 orderId=order_id,
                 clientOid=client_oid,
                 tpslType=tpsl_type,
-            ),
-        )
-
-    @legacy_keywords({"orderList": "order_list", "batchMode": "batch_mode"})
-    def cancel_spot_batch_orders(
-        self,
-        order_list: list[dict[str, Any]],
-        product_symbol: str | None = None,
-        batch_mode: str | None = None,
-    ) -> dict[str, Any]:
-        """Cancel Bitget spot orders in batch."""
-        return self._native_private(
-            "cancel_spot_batch_orders",
-            self._native_params(
-                product_symbol=product_symbol,
-                batchMode=batch_mode,
-                orderList=order_list,
             ),
         )
 
@@ -514,14 +483,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    @legacy_keywords({"orderList": "order_list"})
-    def place_uta_batch_orders(self, order_list: list[dict[str, Any]]) -> dict[str, Any]:
-        """Place Bitget UTA orders in batch."""
-        return self._native_private(
-            "place_uta_batch_orders",
-            self._native_params(orderList=order_list),
-        )
-
     @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
     def cancel_uta_order(
         self,
@@ -552,14 +513,6 @@ class TradeHTTP(HTTPManager):
                 clientOid=client_oid,
                 category=category,
             ),
-        )
-
-    @legacy_keywords({"orderList": "order_list"})
-    def cancel_uta_batch_orders(self, order_list: list[dict[str, Any]]) -> dict[str, Any]:
-        """Cancel Bitget UTA orders in batch."""
-        return self._native_private(
-            "cancel_uta_batch_orders",
-            self._native_params(orderList=order_list),
         )
 
     @legacy_keywords({"orderId": "order_id", "clientOid": "client_oid"})
@@ -910,34 +863,6 @@ class TradeHTTP(HTTPManager):
 
     @legacy_keywords(
         {
-            "orderList": "order_list",
-            "productType": "product_type",
-            "marginMode": "margin_mode",
-            "marginCoin": "margin_coin",
-        }
-    )
-    def place_futures_batch_orders(
-        self,
-        order_list: list[dict[str, Any]],
-        product_symbol: str,
-        product_type: str = "USDT-FUTURES",
-        margin_mode: str = "crossed",
-        margin_coin: str = "USDT",
-    ) -> dict[str, Any]:
-        """Place Bitget futures orders in batch."""
-        return self._native_private(
-            "place_futures_batch_orders",
-            self._native_params(
-                product_symbol=product_symbol,
-                productType=product_type,
-                marginMode=margin_mode,
-                marginCoin=margin_coin,
-                orderList=order_list,
-            ),
-        )
-
-    @legacy_keywords(
-        {
             "orderId": "order_id",
             "clientOid": "client_oid",
             "productType": "product_type",
@@ -961,27 +886,6 @@ class TradeHTTP(HTTPManager):
                 marginCoin=margin_coin,
                 orderId=order_id,
                 clientOid=client_oid,
-            ),
-        )
-
-    @legacy_keywords(
-        {"orderIdList": "order_id_list", "productType": "product_type", "marginCoin": "margin_coin"}
-    )
-    def cancel_futures_batch_orders(
-        self,
-        product_symbol: str | None = None,
-        order_id_list: list[dict[str, Any]] | None = None,
-        product_type: str = "USDT-FUTURES",
-        margin_coin: str = "USDT",
-    ) -> dict[str, Any]:
-        """Cancel Bitget futures orders in batch."""
-        return self._native_private(
-            "cancel_futures_batch_orders",
-            self._native_params(
-                product_symbol=product_symbol,
-                productType=product_type,
-                marginCoin=margin_coin,
-                orderIdList=order_id_list,
             ),
         )
 
@@ -2039,12 +1943,6 @@ class TradeHTTP(HTTPManager):
             "convert_futures_union_asset", self._native_params(coin=coin, amount=amount)
         )
 
-    def get_futures_union_transfer_limits(self, coin: str) -> dict[str, Any]:
-        """Call ``GET /api/v2/mix/account/transfer-limits``."""
-        return self._native_private(
-            "get_futures_union_transfer_limits", self._native_params(coin=coin)
-        )
-
     def get_futures_union_config(self) -> dict[str, Any]:
         """Call ``GET /api/v2/mix/account/union-config``."""
         return self._native_private("get_futures_union_config", self._native_params())
@@ -2141,66 +2039,12 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def get_spot_sub_account_transfer_records(
-        self,
-        *,
-        coin: str | None = None,
-        role: str | None = None,
-        sub_uid: str | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        client_oid: str | None = None,
-        limit: int | None = None,
-        id_less_than: str | None = None,
-    ) -> dict[str, Any]:
-        """Call ``GET /api/v2/spot/account/sub-main-trans-record``."""
-        return self._native_private(
-            "get_spot_sub_account_transfer_records",
-            self._native_params(
-                coin=coin,
-                role=role,
-                subUid=sub_uid,
-                startTime=start_time,
-                endTime=end_time,
-                clientOid=client_oid,
-                limit=limit,
-                idLessThan=id_less_than,
-            ),
-        )
-
     def get_spot_sub_account_assets(
         self, *, id_less_than: str | None = None, limit: int | None = None
     ) -> dict[str, Any]:
         """Call ``GET /api/v2/spot/account/subaccount-assets``."""
         return self._native_private(
             "get_spot_sub_account_assets", self._native_params(idLessThan=id_less_than, limit=limit)
-        )
-
-    def transfer_spot_sub_account(
-        self,
-        from_type: str,
-        to_type: str,
-        amount: str,
-        coin: str,
-        from_user_id: str,
-        to_user_id: str,
-        *,
-        product_symbol: str | None = None,
-        client_oid: str | None = None,
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v2/spot/wallet/subaccount-transfer``."""
-        return self._native_private(
-            "transfer_spot_sub_account",
-            self._native_params(
-                fromType=from_type,
-                toType=to_type,
-                amount=amount,
-                coin=coin,
-                fromUserId=from_user_id,
-                toUserId=to_user_id,
-                product_symbol=product_symbol,
-                clientOid=client_oid,
-            ),
         )
 
     def get_cross_margin_assets(self, *, coin: str | None = None) -> dict[str, Any]:
@@ -2230,12 +2074,6 @@ class TradeHTTP(HTTPManager):
         """Call ``GET /api/v2/margin/crossed/account/max-borrowable-amount``."""
         return self._native_private(
             "get_cross_margin_max_borrowable", self._native_params(coin=coin)
-        )
-
-    def get_cross_margin_max_transferable(self, coin: str) -> dict[str, Any]:
-        """Call ``GET /api/v2/margin/crossed/account/max-transfer-out-amount``."""
-        return self._native_private(
-            "get_cross_margin_max_transferable", self._native_params(coin=coin)
         )
 
     def flash_repay_cross_margin_assets(self, *, coin: str | None = None) -> dict[str, Any]:
@@ -2538,13 +2376,6 @@ class TradeHTTP(HTTPManager):
             "get_isolated_margin_max_borrowable", self._native_params(product_symbol=product_symbol)
         )
 
-    def get_isolated_margin_max_transferable(self, product_symbol: str) -> dict[str, Any]:
-        """Call ``GET /api/v2/margin/isolated/account/max-transfer-out-amount``."""
-        return self._native_private(
-            "get_isolated_margin_max_transferable",
-            self._native_params(product_symbol=product_symbol),
-        )
-
     def flash_repay_isolated_margin_assets(
         self, *, symbol_list: list[str] | None = None
     ) -> dict[str, Any]:
@@ -2840,10 +2671,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol, category=category),
         )
 
-    def get_uta_max_transferable(self, coin: str) -> dict[str, Any]:
-        """Call ``GET /api/v3/account/max-transferable``."""
-        return self._native_private("get_uta_max_transferable", self._native_params(coin=coin))
-
     def set_uta_collateral_type(
         self,
         collateral_type: str,
@@ -2898,12 +2725,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(product_symbol=product_symbol, category=category),
         )
 
-    def get_uta_transferable_coins(self, from_type: str, to_type: str) -> dict[str, Any]:
-        """Call ``GET /api/v3/account/transferable-coins``."""
-        return self._native_private(
-            "get_uta_transferable_coins", self._native_params(fromType=from_type, toType=to_type)
-        )
-
     def get_uta_max_open_available(
         self,
         category: str,
@@ -2926,29 +2747,6 @@ class TradeHTTP(HTTPManager):
                 price=price,
                 size=size,
                 autoBorrow=auto_borrow,
-            ),
-        )
-
-    def get_uta_position_transfer_history(
-        self,
-        category: str,
-        *,
-        product_symbol: str | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        cursor: str | None = None,
-        limit: int | None = None,
-    ) -> dict[str, Any]:
-        """Call ``GET /api/v3/account/move-position-history``."""
-        return self._native_private(
-            "get_uta_position_transfer_history",
-            self._native_params(
-                category=category,
-                product_symbol=product_symbol,
-                startTime=start_time,
-                endTime=end_time,
-                cursor=cursor,
-                limit=limit,
             ),
         )
 
@@ -3025,145 +2823,6 @@ class TradeHTTP(HTTPManager):
     def get_uta_adl_rank(self) -> dict[str, Any]:
         """Call ``GET /api/v3/position/adlRank``."""
         return self._native_private("get_uta_adl_rank", self._native_params())
-
-    def place_cross_margin_batch_orders(
-        self, product_symbol: str, orders: list[dict[str, Any]]
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v2/margin/crossed/batch-place-order``."""
-        return self._native_private(
-            "place_cross_margin_batch_orders",
-            self._native_params(product_symbol=product_symbol, orderList=orders),
-        )
-
-    def place_isolated_margin_batch_orders(
-        self, product_symbol: str, orders: list[dict[str, Any]]
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v2/margin/isolated/batch-place-order``."""
-        return self._native_private(
-            "place_isolated_margin_batch_orders",
-            self._native_params(product_symbol=product_symbol, orderList=orders),
-        )
-
-    def cancel_cross_margin_batch_orders(
-        self, product_symbol: str, orders: list[dict[str, Any]]
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v2/margin/crossed/batch-cancel-order``."""
-        return self._native_private(
-            "cancel_cross_margin_batch_orders",
-            self._native_params(product_symbol=product_symbol, orderIdList=orders),
-        )
-
-    def cancel_isolated_margin_batch_orders(
-        self, product_symbol: str, orders: list[dict[str, Any]]
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v2/margin/isolated/batch-cancel-order``."""
-        return self._native_private(
-            "cancel_isolated_margin_batch_orders",
-            self._native_params(product_symbol=product_symbol, orderIdList=orders),
-        )
-
-    def batch_cancel_replace_spot_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """Call ``POST /api/v2/spot/trade/batch-cancel-replace-order``."""
-        return self._native_private(
-            "batch_cancel_replace_spot_orders", self._native_params(orderList=orders)
-        )
-
-    def modify_uta_batch_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """
-        Call ``POST /api/v3/trade/batch-modify-order``. At most 20 orders in one category; ACK
-        does not confirm matching-engine completion.
-        """
-        return self._native_private("modify_uta_batch_orders", self._native_params(orders=orders))
-
-    def transfer_uta_account(
-        self,
-        from_type: str,
-        to_type: str,
-        amount: str,
-        coin: str,
-        *,
-        product_symbol: str | None = None,
-        allow_borrow: str | None = None,
-        client_oid: str | None = None,
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v3/account/transfer``."""
-        return self._native_private(
-            "transfer_uta_account",
-            self._native_params(
-                fromType=from_type,
-                toType=to_type,
-                amount=amount,
-                coin=coin,
-                product_symbol=product_symbol,
-                allowBorrow=allow_borrow,
-                clientOid=client_oid,
-            ),
-        )
-
-    def transfer_uta_sub_to_master(
-        self, from_type: str, to_type: str, amount: str, coin: str, *, client_oid: str | None = None
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v3/account/sub-master-transfer``."""
-        return self._native_private(
-            "transfer_uta_sub_to_master",
-            self._native_params(
-                fromType=from_type, toType=to_type, amount=amount, coin=coin, clientOid=client_oid
-            ),
-        )
-
-    def transfer_uta_sub_account(
-        self,
-        from_type: str,
-        to_type: str,
-        amount: str,
-        coin: str,
-        from_user_id: str,
-        to_user_id: str,
-        client_oid: str,
-        *,
-        allow_borrow: str | None = None,
-    ) -> dict[str, Any]:
-        """Call ``POST /api/v3/account/sub-transfer``."""
-        return self._native_private(
-            "transfer_uta_sub_account",
-            self._native_params(
-                fromType=from_type,
-                toType=to_type,
-                amount=amount,
-                coin=coin,
-                fromUserId=from_user_id,
-                toUserId=to_user_id,
-                clientOid=client_oid,
-                allowBorrow=allow_borrow,
-            ),
-        )
-
-    def get_uta_sub_account_transfer_records(
-        self,
-        *,
-        sub_uid: str | None = None,
-        role: str | None = None,
-        coin: str | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        client_oid: str | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """Call ``GET /api/v3/account/sub-transfer-record``."""
-        return self._native_private(
-            "get_uta_sub_account_transfer_records",
-            self._native_params(
-                subUid=sub_uid,
-                role=role,
-                coin=coin,
-                startTime=start_time,
-                endTime=end_time,
-                clientOid=client_oid,
-                limit=limit,
-                cursor=cursor,
-            ),
-        )
 
     def get_uta_sub_accounts(
         self, *, limit: int | None = None, cursor: str | None = None
@@ -3688,12 +3347,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def batch_create_classic_sub_accounts(self, accounts: list[dict[str, Any]]) -> dict[str, Any]:
-        """Create 1..5 virtual sub-accounts and API keys using an array body."""
-        return self._native_private(
-            "batch_create_classic_sub_accounts", self._native_params(accounts=accounts)
-        )
-
     def move_uta_positions(
         self,
         from_uid: str,
@@ -3725,16 +3378,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def get_uta_account_max_withdrawal(self, *, coin: str) -> dict[str, Any]:
-        """
-        GET /api/v3/account/max-withdrawal. Native symbols and decimal strings.
-
-        Source: https://www.bitget.com/docs/catalog/account/assets-balance#get-max-withdrawal
-        """
-        return self._native_private(
-            "get_uta_account_max_withdrawal", self._native_params(coin=coin)
-        )
-
     def get_classic_account_bot_assets(self, *, account_type: str | None = None) -> dict[str, Any]:
         """
         GET /api/v2/account/bot-assets. Native symbols and decimal strings.
@@ -3743,82 +3386,6 @@ class TradeHTTP(HTTPManager):
         """
         return self._native_private(
             "get_classic_account_bot_assets", self._native_params(accountType=account_type)
-        )
-
-    def get_classic_spot_wallet_withdrawal_records(
-        self,
-        *,
-        start_time: str,
-        end_time: str,
-        coin: str | None = None,
-        client_oid: str | None = None,
-        id_less_than: str | None = None,
-        order_id: str | None = None,
-        limit: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/v2/spot/wallet/withdrawal-records. Native symbols and decimal strings.
-
-        Source: https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#get-withdrawal-records
-        """
-        return self._native_private(
-            "get_classic_spot_wallet_withdrawal_records",
-            self._native_params(
-                startTime=start_time,
-                endTime=end_time,
-                coin=coin,
-                clientOid=client_oid,
-                idLessThan=id_less_than,
-                orderId=order_id,
-                limit=limit,
-            ),
-        )
-
-    def get_uta_account_withdrawal_records(
-        self,
-        *,
-        start_time: str,
-        end_time: str,
-        coin: str | None = None,
-        order_id: str | None = None,
-        client_oid: str | None = None,
-        limit: str | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/v3/account/withdrawal-records. Native symbols and decimal strings.
-
-        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-withdrawal-records
-        """
-        return self._native_private(
-            "get_uta_account_withdrawal_records",
-            self._native_params(
-                startTime=start_time,
-                endTime=end_time,
-                coin=coin,
-                orderId=order_id,
-                clientOid=client_oid,
-                limit=limit,
-                cursor=cursor,
-            ),
-        )
-
-    def get_uta_account_withdraw_address(
-        self,
-        *,
-        coin: str | None = None,
-        type_: str | None = None,
-        limit: str | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/v3/account/withdraw-address. Native symbols and decimal strings.
-
-        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#get-withdraw-address-book
-        """
-        return self._native_private(
-            "get_uta_account_withdraw_address",
-            self._native_params(coin=coin, type=type_, limit=limit, cursor=cursor),
         )
 
     def get_classic_earn_elite_product(self) -> dict[str, Any]:
@@ -4541,61 +4108,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def create_spot_withdrawal(
-        self,
-        *,
-        coin: str,
-        transfer_type: str,
-        address: str,
-        size: str,
-        chain: str | None = None,
-        inner_to_type: str | None = None,
-        area_code: str | None = None,
-        tag: str | None = None,
-        remark: str | None = None,
-        client_oid: str | None = None,
-        member_code: str | None = None,
-        identity_type: str | None = None,
-        company_name: str | None = None,
-        first_name: str | None = None,
-        last_name: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Withdraw.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Source: https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#withdraw
-        """
-        return self._native_private(
-            "create_spot_withdrawal",
-            self._native_params(
-                coin=coin,
-                transferType=transfer_type,
-                address=address,
-                chain=chain,
-                innerToType=inner_to_type,
-                areaCode=area_code,
-                tag=tag,
-                size=size,
-                remark=remark,
-                clientOid=client_oid,
-                memberCode=member_code,
-                identityType=identity_type,
-                companyName=company_name,
-                firstName=first_name,
-                lastName=last_name,
-            ),
-        )
-
-    def cancel_spot_withdrawal(self, *, order_id: str) -> Any:  # noqa: ANN401
-        """
-        Cancel Withdrawal.
-
-        Cancellation is subject to the exchange withdrawal state.
-        Source: https://www.bitget.com/docs/catalog/classic-spot-account/classic-spot-account#cancel-withdrawal
-        """
-        return self._native_private("cancel_spot_withdrawal", self._native_params(orderId=order_id))
-
     def create_uta_agent_sub_account(
         self, *, username: str, passphrase: str, note: str | None = None
     ) -> Any:  # noqa: ANN401
@@ -4622,65 +4134,4 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "create_classic_agent_sub_account",
             self._native_params(username=username, passphrase=passphrase, note=note),
-        )
-
-    def create_uta_withdrawal(
-        self,
-        *,
-        coin: str,
-        transfer_type: str,
-        address: str,
-        size: str,
-        chain: str | None = None,
-        inner_to_type: str | None = None,
-        area_code: str | None = None,
-        tag: str | None = None,
-        remark: str | None = None,
-        client_oid: str | None = None,
-        member_code: str | None = None,
-        identity_type: str | None = None,
-        company_name: str | None = None,
-        first_name: str | None = None,
-        last_name: str | None = None,
-        account_type: str | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#withdrawal
-        """
-        return self._native_private(
-            "create_uta_withdrawal",
-            self._native_params(
-                coin=coin,
-                chain=chain,
-                transferType=transfer_type,
-                address=address,
-                innerToType=inner_to_type,
-                areaCode=area_code,
-                tag=tag,
-                size=size,
-                remark=remark,
-                clientOid=client_oid,
-                memberCode=member_code,
-                identityType=identity_type,
-                companyName=company_name,
-                firstName=first_name,
-                lastName=last_name,
-                accountType=account_type,
-            ),
-        )
-
-    def cancel_uta_withdrawal(
-        self, *, order_id: str | None = None, client_oid: str | None = None
-    ) -> Any:  # noqa: ANN401
-        """
-        Cancel Withdrawal.
-
-        Cancellation is subject to the exchange withdrawal state.
-        Source: https://www.bitget.com/docs/catalog/account/deposit-withdrawal#cancel-withdrawal
-        """
-        return self._native_private(
-            "cancel_uta_withdrawal", self._native_params(orderId=order_id, clientOid=client_oid)
         )

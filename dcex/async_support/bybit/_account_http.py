@@ -3,36 +3,20 @@
 from typing import Any
 
 from ..._operation_guards import require_confirmation
+from ._batch_http import AccountHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
+from ._withdrawals_http import AccountHTTPWithdrawalsHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(
+    AccountHTTPTransfersHTTP, AccountHTTPBatchHTTP, AccountHTTPWithdrawalsHTTP, HTTPManager
+):
     """Async HTTP client for Bybit account operations."""
 
     async def get_wallet_balance(self, coin: str | None = None) -> dict[str, Any]:
         """Get wallet balance for UNIFIED account."""
         return await self._native_private("get_wallet_balance", self._native_params(coin=coin))
-
-    async def get_transferable_amount(
-        self,
-        coins: str | list[str],
-    ) -> dict[str, Any]:
-        """
-        Get transferable amount for specified coins.
-
-        Args:
-            coins: A single coin name (e.g. ``"USDT"``) or a list of up to 20 coins.
-        """
-        if isinstance(coins, str):
-            coins = [coins] if coins else []
-        if not coins:
-            raise ValueError("coins must contain at least one coin.")
-        if len(coins) > 20:
-            raise ValueError("coins must contain no more than 20 coins.")
-        return await self._native_private(
-            "get_transferable_amount",
-            self._native_params(coins=",".join(coins)),
-        )
 
     async def upgrade_to_unified_trading_account(self) -> dict[str, Any]:
         """Upgrade account to unified trading account."""
@@ -240,15 +224,6 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "set_collateral_coin",
             self._native_params(coin=coin, collateralSwitch=collateral_switch),
-        )
-
-    async def batch_set_collateral_coins(self, request: list[dict[str, str]]) -> dict[str, Any]:
-        """
-        Batch set collateral coins; see
-        https://bybit-exchange.github.io/docs/v5/account/batch-set-collateral.
-        """
-        return await self._native_private(
-            "batch_set_collateral_coins", self._native_params(request=request)
         )
 
     async def get_asset_overview(
@@ -1142,66 +1117,6 @@ class AccountHTTP(HTTPManager):
             "submit_deposit_information",
             self._native_params(
                 depositId=deposit_id, subAccountId=sub_account_id, questionnaire=questionnaire
-            ),
-        )
-
-    async def get_asset_withdraw_vasp_list(self) -> dict[str, Any]:
-        """
-        GET /v5/asset/withdraw/vasp/list.
-
-        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/asset/withdraw/vasp-list.mdx
-        """
-        return await self._native_private("get_asset_withdraw_vasp_list", self._native_params())
-
-    async def get_asset_withdraw_query_address(
-        self,
-        *,
-        coin: str | None = None,
-        chain: str | None = None,
-        address_type: int | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /v5/asset/withdraw/query-address.
-
-        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/asset/withdraw/withdraw-address.mdx
-        """
-        return await self._native_private(
-            "get_asset_withdraw_query_address",
-            self._native_params(
-                coin=coin, chain=chain, addressType=address_type, limit=limit, cursor=cursor
-            ),
-        )
-
-    async def get_asset_withdraw_query_record(
-        self,
-        *,
-        withdraw_id: str | None = None,
-        tx_id: str | None = None,
-        coin: str | None = None,
-        withdraw_type: int | None = None,
-        start_time: int | None = None,
-        end_time: int | None = None,
-        limit: int | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /v5/asset/withdraw/query-record.
-
-        Decimal amounts are strings. Source: https://raw.githubusercontent.com/bybit-exchange/docs/master/docs/v5/asset/withdraw/withdraw-record.mdx
-        """
-        return await self._native_private(
-            "get_asset_withdraw_query_record",
-            self._native_params(
-                withdrawID=withdraw_id,
-                txID=tx_id,
-                coin=coin,
-                withdrawType=withdraw_type,
-                startTime=start_time,
-                endTime=end_time,
-                limit=limit,
-                cursor=cursor,
             ),
         )
 

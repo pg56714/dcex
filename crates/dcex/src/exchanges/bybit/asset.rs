@@ -1,10 +1,8 @@
-use serde_json::Value;
-
-use super::client::BybitClient;
-use super::endpoints::*;
-use super::params::{BybitParams, generate_transfer_id, push_optional, string_body};
-use crate::Result;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::bybit) use super::client::BybitClient;
+pub(in crate::exchanges::bybit) use super::endpoints::*;
+pub(in crate::exchanges::bybit) use super::params::{BybitParams, push_optional, string_body};
+pub(in crate::exchanges::bybit) use crate::Result;
+pub(in crate::exchanges::bybit) use crate::exchange::ValidatedResponse;
 
 impl BybitClient {
     pub(super) async fn asset_private_request(
@@ -58,82 +56,27 @@ impl BybitClient {
                 self.get_request(GET_SINGLE_COIN_BALANCE, query).await
             }
             "get_withdrawable_amount" => {
-                self.get_request(
-                    GET_WITHDRAWABLE_AMOUNT,
-                    vec![("coin".to_string(), params.required("coin")?.to_string())],
-                )
-                .await
+                self.moved_asset_get_withdrawable_amount(method_name, params)
+                    .await
             }
             "get_internal_transfer_records" => {
-                let mut query = vec![(
-                    "limit".to_string(),
-                    params.get("limit").unwrap_or("20").to_string(),
-                )];
-                push_optional(&mut query, "transferId", params.get("transferId"));
-                push_optional(&mut query, "coin", params.get("coin"));
-                push_optional(&mut query, "status", params.get("status"));
-                push_optional(&mut query, "startTime", params.get("startTime"));
-                push_optional(&mut query, "endTime", params.get("endTime"));
-                push_optional(&mut query, "cursor", params.get("cursor"));
-                self.get_request(GET_INTERNAL_TRANSFER_RECORDS, query).await
+                self.moved_asset_get_internal_transfer_records(method_name, params)
+                    .await
             }
             "get_transferable_coin" => {
-                let query = vec![
-                    (
-                        "fromAccountType".to_string(),
-                        params.required("fromAccountType")?.to_string(),
-                    ),
-                    (
-                        "toAccountType".to_string(),
-                        params.required("toAccountType")?.to_string(),
-                    ),
-                ];
-                self.get_request(GET_TRANSFERABLE_COIN, query).await
+                self.moved_asset_get_transferable_coin(method_name, params)
+                    .await
             }
             "create_internal_transfer" => {
-                let mut body = string_body(&[
-                    ("coin", params.required("coin")?),
-                    ("amount", params.required("amount")?),
-                    ("fromAccountType", params.required("fromAccountType")?),
-                    ("toAccountType", params.required("toAccountType")?),
-                ]);
-                let transfer_id = params
-                    .get("transferId")
-                    .map(str::to_string)
-                    .unwrap_or_else(generate_transfer_id);
-                body.insert("transferId".to_string(), Value::String(transfer_id));
-                self.post_request(CREATE_INTERNAL_TRANSFER, body).await
+                self.moved_asset_create_internal_transfer(method_name, params)
+                    .await
             }
             "create_universal_transfer" => {
-                let mut body = string_body(&[
-                    ("coin", params.required("coin")?),
-                    ("amount", params.required("amount")?),
-                    ("fromMemberId", params.required("fromMemberId")?),
-                    ("toMemberId", params.required("toMemberId")?),
-                    ("fromAccountType", params.required("fromAccountType")?),
-                    ("toAccountType", params.required("toAccountType")?),
-                ]);
-                let transfer_id = params
-                    .get("transferId")
-                    .map(str::to_string)
-                    .unwrap_or_else(generate_transfer_id);
-                body.insert("transferId".to_string(), Value::String(transfer_id));
-                self.post_request(CREATE_UNIVERSAL_TRANSFER, body).await
+                self.moved_asset_create_universal_transfer(method_name, params)
+                    .await
             }
             "get_universal_transfer_records" => {
-                let mut query = vec![(
-                    "limit".to_string(),
-                    params.get("limit").unwrap_or("20").to_string(),
-                )];
-                push_optional(&mut query, "transferId", params.get("transferId"));
-                push_optional(&mut query, "coin", params.get("coin"));
-                push_optional(&mut query, "status", params.get("status"));
-                push_optional(&mut query, "startTime", params.get("startTime"));
-                push_optional(&mut query, "endTime", params.get("endTime"));
-                push_optional(&mut query, "fromMemberId", params.get("fromMemberId"));
-                push_optional(&mut query, "toMemberId", params.get("toMemberId"));
-                push_optional(&mut query, "cursor", params.get("cursor"));
-                self.get_request(GET_UNIVERSAL_TRANSFER_RECORDS, query)
+                self.moved_asset_get_universal_transfer_records(method_name, params)
                     .await
             }
             "set_deposit_account" => {

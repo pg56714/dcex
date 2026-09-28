@@ -1,13 +1,13 @@
-use serde_json::{Map, Number, Value};
+pub(in crate::exchanges::hyperliquid) use serde_json::{Map, Number, Value};
 
-use super::endpoints::EXCHANGE;
-use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
-use crate::http::HttpMethod;
-use crate::{DcexError, Result};
+pub(in crate::exchanges::hyperliquid) use super::endpoints::EXCHANGE;
+pub(in crate::exchanges::hyperliquid) use crate::exchange::{ValidatedResponse, unix_timestamp_ms};
+pub(in crate::exchanges::hyperliquid) use crate::http::HttpMethod;
+pub(in crate::exchanges::hyperliquid) use crate::{DcexError, Result};
 
-use super::client::HyperliquidClient;
-use super::msgpack::{OrderedValue, encode_msgpack};
-use super::params::HyperliquidParams;
+pub(in crate::exchanges::hyperliquid) use super::client::HyperliquidClient;
+pub(in crate::exchanges::hyperliquid) use super::msgpack::{OrderedValue, encode_msgpack};
+pub(in crate::exchanges::hyperliquid) use super::params::HyperliquidParams;
 
 impl HyperliquidClient {
     pub async fn private_request(
@@ -68,56 +68,9 @@ impl HyperliquidClient {
                 )
                 .await
             }
-            "transfer_sub_account_usd" => {
-                if params.required_u64("usd")? == 0 {
-                    return Err(DcexError::InvalidInput("usd must be positive".into()));
-                }
-                self.submit_action(
-                    object(vec![
-                        ("type", string("subAccountTransfer")),
-                        ("subAccountUser", string(&params.address("subAccountUser")?)),
-                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
-                        ("usd", uint(params.required_u64("usd")?)),
-                    ]),
-                    &params,
-                )
-                .await
-            }
-            "transfer_sub_account_spot" => {
-                if !params
-                    .required("amount")?
-                    .parse::<f64>()
-                    .is_ok_and(|v| v.is_finite() && v > 0.0)
-                {
-                    return Err(DcexError::InvalidInput("amount must be positive".into()));
-                }
-                self.submit_action(
-                    object(vec![
-                        ("type", string("subAccountSpotTransfer")),
-                        ("subAccountUser", string(&params.address("subAccountUser")?)),
-                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
-                        ("token", string(params.required("token")?)),
-                        ("amount", string(params.required("amount")?)),
-                    ]),
-                    &params,
-                )
-                .await
-            }
-            "transfer_vault_usd" => {
-                if params.required_u64("usd")? == 0 {
-                    return Err(DcexError::InvalidInput("amount must be positive".into()));
-                }
-                self.submit_action(
-                    object(vec![
-                        ("type", string("vaultTransfer")),
-                        ("vaultAddress", string(&params.address("targetVault")?)),
-                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
-                        ("usd", uint(params.required_u64("usd")?)),
-                    ]),
-                    &params,
-                )
-                .await
-            }
+            "transfer_sub_account_usd" => self.moved_transfer_sub_account_usd(&params).await,
+            "transfer_sub_account_spot" => self.moved_transfer_sub_account_spot(&params).await,
+            "transfer_vault_usd" => self.moved_transfer_vault_usd(&params).await,
             "enable_agent_dex_abstraction" => {
                 self.submit_action(
                     object(vec![("type", string("agentEnableDexAbstraction"))]),
@@ -125,23 +78,9 @@ impl HyperliquidClient {
                 )
                 .await
             }
-            "transfer_hip3_liquidator" => {
-                if params.required_u64("ntl")? == 0 {
-                    return Err(DcexError::InvalidInput("amount must be positive".into()));
-                }
-                self.submit_action(
-                    object(vec![
-                        ("type", string("hip3LiquidatorTransfer")),
-                        ("dex", string(params.required("dex")?)),
-                        ("ntl", uint(params.required_u64("ntl")?)),
-                        ("isDeposit", bool_value(params.required_bool("isDeposit")?)),
-                    ]),
-                    &params,
-                )
-                .await
-            }
+            "transfer_hip3_liquidator" => self.moved_transfer_hip3_liquidator(&params).await,
             "deposit_staking_signed" => self.additional_user_action("cDeposit", &params).await,
-            "withdraw_staking_signed" => self.additional_user_action("cWithdraw", &params).await,
+            "withdraw_staking_signed" => self.moved_withdraw_staking_signed(&params).await,
             "delegate_tokens_signed" => self.additional_user_action("tokenDelegate", &params).await,
             "set_user_dex_abstraction_signed" => {
                 self.additional_user_action("userDexAbstraction", &params)
@@ -224,7 +163,7 @@ impl HyperliquidClient {
         }
     }
 
-    async fn additional_user_action(
+    pub(in crate::exchanges::hyperliquid) async fn additional_user_action(
         &self,
         kind: &str,
         params: &HyperliquidParams,
@@ -258,7 +197,7 @@ impl HyperliquidClient {
         self.request(HttpMethod::Post, EXCHANGE, body, None, false)
             .await
     }
-    async fn place_order_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn place_order_from_params(
         &self,
         params: &HyperliquidParams,
         is_buy_override: Option<bool>,
@@ -269,7 +208,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn place_market_order_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn place_market_order_from_params(
         &self,
         params: &HyperliquidParams,
         is_buy_override: Option<bool>,
@@ -323,89 +262,7 @@ impl HyperliquidClient {
         self.place_order_from_params(&params, None, None).await
     }
 
-    /// Places several orders in one `order` action, like hyperliquid-python-sdk `bulk_orders`.
-    ///
-    /// `orders` is a JSON array of objects using the `place_order` keys (`product_symbol`,
-    /// `isBuy`, `price`, `size`, `reduceOnly`, `tif` or `isMarket`/`triggerPx`/`tpsl`,
-    /// `cloid`). `grouping` applies to the whole action, so `normalTpsl`/`positionTpsl`
-    /// can carry an entry order together with its TP/SL children.
-    async fn place_batch_orders_from_params(
-        &self,
-        params: &HyperliquidParams,
-    ) -> Result<ValidatedResponse> {
-        const BATCH_ORDER_FIELDS: &[&str] = &[
-            "product_symbol",
-            "isBuy",
-            "price",
-            "size",
-            "reduceOnly",
-            "tif",
-            "isMarket",
-            "triggerPx",
-            "tpsl",
-            "cloid",
-        ];
-        let orders = batch_items(params, "orders", BATCH_ORDER_FIELDS)?
-            .iter()
-            .map(|order| {
-                let reduce_only = order.optional_bool("reduceOnly")?.unwrap_or(false);
-                self.order_value_from_params(order, None, Some(reduce_only))
-            })
-            .collect::<Result<Vec<_>>>()?;
-        let action = self.order_action(orders, params)?;
-        self.submit_action(action, params).await
-    }
-
-    /// Cancels several orders by `oid` in one `cancel` action (SDK `bulk_cancel`).
-    async fn cancel_batch_orders_from_params(
-        &self,
-        params: &HyperliquidParams,
-    ) -> Result<ValidatedResponse> {
-        let cancels = batch_items(params, "cancels", &["product_symbol", "oid"])?
-            .iter()
-            .map(|cancel| {
-                Ok(object(vec![
-                    (
-                        "a",
-                        uint(self.asset_id(cancel.required("product_symbol")?)?),
-                    ),
-                    ("o", uint(cancel.required_u64("oid")?)),
-                ]))
-            })
-            .collect::<Result<Vec<_>>>()?;
-        let action = object(vec![
-            ("type", string("cancel")),
-            ("cancels", array(cancels)),
-        ]);
-        self.submit_action(action, params).await
-    }
-
-    /// Cancels several orders by `cloid` in one `cancelByCloid` action
-    /// (SDK `bulk_cancel_by_cloid`).
-    async fn cancel_batch_orders_by_cloid_from_params(
-        &self,
-        params: &HyperliquidParams,
-    ) -> Result<ValidatedResponse> {
-        let cancels = batch_items(params, "cancels", &["product_symbol", "cloid"])?
-            .iter()
-            .map(|cancel| {
-                Ok(object(vec![
-                    (
-                        "asset",
-                        uint(self.asset_id(cancel.required("product_symbol")?)?),
-                    ),
-                    ("cloid", string(&cancel.cloid("cloid")?)),
-                ]))
-            })
-            .collect::<Result<Vec<_>>>()?;
-        let action = object(vec![
-            ("type", string("cancelByCloid")),
-            ("cancels", array(cancels)),
-        ]);
-        self.submit_action(action, params).await
-    }
-
-    async fn cancel_order_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn cancel_order_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -425,7 +282,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn cancel_order_by_cloid_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn cancel_order_by_cloid_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -445,7 +302,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn schedule_cancel_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn schedule_cancel_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -463,72 +320,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn transfer_between_dexes_from_params(
-        &self,
-        params: &HyperliquidParams,
-    ) -> Result<ValidatedResponse> {
-        let source_dex = params.get("sourceDex").unwrap_or("");
-        let destination_dex = params.get("destinationDex").unwrap_or("");
-        if source_dex == destination_dex {
-            return Err(DcexError::InvalidInput(
-                "Hyperliquid internal transfer requires distinct source and destination DEXes"
-                    .to_string(),
-            ));
-        }
-        let destination = self.wallet_address.as_deref().ok_or_else(|| {
-            DcexError::InvalidInput(
-                "Hyperliquid internal transfer requires wallet address".to_string(),
-            )
-        })?;
-        let token = params.required("token")?;
-        let amount = params.positive_decimal("amount")?;
-        let nonce = unix_timestamp_ms()?;
-        let action = object(vec![
-            ("type", string("agentSendAsset")),
-            ("destination", string(destination)),
-            ("sourceDex", string(source_dex)),
-            ("destinationDex", string(destination_dex)),
-            ("token", string(token)),
-            ("amount", string(amount)),
-            ("fromSubAccount", string("")),
-            ("nonce", uint(nonce)),
-        ]);
-        let payload = serde_json::json!({"action": action.to_json()});
-        self.exchange_payload_at_nonce(payload, encode_msgpack(&action), nonce)
-            .await
-    }
-
-    async fn transfer_usdc_spot_perp_from_params(
-        &self,
-        params: &HyperliquidParams,
-    ) -> Result<ValidatedResponse> {
-        let amount = params.positive_decimal("amount")?;
-        let to_perp = params.required_bool("toPerp")?;
-        let (nonce, signature_chain_id, signature) = user_signed_fields(params)?;
-        let chain = if self.is_testnet() {
-            "Testnet"
-        } else {
-            "Mainnet"
-        };
-        let payload = serde_json::json!({
-            "action": {
-                "type": "usdClassTransfer",
-                "hyperliquidChain": chain,
-                "signatureChainId": signature_chain_id,
-                "amount": amount,
-                "toPerp": to_perp,
-                "nonce": nonce,
-            },
-            "nonce": nonce,
-            "signature": signature,
-        });
-        let body =
-            serde_json::to_vec(&payload).map_err(|error| DcexError::Decode(error.to_string()))?;
-        self.request(HttpMethod::Post, EXCHANGE, body, None, false)
-            .await
-    }
-
-    async fn set_user_abstraction_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn set_user_abstraction_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -544,7 +336,7 @@ impl HyperliquidClient {
             .await
     }
 
-    async fn modify_order_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn modify_order_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -557,19 +349,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn modify_batch_orders_from_params(
-        &self,
-        params: &HyperliquidParams,
-    ) -> Result<ValidatedResponse> {
-        let modifies = normalize_batch_modifies(params.ordered_json_required("modifies")?)?;
-        let action = object(vec![
-            ("type", string("batchModify")),
-            ("modifies", modifies),
-        ]);
-        self.submit_action(action, params).await
-    }
-
-    async fn update_leverage_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn update_leverage_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -585,7 +365,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn update_isolate_margin_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn update_isolate_margin_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -601,7 +381,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn place_twap_order_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn place_twap_order_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -625,7 +405,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    async fn cancel_twap_order_from_params(
+    pub(in crate::exchanges::hyperliquid) async fn cancel_twap_order_from_params(
         &self,
         params: &HyperliquidParams,
     ) -> Result<ValidatedResponse> {
@@ -640,7 +420,7 @@ impl HyperliquidClient {
         self.submit_action(action, params).await
     }
 
-    fn order_action_from_params(
+    pub(in crate::exchanges::hyperliquid) fn order_action_from_params(
         &self,
         params: &HyperliquidParams,
         is_buy_override: Option<bool>,
@@ -650,7 +430,7 @@ impl HyperliquidClient {
         self.order_action(vec![order], params)
     }
 
-    fn order_action(
+    pub(in crate::exchanges::hyperliquid) fn order_action(
         &self,
         orders: Vec<OrderedValue>,
         params: &HyperliquidParams,
@@ -689,7 +469,7 @@ impl HyperliquidClient {
         Ok(object(fields))
     }
 
-    fn order_value_from_params(
+    pub(in crate::exchanges::hyperliquid) fn order_value_from_params(
         &self,
         params: &HyperliquidParams,
         is_buy_override: Option<bool>,
@@ -789,7 +569,10 @@ impl HyperliquidClient {
     }
 
     /// Returns `(mid price, szDecimals, is_spot)` for a market order.
-    async fn mid_price(&self, product_symbol: &str) -> Result<(f64, u32, bool)> {
+    pub(in crate::exchanges::hyperliquid) async fn mid_price(
+        &self,
+        product_symbol: &str,
+    ) -> Result<(f64, u32, bool)> {
         let coin = self.coin(product_symbol)?;
         let spot_asset = self
             .symbol_parts(product_symbol)
@@ -842,7 +625,11 @@ impl HyperliquidClient {
     }
 
     /// Reads a spot mid price and base-token szDecimals from `spotMetaAndAssetCtxs`.
-    async fn spot_mid_price(&self, coin: &str, asset: Option<u64>) -> Result<(f64, u32)> {
+    pub(in crate::exchanges::hyperliquid) async fn spot_mid_price(
+        &self,
+        coin: &str,
+        asset: Option<u64>,
+    ) -> Result<(f64, u32)> {
         let response = self
             .info_payload(serde_json::json!({"type": "spotMetaAndAssetCtxs"}))
             .await?;
@@ -911,10 +698,10 @@ impl HyperliquidClient {
 }
 
 /// Spot asset ids are `10000 + spot index`; HIP-3 perp dex ids start at 100000.
-const SPOT_ASSET_OFFSET: u64 = 10_000;
-const HIP3_ASSET_OFFSET: u64 = 100_000;
+pub(in crate::exchanges::hyperliquid) const SPOT_ASSET_OFFSET: u64 = 10_000;
+pub(in crate::exchanges::hyperliquid) const HIP3_ASSET_OFFSET: u64 = 100_000;
 
-fn parse_mid_price(context: &Value) -> Result<f64> {
+pub(in crate::exchanges::hyperliquid) fn parse_mid_price(context: &Value) -> Result<f64> {
     let mid_price = context
         .get("midPx")
         .ok_or_else(|| DcexError::Decode("Hyperliquid asset context missing midPx".to_string()))?;
@@ -932,7 +719,10 @@ fn parse_mid_price(context: &Value) -> Result<f64> {
 }
 
 impl HyperliquidParams {
-    fn with_overrides(&self, overrides: Vec<(String, String)>) -> HyperliquidParams {
+    pub(in crate::exchanges::hyperliquid) fn with_overrides(
+        &self,
+        overrides: Vec<(String, String)>,
+    ) -> HyperliquidParams {
         let mut pairs = self.0.clone();
         for (key, value) in overrides {
             if let Some((_, existing)) = pairs.iter_mut().find(|(candidate, _)| candidate == &key) {
@@ -944,14 +734,14 @@ impl HyperliquidParams {
         HyperliquidParams::from_pairs(pairs)
     }
 
-    fn push(&mut self, key: &str, value: &str) {
+    pub(in crate::exchanges::hyperliquid) fn push(&mut self, key: &str, value: &str) {
         if self.get(key).is_none() {
             self.0.push((key.to_string(), value.to_string()));
         }
     }
 }
 
-fn object(values: Vec<(&str, OrderedValue)>) -> OrderedValue {
+pub(in crate::exchanges::hyperliquid) fn object(values: Vec<(&str, OrderedValue)>) -> OrderedValue {
     OrderedValue::Object(
         values
             .into_iter()
@@ -960,19 +750,19 @@ fn object(values: Vec<(&str, OrderedValue)>) -> OrderedValue {
     )
 }
 
-fn array(values: Vec<OrderedValue>) -> OrderedValue {
+pub(in crate::exchanges::hyperliquid) fn array(values: Vec<OrderedValue>) -> OrderedValue {
     OrderedValue::Array(values)
 }
 
-fn string(value: &str) -> OrderedValue {
+pub(in crate::exchanges::hyperliquid) fn string(value: &str) -> OrderedValue {
     OrderedValue::String(value.to_string())
 }
 
-fn int(value: i64) -> OrderedValue {
+pub(in crate::exchanges::hyperliquid) fn int(value: i64) -> OrderedValue {
     OrderedValue::Int(value)
 }
 
-fn order_identifier(value: &str) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn order_identifier(value: &str) -> Result<OrderedValue> {
     if value.starts_with("0x") || value.starts_with("0X") {
         return Ok(string(&super::params::normalize_cloid(value, "oid")?));
     }
@@ -983,15 +773,18 @@ fn order_identifier(value: &str) -> Result<OrderedValue> {
     })
 }
 
-fn uint(value: u64) -> OrderedValue {
+pub(in crate::exchanges::hyperliquid) fn uint(value: u64) -> OrderedValue {
     OrderedValue::Uint(value)
 }
 
-fn bool_value(value: bool) -> OrderedValue {
+pub(in crate::exchanges::hyperliquid) fn bool_value(value: bool) -> OrderedValue {
     OrderedValue::Bool(value)
 }
 
-fn positive_u64(params: &HyperliquidParams, key: &str) -> Result<u64> {
+pub(in crate::exchanges::hyperliquid) fn positive_u64(
+    params: &HyperliquidParams,
+    key: &str,
+) -> Result<u64> {
     let value = params.required_u64(key)?;
     if value == 0 {
         return Err(DcexError::InvalidInput(format!(
@@ -1038,7 +831,10 @@ pub(super) fn user_signed_fields(params: &HyperliquidParams) -> Result<(u64, &st
     Ok((nonce, chain_id, signature))
 }
 
-fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Result<()> {
+pub(in crate::exchanges::hyperliquid) fn validate_private_params(
+    method_name: &str,
+    params: &HyperliquidParams,
+) -> Result<()> {
     const ORDER_FIELDS: &[&str] = &[
         "product_symbol",
         "isBuy",
@@ -1238,7 +1034,7 @@ fn validate_private_params(method_name: &str, params: &HyperliquidParams) -> Res
 ///
 /// Values must be strings, booleans or integers; floats are rejected so prices and sizes
 /// stay exact decimal strings on the wire. `null` values are treated as absent.
-fn batch_items(
+pub(in crate::exchanges::hyperliquid) fn batch_items(
     params: &HyperliquidParams,
     key: &str,
     allowed: &[&str],
@@ -1282,7 +1078,9 @@ fn batch_items(
         .collect()
 }
 
-fn normalize_batch_modifies(value: OrderedValue) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn normalize_batch_modifies(
+    value: OrderedValue,
+) -> Result<OrderedValue> {
     let OrderedValue::Array(modifies) = value else {
         return Err(DcexError::InvalidInput(
             "Hyperliquid modifies must be a JSON array".to_string(),
@@ -1300,7 +1098,9 @@ fn normalize_batch_modifies(value: OrderedValue) -> Result<OrderedValue> {
         .map(array)
 }
 
-fn normalize_modify(value: &OrderedValue) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn normalize_modify(
+    value: &OrderedValue,
+) -> Result<OrderedValue> {
     let fields = exact_object(value, "modify", &["oid", "order"], &["oid", "order"])?;
     Ok(object(vec![
         ("oid", normalize_wire_oid(field(fields, "oid")?)?),
@@ -1334,7 +1134,9 @@ pub(super) fn normalize_wire_order(value: &OrderedValue) -> Result<OrderedValue>
     Ok(object(normalized))
 }
 
-fn normalize_wire_order_type(value: &OrderedValue) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn normalize_wire_order_type(
+    value: &OrderedValue,
+) -> Result<OrderedValue> {
     let fields = exact_object(value, "modify order type", &["limit", "trigger"], &[])?;
     match (
         optional_field(fields, "limit"),
@@ -1392,14 +1194,19 @@ fn normalize_wire_order_type(value: &OrderedValue) -> Result<OrderedValue> {
     }
 }
 
-fn normalize_wire_oid(value: &OrderedValue) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn normalize_wire_oid(
+    value: &OrderedValue,
+) -> Result<OrderedValue> {
     match value {
         OrderedValue::String(value) => Ok(string(&super::params::normalize_cloid(value, "oid")?)),
         _ => normalize_unsigned(value, "oid"),
     }
 }
 
-fn normalize_unsigned(value: &OrderedValue, key: &str) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn normalize_unsigned(
+    value: &OrderedValue,
+    key: &str,
+) -> Result<OrderedValue> {
     match value {
         OrderedValue::Uint(value) => Ok(uint(*value)),
         OrderedValue::Int(value) if *value >= 0 => Ok(uint(*value as u64)),
@@ -1409,7 +1216,10 @@ fn normalize_unsigned(value: &OrderedValue, key: &str) -> Result<OrderedValue> {
     }
 }
 
-fn normalize_boolean(value: &OrderedValue, key: &str) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn normalize_boolean(
+    value: &OrderedValue,
+    key: &str,
+) -> Result<OrderedValue> {
     match value {
         OrderedValue::Bool(value) => Ok(bool_value(*value)),
         _ => Err(DcexError::InvalidInput(format!(
@@ -1418,7 +1228,10 @@ fn normalize_boolean(value: &OrderedValue, key: &str) -> Result<OrderedValue> {
     }
 }
 
-fn normalize_positive_string(value: &OrderedValue, key: &str) -> Result<OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn normalize_positive_string(
+    value: &OrderedValue,
+    key: &str,
+) -> Result<OrderedValue> {
     let OrderedValue::String(value) = value else {
         return Err(DcexError::InvalidInput(format!(
             "Hyperliquid {key} must be a decimal string"
@@ -1435,7 +1248,7 @@ fn normalize_positive_string(value: &OrderedValue, key: &str) -> Result<OrderedV
     Ok(string(value))
 }
 
-fn exact_object<'a>(
+pub(in crate::exchanges::hyperliquid) fn exact_object<'a>(
     value: &'a OrderedValue,
     label: &str,
     allowed: &[&str],
@@ -1468,18 +1281,28 @@ fn exact_object<'a>(
     Ok(fields)
 }
 
-fn field<'a>(fields: &'a [(String, OrderedValue)], key: &str) -> Result<&'a OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn field<'a>(
+    fields: &'a [(String, OrderedValue)],
+    key: &str,
+) -> Result<&'a OrderedValue> {
     optional_field(fields, key)
         .ok_or_else(|| DcexError::InvalidInput(format!("missing Hyperliquid field: {key}")))
 }
 
-fn optional_field<'a>(fields: &'a [(String, OrderedValue)], key: &str) -> Option<&'a OrderedValue> {
+pub(in crate::exchanges::hyperliquid) fn optional_field<'a>(
+    fields: &'a [(String, OrderedValue)],
+    key: &str,
+) -> Option<&'a OrderedValue> {
     fields
         .iter()
         .find_map(|(candidate, value)| (candidate == key).then_some(value))
 }
 
-fn format_market_order_price(value: f64, is_buy: bool, max_decimals: u32) -> String {
+pub(in crate::exchanges::hyperliquid) fn format_market_order_price(
+    value: f64,
+    is_buy: bool,
+    max_decimals: u32,
+) -> String {
     if value <= 0.0 || !value.is_finite() {
         return "0".to_string();
     }
@@ -1507,7 +1330,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn order_requires_limit_or_trigger_type() {
+    pub(in crate::exchanges::hyperliquid) fn order_requires_limit_or_trigger_type() {
         let client = HyperliquidClient::public(false, Duration::from_secs(1)).expect("client");
         let params = HyperliquidParams::from_pairs(vec![
             ("product_symbol".to_string(), "BTC".to_string()),
@@ -1521,7 +1344,7 @@ mod tests {
     }
 
     #[test]
-    fn modify_identifier_preserves_cloid() {
+    pub(in crate::exchanges::hyperliquid) fn modify_identifier_preserves_cloid() {
         assert_eq!(
             order_identifier("0x1234567890abcdef1234567890abcdef").expect("cloid"),
             OrderedValue::String("0x1234567890abcdef1234567890abcdef".to_string())
@@ -1530,14 +1353,15 @@ mod tests {
     }
 
     #[test]
-    fn market_price_respects_significant_figures_and_asset_decimals() {
+    pub(in crate::exchanges::hyperliquid) fn market_price_respects_significant_figures_and_asset_decimals()
+     {
         assert_eq!(format_market_order_price(0.090527, true, 5), "0.09053");
         assert_eq!(format_market_order_price(0.090527, false, 5), "0.09052");
         assert_eq!(format_market_order_price(103.0, true, 1), "103");
     }
 
     #[test]
-    fn transfer_rejects_identical_dexes_before_network() {
+    pub(in crate::exchanges::hyperliquid) fn transfer_rejects_identical_dexes_before_network() {
         let client = HyperliquidClient::public(false, Duration::from_secs(1)).expect("client");
         let error = crate::http::block_on(async move {
             client

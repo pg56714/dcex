@@ -25,6 +25,9 @@ ENDPOINT_FILE_SUFFIXES = (
     "_public_http.py",
     "_trade_http.py",
     "_trading_http.py",
+    "_withdrawals_http.py",
+    "_transfers_http.py",
+    "_batch_http.py",
 )
 NO_REQUEST_METHODS = {
     "check_client",
@@ -358,6 +361,8 @@ def _client_class(mode: str, exchange: str) -> type:
 
 
 def _client_kwargs(exchange: str) -> dict[str, Any]:
+    if exchange == "arcus":
+        return {"address": "0x" + "1" * 40, "account_index": 0}
     kwargs: dict[str, Any] = {"preload_product_table": False}
     if exchange == "aster":
         kwargs.update(
@@ -414,7 +419,7 @@ def _wire_sync(client: Any) -> list[dict[str, Any]]:
         return {"ok": True}
 
     client._request = fake_request
-    if hasattr(client, "_native_public"):
+    if hasattr(client, "_native_public") or getattr(client, "EXCHANGE", None) == Common.ARCUS:
         client._native_client = FakeSyncNativePublicClient(calls)
     return calls
 
@@ -442,7 +447,7 @@ def _wire_async(client: Any) -> list[dict[str, Any]]:
         return {"ok": True}
 
     client._request = fake_request
-    if hasattr(client, "_native_public"):
+    if hasattr(client, "_native_public") or getattr(client, "EXCHANGE", None) == Common.ARCUS:
         client._native_client = FakeAsyncNativePublicClient(calls)
     return calls
 
@@ -516,6 +521,11 @@ def _sample_order(exchange: str) -> dict[str, Any]:
 def _sample_value(case: EndpointCase, parameter: inspect.Parameter) -> Any:
     name = parameter.name
     method_name = case.method_name
+
+    if case.exchange == "arcus" and name == "signed_transfer":
+        return {"amount": "1", "sourceSubaccount": "1", "targetSubaccount": "2"}
+    if case.exchange == "arcus" and name == "cancels":
+        return [{"product_symbol": "BTC-USD-SWAP", "order_id": "1"}]
 
     if name == "body" and method_name == "submit_internal_transfer":
         return {"amount": "1", "sourceSubaccount": "1", "targetSubaccount": "2"}

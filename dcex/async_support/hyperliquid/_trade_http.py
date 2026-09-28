@@ -5,25 +5,14 @@
 import json
 from typing import Any
 
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPTransfersHTTP, TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, HTTPManager):
     """HTTP client for trading operations on Hyperliquid exchange."""
-
-    async def transfer_between_dexes(
-        self, source_dex: str, destination_dex: str, token: str, amount: str
-    ) -> dict[str, Any]:
-        """Move collateral between this wallet''s Spot and Perp DEX balances."""
-        return await self._native_private(
-            "transfer_between_dexes",
-            self._native_params(
-                sourceDex=source_dex,
-                destinationDex=destination_dex,
-                token=token,
-                amount=amount,
-            ),
-        )
 
     async def place_order(
         self,
@@ -182,48 +171,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(**locals()),
         )
 
-    async def place_batch_orders(
-        self,
-        orders: list[dict[str, Any]],
-        grouping: str = "na",
-        builder_address: str | None = None,
-        fee_ten_bp: int | None = None,
-        vaultAddress: str | None = None,
-        expiresAfter: int | None = None,
-    ) -> dict[str, Any]:
-        """
-        Place several orders in one signed ``order`` action.
-
-        Each order uses the ``place_order`` keys (``product_symbol``, ``isBuy``,
-        ``price``, ``size``, optional ``reduceOnly``, ``tif`` or
-        ``isMarket``/``triggerPx``/``tpsl``, ``cloid``). ``grouping`` may be
-        ``normalTpsl`` or ``positionTpsl`` to send an entry with its TP/SL orders.
-        """
-        if (builder_address is None) != (fee_ten_bp is None):
-            raise ValueError("builder_address and fee_ten_bp must be provided together")
-        return await self._native_private("place_batch_orders", self._native_params(**locals()))
-
-    async def cancel_batch_orders(
-        self,
-        cancels: list[dict[str, Any]],
-        vaultAddress: str | None = None,
-        expiresAfter: int | None = None,
-    ) -> dict[str, Any]:
-        """Cancel several orders (``product_symbol`` + ``oid`` each) in one action."""
-        return await self._native_private("cancel_batch_orders", self._native_params(**locals()))
-
-    async def cancel_batch_orders_by_cloid(
-        self,
-        cancels: list[dict[str, Any]],
-        vaultAddress: str | None = None,
-        expiresAfter: int | None = None,
-    ) -> dict[str, Any]:
-        """Cancel several orders (``product_symbol`` + ``cloid`` each) in one action."""
-        return await self._native_private(
-            "cancel_batch_orders_by_cloid",
-            self._native_params(**locals()),
-        )
-
     async def cancel_order(
         self,
         product_symbol: str,
@@ -274,18 +221,6 @@ class TradeHTTP(HTTPManager):
     ) -> dict[str, Any]:
         """Modify an existing order."""
         return await self._native_private("modify_order", self._native_params(**locals()))
-
-    async def modify_batch_orders(
-        self,
-        modifies: list,
-        vaultAddress: str | None = None,
-        expiresAfter: int | None = None,
-    ) -> dict[str, Any]:
-        """Modify multiple orders in batch."""
-        return await self._native_private(
-            "modify_batch_orders",
-            self._native_params(**locals()),
-        )
 
     async def update_leverage(
         self,
@@ -350,31 +285,6 @@ class TradeHTTP(HTTPManager):
         """Cancel a TWAP order."""
         return await self._native_private("cancel_twap_order", self._native_params(**locals()))
 
-    async def transfer_usdc_spot_perp(
-        self,
-        amount: str,
-        to_perp: bool,
-        nonce: int,
-        signature: dict[str, str | int],
-        signature_chain_id: str,
-    ) -> dict[str, Any]:
-        """
-        Submit a wallet-signed USDC transfer between the user's spot and perp accounts.
-
-        The signature must be EIP-712 signed by the user's wallet for this exact
-        usdClassTransfer action and nonce. API agent signatures are not accepted.
-        """
-        return await self._native_private(
-            "transfer_usdc_spot_perp",
-            self._native_params(
-                amount=amount,
-                toPerp=to_perp,
-                nonce=nonce,
-                signature=signature,
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
     async def noop(
         self, nonce: int, *, vault_address: str | None = None, expires_after: int | None = None
     ) -> dict[str, Any] | list[Any]:
@@ -435,34 +345,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def transfer_vault_usd(
-        self,
-        *,
-        target_vault: str | None = None,
-        vault_address: str | None = None,
-        is_deposit: bool,
-        usd: int,
-        nonce: int | None = None,
-        expires_after: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        Transfer raw USD units to/from target_vault (1 USD = 1,000,000 units).
-
-        vault_address is a compatibility alias for target_vault, not a signing vault.
-        """
-        if (target_vault is None) == (vault_address is None):
-            raise ValueError("provide exactly one of target_vault or vault_address")
-        return await self._native_private(
-            "transfer_vault_usd",
-            self._native_params(
-                targetVault=target_vault if target_vault is not None else vault_address,
-                isDeposit=is_deposit,
-                usd=usd,
-                nonce=nonce,
-                expiresAfter=expires_after,
-            ),
-        )
-
     async def enable_agent_dex_abstraction(
         self, *, nonce: int | None = None, expires_after: int | None = None
     ) -> Any:  # noqa: ANN401
@@ -470,23 +352,6 @@ class TradeHTTP(HTTPManager):
         return await self._native_private(
             "enable_agent_dex_abstraction",
             self._native_params(nonce=nonce, expiresAfter=expires_after),
-        )
-
-    async def transfer_hip3_liquidator(
-        self,
-        *,
-        dex: str,
-        ntl: int,
-        is_deposit: bool,
-        nonce: int | None = None,
-        expires_after: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """hip3LiquidatorTransfer. Amounts use the integer units defined by Hyperliquid."""
-        return await self._native_private(
-            "transfer_hip3_liquidator",
-            self._native_params(
-                dex=dex, ntl=ntl, isDeposit=is_deposit, nonce=nonce, expiresAfter=expires_after
-            ),
         )
 
     async def deposit_staking_signed(
@@ -498,23 +363,6 @@ class TradeHTTP(HTTPManager):
         """
         return await self._native_private(
             "deposit_staking_signed",
-            self._native_params(
-                wei=wei,
-                nonce=nonce,
-                signature=json.dumps(signature, separators=(",", ":"), allow_nan=False),
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
-    async def withdraw_staking_signed(
-        self, *, wei: int, nonce: int, signature: dict[str, Any], signature_chain_id: str
-    ) -> Any:  # noqa: ANN401
-        """
-        cWithdraw. Supply the documented wallet EIP-712 signature; nonce and chain ID are
-        forwarded unchanged.
-        """
-        return await self._native_private(
-            "withdraw_staking_signed",
             self._native_params(
                 wei=wei,
                 nonce=nonce,
@@ -582,54 +430,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(name=account_name, nonce=nonce, expiresAfter=expires_after),
         )
 
-    async def transfer_sub_account_usd(
-        self,
-        *,
-        sub_account_user: str,
-        is_deposit: bool,
-        usd: int,
-        nonce: int | None = None,
-        expires_after: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """
-        subAccountTransfer within the authenticated master/subaccount family.
-
-        usd uses raw integer units: 1 USD = 1,000,000 units.
-        """
-        return await self._native_private(
-            "transfer_sub_account_usd",
-            self._native_params(
-                subAccountUser=sub_account_user,
-                isDeposit=is_deposit,
-                usd=usd,
-                nonce=nonce,
-                expiresAfter=expires_after,
-            ),
-        )
-
-    async def transfer_sub_account_spot(
-        self,
-        *,
-        sub_account_user: str,
-        is_deposit: bool,
-        token: str,
-        amount: str,
-        nonce: int | None = None,
-        expires_after: int | None = None,
-    ) -> Any:  # noqa: ANN401
-        """subAccountSpotTransfer within the authenticated master/subaccount family."""
-        return await self._native_private(
-            "transfer_sub_account_spot",
-            self._native_params(
-                subAccountUser=sub_account_user,
-                isDeposit=is_deposit,
-                token=token,
-                amount=amount,
-                nonce=nonce,
-                expiresAfter=expires_after,
-            ),
-        )
-
     async def approve_agent_signed(
         self,
         *,
@@ -678,128 +478,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    async def send_asset_signed(
-        self,
-        *,
-        destination: str,
-        source_dex: str,
-        destination_dex: str,
-        token: str,
-        amount: str,
-        from_sub_account: str,
-        nonce: int,
-        signature: dict[str, str | int],
-        signature_chain_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit sendAsset with a caller-provided wallet EIP-712 signature.
-
-        The amount and signed strings are preserved exactly. Empty DEX names denote the default
-        perpetual DEX.
-        API withdrawals have no second confirmation; they execute on submit.
-        https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-asset
-        """
-        return await self._native_private(
-            "send_asset_signed",
-            self._native_params(
-                destination=destination,
-                sourceDex=source_dex,
-                destinationDex=destination_dex,
-                token=token,
-                amount=amount,
-                fromSubAccount=from_sub_account,
-                nonce=nonce,
-                signature=signature,
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
-    async def send_usd_signed(
-        self,
-        *,
-        destination: str,
-        amount: str,
-        nonce: int,
-        signature: dict[str, str | int],
-        signature_chain_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit usdSend with a caller-provided wallet EIP-712 signature.
-
-        The amount and signed strings are preserved exactly. Empty DEX names denote the default
-        perpetual DEX.
-        API withdrawals have no second confirmation; they execute on submit.
-        https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-usdc-transfer
-        """
-        return await self._native_private(
-            "send_usd_signed",
-            self._native_params(
-                destination=destination,
-                amount=amount,
-                nonce=nonce,
-                signature=signature,
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
-    async def send_spot_signed(
-        self,
-        *,
-        destination: str,
-        token: str,
-        amount: str,
-        nonce: int,
-        signature: dict[str, str | int],
-        signature_chain_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit spotSend with a caller-provided wallet EIP-712 signature.
-
-        The amount and signed strings are preserved exactly. Empty DEX names denote the default
-        perpetual DEX.
-        API withdrawals have no second confirmation; they execute on submit.
-        https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#core-spot-transfer
-        """
-        return await self._native_private(
-            "send_spot_signed",
-            self._native_params(
-                destination=destination,
-                token=token,
-                amount=amount,
-                nonce=nonce,
-                signature=signature,
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
-    async def withdraw_from_bridge_signed(
-        self,
-        *,
-        destination: str,
-        amount: str,
-        nonce: int,
-        signature: dict[str, str | int],
-        signature_chain_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit withdraw3 with a caller-provided wallet EIP-712 signature.
-
-        The amount and signed strings are preserved exactly. Empty DEX names denote the default
-        perpetual DEX.
-        API withdrawals have no second confirmation; they execute on submit.
-        https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#initiate-a-withdrawal-request
-        """
-        return await self._native_private(
-            "withdraw_from_bridge_signed",
-            self._native_params(
-                destination=destination,
-                amount=amount,
-                nonce=nonce,
-                signature=signature,
-                signatureChainId=signature_chain_id,
-            ),
-        )
-
     async def approve_builder_fee_signed(
         self,
         *,
@@ -824,28 +502,5 @@ class TradeHTTP(HTTPManager):
                 nonce=nonce,
                 signature=signature,
                 signatureChainId=signature_chain_id,
-            ),
-        )
-
-    async def send_to_evm_with_data_signed(
-        self,
-        *,
-        action: dict[str, Any],
-        nonce: int,
-        signature: dict[str, str | int],
-        signature_chain_id: str,
-    ) -> Any:  # noqa: ANN401
-        """
-        Submit sendToEvmWithData with a caller-provided wallet EIP-712 signature.
-
-        Supply the complete signed action. The official table calls data bytes without defining its
-        JSON encoding; data is forwarded unchanged. Not verified live.
-        API withdrawals have no second confirmation; they execute on submit.
-        https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/exchange-endpoint#send-to-evm-with-data
-        """
-        return await self._native_private(
-            "send_to_evm_with_data_signed",
-            self._native_params(
-                action=action, nonce=nonce, signature=signature, signatureChainId=signature_chain_id
             ),
         )

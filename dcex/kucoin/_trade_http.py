@@ -1,13 +1,15 @@
 """KuCoin trading HTTP client backed by Rust."""
 
-import json
 from typing import Any
 
 from .._operation_guards import require_confirmation, require_scope
+from ._batch_http import TradeHTTPBatchHTTP
 from ._http_manager import HTTPManager
+from ._transfers_http import TradeHTTPTransfersHTTP
+from ._withdrawals_http import TradeHTTPWithdrawalsHTTP
 
 
-class TradeHTTP(HTTPManager):
+class TradeHTTP(TradeHTTPBatchHTTP, TradeHTTPWithdrawalsHTTP, TradeHTTPTransfersHTTP, HTTPManager):
     """HTTP client for KuCoin spot and futures trading APIs."""
 
     def set_dcp(
@@ -278,27 +280,6 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "place_spot_post_only_limit_sell_order",
             self._native_params(**locals()),
-        )
-
-    def place_spot_batch_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """Place KuCoin spot batch orders."""
-        return self._native_private(
-            "place_spot_batch_orders",
-            self._native_params(orders=orders),
-        )
-
-    def place_spot_batch_limit_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """Place KuCoin spot batch limit orders."""
-        return self._native_private(
-            "place_spot_batch_limit_orders",
-            self._native_params(orders=orders),
-        )
-
-    def place_spot_batch_market_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """Place KuCoin spot batch market orders."""
-        return self._native_private(
-            "place_spot_batch_market_orders",
-            self._native_params(orders=orders),
         )
 
     def alter_spot_order(
@@ -883,20 +864,6 @@ class TradeHTTP(HTTPManager):
                 endAt=end_at,
                 lastId=last_id,
                 pageSize=page_size,
-            ),
-        )
-
-    def batch_cancel_uta_orders(
-        self,
-        trade_type: str,
-        cancel_order_list: list[dict[str, Any]],
-    ) -> dict[str, Any]:
-        """Cancel 1 to 20 UTA orders; each item needs symbol and orderId or clientOid."""
-        return self._native_private(
-            "batch_cancel_uta_orders",
-            self._native_params(
-                tradeType=trade_type,
-                cancelOrderList=json.dumps(cancel_order_list),
             ),
         )
 
@@ -1894,15 +1861,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def get_futures_max_withdraw_margin(
-        self, product_symbol: str, *, position_side: str | None = None
-    ) -> dict[str, Any]:
-        """GET /api/v1/margin/maxWithdrawMargin; classic trading account."""
-        return self._native_private(
-            "get_futures_max_withdraw_margin",
-            self._native_params(product_symbol=product_symbol, positionSide=position_side),
-        )
-
     def add_futures_isolated_margin(
         self, product_symbol: str, margin: str, biz_no: str, *, position_side: str | None = None
     ) -> dict[str, Any]:
@@ -1991,34 +1949,6 @@ class TradeHTTP(HTTPManager):
                 forward=forward,
                 maxCount=max_count,
             ),
-        )
-
-    def place_futures_batch_orders(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """Place 1 to 20 futures orders with native order fields or product_symbol."""
-        return self._native_private(
-            "place_futures_batch_orders", self._native_params(orders=json.dumps(orders))
-        )
-
-    def cancel_futures_batch_orders(
-        self,
-        *,
-        order_ids: list[str] | None = None,
-        client_orders: list[dict[str, str]] | None = None,
-    ) -> dict[str, Any]:
-        """Cancel up to 10 orders; provide exactly one of order_ids or client_orders."""
-        return self._native_private(
-            "cancel_futures_batch_orders",
-            self._native_params(
-                orderIdsList=json.dumps(order_ids) if order_ids is not None else None,
-                clientOidsList=json.dumps(client_orders) if client_orders is not None else None,
-            ),
-        )
-
-    def set_futures_batch_margin_mode(self, margin_mode: str, symbols: list[str]) -> dict[str, Any]:
-        """Change margin mode for a list of contracts."""
-        return self._native_private(
-            "set_futures_batch_margin_mode",
-            self._native_params(marginMode=margin_mode, symbols=json.dumps(symbols)),
         )
 
     def get_spot_stop_order_by_client_oid(
@@ -2212,37 +2142,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def transfer_uta_accounts(
-        self,
-        client_oid: str,
-        transfer_type: str,
-        currency: str,
-        amount: str,
-        from_account_type: str,
-        from_account_tag: str,
-        to_account_type: str,
-        to_account_tag: str,
-        *,
-        from_uid: str | None = None,
-        to_uid: str | None = None,
-    ) -> dict[str, Any]:
-        """Call ``POST /api/ua/v2/account/transfer``."""
-        return self._native_private(
-            "transfer_uta_accounts",
-            self._native_params(
-                clientOid=client_oid,
-                transferType=transfer_type,
-                currency=currency,
-                amount=amount,
-                fromUid=from_uid,
-                fromAccountType=from_account_type,
-                fromAccountTag=from_account_tag,
-                toUid=to_uid,
-                toAccountType=to_account_type,
-                toAccountTag=to_account_tag,
-            ),
-        )
-
     def get_uta_account_mode(self) -> dict[str, Any]:
         """Call ``GET /api/ua/v2/account/mode``."""
         return self._native_private("get_uta_account_mode", self._native_params())
@@ -2302,17 +2201,6 @@ class TradeHTTP(HTTPManager):
             ),
         )
 
-    def get_uta_transfer_quota(
-        self, account_type: str, currency: str, *, product_symbol: str | None = None
-    ) -> dict[str, Any]:
-        """Call ``GET /api/ua/v2/account/transfer-quota``."""
-        return self._native_private(
-            "get_uta_transfer_quota",
-            self._native_params(
-                accountType=account_type, currency=currency, product_symbol=product_symbol
-            ),
-        )
-
     def place_spot_order_sync(
         self,
         product_symbol: str,
@@ -2335,13 +2223,6 @@ class TradeHTTP(HTTPManager):
         return self._native_private(
             "place_spot_order_sync",
             self._native_params(**locals()),
-        )
-
-    def place_spot_batch_orders_sync(self, orders: list[dict[str, Any]]) -> dict[str, Any]:
-        """Place orders using the endpoint that waits for the matching result."""
-        return self._native_private(
-            "place_spot_batch_orders_sync",
-            self._native_params(orders=orders),
         )
 
     def cancel_spot_order_sync(self, product_symbol: str, order_id: str) -> dict[str, Any]:
@@ -2921,22 +2802,6 @@ class TradeHTTP(HTTPManager):
             "get_uta_sub_account_api_list", self._native_params(apiKey=api_key, subName=sub_name)
         )
 
-    def set_uta_sub_account_transfer_permission(
-        self, *, sub_uids: str, sub_to_sub: bool
-    ) -> dict[str, Any]:
-        """
-
-        POST /api/ua/v2/sub-account/canTransferOut.
-
-        Use native exchange symbols and decimal strings. Source:
-        https://www.kucoin.com/docs-new/v2/rest/ua/transfer-permission
-
-        """
-        return self._native_private(
-            "set_uta_sub_account_transfer_permission",
-            self._native_params(subUids=sub_uids, subToSub=sub_to_sub),
-        )
-
     def get_account_info(self) -> dict[str, Any]:
         """
 
@@ -2981,53 +2846,6 @@ class TradeHTTP(HTTPManager):
             self._native_params(
                 password=password, remarks=remarks, subName=sub_name, access=access, mode=mode
             ),
-        )
-
-    def get_withdrawal_history_by_id(self, *, withdrawal_id: str) -> dict[str, Any]:
-        """
-        GET /api/v1/withdrawals/{withdrawalId}.
-
-        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-by-id
-        """
-        return self._native_private(
-            "get_withdrawal_history_by_id", self._native_params(withdrawalId=withdrawal_id)
-        )
-
-    def get_withdrawal_history(
-        self,
-        *,
-        currency: str,
-        status: str | None = None,
-        start_at: int | None = None,
-        end_at: int | None = None,
-        current_page: int | None = None,
-        page_size: int | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/v1/withdrawals.
-
-        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-history
-        """
-        return self._native_private(
-            "get_withdrawal_history",
-            self._native_params(
-                currency=currency,
-                status=status,
-                startAt=start_at,
-                endAt=end_at,
-                currentPage=current_page,
-                pageSize=page_size,
-            ),
-        )
-
-    def get_withdrawal_quotas(self, *, currency: str, chain: str | None = None) -> dict[str, Any]:
-        """
-        GET /api/v1/withdrawals/quotas.
-
-        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/get-withdrawal-quotas
-        """
-        return self._native_private(
-            "get_withdrawal_quotas", self._native_params(currency=currency, chain=chain)
         )
 
     def get_loan_info(self) -> dict[str, Any]:
@@ -3098,55 +2916,6 @@ class TradeHTTP(HTTPManager):
             "get_uta_loan_info", self._native_params(accountType=account_type)
         )
 
-    def get_uta_withdrawal_history(
-        self,
-        *,
-        currency: str | None = None,
-        id: str | None = None,
-        status: str | None = None,
-        start_at: int | None = None,
-        end_at: int | None = None,
-        current_page: int | None = None,
-        page_size: int | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/ua/v2/asset/withdrawal/history.
-
-        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal-history
-        """
-        return self._native_private(
-            "get_uta_withdrawal_history",
-            self._native_params(
-                currency=currency,
-                id=id,
-                status=status,
-                startAt=start_at,
-                endAt=end_at,
-                currentPage=current_page,
-                pageSize=page_size,
-            ),
-        )
-
-    def get_uta_withdrawal_quotas(
-        self,
-        *,
-        currency: str,
-        withdraw_type: str,
-        chain: str | None = None,
-        is_inner: bool | None = None,
-    ) -> dict[str, Any]:
-        """
-        GET /api/ua/v2/withdrawals/quotas.
-
-        Use native exchange symbols and decimal strings. Source: https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal-quota
-        """
-        return self._native_private(
-            "get_uta_withdrawal_quotas",
-            self._native_params(
-                chain=chain, currency=currency, isInner=is_inner, withdrawType=withdraw_type
-            ),
-        )
-
     def set_uta_account_mode(self, *, account_type: str, confirm: bool = False) -> dict[str, Any]:
         """
         Set the account mode; exchange migration eligibility applies.
@@ -3167,94 +2936,4 @@ class TradeHTTP(HTTPManager):
         """
         return self._native_private(
             "cancel_margin_stop_order_by_id_raw", self._native_params(**params)
-        )
-
-    def create_withdrawal(
-        self,
-        *,
-        currency: str,
-        amount: str,
-        to_address: str,
-        withdraw_type: str,
-        chain: str | None = None,
-        memo: str | None = None,
-        remark: str | None = None,
-        is_inner: bool | None = None,
-        fee_deduct_type: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """
-        Submit an address, UID, email or phone withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Caller supplies chain and memo/tag required by the destination.
-        Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/withdraw-v3
-        """
-        return self._native_private(
-            "create_withdrawal",
-            self._native_params(
-                currency=currency,
-                amount=amount,
-                toAddress=to_address,
-                withdrawType=withdraw_type,
-                chain=chain,
-                memo=memo,
-                remark=remark,
-                isInner=is_inner,
-                feeDeductType=fee_deduct_type,
-            ),
-        )
-
-    def create_uta_withdrawal(
-        self,
-        *,
-        currency: str,
-        amount: str,
-        to_address: str,
-        withdraw_type: str,
-        chain: str | None = None,
-        memo: str | None = None,
-        remark: str | None = None,
-        is_inner: bool | None = None,
-        fee_deduct_type: str | None = None,
-    ) -> dict[str, Any] | list[Any]:
-        """
-        Submit an address, UID, email or phone withdrawal.
-
-        API withdrawals have no second confirmation; they execute on submit.
-        Caller supplies chain and memo/tag required by the destination.
-        Source: https://www.kucoin.com/docs-new/v2/rest/ua/withdrawal
-        """
-        return self._native_private(
-            "create_uta_withdrawal",
-            self._native_params(
-                currency=currency,
-                amount=amount,
-                toAddress=to_address,
-                withdrawType=withdraw_type,
-                chain=chain,
-                memo=memo,
-                remark=remark,
-                isInner=is_inner,
-                feeDeductType=fee_deduct_type,
-            ),
-        )
-
-    def cancel_withdrawal(self, withdrawal_id: str) -> dict[str, Any] | list[Any]:
-        """
-        Cancel a withdrawal while the exchange still permits cancellation.
-
-        Source: https://www.kucoin.com/docs-new/rest/account-info/withdrawals/cancel-withdrawal
-        """
-        return self._native_private(
-            "cancel_withdrawal", self._native_params(withdrawalId=withdrawal_id)
-        )
-
-    def cancel_uta_withdrawal(self, withdraw_id: str) -> dict[str, Any] | list[Any]:
-        """
-        Cancel a withdrawal while the exchange still permits cancellation.
-
-        Source: https://www.kucoin.com/docs-new/v2/rest/ua/cancel-withdrawal
-        """
-        return self._native_private(
-            "cancel_uta_withdrawal", self._native_params(withdrawId=withdraw_id)
         )

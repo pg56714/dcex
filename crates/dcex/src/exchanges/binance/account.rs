@@ -1,13 +1,12 @@
-use super::client::{BinanceClient, BinanceMarket};
-use super::endpoints::*;
-use super::params::{
-    BinanceFundingWalletParams, BinanceIncomeHistoryParams, BinanceUniversalTransferHistoryParams,
-    BinanceUniversalTransferParams, BinanceWalletBalanceParams, push_optional,
-    push_optional_display,
+pub(in crate::exchanges::binance) use super::client::{BinanceClient, BinanceMarket};
+pub(in crate::exchanges::binance) use super::endpoints::*;
+pub(in crate::exchanges::binance) use super::params::{
+    BinanceFundingWalletParams, BinanceIncomeHistoryParams, BinanceWalletBalanceParams,
+    push_optional, push_optional_display,
 };
-use crate::Result;
-use crate::exchange::ValidatedResponse;
-use crate::http::HttpMethod;
+pub(in crate::exchanges::binance) use crate::Result;
+pub(in crate::exchanges::binance) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::binance) use crate::http::HttpMethod;
 
 impl BinanceClient {
     pub async fn get_spot_fee_rates(&self, product_symbol: &str) -> Result<ValidatedResponse> {
@@ -122,80 +121,6 @@ impl BinanceClient {
             HttpMethod::Post,
             BinanceMarket::Spot,
             FUNDING_WALLET,
-            params,
-            true,
-        )
-        .await
-    }
-
-    pub fn create_universal_transfer(
-        &self,
-        transfer_type: &str,
-        asset: &str,
-        amount: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "create_universal_transfer",
-            vec![
-                ("type".to_string(), transfer_type.to_string()),
-                ("asset".to_string(), asset.to_string()),
-                ("amount".to_string(), amount.to_string()),
-            ],
-        )
-    }
-
-    pub(super) async fn send_create_universal_transfer(
-        &self,
-        transfer_type: &str,
-        asset: &str,
-        amount: &str,
-        request: BinanceUniversalTransferParams<'_>,
-    ) -> Result<ValidatedResponse> {
-        let mut params = vec![
-            ("type".to_string(), transfer_type.to_string()),
-            ("asset".to_string(), asset.to_string()),
-            ("amount".to_string(), amount.to_string()),
-        ];
-        push_optional(&mut params, "fromSymbol", request.from_symbol);
-        push_optional(&mut params, "toSymbol", request.to_symbol);
-        self.request(
-            HttpMethod::Post,
-            BinanceMarket::Spot,
-            UNIVERSAL_TRANSFER,
-            params,
-            true,
-        )
-        .await
-    }
-
-    pub fn get_universal_transfer_history(
-        &self,
-        transfer_type: &str,
-    ) -> crate::exchanges::ExchangeMethodRequest<'_, Self> {
-        crate::exchanges::ExchangeMethodRequest::private(
-            self,
-            "get_universal_transfer_history",
-            vec![("type".to_string(), transfer_type.to_string())],
-        )
-    }
-
-    pub(super) async fn send_get_universal_transfer_history(
-        &self,
-        transfer_type: &str,
-        request: BinanceUniversalTransferHistoryParams<'_>,
-    ) -> Result<ValidatedResponse> {
-        let mut params = vec![("type".to_string(), transfer_type.to_string())];
-        push_optional_display(&mut params, "startTime", request.start_time);
-        push_optional_display(&mut params, "endTime", request.end_time);
-        push_optional_display(&mut params, "current", request.current);
-        push_optional_display(&mut params, "size", request.size);
-        push_optional(&mut params, "fromSymbol", request.from_symbol);
-        push_optional(&mut params, "toSymbol", request.to_symbol);
-        self.request(
-            HttpMethod::Get,
-            BinanceMarket::Spot,
-            UNIVERSAL_TRANSFER,
             params,
             true,
         )

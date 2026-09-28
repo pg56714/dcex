@@ -8,48 +8,6 @@ from .._market_http import MarketHTTP
 class GeneratedStocksHTTP(MarketHTTP):
     """Stocks API methods."""
 
-    async def stock_plus_assets_transfer(
-        self, *, coin: str | None = None, amount: str | None = None, direction: str | None = None
-    ) -> dict[str, Any]:
-        """
-        Transfer.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/stock-plus/assets#transfer
-        """
-        return await self._native_private(
-            "stock_plus_assets_transfer",
-            self._native_params(**{"coin": coin, "amount": amount, "direction": direction}),
-        )
-
-    async def stock_plus_assets_get_transfer_records(
-        self,
-        *,
-        transfer_id: str | None = None,
-        start_time: str | None = None,
-        end_time: str | None = None,
-        limit: str | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Check Transfer Records.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/stock-plus/assets#check-transfer-records
-        """
-        return await self._native_private(
-            "stock_plus_assets_get_transfer_records",
-            self._native_params(
-                **{
-                    "transferId": transfer_id,
-                    "startTime": start_time,
-                    "endTime": end_time,
-                    "limit": limit,
-                    "cursor": cursor,
-                }
-            ),
-        )
-
     async def stock_plus_assets_get_account(self, *, currency: str | None = None) -> dict[str, Any]:
         """
         Check Account.

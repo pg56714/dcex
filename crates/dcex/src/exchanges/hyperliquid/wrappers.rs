@@ -70,12 +70,12 @@ crate::exchanges::impl_exchange_method_wrappers! {
             signature_chain_id => "signatureChainId"
         ),
         noop(nonce => "nonce"),
-        cancel_batch_orders(cancels => "cancels"),
-        cancel_batch_orders_by_cloid(cancels => "cancels"),
+
+
         cancel_order(product_symbol => "product_symbol", oid => "oid"),
         cancel_order_by_cloid(product_symbol => "product_symbol", cloid => "cloid"),
         cancel_twap_order(product_symbol => "product_symbol", twap_id => "twap_id"),
-        modify_batch_orders(modifies => "modifies"),
+
         modify_order(
             oid => "oid",
             product_symbol => "product_symbol",
@@ -84,7 +84,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
             size => "size",
             reduce_only => "reduceOnly"
         ),
-        place_batch_orders(orders => "orders"),
+
         place_future_limit_buy_order(
             product_symbol => "product_symbol",
             price => "price",
@@ -127,19 +127,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
             randomize => "randomize"
         ),
         schedule_cancel(),
-        transfer_between_dexes(
-            source_dex => "sourceDex",
-            destination_dex => "destinationDex",
-            token => "token",
-            amount => "amount"
-        ),
-        transfer_usdc_spot_perp(
-            amount => "amount",
-            to_perp => "toPerp",
-            nonce => "nonce",
-            signature => "signature",
-            signature_chain_id => "signatureChainId"
-        ),
+
+
         update_isolate_margin(
             product_symbol => "product_symbol",
             is_buy => "isBuy",
@@ -164,9 +153,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
     public [
     ];
     private [
-        transfer_vault_usd(target_vault => "targetVault", is_deposit => "isDeposit", usd => "usd"),
+
         enable_agent_dex_abstraction(),
-        transfer_hip3_liquidator(dex => "dex", ntl => "ntl", is_deposit => "isDeposit"),
+
         deposit_staking_signed(
             wei => "wei",
             nonce => "nonce",
@@ -174,12 +163,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
             signature_chain_id => "signatureChainId"
         ),
         /// API withdrawals and external transfers have no second confirmation; they execute on submit.
-        withdraw_staking_signed(
-            wei => "wei",
-            nonce => "nonce",
-            signature => "signature",
-            signature_chain_id => "signatureChainId"
-        ),
+
         delegate_tokens_signed(
             validator => "validator",
             wei => "wei",
@@ -205,17 +189,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
     ];
     private [
         create_sub_account(account_name => "name"),
-        transfer_sub_account_usd(
-            sub_account_user => "subAccountUser",
-            is_deposit => "isDeposit",
-            usd => "usd"
-        ),
-        transfer_sub_account_spot(
-            sub_account_user => "subAccountUser",
-            is_deposit => "isDeposit",
-            token => "token",
-            amount => "amount"
-        ),
+
+
     ];
 }
 
@@ -266,12 +241,10 @@ crate::exchanges::impl_exchange_method_wrappers! {
     @extend; HyperliquidClient;
     public [get_max_builder_fee(user => "user", builder => "builder"), get_approved_builders(user => "user"), get_referral_state(user => "user")];
     private [
-        send_asset_signed(destination => "destination", source_dex => "sourceDex", destination_dex => "destinationDex", token => "token", amount => "amount", from_sub_account => "fromSubAccount", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
-        send_usd_signed(destination => "destination", amount => "amount", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
-        send_spot_signed(destination => "destination", token => "token", amount => "amount", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
-        /// API withdrawals and external transfers have no second confirmation; they execute on submit.
-        withdraw_from_bridge_signed(destination => "destination", amount => "amount", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
+
+
+
         approve_builder_fee_signed(builder => "builder", max_fee_rate => "maxFeeRate", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
-        send_to_evm_with_data_signed(action => "action", nonce => "nonce", signature => "signature", signature_chain_id => "signatureChainId"),
+
     ];
 }

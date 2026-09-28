@@ -20,3 +20,9 @@ pub use client::{ArcusClient, ArcusSpotClient};
 mod query_validation;
 
 mod schema_requests;
+
+mod batch;
+
+mod withdrawals;
+
+mod transfers;

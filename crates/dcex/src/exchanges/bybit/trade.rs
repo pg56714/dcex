@@ -1,14 +1,14 @@
-use serde_json::{Map, Value};
+pub(in crate::exchanges::bybit) use serde_json::{Map, Value};
 
-use super::client::BybitClient;
-use super::endpoints::*;
-use super::params::{
+pub(in crate::exchanges::bybit) use super::client::BybitClient;
+pub(in crate::exchanges::bybit) use super::endpoints::*;
+pub(in crate::exchanges::bybit) use super::params::{
     BybitParams, insert_optional_bool, insert_optional_i64, insert_optional_string, push_optional,
     require_one_identifier,
 };
-use crate::Result;
-use crate::common::OrderSide;
-use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::bybit) use crate::Result;
+pub(in crate::exchanges::bybit) use crate::common::OrderSide;
+pub(in crate::exchanges::bybit) use crate::exchange::ValidatedResponse;
 
 impl BybitClient {
     pub(super) async fn trade_private_request(
@@ -94,12 +94,21 @@ impl BybitClient {
             "amend_order" => self.amend_order_from_params(params).await,
             "cancel_order" => self.cancel_order_from_params(params).await,
             "get_open_orders" => self.get_open_orders_from_params(params).await,
-            "cancel_batch_orders" => self.batch_request(CANCEL_BATCH_ORDERS, params).await,
+            "cancel_batch_orders" => {
+                self.moved_trade_cancel_batch_orders(method_name, params)
+                    .await
+            }
             "cancel_all_orders" => self.cancel_all_orders_from_params(params).await,
             "get_order_history" => self.get_order_history_from_params(params).await,
             "get_execution_list" => self.get_execution_list_from_params(params).await,
-            "place_batch_order" => self.batch_request(BATCH_PLACE_ORDER, params).await,
-            "amend_batch_order" => self.batch_request(BATCH_AMEND_ORDER, params).await,
+            "place_batch_order" => {
+                self.moved_trade_place_batch_order(method_name, params)
+                    .await
+            }
+            "amend_batch_order" => {
+                self.moved_trade_amend_batch_order(method_name, params)
+                    .await
+            }
             "get_borrow_quota" => {
                 let product_symbol = params.required("product_symbol")?;
                 let query = vec![
@@ -272,15 +281,21 @@ impl BybitClient {
         Ok(Some(result?))
     }
 
-    async fn place_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::bybit) async fn place_order_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<ValidatedResponse> {
         self.order_validation_request(params, PLACE_ORDER).await
     }
 
-    async fn pre_check_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::bybit) async fn pre_check_order_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<ValidatedResponse> {
         self.order_validation_request(params, ORDER_PRE_CHECK).await
     }
 
-    async fn order_validation_request(
+    pub(in crate::exchanges::bybit) async fn order_validation_request(
         &self,
         params: &BybitParams,
         endpoint: &str,
@@ -289,7 +304,10 @@ impl BybitClient {
         self.post_request(endpoint, body).await
     }
 
-    fn order_body_from_params(&self, params: &BybitParams) -> Result<Map<String, Value>> {
+    pub(in crate::exchanges::bybit) fn order_body_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<Map<String, Value>> {
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
         self.insert_symbol_category(&mut body, product_symbol)?;
@@ -343,7 +361,10 @@ impl BybitClient {
         Ok(body)
     }
 
-    async fn amend_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::bybit) async fn amend_order_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<ValidatedResponse> {
         require_one_identifier(params, &["orderId", "orderLinkId"])?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
@@ -369,7 +390,10 @@ impl BybitClient {
         self.post_request(AMEND_ORDER, body).await
     }
 
-    async fn cancel_order_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::bybit) async fn cancel_order_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<ValidatedResponse> {
         require_one_identifier(params, &["orderId", "orderLinkId"])?;
         let product_symbol = params.required("product_symbol")?;
         let mut body = Map::new();
@@ -380,7 +404,10 @@ impl BybitClient {
         self.post_request(CANCEL_ORDER, body).await
     }
 
-    async fn get_open_orders_from_params(&self, params: &BybitParams) -> Result<ValidatedResponse> {
+    pub(in crate::exchanges::bybit) async fn get_open_orders_from_params(
+        &self,
+        params: &BybitParams,
+    ) -> Result<ValidatedResponse> {
         let category = params.get("category").unwrap_or("linear");
         let mut query = vec![
             ("category".to_string(), category.to_string()),
@@ -411,7 +438,7 @@ impl BybitClient {
         self.get_request(GET_OPEN_ORDERS, query).await
     }
 
-    async fn cancel_all_orders_from_params(
+    pub(in crate::exchanges::bybit) async fn cancel_all_orders_from_params(
         &self,
         params: &BybitParams,
     ) -> Result<ValidatedResponse> {
@@ -419,7 +446,7 @@ impl BybitClient {
         self.post_request(CANCEL_ALL_ORDERS, body).await
     }
 
-    fn cancel_all_orders_body_from_params(
+    pub(in crate::exchanges::bybit) fn cancel_all_orders_body_from_params(
         &self,
         params: &BybitParams,
     ) -> Result<Map<String, Value>> {
@@ -453,7 +480,7 @@ impl BybitClient {
         Ok(body)
     }
 
-    async fn get_order_history_from_params(
+    pub(in crate::exchanges::bybit) async fn get_order_history_from_params(
         &self,
         params: &BybitParams,
     ) -> Result<ValidatedResponse> {
@@ -481,7 +508,7 @@ impl BybitClient {
         self.get_request(GET_ORDER_HISTORY, query).await
     }
 
-    async fn get_execution_list_from_params(
+    pub(in crate::exchanges::bybit) async fn get_execution_list_from_params(
         &self,
         params: &BybitParams,
     ) -> Result<ValidatedResponse> {
@@ -512,16 +539,6 @@ impl BybitClient {
         }
         self.get_request(GET_EXECUTION_LIST, query).await
     }
-
-    async fn batch_request(&self, path: &str, params: &BybitParams) -> Result<ValidatedResponse> {
-        let mut body = Map::new();
-        body.insert(
-            "category".to_string(),
-            Value::String(params.get("category").unwrap_or("linear").to_string()),
-        );
-        body.insert("request".to_string(), params.json_required("request")?);
-        self.post_request(path, body).await
-    }
 }
 
 #[cfg(test)]
@@ -531,12 +548,12 @@ mod tests {
     use super::*;
     use crate::DcexError;
 
-    fn client() -> BybitClient {
+    pub(in crate::exchanges::bybit) fn client() -> BybitClient {
         BybitClient::public(5_000, false, Duration::from_secs(1)).expect("client")
     }
 
     #[test]
-    fn linear_cancel_all_requires_a_scope() {
+    pub(in crate::exchanges::bybit) fn linear_cancel_all_requires_a_scope() {
         let error = client()
             .cancel_all_orders_body_from_params(&BybitParams::from_pairs(Vec::new()))
             .expect_err("missing scope must fail");
@@ -551,7 +568,7 @@ mod tests {
     }
 
     #[test]
-    fn cancel_all_forwards_official_scope_and_filter_fields() {
+    pub(in crate::exchanges::bybit) fn cancel_all_forwards_official_scope_and_filter_fields() {
         let body = client()
             .cancel_all_orders_body_from_params(&BybitParams::from_pairs(vec![
                 ("category".to_string(), "linear".to_string()),
@@ -571,7 +588,7 @@ mod tests {
     }
 
     #[test]
-    fn cancel_all_infers_inverse_category_from_symbol() {
+    pub(in crate::exchanges::bybit) fn cancel_all_infers_inverse_category_from_symbol() {
         let body = client()
             .cancel_all_orders_body_from_params(&BybitParams::from_pairs(vec![(
                 "product_symbol".to_string(),
@@ -590,7 +607,8 @@ mod tests {
     }
 
     #[test]
-    fn order_body_preserves_official_json_types_and_current_fields() {
+    pub(in crate::exchanges::bybit) fn order_body_preserves_official_json_types_and_current_fields()
+    {
         let body = client()
             .order_body_from_params(&BybitParams::from_pairs(vec![
                 ("product_symbol".to_string(), "BTC-USDT-SWAP".to_string()),

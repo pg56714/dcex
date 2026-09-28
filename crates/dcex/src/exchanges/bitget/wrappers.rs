@@ -127,18 +127,18 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_uta_strategy_sub_orders(order_id => "orderId"),
         get_uta_deposit_records(start_time => "startTime", end_time => "endTime"),
         get_all_trade_rates(business_type => "businessType"),
-        transfer_uta_account(from_type => "fromType", to_type => "toType", amount => "amount", coin => "coin"),
-        transfer_uta_sub_to_master(from_type => "fromType", to_type => "toType", amount => "amount", coin => "coin"),
-        transfer_uta_sub_account(from_type => "fromType", to_type => "toType", amount => "amount", coin => "coin", from_user_id => "fromUserId", to_user_id => "toUserId", client_oid => "clientOid"),
-        get_uta_sub_account_transfer_records(),
+
+
+
+
         get_uta_sub_accounts(),
         get_uta_sub_account_assets(),
-        place_cross_margin_batch_orders(product_symbol => "product_symbol", orders => "orderList"),
-        place_isolated_margin_batch_orders(product_symbol => "product_symbol", orders => "orderList"),
-        cancel_cross_margin_batch_orders(product_symbol => "product_symbol", orders => "orderIdList"),
-        cancel_isolated_margin_batch_orders(product_symbol => "product_symbol", orders => "orderIdList"),
-        batch_cancel_replace_spot_orders(orders => "orderList"),
-        modify_uta_batch_orders(orders => "orders"),
+
+
+
+
+
+
         get_futures_sub_account_assets(product_type => "productType"),
         get_futures_estimated_open_count(product_symbol => "product_symbol", product_type => "productType", margin_coin => "marginCoin", open_amount => "openAmount", open_price => "openPrice"),
         get_futures_liquidation_price(product_symbol => "product_symbol", product_type => "productType", margin_coin => "marginCoin", pos_side => "posSide", order_type => "orderType", open_amount => "openAmount"),
@@ -148,22 +148,22 @@ crate::exchanges::impl_exchange_method_wrappers! {
         set_futures_auto_margin(product_symbol => "product_symbol", auto_margin => "autoMargin", margin_coin => "marginCoin", hold_side => "holdSide"),
         set_futures_asset_mode(product_type => "productType", asset_mode => "assetMode"),
         convert_futures_union_asset(coin => "coin", amount => "amount"),
-        get_futures_union_transfer_limits(coin => "coin"),
+
         get_futures_union_config(),
         get_futures_isolated_symbols(product_type => "productType"),
         get_futures_position_history(),
         get_futures_adl_rank(product_type => "productType"),
         reverse_futures_position(product_symbol => "product_symbol", margin_coin => "marginCoin", product_type => "productType", side => "side"),
         get_futures_fill_history(product_type => "productType"),
-        get_spot_sub_account_transfer_records(),
+
         get_spot_sub_account_assets(),
-        transfer_spot_sub_account(from_type => "fromType", to_type => "toType", amount => "amount", coin => "coin", from_user_id => "fromUserId", to_user_id => "toUserId"),
+
         get_cross_margin_assets(),
         borrow_cross_margin_asset(coin => "coin", borrow_amount => "borrowAmount"),
         repay_cross_margin_asset(coin => "coin", repay_amount => "repayAmount"),
         get_cross_margin_risk_rate(),
         get_cross_margin_max_borrowable(coin => "coin"),
-        get_cross_margin_max_transferable(coin => "coin"),
+
         flash_repay_cross_margin_assets(),
         get_cross_margin_flash_repay_result(id_list => "idList"),
         get_cross_margin_interest_rate_limits(coin => "coin"),
@@ -183,7 +183,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         repay_isolated_margin_asset(repay_amount => "repayAmount", coin => "coin", product_symbol => "product_symbol"),
         get_isolated_margin_risk_rate(),
         get_isolated_margin_max_borrowable(product_symbol => "product_symbol"),
-        get_isolated_margin_max_transferable(product_symbol => "product_symbol"),
+
         flash_repay_isolated_margin_assets(),
         get_isolated_margin_flash_repay_result(id_list => "idList"),
         get_isolated_margin_interest_rate_limits(product_symbol => "product_symbol"),
@@ -201,7 +201,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_uta_funding_assets(),
         get_uta_funding_records(),
         get_uta_fee_rate(product_symbol => "product_symbol", category => "category"),
-        get_uta_max_transferable(coin => "coin"),
+
         set_uta_collateral_type(collateral_type => "collateralType"),
         get_uta_settings(),
         get_uta_delta_info(),
@@ -210,9 +210,9 @@ crate::exchanges::impl_exchange_method_wrappers! {
         borrow_uta_asset(coin => "coin", amount => "amount"),
         get_uta_max_borrowable(coin => "coin"),
         get_uta_account_open_interest_limit(product_symbol => "product_symbol", category => "category"),
-        get_uta_transferable_coins(from_type => "fromType", to_type => "toType"),
+
         get_uta_max_open_available(category => "category", product_symbol => "product_symbol", order_type => "orderType", side => "side"),
-        get_uta_position_transfer_history(category => "category"),
+
         set_uta_repay_mode(repay_mode => "repayMode"),
         get_uta_eligible_discount_rates(),
         get_uta_eligible_loan_info(),
@@ -253,11 +253,11 @@ crate::exchanges::impl_exchange_method_wrappers! {
 
         get_futures_fee_rates(product_symbol => "product_symbol"),
         get_spot_fee_rates(product_symbol => "product_symbol"),
-        cancel_futures_batch_orders(product_symbol => "product_symbol"),
+
         cancel_futures_order(product_symbol => "product_symbol"),
-        cancel_spot_batch_orders(order_list => "orderList"),
+
         cancel_spot_order(product_symbol => "product_symbol"),
-        cancel_uta_batch_orders(order_list => "orderList"),
+
         cancel_uta_order(),
         get_all_account_balance(),
         get_deposit_records(),
@@ -278,8 +278,8 @@ crate::exchanges::impl_exchange_method_wrappers! {
         get_spot_history_orders(),
         get_spot_open_orders(),
         get_spot_order(),
-        get_transfer_records(coin => "coin"),
-        get_transferable_coins(from_type => "fromType", to_type => "toType"),
+
+
         get_uta_account_assets(),
         get_reality_orderbook(product_symbol => "product_symbol"),
         get_reality_fills(product_symbol => "product_symbol"),
@@ -329,7 +329,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         cancel_uta_strategy_order(),
         get_uta_unfilled_strategy_orders(category => "category"),
         get_uta_history_strategy_orders(category => "category"),
-        place_futures_batch_orders(order_list => "orderList"),
+
         place_futures_limit_buy_order(product_symbol => "product_symbol", size => "size", price => "price"),
         place_futures_limit_order(product_symbol => "product_symbol", side => "side", size => "size", price => "price"),
         place_futures_limit_sell_order(product_symbol => "product_symbol", size => "size", price => "price"),
@@ -340,7 +340,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_futures_post_only_limit_buy_order(product_symbol => "product_symbol", size => "size", price => "price"),
         place_futures_post_only_limit_order(product_symbol => "product_symbol", side => "side", size => "size", price => "price"),
         place_futures_post_only_limit_sell_order(product_symbol => "product_symbol", size => "size", price => "price"),
-        place_spot_batch_orders(order_list => "orderList"),
+
         place_spot_limit_buy_order(product_symbol => "product_symbol", size => "size", price => "price"),
         place_spot_limit_order(product_symbol => "product_symbol", side => "side", size => "size", price => "price"),
         place_spot_limit_sell_order(product_symbol => "product_symbol", size => "size", price => "price"),
@@ -351,7 +351,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         place_spot_post_only_limit_buy_order(product_symbol => "product_symbol", size => "size", price => "price"),
         place_spot_post_only_limit_order(product_symbol => "product_symbol", side => "side", size => "size", price => "price"),
         place_spot_post_only_limit_sell_order(product_symbol => "product_symbol", size => "size", price => "price"),
-        place_uta_batch_orders(order_list => "orderList"),
+
         place_uta_order(category => "category", product_symbol => "product_symbol", side => "side", order_type => "orderType", qty => "qty"),
         place_reality_order(product_symbol => "product_symbol", side => "side", order_type => "orderType", qty => "qty"),
         cancel_reality_order(product_symbol => "product_symbol"),
@@ -360,7 +360,7 @@ crate::exchanges::impl_exchange_method_wrappers! {
         set_futures_position_mode(pos_mode => "posMode"),
         set_uta_hold_mode(hold_mode => "holdMode"),
         set_uta_leverage(category => "category", leverage => "leverage"),
-        transfer(coin => "coin", amount => "amount", from_type => "fromType", to_type => "toType"),
+
     ];
 }
 

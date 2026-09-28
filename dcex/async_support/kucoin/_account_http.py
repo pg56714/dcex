@@ -3,9 +3,10 @@
 from typing import Any
 
 from ._http_manager import HTTPManager
+from ._transfers_http import AccountHTTPTransfersHTTP
 
 
-class AccountHTTP(HTTPManager):
+class AccountHTTP(AccountHTTPTransfersHTTP, HTTPManager):
     """Async HTTP client for KuCoin account API operations."""
 
     async def get_spot_fee_rates(self, product_symbol: str) -> dict[str, Any]:
@@ -42,48 +43,6 @@ class AccountHTTP(HTTPManager):
         return await self._native_private(
             "get_account_balance",
             self._native_params(currency=currency, type=type),
-        )
-
-    async def get_transfer_quotas(
-        self,
-        currency: str,
-        account_type: str,
-        tag: str | None = None,
-    ) -> dict[str, Any]:
-        """Retrieve transferable balance for one KuCoin account type."""
-        return await self._native_private(
-            "get_transfer_quotas",
-            self._native_params(currency=currency, account_type=account_type, tag=tag),
-        )
-
-    async def flex_transfer(
-        self,
-        currency: str,
-        amount: str,
-        fromAccountType: str,
-        toAccountType: str,
-        clientOid: str | None = None,
-        transfer_type: str = "INTERNAL",
-        fromUserId: str | None = None,
-        toUserId: str | None = None,
-        fromAccountTag: str | None = None,
-        toAccountTag: str | None = None,
-    ) -> dict[str, Any]:
-        """Transfer funds between KuCoin account types."""
-        return await self._native_private(
-            "flex_transfer",
-            self._native_params(
-                currency=currency,
-                amount=amount,
-                fromAccountType=fromAccountType,
-                toAccountType=toAccountType,
-                clientOid=clientOid,
-                transfer_type=transfer_type,
-                fromUserId=fromUserId,
-                toUserId=toUserId,
-                fromAccountTag=fromAccountTag,
-                toAccountTag=toAccountTag,
-            ),
         )
 
     async def get_subaccounts(

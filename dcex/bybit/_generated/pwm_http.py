@@ -304,34 +304,6 @@ class GeneratedPwmHTTP(MarketHTTP):
         """
         return self._native_public("get_earn_pwm_customize_plan_product", [])
 
-    def request_earn_pwm_fund_transfer(
-        self, *, transfer_id: str, from_user_id: int, to_user_id: int, amount: str, coin: str
-    ) -> dict[str, Any]:
-        """
-        Fund Transfer Between Sub-Accounts. POST /v5/earn/pwm/fund-transfer.
-
-        Source: https://bybit-exchange.github.io/docs/v5/finance/pwm/fund-transfer
-
-        Args:
-            transfer_id: Transfer request ID
-            from_user_id: Source UID. Must be a custodian sub-account of the current fund
-            to_user_id: Destination UID. Must be a custodian sub-account of the current fund
-            amount: Transfer amount
-            coin: Coin name
-        """
-        return self._native_private(
-            "request_earn_pwm_fund_transfer",
-            self._native_params(
-                **{
-                    "transferId": transfer_id,
-                    "fromUserId": from_user_id,
-                    "toUserId": to_user_id,
-                    "amount": amount,
-                    "coin": coin,
-                }
-            ),
-        )
-
     def get_earn_pwm_investment_plan_all(
         self,
         *,
@@ -591,23 +563,4 @@ class GeneratedPwmHTTP(MarketHTTP):
             self._native_params(
                 **{"planId": plan_id, "accountType": account_type, "orderLinkId": order_link_id}
             ),
-        )
-
-    def get_earn_pwm_query_fund_transfer_result(
-        self, *, transfer_id: str | None = None, from_user_id: int | None = None
-    ) -> dict[str, Any]:
-        """
-        Get Fund Transfer Records. GET /v5/earn/pwm/query-fund-transfer-result.
-
-        Source: https://bybit-exchange.github.io/docs/v5/finance/pwm/query-fund-transfer-result
-
-        Args:
-            transfer_id: Transfer request ID. If omitted, returns up to the 20 most recent
-                non-terminal transfer records within the past month. Records older than one month
-                may have been archived
-            from_user_id: Source UID
-        """
-        return self._native_private(
-            "get_earn_pwm_query_fund_transfer_result",
-            self._native_params(**{"transferId": transfer_id, "fromUserId": from_user_id}),
         )

@@ -1,16 +1,16 @@
-use std::collections::BTreeMap;
+pub(in crate::exchanges::arcus) use std::collections::BTreeMap;
 
-use ed25519_dalek::Signer;
-use serde_json::{Value, json};
+pub(in crate::exchanges::arcus) use ed25519_dalek::Signer;
+pub(in crate::exchanges::arcus) use serde_json::{Value, json};
 
-use super::client::ArcusClient;
-use super::params::{
+pub(in crate::exchanges::arcus) use super::client::ArcusClient;
+pub(in crate::exchanges::arcus) use super::params::{
     compare_decimals, decimal_parts, decimal_product_below, exact_units, required,
 };
-use super::signing::{legacy_signing_message, timestamp_ns};
-use crate::exchange::ValidatedResponse;
-use crate::http::{HttpMethod, HttpRequest, RequestBody};
-use crate::{DcexError, Result};
+pub(in crate::exchanges::arcus) use super::signing::{legacy_signing_message, timestamp_ns};
+pub(in crate::exchanges::arcus) use crate::exchange::ValidatedResponse;
+pub(in crate::exchanges::arcus) use crate::http::{HttpMethod, HttpRequest, RequestBody};
+pub(in crate::exchanges::arcus) use crate::{DcexError, Result};
 
 impl ArcusClient {
     pub async fn private_request(
@@ -63,7 +63,7 @@ impl ArcusClient {
         }}))
     }
 
-    async fn build_private_request(
+    pub(in crate::exchanges::arcus) async fn build_private_request(
         &self,
         method_name: &str,
         params: Vec<(String, String)>,
@@ -114,7 +114,7 @@ impl ArcusClient {
         Ok(request)
     }
 
-    async fn signed_order_payload(
+    pub(in crate::exchanges::arcus) async fn signed_order_payload(
         &self,
         method_name: &str,
         values: &BTreeMap<String, String>,
@@ -380,241 +380,7 @@ impl ArcusClient {
         Ok((path, body, signature))
     }
 
-    async fn batch_order_request(
-        &self,
-        method_name: &str,
-        params: Vec<(String, String)>,
-    ) -> Result<HttpRequest> {
-        let address = self.address.as_deref().ok_or_else(|| {
-            DcexError::InvalidInput("Arcus wallet address is required for trading".into())
-        })?;
-        let values: BTreeMap<_, _> = params.into_iter().collect();
-        let (field, single_method, path) = match method_name {
-            "batch_place_orders" => ("orders", "place_order", "/v1/batchPlaceOrders"),
-            "batch_cancel_orders" => ("cancels", "cancel_order", "/v1/batchCancelOrders"),
-            "batch_modify_orders" => ("modifies", "modify_order", "/v1/batchModifyOrders"),
-            _ => unreachable!("batch dispatch is restricted"),
-        };
-        if values
-            .keys()
-            .any(|key| key != field && !(method_name == "batch_place_orders" && key == "grouping"))
-        {
-            return Err(DcexError::InvalidInput(format!(
-                "unknown Arcus {method_name} parameter"
-            )));
-        }
-        let raw: Value = serde_json::from_str(required(&values, field)?).map_err(|error| {
-            DcexError::InvalidInput(format!("invalid Arcus {field} JSON: {error}"))
-        })?;
-        let items = raw.as_array().ok_or_else(|| {
-            DcexError::InvalidInput(format!("Arcus {field} must be a JSON array"))
-        })?;
-        if items.is_empty() || items.len() > 100 {
-            return Err(DcexError::InvalidInput(format!(
-                "Arcus {field} must contain between 1 and 100 items"
-            )));
-        }
-        let grouping = values.get("grouping").map(String::as_str);
-        if let Some(grouping) = grouping {
-            if !["partialTpsl", "positionTpsl", "entryTpsl"].contains(&grouping) {
-                return Err(DcexError::InvalidInput("unsupported Arcus grouping".into()));
-            }
-            let entry = usize::from(grouping == "entryTpsl");
-            if !(1 + entry..=2 + entry).contains(&items.len()) {
-                return Err(DcexError::InvalidInput(
-                    "Arcus grouping requires one or two TPSL legs and optional entry".into(),
-                ));
-            }
-            let mut kinds = std::collections::BTreeSet::new();
-            for (index, item) in items.iter().enumerate() {
-                if entry == 1 && index == 0 {
-                    if item.get("tpsl_type").is_some() {
-                        return Err(DcexError::InvalidInput(
-                            "Arcus entry must precede TPSL children".into(),
-                        ));
-                    }
-                } else {
-                    let kind = item
-                        .get("tpsl_type")
-                        .and_then(Value::as_str)
-                        .ok_or_else(|| {
-                            DcexError::InvalidInput("Arcus TPSL leg requires tpsl_type".into())
-                        })?;
-                    if !kinds.insert(kind) {
-                        return Err(DcexError::InvalidInput(
-                            "Arcus TPSL legs must have distinct trigger types".into(),
-                        ));
-                    }
-                }
-            }
-        } else if items
-            .iter()
-            .any(|item| item.get("tpsl_type").is_some() || item.get("stop_price").is_some())
-        {
-            return Err(DcexError::InvalidInput(
-                "Arcus TPSL orders require grouping".into(),
-            ));
-        }
-        let timestamp = timestamp_ns()?;
-        let mut signed_items = Vec::with_capacity(items.len());
-        let mut first_signature = None;
-        for item in items {
-            let object = item.as_object().ok_or_else(|| {
-                DcexError::InvalidInput(format!("Arcus {field} item must be an object"))
-            })?;
-            let mut order = BTreeMap::new();
-            for (key, value) in object {
-                let scalar = match value {
-                    Value::String(value) => value.clone(),
-                    Value::Number(value) => value.to_string(),
-                    Value::Bool(value) => value.to_string(),
-                    _ => {
-                        return Err(DcexError::InvalidInput(format!(
-                            "Arcus {field} field {key} must be a scalar"
-                        )));
-                    }
-                };
-                order.insert(key.clone(), scalar);
-            }
-            let (_, mut body, signature) = self
-                .signed_order_payload(
-                    single_method,
-                    &order,
-                    timestamp,
-                    grouping == Some("positionTpsl"),
-                )
-                .await?;
-            body["signature"] = json!(signature);
-            if first_signature.is_none() {
-                first_signature = Some(signature);
-            }
-            signed_items.push(body);
-        }
-        let mut batch_body = serde_json::Map::new();
-        batch_body.insert(field.to_string(), json!(signed_items));
-        if let Some(grouping) = grouping {
-            batch_body.insert("grouping".into(), json!(grouping));
-        }
-        let request = HttpRequest::new(HttpMethod::Post, &self.base_url, path)
-            .query("address", address)
-            .header("X-API-Key", self.api_key.clone().unwrap_or_default())
-            .header("X-Timestamp", timestamp.to_string())
-            .header("X-Signature", first_signature.expect("nonempty batch"))
-            .json(Value::Object(batch_body));
-        Ok(request)
-    }
-
-    async fn submit_internal_transfer_request(
-        &self,
-        params: Vec<(String, String)>,
-    ) -> Result<ValidatedResponse> {
-        let values: BTreeMap<_, _> = params.into_iter().collect();
-        if values.keys().any(|key| key != "signed_transfer_json") {
-            return Err(DcexError::InvalidInput(
-                "unknown Arcus internal transfer parameter".into(),
-            ));
-        }
-        let body: Value = serde_json::from_str(required(&values, "signed_transfer_json")?)
-            .map_err(|error| DcexError::InvalidInput(format!("invalid transfer JSON: {error}")))?;
-        let object = body.as_object().ok_or_else(|| {
-            DcexError::InvalidInput("Arcus internal transfer must be an object".into())
-        })?;
-        let transfer_address = object
-            .get("ethereumAddress")
-            .and_then(Value::as_str)
-            .ok_or_else(|| {
-                DcexError::InvalidInput("transfer ethereumAddress is required".into())
-            })?;
-        if transfer_address.len() != 42
-            || !transfer_address.starts_with("0x")
-            || !transfer_address[2..]
-                .bytes()
-                .all(|byte| byte.is_ascii_hexdigit())
-        {
-            return Err(DcexError::InvalidInput(
-                "invalid transfer ethereumAddress".into(),
-            ));
-        }
-        if self
-            .address
-            .as_deref()
-            .is_some_and(|address| !address.eq_ignore_ascii_case(transfer_address))
-        {
-            return Err(DcexError::InvalidInput(
-                "transfer ethereumAddress does not match configured wallet".into(),
-            ));
-        }
-        let from = object
-            .get("fromAccountIndex")
-            .and_then(Value::as_u64)
-            .ok_or_else(|| DcexError::InvalidInput("fromAccountIndex is required".into()))?;
-        let to = object
-            .get("toAccountIndex")
-            .and_then(Value::as_u64)
-            .ok_or_else(|| DcexError::InvalidInput("toAccountIndex is required".into()))?;
-        if from > 9 || to > 9 || from == to {
-            return Err(DcexError::InvalidInput(
-                "transfer account indexes must differ and be 0..=9".into(),
-            ));
-        }
-        let amount = object
-            .get("amount")
-            .and_then(Value::as_str)
-            .ok_or_else(|| DcexError::InvalidInput("transfer amount is required".into()))?;
-        if amount.is_empty() || !amount.bytes().all(|byte| byte.is_ascii_digit()) {
-            return Err(DcexError::InvalidInput(
-                "transfer amount must be decimal quote quantums".into(),
-            ));
-        }
-        let amount = amount
-            .parse::<i64>()
-            .map_err(|_| DcexError::InvalidInput("invalid transfer amount".into()))?;
-        if amount <= 0 {
-            return Err(DcexError::InvalidInput(
-                "transfer amount must be positive quote quantums".into(),
-            ));
-        }
-        let nonce = object
-            .get("nonce")
-            .and_then(Value::as_str)
-            .ok_or_else(|| DcexError::InvalidInput("transfer nonce is required".into()))?;
-        if nonce.is_empty() || nonce.len() > 64 {
-            return Err(DcexError::InvalidInput(
-                "transfer nonce must be 1..=64 characters".into(),
-            ));
-        }
-        let signature = object
-            .get("signature")
-            .and_then(Value::as_object)
-            .ok_or_else(|| DcexError::InvalidInput("transfer signature is required".into()))?;
-        for component in ["r", "s"] {
-            let valid = signature
-                .get(component)
-                .and_then(Value::as_str)
-                .is_some_and(|value| {
-                    value.len() == 66
-                        && value.starts_with("0x")
-                        && value[2..].bytes().all(|byte| byte.is_ascii_hexdigit())
-                });
-            if !valid {
-                return Err(DcexError::InvalidInput(format!(
-                    "transfer signature {component} must be 32-byte hex"
-                )));
-            }
-        }
-        if !matches!(
-            signature.get("v").and_then(Value::as_str),
-            Some("0x1b" | "0x1c")
-        ) {
-            return Err(DcexError::InvalidInput(
-                "transfer signature v must be 0x1b or 0x1c".into(),
-            ));
-        }
-        self.execute(HttpRequest::new(HttpMethod::Post, &self.base_url, "/v1/transfer").json(body))
-            .await
-    }
-
-    async fn legacy_private_request(
+    pub(in crate::exchanges::arcus) async fn legacy_private_request(
         &self,
         method_name: &str,
         params: Vec<(String, String)>,

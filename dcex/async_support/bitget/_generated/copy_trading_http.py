@@ -1117,48 +1117,6 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
             self._native_params(**{"projectId": project_id}),
         )
 
-    async def copy_trading_follower_copy_transfer(
-        self,
-        *,
-        project_id: str,
-        type_: str,
-        coin: str,
-        amount: str,
-        in_account_type: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Copy Transfer.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/copy-trading/follower#copy-transfer
-        """
-        return await self._native_private(
-            "copy_trading_follower_copy_transfer",
-            self._native_params(
-                **{
-                    "projectId": project_id,
-                    "type": type_,
-                    "coin": coin,
-                    "amount": amount,
-                    "inAccountType": in_account_type,
-                }
-            ),
-        )
-
-    async def copy_trading_follower_get_copy_transfer_record(
-        self, *, project_id: str, limit: str | None = None, cursor: str | None = None
-    ) -> dict[str, Any]:
-        """
-        Get Copy Transfer Record.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/copy-trading/follower#get-copy-transfer-record
-        """
-        return await self._native_private(
-            "copy_trading_follower_get_copy_transfer_record",
-            self._native_params(**{"projectId": project_id, "limit": limit, "cursor": cursor}),
-        )
-
     async def copy_trading_follower_get_current_copy(self, *, project_id: str) -> dict[str, Any]:
         """
         Get Current Copy.
@@ -1380,57 +1338,6 @@ class GeneratedCopyTradingHTTP(MarketHTTP):
         """
         return await self._native_private(
             "copy_trading_public_private_get_trading_pairs", self._native_params(**{})
-        )
-
-    async def copy_trading_public_private_get_max_transferable(
-        self, *, coin: str
-    ) -> dict[str, Any]:
-        """
-        Get Max Transferable.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/copy-trading/public-private#get-max-transferable
-        """
-        return await self._native_private(
-            "copy_trading_public_private_get_max_transferable",
-            self._native_params(**{"coin": coin}),
-        )
-
-    async def copy_trading_public_private_transfer(
-        self, *, type_: str, coin: str, amount: str, in_account_type: str | None = None
-    ) -> dict[str, Any]:
-        """
-        Transfer.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/copy-trading/public-private#transfer
-        """
-        return await self._native_private(
-            "copy_trading_public_private_transfer",
-            self._native_params(
-                **{"type": type_, "coin": coin, "amount": amount, "inAccountType": in_account_type}
-            ),
-        )
-
-    async def copy_trading_public_private_get_transfer_record(
-        self,
-        *,
-        start_time: str | None = None,
-        end_time: str | None = None,
-        limit: str | None = None,
-        cursor: str | None = None,
-    ) -> dict[str, Any]:
-        """
-        Get Transfer Record.
-
-        Use native exchange symbols. Optional fields retain their documented types.
-        Source: https://www.bitget.com/docs/catalog/copy-trading/public-private#get-transfer-record
-        """
-        return await self._native_private(
-            "copy_trading_public_private_get_transfer_record",
-            self._native_params(
-                **{"startTime": start_time, "endTime": end_time, "limit": limit, "cursor": cursor}
-            ),
         )
 
     async def copy_trading_public_private_get_current_followers(
